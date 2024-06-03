@@ -16,8 +16,8 @@ import {
 } from 'react-native'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { T } from '@/app/design-system/theme'
-import { ScreenList } from '@/app/navigation/screenLists'
-import { TabScreens } from '@/app/navigation/TabScreens'
+import { ScreenList } from '@/app/navigation/screen-lists/screenLists'
+import { TabScreens } from '@/app/navigation/screen-lists/TabScreens'
 
 type IconName =
   | 'text-outline'
@@ -25,13 +25,13 @@ type IconName =
   | 'copy-outline'
   | 'trash-outline'
 
-type ThreeDotMenu = {
+type ThreeDotMenuType = {
   name: string
   iconName: IconName
   action: () => void
 }
 
-type TiedSMenu = ThreeDotMenu
+type TiedSMenu = ThreeDotMenuType
 
 function TiedSMenuOption(props: {
   optionName: TiedSMenu['name']
@@ -85,6 +85,7 @@ export function ThreeDotMenu(props: {
     </Menu>
   )
 }
+
 // TODO: hacky, should be fixed by finding a way to apply width 100% and flex options
 const betweenHalfAndThirdOfWindow = Dimensions.get('window').width / 2.5
 
