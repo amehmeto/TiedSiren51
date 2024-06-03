@@ -8,4 +8,4 @@ if [ "$branch" = "main" ]; then
   exit 1
 fi
 
-yarn check:uncommitted && yarn test:cov
+npm run check:uncommitted && npm run test:cov
