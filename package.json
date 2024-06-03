@@ -8,14 +8,17 @@
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
-    "test": "jest --watchAll",
-    "expo:lint": "expo lint",
     "lint": "tsc --noEmit && eslint '**/**/*.{js,ts,tsx}' && prettier '**/**/*.{js,ts,tsx}'",
     "lint:fix": "tsc --noEmit && eslint --fix '**/**/*.{js,ts,tsx}' && prettier --write '**/**/*.{js,ts,tsx}'",
-    "prepare": "husky"
+    "test": "vitest",
+    "test:prepush": "vitest --run",
+    "test:cov": "c8 vitest --run",
+    "prepare": "husky",
+    "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
+    "expo:lint": "expo lint"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": "npm lint:fix"
+    "*.{js,ts,jsx,tsx}": "npm run lint:fix"
   },
   "jest": {
     "preset": "jest-expo"
@@ -46,6 +49,7 @@
     "@types/jest": "^29.5.12",
     "@types/react": "~18.2.45",
     "@types/react-test-renderer": "^18.0.7",
+    "c8": "^9.1.0",
     "eslint": "^8.57.0",
     "eslint-config-expo": "^7.0.0",
     "eslint-config-prettier": "^9.1.0",
@@ -56,7 +60,8 @@
     "lint-staged": "^15.2.5",
     "prettier": "^3.3.0",
     "react-test-renderer": "18.2.0",
-    "typescript": "~5.3.3"
+    "typescript": "~5.3.3",
+    "vitest": "^1.6.0"
   },
   "private": true
 }
