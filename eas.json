@@ -1,0 +1,53 @@
+{
+  "cli": {
+    "version": ">= 9.1.0"
+  },
+  "build": {
+    "development": {
+      "node": "21.6.1",
+      "developmentClient": true,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      },
+      "env": {
+        "NODE_ENV": "development"
+      }
+    },
+    "development-simulator": {
+      "node": "21.6.1",
+      "env": {
+        "NODE_ENV": "development"
+      },
+      "developmentClient": true,
+      "distribution": "internal",
+      "ios": {
+        "simulator": true
+      }
+    },
+    "preview": {
+      "node": "21.6.1",
+      "env": {
+        "NODE_ENV": "test"
+      },
+      "developmentClient": false,
+      "distribution": "internal",
+      "android": {
+        "buildType": "apk"
+      }
+    },
+    "release": {
+      "node": "21.6.1",
+      "distribution": "store"
+    },
+    "production": {
+      "node": "21.6.1",
+      "env": {
+        "NODE_ENV": "production"
+      }
+    }
+  },
+  "submit": {
+    "production": {}
+  }
+}

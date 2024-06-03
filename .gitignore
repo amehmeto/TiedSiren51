@@ -55,6 +55,7 @@ android/build
 android/.idea
 *.iml
 local.properties
+.aab
 
 # PouchDB LevelDB files
 *.ldb

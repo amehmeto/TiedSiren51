@@ -15,13 +15,13 @@ jobs:
           node-version: 21.6.1
 
       - name: Install dependencies
-        run: yarn install
+        run: npm install
 
       - name: Lint
-        run: yarn lint
+        run: npm run lint
 
       - name: Run unit tests
-        run: yarn test:cov
+        run: npm run test:cov
 
   build:
     needs: test
@@ -48,13 +48,13 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: yarn install
+        run: npm install
 
       - name: Prebuild
-        run: yarn prebuild:android
+        run: npm run prebuild:android
 
       - name: Build
-        run: yarn build:android:local --non-interactive
+        run: npm run build:android:local --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
