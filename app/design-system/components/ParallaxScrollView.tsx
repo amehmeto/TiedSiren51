@@ -6,8 +6,7 @@ import Animated, {
   useAnimatedStyle,
   useScrollViewOffset,
 } from 'react-native-reanimated'
-
-import { ThemedView } from '@/app/components/ThemedView'
+import { ThemedView } from '@/app/design-system/components/ThemedView'
 
 const HEADER_HEIGHT = 250
 
