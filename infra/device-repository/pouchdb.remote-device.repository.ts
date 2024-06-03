@@ -5,6 +5,8 @@ import PouchDB from 'pouchdb'
 export class PouchdbRemoteDeviceRepository implements RemoteDeviceRepository {
   private db: PouchDB.Database<Device> = new PouchDB('remote-devices')
 
+  constructor() {}
+
   async findAll(): Promise<Device[]> {
     const response = await this.db.allDocs({ include_docs: true })
     return response.rows
