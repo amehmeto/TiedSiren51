@@ -146,7 +146,7 @@ export function HomeScreen({
     <TiedSLinearBackground>
       <Image
         style={styles.image}
-        source={require('../../../../../assets/tiedsirenlogo.png')}
+        source={require('@/assets/tiedsirenlogo.png')}
       />
       <Text style={styles.greetings}>{viewModel.greetings}</Text>
       <Text style={styles.text}>{"Let's make it productive"}</Text>
