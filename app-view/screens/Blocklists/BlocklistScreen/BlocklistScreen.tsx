@@ -20,15 +20,12 @@ import { BlocklistCard } from '@/app-view/screens/Blocklists/BlocklistCard'
 import { T } from '@/app-view/design-system/theme'
 import { ScreenList } from '@/app-view/screen-lists/screenLists'
 import { TabScreens } from '@/app-view/screen-lists/TabScreens'
-import { BlocklistsStackScreens } from '@/app-view/screen-lists/BlocklistsStackScreens'
 
 type BlockListScreenProps = {
   navigation: NativeStackNavigationProp<ScreenList, TabScreens.BLOCKLIST>
 }
 
-export function BlocklistScreen({
-  navigation,
-}: Readonly<BlockListScreenProps>) {
+export function BlocklistScreen() {
   const viewModel = useSelector<
     RootState,
     ReturnType<typeof selectBlocklistViewModel>
@@ -48,6 +45,7 @@ export function BlocklistScreen({
             data={viewModel.blocklists}
             keyExtractor={(blocklist) => blocklist.id}
             renderItem={({ item: blocklist }) => (
+              // @ts-ignore
               <BlocklistCard blocklist={blocklist} navigation={navigation} />
             )}
           />
@@ -61,9 +59,9 @@ export function BlocklistScreen({
     <TiedSLinearBackground>
       {blocklistsNode}
       <Pressable
-        onPress={() =>
-          navigation.navigate(BlocklistsStackScreens.CREATE_BLOCK_LIST)
-        }
+        onPress={() => {
+          // navigation.navigate(BlocklistsStackScreens.CREATE_BLOCK_LIST)
+        }}
         style={styles.roundButton}
       >
         <Ionicons
