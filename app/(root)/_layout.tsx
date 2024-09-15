@@ -49,7 +49,6 @@ export default function TabLayout() {
     },
   ]
 
-  console.log(tabs.map((tab) => tab.name))
   return (
     <Tabs
       screenOptions={{

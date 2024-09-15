@@ -1,11 +1,11 @@
-import { Session } from './BlockSessionForm.tsx'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { SelectListModal } from './SelectListModal.tsx'
 import { useState } from 'react'
 import { FormikErrors } from 'formik'
-import { T } from '../../../design-system/theme.ts'
-import { Blocklist } from '../../../../core/blocklist/blocklist.ts'
-import { Device } from '../../../../core/device/device.ts'
+import { T } from '@/ui/design-system/theme'
+import { Blocklist } from '@/core/blocklist/blocklist'
+import { Device } from '@/core/device/device'
+import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { SelectListModal } from '@/ui/screens/Home/shared/SelectListModal'
 
 export function SelectFromList({
   values,

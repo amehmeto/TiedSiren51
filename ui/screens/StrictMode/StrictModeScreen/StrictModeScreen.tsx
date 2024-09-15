@@ -1,6 +1,6 @@
-import { TiedSLinearBackground } from '../../../design-system/components/TiedSLinearBackground.tsx'
 import { StyleSheet, Text, View } from 'react-native'
-import { T } from '../../../design-system/theme.ts'
+import { T } from '@/ui/design-system/theme'
+import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
 
 export function StrictModeScreen() {
   return (

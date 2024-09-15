@@ -1,6 +1,6 @@
-import { Text, View, StyleSheet } from 'react-native'
-import { TiedSLinearBackground } from '../../../design-system/components/TiedSLinearBackground.tsx'
-import { T } from '../../../design-system/theme.ts'
+import { StyleSheet, Text, View } from 'react-native'
+import { T } from '@/ui/design-system/theme'
+import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
 
 /*type SettingsScreenProps = {
   navigation: NativeStackNavigationProp<ScreenList, 'Settings'>

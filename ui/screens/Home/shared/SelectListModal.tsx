@@ -1,11 +1,11 @@
 import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
-import { T } from '../../../design-system/theme.ts'
+import { T } from '@/ui/design-system/theme'
 import { useEffect, useState } from 'react'
-import { TiedSButton } from '../../../design-system/components/TiedSButton.tsx'
-import { TiedSModal } from '../../../design-system/components/TiedSModal.tsx'
-import { Blocklist } from '../../../../core/blocklist/blocklist.ts'
-import { Device } from '../../../../core/device/device.ts'
+import { Blocklist } from '@/core/blocklist/blocklist'
+import { Device } from '@/core/device/device'
 import * as ExpoDevice from 'expo-device'
+import { TiedSModal } from '@/ui/design-system/components/components/TiedSModal'
+import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
 
 const currentDevice: Device = {
   id: ExpoDevice.modelId ?? 'unknown',

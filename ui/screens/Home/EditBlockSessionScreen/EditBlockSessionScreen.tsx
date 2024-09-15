@@ -1,12 +1,12 @@
-import { BlockSessionForm } from '../shared/BlockSessionForm.tsx'
-import { TabScreens } from '../../../navigators/screen-lists/TabScreens.ts'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { ScreenList } from '../../../navigators/screen-lists/screenLists.ts'
-import { RootState } from '../../../../core/_redux_/createStore.ts'
+import { RootState } from '@/core/_redux_/createStore'
 import { useSelector } from 'react-redux'
-import { selectBlockSessionById } from '../../../../core/block-session/selectors/selectBlockSessionById.ts'
-import { HomeStackScreens } from '../../../navigators/screen-lists/HomeStackScreens.ts'
+import { selectBlockSessionById } from '@/core/block-session/selectors/selectBlockSessionById'
 import { RouteProp } from '@react-navigation/native'
+import { ScreenList } from '@/ui/navigation/screenLists'
+import { TabScreens } from '@/ui/navigation/TabScreens'
+import { HomeStackScreens } from '@/ui/navigation/HomeStackScreens'
+import { BlockSessionForm } from '@/ui/screens/Home/shared/BlockSessionForm'
 
 export function EditBlockSessionScreen({
   navigation,

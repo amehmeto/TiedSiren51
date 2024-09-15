@@ -1,19 +1,20 @@
-import { RootState } from '../../../../core/_redux_/createStore.ts'
-import { BlockSession } from '../../../../core/block-session/block.session.ts'
+import { RootState } from '@/core/_redux_/createStore'
+import { BlockSession } from '@/core/block-session/block.session'
 import { formatDistance } from 'date-fns'
 import { createSelector } from '@reduxjs/toolkit'
+
+import { selectActiveSessions } from '@/core/block-session/selectors/selectActiveSessions'
+import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAllBlockSessions'
+import { DateProvider } from '@/core/ports/port.date-provider'
+import { isActive } from '@/core/block-session/selectors/isActive'
+import { selectScheduledSessions } from '@/core/block-session/selectors/selectScheduledSessions'
 import {
   Greetings,
   HomeViewModel,
   HomeViewModelType,
   SessionBoardMessage,
   SessionBoardTitle,
-} from './home-view-model.types.ts'
-import { selectActiveSessions } from '../../../../core/block-session/selectors/selectActiveSessions.ts'
-import { selectAllBlockSessions } from '../../../../core/block-session/selectors/selectAllBlockSessions.ts'
-import { DateProvider } from '../../../../core/ports/port.date-provider.ts'
-import { isActive } from '../../../../core/block-session/selectors/isActive.ts'
-import { selectScheduledSessions } from '../../../../core/block-session/selectors/selectScheduledSessions.ts'
+} from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 
 function greetUser(now: Date) {
   const hour = now.getHours()

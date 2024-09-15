@@ -1,7 +1,7 @@
-import { BlockSessionForm } from '../shared/BlockSessionForm.tsx'
-import { TabScreens } from '../../../navigators/screen-lists/TabScreens.ts'
 import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { ScreenList } from '../../../navigators/screen-lists/screenLists.ts'
+import { ScreenList } from '@/ui/navigation/screenLists'
+import { TabScreens } from '@/ui/navigation/TabScreens'
+import { BlockSessionForm } from '@/ui/screens/Home/shared/BlockSessionForm'
 
 export function CreateBlockSessionScreen({
   navigation,

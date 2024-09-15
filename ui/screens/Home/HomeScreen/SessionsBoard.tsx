@@ -1,10 +1,8 @@
 import { FlatList, StyleSheet, Text } from 'react-native'
-import { T } from '../../../design-system/theme.ts'
-import { SessionCard } from './SessionCard.tsx'
-
-import { ViewModelBlockSession } from './home-view-model.types.ts'
-
-import { SessionType } from './SessionType.ts'
+import { T } from '@/ui/design-system/theme'
+import { ViewModelBlockSession } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
+import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
+import { SessionCard } from '@/ui/screens/Home/HomeScreen/SessionCard'
 
 export function SessionsBoard(
   props: Readonly<{

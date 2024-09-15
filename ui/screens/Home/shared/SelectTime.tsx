@@ -1,10 +1,10 @@
-import { Session } from './BlockSessionForm.tsx'
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
-import { T } from '../../../design-system/theme.ts'
+import { T } from '@/ui/design-system/theme'
 import React from 'react'
-import { WebTimePicker } from './WebTimePicker.tsx'
-import { dependencies } from '../../../dependencies.ts'
+import { dependencies } from '@/ui/dependencies'
+import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
 
 /*export function toHHmm(date: Date) {
   const hours = String(date.getHours()).padStart(2, '0')
@@ -27,13 +27,13 @@ export function SelectTime(
 
   const chosenTime =
     props.timeField === 'startedAt'
-      ? props.values.startedAt ?? localeNow
-      : props.values.endedAt ?? localeNow
+      ? (props.values.startedAt ?? localeNow)
+      : (props.values.endedAt ?? localeNow)
 
   const placeholder =
     props.timeField === 'startedAt'
-      ? props.values.startedAt ?? `Select start time...`
-      : props.values.endedAt ?? `Select end time...`
+      ? (props.values.startedAt ?? `Select start time...`)
+      : (props.values.endedAt ?? `Select end time...`)
 
   return (
     <>

@@ -1,5 +1,5 @@
 import { StyleSheet, Text } from 'react-native'
-import { T } from '../../../design-system/theme.ts'
+import { T } from '@/ui/design-system/theme'
 
 export function NoSessionBoard(
   props: Readonly<{

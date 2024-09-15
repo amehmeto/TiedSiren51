@@ -2,26 +2,27 @@ import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { Image, StyleSheet, Text } from 'react-native'
 import 'react-native-gesture-handler'
-import { TiedSButton } from '../../../design-system/components/TiedSButton.tsx'
-import { TiedSLinearBackground } from '../../../design-system/components/TiedSLinearBackground.tsx'
-import { T } from '../../../design-system/theme.ts'
-import { ScreenList } from '../../../navigators/screen-lists/screenLists.ts'
-import { HomeStackScreens } from '../../../navigators/screen-lists/HomeStackScreens.ts'
-import { TabScreens } from '../../../navigators/screen-lists/TabScreens.ts'
+import { T } from '@/ui/design-system/theme'
 import { useSelector } from 'react-redux'
-import { RootState } from '../../../../core/_redux_/createStore.ts'
-import { selectHomeViewModel } from './home.view-model.ts'
-import { exhaustiveGuard } from '../../../../common/exhaustive-guard.ts'
-import { NoSessionBoard } from './NoSessionBoard.tsx'
-import { SessionsBoard } from './SessionsBoard.tsx'
+import { RootState } from '@/core/_redux_/createStore'
+
+import { dependencies } from '@/ui/dependencies'
+import { ScreenList } from '@/ui/navigation/screenLists'
 import {
   HomeViewModel,
   HomeViewModelType,
   SessionBoardTitle,
   ViewModelBlockSession,
-} from './home-view-model.types.ts'
-import { dependencies } from '../../../dependencies.ts'
-import { SessionType } from './SessionType.ts'
+} from '@/ui/screens/Home/HomeScreen/home-view-model.types'
+import { TabScreens } from '@/ui/navigation/TabScreens'
+import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
+import { NoSessionBoard } from '@/ui/screens/Home/HomeScreen/NoSessionBoard'
+import { SessionsBoard } from '@/ui/screens/Home/HomeScreen/SessionsBoard'
+import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
+import { exhaustiveGuard } from '@/ui/exhaustive-guard'
+import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
+import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
+import { HomeStackScreens } from '@/ui/navigation/HomeStackScreens'
 
 async function notifyActiveSessionsStartAndEnd(
   viewModel: HomeViewModelType,

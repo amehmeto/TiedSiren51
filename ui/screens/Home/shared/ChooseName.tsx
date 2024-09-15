@@ -1,11 +1,11 @@
-import { Session } from './BlockSessionForm.tsx'
 import React, { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { TiedSModal } from '../../../design-system/components/TiedSModal.tsx'
-import { TiedSButton } from '../../../design-system/components/TiedSButton.tsx'
-import { T } from '../../../design-system/theme.ts'
-import { TiedSTextInput } from '../../../design-system/components/TiedSTextInput.tsx'
+import { T } from '@/ui/design-system/theme'
 import { FormikErrors } from 'formik'
+import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { TiedSModal } from '@/ui/design-system/components/components/TiedSModal'
+import { TiedSTextInput } from '@/ui/design-system/components/components/TiedSTextInput'
+import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
 
 export function ChooseName(
   props: Readonly<{

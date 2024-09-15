@@ -1,16 +1,17 @@
-import { describe, beforeEach, expect, it, test } from 'vitest'
-import { selectHomeViewModel } from './home.view-model.ts'
-import { createTestStore } from '../../../../core/_tests_/createTestStore.ts'
-import { PreloadedState } from '../../../../core/_redux_/createStore.ts'
-import { stateBuilder } from '../../../../core/_tests_/state-builder.ts'
-import { buildBlockSession } from '../../../../core/_tests_/data-builders/block-session.builder.ts'
+import { beforeEach, describe, expect, it, test } from 'vitest'
+import { createTestStore } from '@/core/_tests_/createTestStore'
+import { PreloadedState } from '@/core/_redux_/createStore'
+import { stateBuilder } from '@/core/_tests_/state-builder'
+import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
+
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import {
   Greetings,
   HomeViewModel,
   SessionBoardMessage,
   SessionBoardTitle,
-} from './home-view-model.types.ts'
-import { StubDateProvider } from '../../../../infra/date-provider/stub.date-provider.ts'
+} from '@/ui/screens/Home/HomeScreen/home-view-model.types'
+import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 
 describe('Home View Model', () => {
   let dateProvider: StubDateProvider
