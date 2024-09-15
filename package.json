@@ -28,7 +28,7 @@
     "expo:lint": "expo lint"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": "npm run lint:fix"
+    "*.{js,ts,jsx,tsx}": "yarn lint:fix"
   },
   "dependencies": {
     "@expo/vector-icons": "^14.0.0",
@@ -45,6 +45,7 @@
     "expo-font": "~12.0.6",
     "expo-linear-gradient": "^13.0.2",
     "expo-linking": "~6.3.1",
+    "expo-navigation-bar": "~3.0.4",
     "expo-notifications": "~0.28.5",
     "expo-router": "~3.5.15",
     "expo-splash-screen": "~0.27.4",
