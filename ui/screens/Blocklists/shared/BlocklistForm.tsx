@@ -12,27 +12,23 @@ import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.
 import { Dimensions, StyleSheet, Text } from 'react-native'
 import { updateBlocklist } from '@/core/blocklist/usecases/update-blocklist.usecase'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { T } from '@/ui/design-system/theme'
-import { ScreenList } from '@/ui/navigation/screenLists'
-import { TabScreens } from '@/ui/navigation/TabScreens'
 import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
 import { AppsSelectionScene } from '@/ui/screens/Blocklists/shared/AppsSelectionScene'
 import { TextInputSelectionScene } from '@/ui/screens/Blocklists/shared/TextInputSelectionScene'
 import { TiedSBlurView } from '@/ui/design-system/components/components/TiedSBlurView'
 import { TiedSTextInput } from '@/ui/design-system/components/components/TiedSTextInput'
 import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
-import { BlocklistsStackScreens } from '@/ui/navigation/BlocklistsStackScreens'
 import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/shared/ChooseBlockTabBar'
 
 export type BlocklistScreenProps = {
-  navigation: NativeStackNavigationProp<ScreenList, TabScreens.BLOCKLIST>
+  // navigation: NativeStackNavigationProp<ScreenList, TabScreens.BLOCKLIST>
   mode: 'create' | 'edit'
   blocklistId?: string
 }
 
 export function BlocklistForm({
-  navigation,
+  // navigation,
   mode,
   blocklistId,
 }: Readonly<BlocklistScreenProps>) {
@@ -185,7 +181,7 @@ export function BlocklistForm({
                   blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>,
                 ),
               )
-          navigation.navigate(BlocklistsStackScreens.MAIN_BLOCKLIST)
+          // navigation.navigate(BlocklistsStackScreens.MAIN_BLOCKLIST)
         }}
       />
     </TiedSLinearBackground>

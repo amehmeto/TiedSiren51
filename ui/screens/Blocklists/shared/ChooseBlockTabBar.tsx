@@ -1,16 +1,20 @@
 import { T } from '@/ui/design-system/theme'
 import * as React from 'react'
-import { NavigationState } from '@react-navigation/native'
 import { Pressable, StyleSheet, Text } from 'react-native'
-import { Route, SceneRendererProps, TabBar } from 'react-native-tab-view'
+import { SceneRendererProps, TabBar } from 'react-native-tab-view'
 
 export function ChooseBlockTabBar(
-  props: SceneRendererProps & {
+  props: SceneRendererProps /* & {
     navigationState: NavigationState<Route>
-  },
+  }*/,
 ) {
   return (
     <TabBar
+      navigationState={{
+        index: 0,
+        // @ts-ignore
+        routes: [{ title: 'Websites' }, { title: 'Keywords' }],
+      }}
       {...props}
       indicatorStyle={styles.indicator}
       renderLabel={({ route, focused, color }) => (

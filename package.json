@@ -55,7 +55,6 @@
     "expo-task-manager": "^11.8.2",
     "expo-web-browser": "~13.0.3",
     "formik": "^2.4.5",
-
     "pouchdb": "^8.0.1",
     "react": "18.2.0",
     "react-dom": "18.2.0",

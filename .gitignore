@@ -48,6 +48,10 @@ yarn-error.*
 
 coverage/
 
+# Expo
+
+expo-env.d.ts
+
 # Android
 #
 android/.gradle
