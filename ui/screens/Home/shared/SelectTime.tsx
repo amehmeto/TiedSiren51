@@ -27,13 +27,13 @@ export function SelectTime(
 
   const chosenTime =
     props.timeField === 'startedAt'
-      ? (props.values.startedAt ?? localeNow)
-      : (props.values.endedAt ?? localeNow)
+      ? props.values.startedAt ?? localeNow
+      : props.values.endedAt ?? localeNow
 
   const placeholder =
     props.timeField === 'startedAt'
-      ? (props.values.startedAt ?? `Select start time...`)
-      : (props.values.endedAt ?? `Select end time...`)
+      ? props.values.startedAt ?? `Select start time...`
+      : props.values.endedAt ?? `Select end time...`
 
   return (
     <>

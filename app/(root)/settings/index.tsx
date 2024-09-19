@@ -22,5 +22,3 @@ const styles = StyleSheet.create({
     color: T.color.white,
   },
 })
-
-

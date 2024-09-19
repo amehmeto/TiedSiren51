@@ -36,7 +36,7 @@ export function SelectBlockSessionParams(
   const blocklists = useSelector((state: RootState) =>
     selectAllBlocklists(state),
   )
-  
+
   const router = useRouter()
 
   const [selectedDevice, setSelectedDevice] = useState<Device | null>(null)

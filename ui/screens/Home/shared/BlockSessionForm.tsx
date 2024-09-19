@@ -96,9 +96,7 @@ export function BlockSessionForm({
             : dispatch(createBlockSession(values))
         }}
       >
-        {(form) => (
-          <SelectBlockSessionParams form={form} />
-        )}
+        {(form) => <SelectBlockSessionParams form={form} />}
       </Formik>
     </TiedSLinearBackground>
   )

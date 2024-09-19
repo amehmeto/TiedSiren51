@@ -21,14 +21,13 @@ import { Ionicons } from '@expo/vector-icons'
 import { T } from '@/ui/design-system/theme'
 import { useRouter } from 'expo-router'
 
-
 export default function BlocklistScreen() {
   const viewModel = useSelector<
     RootState,
     ReturnType<typeof selectBlocklistViewModel>
   >((rootState) => selectBlocklistViewModel(rootState))
 
-  const router = useRouter();
+  const router = useRouter()
 
   const blocklistsNode: ReactNode = (() => {
     switch (viewModel.type) {
@@ -44,7 +43,7 @@ export default function BlocklistScreen() {
             data={viewModel.blocklists}
             keyExtractor={(blocklist) => blocklist.id}
             renderItem={({ item: blocklist }) => (
-              <BlocklistCard blocklist={blocklist}/>
+              <BlocklistCard blocklist={blocklist} />
             )}
           />
         )
@@ -57,9 +56,9 @@ export default function BlocklistScreen() {
     <TiedSLinearBackground>
       {blocklistsNode}
       <Pressable
-        onPress={
-          () => {router.push('/(root)/blocklists/create-blocklist-screen')}
-        }
+        onPress={() => {
+          router.push('/(root)/blocklists/create-blocklist-screen')
+        }}
         style={styles.roundButton}
       >
         <Ionicons

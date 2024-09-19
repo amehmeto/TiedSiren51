@@ -64,11 +64,11 @@ export function BlocklistCard(
   return (
     <>
       <Pressable
-        // onPress={() =>
-        //   props.navigation.navigate(BlocklistsStackScreens.EDIT_BLOCKLIST, {
-        //     blocklistId: props.blocklist.id,
-        //   })
-        // }
+      // onPress={() =>
+      //   props.navigation.navigate(BlocklistsStackScreens.EDIT_BLOCKLIST, {
+      //     blocklistId: props.blocklist.id,
+      //   })
+      // }
       >
         <TiedSBlurView style={styles.container}>
           <View style={styles.infoContainer}>
