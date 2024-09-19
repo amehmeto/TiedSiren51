@@ -1,27 +1,26 @@
-import ParallaxScrollView from '@/ui/design-system/components/ParallaxScrollView'
-import Ionicons from '@expo/vector-icons/Ionicons'
-import { StyleSheet } from 'react-native'
+import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
+import { StyleSheet, Text, View } from 'react-native'
+import { T } from '@/ui/design-system/theme'
 
-export default function TabTwoScreen() {
+export default function SettingsScreen() {
   return (
-    <ParallaxScrollView
-      headerBackgroundColor={{ light: '#D0D0D0', dark: '#353636' }}
-      headerImage={
-        <Ionicons size={310} name="code-slash" style={styles.headerImage} />
-      }
-    ></ParallaxScrollView>
+    <TiedSLinearBackground>
+      <View style={styles.container}>
+        <Text style={styles.text}>Settings</Text>
+      </View>
+    </TiedSLinearBackground>
   )
 }
 
 const styles = StyleSheet.create({
-  headerImage: {
-    color: '#808080',
-    bottom: -90,
-    left: -35,
-    position: 'absolute',
+  container: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
-  titleContainer: {
-    flexDirection: 'row',
-    gap: 8,
+  text: {
+    color: T.color.white,
   },
 })
+
+

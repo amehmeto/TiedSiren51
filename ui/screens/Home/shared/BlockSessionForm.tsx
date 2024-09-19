@@ -33,11 +33,11 @@ const defaultSession: Session = {
 }
 
 export function BlockSessionForm({
-  navigation,
+  // navigation,
   session = defaultSession,
   mode,
 }: Readonly<{
-  navigation: NativeStackNavigationProp<ScreenList, TabScreens.HOME>
+  // navigation: NativeStackNavigationProp<ScreenList, TabScreens.HOME>
   mode: 'create' | 'edit'
   session?: Session
 }>) {
@@ -97,7 +97,7 @@ export function BlockSessionForm({
         }}
       >
         {(form) => (
-          <SelectBlockSessionParams form={form} navigation={navigation} />
+          <SelectBlockSessionParams form={form} />
         )}
       </Formik>
     </TiedSLinearBackground>

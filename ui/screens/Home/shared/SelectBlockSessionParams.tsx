@@ -17,10 +17,11 @@ import { SelectFromList } from '@/ui/screens/Home/shared/SelectFromList'
 import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
 import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
 import { HomeStackScreens } from '@/ui/navigation/HomeStackScreens'
+import { useRouter } from 'expo-router'
 
 export function SelectBlockSessionParams(
   props: Readonly<{
-    navigation: NativeStackNavigationProp<ScreenList, TabScreens.HOME>
+    // navigation: NativeStackNavigationProp<ScreenList, TabScreens.HOME>
     form: FormikProps<Session>
   }>,
 ) {
@@ -35,7 +36,10 @@ export function SelectBlockSessionParams(
   const blocklists = useSelector((state: RootState) =>
     selectAllBlocklists(state),
   )
+  
+  const router = useRouter()
 
+  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null)
   useEffect(() => {
     deviceRepository.findAll().then((devices) => {
       setDevices(devices)
@@ -87,7 +91,7 @@ export function SelectBlockSessionParams(
         text={'START'}
         onPress={() => {
           handleSubmit()
-          props.navigation.navigate(HomeStackScreens.MAIN_HOME)
+          router.push('/(root)')
         }}
       />
     </View>

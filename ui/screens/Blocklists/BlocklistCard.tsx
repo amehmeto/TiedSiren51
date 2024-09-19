@@ -21,7 +21,7 @@ export function BlocklistCard(
       name: string
       totalBlocks: string
     }
-    navigation: NativeStackNavigationProp<ScreenList, TabScreens.BLOCKLIST>
+    // navigation: NativeStackNavigationProp<ScreenList, TabScreens.BLOCKLIST>
   }>,
 ) {
   const dispatch = useDispatch<AppDispatch>()
@@ -40,10 +40,10 @@ export function BlocklistCard(
     {
       name: 'Edit',
       iconName: 'create-outline' as const,
-      action: () =>
-        props.navigation.navigate(BlocklistsStackScreens.EDIT_BLOCKLIST, {
-          blocklistId: props.blocklist.id,
-        }),
+      // action: () =>
+      //   props.navigation.navigate(BlocklistsStackScreens.EDIT_BLOCKLIST, {
+      //     blocklistId: props.blocklist.id,
+      //   }),
     },
     {
       name: 'Duplicate',
@@ -64,11 +64,11 @@ export function BlocklistCard(
   return (
     <>
       <Pressable
-        onPress={() =>
-          props.navigation.navigate(BlocklistsStackScreens.EDIT_BLOCKLIST, {
-            blocklistId: props.blocklist.id,
-          })
-        }
+        // onPress={() =>
+        //   props.navigation.navigate(BlocklistsStackScreens.EDIT_BLOCKLIST, {
+        //     blocklistId: props.blocklist.id,
+        //   })
+        // }
       >
         <TiedSBlurView style={styles.container}>
           <View style={styles.infoContainer}>
@@ -77,10 +77,10 @@ export function BlocklistCard(
               {props.blocklist.totalBlocks}
             </Text>
           </View>
-          <ThreeDotMenu
-            menuOptions={blocklistCardMenu}
-            navigation={props.navigation}
-          />
+          {/* <ThreeDotMenu
+            // menuOptions={blocklistCardMenu}
+            // navigation={props.navigation}
+          /> */}
         </TiedSBlurView>
       </Pressable>
 

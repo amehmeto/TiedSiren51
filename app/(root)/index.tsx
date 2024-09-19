@@ -1,8 +1,6 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { Image, StyleSheet, Text } from 'react-native'
 import 'react-native-gesture-handler'
-import { ScreenList } from '@/ui/navigation/screenLists'
 import { dependencies } from '@/ui/dependencies'
 import {
   HomeViewModel,
@@ -10,7 +8,6 @@ import {
   SessionBoardTitle,
   ViewModelBlockSession,
 } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
-import { TabScreens } from '@/ui/navigation/TabScreens'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
@@ -20,8 +17,8 @@ import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
 import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
-import { HomeStackScreens } from '@/ui/navigation/HomeStackScreens'
 import { T } from '@/ui/design-system/theme'
+import { useRouter } from 'expo-router'
 
 async function notifyActiveSessionsStartAndEnd(
   viewModel: HomeViewModelType,
@@ -74,11 +71,8 @@ async function notifyActiveSessionsStartAndEnd(
   previousActiveSessionsRef.current = currentActiveSessions
 }
 
-export default function HomeScreen({
-  navigation,
-}: Readonly<{
-  navigation: NativeStackNavigationProp<ScreenList, TabScreens.HOME>
-}>) {
+export default function HomeScreen() {
+  const router = useRouter()
   const { dateProvider } = dependencies
   const [now, setNow] = useState<Date>(dateProvider.getNow())
   const viewModel = useSelector<
@@ -156,9 +150,7 @@ export default function HomeScreen({
 
       <TiedSButton
         text={'CREATE A BLOCK SESSION'}
-        onPress={() =>
-          navigation.navigate(HomeStackScreens.CREATE_BLOCK_SESSION)
-        }
+        onPress={() => router.push('/create-block-session')}
       />
     </TiedSLinearBackground>
   )

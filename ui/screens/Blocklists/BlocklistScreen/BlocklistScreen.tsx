@@ -48,7 +48,7 @@ export function BlocklistScreen({
             data={viewModel.blocklists}
             keyExtractor={(blocklist) => blocklist.id}
             renderItem={({ item: blocklist }) => (
-              <BlocklistCard blocklist={blocklist} navigation={navigation} />
+              <BlocklistCard blocklist={blocklist} />
             )}
           />
         )

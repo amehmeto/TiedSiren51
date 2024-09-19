@@ -19,18 +19,16 @@ import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
 import { Ionicons } from '@expo/vector-icons'
 import { T } from '@/ui/design-system/theme'
+import { useRouter } from 'expo-router'
 
-type BlockListScreenProps = {
-  navigation: NativeStackNavigationProp<ScreenList, TabScreens.BLOCKLIST>
-}
 
-export default function BlocklistScreen({
-  navigation,
-}: Readonly<BlockListScreenProps>) {
+export default function BlocklistScreen() {
   const viewModel = useSelector<
     RootState,
     ReturnType<typeof selectBlocklistViewModel>
   >((rootState) => selectBlocklistViewModel(rootState))
+
+  const router = useRouter();
 
   const blocklistsNode: ReactNode = (() => {
     switch (viewModel.type) {
@@ -46,7 +44,7 @@ export default function BlocklistScreen({
             data={viewModel.blocklists}
             keyExtractor={(blocklist) => blocklist.id}
             renderItem={({ item: blocklist }) => (
-              <BlocklistCard blocklist={blocklist} navigation={navigation} />
+              <BlocklistCard blocklist={blocklist}/>
             )}
           />
         )
@@ -60,8 +58,7 @@ export default function BlocklistScreen({
       {blocklistsNode}
       <Pressable
         onPress={
-          () => {}
-          // navigation.navigate(BlocklistsStackScreens.CREATE_BLOCK_LIST)
+          () => {router.push('/(root)/blocklists/create-blocklist-screen')}
         }
         style={styles.roundButton}
       >
