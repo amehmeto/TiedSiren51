@@ -1,20 +1,15 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { Image, StyleSheet, Text } from 'react-native'
 import 'react-native-gesture-handler'
-import { T } from '@/ui/design-system/theme'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/core/_redux_/createStore'
-
 import { dependencies } from '@/ui/dependencies'
-import { ScreenList } from '@/ui/navigation/screenLists'
 import {
   HomeViewModel,
   HomeViewModelType,
   SessionBoardTitle,
   ViewModelBlockSession,
 } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
-import { TabScreens } from '@/ui/navigation/TabScreens'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/core/_redux_/createStore'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 import { NoSessionBoard } from '@/ui/screens/Home/HomeScreen/NoSessionBoard'
 import { SessionsBoard } from '@/ui/screens/Home/HomeScreen/SessionsBoard'
@@ -22,7 +17,8 @@ import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
 import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
-import { HomeStackScreens } from '@/ui/navigation/HomeStackScreens'
+import { T } from '@/ui/design-system/theme'
+import { useRouter } from 'expo-router'
 
 async function notifyActiveSessionsStartAndEnd(
   viewModel: HomeViewModelType,
@@ -75,11 +71,8 @@ async function notifyActiveSessionsStartAndEnd(
   previousActiveSessionsRef.current = currentActiveSessions
 }
 
-export function HomeScreen({
-  navigation,
-}: Readonly<{
-  navigation: NativeStackNavigationProp<ScreenList, TabScreens.HOME>
-}>) {
+export default function HomeScreen() {
+  const router = useRouter()
   const { dateProvider } = dependencies
   const [now, setNow] = useState<Date>(dateProvider.getNow())
   const viewModel = useSelector<
@@ -147,7 +140,7 @@ export function HomeScreen({
     <TiedSLinearBackground>
       <Image
         style={styles.image}
-        source={require('../../../../../assets/tiedsirenlogo.png')}
+        source={require('@/assets/tiedsirenlogo.png')}
       />
       <Text style={styles.greetings}>{viewModel.greetings}</Text>
       <Text style={styles.text}>{"Let's make it productive"}</Text>
@@ -157,9 +150,7 @@ export function HomeScreen({
 
       <TiedSButton
         text={'CREATE A BLOCK SESSION'}
-        onPress={() =>
-          navigation.navigate(HomeStackScreens.CREATE_BLOCK_SESSION)
-        }
+        onPress={() => router.push('/(tabs)/home/create-block-session')}
       />
     </TiedSLinearBackground>
   )

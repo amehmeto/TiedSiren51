@@ -8,10 +8,10 @@ import { storePromise } from '@/ui/preloadedStateForManualTesting'
 import { tieSirens } from '@/core/siren/usecases/tie-sirens.usecase'
 import { RealBackgroundTaskService } from '@/infra/background-task-service/real.background-task.service'
 import { dependencies } from '@/ui/dependencies'
-import { Stack } from 'expo-router'
 import * as NavigationBar from 'expo-navigation-bar'
 import { Platform } from 'react-native'
 import { T } from '@/ui/design-system/theme'
+import { Stack } from 'expo-router'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -53,7 +53,9 @@ export default function App() {
             header: () => null,
             contentStyle: { backgroundColor: '#FFF' },
           }}
-        />
+        >
+          <Stack.Screen name="(tabs)" />
+        </Stack>
       </MenuProvider>
     </Provider>
   )

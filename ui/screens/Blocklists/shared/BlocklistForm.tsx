@@ -20,15 +20,14 @@ import { TiedSBlurView } from '@/ui/design-system/components/components/TiedSBlu
 import { TiedSTextInput } from '@/ui/design-system/components/components/TiedSTextInput'
 import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
 import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/shared/ChooseBlockTabBar'
+import { useRouter } from 'expo-router'
 
 export type BlocklistScreenProps = {
-  // navigation: NativeStackNavigationProp<ScreenList, TabScreens.BLOCKLIST>
   mode: 'create' | 'edit'
   blocklistId?: string
 }
 
 export function BlocklistForm({
-  // navigation,
   mode,
   blocklistId,
 }: Readonly<BlocklistScreenProps>) {
@@ -39,6 +38,8 @@ export function BlocklistForm({
   const blocklistFromState = useSelector((state: RootState) =>
     blocklistId ? selectBlocklistById(blocklistId, state) : undefined,
   )
+
+  const router = useRouter()
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
     {
@@ -181,7 +182,7 @@ export function BlocklistForm({
                   blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>,
                 ),
               )
-          // navigation.navigate(BlocklistsStackScreens.MAIN_BLOCKLIST)
+          router.push('/(tabs)/blocklists')
         }}
       />
     </TiedSLinearBackground>

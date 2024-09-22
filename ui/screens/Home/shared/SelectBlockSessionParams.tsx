@@ -2,26 +2,21 @@ import { useEffect, useState } from 'react'
 import { FormikProps } from 'formik'
 import { StyleSheet, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { deviceRepository } from '@/ui/dependencies'
 import { Device } from '@/core/device/device'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
-import { ScreenList } from '@/ui/navigation/screenLists'
-import { TabScreens } from '@/ui/navigation/TabScreens'
 import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { TiedSBlurView } from '@/ui/design-system/components/components/TiedSBlurView'
 import { ChooseName } from '@/ui/screens/Home/shared/ChooseName'
 import { SelectFromList } from '@/ui/screens/Home/shared/SelectFromList'
 import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
 import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
-import { HomeStackScreens } from '@/ui/navigation/HomeStackScreens'
 import { useRouter } from 'expo-router'
 
 export function SelectBlockSessionParams(
   props: Readonly<{
-    // navigation: NativeStackNavigationProp<ScreenList, TabScreens.HOME>
     form: FormikProps<Session>
   }>,
 ) {
@@ -91,7 +86,7 @@ export function SelectBlockSessionParams(
         text={'START'}
         onPress={() => {
           handleSubmit()
-          router.push('/(root)')
+          router.push('/(tabs)')
         }}
       />
     </View>

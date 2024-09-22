@@ -1,4 +1,3 @@
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { Formik } from 'formik'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
@@ -8,8 +7,6 @@ import { createBlockSession } from '@/core/block-session/usecases/create-block-s
 import uuid from 'react-native-uuid'
 import { BlockSession } from '@/core/block-session/block.session'
 import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
-import { ScreenList } from '@/ui/navigation/screenLists'
-import { TabScreens } from '@/ui/navigation/TabScreens'
 import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
 import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
 // import { z } from 'zod'
@@ -33,11 +30,9 @@ const defaultSession: Session = {
 }
 
 export function BlockSessionForm({
-  // navigation,
   session = defaultSession,
   mode,
 }: Readonly<{
-  // navigation: NativeStackNavigationProp<ScreenList, TabScreens.HOME>
   mode: 'create' | 'edit'
   session?: Session
 }>) {

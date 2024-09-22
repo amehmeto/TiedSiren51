@@ -1,3 +1,5 @@
+import { useSelector } from 'react-redux'
+import React, { ReactNode } from 'react'
 import {
   FlatList,
   Platform,
@@ -6,33 +8,23 @@ import {
   Text,
   View,
 } from 'react-native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
-import { T } from '@/ui/design-system/theme'
-import { Ionicons } from '@expo/vector-icons'
-import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
-import * as React from 'react'
-import { ReactNode } from 'react'
-import { ScreenList } from '@/ui/navigation/screenLists'
-import { TabScreens } from '@/ui/navigation/TabScreens'
 import { selectBlocklistViewModel } from '@/ui/screens/Blocklists/BlocklistScreen/blocklist.view-model'
 import { BlocklistViewModel } from '@/ui/screens/Blocklists/BlocklistScreen/blocklist-view-model.type'
 import { BlocklistCard } from '@/ui/screens/Blocklists/BlocklistCard'
 import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
-import { BlocklistsStackScreens } from '@/ui/navigation/BlocklistsStackScreens'
+import { Ionicons } from '@expo/vector-icons'
+import { T } from '@/ui/design-system/theme'
+import { useRouter } from 'expo-router'
 
-type BlockListScreenProps = {
-  navigation: NativeStackNavigationProp<ScreenList, TabScreens.BLOCKLIST>
-}
-
-export function BlocklistScreen({
-  navigation,
-}: Readonly<BlockListScreenProps>) {
+export default function BlocklistScreen() {
   const viewModel = useSelector<
     RootState,
     ReturnType<typeof selectBlocklistViewModel>
   >((rootState) => selectBlocklistViewModel(rootState))
+
+  const router = useRouter()
 
   const blocklistsNode: ReactNode = (() => {
     switch (viewModel.type) {
@@ -61,9 +53,9 @@ export function BlocklistScreen({
     <TiedSLinearBackground>
       {blocklistsNode}
       <Pressable
-        onPress={() =>
-          navigation.navigate(BlocklistsStackScreens.CREATE_BLOCK_LIST)
-        }
+        onPress={() => {
+          router.push('/(tabs)/blocklists/create-blocklist-screen')
+        }}
         style={styles.roundButton}
       >
         <Ionicons

@@ -12,59 +12,64 @@ import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
   return `${hours}:${minutes}`
 }*/
 
-export function SelectTime(
-  props: Readonly<{
-    timeField: 'startedAt' | 'endedAt'
-    setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
-    values: Session
-    isTimePickerVisible: boolean
-    setFieldValue: (field: string, value: string) => void
-    handleChange: (field: 'startedAt' | 'endedAt') => void
-  }>,
-) {
+export function SelectTime({
+  timeField = 'startedAt', // Default to 'startedAt'
+  setIsTimePickerVisible,
+  values,
+  isTimePickerVisible = false, // Default to false
+  setFieldValue,
+  handleChange,
+}: Readonly<{
+  timeField?: 'startedAt' | 'endedAt'
+  setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
+  values: Session
+  isTimePickerVisible?: boolean
+  setFieldValue: (field: string, value: string) => void
+  handleChange: (field: 'startedAt' | 'endedAt') => void
+}>) {
   const { dateProvider } = dependencies
   const localeNow = dateProvider.toHHmm(new Date())
 
   const chosenTime =
-    props.timeField === 'startedAt'
-      ? props.values.startedAt ?? localeNow
-      : props.values.endedAt ?? localeNow
+    timeField === 'startedAt'
+      ? values.startedAt ?? localeNow
+      : values.endedAt ?? localeNow
 
   const placeholder =
-    props.timeField === 'startedAt'
-      ? props.values.startedAt ?? `Select start time...`
-      : props.values.endedAt ?? `Select end time...`
+    timeField === 'startedAt'
+      ? values.startedAt ?? `Select start time...`
+      : values.endedAt ?? `Select end time...`
 
   return (
     <>
       <View style={styles.param}>
-        <Text style={styles.label}>{props.timeField}</Text>
-        <Pressable onPress={() => props.setIsTimePickerVisible(true)}>
+        <Text style={styles.label}>{timeField}</Text>
+        <Pressable onPress={() => setIsTimePickerVisible(true)}>
           <Text style={styles.option}>{placeholder}</Text>
         </Pressable>
       </View>
       <View>
         {Platform.OS === 'web' ? (
-          props.isTimePickerVisible && (
+          isTimePickerVisible && (
             <WebTimePicker
               chosenTime={chosenTime}
-              handleChange={() => props.handleChange(props.timeField)}
+              handleChange={() => handleChange(timeField)}
               setTime={(chosenTime: string) => {
-                props.setFieldValue(props.timeField, chosenTime)
+                setFieldValue(timeField, chosenTime)
               }}
-              setIsTimePickerVisible={props.setIsTimePickerVisible}
+              setIsTimePickerVisible={setIsTimePickerVisible}
             />
           )
         ) : (
           <DateTimePickerModal
-            isVisible={props.isTimePickerVisible}
+            isVisible={isTimePickerVisible}
             is24Hour={true}
             mode="time"
             onConfirm={(date) => {
-              props.setFieldValue(props.timeField, dateProvider.toHHmm(date))
-              props.setIsTimePickerVisible(false)
+              setFieldValue(timeField, dateProvider.toHHmm(date))
+              setIsTimePickerVisible(false)
             }}
-            onCancel={() => props.setIsTimePickerVisible(false)}
+            onCancel={() => setIsTimePickerVisible(false)}
           />
         )}
       </View>
