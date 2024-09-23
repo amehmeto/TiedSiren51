@@ -1,13 +1,15 @@
 import { Stack } from 'expo-router'
 import React from 'react'
+import { StyleSheet } from 'react-native'
+import { T } from '@/ui/design-system/theme'
 
-const HomeStackLayout = () => {
+export default function HomeStackLayout() {
   return (
     <>
       <Stack
         screenOptions={{
           header: () => null,
-          contentStyle: { backgroundColor: '#FFF' },
+          contentStyle: styles.contentStyle,
         }}
       >
         <Stack.Screen name="index" />
@@ -16,4 +18,8 @@ const HomeStackLayout = () => {
   )
 }
 
-export default HomeStackLayout
+const styles = StyleSheet.create({
+  contentStyle: {
+    backgroundColor: T.color.white,
+  },
+})

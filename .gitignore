@@ -40,6 +40,12 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# Windows
+
+%ProgramData%/Microsoft/Windows/UUS/State/_active.uusver
+.uusver
+%ProgramData%/
+
 # local env files
 .env*.local
 
@@ -51,6 +57,7 @@ coverage/
 # Expo
 
 expo-env.d.ts
+.expo
 
 # Android
 #

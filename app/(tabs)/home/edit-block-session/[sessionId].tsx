@@ -7,7 +7,7 @@ import { useLocalSearchParams } from 'expo-router'
 export default function EditBlockSessionScreen() {
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>()
   const session = useSelector((state: RootState) =>
-    selectBlockSessionById(sessionId as string, state),
+    selectBlockSessionById(sessionId, state),
   )
 
   return <BlockSessionForm session={session} mode="edit" />

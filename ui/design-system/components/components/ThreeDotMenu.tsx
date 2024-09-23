@@ -25,13 +25,11 @@ type IconName =
   | 'copy-outline'
   | 'trash-outline'
 
-type ThreeDotMenu = {
+type TiedSMenu = {
   name: string
   iconName: IconName
   action: () => void
 }
-
-type TiedSMenu = ThreeDotMenu
 
 function TiedSMenuOption(props: {
   optionName: TiedSMenu['name']

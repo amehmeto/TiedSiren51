@@ -1,13 +1,15 @@
 import { Stack } from 'expo-router'
 import React from 'react'
+import { T } from '@/ui/design-system/theme'
+import { StyleSheet } from 'react-native'
 
-const BlocklistsStackLayout = () => {
+export default function BlocklistsStackLayout() {
   return (
     <>
       <Stack
         screenOptions={{
           header: () => null,
-          contentStyle: { backgroundColor: '#FFF' },
+          contentStyle: styles.contentStyle,
         }}
       >
         <Stack.Screen name="index" />
@@ -16,4 +18,8 @@ const BlocklistsStackLayout = () => {
   )
 }
 
-export default BlocklistsStackLayout
+const styles = StyleSheet.create({
+  contentStyle: {
+    backgroundColor: T.color.white,
+  },
+})
