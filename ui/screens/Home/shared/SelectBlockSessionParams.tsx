@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { FormikProps } from 'formik'
-import { StyleSheet, View } from 'react-native'
+import { StyleSheet, TouchableOpacity, View, Text } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { deviceRepository } from '@/ui/dependencies'
 import { Device } from '@/core/device/device'
@@ -14,6 +14,14 @@ import { SelectFromList } from '@/ui/screens/Home/shared/SelectFromList'
 import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
 import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
 import { useRouter } from 'expo-router'
+import BlockingConditionModal from '@/ui/design-system/components/components/BlockingConditionModal'
+
+const BUTTON_TEXT_START = 'START'
+const LIST_TYPE_BLOCKLISTS = 'blocklists'
+const LIST_TYPE_DEVICES = 'devices'
+const LABEL_BLOCKING_CONDITIONS = 'Blocking Conditions'
+const DEFAULT_BLOCKING_CONDITION = 'Select Blocking Conditions'
+const ROUTE_TABS = '/(tabs)'
 
 export function SelectBlockSessionParams(
   props: Readonly<{
@@ -27,6 +35,8 @@ export function SelectBlockSessionParams(
     useState<boolean>(false)
   const [isEndTimePickerVisible, setIsEndTimePickerVisible] =
     useState<boolean>(false)
+  const [isBlockingConditionModalVisible, setBlockingConditionModalVisible] =
+    useState<boolean>(false)
 
   const blocklists = useSelector((state: RootState) =>
     selectAllBlocklists(state),
@@ -34,12 +44,16 @@ export function SelectBlockSessionParams(
 
   const router = useRouter()
 
-  const [selectedDevice, setSelectedDevice] = useState<Device | null>(null)
   useEffect(() => {
     deviceRepository.findAll().then((devices) => {
       setDevices(devices)
     })
   }, [])
+
+  const handleSelectBlockingCondition = (selectedCondition: string) => {
+    setFieldValue('blockingCondition', selectedCondition)
+    setBlockingConditionModalVisible(false)
+  }
 
   return (
     <View>
@@ -53,13 +67,13 @@ export function SelectBlockSessionParams(
 
         <SelectFromList
           values={values}
-          listType={'blocklists'}
+          listType={LIST_TYPE_BLOCKLISTS}
           setFieldValue={setFieldValue}
           items={blocklists}
         />
         <SelectFromList
           values={values}
-          listType={'devices'}
+          listType={LIST_TYPE_DEVICES}
           setFieldValue={setFieldValue}
           items={devices}
         />
@@ -80,13 +94,29 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           handleChange={handleChange}
         />
+
+        <TouchableOpacity
+          style={styles.blockingCondition}
+          onPress={() => setBlockingConditionModalVisible(true)}
+        >
+          <Text style={styles.label}>{LABEL_BLOCKING_CONDITIONS}</Text>
+          <Text style={styles.option}>
+            {values.blockingCondition || DEFAULT_BLOCKING_CONDITION}
+          </Text>
+        </TouchableOpacity>
       </TiedSBlurView>
 
+      <BlockingConditionModal
+        visible={isBlockingConditionModalVisible}
+        onClose={() => setBlockingConditionModalVisible(false)}
+        onSelectBlockingCondition={handleSelectBlockingCondition}
+      />
+
       <TiedSButton
-        text={'START'}
+        text={BUTTON_TEXT_START}
         onPress={() => {
           handleSubmit()
-          router.push('/(tabs)')
+          router.push(ROUTE_TABS)
         }}
       />
     </View>
@@ -112,5 +142,15 @@ const styles = StyleSheet.create({
   option: {
     color: T.color.lightBlue,
     textAlign: 'right',
+  },
+  blockingCondition: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    paddingTop: T.spacing.medium,
+    paddingBottom: T.spacing.medium,
+    paddingLeft: T.spacing.small,
+    paddingRight: T.spacing.small,
+    borderBottomWidth: 1,
+    borderBottomColor: T.color.lightBlue,
   },
 })

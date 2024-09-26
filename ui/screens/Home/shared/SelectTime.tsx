@@ -43,7 +43,9 @@ export function SelectTime({
   return (
     <>
       <View style={styles.param}>
-        <Text style={styles.label}>{timeField}</Text>
+        <Text style={styles.label}>
+          {timeField === 'startedAt' ? 'Start Time' : 'End Time'}
+        </Text>
         <Pressable onPress={() => setIsTimePickerVisible(true)}>
           <Text style={styles.option}>{placeholder}</Text>
         </Pressable>

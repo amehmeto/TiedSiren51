@@ -42,7 +42,7 @@ const CONDITIONS = [
 interface BlockingConditionModalProps {
   visible: boolean
   onClose: () => void
-  onSelectBlockingCondition: () => void
+  onSelectBlockingCondition: (condition: string) => void
 }
 
 export default function BlockingConditionModal({
@@ -66,7 +66,7 @@ export default function BlockingConditionModal({
                 iconName={condition.iconName as keyof typeof Ionicons.glyphMap}
                 title={condition.title}
                 subtitle={condition.subtitle}
-                onSelect={onSelectBlockingCondition}
+                onSelect={() => onSelectBlockingCondition(condition.title)}
               />
             ))}
           </ScrollView>

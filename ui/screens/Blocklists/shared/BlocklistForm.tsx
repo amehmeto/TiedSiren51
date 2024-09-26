@@ -21,7 +21,7 @@ import { TiedSTextInput } from '@/ui/design-system/components/components/TiedSTe
 import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
 import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/shared/ChooseBlockTabBar'
 import { useRouter } from 'expo-router'
-import BlockingConditionModal from '@/ui/design-system/components/components/BlockingConditionModal'
+// import BlockingConditionModal from '@/ui/design-system/components/components/BlockingConditionModal'
 
 export type BlocklistScreenProps = {
   mode: 'create' | 'edit'
@@ -41,11 +41,11 @@ export function BlocklistForm({
   )
 
   const router = useRouter()
-  const [modalVisible, setModalVisible] = useState(false)
-  const handleBlockingConditionSelection = () => {
-    router.push('/(tabs)/blocklists')
-    setModalVisible(false)
-  }
+  // const [modalVisible, setModalVisible] = useState(false)
+  // const handleBlockingConditionSelection = () => {
+  //   router.push('/(tabs)/blocklists')
+  //   setModalVisible(false)
+  // }
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
     {
@@ -188,15 +188,15 @@ export function BlocklistForm({
                   blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>,
                 ),
               )
-          // router.push('/(tabs)/blocklists')
-          setModalVisible(true)
+          router.push('/(tabs)/blocklists')
+          // setModalVisible(true)
         }}
       />
-      <BlockingConditionModal
+      {/* <BlockingConditionModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}
         onSelectBlockingCondition={handleBlockingConditionSelection}
-      />
+      /> */}
     </TiedSLinearBackground>
   )
 }

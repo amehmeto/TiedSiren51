@@ -12,6 +12,7 @@ import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSe
 // import { z } from 'zod'
 
 export type Session = {
+  blockingCondition?: string
   id: string
   name: string | null
   blocklists: Blocklist[]
