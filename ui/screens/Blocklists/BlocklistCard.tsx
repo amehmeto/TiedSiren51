@@ -1,18 +1,15 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
 import { renameBlocklist } from '@/core/blocklist/usecases/rename-blocklist.usecase'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { duplicateBlocklist } from '@/core/blocklist/usecases/duplicate-blocklist.usecase'
 import { deleteBlocklist } from '@/core/blocklist/usecases/delete-blocklist.usecase'
-import { ScreenList } from '@/ui/navigation/screenLists'
-import { TabScreens } from '@/ui/navigation/TabScreens'
-import { BlocklistsStackScreens } from '@/ui/navigation/BlocklistsStackScreens'
 import { TiedSBlurView } from '@/ui/design-system/components/components/TiedSBlurView'
 import { ThreeDotMenu } from '@/ui/design-system/components/components/ThreeDotMenu'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
+import { useRouter } from 'expo-router'
 
 export function BlocklistCard(
   props: Readonly<{
@@ -21,10 +18,10 @@ export function BlocklistCard(
       name: string
       totalBlocks: string
     }
-    navigation: NativeStackNavigationProp<ScreenList, TabScreens.BLOCKLIST>
   }>,
 ) {
   const dispatch = useDispatch<AppDispatch>()
+  const router = useRouter()
 
   const [isRenameModalVisible, setRenameModalVisible] = useState(false)
   const [isDuplicateModalVisible, setIsDuplicateModalVisible] = useState(false)
@@ -40,10 +37,12 @@ export function BlocklistCard(
     {
       name: 'Edit',
       iconName: 'create-outline' as const,
-      action: () =>
-        props.navigation.navigate(BlocklistsStackScreens.EDIT_BLOCKLIST, {
-          blocklistId: props.blocklist.id,
-        }),
+      action: () => {
+        router.push({
+          pathname: '/(tabs)/blocklists/edit-blocklist-screen/[blocklistId]',
+          params: { blocklistId: props.blocklist.id },
+        })
+      },
     },
     {
       name: 'Duplicate',
@@ -65,8 +64,9 @@ export function BlocklistCard(
     <>
       <Pressable
         onPress={() =>
-          props.navigation.navigate(BlocklistsStackScreens.EDIT_BLOCKLIST, {
-            blocklistId: props.blocklist.id,
+          router.push({
+            pathname: '/(tabs)/blocklists/edit-blocklist-screen/[blocklistId]',
+            params: { blocklistId: props.blocklist.id },
           })
         }
       >
@@ -77,10 +77,7 @@ export function BlocklistCard(
               {props.blocklist.totalBlocks}
             </Text>
           </View>
-          <ThreeDotMenu
-            menuOptions={blocklistCardMenu}
-            navigation={props.navigation}
-          />
+          <ThreeDotMenu menuOptions={blocklistCardMenu} />
         </TiedSBlurView>
       </Pressable>
 

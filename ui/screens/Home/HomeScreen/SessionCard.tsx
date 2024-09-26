@@ -12,6 +12,7 @@ import { TiedSBlurView } from '@/ui/design-system/components/components/TiedSBlu
 import { RoundBlueDot } from '@/ui/screens/Home/HomeScreen/RoundBlueDot'
 import { ThreeDotMenu } from '@/ui/design-system/components/components/ThreeDotMenu'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
+import { useRouter } from 'expo-router'
 
 export function SessionCard(
   props: Readonly<{
@@ -26,6 +27,8 @@ export function SessionCard(
   }>,
 ) {
   const dispatch = useDispatch<AppDispatch>()
+
+  const router = useRouter()
 
   const [isRenameModalVisible, setIsRenameModalVisible] = useState(false)
   const [isDuplicateModalVisible, setIsDuplicateModalVisible] = useState(false)
@@ -42,9 +45,10 @@ export function SessionCard(
       name: 'Edit',
       iconName: 'create-outline' as const,
       action: () => {
-        /*        navigation.navigate(HomeStackScreens.EDIT_BLOCK_SESSION, {
-          sessionId: props.session.id,
-        })*/
+        router.push({
+          pathname: '/(tabs)/home/edit-block-session/[sessionId]',
+          params: { sessionId: props.session.id },
+        })
       },
     },
     {
@@ -67,9 +71,10 @@ export function SessionCard(
     <>
       <Pressable
         onPress={() => {
-          /*          navigation.navigate(HomeStackScreens.EDIT_BLOCK_SESSION, {
-            sessionId: props.session.id,
-          })*/
+          router.push({
+            pathname: '/(tabs)/home/edit-block-session/[sessionId]',
+            params: { sessionId: props.session.id },
+          })
         }}
       >
         <TiedSBlurView>
