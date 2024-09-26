@@ -14,6 +14,10 @@ export const T = {
     grey: 'rgba(211, 211, 211, 1)',
     red: 'rgba(255, 0, 0, 1)',
     yellow: 'rgba(255, 255, 0, 1)',
+    blueIconColor: 'rgba(0, 102, 255,1)',
+    modalBackgroundColor: 'rgba(0, 0, 0, 0.3)',
+    modalContentColor: 'rgba(240, 244, 255,1)',
+    modalTitleColor: 'rgba(125, 138, 153,1)',
   },
   font: {
     size: {
@@ -35,6 +39,7 @@ export const T = {
     },
   },
   size: {
+    tiny: 10,
     xSmall: 11,
     small: 14,
     medium: 20,
@@ -58,6 +63,8 @@ export const T = {
     },
     radius: {
       roundedSmall: 5,
+      roundedMedium: 10,
+      roundedLarge: 15,
       extraRounded: 20,
       fullRound: 100,
     },
