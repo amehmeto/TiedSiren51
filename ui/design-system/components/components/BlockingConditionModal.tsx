@@ -9,6 +9,12 @@ import {
 } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { Ionicons } from '@expo/vector-icons'
+import Animated, {
+  useAnimatedStyle,
+  useSharedValue,
+  withSpring,
+  withTiming,
+} from 'react-native-reanimated'
 
 type IconName =
   | 'time-outline'
@@ -74,10 +80,33 @@ export default function BlockingConditionModal({
   onClose,
   onSelectBlockingCondition,
 }: BlockingConditionModalProps) {
+  const scale = useSharedValue(0.8)
+  const opacity = useSharedValue(0)
+
+  const animatedStyle = useAnimatedStyle(() => {
+    return {
+      transform: [
+        { scale: withSpring(scale.value, { damping: 10, stiffness: 80 }) },
+      ],
+      opacity: withTiming(opacity.value, { duration: 300 }),
+    }
+  })
+
+  React.useEffect(() => {
+    if (visible) {
+      scale.value = 1
+      opacity.value = 1
+    } else {
+      scale.value = 0.8
+      opacity.value = 0
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [visible])
+
   return (
     <Modal visible={visible} transparent={true} animationType="slide">
       <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
+        <Animated.View style={[styles.modalContent, animatedStyle]}>
           <TouchableOpacity style={styles.closeIconContainer} onPress={onClose}>
             <Ionicons name="close" size={28} color={T.color.blueIconColor} />
           </TouchableOpacity>
@@ -94,7 +123,7 @@ export default function BlockingConditionModal({
               />
             ))}
           </ScrollView>
-        </View>
+        </Animated.View>
       </View>
     </Modal>
   )
