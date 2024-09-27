@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import {
   Modal,
   View,
@@ -35,7 +35,7 @@ type BlockingConditionModalProps = {
   onSelectBlockingCondition: (condition: string) => void
 }
 
-type BlockingConditionComponentProps = {
+type BlockingConditionProps = {
   iconName: IconName
   title: string
   subtitle: string
@@ -92,7 +92,7 @@ export default function BlockingConditionModal({
     }
   })
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (visible) {
       scale.value = 1
       opacity.value = 1
@@ -100,8 +100,7 @@ export default function BlockingConditionModal({
       scale.value = 0.8
       opacity.value = 0
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [visible])
+  }, [visible, scale, opacity])
 
   return (
     <Modal visible={visible} transparent={true} animationType="slide">
@@ -113,9 +112,9 @@ export default function BlockingConditionModal({
           <Text style={styles.modalTitle}>{TEXTS.MODAL_TITLE}</Text>
           <Text style={styles.modalSubtitle}>{TEXTS.MODAL_SUBTITLE}</Text>
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
-            {CONDITIONS.map((condition, index) => (
+            {CONDITIONS.map((condition) => (
               <BlockingConditionComponent
-                key={index}
+                key={condition.title}
                 iconName={condition.iconName}
                 title={condition.title}
                 subtitle={condition.subtitle}
@@ -134,7 +133,7 @@ function BlockingConditionComponent({
   title,
   subtitle,
   onSelect,
-}: BlockingConditionComponentProps) {
+}: BlockingConditionProps) {
   return (
     <TouchableOpacity style={styles.conditionContainer} onPress={onSelect}>
       <Ionicons
