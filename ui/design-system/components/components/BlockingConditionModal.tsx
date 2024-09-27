@@ -10,12 +10,38 @@ import {
 import { T } from '@/ui/design-system/theme'
 import { Ionicons } from '@expo/vector-icons'
 
+type IconName =
+  | 'time-outline'
+  | 'location-outline'
+  | 'wifi-outline'
+  | 'hourglass-outline'
+  | 'power-outline'
+
+type BlockingCondition = {
+  iconName: IconName
+  title: string
+  subtitle: string
+}
+
+type BlockingConditionModalProps = {
+  visible: boolean
+  onClose: () => void
+  onSelectBlockingCondition: (condition: string) => void
+}
+
+type BlockingConditionComponentProps = {
+  iconName: IconName
+  title: string
+  subtitle: string
+  onSelect: () => void
+}
+
 const TEXTS = {
   MODAL_TITLE: 'Blocking conditions',
   MODAL_SUBTITLE: "Select when or where you don't want to be disturbed",
 }
 
-const CONDITIONS = [
+const CONDITIONS: BlockingCondition[] = [
   {
     iconName: 'time-outline',
     title: 'Time',
@@ -26,7 +52,11 @@ const CONDITIONS = [
     title: 'Location',
     subtitle: 'e.g. workplace or campus',
   },
-  { iconName: 'wifi-outline', title: 'Wi-Fi', subtitle: 'e.g. home network' },
+  {
+    iconName: 'wifi-outline',
+    title: 'Wi-Fi',
+    subtitle: 'e.g. home network',
+  },
   {
     iconName: 'hourglass-outline',
     title: 'Usage limit',
@@ -38,12 +68,6 @@ const CONDITIONS = [
     subtitle: 'e.g. max 20 times a day / an hour',
   },
 ]
-
-interface BlockingConditionModalProps {
-  visible: boolean
-  onClose: () => void
-  onSelectBlockingCondition: (condition: string) => void
-}
 
 export default function BlockingConditionModal({
   visible,
@@ -61,9 +85,9 @@ export default function BlockingConditionModal({
           <Text style={styles.modalSubtitle}>{TEXTS.MODAL_SUBTITLE}</Text>
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
             {CONDITIONS.map((condition, index) => (
-              <ConditionItem
+              <BlockingConditionComponent
                 key={index}
-                iconName={condition.iconName as keyof typeof Ionicons.glyphMap}
+                iconName={condition.iconName}
                 title={condition.title}
                 subtitle={condition.subtitle}
                 onSelect={() => onSelectBlockingCondition(condition.title)}
@@ -76,24 +100,17 @@ export default function BlockingConditionModal({
   )
 }
 
-interface ConditionItemProps {
-  iconName: keyof typeof Ionicons.glyphMap
-  title: string
-  subtitle: string
-  onSelect: () => void
-}
-
-function ConditionItem({
+function BlockingConditionComponent({
   iconName,
   title,
   subtitle,
   onSelect,
-}: ConditionItemProps) {
+}: BlockingConditionComponentProps) {
   return (
-    <TouchableOpacity style={styles.conditionItem} onPress={onSelect}>
+    <TouchableOpacity style={styles.conditionContainer} onPress={onSelect}>
       <Ionicons
         name={iconName}
-        size={24}
+        size={T.size.large}
         color={T.color.blueIconColor}
         style={styles.conditionIcon}
       />
@@ -139,7 +156,7 @@ const styles = StyleSheet.create({
   scrollViewContent: {
     paddingBottom: T.size.medium,
   },
-  conditionItem: {
+  conditionContainer: {
     backgroundColor: T.color.white,
     borderRadius: T.border.radius.roundedMedium,
     padding: T.size.small,

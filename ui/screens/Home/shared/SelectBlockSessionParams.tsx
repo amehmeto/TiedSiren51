@@ -16,12 +16,14 @@ import { TiedSButton } from '@/ui/design-system/components/components/TiedSButto
 import { useRouter } from 'expo-router'
 import BlockingConditionModal from '@/ui/design-system/components/components/BlockingConditionModal'
 
-const BUTTON_TEXT_START = 'START'
-const LIST_TYPE_BLOCKLISTS = 'blocklists'
-const LIST_TYPE_DEVICES = 'devices'
-const LABEL_BLOCKING_CONDITIONS = 'Blocking Conditions'
-const DEFAULT_BLOCKING_CONDITION = 'Select Blocking Conditions'
-const ROUTE_TABS = '/(tabs)'
+enum BlockSessionParams {
+  BUTTON_TEXT_START = 'START',
+  LIST_TYPE_BLOCKLISTS = 'blocklists',
+  LIST_TYPE_DEVICES = 'devices',
+  LABEL_BLOCKING_CONDITIONS = 'Blocking Conditions',
+  DEFAULT_BLOCKING_CONDITION = 'Select Blocking Conditions',
+  ROUTE_TABS = '/(tabs)',
+}
 
 export function SelectBlockSessionParams(
   props: Readonly<{
@@ -67,13 +69,13 @@ export function SelectBlockSessionParams(
 
         <SelectFromList
           values={values}
-          listType={LIST_TYPE_BLOCKLISTS}
+          listType={BlockSessionParams.LIST_TYPE_BLOCKLISTS}
           setFieldValue={setFieldValue}
           items={blocklists}
         />
         <SelectFromList
           values={values}
-          listType={LIST_TYPE_DEVICES}
+          listType={BlockSessionParams.LIST_TYPE_DEVICES}
           setFieldValue={setFieldValue}
           items={devices}
         />
@@ -99,9 +101,12 @@ export function SelectBlockSessionParams(
           style={styles.blockingCondition}
           onPress={() => setBlockingConditionModalVisible(true)}
         >
-          <Text style={styles.label}>{LABEL_BLOCKING_CONDITIONS}</Text>
+          <Text style={styles.label}>
+            {BlockSessionParams.LABEL_BLOCKING_CONDITIONS}
+          </Text>
           <Text style={styles.option}>
-            {values.blockingCondition || DEFAULT_BLOCKING_CONDITION}
+            {values.blockingCondition ||
+              BlockSessionParams.DEFAULT_BLOCKING_CONDITION}
           </Text>
         </TouchableOpacity>
       </TiedSBlurView>
@@ -113,10 +118,10 @@ export function SelectBlockSessionParams(
       />
 
       <TiedSButton
-        text={BUTTON_TEXT_START}
+        text={BlockSessionParams.BUTTON_TEXT_START}
         onPress={() => {
           handleSubmit()
-          router.push(ROUTE_TABS)
+          router.push(BlockSessionParams.ROUTE_TABS)
         }}
       />
     </View>

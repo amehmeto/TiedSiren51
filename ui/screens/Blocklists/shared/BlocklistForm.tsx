@@ -41,11 +41,6 @@ export function BlocklistForm({
   )
 
   const router = useRouter()
-  // const [modalVisible, setModalVisible] = useState(false)
-  // const handleBlockingConditionSelection = () => {
-  //   router.push('/(tabs)/blocklists')
-  //   setModalVisible(false)
-  // }
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
     {
@@ -181,6 +176,7 @@ export function BlocklistForm({
       <TiedSButton
         text={'Save Blocklist'}
         onPress={async () => {
+          // eslint-disable-next-line no-unused-expressions
           mode === 'edit'
             ? await dispatch(updateBlocklist(blocklist as Blocklist))
             : await dispatch(
@@ -189,14 +185,8 @@ export function BlocklistForm({
                 ),
               )
           router.push('/(tabs)/blocklists')
-          // setModalVisible(true)
         }}
       />
-      {/* <BlockingConditionModal
-        visible={modalVisible}
-        onClose={() => setModalVisible(false)}
-        onSelectBlockingCondition={handleBlockingConditionSelection}
-      /> */}
     </TiedSLinearBackground>
   )
 }
