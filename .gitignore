@@ -40,6 +40,12 @@ yarn-error.*
 .DS_Store
 *.pem
 
+# Windows
+
+%ProgramData%/Microsoft/Windows/UUS/State/_active.uusver
+.uusver
+%ProgramData%/
+
 # local env files
 .env*.local
 
@@ -47,6 +53,11 @@ yarn-error.*
 *.tsbuildinfo
 
 coverage/
+
+# Expo
+
+expo-env.d.ts
+.expo
 
 # Android
 #
@@ -67,7 +78,6 @@ MANIFEST-*
 
 # PouchDB databases
 block-sessions/
-blocklists/
 devices/
 sirens/
 remote-devices/
