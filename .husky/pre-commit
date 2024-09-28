@@ -1,4 +1,6 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
+sh .husky/scripts/no-package-lock-json-file.sh
+
 npx lint-staged
