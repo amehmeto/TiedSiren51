@@ -4,7 +4,7 @@ import { blocklistAdapter } from '@/core/blocklist/blocklist'
 import {
   BlocklistViewModel,
   BlocklistViewModelType,
-} from '@/ui/screens/Blocklists/BlocklistScreen/blocklist-view-model.type'
+} from '@/core/blocklist/selectors/blocklist-view-model.type'
 
 export const selectBlocklistViewModel = createSelector(
   [(rootState: RootState) => rootState.blocklist],

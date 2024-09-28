@@ -32,13 +32,13 @@ export function SelectTime({
 
   const chosenTime =
     timeField === 'startedAt'
-      ? values.startedAt ?? localeNow
-      : values.endedAt ?? localeNow
+      ? (values.startedAt ?? localeNow)
+      : (values.endedAt ?? localeNow)
 
   const placeholder =
     timeField === 'startedAt'
-      ? values.startedAt ?? `Select start time...`
-      : values.endedAt ?? `Select end time...`
+      ? (values.startedAt ?? `Select start time...`)
+      : (values.endedAt ?? `Select end time...`)
 
   return (
     <>

@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { FormikProps } from 'formik'
-import { StyleSheet, TouchableOpacity, View, Text } from 'react-native'
+import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { deviceRepository } from '@/ui/dependencies'
 import { Device } from '@/core/device/device'
@@ -8,21 +8,20 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
 import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
-import { TiedSBlurView } from '@/ui/design-system/components/components/TiedSBlurView'
 import { ChooseName } from '@/ui/screens/Home/shared/ChooseName'
 import { SelectFromList } from '@/ui/screens/Home/shared/SelectFromList'
 import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
-import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
 import { useRouter } from 'expo-router'
-import BlockingConditionModal from '@/ui/design-system/components/components/BlockingConditionModal'
+import BlockingConditionModal from '@/ui/design-system/components/shared/BlockingConditionModal'
+import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 
 enum BlockSessionParams {
   BUTTON_TEXT_START = 'START',
   LIST_TYPE_BLOCKLISTS = 'blocklists',
   LIST_TYPE_DEVICES = 'devices',
   LABEL_BLOCKING_CONDITIONS = 'Blocking Conditions',
-  DEFAULT_BLOCKING_CONDITION = 'Select Blocking Conditions',
-  ROUTE_TABS = '/(tabs)',
+  DEFAULT_BLOCKING_CONDITION = 'Select blocking conditions...',
 }
 
 export function SelectBlockSessionParams(
@@ -101,12 +100,9 @@ export function SelectBlockSessionParams(
           style={styles.blockingCondition}
           onPress={() => setBlockingConditionModalVisible(true)}
         >
-          <Text style={styles.label}>
-            {BlockSessionParams.LABEL_BLOCKING_CONDITIONS}
-          </Text>
+          <Text style={styles.label}>{'Blocking Conditions'}</Text>
           <Text style={styles.option}>
-            {values.blockingCondition ||
-              BlockSessionParams.DEFAULT_BLOCKING_CONDITION}
+            {values.blockingCondition || 'Select blocking conditions...'}
           </Text>
         </TouchableOpacity>
       </TiedSBlurView>
@@ -121,7 +117,7 @@ export function SelectBlockSessionParams(
         text={BlockSessionParams.BUTTON_TEXT_START}
         onPress={() => {
           handleSubmit()
-          router.push(BlockSessionParams.ROUTE_TABS)
+          router.push('/(tabs)')
         }}
       />
     </View>
@@ -155,7 +151,5 @@ const styles = StyleSheet.create({
     paddingBottom: T.spacing.medium,
     paddingLeft: T.spacing.small,
     paddingRight: T.spacing.small,
-    borderBottomWidth: 1,
-    borderBottomColor: T.color.lightBlue,
   },
 })

@@ -9,14 +9,14 @@ import {
   View,
 } from 'react-native'
 import { RootState } from '@/core/_redux_/createStore'
-import { selectBlocklistViewModel } from '@/ui/screens/Blocklists/BlocklistScreen/blocklist.view-model'
-import { BlocklistViewModel } from '@/ui/screens/Blocklists/BlocklistScreen/blocklist-view-model.type'
+import { selectBlocklistViewModel } from '@/core/blocklist/selectors/blocklist.view-model'
+import { BlocklistViewModel } from '@/core/blocklist/selectors/blocklist-view-model.type'
 import { BlocklistCard } from '@/ui/screens/Blocklists/BlocklistCard'
 import { exhaustiveGuard } from '@/ui/exhaustive-guard'
-import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
 import { Ionicons } from '@expo/vector-icons'
 import { T } from '@/ui/design-system/theme'
 import { useRouter } from 'expo-router'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 
 export default function BlocklistScreen() {
   const viewModel = useSelector<

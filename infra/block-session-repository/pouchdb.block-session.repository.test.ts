@@ -11,7 +11,7 @@ describe('PouchDBBlockSessionRepository', () => {
   let db: PouchDB.Database<BlockSession>
 
   beforeEach(async () => {
-    db = new PouchDB('block-sessions')
+    db = new PouchDB('pdb-block-sessions')
     await db.destroy()
 
     blockSessionRepository = new PouchdbBlockSessionRepository()

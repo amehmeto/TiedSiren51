@@ -1,22 +1,11 @@
 import { Tabs } from 'expo-router'
 import React from 'react'
-import { T } from '@/ui/design-system/theme'
 import { StyleSheet } from 'react-native'
-import { TabScreens } from '@/ui/navigation/TabScreens'
 import { Entypo, Ionicons } from '@expo/vector-icons'
-
-/*type IconName =
-  | 'home'
-  | 'lock-open'
-  | 'shield'
-  | 'settings'
-  | 'light-up'
-  | 'lock-open-outline'
-  | 'settings-outline'*/
+import { TabScreens } from '@/ui/navigation/TabScreens'
+import { T } from '@/ui/design-system/theme'
 
 export default function TabLayout() {
-  // const colorScheme = useColorScheme()
-
   const tabs: {
     name: string
     title: string

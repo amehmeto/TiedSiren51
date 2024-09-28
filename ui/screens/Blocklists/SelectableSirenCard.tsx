@@ -5,7 +5,7 @@ import { FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
 import { CheckBox } from 'react-native-elements'
 
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
-import { TiedSBlurView } from '@/ui/design-system/components/components/TiedSBlurView'
+import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
 
 export function SelectableSirenCard({
   sirenType,

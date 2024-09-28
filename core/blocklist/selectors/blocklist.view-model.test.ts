@@ -6,8 +6,8 @@ import {
   amazonPrimeAndroidSiren,
   youtubeAndroidSiren,
 } from '@/core/_tests_/data-builders/android-siren.builder'
-import { BlocklistViewModel } from '@/ui/screens/Blocklists/BlocklistScreen/blocklist-view-model.type'
-import { selectBlocklistViewModel } from '@/ui/screens/Blocklists/BlocklistScreen/blocklist.view-model'
+import { BlocklistViewModel } from '@/core/blocklist/selectors/blocklist-view-model.type'
+import { selectBlocklistViewModel } from '@/core/blocklist/selectors/blocklist.view-model'
 
 describe('Blocklists View Model', () => {
   test('Example: there is no blocklist', () => {

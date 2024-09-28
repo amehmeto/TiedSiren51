@@ -9,7 +9,7 @@ export class PouchdbBlocklistRepository implements BlocklistRepository {
   private db: PouchDB.Database<Blocklist>
 
   constructor() {
-    this.db = new PouchDB('blocklists')
+    this.db = new PouchDB('pdb-blocklists')
   }
 
   async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {

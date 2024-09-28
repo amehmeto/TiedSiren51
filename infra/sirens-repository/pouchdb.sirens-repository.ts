@@ -6,7 +6,7 @@ export class PouchdbSirensRepository implements SirensRepository {
   private db: PouchDB.Database<Sirens>
 
   constructor() {
-    this.db = new PouchDB('sirens')
+    this.db = new PouchDB('pdb-sirens')
     this.initSirens()
   }
 
