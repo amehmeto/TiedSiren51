@@ -12,6 +12,7 @@ import * as NavigationBar from 'expo-navigation-bar'
 import { Platform } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { Stack } from 'expo-router'
+import { listInstalledApps } from '@/modules/list-installed-apps'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -23,6 +24,8 @@ Notifications.setNotificationHandler({
 
 export default function App() {
   const [store, setStore] = useState<AppStore | null>(null)
+
+  console.log(listInstalledApps())
 
   useEffect(() => {
     storePromise.then(setStore)

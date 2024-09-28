@@ -13,7 +13,8 @@
       "backgroundColor": "#ffffff"
     },
     "ios": {
-      "supportsTablet": true
+      "supportsTablet": true,
+      "bundleIdentifier": "com.tiedsiren.tiedsiren"
     },
     "android": {
       "adaptiveIcon": {
@@ -38,8 +39,10 @@
         "origin": false
       },
       "eas": {
+        "owner": "epictechtus",
         "projectId": "b92a6e4e-b682-4d8a-aa5b-d3e299aa6764"
       }
-    }
+    },
+    "owner": "epictechtus"
   }
 }
