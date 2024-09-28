@@ -17,7 +17,7 @@ export function hello(): string {
   return ListInstalledAppsModule.hello()
 }
 
-export function listInstalledApps(): Array<any> {
+export function listInstalledApps(): any[] {
   return ListInstalledAppsModule.listInstalledApps()
 }
 
