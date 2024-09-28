@@ -4,10 +4,11 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
-    "reset-project": "node ./scripts/reset-project.js",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "web": "expo start --web",
+    "electron:start": "electron electron.js",
+    "electron:dev": "concurrently \"BROWSER=none yarn web --port 19006\" \"wait-on http://localhost:19006 && yarn electron:start\"",
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts,tsx}\" && prettier \"**/*.{js,ts,tsx}\"",
     "lint:fix": "tsc --noEmit && eslint --fix \"**/*.{js,ts,tsx}\" && prettier --write \"**/*.{js,ts,tsx}\"",
     "test": "vitest",
@@ -35,10 +36,10 @@
     "@expo/vector-icons": "14.0.3",
     "@faker-js/faker": "^8.4.1",
     "@react-native-community/datetimepicker": "8.0.1",
-    "@react-navigation/native": "^6.0.2",
     "@reduxjs/toolkit": "^2.2.5",
     "@types/react-redux": "^7.1.33",
     "date-fns": "^3.6.0",
+    "electron": "^30.0.3",
     "events": "^3.3.0",
     "expo": "~51.0.31",
     "expo-background-fetch": "^12.0.1",
@@ -80,6 +81,7 @@
     "@types/react": "~18.2.45",
     "@types/react-test-renderer": "^18.0.7",
     "c8": "^9.1.0",
+    "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
     "eslint-config-expo": "^7.0.0",
     "eslint-config-prettier": "^9.1.0",
@@ -92,7 +94,8 @@
     "vite": "^5.2.12",
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.6.0",
-    "vitest-tsconfig-paths": "^3.4.1"
+    "vitest-tsconfig-paths": "^3.4.1",
+    "wait-on": "^7.2.0"
   },
   "private": true
 }

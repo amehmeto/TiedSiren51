@@ -14,10 +14,7 @@ import {
   Text,
   ViewStyle,
 } from 'react-native'
-import { NativeStackNavigationProp } from '@react-navigation/native-stack'
 import { T } from '@/ui/design-system/theme'
-import { ScreenList } from '@/ui/navigation/screenLists'
-import { TabScreens } from '@/ui/navigation/TabScreens'
 
 type IconName =
   | 'text-outline'
@@ -49,7 +46,6 @@ function TiedSMenuOption(props: {
 
 export function ThreeDotMenu(props: {
   menuOptions: TiedSMenu[]
-  navigation?: NativeStackNavigationProp<ScreenList, TabScreens.BLOCKLIST>
   style?: StyleProp<ViewStyle>
 }) {
   const selectMenuOption = (optionName: TiedSMenu['name']) => {

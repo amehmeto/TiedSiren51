@@ -56,7 +56,6 @@ coverage/
 
 # Expo
 
-expo-env.d.ts
 .expo
 
 # Android
@@ -77,9 +76,10 @@ LOG
 MANIFEST-*
 
 # PouchDB databases
-block-sessions/
-devices/
-sirens/
-remote-devices/
+pdb-block-sessions/
+pdb-blocklists/
+pdb-remote-devices/
+pdb-devices/
+pdb-sirens/
 
 .idea/

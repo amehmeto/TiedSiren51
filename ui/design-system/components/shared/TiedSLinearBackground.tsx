@@ -7,7 +7,7 @@ export function TiedSLinearBackground(
   props: Readonly<{ children: React.ReactNode }>,
 ) {
   const statusBarHeight =
-    Platform.OS === 'android' ? StatusBar.currentHeight ?? 0 : 0
+    Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 0
 
   return (
     <LinearGradient

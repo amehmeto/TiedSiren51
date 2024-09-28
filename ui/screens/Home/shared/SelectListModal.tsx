@@ -4,8 +4,9 @@ import { useEffect, useState } from 'react'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
 import * as ExpoDevice from 'expo-device'
-import { TiedSModal } from '@/ui/design-system/components/components/TiedSModal'
-import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
+import { useRouter } from 'expo-router'
 
 const currentDevice: Device = {
   id: ExpoDevice.modelId ?? 'unknown',
@@ -32,6 +33,7 @@ export function SelectListModal(
     items: (Blocklist | Device)[]
   }>,
 ) {
+  const router = useRouter()
   const availableItems =
     props.listType === 'devices' ? [currentDevice, ...props.items] : props.items
   const [selectedItems, setSelectedItems] = useState<(Blocklist | Device)[]>(
@@ -80,7 +82,18 @@ export function SelectListModal(
             </View>
           )}
         />
-        <TiedSButton style={styles.button} onPress={saveList} text={'SAVE'} />
+        {false ? (
+          <TiedSButton
+            style={styles.button}
+            onPress={() => {
+              router.push('/(tabs)/blocklists/create-blocklist-screen')
+              props.onRequestClose()
+            }}
+            text={'CREATE BLOCKLIST'}
+          />
+        ) : (
+          <TiedSButton style={styles.button} onPress={saveList} text={'SAVE'} />
+        )}
       </View>
     </TiedSModal>
   )

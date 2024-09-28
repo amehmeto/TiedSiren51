@@ -7,8 +7,8 @@ import { createBlockSession } from '@/core/block-session/usecases/create-block-s
 import uuid from 'react-native-uuid'
 import { BlockSession } from '@/core/block-session/block.session'
 import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
-import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
 import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 // import { z } from 'zod'
 
 export type Session = {

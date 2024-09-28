@@ -3,9 +3,9 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { FormikErrors } from 'formik'
 import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
-import { TiedSModal } from '@/ui/design-system/components/components/TiedSModal'
-import { TiedSTextInput } from '@/ui/design-system/components/components/TiedSTextInput'
-import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
+import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 
 export function ChooseName(
   props: Readonly<{

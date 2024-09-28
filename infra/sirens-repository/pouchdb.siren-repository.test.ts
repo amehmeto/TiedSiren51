@@ -6,7 +6,7 @@ describe('PouchDBSirenRepository', () => {
   let sirenRepository: PouchdbSirensRepository
 
   beforeEach(async () => {
-    const db = new PouchDB('sirens')
+    const db = new PouchDB('pdb-sirens')
     await db.destroy()
 
     sirenRepository = new PouchdbSirensRepository()

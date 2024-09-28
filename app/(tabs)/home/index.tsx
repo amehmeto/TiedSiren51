@@ -15,10 +15,10 @@ import { NoSessionBoard } from '@/ui/screens/Home/HomeScreen/NoSessionBoard'
 import { SessionsBoard } from '@/ui/screens/Home/HomeScreen/SessionsBoard'
 import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 import { exhaustiveGuard } from '@/ui/exhaustive-guard'
-import { TiedSLinearBackground } from '@/ui/design-system/components/components/TiedSLinearBackground'
-import { TiedSButton } from '@/ui/design-system/components/components/TiedSButton'
 import { T } from '@/ui/design-system/theme'
 import { useRouter } from 'expo-router'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 
 async function notifyActiveSessionsStartAndEnd(
   viewModel: HomeViewModelType,

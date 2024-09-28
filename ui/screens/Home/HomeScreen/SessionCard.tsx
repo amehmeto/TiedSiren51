@@ -8,11 +8,11 @@ import { duplicateBlockSession } from '@/core/block-session/usecases/duplicate-b
 import { renameBlockSession } from '@/core/block-session/usecases/rename-block-session.usecase'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
-import { TiedSBlurView } from '@/ui/design-system/components/components/TiedSBlurView'
 import { RoundBlueDot } from '@/ui/screens/Home/HomeScreen/RoundBlueDot'
-import { ThreeDotMenu } from '@/ui/design-system/components/components/ThreeDotMenu'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 import { useRouter } from 'expo-router'
+import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
+import { ThreeDotMenu } from '@/ui/design-system/components/shared/ThreeDotMenu'
 
 export function SessionCard(
   props: Readonly<{

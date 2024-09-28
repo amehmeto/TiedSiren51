@@ -9,7 +9,7 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
   private db: PouchDB.Database<BlockSession>
 
   constructor() {
-    this.db = new PouchDB('block-sessions')
+    this.db = new PouchDB('pdb-block-sessions')
   }
 
   findAll(): Promise<BlockSession[]> {

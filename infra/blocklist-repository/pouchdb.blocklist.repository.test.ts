@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { PouchdbBlocklistRepository } from './pouchdb.blocklist.repository'
@@ -9,7 +9,7 @@ describe('PouchDBBlocklistRepository', () => {
   let blocklistRepository: PouchdbBlocklistRepository
 
   beforeEach(async () => {
-    const db = new PouchDB('blocklists')
+    const db = new PouchDB('pdb-blocklists')
     await db.destroy()
 
     blocklistRepository = new PouchdbBlocklistRepository()

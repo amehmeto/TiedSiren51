@@ -1,4 +1,4 @@
-import { describe, it, beforeEach, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { PouchdbRemoteDeviceRepository } from './pouchdb.remote-device.repository'
 import PouchDB from 'pouchdb'
 
@@ -6,7 +6,7 @@ describe('PouchDBRemoteDeviceRepository', () => {
   let deviceRepository: PouchdbRemoteDeviceRepository
 
   beforeEach(async () => {
-    const db = new PouchDB('remote-devices')
+    const db = new PouchDB('pdb-remote-devices')
     await db.destroy()
 
     deviceRepository = new PouchdbRemoteDeviceRepository()

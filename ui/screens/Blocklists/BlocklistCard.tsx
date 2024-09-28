@@ -6,10 +6,10 @@ import { renameBlocklist } from '@/core/blocklist/usecases/rename-blocklist.usec
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { duplicateBlocklist } from '@/core/blocklist/usecases/duplicate-blocklist.usecase'
 import { deleteBlocklist } from '@/core/blocklist/usecases/delete-blocklist.usecase'
-import { TiedSBlurView } from '@/ui/design-system/components/components/TiedSBlurView'
-import { ThreeDotMenu } from '@/ui/design-system/components/components/ThreeDotMenu'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 import { useRouter } from 'expo-router'
+import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
+import { ThreeDotMenu } from '@/ui/design-system/components/shared/ThreeDotMenu'
 
 export function BlocklistCard(
   props: Readonly<{
