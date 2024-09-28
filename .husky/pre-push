@@ -1,11 +1,8 @@
 #!/bin/sh
 . "$(dirname "$0")/_/husky.sh"
 
-branch=$(git branch --show-current)
+sh .husky/scripts/no-direct-push-main-demo.sh
+sh .husky/scripts/no-package-lock-json-file.sh
+sh .husky/scripts/uncommitted-files-check.sh
 
-if [ "$branch" = "main" ]; then
-  printf "\033[0;35mDirect push to main branch is not allowed.\033[0m\n"
-  exit 1
-fi
-
-npm run check:uncommitted && npm run test:cov
+npm run test:cov

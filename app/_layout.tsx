@@ -51,7 +51,7 @@ export default function App() {
         <Stack
           screenOptions={{
             header: () => null,
-            contentStyle: { backgroundColor: '#FFF' },
+            contentStyle: { backgroundColor: T.color.white },
           }}
         >
           <Stack.Screen name="(tabs)" />
