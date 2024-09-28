@@ -18,7 +18,7 @@ web-build/
 # Expo extra
 credentials.json
 ios/
-android/
+./android/
 
 # Native
 *.orig.*
