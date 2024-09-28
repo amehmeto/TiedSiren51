@@ -21,7 +21,44 @@ import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurVie
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
-// import BlockingConditionModal from '@/ui/design-system/components/components/BlockingConditionModal'
+import { z } from 'zod'
+
+const blocklistSchema = z.object({
+  name: z
+    .string()
+    .nullable()
+    .refine((val) => val !== null && val.trim() !== '', {
+      message: 'Blocklist name must be provided',
+    }),
+  sirens: z
+    .object({
+      // android: z.array(
+      //   z.object({
+      //     packageName: z.string(),
+      //   }),
+      // ),
+      // ios: z.array(z.string()),
+      // windows: z.array(z.string()),
+      // macos: z.array(z.string()),
+      // linux: z.array(z.string()),
+      android: z.array(z.any()).optional(),
+      websites: z.array(z.string()).optional(),
+      keywords: z.array(z.string()).optional(),
+    })
+    .refine(
+      (sirens) => {
+        const hasSelectedApps = (sirens.android?.length ?? 0) > 0
+        const hasSelectedWebsites = (sirens.websites?.length ?? 0) > 0
+        const hasSelectedKeywords = (sirens.keywords?.length ?? 0) > 0
+
+        return hasSelectedApps || hasSelectedWebsites || hasSelectedKeywords
+      },
+      {
+        message:
+          'You must select at least one of: Apps, Websites, or Keywords.',
+      },
+    ),
+})
 
 export type BlocklistScreenProps = {
   mode: 'create' | 'edit'
@@ -56,6 +93,8 @@ export function BlocklistForm({
       },
     },
   )
+
+  const [errors, setErrors] = useState<{ [key: string]: string }>({})
 
   useEffect(() => {
     dispatch(fetchAvailableSirens())
@@ -152,6 +191,39 @@ export function BlocklistForm({
     ),
   })
 
+  const validateForm = (data: typeof blocklist) => {
+    try {
+      blocklistSchema.parse(data)
+      setErrors({})
+      return true
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        const validationErrors: { [key: string]: string } = {}
+        e.errors.forEach((error) => {
+          const field = error.path.join('.')
+          validationErrors[field] = error.message
+        })
+        setErrors(validationErrors)
+      }
+      return false
+    }
+  }
+
+  const handleSubmit = async () => {
+    if (!validateForm(blocklist)) {
+      return
+    }
+
+    // Proceed with form submission
+    mode === 'edit'
+      ? await dispatch(updateBlocklist(blocklist as Blocklist))
+      : await dispatch(
+          createBlocklist(blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>),
+        )
+
+    router.push('/(tabs)/blocklists')
+  }
+
   return (
     <TiedSLinearBackground>
       <Text style={styles.title}>Name</Text>
@@ -161,7 +233,7 @@ export function BlocklistForm({
           onChangeText={(text) => setBlocklist({ ...blocklist, name: text })}
         />
       </TiedSBlurView>
-
+      {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
@@ -172,21 +244,11 @@ export function BlocklistForm({
           <ChooseBlockTabBar {...props} />
         )}
       />
+      {errors['sirens'] && (
+        <Text style={styles.errorText}>{errors['sirens']}</Text>
+      )}
 
-      <TiedSButton
-        text={'Save Blocklist'}
-        onPress={async () => {
-          // eslint-disable-next-line no-unused-expressions
-          mode === 'edit'
-            ? await dispatch(updateBlocklist(blocklist as Blocklist))
-            : await dispatch(
-                createBlocklist(
-                  blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>,
-                ),
-              )
-          router.push('/(tabs)/blocklists')
-        }}
-      />
+      <TiedSButton text={'Save Blocklist'} onPress={handleSubmit} />
     </TiedSLinearBackground>
   )
 }
@@ -199,5 +261,11 @@ const styles = StyleSheet.create({
     fontSize: T.size.small,
     marginTop: T.spacing.small,
     marginBottom: T.spacing.small,
+  },
+  errorText: {
+    color: T.color.red,
+    fontSize: T.font.size.small,
+    fontWeight: T.font.weight.bold,
+    // marginTop: 4,
   },
 })

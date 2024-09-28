@@ -11,7 +11,6 @@ import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { ChooseName } from '@/ui/screens/Home/shared/ChooseName'
 import { SelectFromList } from '@/ui/screens/Home/shared/SelectFromList'
 import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
-import { useRouter } from 'expo-router'
 import BlockingConditionModal from '@/ui/design-system/components/shared/BlockingConditionModal'
 import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -43,8 +42,6 @@ export function SelectBlockSessionParams(
     selectAllBlocklists(state),
   )
 
-  const router = useRouter()
-
   useEffect(() => {
     deviceRepository.findAll().then((devices) => {
       setDevices(devices)
@@ -53,8 +50,13 @@ export function SelectBlockSessionParams(
 
   const handleSelectBlockingCondition = (selectedCondition: string) => {
     setFieldValue('blockingCondition', selectedCondition)
+    props.form.setFieldTouched('blockingCondition', true)
     setBlockingConditionModalVisible(false)
   }
+  // console.log('blocklists', values.blocklists)
+  // console.log('Form values:', props.form.values)
+  // console.log('Form errors:', props.form.errors)
+  // console.log('Touched fields:', props.form.touched)
 
   return (
     <View>
@@ -65,6 +67,9 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           onBlur={() => handleBlur('name')}
         />
+        {props.form.touched.name && props.form.errors.name && (
+          <Text style={styles.errorText}>{props.form.errors.name}</Text>
+        )}
 
         <SelectFromList
           values={values}
@@ -72,12 +77,50 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           items={blocklists}
         />
+        {props.form.touched.blocklists &&
+          props.form.errors.blocklists &&
+          (Array.isArray(props.form.errors.blocklists) ? (
+            props.form.errors.blocklists.map((error, index) => (
+              <Text key={index} style={styles.errorText}>
+                {typeof error === 'string' ? error : JSON.stringify(error)}
+              </Text>
+            ))
+          ) : (
+            <Text style={styles.errorText}>
+              {typeof props.form.errors.blocklists === 'string'
+                ? props.form.errors.blocklists
+                : JSON.stringify(props.form.errors.blocklists)}
+            </Text>
+          ))}
         <SelectFromList
           values={values}
           listType={BlockSessionParams.LIST_TYPE_DEVICES}
-          setFieldValue={setFieldValue}
+          setFieldValue={(field, selectedDevices) =>
+            setFieldValue(
+              field,
+              selectedDevices.map((device) => ({
+                id: device.id,
+                name: device.name,
+              })),
+            )
+          }
           items={devices}
         />
+        {props.form.touched.devices &&
+          props.form.errors.devices &&
+          (Array.isArray(props.form.errors.devices) ? (
+            props.form.errors.devices.map((error, index) => (
+              <Text key={index} style={styles.errorText}>
+                {typeof error === 'string' ? error : JSON.stringify(error)}
+              </Text>
+            ))
+          ) : (
+            <Text style={styles.errorText}>
+              {typeof props.form.errors.devices === 'string'
+                ? props.form.errors.devices
+                : JSON.stringify(props.form.errors.devices)}
+            </Text>
+          ))}
         <SelectTime
           timeField={'startedAt'}
           setIsTimePickerVisible={setIsStartTimePickerVisible}
@@ -86,6 +129,9 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           handleChange={handleChange}
         />
+        {props.form.touched.startedAt && props.form.errors.startedAt && (
+          <Text style={styles.errorText}>{props.form.errors.startedAt}</Text>
+        )}
 
         <SelectTime
           timeField={'endedAt'}
@@ -95,6 +141,9 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           handleChange={handleChange}
         />
+        {props.form.touched.endedAt && props.form.errors.endedAt && (
+          <Text style={styles.errorText}>{props.form.errors.endedAt}</Text>
+        )}
 
         <TouchableOpacity
           style={styles.blockingCondition}
@@ -105,6 +154,12 @@ export function SelectBlockSessionParams(
             {values.blockingCondition || 'Select blocking conditions...'}
           </Text>
         </TouchableOpacity>
+        {props.form.touched.blockingCondition &&
+          props.form.errors.blockingCondition && (
+            <Text style={styles.errorText}>
+              {props.form.errors.blockingCondition}
+            </Text>
+          )}
       </TiedSBlurView>
 
       <BlockingConditionModal
@@ -117,7 +172,6 @@ export function SelectBlockSessionParams(
         text={BlockSessionParams.BUTTON_TEXT_START}
         onPress={() => {
           handleSubmit()
-          router.push('/(tabs)')
         }}
       />
     </View>
@@ -128,14 +182,6 @@ const styles = StyleSheet.create({
   blockSession: {
     flexDirection: 'column',
     alignItems: 'stretch',
-  },
-  param: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: T.spacing.medium,
-    paddingBottom: T.spacing.medium,
-    paddingLeft: T.spacing.small,
-    paddingRight: T.spacing.small,
   },
   label: {
     color: T.color.text,
@@ -151,5 +197,11 @@ const styles = StyleSheet.create({
     paddingBottom: T.spacing.medium,
     paddingLeft: T.spacing.small,
     paddingRight: T.spacing.small,
+  },
+  errorText: {
+    color: T.color.red,
+    fontSize: T.font.size.small,
+    marginTop: T.spacing.extraSmall,
+    fontWeight: T.font.weight.bold,
   },
 })

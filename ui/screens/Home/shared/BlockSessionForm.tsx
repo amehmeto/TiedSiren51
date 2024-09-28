@@ -9,7 +9,8 @@ import { BlockSession } from '@/core/block-session/block.session'
 import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
 import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
-// import { z } from 'zod'
+import { z } from 'zod'
+import { useRouter } from 'expo-router'
 
 export type Session = {
   blockingCondition?: string
@@ -28,6 +29,7 @@ const defaultSession: Session = {
   devices: [] as Device[],
   startedAt: null,
   endedAt: null,
+  blockingCondition: '',
 }
 
 export function BlockSessionForm({
@@ -38,33 +40,68 @@ export function BlockSessionForm({
   session?: Session
 }>) {
   const dispatch = useDispatch<AppDispatch>()
+  const router = useRouter()
 
-  /*  const validationSchema = z.object({
+  const validationSchema = z.object({
     id: z.string(),
-    name: z.string(),
-    blocklists: z.array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        totalBlocks: z.number(),
+    name: z
+      .string()
+      .nullable()
+      .refine((val) => val !== null && val.trim() !== '', {
+        message: 'A session name must be provided',
       }),
-    ),
-    devices: z.array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
+    blocklists: z
+      .array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+          // totalBlocks: z.number(),
+        }),
+      )
+      .min(1, { message: 'At least one blocklist must be selected' }),
+    devices: z
+      .array(
+        z.object({
+          id: z.string(),
+          name: z.string(),
+        }),
+      )
+      .min(1, { message: 'At least one device must be selected' }),
+    startedAt: z
+      .string()
+      .nullable()
+      .refine((val) => val !== null && val.trim() !== '', {
+        message: 'A start time must be provided',
       }),
-    ),
-    start: z.string(),
-    end: z.string(),
-  })*/
+    endedAt: z
+      .string()
+      .nullable()
+      .refine((val) => val !== null && val.trim() !== '', {
+        message: 'An end time must be provided',
+      }),
+    blockingCondition: z
+      .string()
+      .nullable()
+      .refine((val) => val !== null && val.trim() !== '', {
+        message: 'A blocking condition must be selected',
+      }),
+  })
 
   function assertIsBlockSession(
     values: Session,
   ): asserts values is BlockSession {
-    if (!Object.values(values).every((value) => value !== null)) {
+    const { name, blocklists, devices, startedAt, endedAt, blockingCondition } =
+      values
+    if (
+      !name ||
+      blocklists.length === 0 ||
+      devices.length === 0 ||
+      !startedAt ||
+      !endedAt ||
+      !blockingCondition
+    ) {
       throw new Error(
-        `Some properties are null ${JSON.stringify(values, null, 2)}`,
+        `Some properties are invalid: ${JSON.stringify(values, null, 2)}`,
       )
     }
   }
@@ -73,23 +110,30 @@ export function BlockSessionForm({
     <TiedSLinearBackground>
       <Formik
         initialValues={session}
-        /*
         validate={(values) => {
           try {
-            console.log('Validate values')
-            return validationSchema.parse(values)
+            validationSchema.parse(values)
+            return {}
           } catch (e) {
-            if (e instanceof z.ZodError) return e.formErrors.fieldErrors
-
-            return e
+            if (e instanceof z.ZodError) {
+              const errors: { [key: string]: string } = {}
+              e.errors.forEach((error) => {
+                const field = error.path[0] as string
+                errors[field] = error.message
+              })
+              return errors
+            }
+            return {}
           }
         }}
-        */
         onSubmit={(values) => {
           assertIsBlockSession(values)
-          mode === 'edit'
-            ? dispatch(updateBlockSession(values))
-            : dispatch(createBlockSession(values))
+          if (mode === 'edit') {
+            dispatch(updateBlockSession(values))
+          } else {
+            dispatch(createBlockSession(values))
+          }
+          router.push('/(tabs)')
         }}
       >
         {(form) => <SelectBlockSessionParams form={form} />}
