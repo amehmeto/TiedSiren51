@@ -23,6 +23,8 @@ import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextIn
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { z } from 'zod'
 
+export type ErrorMessages = { [key: string]: string }
+
 const blocklistSchema = z.object({
   name: z
     .string()
@@ -94,7 +96,7 @@ export function BlocklistForm({
     },
   )
 
-  const [errors, setErrors] = useState<{ [key: string]: string }>({})
+  const [errors, setErrors] = useState<ErrorMessages>({})
 
   useEffect(() => {
     dispatch(fetchAvailableSirens())
@@ -197,14 +199,13 @@ export function BlocklistForm({
       setErrors({})
       return true
     } catch (e) {
-      if (e instanceof z.ZodError) {
-        const validationErrors: { [key: string]: string } = {}
-        e.errors.forEach((error) => {
-          const field = error.path.join('.')
-          validationErrors[field] = error.message
-        })
-        setErrors(validationErrors)
-      }
+      if (!(e instanceof z.ZodError)) return false
+      const validationErrors: ErrorMessages = {}
+      e.errors.forEach((error) => {
+        const field = error.path.join('.')
+        validationErrors[field] = error.message
+      })
+      setErrors(validationErrors)
       return false
     }
   }
@@ -213,8 +214,6 @@ export function BlocklistForm({
     if (!validateForm(blocklist)) {
       return
     }
-
-    // Proceed with form submission
     mode === 'edit'
       ? await dispatch(updateBlocklist(blocklist as Blocklist))
       : await dispatch(
@@ -266,6 +265,5 @@ const styles = StyleSheet.create({
     color: T.color.red,
     fontSize: T.font.size.small,
     fontWeight: T.font.weight.bold,
-    // marginTop: 4,
   },
 })

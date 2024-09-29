@@ -11,6 +11,7 @@ import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSe
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { z } from 'zod'
 import { useRouter } from 'expo-router'
+import { ErrorMessages } from '../../Blocklists/BlocklistForm'
 
 export type Session = {
   blockingCondition?: string
@@ -87,19 +88,23 @@ export function BlockSessionForm({
       }),
   })
 
-  function assertIsBlockSession(
-    values: Session,
-  ): asserts values is BlockSession {
+  function hasSomeEmptyField(values: Session) {
     const { name, blocklists, devices, startedAt, endedAt, blockingCondition } =
       values
-    if (
+    return (
       !name ||
       blocklists.length === 0 ||
       devices.length === 0 ||
       !startedAt ||
       !endedAt ||
       !blockingCondition
-    ) {
+    )
+  }
+
+  function assertIsBlockSession(
+    values: Session,
+  ): asserts values is BlockSession {
+    if (hasSomeEmptyField(values)) {
       throw new Error(
         `Some properties are invalid: ${JSON.stringify(values, null, 2)}`,
       )
@@ -115,24 +120,21 @@ export function BlockSessionForm({
             validationSchema.parse(values)
             return {}
           } catch (e) {
-            if (e instanceof z.ZodError) {
-              const errors: { [key: string]: string } = {}
-              e.errors.forEach((error) => {
-                const field = error.path[0] as string
-                errors[field] = error.message
-              })
-              return errors
-            }
-            return {}
+            if (!(e instanceof z.ZodError)) return {}
+            const validationErrors: ErrorMessages = {}
+            e.errors.forEach((error) => {
+              const field = error.path[0] as string
+              validationErrors[field] = error.message
+            })
+            return validationErrors
           }
         }}
         onSubmit={(values) => {
           assertIsBlockSession(values)
-          if (mode === 'edit') {
-            dispatch(updateBlockSession(values))
-          } else {
-            dispatch(createBlockSession(values))
-          }
+          // eslint-disable-next-line no-unused-expressions
+          mode === 'edit'
+            ? dispatch(updateBlockSession(values))
+            : dispatch(createBlockSession(values))
           router.push('/(tabs)')
         }}
       >

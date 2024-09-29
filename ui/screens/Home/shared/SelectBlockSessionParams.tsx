@@ -23,13 +23,38 @@ enum BlockSessionParams {
   DEFAULT_BLOCKING_CONDITION = 'Select blocking conditions...',
 }
 
-export function SelectBlockSessionParams(
-  props: Readonly<{
-    form: FormikProps<Session>
-  }>,
-) {
-  const { handleChange, handleBlur, handleSubmit, setFieldValue, values } =
-    props.form
+const hasFieldError = (
+  form: FormikProps<Session>,
+  field: keyof Session,
+): boolean => !!form.touched[field] && !!form.errors[field]
+
+const renderFieldError = (error: unknown): JSX.Element => (
+  <Text key={String(error)} style={styles.errorText}>
+    {typeof error === 'string' ? error : JSON.stringify(error)}
+  </Text>
+)
+
+const renderArrayFieldErrors = (
+  fieldErrors: FormikProps<Session>['errors'],
+  fieldName: keyof Session,
+): JSX.Element[] | JSX.Element | null => {
+  const errors = fieldErrors[fieldName]
+
+  if (Array.isArray(errors)) {
+    return errors.map(renderFieldError)
+  } else if (errors) {
+    return renderFieldError(errors)
+  }
+
+  return null
+}
+
+export function SelectBlockSessionParams({
+  form,
+}: {
+  form: FormikProps<Session>
+}) {
+  const { handleChange, handleBlur, handleSubmit, setFieldValue, values } = form
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
@@ -50,13 +75,9 @@ export function SelectBlockSessionParams(
 
   const handleSelectBlockingCondition = (selectedCondition: string) => {
     setFieldValue('blockingCondition', selectedCondition)
-    props.form.setFieldTouched('blockingCondition', true)
+    form.setFieldTouched('blockingCondition', true)
     setBlockingConditionModalVisible(false)
   }
-  // console.log('blocklists', values.blocklists)
-  // console.log('Form values:', props.form.values)
-  // console.log('Form errors:', props.form.errors)
-  // console.log('Touched fields:', props.form.touched)
 
   return (
     <View>
@@ -67,8 +88,8 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           onBlur={() => handleBlur('name')}
         />
-        {props.form.touched.name && props.form.errors.name && (
-          <Text style={styles.errorText}>{props.form.errors.name}</Text>
+        {hasFieldError(form, 'name') && (
+          <Text style={styles.errorText}>{form.errors.name}</Text>
         )}
 
         <SelectFromList
@@ -77,21 +98,7 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           items={blocklists}
         />
-        {props.form.touched.blocklists &&
-          props.form.errors.blocklists &&
-          (Array.isArray(props.form.errors.blocklists) ? (
-            props.form.errors.blocklists.map((error, index) => (
-              <Text key={index} style={styles.errorText}>
-                {typeof error === 'string' ? error : JSON.stringify(error)}
-              </Text>
-            ))
-          ) : (
-            <Text style={styles.errorText}>
-              {typeof props.form.errors.blocklists === 'string'
-                ? props.form.errors.blocklists
-                : JSON.stringify(props.form.errors.blocklists)}
-            </Text>
-          ))}
+        {renderArrayFieldErrors(form.errors, 'blocklists')}
         <SelectFromList
           values={values}
           listType={BlockSessionParams.LIST_TYPE_DEVICES}
@@ -106,21 +113,7 @@ export function SelectBlockSessionParams(
           }
           items={devices}
         />
-        {props.form.touched.devices &&
-          props.form.errors.devices &&
-          (Array.isArray(props.form.errors.devices) ? (
-            props.form.errors.devices.map((error, index) => (
-              <Text key={index} style={styles.errorText}>
-                {typeof error === 'string' ? error : JSON.stringify(error)}
-              </Text>
-            ))
-          ) : (
-            <Text style={styles.errorText}>
-              {typeof props.form.errors.devices === 'string'
-                ? props.form.errors.devices
-                : JSON.stringify(props.form.errors.devices)}
-            </Text>
-          ))}
+        {renderArrayFieldErrors(form.errors, 'devices')}
         <SelectTime
           timeField={'startedAt'}
           setIsTimePickerVisible={setIsStartTimePickerVisible}
@@ -129,8 +122,8 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           handleChange={handleChange}
         />
-        {props.form.touched.startedAt && props.form.errors.startedAt && (
-          <Text style={styles.errorText}>{props.form.errors.startedAt}</Text>
+        {hasFieldError(form, 'startedAt') && (
+          <Text style={styles.errorText}>{form.errors.startedAt}</Text>
         )}
 
         <SelectTime
@@ -141,8 +134,8 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           handleChange={handleChange}
         />
-        {props.form.touched.endedAt && props.form.errors.endedAt && (
-          <Text style={styles.errorText}>{props.form.errors.endedAt}</Text>
+        {hasFieldError(form, 'endedAt') && (
+          <Text style={styles.errorText}>{form.errors.endedAt}</Text>
         )}
 
         <TouchableOpacity
@@ -154,12 +147,9 @@ export function SelectBlockSessionParams(
             {values.blockingCondition || 'Select blocking conditions...'}
           </Text>
         </TouchableOpacity>
-        {props.form.touched.blockingCondition &&
-          props.form.errors.blockingCondition && (
-            <Text style={styles.errorText}>
-              {props.form.errors.blockingCondition}
-            </Text>
-          )}
+        {hasFieldError(form, 'blockingCondition') && (
+          <Text style={styles.errorText}>{form.errors.blockingCondition}</Text>
+        )}
       </TiedSBlurView>
 
       <BlockingConditionModal
