@@ -1,10 +1,11 @@
 import { Pressable, StyleProp, StyleSheet, Text, ViewStyle } from 'react-native'
 import { T } from '@/ui/design-system/theme'
+import { ReactNode } from 'react'
 
 export function TiedSButton(
   props: Readonly<{
     onPress: () => void
-    text: string
+    text: string | ReactNode
     style?: StyleProp<ViewStyle>
   }>,
 ) {
@@ -17,7 +18,11 @@ export function TiedSButton(
       ]}
       onPress={props.onPress}
     >
-      <Text style={styles.buttonText}>{props.text}</Text>
+      {typeof props.text === 'string' ? (
+        <Text style={styles.buttonText}>{props.text}</Text>
+      ) : (
+        props.text
+      )}
     </Pressable>
   )
 }

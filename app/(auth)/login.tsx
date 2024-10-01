@@ -1,74 +1,92 @@
-import React from 'react'
-import {
-  View,
-  Text,
-  TextInput,
-  StyleSheet,
-  TouchableOpacity,
-} from 'react-native'
+import React, { useState } from 'react'
+import { View, Text, StyleSheet, TouchableOpacity } from 'react-native'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { T } from '@/ui/design-system/theme'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 
 export default function LoginScreen() {
   const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false)
 
   return (
-    <View style={styles.container}>
-      <TouchableOpacity
-        style={styles.crossButton}
-        onPress={() => router.back()}
-      >
-        <Ionicons name="close" size={T.size.large} color={T.color.white} />
-      </TouchableOpacity>
-      <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
-      <TouchableOpacity style={styles.socialButton}>
-        <Ionicons
-          name="logo-google"
-          size={T.size.large}
-          color={T.color.white}
+    <TiedSLinearBackground>
+      <View style={styles.container}>
+        <TiedSButton
+          style={styles.crossButton}
+          onPress={() => router.back()}
+          text={
+            <Ionicons name="close" size={T.size.large} color={T.color.white} />
+          }
         />
-        <Text style={styles.socialButtonText}> {'CONTINUE WITH GOOGLE'}</Text>
-      </TouchableOpacity>
-      <TouchableOpacity style={styles.socialButton}>
-        <Ionicons name="logo-apple" size={T.size.large} color={T.color.white} />
-        <Text style={styles.socialButtonText}> {'CONTINUE WITH APPLE'}</Text>
-      </TouchableOpacity>
-      <Text style={styles.orText}>OR</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Your Email"
-        placeholderTextColor={T.color.grey}
-      />
-      <View style={styles.passwordContainer}>
-        <TextInput
-          style={styles.passwordInput}
+        <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
+        <TiedSButton
+          style={styles.socialButton}
+          onPress={() => console.log('Continue with Google')}
+          text={
+            <>
+              <Ionicons
+                name="logo-google"
+                size={T.size.large}
+                color={T.color.white}
+              />
+              <Text style={styles.socialButtonText}>
+                {'CONTINUE WITH GOOGLE'}
+              </Text>
+            </>
+          }
+        />
+        <TiedSButton
+          style={styles.socialButton}
+          onPress={() => console.log('Continue with Apple')}
+          text={
+            <>
+              <Ionicons
+                name="logo-apple"
+                size={T.size.large}
+                color={T.color.white}
+              />
+              <Text style={styles.socialButtonText}>
+                {'CONTINUE WITH APPLE'}
+              </Text>
+            </>
+          }
+        />
+
+        <Text style={styles.orText}>{'OR'}</Text>
+        <TiedSTextInput
+          placeholder={'Your Email'}
+          placeholderTextColor={T.color.grey}
+        />
+        <TiedSTextInput
           placeholder="Create Password"
           placeholderTextColor={T.color.grey}
-          secureTextEntry={true}
+          secureTextEntry={!showPassword}
+          rightIcon={
+            <TouchableOpacity onPress={() => setShowPassword(!showPassword)}>
+              <Ionicons
+                name={showPassword ? 'eye-off-outline' : 'eye-outline'}
+                size={T.size.large}
+                color={T.color.grey}
+              />
+            </TouchableOpacity>
+          }
         />
-        <TouchableOpacity>
-          <Ionicons
-            name="eye-outline"
-            size={T.size.large}
-            color={T.color.grey}
-            style={styles.passwordIcon}
-          />
-        </TouchableOpacity>
+        <TiedSButton
+          onPress={() => router.replace('/home')}
+          text={'LOG IN'}
+          style={styles.button}
+        />
+        <Text
+          style={styles.subtext}
+          onPress={() => router.push('/(auth)/forgot-password')}
+        >
+          {'Forgot your password?'}
+        </Text>
       </View>
-      <TouchableOpacity
-        style={styles.createAccountButton}
-        onPress={() => router.replace('/home')}
-      >
-        <Text style={styles.createAccountText}>{'LOG IN'}</Text>
-      </TouchableOpacity>
-      <Text
-        style={styles.subtitle}
-        onPress={() => router.push('/(auth)/forgot-password')}
-      >
-        {'Forgot your password?'}
-      </Text>
-    </View>
+    </TiedSLinearBackground>
   )
 }
 
@@ -77,14 +95,13 @@ const styles = StyleSheet.create({
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: T.color.applyBackgroundColor,
     paddingHorizontal: T.spacing.large,
   },
   crossButton: {
     position: 'absolute',
     top: T.spacing.xx_large,
     left: T.spacing.medium,
-    zIndex: 1,
+    backgroundColor: 'transparent',
   },
   subtitle: {
     color: T.color.text,
@@ -94,12 +111,12 @@ const styles = StyleSheet.create({
   socialButton: {
     width: '90%',
     alignItems: 'center',
-    flexDirection: 'row',
     justifyContent: 'center',
-    backgroundColor: T.color.registerBackgroundColor,
+    flexDirection: 'row',
     padding: T.spacing.medium,
     borderRadius: T.border.radius.roundedMedium,
     marginBottom: T.spacing.medium,
+    backgroundColor: T.color.modalBackgroundColor,
   },
   socialButtonText: {
     color: T.color.text,
@@ -112,42 +129,14 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.regular,
     marginVertical: T.spacing.medium,
   },
-  input: {
-    backgroundColor: T.color.white,
-    padding: T.spacing.medium,
-    borderRadius: T.border.radius.roundedSmall,
-    marginBottom: T.spacing.medium,
-    color: T.color.text,
-    width: '90%',
+  button: {
+    paddingVertical: T.spacing.small,
+    paddingHorizontal: T.spacing.xx_large,
+    marginBottom: T.spacing.x_large,
   },
-  passwordContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    width: '90%',
-    backgroundColor: T.color.white,
-    borderRadius: T.border.radius.roundedSmall,
-    paddingHorizontal: T.spacing.small,
-    marginBottom: T.spacing.medium,
-  },
-  passwordInput: {
-    flex: 1,
-    padding: T.spacing.medium,
-    color: T.color.text,
-  },
-  passwordIcon: {
-    paddingLeft: T.spacing.small,
-  },
-  createAccountButton: {
-    backgroundColor: T.color.lightBlue,
-    padding: T.spacing.medium,
-    borderRadius: T.border.radius.roundedSmall,
-    marginTop: T.spacing.medium,
-    alignItems: 'center',
-    width: '90%',
-  },
-  createAccountText: {
+  subtext: {
     color: T.color.text,
     fontSize: T.font.size.regular,
-    fontWeight: T.font.weight.bold,
+    marginBottom: T.spacing.large,
   },
 })

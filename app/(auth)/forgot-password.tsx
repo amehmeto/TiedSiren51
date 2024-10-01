@@ -1,26 +1,36 @@
 import React from 'react'
-import { View, Text, TextInput, Button, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
+import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { Ionicons } from '@expo/vector-icons'
 
 export default function ForgotPasswordScreen() {
   const router = useRouter()
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.title}>{'RESET YOUR PASSWORD'}</Text>
-      <TextInput
-        style={styles.input}
-        placeholder="Your Email"
-        keyboardType="email-address"
-        placeholderTextColor={T.color.grey}
-      />
-      <Button
-        title={'SEND PASSWORD RESET EMAIL'}
-        onPress={() => router.replace('/(auth)/login')}
-        color={T.color.lightBlue}
-      />
-    </View>
+    <TiedSLinearBackground>
+      <View style={styles.container}>
+        <TiedSButton
+          style={styles.crossButton}
+          onPress={() => router.back()}
+          text={
+            <Ionicons name="close" size={T.size.large} color={T.color.white} />
+          }
+        />
+        <Text style={styles.title}>{'RESET YOUR PASSWORD'}</Text>
+        <TiedSTextInput
+          placeholder={'Your Email'}
+          placeholderTextColor={T.color.grey}
+        />
+        <TiedSButton
+          onPress={() => router.replace('/(auth)/login')}
+          text={'SEND PASSWORD RESET EMAIL'}
+        />
+      </View>
+    </TiedSLinearBackground>
   )
 }
 
@@ -29,21 +39,17 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: T.spacing.medium,
     justifyContent: 'center',
-    backgroundColor: T.color.applyBackgroundColor,
+  },
+  crossButton: {
+    position: 'absolute',
+    top: T.spacing.xx_large,
+    left: T.spacing.medium,
+    backgroundColor: 'transparent',
   },
   title: {
     fontSize: T.font.size.large,
     fontWeight: T.font.weight.bold,
     color: T.color.text,
     marginBottom: T.spacing.large,
-  },
-  input: {
-    borderWidth: T.border.width.thin,
-    borderColor: T.color.darkBlue,
-    padding: T.spacing.medium,
-    marginBottom: T.spacing.medium,
-    borderRadius: T.border.radius.roundedSmall,
-    backgroundColor: T.color.white,
-    color: T.color.text,
   },
 })
