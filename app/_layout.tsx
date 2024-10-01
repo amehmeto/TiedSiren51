@@ -11,7 +11,7 @@ import { dependencies } from '@/ui/dependencies'
 import * as NavigationBar from 'expo-navigation-bar'
 import { Platform } from 'react-native'
 import { T } from '@/ui/design-system/theme'
-import { Stack } from 'expo-router'
+import { Stack, useRouter } from 'expo-router'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -23,6 +23,9 @@ Notifications.setNotificationHandler({
 
 export default function App() {
   const [store, setStore] = useState<AppStore | null>(null)
+  // const isAuthenticated = useSelector(selectIsAuthenticated)
+  const router = useRouter()
+  const isAuthenticated = false
 
   useEffect(() => {
     storePromise.then(setStore)
@@ -36,13 +39,21 @@ export default function App() {
       )
   }, [])
 
-  if (!store) return null
+  useEffect(() => {
+    if (store) {
+      store.dispatch(tieSirens())
+      ;(dependencies.backgroundTaskService as RealBackgroundTaskService)
+        .initialize(store)
+        .then(() => console.log('task service initialized'))
+      if (!isAuthenticated) {
+        router.replace('/register')
+      } else {
+        router.replace('/home')
+      }
+    }
+  }, [store, isAuthenticated])
 
-  store.dispatch(tieSirens())
-  ;(dependencies.backgroundTaskService as RealBackgroundTaskService)
-    .initialize(store)
-    // eslint-disable-next-line no-console
-    .then(() => console.log('task service initialised'))
+  if (!store) return null
 
   return (
     <Provider store={store}>
@@ -54,6 +65,10 @@ export default function App() {
             contentStyle: { backgroundColor: T.color.white },
           }}
         >
+          <Stack.Screen name="(auth)/register" />
+          <Stack.Screen name="(auth)/login" />
+          <Stack.Screen name="(auth)/signup" />
+          <Stack.Screen name="(auth)/forgot-password" />
           <Stack.Screen name="(tabs)" />
         </Stack>
       </MenuProvider>

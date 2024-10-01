@@ -18,6 +18,8 @@ export const T = {
     modalBackgroundColor: 'rgba(0, 0, 0, 0.3)',
     modalContentColor: 'rgba(240, 244, 255,1)',
     modalTitleColor: 'rgba(125, 138, 153,1)',
+    registerBackgroundColor: 'rgba(0, 0, 0, 0.4)',
+    applyBackgroundColor: 'rgba(19,36,132,255)',
   },
   font: {
     size: {
@@ -54,6 +56,7 @@ export const T = {
     large: 20,
     x_large: 25,
     xx_large: 32,
+    xxx_large: 50,
   },
   border: {
     width: {
