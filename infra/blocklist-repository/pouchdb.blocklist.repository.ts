@@ -1,7 +1,7 @@
 import { BlocklistRepository } from '@/core/ports/blocklist.repository'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import uuid from 'react-native-uuid'
-import PouchDB from 'pouchdb'
+import PouchDB from 'pouchdb-react-native'
 import { UpdatePayload } from '@/core/ports/update.payload'
 import { CreatePayload } from '@/core/ports/create.payload'
 

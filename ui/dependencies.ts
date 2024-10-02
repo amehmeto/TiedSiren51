@@ -9,15 +9,13 @@ import { InMemorySirenTier } from '@/infra/siren-tier/in-memory-siren.tier'
 import { RealBackgroundTaskService } from '@/infra/background-task-service/real.background-task.service'
 import { PouchdbBlockSessionRepository } from '@/infra/block-session-repository/pouchdb.block-session.repository'
 import { PouchdbBlocklistRepository } from '@/infra/blocklist-repository/pouchdb.blocklist.repository'
-import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
-import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
 
 export const deviceRepository: RemoteDeviceRepository =
   new FakeDataDeviceRepository()
 
 export const dependencies: Dependencies = {
-  blockSessionRepository: new FakeDataBlockSessionRepository(), // new PouchdbBlockSessionRepository(),
-  blocklistRepository: new FakeDataBlocklistRepository(), //PouchdbBlocklistRepository(),
+  blockSessionRepository: new PouchdbBlockSessionRepository(),
+  blocklistRepository: new PouchdbBlocklistRepository(),
   sirenTier: new InMemorySirenTier(),
   dateProvider: new RealDateProvider(),
   installedAppRepository: new FakeDataInstalledAppsRepository(),

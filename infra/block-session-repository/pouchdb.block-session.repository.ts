@@ -1,15 +1,21 @@
 import { BlockSession } from '@/core/block-session/block.session'
 import { BlockSessionRepository } from '@/core/ports/block-session.repository'
-import PouchDB from 'pouchdb'
 import uuid from 'react-native-uuid'
 import { UpdatePayload } from '@/core/ports/update.payload'
 import { CreatePayload } from '@/core/ports/create.payload'
+import PouchDB from 'pouchdb-react-native'
+import PouchDBFind from 'pouchdb-find'
 
 export class PouchdbBlockSessionRepository implements BlockSessionRepository {
   private db: PouchDB.Database<BlockSession>
 
   constructor() {
-    this.db = new PouchDB('pdb-block-sessions')
+    AsyncStorage.getAllKeys()
+      .then((keys: any) => AsyncStorage.multiGet(keys))
+      .then((items: any) => console.log('all pure Items', items))
+      .catch((error: any) => console.warn('error get all Items', error))
+    PouchDB.plugin(PouchDBFind)
+    this.db = new PouchDB('pdb-block-sessions', { adapter: 'asyncstorage' })
   }
 
   findAll(): Promise<BlockSession[]> {
