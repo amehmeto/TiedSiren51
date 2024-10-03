@@ -5,7 +5,7 @@ import { T } from '@/ui/design-system/theme'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
-import { Ionicons } from '@expo/vector-icons'
+import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 
 export default function ForgotPasswordScreen() {
   const router = useRouter()
@@ -13,12 +13,9 @@ export default function ForgotPasswordScreen() {
   return (
     <TiedSLinearBackground>
       <View style={styles.container}>
-        <TiedSButton
-          style={styles.crossButton}
-          onPress={() => router.back()}
-          text={
-            <Ionicons name="close" size={T.size.large} color={T.color.white} />
-          }
+        <TiedSCloseButton
+          onClose={() => router.back()}
+          iconColor={T.color.white}
         />
         <Text style={styles.title}>{'RESET YOUR PASSWORD'}</Text>
         <TiedSTextInput
@@ -39,12 +36,6 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: T.spacing.medium,
     justifyContent: 'center',
-  },
-  crossButton: {
-    position: 'absolute',
-    top: T.spacing.xx_large,
-    left: T.spacing.medium,
-    backgroundColor: 'transparent',
   },
   title: {
     fontSize: T.font.size.large,

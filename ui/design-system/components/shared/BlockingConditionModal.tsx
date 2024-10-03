@@ -15,6 +15,7 @@ import Animated, {
   withSpring,
   withTiming,
 } from 'react-native-reanimated'
+import { TiedSCloseButton } from './TiedSCloseButton'
 
 type IconName =
   | 'time-outline'
@@ -32,7 +33,7 @@ type BlockingCondition = {
 type BlockingConditionModalProps = {
   visible: boolean
   onClose: () => void
-  onSelectBlockingCondition: (condition: string) => void
+  onSelectCondition: (condition: string) => void
 }
 
 type BlockingConditionProps = {
@@ -78,37 +79,28 @@ const CONDITIONS: BlockingCondition[] = [
 export default function BlockingConditionModal({
   visible,
   onClose,
-  onSelectBlockingCondition,
+  onSelectCondition,
 }: BlockingConditionModalProps) {
   const scale = useSharedValue(0.8)
   const opacity = useSharedValue(0)
 
-  const animatedStyle = useAnimatedStyle(() => {
-    return {
-      transform: [
-        { scale: withSpring(scale.value, { damping: 10, stiffness: 80 }) },
-      ],
-      opacity: withTiming(opacity.value, { duration: 300 }),
-    }
-  })
+  const animationStyle = useAnimatedStyle(() => ({
+    transform: [
+      { scale: withSpring(scale.value, { damping: 10, stiffness: 80 }) },
+    ],
+    opacity: withTiming(opacity.value, { duration: 300 }),
+  }))
 
   useEffect(() => {
-    if (visible) {
-      scale.value = 1
-      opacity.value = 1
-    } else {
-      scale.value = 0.8
-      opacity.value = 0
-    }
+    scale.value = visible ? 1 : 0.8
+    opacity.value = visible ? 1 : 0
   }, [visible, scale, opacity])
 
   return (
-    <Modal visible={visible} transparent={true} animationType="slide">
+    <Modal visible={visible} transparent animationType="slide">
       <View style={styles.modalContainer}>
-        <Animated.View style={[styles.modalContent, animatedStyle]}>
-          <TouchableOpacity style={styles.closeIconContainer} onPress={onClose}>
-            <Ionicons name="close" size={28} color={T.color.blueIconColor} />
-          </TouchableOpacity>
+        <Animated.View style={[styles.modalContent, animationStyle]}>
+          <TiedSCloseButton onClose={onClose} />
           <Text style={styles.modalTitle}>{TEXTS.MODAL_TITLE}</Text>
           <Text style={styles.modalSubtitle}>{TEXTS.MODAL_SUBTITLE}</Text>
           <ScrollView contentContainerStyle={styles.scrollViewContent}>
@@ -118,7 +110,7 @@ export default function BlockingConditionModal({
                 iconName={condition.iconName}
                 title={condition.title}
                 subtitle={condition.subtitle}
-                onSelect={() => onSelectBlockingCondition(condition.title)}
+                onSelect={() => onSelectCondition(condition.title)}
               />
             ))}
           </ScrollView>
@@ -162,12 +154,6 @@ const styles = StyleSheet.create({
     backgroundColor: T.color.modalContentColor,
     borderRadius: T.border.radius.roundedLarge,
     padding: T.spacing.medium,
-  },
-  closeIconContainer: {
-    position: 'absolute',
-    top: 10,
-    right: 10,
-    zIndex: 1,
   },
   modalTitle: {
     fontSize: T.font.size.large,

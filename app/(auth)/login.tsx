@@ -6,6 +6,7 @@ import { T } from '@/ui/design-system/theme'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
+import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 
 export default function LoginScreen() {
   const router = useRouter()
@@ -14,12 +15,9 @@ export default function LoginScreen() {
   return (
     <TiedSLinearBackground>
       <View style={styles.container}>
-        <TiedSButton
-          style={styles.crossButton}
-          onPress={() => router.back()}
-          text={
-            <Ionicons name="close" size={T.size.large} color={T.color.white} />
-          }
+        <TiedSCloseButton
+          onClose={() => router.back()}
+          iconColor={T.color.white}
         />
         <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
         <TiedSButton

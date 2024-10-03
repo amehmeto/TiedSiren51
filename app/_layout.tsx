@@ -23,7 +23,6 @@ Notifications.setNotificationHandler({
 
 export default function App() {
   const [store, setStore] = useState<AppStore | null>(null)
-  // const isAuthenticated = useSelector(selectIsAuthenticated)
   const router = useRouter()
   const isAuthenticated = false
 
