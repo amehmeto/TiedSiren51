@@ -40,10 +40,7 @@ export const blockSessionSchema = z.object({
     .refine((val) => isEmptyString(val), {
       message: 'An end time must be provided',
     }),
-  blockingCondition: z
-    .string()
-    .nullable()
-    .refine((val) => isEmptyString(val), {
-      message: 'A blocking condition must be selected',
-    }),
+  blockingConditions: z
+    .array(z.string())
+    .min(1, { message: 'A blocking condition must be selected' }),
 })

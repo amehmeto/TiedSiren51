@@ -27,30 +27,48 @@ export default function App() {
   const isAuthenticated = false
 
   useEffect(() => {
-    storePromise.then(setStore)
-    if (Platform.OS === 'android')
-      NavigationBar.setBackgroundColorAsync(T.color.darkBlue).catch(
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        (e: any) => {
-          // eslint-disable-next-line no-console
-          console.error('Failed to set navigation bar color', e)
-        },
-      )
+    initializeStore()
+    configureNavigationBar()
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
   useEffect(() => {
     if (store) {
-      store.dispatch(tieSirens())
-      ;(dependencies.backgroundTaskService as RealBackgroundTaskService)
-        .initialize(store)
-        .then(() => console.log('task service initialized'))
-      if (!isAuthenticated) {
-        router.replace('/register')
-      } else {
-        router.replace('/home')
-      }
+      initializeBackgroundTasks(store)
+      navigateBasedOnAuth()
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store, isAuthenticated])
+
+  const initializeStore = () => {
+    storePromise.then(setStore)
+  }
+
+  const configureNavigationBar = () => {
+    if (Platform.OS === 'android') {
+      NavigationBar.setBackgroundColorAsync(T.color.darkBlue).catch(handleError)
+    }
+  }
+
+  const initializeBackgroundTasks = async (store: AppStore) => {
+    store.dispatch(tieSirens())
+    try {
+      await (
+        dependencies.backgroundTaskService as RealBackgroundTaskService
+      ).initialize(store)
+      console.log('Background task service initialized')
+    } catch (error) {
+      handleError(error)
+    }
+  }
+
+  const navigateBasedOnAuth = () => {
+    router.replace(isAuthenticated ? '/home' : '/register')
+  }
+
+  const handleError = (error: unknown) => {
+    console.error('Error:', error)
+  }
 
   if (!store) return null
 

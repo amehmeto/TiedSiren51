@@ -7,7 +7,11 @@ import { useState } from 'react'
 
 export function SelectBlockingCondition(props: { form: FormikProps<Session> }) {
   const selectBlockingCondition = (selectedCondition: string) => {
-    props.form.setFieldValue('blockingCondition', selectedCondition)
+    const currentConditions = props.form.values.blockingConditions || []
+    props.form.setFieldValue('blockingConditions', [
+      ...currentConditions,
+      selectedCondition,
+    ])
     props.form.setFieldTouched('blockingCondition', true)
     setIsBlockingConditionModalVisible(false)
   }
@@ -22,15 +26,16 @@ export function SelectBlockingCondition(props: { form: FormikProps<Session> }) {
       >
         <Text style={styles.label}>{'Blocking Conditions'}</Text>
         <Text style={styles.option}>
-          {props.form.values.blockingConditions ||
-            'Select blocking conditions...'}
+          {props.form.values.blockingConditions.length > 0
+            ? props.form.values.blockingConditions.join(', ')
+            : 'Select blocking conditions...'}
         </Text>
       </TouchableOpacity>
 
       <BlockingConditionModal
         visible={isBlockingConditionModalVisible}
         onClose={() => setIsBlockingConditionModalVisible(false)}
-        onSelectBlockingCondition={selectBlockingCondition}
+        onSelectCondition={selectBlockingCondition}
       />
     </>
   )
