@@ -1,7 +1,10 @@
 import { faker } from '@faker-js/faker'
 import { buildBlocklist } from './blocklist.builder'
 import { buildDevice } from './device.builder'
-import { BlockSession } from '@/core/block-session/block.session'
+import {
+  BlockingConditions,
+  BlockSession,
+} from '@/core/block-session/block.session'
 
 export const buildBlockSession = (
   wantedBlockSession: Partial<BlockSession> = {},
@@ -21,6 +24,7 @@ export const buildBlockSession = (
     endNotificationId: 'end-notification-id',
     blocklists: [buildBlocklist()],
     devices: [buildDevice(), buildDevice()],
+    blockingConditions: [BlockingConditions.TIME],
   }
   return { ...defaultBlockSession, ...wantedBlockSession }
 }

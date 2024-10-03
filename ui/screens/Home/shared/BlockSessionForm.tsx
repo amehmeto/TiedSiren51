@@ -3,24 +3,30 @@ import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { useDispatch } from 'react-redux'
-import { createBlockSession } from '@/core/block-session/usecases/create-block-session.usecase'
+import {
+  createBlockSession,
+  CreateBlockSessionPayload,
+} from '@/core/block-session/usecases/create-block-session.usecase'
 import uuid from 'react-native-uuid'
-import { BlockSession } from '@/core/block-session/block.session'
-import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
+import { BlockingConditions } from '@/core/block-session/block.session'
+import {
+  updateBlockSession,
+  UpdateBlockSessionPayload,
+} from '@/core/block-session/usecases/update-block-session.usecase'
 import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
-import { z } from 'zod'
 import { useRouter } from 'expo-router'
-import { ErrorMessages } from '../../Blocklists/BlocklistForm'
+import { assertIsBlockSession } from '@/ui/screens/Home/HomeScreen/assertIsBlockSession'
+import { validateBlockSessionForm } from '@/ui/screens/Home/schemas/validate-block-session-form'
 
 export type Session = {
-  blockingCondition?: string
   id: string
   name: string | null
   blocklists: Blocklist[]
   devices: Device[]
   startedAt: string | null
   endedAt: string | null
+  blockingConditions: BlockingConditions[]
 }
 
 const defaultSession: Session = {
@@ -30,7 +36,7 @@ const defaultSession: Session = {
   devices: [] as Device[],
   startedAt: null,
   endedAt: null,
-  blockingCondition: '',
+  blockingConditions: [] as BlockingConditions[],
 }
 
 export function BlockSessionForm({
@@ -43,71 +49,17 @@ export function BlockSessionForm({
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
-  const validationSchema = z.object({
-    id: z.string(),
-    name: z
-      .string()
-      .nullable()
-      .refine((val) => val !== null && val.trim() !== '', {
-        message: 'A session name must be provided',
-      }),
-    blocklists: z
-      .array(
-        z.object({
-          id: z.string(),
-          name: z.string(),
-          // totalBlocks: z.number(),
-        }),
-      )
-      .min(1, { message: 'At least one blocklist must be selected' }),
-    devices: z
-      .array(
-        z.object({
-          id: z.string(),
-          name: z.string(),
-        }),
-      )
-      .min(1, { message: 'At least one device must be selected' }),
-    startedAt: z
-      .string()
-      .nullable()
-      .refine((val) => val !== null && val.trim() !== '', {
-        message: 'A start time must be provided',
-      }),
-    endedAt: z
-      .string()
-      .nullable()
-      .refine((val) => val !== null && val.trim() !== '', {
-        message: 'An end time must be provided',
-      }),
-    blockingCondition: z
-      .string()
-      .nullable()
-      .refine((val) => val !== null && val.trim() !== '', {
-        message: 'A blocking condition must be selected',
-      }),
-  })
+  function saveBlockSession() {
+    return (values: Session) => {
+      assertIsBlockSession(values)
 
-  function hasSomeEmptyField(values: Session) {
-    const { name, blocklists, devices, startedAt, endedAt, blockingCondition } =
-      values
-    return (
-      !name ||
-      blocklists.length === 0 ||
-      devices.length === 0 ||
-      !startedAt ||
-      !endedAt ||
-      !blockingCondition
-    )
-  }
+      if (mode === 'edit') {
+        dispatch(updateBlockSession(values as UpdateBlockSessionPayload))
+      } else {
+        dispatch(createBlockSession(values as CreateBlockSessionPayload))
+      }
 
-  function assertIsBlockSession(
-    values: Session,
-  ): asserts values is BlockSession {
-    if (hasSomeEmptyField(values)) {
-      throw new Error(
-        `Some properties are invalid: ${JSON.stringify(values, null, 2)}`,
-      )
+      router.push('/(tabs)')
     }
   }
 
@@ -115,28 +67,8 @@ export function BlockSessionForm({
     <TiedSLinearBackground>
       <Formik
         initialValues={session}
-        validate={(values) => {
-          try {
-            validationSchema.parse(values)
-            return {}
-          } catch (e) {
-            if (!(e instanceof z.ZodError)) return {}
-            const validationErrors: ErrorMessages = {}
-            e.errors.forEach((error) => {
-              const field = error.path[0] as string
-              validationErrors[field] = error.message
-            })
-            return validationErrors
-          }
-        }}
-        onSubmit={(values) => {
-          assertIsBlockSession(values)
-          // eslint-disable-next-line no-unused-expressions
-          mode === 'edit'
-            ? dispatch(updateBlockSession(values))
-            : dispatch(createBlockSession(values))
-          router.push('/(tabs)')
-        }}
+        validate={validateBlockSessionForm()}
+        onSubmit={saveBlockSession()}
       >
         {(form) => <SelectBlockSessionParams form={form} />}
       </Formik>

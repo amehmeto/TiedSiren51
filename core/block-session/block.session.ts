@@ -2,6 +2,14 @@ import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '../device/device'
 import { createEntityAdapter } from '@reduxjs/toolkit'
 
+export enum BlockingConditions {
+  TIME = 'time',
+  LOCATION = 'location',
+  WIFI = 'wifi',
+  USAGE_LIMIT = 'usage_limit',
+  LAUNCH_COUNT = 'launch_count',
+}
+
 export type BlockSession = {
   id: string
   name: string
@@ -11,6 +19,7 @@ export type BlockSession = {
   endedAt: string
   startNotificationId: string
   endNotificationId: string
+  blockingConditions: BlockingConditions[]
 }
 
 export const blockSessionAdapter = createEntityAdapter<BlockSession>()

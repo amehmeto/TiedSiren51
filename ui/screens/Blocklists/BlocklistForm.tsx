@@ -22,45 +22,8 @@ import { TiedSLinearBackground } from '@/ui/design-system/components/shared/Tied
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { z } from 'zod'
-
-export type ErrorMessages = { [key: string]: string }
-
-const blocklistSchema = z.object({
-  name: z
-    .string()
-    .nullable()
-    .refine((val) => val !== null && val.trim() !== '', {
-      message: 'Blocklist name must be provided',
-    }),
-  sirens: z
-    .object({
-      // android: z.array(
-      //   z.object({
-      //     packageName: z.string(),
-      //   }),
-      // ),
-      // ios: z.array(z.string()),
-      // windows: z.array(z.string()),
-      // macos: z.array(z.string()),
-      // linux: z.array(z.string()),
-      android: z.array(z.any()).optional(),
-      websites: z.array(z.string()).optional(),
-      keywords: z.array(z.string()).optional(),
-    })
-    .refine(
-      (sirens) => {
-        const hasSelectedApps = (sirens.android?.length ?? 0) > 0
-        const hasSelectedWebsites = (sirens.websites?.length ?? 0) > 0
-        const hasSelectedKeywords = (sirens.keywords?.length ?? 0) > 0
-
-        return hasSelectedApps || hasSelectedWebsites || hasSelectedKeywords
-      },
-      {
-        message:
-          'You must select at least one of: Apps, Websites, or Keywords.',
-      },
-    ),
-})
+import { blocklistSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
+import { ErrorMessages } from '@/ui/error-messages.type'
 
 export type BlocklistScreenProps = {
   mode: 'create' | 'edit'
@@ -193,32 +156,35 @@ export function BlocklistForm({
     ),
   })
 
-  const validateForm = (data: typeof blocklist) => {
+  const validateForm = (submittedBlocklistForm: typeof blocklist) => {
     try {
-      blocklistSchema.parse(data)
+      blocklistSchema.parse(submittedBlocklistForm)
       setErrors({})
       return true
     } catch (e) {
-      if (!(e instanceof z.ZodError)) return false
-      const validationErrors: ErrorMessages = {}
-      e.errors.forEach((error) => {
-        const field = error.path.join('.')
-        validationErrors[field] = error.message
-      })
-      setErrors(validationErrors)
+      if (e instanceof z.ZodError) {
+        const validationErrors: ErrorMessages = {}
+        e.errors.forEach((error) => {
+          const field = error.path.join('.')
+          validationErrors[field] = error.message
+        })
+        setErrors(validationErrors)
+      }
+
       return false
     }
   }
 
-  const handleSubmit = async () => {
-    if (!validateForm(blocklist)) {
-      return
+  const saveBlocklist = async () => {
+    if (!validateForm(blocklist)) return
+
+    if (mode === 'edit') {
+      await dispatch(updateBlocklist(blocklist as Blocklist))
+    } else {
+      await dispatch(
+        createBlocklist(blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>),
+      )
     }
-    mode === 'edit'
-      ? await dispatch(updateBlocklist(blocklist as Blocklist))
-      : await dispatch(
-          createBlocklist(blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>),
-        )
 
     router.push('/(tabs)/blocklists')
   }
@@ -247,7 +213,7 @@ export function BlocklistForm({
         <Text style={styles.errorText}>{errors['sirens']}</Text>
       )}
 
-      <TiedSButton text={'Save Blocklist'} onPress={handleSubmit} />
+      <TiedSButton text={'Save Blocklist'} onPress={saveBlocklist} />
     </TiedSLinearBackground>
   )
 }

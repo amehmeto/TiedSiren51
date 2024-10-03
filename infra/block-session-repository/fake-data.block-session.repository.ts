@@ -1,7 +1,10 @@
 import { BlockSessionRepository } from '@/core/ports/block-session.repository'
 import uuid from 'react-native-uuid'
 
-import { BlockSession } from '@/core/block-session/block.session'
+import {
+  BlockingConditions,
+  BlockSession,
+} from '@/core/block-session/block.session'
 import {
   facebookAndroidSiren,
   instagramAndroidSiren,
@@ -111,6 +114,7 @@ export class FakeDataBlockSessionRepository
         endedAt: '13:58',
         startNotificationId: 'start-notification-id',
         endNotificationId: 'end-notification-id',
+        blockingConditions: [BlockingConditions.TIME],
       },
       {
         id: String(uuid.v4()),
@@ -160,6 +164,7 @@ export class FakeDataBlockSessionRepository
         endedAt: '13:58',
         startNotificationId: 'start-notification-id',
         endNotificationId: 'end-notification-id',
+        blockingConditions: [BlockingConditions.TIME],
       },
     ].map((blockSession) => [blockSession.id, blockSession]),
   )
