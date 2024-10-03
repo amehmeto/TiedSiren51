@@ -1,11 +1,12 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { blockSessionFixture } from './block-session.fixture'
-import { buildBlocklist } from '../../_tests_/data-builders/blocklist.builder'
+import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import {
   facebookAndroidSiren,
   instagramAndroidSiren,
-} from '../../_tests_/data-builders/android-siren.builder'
+} from '@/core/_tests_/data-builders/android-siren.builder'
 import { CreateBlockSessionPayload } from './create-block-session.usecase'
+import { BlockingConditions } from '@/core/block-session/block.session'
 
 describe('Feature: Creating a block session', () => {
   let fixture: ReturnType<typeof blockSessionFixture>
@@ -41,6 +42,7 @@ describe('Feature: Creating a block session', () => {
       ],
       startedAt: '00:10',
       endedAt: '00:30',
+      blockingConditions: [BlockingConditions.TIME],
     }
 
     fixture.given.nowIs({
@@ -71,6 +73,7 @@ describe('Feature: Creating a block session', () => {
       {
         id: expect.any(String),
         name: 'Sleeping time',
+        blockingConditions: [BlockingConditions.TIME],
         blocklists: [
           buildBlocklist({
             id: 'blocklist-id',
