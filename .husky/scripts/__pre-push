@@ -1,0 +1,4 @@
+sh .husky/scripts/no-direct-push-main-demo.sh
+sh .husky/scripts/branch-name-check.sh
+sh .husky/scripts/uncommitted-files-check.sh
+
