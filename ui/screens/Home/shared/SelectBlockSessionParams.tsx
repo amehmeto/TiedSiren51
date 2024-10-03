@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { FormikProps } from 'formik'
-import { StyleSheet, Text, TouchableOpacity, View } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { deviceRepository } from '@/ui/dependencies'
 import { Device } from '@/core/device/device'
@@ -11,39 +11,28 @@ import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { ChooseName } from '@/ui/screens/Home/shared/ChooseName'
 import { SelectFromList } from '@/ui/screens/Home/shared/SelectFromList'
 import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
-import { useRouter } from 'expo-router'
-import BlockingConditionModal from '@/ui/design-system/components/shared/BlockingConditionModal'
 import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlockingCondition'
+import { FormError } from '@/ui/screens/Home/shared/FormError'
+import { FieldErrors } from '@/ui/screens/Home/shared/FieldErrors'
 
-enum BlockSessionParams {
-  BUTTON_TEXT_START = 'START',
-  LIST_TYPE_BLOCKLISTS = 'blocklists',
-  LIST_TYPE_DEVICES = 'devices',
-  LABEL_BLOCKING_CONDITIONS = 'Blocking Conditions',
-  DEFAULT_BLOCKING_CONDITION = 'Select blocking conditions...',
-}
-
-export function SelectBlockSessionParams(
-  props: Readonly<{
-    form: FormikProps<Session>
-  }>,
-) {
-  const { handleChange, handleBlur, handleSubmit, setFieldValue, values } =
-    props.form
+export function SelectBlockSessionParams({
+  form,
+}: {
+  form: FormikProps<Session>
+}) {
+  // TODO: It was a mistake from my side, I shouldn't have destructured form here. It complicates things unnecessarily.
+  const { handleChange, handleBlur, handleSubmit, setFieldValue, values } = form
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
   const [isEndTimePickerVisible, setIsEndTimePickerVisible] =
     useState<boolean>(false)
-  const [isBlockingConditionModalVisible, setBlockingConditionModalVisible] =
-    useState<boolean>(false)
 
   const blocklists = useSelector((state: RootState) =>
     selectAllBlocklists(state),
   )
-
-  const router = useRouter()
 
   useEffect(() => {
     deviceRepository.findAll().then((devices) => {
@@ -51,9 +40,8 @@ export function SelectBlockSessionParams(
     })
   }, [])
 
-  const handleSelectBlockingCondition = (selectedCondition: string) => {
-    setFieldValue('blockingCondition', selectedCondition)
-    setBlockingConditionModalVisible(false)
+  function hasFieldError(field: keyof Session): boolean {
+    return !!form.touched[field] && !!form.errors[field]
   }
 
   return (
@@ -65,19 +53,25 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           onBlur={() => handleBlur('name')}
         />
-
+        {hasFieldError('name') && <FormError error={form.errors.name} />}
         <SelectFromList
           values={values}
-          listType={BlockSessionParams.LIST_TYPE_BLOCKLISTS}
+          listType={'blocklists'}
           setFieldValue={setFieldValue}
           items={blocklists}
         />
+        {hasFieldError('blocklists') && (
+          <FieldErrors errors={form.errors} fieldName={'blocklists'} />
+        )}
         <SelectFromList
           values={values}
-          listType={BlockSessionParams.LIST_TYPE_DEVICES}
+          listType={'devices'}
           setFieldValue={setFieldValue}
           items={devices}
         />
+        {hasFieldError('devices') && (
+          <FieldErrors errors={form.errors} fieldName={'devices'} />
+        )}
         <SelectTime
           timeField={'startedAt'}
           setIsTimePickerVisible={setIsStartTimePickerVisible}
@@ -86,7 +80,9 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           handleChange={handleChange}
         />
-
+        {hasFieldError('startedAt') && (
+          <FormError error={form.errors.startedAt} />
+        )}
         <SelectTime
           timeField={'endedAt'}
           setIsTimePickerVisible={setIsEndTimePickerVisible}
@@ -95,31 +91,14 @@ export function SelectBlockSessionParams(
           setFieldValue={setFieldValue}
           handleChange={handleChange}
         />
-
-        <TouchableOpacity
-          style={styles.blockingCondition}
-          onPress={() => setBlockingConditionModalVisible(true)}
-        >
-          <Text style={styles.label}>{'Blocking Conditions'}</Text>
-          <Text style={styles.option}>
-            {values.blockingCondition || 'Select blocking conditions...'}
-          </Text>
-        </TouchableOpacity>
+        {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
+        <SelectBlockingCondition form={form} />
+        {hasFieldError('blockingConditions') && (
+          <FieldErrors errors={form.errors} fieldName={'blockingConditions'} />
+        )}
       </TiedSBlurView>
 
-      <BlockingConditionModal
-        visible={isBlockingConditionModalVisible}
-        onClose={() => setBlockingConditionModalVisible(false)}
-        onSelectBlockingCondition={handleSelectBlockingCondition}
-      />
-
-      <TiedSButton
-        text={BlockSessionParams.BUTTON_TEXT_START}
-        onPress={() => {
-          handleSubmit()
-          router.push('/(tabs)')
-        }}
-      />
+      <TiedSButton text={'START'} onPress={() => handleSubmit()} />
     </View>
   )
 }
@@ -129,14 +108,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'stretch',
   },
-  param: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: T.spacing.medium,
-    paddingBottom: T.spacing.medium,
-    paddingLeft: T.spacing.small,
-    paddingRight: T.spacing.small,
-  },
   label: {
     color: T.color.text,
   },
@@ -144,12 +115,10 @@ const styles = StyleSheet.create({
     color: T.color.lightBlue,
     textAlign: 'right',
   },
-  blockingCondition: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    paddingTop: T.spacing.medium,
-    paddingBottom: T.spacing.medium,
-    paddingLeft: T.spacing.small,
-    paddingRight: T.spacing.small,
+  errorText: {
+    color: T.color.red,
+    fontSize: T.font.size.small,
+    marginTop: T.spacing.extraSmall,
+    fontWeight: T.font.weight.bold,
   },
 })

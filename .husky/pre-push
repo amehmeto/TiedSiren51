@@ -1,8 +1,5 @@
-#!/bin/sh
-. "$(dirname "$0")/_/husky.sh"
-
 sh .husky/scripts/no-direct-push-main-demo.sh
-sh .husky/scripts/no-package-lock-json-file.sh
+sh .husky/scripts/branch-name-check.sh
 sh .husky/scripts/uncommitted-files-check.sh
 
 npm run test:cov

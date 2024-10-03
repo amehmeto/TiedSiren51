@@ -21,7 +21,9 @@ import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurVie
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
-// import BlockingConditionModal from '@/ui/design-system/components/components/BlockingConditionModal'
+import { z } from 'zod'
+import { blocklistSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
+import { ErrorMessages } from '@/ui/error-messages.type'
 
 export type BlocklistScreenProps = {
   mode: 'create' | 'edit'
@@ -56,6 +58,8 @@ export function BlocklistForm({
       },
     },
   )
+
+  const [errors, setErrors] = useState<ErrorMessages>({})
 
   useEffect(() => {
     dispatch(fetchAvailableSirens())
@@ -152,6 +156,39 @@ export function BlocklistForm({
     ),
   })
 
+  const validateForm = (submittedBlocklistForm: typeof blocklist) => {
+    try {
+      blocklistSchema.parse(submittedBlocklistForm)
+      setErrors({})
+      return true
+    } catch (e) {
+      if (e instanceof z.ZodError) {
+        const validationErrors: ErrorMessages = {}
+        e.errors.forEach((error) => {
+          const field = error.path.join('.')
+          validationErrors[field] = error.message
+        })
+        setErrors(validationErrors)
+      }
+
+      return false
+    }
+  }
+
+  const saveBlocklist = async () => {
+    if (!validateForm(blocklist)) return
+
+    if (mode === 'edit') {
+      await dispatch(updateBlocklist(blocklist as Blocklist))
+    } else {
+      await dispatch(
+        createBlocklist(blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>),
+      )
+    }
+
+    router.push('/(tabs)/blocklists')
+  }
+
   return (
     <TiedSLinearBackground>
       <Text style={styles.title}>Name</Text>
@@ -161,7 +198,7 @@ export function BlocklistForm({
           onChangeText={(text) => setBlocklist({ ...blocklist, name: text })}
         />
       </TiedSBlurView>
-
+      {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
       <TabView
         navigationState={{ index, routes }}
         renderScene={renderScene}
@@ -172,21 +209,11 @@ export function BlocklistForm({
           <ChooseBlockTabBar {...props} />
         )}
       />
+      {errors['sirens'] && (
+        <Text style={styles.errorText}>{errors['sirens']}</Text>
+      )}
 
-      <TiedSButton
-        text={'Save Blocklist'}
-        onPress={async () => {
-          // eslint-disable-next-line no-unused-expressions
-          mode === 'edit'
-            ? await dispatch(updateBlocklist(blocklist as Blocklist))
-            : await dispatch(
-                createBlocklist(
-                  blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>,
-                ),
-              )
-          router.push('/(tabs)/blocklists')
-        }}
-      />
+      <TiedSButton text={'Save Blocklist'} onPress={saveBlocklist} />
     </TiedSLinearBackground>
   )
 }
@@ -199,5 +226,10 @@ const styles = StyleSheet.create({
     fontSize: T.size.small,
     marginTop: T.spacing.small,
     marginBottom: T.spacing.small,
+  },
+  errorText: {
+    color: T.color.red,
+    fontSize: T.font.size.small,
+    fontWeight: T.font.weight.bold,
   },
 })

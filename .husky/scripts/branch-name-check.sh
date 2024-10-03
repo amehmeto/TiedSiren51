@@ -1,7 +1,7 @@
 #!/bin/sh
 
 branch=$(git branch --show-current)
-pattern="^(feature|fix|build|chore|ci|docs|chore|style|refactor|perf|test)\/MA2-[0-9]+-.+$"
+pattern="^(feature|fix|build|chore|ci|docs|chore|style|refactor|perf|test)\/.+$"
 
 if ! [[ "$branch" =~ $pattern ]]; then
   printf "\033[0;35mBranch name '%s' does not follow the required pattern.\033[0m\n\n" "$branch"

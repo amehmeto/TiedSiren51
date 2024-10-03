@@ -3,22 +3,30 @@ import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { useDispatch } from 'react-redux'
-import { createBlockSession } from '@/core/block-session/usecases/create-block-session.usecase'
+import {
+  createBlockSession,
+  CreateBlockSessionPayload,
+} from '@/core/block-session/usecases/create-block-session.usecase'
 import uuid from 'react-native-uuid'
-import { BlockSession } from '@/core/block-session/block.session'
-import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
+import { BlockingConditions } from '@/core/block-session/block.session'
+import {
+  updateBlockSession,
+  UpdateBlockSessionPayload,
+} from '@/core/block-session/usecases/update-block-session.usecase'
 import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
-// import { z } from 'zod'
+import { useRouter } from 'expo-router'
+import { assertIsBlockSession } from '@/ui/screens/Home/HomeScreen/assertIsBlockSession'
+import { validateBlockSessionForm } from '@/ui/screens/Home/schemas/validate-block-session-form'
 
 export type Session = {
-  blockingCondition?: string
   id: string
   name: string | null
   blocklists: Blocklist[]
   devices: Device[]
   startedAt: string | null
   endedAt: string | null
+  blockingConditions: BlockingConditions[]
 }
 
 const defaultSession: Session = {
@@ -28,6 +36,7 @@ const defaultSession: Session = {
   devices: [] as Device[],
   startedAt: null,
   endedAt: null,
+  blockingConditions: [] as BlockingConditions[],
 }
 
 export function BlockSessionForm({
@@ -38,34 +47,19 @@ export function BlockSessionForm({
   session?: Session
 }>) {
   const dispatch = useDispatch<AppDispatch>()
+  const router = useRouter()
 
-  /*  const validationSchema = z.object({
-    id: z.string(),
-    name: z.string(),
-    blocklists: z.array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-        totalBlocks: z.number(),
-      }),
-    ),
-    devices: z.array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-      }),
-    ),
-    start: z.string(),
-    end: z.string(),
-  })*/
+  function saveBlockSession() {
+    return (values: Session) => {
+      assertIsBlockSession(values)
 
-  function assertIsBlockSession(
-    values: Session,
-  ): asserts values is BlockSession {
-    if (!Object.values(values).every((value) => value !== null)) {
-      throw new Error(
-        `Some properties are null ${JSON.stringify(values, null, 2)}`,
-      )
+      if (mode === 'edit') {
+        dispatch(updateBlockSession(values as UpdateBlockSessionPayload))
+      } else {
+        dispatch(createBlockSession(values as CreateBlockSessionPayload))
+      }
+
+      router.push('/(tabs)')
     }
   }
 
@@ -73,24 +67,8 @@ export function BlockSessionForm({
     <TiedSLinearBackground>
       <Formik
         initialValues={session}
-        /*
-        validate={(values) => {
-          try {
-            console.log('Validate values')
-            return validationSchema.parse(values)
-          } catch (e) {
-            if (e instanceof z.ZodError) return e.formErrors.fieldErrors
-
-            return e
-          }
-        }}
-        */
-        onSubmit={(values) => {
-          assertIsBlockSession(values)
-          mode === 'edit'
-            ? dispatch(updateBlockSession(values))
-            : dispatch(createBlockSession(values))
-        }}
+        validate={validateBlockSessionForm()}
+        onSubmit={saveBlockSession()}
       >
         {(form) => <SelectBlockSessionParams form={form} />}
       </Formik>
