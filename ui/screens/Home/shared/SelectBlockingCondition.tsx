@@ -1,6 +1,6 @@
 import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { FormikProps } from 'formik'
-import { StyleSheet, Text, TouchableOpacity } from 'react-native'
+import { StyleSheet, Text, Pressable } from 'react-native'
 import BlockingConditionModal from '@/ui/design-system/components/shared/BlockingConditionModal'
 import { T } from '@/ui/design-system/theme'
 import { useState } from 'react'
@@ -20,7 +20,7 @@ export function SelectBlockingCondition(props: { form: FormikProps<Session> }) {
 
   return (
     <>
-      <TouchableOpacity
+      <Pressable
         style={styles.blockingCondition}
         onPress={() => setIsBlockingConditionModalVisible(true)}
       >
@@ -30,7 +30,7 @@ export function SelectBlockingCondition(props: { form: FormikProps<Session> }) {
             ? props.form.values.blockingConditions.join(', ')
             : 'Select blocking conditions...'}
         </Text>
-      </TouchableOpacity>
+      </Pressable>
 
       <BlockingConditionModal
         visible={isBlockingConditionModalVisible}

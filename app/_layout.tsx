@@ -12,6 +12,7 @@ import * as NavigationBar from 'expo-navigation-bar'
 import { Platform } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { Stack, useRouter } from 'expo-router'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -33,26 +34,29 @@ export default function App() {
   }, [])
 
   useEffect(() => {
-    if (store) {
-      initializeBackgroundTasks(store)
-      navigateBasedOnAuth()
-    }
+    if (!store) return
+    initializeBackgroundTasks(store)
+    navigateBasedOnAuth()
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [store, isAuthenticated])
 
-  const initializeStore = () => {
-    storePromise.then(setStore)
+  function navigateBasedOnAuth() {
+    router.replace(isAuthenticated ? '/home' : '/register')
   }
 
-  const configureNavigationBar = () => {
+  function initializeStore() {
+    storePromise.then(setStore).catch(handleError)
+  }
+
+  function configureNavigationBar() {
     if (Platform.OS === 'android') {
       NavigationBar.setBackgroundColorAsync(T.color.darkBlue).catch(handleError)
     }
   }
 
-  const initializeBackgroundTasks = async (store: AppStore) => {
-    store.dispatch(tieSirens())
+  async function initializeBackgroundTasks(store: AppStore) {
     try {
+      store.dispatch(tieSirens())
       await (
         dependencies.backgroundTaskService as RealBackgroundTaskService
       ).initialize(store)
@@ -62,32 +66,36 @@ export default function App() {
     }
   }
 
-  const navigateBasedOnAuth = () => {
-    router.replace(isAuthenticated ? '/home' : '/register')
-  }
-
-  const handleError = (error: unknown) => {
+  function handleError(error: unknown) {
     console.error('Error:', error)
   }
 
   if (!store) return null
 
+  const routes = [
+    '(auth)/register',
+    '(auth)/login',
+    '(auth)/signup',
+    '(auth)/forgot-password',
+    '(tabs)',
+  ]
+
   return (
     <Provider store={store}>
       <MenuProvider>
         <StatusBar style={'auto'} />
-        <Stack
-          screenOptions={{
-            header: () => null,
-            contentStyle: { backgroundColor: T.color.white },
-          }}
-        >
-          <Stack.Screen name="(auth)/register" />
-          <Stack.Screen name="(auth)/login" />
-          <Stack.Screen name="(auth)/signup" />
-          <Stack.Screen name="(auth)/forgot-password" />
-          <Stack.Screen name="(tabs)" />
-        </Stack>
+        <TiedSLinearBackground>
+          <Stack
+            screenOptions={{
+              header: () => null,
+              contentStyle: { backgroundColor: 'transparent' },
+            }}
+          >
+            {routes.map((route) => (
+              <Stack.Screen key={route} name={route} />
+            ))}
+          </Stack>
+        </TiedSLinearBackground>
       </MenuProvider>
     </Provider>
   )

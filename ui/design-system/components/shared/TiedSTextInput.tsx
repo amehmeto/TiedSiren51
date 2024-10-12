@@ -1,18 +1,27 @@
-import { StyleSheet, TextInput, TextInputProps, View, Text } from 'react-native'
+import {
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+  View,
+  Text,
+  Pressable,
+} from 'react-native'
 import { T } from '@/ui/design-system/theme'
-import { ReactNode, useState } from 'react'
+import { useState } from 'react'
+import { Ionicons } from '@expo/vector-icons'
 
 interface TiedSTextInputProps extends TextInputProps {
   label?: string
-  rightIcon?: ReactNode
+  hasPasswordToggle?: boolean
 }
 
 export function TiedSTextInput({
   label,
-  rightIcon,
+  hasPasswordToggle = false,
   ...props
 }: TiedSTextInputProps) {
   const [isFocused, setIsFocused] = useState(false)
+  const [isPasswordShown, setIsPasswordShown] = useState(false)
 
   return (
     <View style={styles.container}>
@@ -24,11 +33,23 @@ export function TiedSTextInput({
             { borderColor: isFocused ? T.color.lightBlue : T.color.white },
           ]}
           placeholderTextColor={T.color.white}
+          secureTextEntry={hasPasswordToggle && !isPasswordShown}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           {...props}
         />
-        {rightIcon && <View style={styles.iconContainer}>{rightIcon}</View>}
+        {hasPasswordToggle && (
+          <Pressable
+            style={styles.iconContainer}
+            onPress={() => setIsPasswordShown((prev) => !prev)}
+          >
+            <Ionicons
+              name={isPasswordShown ? 'eye-outline' : 'eye-off-outline'}
+              size={T.size.large}
+              color={T.color.grey}
+            />
+          </Pressable>
+        )}
       </View>
     </View>
   )

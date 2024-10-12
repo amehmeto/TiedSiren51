@@ -2,7 +2,6 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
-import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
@@ -11,7 +10,7 @@ export default function ForgotPasswordScreen() {
   const router = useRouter()
 
   return (
-    <TiedSLinearBackground>
+    <>
       <View style={styles.container}>
         <TiedSCloseButton
           onClose={() => router.back()}
@@ -27,7 +26,7 @@ export default function ForgotPasswordScreen() {
           text={'SEND PASSWORD RESET EMAIL'}
         />
       </View>
-    </TiedSLinearBackground>
+    </>
   )
 }
 
