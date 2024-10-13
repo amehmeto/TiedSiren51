@@ -35,14 +35,14 @@ export function BlocklistForm({
   blocklistId,
 }: Readonly<BlocklistScreenProps>) {
   const dispatch = useDispatch<AppDispatch>()
+  const router = useRouter()
+
   const selectableSirens: Sirens = useSelector(
     (state: RootState) => state.siren.availableSirens,
   )
   const blocklistFromState = useSelector((state: RootState) =>
     blocklistId ? selectBlocklistById(blocklistId, state) : undefined,
   )
-
-  const router = useRouter()
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
     {
@@ -60,18 +60,18 @@ export function BlocklistForm({
   )
 
   const [errors, setErrors] = useState<ErrorMessages>({})
-
-  useEffect(() => {
-    dispatch(fetchAvailableSirens())
-    if (mode === 'edit' && blocklistFromState) setBlocklist(blocklistFromState)
-  }, [mode, blocklistFromState, dispatch])
-
   const [index, setIndex] = useState(0)
+
   const routes = [
     { key: 'apps', title: 'Apps' },
     { key: 'websites', title: 'Websites' },
     { key: 'keywords', title: 'Keywords' },
   ]
+
+  useEffect(() => {
+    dispatch(fetchAvailableSirens())
+    if (mode === 'edit' && blocklistFromState) setBlocklist(blocklistFromState)
+  }, [mode, blocklistFromState, dispatch])
 
   function toggleTextSiren(sirenType: keyof Sirens, sirenId: string) {
     setBlocklist((prevBlocklist) => {

@@ -1,32 +1,69 @@
-import { StyleSheet, TextInput, TextInputProps, View, Text } from 'react-native'
+import {
+  StyleSheet,
+  TextInput,
+  TextInputProps,
+  View,
+  Text,
+  Pressable,
+} from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { useState } from 'react'
+import { Ionicons } from '@expo/vector-icons'
 
 interface TiedSTextInputProps extends TextInputProps {
   label?: string
+  hasPasswordToggle?: boolean
 }
 
-export function TiedSTextInput(props: Readonly<TiedSTextInputProps>) {
+export function TiedSTextInput({
+  label,
+  hasPasswordToggle = false,
+  ...props
+}: TiedSTextInputProps) {
   const [isFocused, setIsFocused] = useState(false)
+  const [isPasswordShown, setIsPasswordShown] = useState(false)
 
   return (
     <View style={styles.container}>
-      {props.label && <Text style={styles.text}>{props.label}</Text>}
-      <TextInput
-        style={[
-          styles.input,
-          { borderColor: isFocused ? T.color.lightBlue : T.color.white },
-        ]}
-        placeholderTextColor={T.color.white}
-        onFocus={() => setIsFocused(true)}
-        onBlur={() => setIsFocused(false)}
-        {...props}
-      />
+      {label && <Text style={styles.text}>{label}</Text>}
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={[
+            styles.input,
+            { borderColor: isFocused ? T.color.lightBlue : T.color.white },
+          ]}
+          placeholderTextColor={T.color.white}
+          secureTextEntry={hasPasswordToggle && !isPasswordShown}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => setIsFocused(false)}
+          {...props}
+        />
+        {hasPasswordToggle && (
+          <Pressable
+            style={styles.iconContainer}
+            onPress={() => setIsPasswordShown((prev) => !prev)}
+          >
+            <Ionicons
+              name={isPasswordShown ? 'eye-outline' : 'eye-off-outline'}
+              size={T.size.large}
+              color={T.color.grey}
+            />
+          </Pressable>
+        )}
+      </View>
     </View>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    width: '100%',
+    marginVertical: T.spacing.medium,
+  },
+  inputContainer: {
+    position: 'relative',
+    justifyContent: 'center',
+  },
   input: {
     height: T.width.textInputHeight,
     padding: T.spacing.small,
@@ -41,7 +78,9 @@ const styles = StyleSheet.create({
     color: T.color.white,
     marginBottom: T.spacing.medium,
   },
-  container: {
-    width: '100%',
+  iconContainer: {
+    position: 'absolute',
+    right: T.spacing.small,
+    top: T.spacing.small,
   },
 })
