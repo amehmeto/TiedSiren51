@@ -10,10 +10,12 @@ export default function ForgotPasswordScreen() {
   const router = useRouter()
 
   const handleClose = () => {
-    console.log('Close button pressed') // Log when the close button is pressed
     if (router.canGoBack()) {
-      router.back() // Navigate back if possible
-    } else if (Platform.OS === 'ios') {
+      router.back()
+      return
+    }
+
+    if (Platform.OS === 'ios') {
       router.replace('/(auth)/login')
     }
   }

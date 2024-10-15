@@ -18,7 +18,6 @@ export function TiedSCloseButton({
     <Pressable
       style={styles.closeIconContainer}
       onPress={() => {
-        console.log('Close button pressed inside TiedSCloseButton') // Log to check if it's triggered
         onClose()
       }}
     >
@@ -33,7 +32,7 @@ const styles = StyleSheet.create({
     top: T.size.tiny,
     right: T.size.tiny,
     zIndex: 1,
-    backgroundColor: 'transparent', // Change to a visible color for testing
-    padding: 10, // Add padding to increase touch area
+    backgroundColor: T.color.transparent,
+    padding: T.size.tiny,
   },
 })
