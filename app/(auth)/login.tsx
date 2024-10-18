@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Platform } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -10,13 +10,21 @@ import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialB
 export default function LoginScreen() {
   const router = useRouter()
 
+  const handleClose = () => {
+    if (router.canGoBack()) {
+      router.back()
+      return
+    }
+
+    if (Platform.OS === 'ios') {
+      router.replace('/(auth)/login')
+    }
+  }
+
   return (
     <>
       <View style={styles.container}>
-        <TiedSCloseButton
-          onClose={() => router.back()}
-          iconColor={T.color.white}
-        />
+        <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
         <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
         <TiedSSocialButton
           iconName="logo-google"
