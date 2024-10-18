@@ -1,8 +1,9 @@
-import { beforeEach, describe, expect, it, test } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { PreloadedState } from '@/core/_redux_/createStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
+import timezoneMock from 'timezone-mock'
 
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import {
@@ -17,7 +18,12 @@ describe('Home View Model', () => {
   let dateProvider: StubDateProvider
 
   beforeEach(() => {
+    timezoneMock.register('UTC')
     dateProvider = new StubDateProvider()
+  })
+  afterEach(() => {
+    // Unregister the mock after tests
+    timezoneMock.unregister()
   })
 
   test.each([
@@ -308,7 +314,7 @@ describe('Home View Model', () => {
       const store = createTestStore({}, preloadedState)
       const now = new Date()
       now.setUTCHours(13, 48, 0, 0)
-      dateProvider.now = now
+      dateProvider.setNow(now)
 
       const homeViewModel = selectHomeViewModel(
         store.getState(),
@@ -346,7 +352,7 @@ describe('Home View Model', () => {
       const [hours, minutes] = nowHHmm.split(':').map(Number)
       const now = new Date()
       now.setHours(hours, minutes)
-      dateProvider.now = now
+      dateProvider.setNow(now)
 
       const homeViewModel = selectHomeViewModel(
         store.getState(),
