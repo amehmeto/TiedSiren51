@@ -8,6 +8,10 @@ export class StubDateProvider implements DateProvider {
     return this.now
   }
 
+  setNow(date: Date) {
+    this.now = date
+  }
+
   getISOStringNow(): string {
     return this.now.toISOString()
   }
