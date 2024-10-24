@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   tabBar: {
     borderTopWidth: T.border.width.none,
     backgroundColor: T.color.darkBlue,
-    height: T.tabBarHeight,
+    // height: T.tabBarHeight,
     padding: T.spacing.small,
   },
 })
