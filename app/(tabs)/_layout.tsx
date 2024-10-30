@@ -1,9 +1,7 @@
-import { Tabs } from 'expo-router'
 import React from 'react'
-import { StyleSheet } from 'react-native'
 import { Entypo, Ionicons } from '@expo/vector-icons'
 import { TabScreens } from '@/ui/navigation/TabScreens'
-import { T } from '@/ui/design-system/theme'
+import { BottomTabs } from '@/ui/navigation/BottomTabs'
 
 export default function TabLayout() {
   const tabs: {
@@ -39,40 +37,40 @@ export default function TabLayout() {
   ]
 
   return (
-    <Tabs
-      screenOptions={{
-        tabBarLabelPosition: 'below-icon',
-        tabBarStyle: styles.tabBar,
-        tabBarActiveTintColor: T.color.lightBlue,
-        tabBarInactiveTintColor: T.color.inactive,
-        headerShown: false,
-        headerStyle: { backgroundColor: T.color.darkBlue },
-        headerTintColor: T.color.lightBlue,
-        headerTitleStyle: { fontWeight: T.font.weight.bold },
-        headerShadowVisible: false,
-      }}
+    <BottomTabs
+    // screenOptions={{
+    //   tabBarLabelPosition: 'below-icon',
+    //   tabBarStyle: styles.tabBar,
+    //   tabBarActiveTintColor: T.color.lightBlue,
+    //   tabBarInactiveTintColor: T.color.inactive,
+    //   headerShown: false,
+    //   headerStyle: { backgroundColor: T.color.darkBlue },
+    //   headerTintColor: T.color.lightBlue,
+    //   headerTitleStyle: { fontWeight: T.font.weight.bold },
+    //   headerShadowVisible: false,
+    // }}
     >
       {tabs.map((tab) => (
-        <Tabs.Screen
+        <BottomTabs.Screen
           key={tab.name}
           name={tab.name}
           options={{
             title: tab.title,
-            tabBarIcon: ({ color, size }) => (
+            tabBarIcon: ({ color, size }: { color: string; size: number }) => (
               <tab.IconType name={tab.icon} size={size} color={color} />
             ),
           }}
         />
       ))}
-    </Tabs>
+    </BottomTabs>
   )
 }
 
-const styles = StyleSheet.create({
-  tabBar: {
-    borderTopWidth: T.border.width.none,
-    backgroundColor: T.color.darkBlue,
-    height: T.tabBarHeight,
-    padding: T.spacing.small,
-  },
-})
+// const styles = StyleSheet.create({
+//   tabBar: {
+//     borderTopWidth: T.border.width.none,
+//     backgroundColor: T.color.darkBlue,
+//     height: T.tabBarHeight,
+//     padding: T.spacing.small,
+//   },
+// })
