@@ -9,7 +9,7 @@ import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sire
 import { Route, SceneMap, TabBarProps, TabView } from 'react-native-tab-view'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
-import { Dimensions, StyleSheet, Text } from 'react-native'
+import { Dimensions, StyleSheet, Text, View } from 'react-native'
 import { updateBlocklist } from '@/core/blocklist/usecases/update-blocklist.usecase'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
 import { T } from '@/ui/design-system/theme'
@@ -191,29 +191,31 @@ export function BlocklistForm({
 
   return (
     <TiedSLinearBackground>
-      <Text style={styles.title}>Name</Text>
-      <TiedSBlurView>
-        <TiedSTextInput
-          placeholder={blocklistFromState?.name ?? 'Blocklist name'}
-          onChangeText={(text) => setBlocklist({ ...blocklist, name: text })}
+      <View style={{ flex: 1, paddingBottom: 60 }}>
+        <Text style={styles.title}>Name</Text>
+        <TiedSBlurView>
+          <TiedSTextInput
+            placeholder={blocklistFromState?.name ?? 'Blocklist name'}
+            onChangeText={(text) => setBlocklist({ ...blocklist, name: text })}
+          />
+        </TiedSBlurView>
+        {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
+        <TabView
+          navigationState={{ index, routes }}
+          renderScene={renderScene}
+          lazy={false}
+          onIndexChange={setIndex}
+          initialLayout={{ width: Dimensions.get('window').width }}
+          renderTabBar={(props: TabBarProps<Route>) => (
+            <ChooseBlockTabBar {...props} />
+          )}
         />
-      </TiedSBlurView>
-      {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
-      <TabView
-        navigationState={{ index, routes }}
-        renderScene={renderScene}
-        lazy={false}
-        onIndexChange={setIndex}
-        initialLayout={{ width: Dimensions.get('window').width }}
-        renderTabBar={(props: TabBarProps<Route>) => (
-          <ChooseBlockTabBar {...props} />
+        {errors['sirens'] && (
+          <Text style={styles.errorText}>{errors['sirens']}</Text>
         )}
-      />
-      {errors['sirens'] && (
-        <Text style={styles.errorText}>{errors['sirens']}</Text>
-      )}
 
-      <TiedSButton text={'Save Blocklist'} onPress={saveBlocklist} />
+        <TiedSButton text={'Save Blocklist'} onPress={saveBlocklist} />
+      </View>
     </TiedSLinearBackground>
   )
 }
@@ -224,8 +226,6 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontFamily: T.font.family.primary,
     fontSize: T.size.small,
-    marginTop: T.spacing.small,
-    marginBottom: T.spacing.small,
   },
   errorText: {
     color: T.color.red,

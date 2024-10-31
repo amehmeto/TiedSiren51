@@ -54,7 +54,7 @@ export const T = {
     large: 20,
     x_large: 25,
     xx_large: 32,
-    xxx_large: 50,
+    xxx_large: 60,
   },
   border: {
     width: {

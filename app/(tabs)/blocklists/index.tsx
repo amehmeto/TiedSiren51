@@ -78,8 +78,8 @@ const styles = StyleSheet.create({
     borderRadius: T.border.radius.fullRound,
     backgroundColor: T.color.darkBlue,
     position: 'absolute',
-    bottom: T.spacing.large,
-    right: T.spacing.large,
+    bottom: T.spacing.xxx_large,
+    right: T.spacing.medium,
 
     ...Platform.select({
       ios: {
