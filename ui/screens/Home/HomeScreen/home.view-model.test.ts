@@ -301,7 +301,7 @@ describe('Home View Model', () => {
       const store = createTestStore({}, preloadedState)
       const now = new Date()
       console.log('Initial local time:', now)
-      now.setUTCHours(13, 48, 0, 0)
+      now.setHours(13, 48, 0, 0)
       dateProvider.now = now
 
       console.log('Modified dateProvider.now:', dateProvider.now.toISOString())
@@ -345,7 +345,7 @@ describe('Home View Model', () => {
       )
       const [hours, minutes] = nowHHmm.split(':').map(Number)
       const now = new Date()
-      now.setUTCHours(hours, minutes)
+      now.setHours(hours, minutes)
       dateProvider.now = now
 
       const homeViewModel = selectHomeViewModel(

@@ -18,7 +18,7 @@ import {
 
 function greetUser(now: Date) {
   console.log('greetUserNow', now)
-  const hour = now.getUTCHours()
+  const hour = now.getHours()
   console.log('UTC hours', now.getUTCHours())
   console.log('Local hours', now.getHours())
   if (hour >= 6 && hour < 12) return Greetings.GoodMorning
