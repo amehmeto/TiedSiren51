@@ -21,11 +21,13 @@ export default function LoginScreen() {
         <TiedSSocialButton
           iconName="logo-google"
           text="CONTINUE WITH GOOGLE"
+          // eslint-disable-next-line no-console
           onPress={() => console.log('Continue with Google')}
         />
         <TiedSSocialButton
           iconName="logo-apple"
           text="CONTINUE WITH APPLE"
+          // eslint-disable-next-line no-console
           onPress={() => console.log('Continue with Apple')}
         />
         <Text style={styles.orText}>{'OR'}</Text>

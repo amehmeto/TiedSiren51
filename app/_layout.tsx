@@ -60,13 +60,13 @@ export default function App() {
       await (
         dependencies.backgroundTaskService as RealBackgroundTaskService
       ).initialize(store)
-      console.log('Background task service initialized')
     } catch (error) {
       handleError(error)
     }
   }
 
   function handleError(error: unknown) {
+    // eslint-disable-next-line no-console
     console.error('Error:', error)
   }
 

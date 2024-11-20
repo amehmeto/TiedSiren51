@@ -13,6 +13,7 @@ export class FakeNotificationService implements NotificationService {
   lastCancelledNotificationIds: string[] = []
 
   async sendPushNotification(message: string): Promise<void> {
+    // eslint-disable-next-line no-console
     console.log(`Fake notification: ${message}`)
   }
 

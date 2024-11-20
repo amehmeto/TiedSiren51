@@ -11,6 +11,7 @@ export class FakeBackgroundTaskService implements BackgroundTaskService {
   }
 
   async cancelTask(taskId: string): Promise<void> {
+    // eslint-disable-next-line no-console
     console.log('FakeBackgroundTaskService.cancelTask', taskId)
   }
 
