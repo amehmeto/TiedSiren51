@@ -17,10 +17,7 @@ import {
 } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 
 function greetUser(now: Date) {
-  console.log('greetUserNow', now)
   const hour = now.getHours()
-  console.log('UTC hours', now.getUTCHours())
-  console.log('Local hours', now.getHours())
   if (hour >= 6 && hour < 12) return Greetings.GoodMorning
   if (hour >= 12 && hour < 18) return Greetings.GoodAfternoon
   if (hour >= 18 && hour < 22) return Greetings.GoodEvening
@@ -31,7 +28,6 @@ function generateTimeInfo(dateProvider: DateProvider, session: BlockSession) {
   const start = dateProvider.recoverDate(session.startedAt)
   const end = dateProvider.recoverDate(session.endedAt)
   const now = dateProvider.getNow()
-  console.log('dateProvider', now)
   return isActive(dateProvider, session)
     ? 'Ends ' +
         formatDistance(end, now, {

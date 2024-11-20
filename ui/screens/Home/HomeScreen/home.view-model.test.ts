@@ -300,21 +300,14 @@ describe('Home View Model', () => {
     (_, preloadedState: PreloadedState, expectedViewModel) => {
       const store = createTestStore({}, preloadedState)
       const now = new Date()
-      console.log('Initial local time:', now)
       now.setHours(13, 48, 0, 0)
       dateProvider.now = now
-
-      console.log('Modified dateProvider.now:', dateProvider.now.toISOString())
-      console.log('Modified test date (now):', now.toISOString())
 
       const homeViewModel = selectHomeViewModel(
         store.getState(),
         now,
         dateProvider,
       )
-
-      console.log('homeViewModel', homeViewModel)
-      console.log('expectedViewModel', expectedViewModel)
 
       expect(homeViewModel).toStrictEqual(expectedViewModel)
     },

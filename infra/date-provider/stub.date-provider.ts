@@ -5,7 +5,6 @@ export class StubDateProvider implements DateProvider {
   now = new Date()
 
   getNow(): Date {
-    console.log('getNow of StubDateProvider', this.now)
     return this.now
   }
 
