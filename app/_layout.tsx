@@ -6,7 +6,6 @@ import { StatusBar } from 'expo-status-bar'
 import { AppStore } from '@/core/_redux_/createStore'
 import { storePromise } from '@/ui/preloadedStateForManualTesting'
 import { tieSirens } from '@/core/siren/usecases/tie-sirens.usecase'
-import { RealBackgroundTaskService } from '@/infra/background-task-service/real.background-task.service'
 import { dependencies } from '@/ui/dependencies'
 import * as NavigationBar from 'expo-navigation-bar'
 import { Platform } from 'react-native'
@@ -57,16 +56,16 @@ export default function App() {
   async function initializeBackgroundTasks(store: AppStore) {
     try {
       store.dispatch(tieSirens())
-      await (
-        dependencies.backgroundTaskService as RealBackgroundTaskService
-      ).initialize(store)
-      console.log('Background task service initialized')
+      await dependencies.backgroundTaskService.initialize(store)
     } catch (error) {
-      handleError(error)
+      const parsedError =
+        error instanceof Error ? error : new Error(String(error))
+      handleError(parsedError)
     }
   }
 
-  function handleError(error: unknown) {
+  function handleError(error: Error) {
+    // eslint-disable-next-line no-console
     console.error('Error:', error)
   }
 

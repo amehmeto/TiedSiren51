@@ -18,7 +18,6 @@ import {
 
 function greetUser(now: Date) {
   const hour = now.getHours()
-
   if (hour >= 6 && hour < 12) return Greetings.GoodMorning
   if (hour >= 12 && hour < 18) return Greetings.GoodAfternoon
   if (hour >= 18 && hour < 22) return Greetings.GoodEvening

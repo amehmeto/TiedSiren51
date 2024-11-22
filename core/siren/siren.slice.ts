@@ -31,6 +31,7 @@ export const sirenSlice = createSlice({
         state.availableSirens.websites.push(action.payload)
       })
       .addCase(tieSirens.fulfilled, () => {
+        // eslint-disable-next-line no-console
         console.log('sirens tied!')
       })
   },

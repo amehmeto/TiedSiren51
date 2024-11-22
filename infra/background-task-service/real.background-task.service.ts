@@ -22,6 +22,7 @@ export class RealBackgroundTaskService implements BackgroundTaskService {
       const now = Date.now()
 
       store.dispatch(tieSirens())
+      // eslint-disable-next-line no-console
       console.log(
         `Got background fetch call at date: ${new Date(now).toISOString()}`,
       )
