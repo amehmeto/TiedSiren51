@@ -37,7 +37,6 @@ describe('Home View Model', () => {
         },
       },
     ],
-
     [
       'one active session',
       stateBuilder()
@@ -71,7 +70,6 @@ describe('Home View Model', () => {
         },
       },
     ],
-
     [
       'one active session',
       stateBuilder()
@@ -105,7 +103,6 @@ describe('Home View Model', () => {
         },
       },
     ],
-
     [
       'one active session that has just started',
       stateBuilder()
@@ -139,7 +136,6 @@ describe('Home View Model', () => {
         },
       },
     ],
-
     [
       'one active session that has started the day before',
       stateBuilder()
@@ -173,7 +169,6 @@ describe('Home View Model', () => {
         },
       },
     ],
-
     [
       'two sessions',
       stateBuilder()
@@ -220,7 +215,6 @@ describe('Home View Model', () => {
         },
       },
     ],
-
     [
       'one scheduled session and 0 active session',
       stateBuilder()
@@ -254,7 +248,6 @@ describe('Home View Model', () => {
         },
       },
     ],
-
     [
       'one scheduled session and 1 active session',
       stateBuilder()
@@ -307,7 +300,7 @@ describe('Home View Model', () => {
     (_, preloadedState: PreloadedState, expectedViewModel) => {
       const store = createTestStore({}, preloadedState)
       const now = new Date()
-      now.setUTCHours(13, 48, 0, 0)
+      now.setHours(13, 48, 0, 0)
       dateProvider.now = now
 
       const homeViewModel = selectHomeViewModel(

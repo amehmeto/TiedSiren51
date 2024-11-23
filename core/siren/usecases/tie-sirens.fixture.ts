@@ -23,7 +23,7 @@ export function tieSirensFixture(
       },
       nowIs({ hours, minutes }: { hours: number; minutes: number }) {
         const date = new Date()
-        date.setUTCHours(hours, minutes, 0, 0)
+        date.setHours(hours, minutes, 0, 0)
         dateProvider.now = date
       },
     },

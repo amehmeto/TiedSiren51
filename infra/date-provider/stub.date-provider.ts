@@ -16,14 +16,14 @@ export class StubDateProvider implements DateProvider {
     const [hours, minutes] = timeInHHmm.split(':').map(Number)
 
     const todayWithNewTime = new Date(this.now.getTime())
-    todayWithNewTime.setUTCHours(hours, minutes, 0, 0)
+    todayWithNewTime.setHours(hours, minutes, 0, 0)
 
     return todayWithNewTime
   }
 
   toHHmm(date: Date): string {
-    const hours = String(date.getUTCHours()).padStart(2, '0')
-    const minutes = String(date.getUTCMinutes()).padStart(2, '0')
+    const hours = String(date.getHours()).padStart(2, '0')
+    const minutes = String(date.getMinutes()).padStart(2, '0')
     return `${hours}:${minutes}`
   }
 
@@ -33,7 +33,7 @@ export class StubDateProvider implements DateProvider {
     const todayWithNewTime = new Date(
       this.now.getTime() - this.MILLISECONDS_IN_A_DAY,
     )
-    todayWithNewTime.setUTCHours(hours, minutes, 0, 0)
+    todayWithNewTime.setHours(hours, minutes, 0, 0)
 
     return todayWithNewTime
   }

@@ -41,7 +41,7 @@ export function blockSessionFixture(
       },
       nowIs(now: { hours: number; minutes: number }) {
         const nowDate = new Date()
-        nowDate.setUTCHours(now.hours, now.minutes, 0, 0)
+        nowDate.setHours(now.hours, now.minutes, 0, 0)
         dateProvider.now = nowDate
       },
     },
