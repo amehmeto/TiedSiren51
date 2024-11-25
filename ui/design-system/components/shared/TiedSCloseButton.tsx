@@ -27,5 +27,7 @@ const styles = StyleSheet.create({
     top: T.size.tiny,
     right: T.size.tiny,
     zIndex: 1,
+    backgroundColor: T.color.transparent,
+    padding: T.size.tiny,
   },
 })

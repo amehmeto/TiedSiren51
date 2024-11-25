@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { View, Text, StyleSheet, Platform } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -10,12 +10,20 @@ import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialB
 export default function SignUpScreen() {
   const router = useRouter()
 
+  const handleClose = () => {
+    if (router.canGoBack()) {
+      router.back()
+      return
+    }
+
+    if (Platform.OS === 'ios') {
+      router.replace('/(auth)/login')
+    }
+  }
+
   return (
     <View style={styles.container}>
-      <TiedSCloseButton
-        onClose={() => router.back()}
-        iconColor={T.color.white}
-      />
+      <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
       <Text style={styles.subtitle}>{'GET STARTED FOR FREE'}</Text>
       <TiedSSocialButton
         iconName="logo-google"
@@ -58,22 +66,6 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontSize: T.font.size.large,
     marginBottom: T.spacing.large,
-  },
-  socialButton: {
-    width: '90%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    padding: T.spacing.medium,
-    borderRadius: T.border.radius.roundedMedium,
-    marginBottom: T.spacing.medium,
-    backgroundColor: T.color.modalBackgroundColor,
-  },
-  socialButtonText: {
-    color: T.color.text,
-    fontSize: T.font.size.regular,
-    fontWeight: T.font.weight.bold,
-    marginLeft: T.spacing.medium,
   },
   orText: {
     color: T.color.text,
