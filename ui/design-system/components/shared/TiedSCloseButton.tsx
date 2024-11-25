@@ -15,12 +15,7 @@ export function TiedSCloseButton({
   iconSize = T.size.large,
 }: CloseButtonProps) {
   return (
-    <Pressable
-      style={styles.closeIconContainer}
-      onPress={() => {
-        onClose()
-      }}
-    >
+    <Pressable style={styles.closeIconContainer} onPress={onClose}>
       <Ionicons name="close" size={iconSize} color={iconColor} />
     </Pressable>
   )
