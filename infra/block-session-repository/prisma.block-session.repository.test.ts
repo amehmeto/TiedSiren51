@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it, afterAll } from 'vitest'
+import { beforeEach, describe, expect, it, afterAll, afterEach } from 'vitest'
 import { PrismaClient } from '@prisma/client'
 import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
@@ -10,12 +10,21 @@ describe('PrismaBlockSessionRepository', () => {
   let repository: PrismaBlockSessionRepository
 
   beforeEach(async () => {
+    // Create new PrismaClient for each test
     prisma = new PrismaClient()
+    await prisma.$connect() // Explicitly connect
     repository = new PrismaBlockSessionRepository(prisma)
-    // Clear all data before each test
-    await prisma.blockSession.deleteMany()
-    await prisma.blocklist.deleteMany()
-    await prisma.device.deleteMany()
+
+    // Clear all data in reverse order of relationships
+    await prisma.$transaction([
+      prisma.blockSession.deleteMany(),
+      prisma.blocklist.deleteMany(),
+      prisma.device.deleteMany(),
+    ])
+  })
+
+  afterEach(async () => {
+    await prisma.$disconnect()
   })
 
   afterAll(async () => {
