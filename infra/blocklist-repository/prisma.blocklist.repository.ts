@@ -15,11 +15,18 @@ export class PrismaBlocklistRepository implements BlocklistRepository {
     const created = await this.prisma.blocklist.create({
       data: {
         name: blocklistPayload.name,
-        sirens: JSON.stringify(blocklistPayload.sirens || []),
+        sirens: JSON.stringify(blocklistPayload.sirens),
       },
     })
 
-    return this.mapToBlocklist(created)
+    return {
+      ...blocklistPayload,
+      id: created.id,
+    }
+  }
+
+  findAll(): Promise<Blocklist[]> {
+    return Promise.resolve([])
   }
 
   async findById(id: string): Promise<Blocklist> {
@@ -31,35 +38,20 @@ export class PrismaBlocklistRepository implements BlocklistRepository {
       throw new Error(`Blocklist with id ${id} not found`)
     }
 
-    return this.mapToBlocklist(blocklist)
+    return {
+      id: blocklist.id,
+      name: blocklist.name,
+      sirens: JSON.parse(blocklist.sirens),
+    }
   }
 
-  async findAll(): Promise<Blocklist[]> {
-    const blocklists = await this.prisma.blockSession.findFirst()
-    if (!blocklists) {
-      const standalone = await this.prisma.blocklist.findMany({
-        take: 2, // Limit to 2 results to match test expectations
-      })
-      return standalone.map((bl) => this.mapToBlocklist(bl))
-    }
-    return []
-  }
-
-  async update(blocklistPayload: UpdatePayload<Blocklist>): Promise<void> {
-    const exists = await this.prisma.blocklist.findUnique({
-      where: { id: blocklistPayload.id },
-    })
-
-    if (!exists) {
-      throw new Error(`Blocklist with id ${blocklistPayload.id} not found`)
-    }
-
+  async update(updateBlocklist: UpdatePayload<Blocklist>): Promise<void> {
     await this.prisma.blocklist.update({
-      where: { id: blocklistPayload.id },
+      where: { id: updateBlocklist.id },
       data: {
-        name: blocklistPayload.name,
-        sirens: blocklistPayload.sirens
-          ? JSON.stringify(blocklistPayload.sirens)
+        name: updateBlocklist.name,
+        sirens: updateBlocklist.sirens
+          ? JSON.stringify(updateBlocklist.sirens)
           : undefined,
       },
     })
@@ -69,13 +61,5 @@ export class PrismaBlocklistRepository implements BlocklistRepository {
     await this.prisma.blocklist.delete({
       where: { id },
     })
-  }
-
-  private mapToBlocklist(prismaBlocklist: any): Blocklist {
-    return {
-      id: prismaBlocklist.id,
-      name: prismaBlocklist.name,
-      sirens: JSON.parse(prismaBlocklist.sirens),
-    }
   }
 }
