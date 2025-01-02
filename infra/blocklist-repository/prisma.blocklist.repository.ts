@@ -35,11 +35,10 @@ export class PrismaBlocklistRepository implements BlocklistRepository {
   }
 
   async findAll(): Promise<Blocklist[]> {
-    const blocklists = await this.prisma.blocklist.findMany()
-    return blocklists.map((bl) => ({
-      ...bl,
-      sirens: JSON.parse(bl.sirens),
-    }))
+    const blocklists = await this.prisma.blocklist.findMany({
+      orderBy: { id: 'asc' },
+    })
+    return blocklists.map((bl) => this.mapToBlocklist(bl))
   }
 
   async update(blocklistPayload: UpdatePayload<Blocklist>): Promise<void> {

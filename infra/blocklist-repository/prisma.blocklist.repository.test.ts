@@ -10,9 +10,16 @@ describe('PrismaBlocklistRepository', () => {
   let repository: PrismaBlocklistRepository
 
   beforeEach(async () => {
+    // Create new PrismaClient for each test
     prisma = new PrismaClient()
     repository = new PrismaBlocklistRepository(prisma)
-    await prisma.blocklist.deleteMany()
+
+    // Clean up ALL related data
+    await prisma.$transaction([
+      prisma.blockSession.deleteMany(),
+      prisma.blocklist.deleteMany(),
+      prisma.device.deleteMany(),
+    ])
   })
 
   afterAll(async () => {
@@ -45,51 +52,58 @@ describe('PrismaBlocklistRepository', () => {
   })
 
   it('should find all current blocklists', async () => {
+    // Create first blocklist
     const blocklistPayload1: CreatePayload<Blocklist> = buildBlocklist()
     // @ts-expect-error - removing id for creation
     delete blocklistPayload1.id
-    await repository.create(blocklistPayload1)
+    const created1 = await repository.create(blocklistPayload1)
 
+    // Create second blocklist
     const blocklistPayload2: CreatePayload<Blocklist> = buildBlocklist()
     // @ts-expect-error - removing id for creation
     delete blocklistPayload2.id
-    await repository.create(blocklistPayload2)
+    const created2 = await repository.create(blocklistPayload2)
 
     const currentBlocklists = await repository.findAll()
     expect(currentBlocklists).toHaveLength(2)
-    expect(currentBlocklists.map((bl) => bl.name)).toContain(
-      blocklistPayload1.name,
-    )
-    expect(currentBlocklists.map((bl) => bl.name)).toContain(
-      blocklistPayload2.name,
+    expect(currentBlocklists).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ id: created1.id }),
+        expect.objectContaining({ id: created2.id }),
+      ]),
     )
   })
 
   it('should update a blocklist', async () => {
+    // Create a blocklist first
     const blocklistPayload: CreatePayload<Blocklist> = buildBlocklist()
     // @ts-expect-error - removing id for creation
     delete blocklistPayload.id
-
     const created = await repository.create(blocklistPayload)
-    const updatedBlocklist = {
-      ...created,
+
+    // Update the blocklist
+    const updatePayload = {
+      id: created.id,
       name: 'Updated Blocklist',
     }
 
-    await repository.update(updatedBlocklist)
-    const found = await repository.findById(created.id)
+    await repository.update(updatePayload)
+    const updated = await repository.findById(created.id)
 
-    expect(found.name).toBe('Updated Blocklist')
+    expect(updated.name).toBe('Updated Blocklist')
   })
 
   it('should delete a blocklist', async () => {
+    // Create a blocklist first
     const blocklistPayload: CreatePayload<Blocklist> = buildBlocklist()
     // @ts-expect-error - removing id for creation
     delete blocklistPayload.id
 
+    // Create and then delete
     const created = await repository.create(blocklistPayload)
     await repository.delete(created.id)
 
+    // Verify deletion
     await expect(repository.findById(created.id)).rejects.toThrow(
       `Blocklist with id ${created.id} not found`,
     )
