@@ -1,4 +1,4 @@
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient, Siren as PrismaSiren } from '@prisma/client'
 import { AndroidSiren, Sirens } from '@/core/siren/sirens'
 import { SirensRepository } from '@/core/ports/sirens.repository'
 
@@ -13,8 +13,8 @@ export class PrismaSirensRepository implements SirensRepository {
     const sirens = await this.prisma.siren.findMany()
     return {
       android: sirens
-        .filter((s) => s.type === 'android')
-        .map((s) => ({
+        .filter((s: PrismaSiren) => s.type === 'android')
+        .map((s: PrismaSiren) => ({
           packageName: s.value,
           appName: s.name || '',
           icon: s.icon || '',
@@ -23,8 +23,12 @@ export class PrismaSirensRepository implements SirensRepository {
       windows: [],
       macos: [],
       linux: [],
-      websites: sirens.filter((s) => s.type === 'website').map((s) => s.value),
-      keywords: sirens.filter((s) => s.type === 'keyword').map((s) => s.value),
+      websites: sirens
+        .filter((s: PrismaSiren) => s.type === 'website')
+        .map((s: PrismaSiren) => s.value),
+      keywords: sirens
+        .filter((s: PrismaSiren) => s.type === 'keyword')
+        .map((s: PrismaSiren) => s.value),
     }
   }
 
