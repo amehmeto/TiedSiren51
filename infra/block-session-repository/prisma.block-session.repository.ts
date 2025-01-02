@@ -17,21 +17,16 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
     const created = await this.prisma.blockSession.create({
       data: {
         name: sessionPayload.name,
-        // minutesLeft: sessionPayload.minutesLeft,
         startedAt: sessionPayload.startedAt,
         endedAt: sessionPayload.endedAt,
         startNotificationId: sessionPayload.startNotificationId,
         endNotificationId: sessionPayload.endNotificationId,
-        blockingConditions: JSON.stringify(
-          sessionPayload.blockingConditions || [],
-        ),
+        blockingConditions: JSON.stringify(sessionPayload.blockingConditions),
         blocklists: {
-          connect:
-            sessionPayload.blocklists?.map((list) => ({ id: list.id })) || [],
+          connect: sessionPayload.blocklists.map((bl) => ({ id: bl.id })),
         },
         devices: {
-          connect:
-            sessionPayload.devices?.map((device) => ({ id: device.id })) || [],
+          connect: sessionPayload.devices.map((dev) => ({ id: dev.id })),
         },
       },
       include: {
@@ -40,7 +35,25 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
       },
     })
 
-    return this.mapToBlockSession(created)
+    return {
+      id: created.id,
+      name: created.name,
+      startedAt: created.startedAt,
+      endedAt: created.endedAt,
+      startNotificationId: created.startNotificationId,
+      endNotificationId: created.endNotificationId,
+      blockingConditions: JSON.parse(created.blockingConditions),
+      blocklists: created.blocklists.map((bl) => ({
+        id: bl.id,
+        name: bl.name,
+        sirens: JSON.parse(bl.sirens),
+      })),
+      devices: created.devices.map((dev) => ({
+        id: dev.id,
+        name: dev.name,
+        type: dev.type,
+      })),
+    }
   }
 
   async findById(sessionId: string): Promise<BlockSession> {
