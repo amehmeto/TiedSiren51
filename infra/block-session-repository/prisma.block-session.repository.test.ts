@@ -1,7 +1,9 @@
 import { beforeEach, describe, expect, it, afterAll } from 'vitest'
 import { PrismaClient } from '@prisma/client'
 import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
-import { BlockingConditions } from '@/core/block-session/block.session'
+import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
+import { BlockSession } from '@/core/block-session/block.session'
+import { UpdatePayload } from '@/core/ports/update.payload'
 
 describe('PrismaBlockSessionRepository', () => {
   let prisma: PrismaClient
@@ -21,178 +23,104 @@ describe('PrismaBlockSessionRepository', () => {
     await prisma.$disconnect()
   })
 
-  const createMockBlocklist = async () => {
+  const createTestBlocklist = async () => {
     const blocklist = await prisma.blocklist.create({
       data: {
         name: 'Test Blocklist',
         sirens: JSON.stringify([]),
       },
     })
-    // Map to domain model
     return {
-      id: blocklist.id,
-      name: blocklist.name,
+      ...blocklist,
       sirens: JSON.parse(blocklist.sirens),
     }
   }
 
-  const createMockDevice = async () => {
-    const device = await prisma.device.create({
+  const createTestDevice = async () => {
+    return await prisma.device.create({
       data: {
         name: 'Test Device',
         type: 'android',
       },
     })
-    // Map to domain model
+  }
+
+  const prepareSessionPayload = async () => {
+    const sessionPayload = buildBlockSession()
+    const blocklist = await createTestBlocklist()
+    const device = await createTestDevice()
+
+    // @ts-expect-error - removing id for creation
+    delete sessionPayload.id
+
     return {
-      id: device.id,
-      name: device.name,
-      type: device.type,
+      ...sessionPayload,
+      blocklists: [blocklist],
+      devices: [device],
     }
   }
 
   it('should create a block session', async () => {
-    const blocklist = await createMockBlocklist()
-    const device = await createMockDevice()
+    const sessionPayload = await prepareSessionPayload()
+    const created = await repository.create(sessionPayload)
 
-    const sessionData = {
-      name: 'Test Session',
-      //   minutesLeft: '30',
-      startedAt: new Date().toISOString(),
-      endedAt: new Date().toISOString(),
-      startNotificationId: '123',
-      endNotificationId: '456',
-      blockingConditions: [
-        BlockingConditions.TIME,
-        BlockingConditions.LOCATION,
-      ],
-      blocklists: [blocklist],
-      devices: [device],
-    }
-
-    const created = await repository.create(sessionData)
-
-    expect(created).toMatchObject({
+    expect(created).toStrictEqual({
       id: expect.any(String),
-      name: sessionData.name,
-      startedAt: sessionData.startedAt,
-      endedAt: sessionData.endedAt,
-      startNotificationId: sessionData.startNotificationId,
-      endNotificationId: sessionData.endNotificationId,
-      blockingConditions: sessionData.blockingConditions,
+      name: sessionPayload.name,
+      startedAt: sessionPayload.startedAt,
+      endedAt: sessionPayload.endedAt,
+      startNotificationId: sessionPayload.startNotificationId,
+      endNotificationId: sessionPayload.endNotificationId,
+      blockingConditions: sessionPayload.blockingConditions,
+      blocklists: sessionPayload.blocklists,
+      devices: sessionPayload.devices,
     })
-    expect(created.blocklists).toHaveLength(1)
-    expect(created.devices).toHaveLength(1)
   })
 
   it('should find a block session by id', async () => {
-    const sessionData = {
-      name: 'Test Session',
-      minutesLeft: '30',
-      startedAt: new Date().toISOString(),
-      endedAt: new Date().toISOString(),
-      startNotificationId: '123',
-      endNotificationId: '456',
-      blockingConditions: JSON.stringify([BlockingConditions.TIME]),
-    }
-
-    const created = await prisma.blockSession.create({ data: sessionData })
+    const sessionPayload = await prepareSessionPayload()
+    const created = await repository.create(sessionPayload)
     const found = await repository.findById(created.id)
 
-    expect(found).toBeTruthy()
-    expect(found.id).toBe(created.id)
-    expect(found.name).toBe(sessionData.name)
-    expect(found.blockingConditions).toEqual([BlockingConditions.TIME])
+    expect(found).toStrictEqual(created)
+  })
+
+  it('should find all current block sessions', async () => {
+    const sessionPayload1 = await prepareSessionPayload()
+    await repository.create(sessionPayload1)
+
+    const sessionPayload2 = await prepareSessionPayload()
+    await repository.create(sessionPayload2)
+
+    const currentSessions = await repository.findAll()
+    expect(currentSessions).toHaveLength(2)
   })
 
   it('should update a block session', async () => {
-    const sessionData = {
-      name: 'Test Session',
-      minutesLeft: '30',
-      startedAt: new Date().toISOString(),
-      endedAt: new Date().toISOString(),
-      startNotificationId: '123',
-      endNotificationId: '456',
-      blockingConditions: JSON.stringify([BlockingConditions.TIME]),
-    }
+    const sessionPayload = await prepareSessionPayload()
+    const created = await repository.create(sessionPayload)
 
-    const created = await prisma.blockSession.create({ data: sessionData })
-
-    const updateData = {
+    const updateSessionPayload: UpdatePayload<BlockSession> = {
       id: created.id,
-      name: 'Updated Session',
-      minutesLeft: '45',
-      startedAt: sessionData.startedAt,
-      endedAt: sessionData.endedAt,
-      startNotificationId: sessionData.startNotificationId,
-      endNotificationId: sessionData.endNotificationId,
-      blockingConditions: [
-        BlockingConditions.TIME,
-        BlockingConditions.LOCATION,
-      ],
+      name: 'Updated name',
     }
 
-    await repository.update(updateData)
+    await repository.update(updateSessionPayload)
     const updated = await repository.findById(created.id)
 
-    expect(updated.name).toBe('Updated Session')
-    expect(updated.blockingConditions).toEqual([
-      BlockingConditions.TIME,
-      BlockingConditions.LOCATION,
-    ])
+    expect(updated).toStrictEqual({
+      ...created,
+      name: 'Updated name',
+    })
   })
 
   it('should delete a block session', async () => {
-    const sessionData = {
-      name: 'Test Session',
-      startedAt: new Date().toISOString(),
-      endedAt: new Date().toISOString(),
-      startNotificationId: '123',
-      endNotificationId: '456',
-      blockingConditions: JSON.stringify([BlockingConditions.TIME]),
-    }
-
-    const created = await prisma.blockSession.create({ data: sessionData })
+    const sessionPayload = await prepareSessionPayload()
+    const created = await repository.create(sessionPayload)
     await repository.delete(created.id)
 
     await expect(repository.findById(created.id)).rejects.toThrow(
       `BlockSession with id ${created.id} not found`,
     )
-  })
-
-  it('should find all current block sessions', async () => {
-    const blocklist = await createMockBlocklist()
-    const device = await createMockDevice()
-
-    // Create first session
-    const sessionData1 = {
-      name: 'Test Session 1',
-      startedAt: new Date().toISOString(),
-      endedAt: new Date().toISOString(),
-      startNotificationId: '123',
-      endNotificationId: '456',
-      blockingConditions: [BlockingConditions.TIME],
-      blocklists: [blocklist],
-      devices: [device],
-    }
-    await repository.create(sessionData1)
-
-    // Create second session
-    const sessionData2 = {
-      name: 'Test Session 2',
-      startedAt: new Date().toISOString(),
-      endedAt: new Date().toISOString(),
-      startNotificationId: '789',
-      endNotificationId: '012',
-      blockingConditions: [BlockingConditions.LOCATION],
-      blocklists: [blocklist],
-      devices: [device],
-    }
-    await repository.create(sessionData2)
-
-    const allSessions = await repository.findAll()
-    expect(allSessions).toHaveLength(2)
-    expect(allSessions[0].name).toBe('Test Session 1')
-    expect(allSessions[1].name).toBe('Test Session 2')
   })
 })
