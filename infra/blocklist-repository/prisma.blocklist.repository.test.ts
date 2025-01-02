@@ -45,18 +45,24 @@ describe('PrismaBlocklistRepository', () => {
   })
 
   it('should find all current blocklists', async () => {
-    const createBlocklistPayload1: CreatePayload<Blocklist> = buildBlocklist()
+    const blocklistPayload1: CreatePayload<Blocklist> = buildBlocklist()
     // @ts-expect-error - removing id for creation
-    delete createBlocklistPayload1.id
-    await repository.create(createBlocklistPayload1)
+    delete blocklistPayload1.id
+    await repository.create(blocklistPayload1)
 
-    const createBlocklistPayload2: CreatePayload<Blocklist> = buildBlocklist()
+    const blocklistPayload2: CreatePayload<Blocklist> = buildBlocklist()
     // @ts-expect-error - removing id for creation
-    delete createBlocklistPayload2.id
-    await repository.create(createBlocklistPayload2)
+    delete blocklistPayload2.id
+    await repository.create(blocklistPayload2)
 
     const currentBlocklists = await repository.findAll()
     expect(currentBlocklists).toHaveLength(2)
+    expect(currentBlocklists.map((bl) => bl.name)).toContain(
+      blocklistPayload1.name,
+    )
+    expect(currentBlocklists.map((bl) => bl.name)).toContain(
+      blocklistPayload2.name,
+    )
   })
 
   it('should update a blocklist', async () => {
