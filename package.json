@@ -35,6 +35,8 @@
   "dependencies": {
     "@expo/vector-icons": "14.0.3",
     "@faker-js/faker": "^8.4.1",
+    "@prisma/client": "6.1.0",
+    "@prisma/react-native": "6.0.1",
     "@react-native-community/datetimepicker": "8.0.1",
     "@reduxjs/toolkit": "^2.2.5",
     "@types/react-redux": "^7.1.33",
@@ -67,6 +69,7 @@
     "react-native-modal-datetime-picker": "^17.1.0",
     "react-native-pager-view": "6.3.0",
     "react-native-popup-menu": "^0.16.1",
+    "react-native-quick-base64": "2.1.2",
     "react-native-reanimated": "~3.10.1",
     "react-native-safe-area-context": "4.10.5",
     "react-native-screens": "3.31.1",
