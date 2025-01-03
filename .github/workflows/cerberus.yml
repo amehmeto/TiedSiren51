@@ -17,14 +17,14 @@ jobs:
       - name: Install dependencies
         run: npm install
 
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
       - name: Lint
         run: npm run lint
 
       - name: Run unit tests
         run: npm run test:cov
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
 
   build:
     needs: test
