@@ -1,11 +1,14 @@
 import React from 'react'
-import { View, Text, StyleSheet, Platform } from 'react-native'
+import { Platform, StyleSheet, Text, View } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/core/_redux_/createStore'
+import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 
 export default function LoginScreen() {
   const router = useRouter()
@@ -20,6 +23,10 @@ export default function LoginScreen() {
       router.replace('/(auth)/login')
     }
   }
+
+  const isUserAuthenticated = useSelector((state: RootState) =>
+    selectIsUserAuthenticated(state),
+  )
 
   return (
     <>

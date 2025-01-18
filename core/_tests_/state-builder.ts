@@ -17,9 +17,13 @@ const initialState = rootReducer(undefined, { type: 'unknown' })
 const withBlockSessions = createAction<BlockSession[]>('withBlockSession')
 const withBlocklists = createAction<Blocklist[]>('withBlocklists')
 const withAvailableSirens = createAction<Sirens>('withAvailableSirens')
+const withAuthUser = createAction<{ authUser: string }>('withAuthUser')
 
 const reducer = createReducer(initialState, (builder) => {
   builder
+    .addCase(withAuthUser, (state, action) => {
+      state.auth.authUser = action.payload.authUser
+    })
     .addCase(withBlockSessions, (state, action) => {
       blockSessionAdapter.addMany(state.blockSession, action.payload)
     })
@@ -41,6 +45,7 @@ export const stateBuilder = (baseState = initialState) => {
     build(): RootState {
       return baseState
     },
+    withAuthUser: reduce(withAuthUser),
     withBlockSessions: reduce(withBlockSessions),
     withBlocklists: reduce(withBlocklists),
     withAvailableSirens: reduce(withAvailableSirens),
