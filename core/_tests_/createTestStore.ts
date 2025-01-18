@@ -9,9 +9,11 @@ import { FakeDataSirensRepository } from '@/infra/sirens-repository/fake-data.si
 import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
 import { InMemorySirenTier } from '@/infra/siren-tier/in-memory-siren.tier'
 import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
+import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 
 export const createTestStore = (
   {
+    authGateway = new FakeAuthGateway(),
     blockSessionRepository = new FakeDataBlockSessionRepository(),
     blocklistRepository = new FakeDataBlocklistRepository(),
     sirenTier = new InMemorySirenTier(),
@@ -25,6 +27,7 @@ export const createTestStore = (
 ) =>
   createStore(
     {
+      authGateway,
       blockSessionRepository,
       blocklistRepository,
       sirenTier,

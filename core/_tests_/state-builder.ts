@@ -11,18 +11,19 @@ import {
 import { rootReducer } from '../_redux_/rootReducer'
 import { Blocklist, blocklistAdapter } from '../blocklist/blocklist'
 import { Sirens } from '../siren/sirens'
+import { AuthUser } from '@/core/auth/authUser'
 
 const initialState = rootReducer(undefined, { type: 'unknown' })
 
 const withBlockSessions = createAction<BlockSession[]>('withBlockSession')
 const withBlocklists = createAction<Blocklist[]>('withBlocklists')
 const withAvailableSirens = createAction<Sirens>('withAvailableSirens')
-const withAuthUser = createAction<{ authUser: string }>('withAuthUser')
+const withAuthUser = createAction<AuthUser>('withAuthUser')
 
 const reducer = createReducer(initialState, (builder) => {
   builder
     .addCase(withAuthUser, (state, action) => {
-      state.auth.authUser = action.payload.authUser
+      state.auth.authUser = action.payload
     })
     .addCase(withBlockSessions, (state, action) => {
       blockSessionAdapter.addMany(state.blockSession, action.payload)
