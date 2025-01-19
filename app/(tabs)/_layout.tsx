@@ -1,6 +1,7 @@
 import { Tabs } from 'expo-router'
 import React, { useEffect } from 'react'
 import { StyleSheet, Pressable, PressableProps } from 'react-native'
+import { StyleSheet, Pressable, PressableProps } from 'react-native'
 import { Entypo, Ionicons } from '@expo/vector-icons'
 import { TabScreens } from '@/ui/navigation/TabScreens'
 import { T } from '@/ui/design-system/theme'
@@ -33,6 +34,7 @@ type TabBarButtonProps = {
 
 export default function TabLayout() {
   const tabs: Tab[] = [
+  const tabs: Tab[] = [
     {
       name: 'home',
       title: TabScreens.HOME,
@@ -49,11 +51,13 @@ export default function TabLayout() {
       name: 'blocklists',
       title: TabScreens.BLOCKLIST,
       icon: 'shield',
+      icon: 'shield',
       IconType: Entypo,
     },
     {
       name: 'settings/index',
       title: TabScreens.SETTINGS,
+      icon: 'settings-outline',
       icon: 'settings-outline',
       IconType: Ionicons,
     },
@@ -66,9 +70,14 @@ export default function TabLayout() {
     size,
     isFocused,
   }: TabBarIconProps) => {
+  }: TabBarIconProps) => {
     const scale = useSharedValue(1)
     const opacity = useSharedValue(1)
 
+    const animatedStyle = useAnimatedStyle(() => ({
+      transform: [{ scale: scale.value }],
+      opacity: opacity.value,
+    }))
     const animatedStyle = useAnimatedStyle(() => ({
       transform: [{ scale: scale.value }],
       opacity: opacity.value,
@@ -137,11 +146,14 @@ export default function TabLayout() {
         tabBarActiveTintColor: T.color.lightBlue,
         tabBarInactiveTintColor: T.color.inactive,
         headerShown: false,
+        headerStyle: { backgroundColor: T.color.darkBlue },
+        headerTintColor: T.color.lightBlue,
+        headerTitleStyle: { fontWeight: T.font.weight.bold },
+        headerShadowVisible: false,
         tabBarIcon: (props) => handleTabBarIcon({ ...props, route }),
         tabBarButton: (props) =>
           handleTabBarButton(props, { route, navigation }),
       })}
-      sceneContainerStyle={{ backgroundColor: 'transparent' }}
     >
       {tabs.map((tab) => (
         <Tabs.Screen
