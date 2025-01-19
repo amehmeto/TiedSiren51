@@ -3,7 +3,7 @@ import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-g
 import { AuthUser } from '@/core/auth/authUser'
 
 export type AuthState = {
-  authUser?: AuthUser
+  authUser: AuthUser | null
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -12,7 +12,7 @@ export const userAuthenticated = createAction<AuthUser>(
 
 export const reducer = createReducer<AuthState>(
   {
-    authUser: undefined,
+    authUser: null,
   },
   (builder) => {
     builder

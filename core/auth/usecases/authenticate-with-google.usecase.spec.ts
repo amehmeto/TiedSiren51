@@ -21,7 +21,6 @@ export function authentificationFixture(
         authGateway.willSucceedForUser = authUser
       },
     },
-
     when: {
       async authenticateWithGoogle() {
         return store.dispatch(authenticateWithGoogle())
