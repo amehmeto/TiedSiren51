@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-google.usecase'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 
 export default function LoginScreen() {
   const router = useRouter()
@@ -35,7 +36,7 @@ export default function LoginScreen() {
   }, [isUserAuthenticated, router])
 
   return (
-    <>
+    <TiedSLinearBackground>
       <View style={styles.container}>
         <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
         <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
@@ -72,7 +73,7 @@ export default function LoginScreen() {
           {'Forgot your password?'}
         </Text>
       </View>
-    </>
+    </TiedSLinearBackground>
   )
 }
 

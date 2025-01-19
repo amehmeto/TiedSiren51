@@ -1,17 +1,18 @@
 import { Tabs } from 'expo-router'
-import React from 'react'
-import { StyleSheet } from 'react-native'
+import React, { useEffect } from 'react'
+import { StyleSheet, Pressable } from 'react-native'
 import { Entypo, Ionicons } from '@expo/vector-icons'
 import { TabScreens } from '@/ui/navigation/TabScreens'
 import { T } from '@/ui/design-system/theme'
+import Animated, {
+  useAnimatedStyle,
+  withTiming,
+  useSharedValue,
+  Easing,
+} from 'react-native-reanimated'
 
 export default function TabLayout() {
-  const tabs: {
-    name: string
-    title: string
-    icon: any
-    IconType: typeof Entypo | typeof Ionicons
-  }[] = [
+  const tabs = [
     {
       name: 'home',
       title: TabScreens.HOME,
@@ -38,9 +39,51 @@ export default function TabLayout() {
     },
   ]
 
+  const TabBarIcon = ({
+    IconType,
+    iconName,
+    color,
+    size,
+    isFocused,
+  }: {
+    IconType: typeof Entypo | typeof Ionicons
+    iconName: any
+    color: string
+    size: number
+    isFocused: boolean
+  }) => {
+    const scale = useSharedValue(1)
+    const opacity = useSharedValue(1)
+
+    const animatedStyle = useAnimatedStyle(() => {
+      return {
+        transform: [{ scale: scale.value }],
+        opacity: opacity.value,
+      }
+    })
+
+    useEffect(() => {
+      // Using ternary operator for smoother animation and immediate focus handling
+      scale.value = withTiming(isFocused ? 1.2 : 1, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      })
+      opacity.value = withTiming(isFocused ? 1 : 0.7, {
+        duration: 300,
+        easing: Easing.out(Easing.ease),
+      })
+    }, [isFocused])
+
+    return (
+      <Animated.View style={animatedStyle}>
+        <IconType name={iconName} size={size} color={color} />
+      </Animated.View>
+    )
+  }
+
   return (
     <Tabs
-      screenOptions={{
+      screenOptions={({ route, navigation }) => ({
         tabBarLabelPosition: 'below-icon',
         tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: T.color.lightBlue,
@@ -50,7 +93,30 @@ export default function TabLayout() {
         headerTintColor: T.color.lightBlue,
         headerTitleStyle: { fontWeight: T.font.weight.bold },
         headerShadowVisible: false,
-      }}
+        tabBarIcon: ({ color, size, focused }) => {
+          const tab = tabs.find((t) => t.name === route.name)
+          if (!tab) return null
+
+          return (
+            <TabBarIcon
+              IconType={tab.IconType}
+              iconName={tab.icon}
+              color={color}
+              size={size}
+              isFocused={focused}
+            />
+          )
+        },
+        tabBarButton: (props) => (
+          <Pressable
+            {...props}
+            onPress={() => {
+              // Immediate tab change without delay
+              navigation.navigate(route.name)
+            }}
+          />
+        ),
+      })}
     >
       {tabs.map((tab) => (
         <Tabs.Screen
@@ -58,9 +124,6 @@ export default function TabLayout() {
           name={tab.name}
           options={{
             title: tab.title,
-            tabBarIcon: ({ color, size }) => (
-              <tab.IconType name={tab.icon} size={size} color={color} />
-            ),
           }}
         />
       ))}
