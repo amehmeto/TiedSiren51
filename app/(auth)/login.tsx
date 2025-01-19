@@ -6,12 +6,14 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/core/_redux_/createStore'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
+import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-google.usecase'
 
 export default function LoginScreen() {
   const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleClose = () => {
     if (router.canGoBack()) {
@@ -29,10 +31,9 @@ export default function LoginScreen() {
   )
 
   useEffect(() => {
-    if (!isUserAuthenticated) router.navigate('/(auth)/login')
+    if (isUserAuthenticated) router.push('/')
   }, [isUserAuthenticated, router])
 
-  if (!isUserAuthenticated) return null
   return (
     <>
       <View style={styles.container}>
@@ -41,8 +42,7 @@ export default function LoginScreen() {
         <TiedSSocialButton
           iconName="logo-google"
           text="CONTINUE WITH GOOGLE"
-          // eslint-disable-next-line no-console
-          onPress={() => console.log('Continue with Google')}
+          onPress={() => dispatch(authenticateWithGoogle())}
         />
         <TiedSSocialButton
           iconName="logo-apple"
