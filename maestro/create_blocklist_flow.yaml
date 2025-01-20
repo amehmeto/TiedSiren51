@@ -1,0 +1,22 @@
+appId: com.tiedsiren.tiedsiren
+---
+- launchApp
+- assertVisible: "Let's make it productive"
+- tapOn: 'LOG IN'
+- assertVisible: 'LOG INTO YOUR ACCOUNT'
+- tapOn: '.*CONTINUE WITH GOOGLE'
+- tapOn: 'Blocklist'
+- assertVisible: 'Blocklist'
+# Tap on the "+" button to create a blocklist
+- tapOn:
+    id: 'addBlocklistButton'
+- assertVisible: 'Name'
+# Enter a name for the blocklist
+- tapOn:
+    id: 'addBlocklistName'
+- inputText: 'My New Blocklist'
+- tapOn:
+    id: 'siren-android-com.example.youtube'
+# Save the blocklist
+- tapOn: 'Save Blocklist'
+- assertVisible: 'Blocklist'
