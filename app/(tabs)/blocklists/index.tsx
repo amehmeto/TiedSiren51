@@ -57,6 +57,7 @@ export default function BlocklistScreen() {
           router.push('/(tabs)/blocklists/create-blocklist-screen')
         }}
         style={styles.roundButton}
+        testID="addBlocklistButton"
       >
         <Ionicons
           name={'add'}

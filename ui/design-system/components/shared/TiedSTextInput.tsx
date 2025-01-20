@@ -13,6 +13,7 @@ import { Ionicons } from '@expo/vector-icons'
 interface TiedSTextInputProps extends TextInputProps {
   label?: string
   hasPasswordToggle?: boolean
+  testID?: string
 }
 
 export function TiedSTextInput({
