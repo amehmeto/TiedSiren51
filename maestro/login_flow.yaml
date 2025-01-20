@@ -1,0 +1,8 @@
+appId: com.tiedsiren.tiedsiren
+---
+- launchApp
+- assertVisible: "Let's make it productive"
+- tapOn: 'LOG IN'
+- assertVisible: 'LOG INTO YOUR ACCOUNT'
+- tapOn: '.*CONTINUE WITH GOOGLE'
+- assertVisible: 'CREATE A BLOCK SESSION'
