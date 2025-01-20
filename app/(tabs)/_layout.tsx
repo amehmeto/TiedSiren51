@@ -158,6 +158,9 @@ export default function TabLayout() {
           name={tab.name}
           options={{
             title: tab.title,
+            tabBarIcon: ({ color, size }) => (
+              <tab.IconType name={tab.icon} size={size} color={color} />
+            ),
             tabBarAccessibilityLabel: tab.title,
           }}
         />
