@@ -27,7 +27,8 @@
     "build:ios:simulator": "eas build --profile development-simulator --platform ios",
     "prepare": "husky",
     "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
-    "expo:lint": "expo lint"
+    "expo:lint": "expo lint",
+    "test:e2e": "maestro test maestro/"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "yarn lint:fix"
