@@ -68,6 +68,8 @@ jobs:
           cd android
           ./gradlew assembleDebug
           cd ..
+          echo "Debug APK path:"
+          find android/app/build/outputs/apk -name "*.apk"
 
       - name: Install and start Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
@@ -116,12 +118,18 @@ jobs:
 
             # Install app (retry if necessary)
             echo "Installing app..."
-            if ! adb install app-release.apk; then
+            APK_PATH=$(find android/app/build/outputs/apk -name "*.apk" | head -n 1)
+            if [ -z "$APK_PATH" ]; then
+              echo "Error: No APK file found. Exiting..."
+              exit 1
+            fi
+            echo "Installing APK: $APK_PATH"
+            if ! adb install "$APK_PATH"; then
               echo "Failed to install app. Restarting adb server and retrying..."
               adb kill-server
               adb start-server
               adb devices
-              adb install app-release.apk || { echo "App installation failed after retry. Exiting..."; exit 1; }
+              adb install "$APK_PATH" || { echo "App installation failed after retry. Exiting..."; exit 1; }
             fi
 
             # Run E2E tests
