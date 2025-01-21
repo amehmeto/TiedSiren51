@@ -26,7 +26,13 @@ jobs:
   e2e:
     needs: test
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 90 # Increased timeout
+    strategy:
+      fail-fast: false
+      matrix:
+        api-level: [30, 33] # Test on API levels 30 and 33
+        target: [google_apis_playstore] # Use Play Store images for faster boot
+        arch: [x86_64] # Use x86_64 architecture
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -59,18 +65,29 @@ jobs:
       - name: Install and start Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
-          api-level: 33
-          target: google_apis_playstore # Use Play Store image for faster boot
-          arch: x86_64
+          api-level: ${{ matrix.api-level }}
+          target: ${{ matrix.target }}
+          arch: ${{ matrix.arch }}
           profile: Nexus 6
           ram-size: 4096M
           disk-size: 8192M
           cores: 2
+          emulator-boot-timeout: 900 # 15 minutes
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          disable-animations: true
+          pre-emulator-launch-script: |
+            echo "Running pre-emulator launch script..."
+            echo "Working directory:"
+            pwd
+            echo "Environment info:"
+            npx envinfo
           script: |
             # Wait for boot to complete
+            echo "Waiting for emulator to boot..."
             adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
 
             # Disable animations
+            echo "Disabling animations..."
             adb shell settings put global window_animation_scale 0
             adb shell settings put global transition_animation_scale 0
             adb shell settings put global animator_duration_scale 0
@@ -79,9 +96,15 @@ jobs:
             sleep 30
 
             # Show device status
+            echo "Device status:"
             adb devices -l
 
-            # Run the E2E tests
+            # Install app (retry if necessary)
+            echo "Installing app..."
+            adb install app-release.apk || (adb kill-server && adb start-server && adb devices && adb install app-release.apk)
+
+            # Run E2E tests
+            echo "Running E2E tests..."
             npm run test:e2e
 
       - name: Debug Emulator Logs
