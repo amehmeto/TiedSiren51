@@ -29,6 +29,7 @@ jobs:
   e2e:
     needs: test
     runs-on: ubuntu-latest
+    timeout-minutes: 30
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -62,12 +63,28 @@ jobs:
         uses: reactivecircus/android-emulator-runner@v2
         with:
           api-level: 33
-          target: google_apis
+          target: google_apis_playstore # Use Play Store image for faster boot
           arch: x86_64
           profile: Nexus 6
+          ram-size: 4096M
+          disk-size: 8192M
+          cores: 2
           script: |
-            adb wait-for-device
-            adb devices
+            # Wait for boot to complete
+            adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
+
+            # Disable animations
+            adb shell settings put global window_animation_scale 0
+            adb shell settings put global transition_animation_scale 0
+            adb shell settings put global animator_duration_scale 0
+
+            # Additional wait to ensure device is fully ready
+            sleep 30
+
+            # Show device status
+            adb devices -l
+
+            # Run the E2E tests
             npm run test:e2e
 
       - name: Debug Emulator Logs
