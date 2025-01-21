@@ -56,11 +56,32 @@ jobs:
 
       - name: Install Maestro
         run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
+          curl -fsSL "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
       - name: Verify Maestro Installation
         run: maestro --version
+
+      # Create and start Android emulator
+      - name: Create Android emulator
+        run: |
+          echo "Creating Android emulator..."
+          avdmanager create avd \
+            --name "test-emulator" \
+            --package "system-images;android-${{ matrix.api-level }};${{ matrix.target }};${{ matrix.arch }}" \
+            --device "pixel_4" \
+            --force
+
+      - name: Start Android emulator
+        run: |
+          echo "Starting Android emulator..."
+          emulator -avd test-emulator -no-audio -no-boot-anim -no-window -accel on &
+          adb wait-for-device
+
+      - name: Wait for emulator to boot
+        run: |
+          echo "Waiting for emulator to boot..."
+          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
 
       # Prebuild Android
       - name: Expo Prebuild Android
@@ -111,6 +132,12 @@ jobs:
 
       - name: Verify Maestro Installation
         run: maestro --version
+
+      # Start iOS Simulator
+      - name: Start iOS Simulator
+        run: |
+          xcrun simctl boot "iPhone 15" || true
+          xcrun simctl logverbose "iPhone 15" enable
 
       # Prebuild iOS
       - name: Expo Prebuild iOS
