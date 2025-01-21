@@ -20,6 +20,12 @@ jobs:
         with:
           node-version: 21.6.1
 
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
+
       - name: Install dependencies
         run: yarn install
 
@@ -36,12 +42,6 @@ jobs:
     needs: test
     runs-on: macos-latest
     timeout-minutes: 90
-    strategy:
-      fail-fast: false
-      matrix:
-        api-level: [33]
-        target: [google_apis]
-        arch: [x86_64]
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -50,6 +50,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 21.6.1
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
         run: npm install
@@ -66,51 +72,26 @@ jobs:
       - name: Install Maestro
         run: |
           curl -fsSL "https://get.maestro.mobile.dev" | bash
-          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+          echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
 
       - name: Verify Maestro Installation
         run: maestro --version
 
-      # Create and start Android emulator
-      - name: Create Android emulator
-        run: |
-          echo "Creating Android emulator..."
-          avdmanager create avd \
-            --name "test-emulator" \
-            --package "system-images;android-${{ matrix.api-level }};${{ matrix.target }};${{ matrix.arch }}" \
-            --device "pixel_4" \
-            --force
-
-      - name: Start Android emulator
-        run: |
-          echo "Starting Android emulator..."
-          emulator -avd test-emulator -no-audio -no-boot-anim -no-window -accel on &
-          adb wait-for-device
-
-      - name: Wait for emulator to boot
-        run: |
-          echo "Waiting for emulator to boot..."
-          adb shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done; input keyevent 82'
-
-      # Prebuild Android
       - name: Expo Prebuild Android
         run: npm run prebuild:android
 
-      # Run Android app
-      - name: Run Android app
-        run: npm run android --no-build-cache --no-install &
-
-      - name: Wait for Android app to start
-        run: sleep 60
-
-      - name: Run E2E tests
-        run: npm run test:e2e
-
-      - name: Debug Emulator Logs
-        if: failure()
-        run: |
-          echo "Emulator logs:"
-          adb logcat -d
+      - name: AVD test
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 33
+          target: google_apis
+          arch: x86_64
+          profile: pixel_4
+          script: |
+            npm run android --no-build-cache --no-install &
+            sleep 120
+            npm run test:e2e
+            adb logcat -d
 
   e2e-ios:
     needs: test
@@ -124,6 +105,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 21.6.1
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Install dependencies
         run: npm install
@@ -142,13 +129,13 @@ jobs:
       - name: Verify Maestro Installation
         run: maestro --version
 
-      # Start iOS Simulator
-      - name: Start iOS Simulator
+      - name: Reset Simulator
         run: |
-          xcrun simctl boot "iPhone 15" || true
-          xcrun simctl logverbose "iPhone 15" enable
+          xcrun simctl shutdown "iPhone 15" || true
+          xcrun simctl erase "iPhone 15"
+          xcrun simctl boot "iPhone 15"
+          xcrun simctl bootstatus "iPhone 15"
 
-      # Prebuild iOS
       - name: Expo Prebuild iOS
         run: npm run prebuild:ios
 
@@ -157,15 +144,39 @@ jobs:
           cd ios
           pod install
 
-      # Run iOS app
+      - name: Build iOS App
+        run: |
+          cd ios
+          xcodebuild -scheme TiedSiren51 -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15' build
+
+      - name: Verify App Bundle Path
+        run: |
+          ls -la ios/build/Build/Products/Debug-iphonesimulator/
+
+      - name: Install App on Simulator
+        run: |
+          xcrun simctl install "iPhone 15" ios/build/Build/Products/Debug-iphonesimulator/TiedSiren51.app
+
+      - name: Verify App Installation
+        run: |
+          xcrun simctl listapps "iPhone 15" | grep "com.tiedsiren.tiedsiren"
+
       - name: Run iOS app
         run: npm run ios --no-build-cache --no-install &
 
       - name: Wait for iOS app to start
-        run: sleep 60
+        run: sleep 180
+
+      - name: Capture Simulator Logs
+        run: |
+          xcrun simctl spawn "iPhone 15" log stream --level debug > simulator.log &
+          sleep 20
+          cat simulator.log
 
       - name: Run E2E tests
-        run: npm run test:e2e
+        run: |
+          npm run test:e2e
+          cat maestro.log
 
   build:
     needs: [test, e2e-android, e2e-ios]
@@ -178,6 +189,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 21.6.1
+
+      - name: Cache Node.js modules
+        uses: actions/cache@v3
+        with:
+          path: node_modules
+          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
