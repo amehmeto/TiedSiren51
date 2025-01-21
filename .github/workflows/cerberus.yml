@@ -52,20 +52,6 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
-      - name: 🏗 Setup EAS
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Prebuild Android
-        run: npm run prebuild:android
-
-      - name: Build Android Debug APK
-        run: |
-          cd android
-          ./gradlew assembleDebug
-
       - name: Install and start Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -74,8 +60,9 @@ jobs:
           arch: x86_64
           profile: Nexus 6
           script: |
+            adb wait-for-device
             adb devices
-            maestro test maestro/
+            npm run test:e2e
 
   build:
     needs: [test, e2e]
