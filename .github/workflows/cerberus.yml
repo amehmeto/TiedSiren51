@@ -44,8 +44,27 @@ jobs:
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
       - name: Verify Maestro Installation
+        run: maestro --version
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v3
+        with:
+          distribution: 'zulu'
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android Emulator
         run: |
-          maestro --version
+          sdkmanager "system-images;android-33;google_apis;x86_64"
+          echo "no" | avdmanager create avd -n test -k "system-images;android-33;google_apis;x86_64"
+
+      - name: Start Android Emulator
+        run: |
+          emulator -avd test -no-audio -no-window -no-snapshot -no-boot-anim &
+          adb wait-for-device
+          adb devices
 
       - name: Install dependencies
         run: npm install
