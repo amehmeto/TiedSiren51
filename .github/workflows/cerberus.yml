@@ -47,6 +47,14 @@ jobs:
       - name: Install Maestro
         run: |
           curl -fsSL "https://get.maestro.mobile.dev" | bash
+          echo "$HOME/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Verify Maestro Installation
+        run: |
+          maestro --version
+
+      - name: Install dependencies
+        run: npm install
 
       - name: Run E2E tests
         run: npm run test:e2e
