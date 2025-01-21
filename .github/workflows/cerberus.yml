@@ -55,6 +55,9 @@ jobs:
           curl -Ls "https://get.maestro.mobile.dev" | bash
           echo "$HOME/.maestro/bin" >> $GITHUB_PATH
 
+      - name: Verify Maestro Installation
+        run: maestro --version
+
       - name: Install and start Android Emulator
         uses: reactivecircus/android-emulator-runner@v2
         with:
@@ -66,6 +69,9 @@ jobs:
             adb wait-for-device
             adb devices
             npm run test:e2e
+
+      - name: Debug Emulator Logs
+        run: cat ~/.android/avd/test.avd/config.ini
 
   build:
     needs: [test, e2e]
