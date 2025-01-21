@@ -26,15 +26,15 @@ jobs:
       - name: Run unit tests
         run: yarn test:cov
 
-  e2e:
+  e2e-android:
     needs: test
-    runs-on: ubuntu-latest
-    timeout-minutes: 90 # Increased timeout
+    runs-on: macos-latest
+    timeout-minutes: 90
     strategy:
       fail-fast: false
       matrix:
         api-level: [33]
-        target: [google_apis_playstore]
+        target: [google_apis]
         arch: [x86_64]
     steps:
       - name: Checkout code
@@ -65,97 +65,77 @@ jobs:
       - name: Verify Maestro Installation
         run: maestro --version
 
-      - name: Clean up disk space
-        run: |
-          echo "Cleaning up disk space..."
-          sudo apt-get clean
-          sudo rm -rf /usr/local/lib/android/sdk/emulator/qemu/linux-x86_64/*
-          sudo rm -rf /usr/local/lib/android/sdk/system-images/android-33/google_apis/x86_64/
-          df -h
+      # Prebuild Android
+      - name: Expo Prebuild Android
+        run: npm run prebuild:android
 
-      - name: Build Debug APK
-        run: |
-          npm run prebuild:android
-          cd android
-          ./gradlew assembleDebug
-          cd ..
-          echo "Debug APK path:"
-          find android/app/build/outputs/apk -name "*.apk"
+      # Run Android app
+      - name: Run Android app
+        run: npm run android --no-build-cache --no-install &
 
-      - name: Install and start Android Emulator
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: ${{ matrix.api-level }}
-          target: ${{ matrix.target }}
-          arch: ${{ matrix.arch }}
-          profile: Nexus 6
-          ram-size: 4096M
-          disk-size: 4096M # Reduced disk size to 4 GB
-          cores: 2
-          emulator-boot-timeout: 900 # 15 minutes
-          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
-          disable-animations: true
-          pre-emulator-launch-script: |
-            echo "Running pre-emulator launch script..."
-            echo "Working directory:"
-            pwd
-            echo "Environment info:"
-            npx envinfo
-          script: |
-            # Wait for emulator to come online
-            echo "Waiting for emulator to come online..."
-            until adb devices | grep -q 'emulator-5554'; do
-              echo "Emulator not online yet. Retrying in 5 seconds..."
-              sleep 5
-            done
+      - name: Wait for Android app to start
+        run: sleep 60
 
-            # Wait for boot to complete
-            echo "Waiting for emulator to boot..."
-            adb wait-for-device shell 'while [[ -z $(getprop sys.boot_completed) ]]; do sleep 1; done'
-
-            # Disable animations
-            echo "Disabling animations..."
-            adb shell settings put global window_animation_scale 0
-            adb shell settings put global transition_animation_scale 0
-            adb shell settings put global animator_duration_scale 0
-
-            # Additional wait to ensure device is fully ready
-            echo "Waiting for device to be fully ready..."
-            sleep 30
-
-            # Show device status
-            echo "Device status:"
-            adb devices -l
-
-            # Install app (retry if necessary)
-            echo "Installing app..."
-            APK_PATH=$(find android/app/build/outputs/apk -name "*.apk" | head -n 1)
-            if [ -z "$APK_PATH" ]; then
-              echo "Error: No APK file found. Exiting..."
-              exit 1
-            fi
-            echo "Installing APK: $APK_PATH"
-            if ! adb install "$APK_PATH"; then
-              echo "Failed to install app. Restarting adb server and retrying..."
-              adb kill-server
-              adb start-server
-              adb devices
-              adb install "$APK_PATH" || { echo "App installation failed after retry. Exiting..."; exit 1; }
-            fi
-
-            # Run E2E tests
-            echo "Running E2E tests..."
-            npm run test:e2e
+      - name: Run E2E tests
+        run: npm run test:e2e
 
       - name: Debug Emulator Logs
+        if: failure()
         run: |
           echo "Emulator logs:"
           adb logcat -d
-          echo "Emulator configuration:"
-          cat ~/.android/avd/test.avd/config.ini
+
+  e2e-ios:
+    needs: test
+    runs-on: macos-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: 21.6.1
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Setup Expo
+        uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install Maestro
+        run: |
+          curl -Ls "https://get.maestro.mobile.dev" | bash
+          echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
+
+      - name: Verify Maestro Installation
+        run: maestro --version
+
+      # Prebuild iOS
+      - name: Expo Prebuild iOS
+        run: npm run prebuild:ios
+
+      - name: Install iOS dependencies
+        run: |
+          cd ios
+          pod install
+
+      # Run iOS app
+      - name: Run iOS app
+        run: npm run ios --no-build-cache --no-install &
+
+      - name: Wait for iOS app to start
+        run: sleep 60
+
+      - name: Run E2E tests
+        run: npm run test:e2e
 
   build:
-    needs: [test, e2e]
+    needs: [test, e2e-android, e2e-ios]
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
