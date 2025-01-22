@@ -15,16 +15,16 @@ jobs:
           node-version: 21.6.1
 
       - name: Install dependencies
-        run: npm install
+        run: yarn install
 
       - name: Generate Prisma Client
         run: npx prisma generate
 
       - name: Lint
-        run: npm run lint
+        run: yarn lint
 
       - name: Run unit tests
-        run: npm run test:cov
+        run: yarn test:cov
 
   build:
     needs: test
@@ -51,13 +51,13 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: npm install
+        run: yarn install
 
       - name: Prebuild
-        run: npm run prebuild:android
+        run: yarn prebuild:android
 
       - name: Build
-        run: npm run build:android:local --non-interactive
+        run: yarn build:android:local --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 #
