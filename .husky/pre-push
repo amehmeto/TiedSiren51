@@ -3,3 +3,4 @@ sh .husky/scripts/branch-name-check.sh
 sh .husky/scripts/uncommitted-files-check.sh
 
 npm run test:cov
+yarn test:e2e 
