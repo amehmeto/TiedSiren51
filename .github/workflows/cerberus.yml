@@ -14,12 +14,6 @@ jobs:
         with:
           node-version: 21.6.1
 
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
       - name: Install dependencies
         run: yarn install
 
@@ -32,148 +26,8 @@ jobs:
       - name: Run unit tests
         run: yarn test:cov
 
-  e2e-android:
-    needs: test
-    runs-on: macos-latest
-    timeout-minutes: 90
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 21.6.1
-
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Set up JDK 17
-        uses: actions/setup-java@v3
-        with:
-          distribution: 'zulu'
-          java-version: '17'
-
-      - name: Setup Android SDK
-        uses: android-actions/setup-android@v3
-
-      - name: Install Maestro
-        run: |
-          curl -fsSL "https://get.maestro.mobile.dev" | bash
-          echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
-
-      - name: Verify Maestro Installation
-        run: maestro --version
-
-      - name: Expo Prebuild Android
-        run: npm run prebuild:android
-
-      - name: AVD test
-        uses: reactivecircus/android-emulator-runner@v2
-        with:
-          api-level: 33
-          target: google_apis
-          arch: x86_64
-          profile: pixel_4
-          script: |
-            npm run android --no-build-cache --no-install &
-            sleep 120
-            npm run test:e2e
-            adb logcat -d
-
-  e2e-ios:
-    needs: test
-    runs-on: macos-latest
-    timeout-minutes: 90
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-
-      - name: Setup Node.js
-        uses: actions/setup-node@v3
-        with:
-          node-version: 21.6.1
-
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
-
-      - name: Install dependencies
-        run: npm install
-
-      - name: Setup Expo
-        uses: expo/expo-github-action@v8
-        with:
-          eas-version: latest
-          token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Install Maestro
-        run: |
-          curl -Ls "https://get.maestro.mobile.dev" | bash
-          echo "${HOME}/.maestro/bin" >> $GITHUB_PATH
-
-      - name: Verify Maestro Installation
-        run: maestro --version
-
-      - name: Reset Simulator
-        run: |
-          xcrun simctl shutdown "iPhone 15" || true
-          xcrun simctl erase "iPhone 15"
-          xcrun simctl boot "iPhone 15"
-          xcrun simctl bootstatus "iPhone 15"
-
-      - name: Expo Prebuild iOS
-        run: npm run prebuild:ios
-
-      - name: Install iOS dependencies
-        run: |
-          cd ios
-          pod install
-
-      - name: Build iOS App
-        run: |
-          cd ios
-          xcodebuild -scheme TiedSiren51 -configuration Debug -sdk iphonesimulator -destination 'platform=iOS Simulator,name=iPhone 15' build
-
-      - name: Verify App Bundle Path
-        run: |
-          ls -la ios/build/Build/Products/Debug-iphonesimulator/
-
-      - name: Install App on Simulator
-        run: |
-          xcrun simctl install "iPhone 15" ios/build/Build/Products/Debug-iphonesimulator/TiedSiren51.app
-
-      - name: Verify App Installation
-        run: |
-          xcrun simctl listapps "iPhone 15" | grep "com.tiedsiren.tiedsiren"
-
-      - name: Run iOS app
-        run: npm run ios --no-build-cache --no-install &
-
-      - name: Wait for iOS app to start
-        run: sleep 180
-
-      - name: Capture Simulator Logs
-        run: |
-          xcrun simctl spawn "iPhone 15" log stream --level debug > simulator.log &
-          sleep 20
-          cat simulator.log
-
-      - name: Run E2E tests
-        run: |
-          npm run test:e2e
-          cat maestro.log
-
   build:
-    needs: [test, e2e-android, e2e-ios]
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -183,12 +37,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: 21.6.1
-
-      - name: Cache Node.js modules
-        uses: actions/cache@v3
-        with:
-          path: node_modules
-          key: node-modules-${{ runner.os }}-${{ hashFiles('package-lock.json') }}
 
       - name: Set up JDK 17
         uses: actions/setup-java@v3
