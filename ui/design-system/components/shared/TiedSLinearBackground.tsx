@@ -2,12 +2,15 @@ import React from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
 import { T } from '@/ui/design-system/theme'
 import { Platform, StatusBar, StyleSheet } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 export function TiedSLinearBackground(
   props: Readonly<{ children: React.ReactNode }>,
 ) {
+  const insets = useSafeAreaInsets()
+
   const statusBarHeight =
-    Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : 0
+    Platform.OS === 'android' ? (StatusBar.currentHeight ?? 0) : insets.top
 
   return (
     <LinearGradient
@@ -16,7 +19,9 @@ export function TiedSLinearBackground(
       end={{ x: 1, y: 1 }}
       style={[
         styles.container,
-        { paddingTop: T.spacing.large + statusBarHeight },
+        {
+          paddingTop: T.spacing.large + statusBarHeight,
+        },
       ]}
     >
       {props.children}
@@ -27,6 +32,5 @@ export function TiedSLinearBackground(
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: T.spacing.large,
   },
 })
