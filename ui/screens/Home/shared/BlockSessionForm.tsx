@@ -14,7 +14,6 @@ import {
   UpdateBlockSessionPayload,
 } from '@/core/block-session/usecases/update-block-session.usecase'
 import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
-import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { useRouter } from 'expo-router'
 import { assertIsBlockSession } from '@/ui/screens/Home/HomeScreen/assertIsBlockSession'
 import { validateBlockSessionForm } from '@/ui/screens/Home/schemas/validate-block-session-form'
@@ -64,14 +63,12 @@ export function BlockSessionForm({
   }
 
   return (
-    <TiedSLinearBackground>
-      <Formik
-        initialValues={session}
-        validate={validateBlockSessionForm()}
-        onSubmit={saveBlockSession()}
-      >
-        {(form) => <SelectBlockSessionParams form={form} />}
-      </Formik>
-    </TiedSLinearBackground>
+    <Formik
+      initialValues={session}
+      validate={validateBlockSessionForm()}
+      onSubmit={saveBlockSession()}
+    >
+      {(form) => <SelectBlockSessionParams form={form} />}
+    </Formik>
   )
 }

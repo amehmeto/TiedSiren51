@@ -83,7 +83,7 @@ export default function TabLayout() {
         duration: 300,
         easing: Easing.out(Easing.ease),
       })
-    }, [isFocused])
+    }, [isFocused, opacity, scale])
 
     return (
       <Animated.View style={animatedStyle}>
@@ -137,14 +137,11 @@ export default function TabLayout() {
         tabBarActiveTintColor: T.color.lightBlue,
         tabBarInactiveTintColor: T.color.inactive,
         headerShown: false,
-        headerStyle: { backgroundColor: T.color.darkBlue },
-        headerTintColor: T.color.lightBlue,
-        headerTitleStyle: { fontWeight: T.font.weight.bold },
-        headerShadowVisible: false,
         tabBarIcon: (props) => handleTabBarIcon({ ...props, route }),
         tabBarButton: (props) =>
           handleTabBarButton(props, { route, navigation }),
       })}
+      sceneContainerStyle={{ backgroundColor: 'transparent' }}
     >
       {tabs.map((tab) => (
         <Tabs.Screen
