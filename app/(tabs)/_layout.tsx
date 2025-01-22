@@ -61,6 +61,7 @@ export default function TabLayout() {
             tabBarIcon: ({ color, size }) => (
               <tab.IconType name={tab.icon} size={size} color={color} />
             ),
+            tabBarAccessibilityLabel: tab.title,
           }}
         />
       ))}
