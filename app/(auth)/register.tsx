@@ -3,29 +3,32 @@ import { View, Text, StyleSheet, Image } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 
 export default function RegisterScreen() {
   const router = useRouter()
 
   return (
-    <View style={styles.container}>
-      <Image
-        style={styles.image}
-        source={require('@/assets/tiedsirenlogo.png')}
-      />
-      <Text style={styles.title}>{"Let's make it productive"}</Text>
-      <TiedSButton
-        style={styles.button}
-        text={'SIGN UP'}
-        onPress={() => router.push('/(auth)/signup')}
-      />
-      <Text style={styles.haveAccountText}>{'ALREADY HAVE AN ACCOUNT?'}</Text>
-      <TiedSButton
-        style={styles.button}
-        text={'LOG IN'}
-        onPress={() => router.push('/(auth)/login')}
-      />
-    </View>
+    <TiedSLinearBackground>
+      <View style={styles.container}>
+        <Image
+          style={styles.image}
+          source={require('@/assets/tiedsirenlogo.png')}
+        />
+        <Text style={styles.title}>{"Let's make it productive"}</Text>
+        <TiedSButton
+          style={styles.button}
+          text={'SIGN UP'}
+          onPress={() => router.push('/(auth)/signup')}
+        />
+        <Text style={styles.haveAccountText}>{'ALREADY HAVE AN ACCOUNT?'}</Text>
+        <TiedSButton
+          style={styles.button}
+          text={'LOG IN'}
+          onPress={() => router.push('/(auth)/login')}
+        />
+      </View>
+    </TiedSLinearBackground>
   )
 }
 

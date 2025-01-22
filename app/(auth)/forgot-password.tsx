@@ -5,6 +5,7 @@ import { T } from '@/ui/design-system/theme'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 
 export default function ForgotPasswordScreen() {
   const router = useRouter()
@@ -21,7 +22,7 @@ export default function ForgotPasswordScreen() {
   }
 
   return (
-    <>
+    <TiedSLinearBackground>
       <View style={styles.container}>
         <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
         <Text style={styles.title}>{'RESET YOUR PASSWORD'}</Text>
@@ -34,7 +35,7 @@ export default function ForgotPasswordScreen() {
           text={'SEND PASSWORD RESET EMAIL'}
         />
       </View>
-    </>
+    </TiedSLinearBackground>
   )
 }
 
