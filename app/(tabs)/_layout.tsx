@@ -149,6 +149,7 @@ export default function TabLayout() {
           name={tab.name}
           options={{
             title: tab.title,
+            tabBarAccessibilityLabel: tab.title,
           }}
         />
       ))}
