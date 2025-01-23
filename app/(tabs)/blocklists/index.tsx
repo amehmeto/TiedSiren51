@@ -16,7 +16,6 @@ import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { Ionicons } from '@expo/vector-icons'
 import { T } from '@/ui/design-system/theme'
 import { useRouter } from 'expo-router'
-import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 
 export default function BlocklistScreen() {
   const viewModel = useSelector<
@@ -50,7 +49,7 @@ export default function BlocklistScreen() {
   })()
 
   return (
-    <TiedSLinearBackground>
+    <>
       {blocklistsNode}
       <Pressable
         onPress={() => {
@@ -65,7 +64,7 @@ export default function BlocklistScreen() {
           color={T.color.white}
         />
       </Pressable>
-    </TiedSLinearBackground>
+    </>
   )
 }
 

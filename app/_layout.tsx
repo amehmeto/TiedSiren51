@@ -12,6 +12,7 @@ import { Platform } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { Stack, useRouter } from 'expo-router'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
+import { SafeAreaProvider } from 'react-native-safe-area-context'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -80,22 +81,30 @@ export default function App() {
   ]
 
   return (
-    <Provider store={store}>
-      <MenuProvider>
-        <StatusBar style={'auto'} />
-        <TiedSLinearBackground>
-          <Stack
-            screenOptions={{
-              header: () => null,
-              contentStyle: { backgroundColor: 'transparent' },
-            }}
-          >
-            {routes.map((route) => (
-              <Stack.Screen key={route} name={route} />
-            ))}
-          </Stack>
-        </TiedSLinearBackground>
-      </MenuProvider>
-    </Provider>
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <MenuProvider>
+          <StatusBar style={'auto'} />
+          <TiedSLinearBackground>
+            <Stack
+              screenOptions={{
+                header: () => null,
+                contentStyle: { backgroundColor: 'transparent' },
+              }}
+            >
+              {routes.map((route) => (
+                <Stack.Screen
+                  key={route}
+                  name={route}
+                  options={{
+                    contentStyle: { backgroundColor: 'transparent' },
+                  }}
+                />
+              ))}
+            </Stack>
+          </TiedSLinearBackground>
+        </MenuProvider>
+      </Provider>
+    </SafeAreaProvider>
   )
 }

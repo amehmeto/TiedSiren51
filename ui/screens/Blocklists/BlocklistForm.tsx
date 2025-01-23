@@ -18,7 +18,6 @@ import { TextInputSelectionScene } from '@/ui/screens/Blocklists/TextInputSelect
 import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/ChooseBlockTabBar'
 import { useRouter } from 'expo-router'
 import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
-import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { z } from 'zod'
@@ -190,7 +189,7 @@ export function BlocklistForm({
   }
 
   return (
-    <TiedSLinearBackground>
+    <>
       <Text style={styles.title}>Name</Text>
       <TiedSBlurView>
         <TiedSTextInput
@@ -215,7 +214,7 @@ export function BlocklistForm({
       )}
 
       <TiedSButton text={'Save Blocklist'} onPress={saveBlocklist} />
-    </TiedSLinearBackground>
+    </>
   )
 }
 
