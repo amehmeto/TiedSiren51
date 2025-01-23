@@ -195,6 +195,7 @@ export function BlocklistForm({
         <TiedSTextInput
           placeholder={blocklistFromState?.name ?? 'Blocklist name'}
           onChangeText={(text) => setBlocklist({ ...blocklist, name: text })}
+          testID="addBlocklistName"
         />
       </TiedSBlurView>
       {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
