@@ -26,9 +26,6 @@ jobs:
       - name: Run unit tests
         run: yarn test:cov
 
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
   build:
     needs: test
     runs-on: ubuntu-latest
