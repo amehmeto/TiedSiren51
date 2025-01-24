@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
@@ -28,6 +28,11 @@ export default function LoginScreen() {
     selectIsUserAuthenticated(state),
   )
 
+  useEffect(() => {
+    if (!isUserAuthenticated) router.navigate('/(auth)/login')
+  }, [isUserAuthenticated, router])
+
+  if (!isUserAuthenticated) return null
   return (
     <>
       <View style={styles.container}>
