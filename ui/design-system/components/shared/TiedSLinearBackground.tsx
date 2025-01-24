@@ -30,10 +30,7 @@ export function TiedSLinearBackground(
 }
 
 const styles = StyleSheet.create({
-  gradient: {
-    flex: 1,
-  },
-  safeArea: {
+  container: {
     flex: 1,
   },
 })
