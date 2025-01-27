@@ -46,8 +46,13 @@ export function SelectableSirenCard({
       ? (siren as InstalledApp).appName
       : (siren as string)
 
+  const baseTestId =
+    sirenType === SirenType.ANDROID
+      ? `siren-${sirenType}-${(siren as InstalledApp).packageName}`
+      : `siren-${sirenType}-${siren}`
+
   return (
-    <Pressable onPress={onPress}>
+    <Pressable onPress={onPress} testID={baseTestId}>
       <TiedSBlurView
         style={[
           styles.container,
@@ -56,7 +61,9 @@ export function SelectableSirenCard({
         ]}
       >
         {iconElement}
-        <Text style={styles.appName}>{sirenName}</Text>
+        <Text style={styles.appName} testID={`${baseTestId}-name`}>
+          {sirenName}
+        </Text>
 
         <CheckBox
           style={styles.checkbox}
@@ -64,6 +71,7 @@ export function SelectableSirenCard({
           checked={isSelected}
           checkedColor={T.color.lightBlue}
           onPress={onPress}
+          testID={`${baseTestId}-checkbox`}
         />
       </TiedSBlurView>
     </Pressable>

@@ -17,7 +17,6 @@ import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { T } from '@/ui/design-system/theme'
 import { useRouter } from 'expo-router'
-import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 
 async function notifyActiveSessionsStartAndEnd(
@@ -137,7 +136,7 @@ export default function HomeScreen() {
   })()
 
   return (
-    <TiedSLinearBackground>
+    <>
       <Image
         style={styles.image}
         source={require('@/assets/tiedsirenlogo.png')}
@@ -152,7 +151,7 @@ export default function HomeScreen() {
         text={'CREATE A BLOCK SESSION'}
         onPress={() => router.push('/(tabs)/home/create-block-session')}
       />
-    </TiedSLinearBackground>
+    </>
   )
 }
 

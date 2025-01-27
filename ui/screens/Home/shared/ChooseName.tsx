@@ -17,6 +17,7 @@ export function ChooseName(
       value: string,
       shouldValidate?: boolean,
     ) => Promise<void | FormikErrors<Session>>
+    testID?: string
   }>,
 ) {
   const [isNameModalVisible, setIsNameModalVisible] = useState<boolean>(false)

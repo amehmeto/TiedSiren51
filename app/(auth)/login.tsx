@@ -1,14 +1,20 @@
-import React from 'react'
-import { View, Text, StyleSheet, Platform } from 'react-native'
+import React, { useEffect } from 'react'
+import { Platform, StyleSheet, Text, View } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
+import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-google.usecase'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 
 export default function LoginScreen() {
   const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleClose = () => {
     if (router.canGoBack()) {
@@ -21,16 +27,23 @@ export default function LoginScreen() {
     }
   }
 
+  const isUserAuthenticated = useSelector((state: RootState) =>
+    selectIsUserAuthenticated(state),
+  )
+
+  useEffect(() => {
+    if (isUserAuthenticated) router.push('/')
+  }, [isUserAuthenticated, router])
+
   return (
-    <>
+    <TiedSLinearBackground>
       <View style={styles.container}>
         <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
         <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
         <TiedSSocialButton
           iconName="logo-google"
           text="CONTINUE WITH GOOGLE"
-          // eslint-disable-next-line no-console
-          onPress={() => console.log('Continue with Google')}
+          onPress={() => dispatch(authenticateWithGoogle())}
         />
         <TiedSSocialButton
           iconName="logo-apple"
@@ -60,7 +73,7 @@ export default function LoginScreen() {
           {'Forgot your password?'}
         </Text>
       </View>
-    </>
+    </TiedSLinearBackground>
   )
 }
 
