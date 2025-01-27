@@ -12,7 +12,7 @@
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts,tsx}\" && prettier \"**/*.{js,ts,tsx}\"",
     "lint:fix": "tsc --noEmit && eslint --fix \"**/*.{js,ts,tsx}\" && prettier --write \"**/*.{js,ts,tsx}\"",
     "test": "vitest",
-    "test:prepush": "vitest --run",
+    "test:prepush": "prisma generate && vitest --run",
     "test:cov": "c8 vitest --run",
     "typecheck": "tsc --noEmit",
     "prebuild": "npx expo prebuild",
