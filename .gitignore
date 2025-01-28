@@ -81,6 +81,7 @@ pdb-sirens/
 prisma/*.db
 *.db-journal
 *.db
+app.db
 
 # IDE
 .idea/
