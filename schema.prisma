@@ -1,0 +1,51 @@
+generator client {
+  provider = "prisma-client-js"
+  previewFeatures = ["reactNative"]
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./app.db"
+}
+
+// Your data model
+
+model User {
+  id           Int     @id @default(autoincrement())
+  name         String
+}
+
+model BlockSession {
+  id                  String    @id @default(uuid())
+  name                String
+  minutesLeft         String?
+  startedAt           String
+  endedAt             String
+  startNotificationId String
+  endNotificationId   String
+  blockingConditions  String    // Will store enum values as JSON string
+  blocklists         Blocklist[]
+  devices            Device[]
+}
+
+model Blocklist {
+  id        String    @id @default(uuid())
+  name      String
+  sirens    String    // Store as JSON string
+  sessions  BlockSession[]
+}
+
+model Device {
+  id        String    @id @default(uuid())
+  type      String
+  name      String
+  sessions  BlockSession[]
+}
+
+model Siren {
+  id          String  @id @default(uuid())
+  type        String  // 'android', 'ios', 'website', 'keyword'
+  value       String  // package name for apps, URL for websites, or keyword
+  name        String?
+  icon        String?
+}
