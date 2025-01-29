@@ -6,6 +6,8 @@ yarn test:cov
 
 exec < /dev/tty  # Redirect input to terminal
 
+echo ""
+echo ""
 echo "⚠️  Warning: E2E tests are not part of CI pipeline yet."
 echo "👉 It's your responsibility to ensure e2e tests pass before final merge."
 read -p "❓ Have you manually verified that e2e tests pass? (y/n): " answer
@@ -19,3 +21,5 @@ fi
 exec <&- # Close terminal input
 
 echo "✅ Proceeding with push. Remember to run e2e tests before final merge!"
+echo ""
+echo ""
