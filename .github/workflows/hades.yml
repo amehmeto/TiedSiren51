@@ -39,6 +39,6 @@ jobs:
         run: yarn install
 
       - name: Trigger Preview Build
-        run: eas build -p android --profile preview --no-wait
+        run: yarn build:android:apk
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
