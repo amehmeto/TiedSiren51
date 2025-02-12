@@ -35,10 +35,30 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
+      - name: Get yarn cache directory path
+        id: yarn-cache-dir-path
+        run: echo "dir=$(yarn cache dir)" >> $GITHUB_OUTPUT
+
       - name: Install dependencies
-        run: yarn install
+        run: yarn install --prefer-offline
+
+      - name: Check project setup
+        run: |
+          yarn expo doctor
+          yarn expo diagnostics
+        continue-on-error: true
 
       - name: Trigger Preview Build
-        run: eas build -p android --profile preview --no-wait
+        id: preview-build
+        run: |
+          build_id=$(eas build -p android --profile preview --no-wait --json | jq -r '.id')
+          echo "build_id=$build_id" >> $GITHUB_OUTPUT
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Build Status
+        if: steps.preview-build.outcome == 'success'
+        run: |
+          echo "Preview build initiated successfully!"
+          echo "Build ID: ${{ steps.preview-build.outputs.build_id }}"
+          echo "Monitor build status at: https://expo.dev/builds/${{ steps.preview-build.outputs.build_id }}"

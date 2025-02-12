@@ -1,53 +1,58 @@
 {
-  "cli": {
-    "version": ">= 9.1.0"
-  },
-  "build": {
+"cli": {
+    "version": ">= 9.1.0",
+    "appVersionSource": "remote"
+},
+"build": {
     "development": {
-      "node": "21.6.1",
-      "developmentClient": true,
-      "distribution": "internal",
-      "android": {
+    "node": "20.9.0",
+    "developmentClient": true,
+    "distribution": "internal",
+    "android": {
         "buildType": "apk"
-      },
-      "env": {
+    },
+    "env": {
         "NODE_ENV": "development"
-      }
+    }
     },
     "development-simulator": {
-      "node": "21.6.1",
-      "env": {
+    "node": "20.9.0",
+    "env": {
         "NODE_ENV": "development"
-      },
-      "developmentClient": true,
-      "distribution": "internal",
-      "ios": {
+    },
+    "developmentClient": true,
+    "distribution": "internal",
+    "ios": {
         "simulator": true
-      }
+    }
     },
     "preview": {
-      "node": "21.6.1",
-      "env": {
-        "NODE_ENV": "test"
-      },
-      "developmentClient": false,
-      "distribution": "internal",
-      "android": {
-        "buildType": "apk"
-      }
+    "node": "20.9.0",
+    "env": {
+        "NODE_ENV": "test",
+        "EXPO_ROUTER_APP_ROOT": "app"
+    },
+    "developmentClient": false,
+    "distribution": "internal",
+    "android": {
+        "buildType": "apk",
+        "env": {
+        "EXPO_ROUTER_APP_ROOT": "app"
+        }
+    }
     },
     "release": {
-      "node": "21.6.1",
-      "distribution": "store"
+    "node": "20.9.0",
+    "distribution": "store"
     },
     "production": {
-      "node": "21.6.1",
-      "env": {
+    "node": "20.9.0",
+    "env": {
         "NODE_ENV": "production"
-      }
     }
-  },
-  "submit": {
+    }
+},
+"submit": {
     "production": {}
-  }
+}
 }
