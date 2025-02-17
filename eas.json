@@ -1,58 +1,58 @@
 {
-"cli": {
-    "version": ">= 9.1.0",
-    "appVersionSource": "remote"
-},
-"build": {
-    "development": {
-    "node": "20.9.0",
-    "developmentClient": true,
-    "distribution": "internal",
-    "android": {
-        "buildType": "apk"
+    "cli": {
+        "version": ">= 9.1.0",
+        "appVersionSource": "remote"
     },
-    "env": {
-        "NODE_ENV": "development"
-    }
-    },
-    "development-simulator": {
-    "node": "20.9.0",
-    "env": {
-        "NODE_ENV": "development"
-    },
-    "developmentClient": true,
-    "distribution": "internal",
-    "ios": {
-        "simulator": true
-    }
-    },
-    "preview": {
-    "node": "20.9.0",
-    "env": {
-        "NODE_ENV": "test",
-        "EXPO_ROUTER_APP_ROOT": "app"
-    },
-    "developmentClient": false,
-    "distribution": "internal",
-    "android": {
-        "buildType": "apk",
-        "env": {
-        "EXPO_ROUTER_APP_ROOT": "app"
+    "build": {
+        "development": {
+            "node": "20.9.0",
+            "developmentClient": true,
+            "distribution": "internal",
+            "android": {
+                "buildType": "apk"
+            },
+            "env": {
+                "NODE_ENV": "development"
+            }
+        },
+        "development-simulator": {
+            "node": "20.9.0",
+            "env": {
+                "NODE_ENV": "development"
+            },
+            "developmentClient": true,
+            "distribution": "internal",
+            "ios": {
+                "simulator": true
+            }
+        },
+        "preview": {
+            "node": "20.9.0",
+            "env": {
+                "NODE_ENV": "test",
+                "EXPO_ROUTER_APP_ROOT": "./app"
+            },
+            "developmentClient": false,
+            "distribution": "internal",
+            "android": {
+                "buildType": "apk",
+                "env": {
+                    "EXPO_ROUTER_APP_ROOT": "./app"
+                }
+            }
+        },
+        "release": {
+            "node": "20.9.0",
+            "distribution": "store"
+        },
+        "production": {
+            "node": "20.9.0",
+            "env": {
+                "NODE_ENV": "production"
+            }
         }
-    }
     },
-    "release": {
-    "node": "20.9.0",
-    "distribution": "store"
-    },
-    "production": {
-    "node": "20.9.0",
-    "env": {
-        "NODE_ENV": "production"
+    "submit": {
+        "production": {}
     }
-    }
-},
-"submit": {
-    "production": {}
-}
 }
