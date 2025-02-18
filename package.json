@@ -25,10 +25,10 @@
     "build:android:apk": "eas build -p android --profile preview",
     "build:ios": "eas build --platform ios",
     "build:ios:simulator": "eas build --profile development-simulator --platform ios",
-    "prepare": "husky",
     "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
     "expo:lint": "expo lint",
-    "test:e2e": "maestro test maestro/"
+    "test:e2e": "maestro test maestro/",
+      "prepare": "if [ -z \"$CI\" ]; then husky install; fi"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "yarn lint:fix"
@@ -88,7 +88,7 @@
     "eslint-config-expo": "^7.0.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-plugin-prettier": "^5.1.3",
-    "husky": "^9.0.11",
+    "husky": "^9.1.7",
     "lint-staged": "^15.2.5",
     "prettier": "^3.3.0",
     "react-test-renderer": "18.2.0",
