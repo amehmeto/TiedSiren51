@@ -25,10 +25,10 @@
     "build:android:apk": "eas build -p android --profile preview",
     "build:ios": "eas build --platform ios",
     "build:ios:simulator": "eas build --profile development-simulator --platform ios",
+    "prepare": "husky",
     "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
     "expo:lint": "expo lint",
-    "test:e2e": "maestro test maestro/",
-      "prepare": "if [ -z \"$CI\" ]; then husky install; fi"
+    "test:e2e": "maestro test maestro/"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "yarn lint:fix"
