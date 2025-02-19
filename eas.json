@@ -1,6 +1,7 @@
 {
   "cli": {
-    "version": ">= 9.1.0"
+    "version": ">= 9.1.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
@@ -29,7 +30,7 @@
     "preview": {
       "node": "18.18.2",
       "env": {
-       "NODE_ENV": "production",
+       "NODE_ENV": "preview",
         "EXPO_ROUTER_APP_ROOT": "./app"
       },
       "developmentClient": false,
@@ -45,7 +46,8 @@
     "production": {
       "node": "18.18.2",
       "env": {
-        "NODE_ENV": "production"
+        "NODE_ENV": "production",
+        "EXPO_ROUTER_APP_ROOT": "./app"
       }
     }
   },
