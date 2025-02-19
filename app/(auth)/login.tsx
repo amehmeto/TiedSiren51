@@ -22,9 +22,7 @@ export default function LoginScreen() {
       return
     }
 
-    if (Platform.OS === 'ios') {
-      router.replace('/(auth)/login')
-    }
+    if (Platform.OS === 'ios') router.replace('/(auth)/login')
   }
 
   const isUserAuthenticated = useSelector((state: RootState) =>
