@@ -1,21 +1,23 @@
 {
   "cli": {
-    "version": ">= 9.1.0"
+    "version": ">= 9.1.0",
+    "appVersionSource": "remote"
   },
   "build": {
     "development": {
-      "node": "21.6.1",
+      "node": "18.18.2",
       "developmentClient": true,
       "distribution": "internal",
       "android": {
         "buildType": "apk"
       },
       "env": {
-        "NODE_ENV": "development"
+        "NODE_ENV": "development",
+        "EXPO_ROUTER_APP_ROOT": "./app"
       }
     },
     "development-simulator": {
-      "node": "21.6.1",
+      "node": "18.18.2",
       "env": {
         "NODE_ENV": "development"
       },
@@ -26,9 +28,10 @@
       }
     },
     "preview": {
-      "node": "21.6.1",
+      "node": "18.18.2",
       "env": {
-        "NODE_ENV": "test"
+       "NODE_ENV": "preview",
+        "EXPO_ROUTER_APP_ROOT": "./app"
       },
       "developmentClient": false,
       "distribution": "internal",
@@ -37,13 +40,14 @@
       }
     },
     "release": {
-      "node": "21.6.1",
+      "node": "18.18.2",
       "distribution": "store"
     },
     "production": {
-      "node": "21.6.1",
+      "node": "18.18.2",
       "env": {
-        "NODE_ENV": "production"
+        "NODE_ENV": "production",
+        "EXPO_ROUTER_APP_ROOT": "./app"
       }
     }
   },
@@ -51,3 +55,4 @@
     "production": {}
   }
 }
+
