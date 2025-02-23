@@ -13,14 +13,19 @@ import { RealBackgroundTaskService } from '@/infra/background-task-service/real.
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
+import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/prisma.block-session.repository'
+import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.blocklist.repository'
+import { PrismaClient } from '@prisma/client'
 
 export const deviceRepository: RemoteDeviceRepository =
   new FakeDataDeviceRepository()
 
+const prismaClient = new PrismaClient()
+
 export const dependencies: Dependencies = {
   authGateway: new FakeAuthGateway(),
   blockSessionRepository: new FakeDataBlockSessionRepository(), // new PouchdbBlockSessionRepository(),
-  blocklistRepository: new FakeDataBlocklistRepository(), //PouchdbBlocklistRepository(),
+  blocklistRepository: new PrismaBlocklistRepository(prismaClient), //PouchdbBlocklistRepository(),
   sirenTier: new InMemorySirenTier(),
   dateProvider: new RealDateProvider(),
   installedAppRepository: new FakeDataInstalledAppsRepository(),

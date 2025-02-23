@@ -31,7 +31,7 @@ model BlockSession {
 model Blocklist {
   id        String    @id @default(uuid())
   name      String
-  sirens    String    // Store as JSON string
+  sirens    Siren[]   // Changed from String to relation
   sessions  BlockSession[]
 }
 
@@ -43,9 +43,10 @@ model Device {
 }
 
 model Siren {
-  id          String  @id @default(uuid())
-  type        String  // 'android', 'ios', 'website', 'keyword'
-  value       String  // package name for apps, URL for websites, or keyword
-  name        String?
-  icon        String?
+  id          String      @id @default(uuid())
+  type        String      // Will match SirenType enum: 'android', 'windows', 'macos', etc.
+  value       String      // package name for apps, URL for websites, or keyword
+  name        String?     // For Android apps: appName
+  icon        String?     // For Android apps: icon
+  blocklists  Blocklist[]
 }
