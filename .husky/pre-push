@@ -10,6 +10,7 @@ echo ""
 echo ""
 echo "⚠️  Warning: E2E tests are not part of CI pipeline yet."
 echo "👉 It's your responsibility to ensure e2e tests pass before final merge."
+echo "🛑 Please run 'yarn test:e2e' to verify your changes."
 read -p "❓ Have you manually verified that e2e tests pass? (y/n): " answer
 
 if [ "$answer" != "y" ]; then

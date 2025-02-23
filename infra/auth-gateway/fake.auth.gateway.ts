@@ -9,4 +9,12 @@ export class FakeAuthGateway implements AuthGateway {
   }
 
   onAuthStateChanged(listener: (user: AuthUser) => void): void {}
+
+  authenticateWithApple(): Promise<AuthUser> {
+    return Promise.resolve(this.willSucceedForUser)
+  }
+
+  authenticateWithEmail(email: string, password: string): Promise<AuthUser> {
+    return Promise.resolve(this.willSucceedForUser)
+  }
 }
