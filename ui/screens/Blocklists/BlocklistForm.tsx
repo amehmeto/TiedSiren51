@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { AndroidSiren, Sirens, SirenType } from '@/core/siren/sirens'
@@ -35,6 +36,7 @@ export function BlocklistForm({
 }: Readonly<BlocklistScreenProps>) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const blocklistState = useSelector((state: RootState) => state.blocklist)
 
   const selectableSirens: Sirens = useSelector(
     (state: RootState) => state.siren.availableSirens,
@@ -177,15 +179,24 @@ export function BlocklistForm({
   const saveBlocklist = async () => {
     if (!validateForm(blocklist)) return
 
-    if (mode === 'edit') {
-      await dispatch(updateBlocklist(blocklist as Blocklist))
-    } else {
-      await dispatch(
-        createBlocklist(blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>),
-      )
-    }
+    try {
+      if (mode === 'edit') {
+        await dispatch(updateBlocklist(blocklist as Blocklist))
+      } else {
+        console.log('Creating blocklist:', blocklist)
+        const result = await dispatch(
+          createBlocklist(blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>),
+        ).unwrap()
+        console.log('Creation result:', result)
+      }
 
-    router.push('/(tabs)/blocklists')
+      await new Promise((resolve) => setTimeout(resolve, 100))
+      console.log('Updated store state:', blocklistState)
+
+      router.push('/(tabs)/blocklists')
+    } catch (error) {
+      console.error('Error saving blocklist:', error)
+    }
   }
 
   return (

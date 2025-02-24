@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { useEffect, useState } from 'react'
 import { Provider } from 'react-redux'
 import { MenuProvider } from 'react-native-popup-menu'
@@ -13,6 +14,7 @@ import { T } from '@/ui/design-system/theme'
 import { Stack, useRouter } from 'expo-router'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
+import { initializeDb } from '@/myDbModule'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -28,9 +30,18 @@ export default function App() {
   const isAuthenticated = false
 
   useEffect(() => {
-    initializeStore()
-    configureNavigationBar()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    const initialize = async () => {
+      try {
+        await initializeDb()
+        const newStore = await storePromise
+        console.log('Store initialized:', newStore.getState())
+        setStore(newStore)
+        configureNavigationBar()
+      } catch (error) {
+        console.error('Initialization error:', error)
+      }
+    }
+    initialize()
   }, [])
 
   useEffect(() => {
@@ -42,10 +53,6 @@ export default function App() {
 
   function navigateBasedOnAuth() {
     router.replace(isAuthenticated ? '/home' : '/register')
-  }
-
-  function initializeStore() {
-    storePromise.then(setStore).catch(handleError)
   }
 
   function configureNavigationBar() {

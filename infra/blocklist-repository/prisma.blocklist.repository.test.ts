@@ -1,5 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { PrismaClient } from '@prisma/client'
+import { PrismaClient } from '@prisma/client/react-native'
 import { PrismaBlocklistRepository } from './prisma.blocklist.repository'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 

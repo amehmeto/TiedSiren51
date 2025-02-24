@@ -1,23 +1,23 @@
-import { PrismaClient } from '@prisma/client'
+/* eslint-disable no-console */
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { BlocklistRepository } from '@/core/ports/blocklist.repository'
 import { CreatePayload } from '@/core/ports/create.payload'
 import { UpdatePayload } from '@/core/ports/update.payload'
+import { baseClient } from '@/myDbModule'
+import { PrismaClient } from '@prisma/client/react-native'
 
 export class PrismaBlocklistRepository implements BlocklistRepository {
-  private prisma: PrismaClient
-
-  constructor(prisma?: PrismaClient) {
-    this.prisma = prisma || new PrismaClient()
-  }
+  constructor(private prisma: PrismaClient = baseClient) {}
 
   async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
+    console.log('Creating blocklist in DB:', blocklistPayload)
     const created = await this.prisma.blocklist.create({
       data: {
         name: blocklistPayload.name,
         sirens: JSON.stringify(blocklistPayload.sirens),
       },
     })
+    console.log('DB creation result:', created)
 
     return {
       ...blocklistPayload,
@@ -25,8 +25,16 @@ export class PrismaBlocklistRepository implements BlocklistRepository {
     }
   }
 
-  findAll(): Promise<Blocklist[]> {
-    return Promise.resolve([])
+  async findAll(): Promise<Blocklist[]> {
+    console.log('Fetching all blocklists...')
+    const blocklists = await this.prisma.blocklist.findMany()
+    console.log('Found blocklists in DB:', blocklists)
+
+    return blocklists.map((blocklist) => ({
+      id: blocklist.id,
+      name: blocklist.name,
+      sirens: JSON.parse(blocklist.sirens),
+    }))
   }
 
   async findById(id: string): Promise<Blocklist> {
