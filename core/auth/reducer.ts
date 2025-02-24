@@ -3,6 +3,7 @@ import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-g
 import { AuthUser } from '@/core/auth/authUser'
 import { authenticateWithApple } from '@/core/auth/usecases/authenticate-with-apple.usecase'
 import { authenticateWithEmail } from '@/core/auth/usecases/authenticate-with-email.usecase'
+import { logOut } from '@/core/auth/usecases/log-out.usecase'
 
 export type AuthState = {
   authUser: AuthUser | null
@@ -29,6 +30,9 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(authenticateWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
+      })
+      .addCase(logOut.fulfilled, (state) => {
+        state.authUser = null
       })
   },
 )

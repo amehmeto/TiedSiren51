@@ -10,6 +10,7 @@ import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-g
 import { expect } from 'vitest'
 import { authenticateWithApple } from '@/core/auth/usecases/authenticate-with-apple.usecase'
 import { authenticateWithEmail } from '@/core/auth/usecases/authenticate-with-email.usecase'
+import { logOut } from '@/core/auth/usecases/log-out.usecase'
 
 export function authentificationFixture(
   testStateBuilderProvider = stateBuilderProvider(),
@@ -29,6 +30,11 @@ export function authentificationFixture(
       authenticationWithEmailWillSucceedForUser(authUser: AuthUser) {
         authGateway.willSucceedForUser = authUser
       },
+      authUserIs(authUser: AuthUser) {
+        testStateBuilderProvider.setState((stateBuilder) =>
+          stateBuilder.withAuthUser(authUser),
+        )
+      },
     },
     when: {
       async authenticateWithGoogle() {
@@ -40,10 +46,21 @@ export function authentificationFixture(
       authenticateWithEmail(email: string, password: string) {
         return store.dispatch(authenticateWithEmail({ email, password }))
       },
+      logOut() {
+        store = createTestStore(
+          { authGateway },
+          testStateBuilderProvider.getState(),
+        )
+        return store.dispatch(logOut())
+      },
     },
     then: {
       userShouldBeAuthenticated(authUser: AuthUser) {
         const expectedState = stateBuilder().withAuthUser(authUser).build()
+        expect(store.getState()).toEqual(expectedState)
+      },
+      userShouldNotBeAuthenticated() {
+        const expectedState = stateBuilder().withoutAuthUser({}).build()
         expect(store.getState()).toEqual(expectedState)
       },
     },

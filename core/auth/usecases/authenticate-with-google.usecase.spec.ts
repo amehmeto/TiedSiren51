@@ -7,6 +7,7 @@ describe('Feature: Authenticate with Google', () => {
   beforeEach(() => {
     fixture = authentificationFixture()
   })
+
   it('should authenticate with Google successfully', async () => {
     fixture.given.authenticationWithGoogleWillSucceedForUser({
       id: 'auth-user-id',
