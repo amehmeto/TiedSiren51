@@ -1,3 +1,4 @@
+/* eslint-disable no-console */
 import { PrismaClient } from '@prisma/client'
 import { BlockSession } from '@/core/block-session/block.session'
 import { BlockSessionRepository } from '@/core/ports/block-session.repository'
@@ -19,25 +20,47 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
     try {
-      const created = await this.prisma.blockSession.create({
-        data: {
-          name: sessionPayload.name,
-          startedAt: sessionPayload.startedAt,
-          endedAt: sessionPayload.endedAt,
-          startNotificationId: sessionPayload.startNotificationId,
-          endNotificationId: sessionPayload.endNotificationId,
-          blockingConditions: JSON.stringify(sessionPayload.blockingConditions),
-        },
+      const created = await this.prisma.$transaction(async (tx) => {
+        return tx.blockSession.create({
+          data: {
+            name: sessionPayload.name,
+            startedAt: sessionPayload.startedAt,
+            endedAt: sessionPayload.endedAt,
+            startNotificationId: sessionPayload.startNotificationId,
+            endNotificationId: sessionPayload.endNotificationId,
+            blockingConditions: JSON.stringify(
+              sessionPayload.blockingConditions,
+            ),
+            blocklists: {
+              connect:
+                sessionPayload.blocklists?.map((blocklist) => ({
+                  id: blocklist.id,
+                })) || [],
+            },
+            devices: {
+              connect:
+                sessionPayload.devices?.map((device) => ({
+                  id: device.id,
+                })) || [],
+            },
+          },
+          include: {
+            blocklists: true,
+            devices: true,
+          },
+        })
       })
 
       return {
-        ...sessionPayload,
-        id: created.id,
-        blocklists: [],
-        devices: [],
+        ...created,
+        blockingConditions: JSON.parse(created.blockingConditions),
+        blocklists: created.blocklists.map((blocklist) => ({
+          ...blocklist,
+          sirens: JSON.parse(blocklist.sirens),
+        })),
+        devices: created.devices,
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
       console.error('Error creating block session:', error)
       throw new Error('Failed to create block session')
     }
