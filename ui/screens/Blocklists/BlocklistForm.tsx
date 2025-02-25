@@ -24,6 +24,7 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { z } from 'zod'
 import { blocklistSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
 import { ErrorMessages } from '@/ui/error-messages.type'
+import { dependencies } from '@/ui/dependencies'
 
 export type BlocklistScreenProps = {
   mode: 'create' | 'edit'
@@ -36,7 +37,6 @@ export function BlocklistForm({
 }: Readonly<BlocklistScreenProps>) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
-  const blocklistState = useSelector((state: RootState) => state.blocklist)
 
   const selectableSirens: Sirens = useSelector(
     (state: RootState) => state.siren.availableSirens,
@@ -70,9 +70,18 @@ export function BlocklistForm({
   ]
 
   useEffect(() => {
-    dispatch(fetchAvailableSirens())
-    if (mode === 'edit' && blocklistFromState) setBlocklist(blocklistFromState)
-  }, [mode, blocklistFromState, dispatch])
+    const initialize = async () => {
+      await dispatch(fetchAvailableSirens())
+      if (mode === 'edit' && blocklistId) {
+        const existingBlocklist =
+          await dependencies.blocklistRepository.findById(blocklistId)
+        if (existingBlocklist) {
+          setBlocklist(existingBlocklist)
+        }
+      }
+    }
+    initialize()
+  }, [mode, blocklistId, dispatch])
 
   function toggleTextSiren(sirenType: keyof Sirens, sirenId: string) {
     setBlocklist((prevBlocklist) => {
@@ -186,6 +195,7 @@ export function BlocklistForm({
         createBlocklist(blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>),
       )
     }
+
     router.push('/(tabs)/blocklists')
   }
 

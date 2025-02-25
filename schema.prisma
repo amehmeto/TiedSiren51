@@ -31,8 +31,10 @@ model BlockSession {
 model Blocklist {
   id        String    @id @default(uuid())
   name      String
-  sirens    String    // Store as JSON string
+  sirens    String     // Add default empty JSON object
   sessions  BlockSession[]
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
 }
 
 model Device {

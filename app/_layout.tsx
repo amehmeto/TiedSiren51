@@ -14,7 +14,9 @@ import { T } from '@/ui/design-system/theme'
 import { Stack, useRouter } from 'expo-router'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { initializeDb } from '@/myDbModule'
+import { initializeDb, closeDb, extendedClient } from '@/myDbModule'
+import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.blocklist.repository'
+import { setBlocklists } from '@/core/blocklist/blocklist.slice'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -26,15 +28,27 @@ Notifications.setNotificationHandler({
 
 export default function App() {
   const [store, setStore] = useState<AppStore | null>(null)
+  const [dbInitialized, setDbInitialized] = useState(false)
+  const [refreshKey, setRefreshKey] = useState(0)
   const router = useRouter()
   const isAuthenticated = false
 
+  // Separate DB initialization effect
   useEffect(() => {
     const initialize = async () => {
       try {
         await initializeDb()
+        setDbInitialized(true)
         const newStore = await storePromise
-        console.log('Store initialized:', newStore.getState())
+
+        // Load existing blocklists into store
+        const blocklistRepository = new PrismaBlocklistRepository()
+        const blocklists = await blocklistRepository.findAll()
+
+        // Dispatch using the correct action
+        newStore.dispatch(setBlocklists(blocklists))
+        console.log('Dispatching blocklists:', blocklists)
+
         setStore(newStore)
         configureNavigationBar()
       } catch (error) {
@@ -42,7 +56,37 @@ export default function App() {
       }
     }
     initialize()
+
+    return () => {
+      closeDb().catch(console.error)
+    }
   }, [])
+
+  // Refresh subscriptions effect
+  useEffect(() => {
+    if (!dbInitialized) return
+
+    let timeoutId: NodeJS.Timeout
+    let isActive = true
+
+    const refresh = async () => {
+      if (!isActive) return
+      try {
+        await extendedClient.$refreshSubscriptions()
+        setRefreshKey((prev) => prev + 1)
+        timeoutId = setTimeout(refresh, 1000)
+      } catch (error) {
+        console.error('Refresh error:', error)
+      }
+    }
+
+    refresh()
+
+    return () => {
+      isActive = false
+      if (timeoutId) clearTimeout(timeoutId)
+    }
+  }, [dbInitialized])
 
   useEffect(() => {
     if (!store) return
@@ -77,7 +121,8 @@ export default function App() {
     console.error('Error:', error)
   }
 
-  if (!store) return null
+  // Don't render anything until DB is initialized
+  if (!dbInitialized || !store) return null
 
   const routes = [
     '(auth)/register',

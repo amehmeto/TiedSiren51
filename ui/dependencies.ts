@@ -14,7 +14,6 @@ import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.blocklist.repository'
-import { PrismaClient } from '@prisma/client/react-native'
 
 export const deviceRepository: RemoteDeviceRepository =
   new FakeDataDeviceRepository()
@@ -22,7 +21,7 @@ export const deviceRepository: RemoteDeviceRepository =
 export const dependencies: Dependencies = {
   authGateway: new FakeAuthGateway(),
   blockSessionRepository: new FakeDataBlockSessionRepository(), // new PouchdbBlockSessionRepository(),
-  blocklistRepository: new PrismaBlocklistRepository(new PrismaClient()), // Pass PrismaClient instance
+  blocklistRepository: new PrismaBlocklistRepository(), // Pass PrismaClient instance
   sirenTier: new InMemorySirenTier(),
   dateProvider: new RealDateProvider(),
   installedAppRepository: new FakeDataInstalledAppsRepository(),
