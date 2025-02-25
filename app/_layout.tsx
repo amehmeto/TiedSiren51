@@ -26,33 +26,18 @@ Notifications.setNotificationHandler({
   }),
 })
 
-export default function App() {
-  const [store, setStore] = useState<AppStore | null>(null)
-  const [dbInitialized, setDbInitialized] = useState(false)
+// Custom hook for database initialization
+function useDatabase() {
+  const [isInitialized, setIsInitialized] = useState(false)
   const [refreshKey, setRefreshKey] = useState(0)
-  const router = useRouter()
-  const isAuthenticated = false
 
-  // Separate DB initialization effect
   useEffect(() => {
     const initialize = async () => {
       try {
         await initializeDb()
-        setDbInitialized(true)
-        const newStore = await storePromise
-
-        // Load existing blocklists into store
-        const blocklistRepository = new PrismaBlocklistRepository()
-        const blocklists = await blocklistRepository.findAll()
-
-        // Dispatch using the correct action
-        newStore.dispatch(setBlocklists(blocklists))
-        console.log('Dispatching blocklists:', blocklists)
-
-        setStore(newStore)
-        configureNavigationBar()
+        setIsInitialized(true)
       } catch (error) {
-        console.error('Initialization error:', error)
+        console.error('Database initialization error:', error)
       }
     }
     initialize()
@@ -62,9 +47,9 @@ export default function App() {
     }
   }, [])
 
-  // Refresh subscriptions effect
+  // Subscription refresh logic
   useEffect(() => {
-    if (!dbInitialized) return
+    if (!isInitialized) return
 
     let timeoutId: NodeJS.Timeout
     let isActive = true
@@ -76,7 +61,7 @@ export default function App() {
         setRefreshKey((prev) => prev + 1)
         timeoutId = setTimeout(refresh, 1000)
       } catch (error) {
-        console.error('Refresh error:', error)
+        console.error('Subscription refresh error:', error)
       }
     }
 
@@ -86,42 +71,76 @@ export default function App() {
       isActive = false
       if (timeoutId) clearTimeout(timeoutId)
     }
-  }, [dbInitialized])
+  }, [isInitialized])
+
+  return { isInitialized, refreshKey }
+}
+
+// Custom hook for store initialization
+function useStoreInitialization() {
+  const [store, setStore] = useState<AppStore | null>(null)
 
   useEffect(() => {
+    const initializeStore = async () => {
+      try {
+        const newStore = await storePromise
+        const blocklistRepository = new PrismaBlocklistRepository()
+        const blocklists = await blocklistRepository.findAll()
+        newStore.dispatch(setBlocklists(blocklists))
+        setStore(newStore)
+      } catch (error) {
+        console.error('Store initialization error:', error)
+      }
+    }
+    initializeStore()
+  }, [])
+
+  return store
+}
+
+export default function App() {
+  const { isInitialized: dbInitialized } = useDatabase()
+  const store = useStoreInitialization()
+  const router = useRouter()
+  const isAuthenticated = false
+
+  // Split the initialization into two effects
+  useEffect(() => {
     if (!store) return
-    initializeBackgroundTasks(store)
-    navigateBasedOnAuth()
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [store, isAuthenticated])
 
-  function navigateBasedOnAuth() {
-    router.replace(isAuthenticated ? '/home' : '/register')
-  }
+    const initializeServices = async () => {
+      try {
+        // Configure navigation bar
+        if (Platform.OS === 'android') {
+          await NavigationBar.setBackgroundColorAsync(T.color.darkBlue)
+        }
 
-  function configureNavigationBar() {
-    if (Platform.OS === 'android') {
-      NavigationBar.setBackgroundColorAsync(T.color.darkBlue).catch(handleError)
+        // Initialize background tasks
+        store.dispatch(tieSirens())
+        await dependencies.backgroundTaskService.initialize(store)
+      } catch (error) {
+        console.error(
+          'Service initialization error:',
+          error instanceof Error ? error : String(error),
+        )
+      }
     }
-  }
 
-  async function initializeBackgroundTasks(store: AppStore) {
-    try {
-      store.dispatch(tieSirens())
-      await dependencies.backgroundTaskService.initialize(store)
-    } catch (error) {
-      const parsedError =
-        error instanceof Error ? error : new Error(String(error))
-      handleError(parsedError)
-    }
-  }
+    initializeServices()
+  }, [store])
 
-  function handleError(error: Error) {
-    // eslint-disable-next-line no-console
-    console.error('Error:', error)
-  }
+  // Separate navigation effect that runs after initialization
+  useEffect(() => {
+    if (!store || !dbInitialized) return
 
-  // Don't render anything until DB is initialized
+    // Small delay to ensure Root Layout is mounted
+    const timeoutId = setTimeout(() => {
+      router.replace(isAuthenticated ? '/home' : '/register')
+    }, 100)
+
+    return () => clearTimeout(timeoutId)
+  }, [store, dbInitialized, isAuthenticated, router])
+
   if (!dbInitialized || !store) return null
 
   const routes = [
