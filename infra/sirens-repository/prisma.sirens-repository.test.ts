@@ -1,16 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { PrismaClient } from '@prisma/client'
 import { PrismaSirensRepository } from './prisma.sirens-repository'
+import { extendedClient } from '@/myDbModule'
 
 describe('PrismaSirensRepository', () => {
-  let prisma: PrismaClient
   let repository: PrismaSirensRepository
 
   beforeEach(async () => {
-    prisma = new PrismaClient()
-    await prisma.$connect()
-    repository = new PrismaSirensRepository(prisma)
-    await prisma.siren.deleteMany()
+    repository = new PrismaSirensRepository()
+    await extendedClient.siren.deleteMany()
   })
 
   it('should init selectable sirens when empty', async () => {

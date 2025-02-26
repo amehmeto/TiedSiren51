@@ -62,6 +62,17 @@ async function connectToDatabase() {
 async function createTables() {
   try {
     await baseClient.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "Siren" (
+        "id" TEXT PRIMARY KEY NOT NULL,
+        "type" TEXT NOT NULL,
+        "value" TEXT NOT NULL,
+        "name" TEXT,
+        "icon" TEXT
+      );
+    `
+    console.log('Siren table created/verified')
+
+    await baseClient.$executeRaw`
       CREATE TABLE IF NOT EXISTS "Blocklist" (
         "id" TEXT PRIMARY KEY NOT NULL,
         "name" TEXT NOT NULL,
@@ -126,6 +137,11 @@ async function createJunctionTables() {
 // Load and verify initial data
 async function loadInitialData() {
   try {
+    // Verify Sirens
+    const sirens = await baseClient.siren.findMany()
+    console.log('Loaded sirens:', sirens.length)
+
+    // Existing blocklist verification
     const lists = await baseClient.blocklist.findMany()
     console.log(
       'Loaded blocklists:',

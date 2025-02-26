@@ -19,6 +19,8 @@ import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.b
 import { setBlocklists } from '@/core/blocklist/blocklist.slice'
 import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/prisma.block-session.repository'
 import { setBlockSessions } from '@/core/block-session/block-session.slice'
+import { PrismaSirensRepository } from '@/infra/sirens-repository/prisma.sirens-repository'
+import { setSirens } from '@/core/siren/siren.slice'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -90,16 +92,19 @@ function useStoreInitialization() {
         // Initialize repositories
         const blocklistRepository = new PrismaBlocklistRepository()
         const blockSessionRepository = new PrismaBlockSessionRepository()
+        const sirensRepository = new PrismaSirensRepository()
 
         // Load initial data
-        const [blocklists, blockSessions] = await Promise.all([
+        const [blocklists, blockSessions, sirens] = await Promise.all([
           blocklistRepository.findAll(),
           blockSessionRepository.findAll(),
+          sirensRepository.getSelectableSirens(),
         ])
 
         // Update store with initial data
         newStore.dispatch(setBlocklists(blocklists))
         newStore.dispatch(setBlockSessions(blockSessions))
+        newStore.dispatch(setSirens(sirens))
 
         setStore(newStore)
       } catch (error) {
