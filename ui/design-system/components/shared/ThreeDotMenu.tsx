@@ -12,6 +12,7 @@ import {
   StyleProp,
   StyleSheet,
   Text,
+  TextStyle,
   ViewStyle,
 } from 'react-native'
 import { T } from '@/ui/design-system/theme'
@@ -26,19 +27,23 @@ type TiedSMenu = {
   name: string
   iconName: IconName
   action: () => void
+  textStyle?: StyleProp<TextStyle>
 }
 
 function TiedSMenuOption(props: {
   optionName: TiedSMenu['name']
   iconName: TiedSMenu['iconName']
+  textStyle?: StyleProp<TextStyle>
 }) {
   return (
     <MenuOption value={props.optionName} style={styles.menuOption}>
-      <Text style={styles.menuOptionText}>{props.optionName}</Text>
+      <Text style={[styles.menuOptionText, props.textStyle]}>
+        {props.optionName}
+      </Text>
       <Ionicons
         name={props.iconName}
         size={T.size.large}
-        color={T.color.white}
+        color={T.color.text}
       />
     </MenuOption>
   )
@@ -62,7 +67,7 @@ export function ThreeDotMenu(props: {
         <Ionicons
           name={'ellipsis-horizontal'}
           size={T.size.large}
-          color={T.color.white}
+          color={T.color.text}
         />
       </MenuTrigger>
       <MenuOptions customStyles={optionsStyles}>
@@ -72,6 +77,7 @@ export function ThreeDotMenu(props: {
               key={option.name}
               optionName={option.name}
               iconName={option.iconName}
+              textStyle={option.textStyle}
             />
           ))}
         </TiedSBlurView>
@@ -84,8 +90,9 @@ const betweenHalfAndThirdOfWindow = Dimensions.get('window').width / 2.5
 
 const styles = StyleSheet.create({
   menuOptionText: {
-    color: T.color.white,
+    color: T.color.text,
     fontSize: T.size.small,
+    flex: 1,
   },
   menuOptions: {
     flexDirection: 'column',
@@ -93,13 +100,16 @@ const styles = StyleSheet.create({
     margin: T.spacing.none,
     marginTop: T.spacing.none,
     marginBottom: T.spacing.none,
+    backgroundColor: T.color.transparent,
   },
   menuOption: {
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     width: betweenHalfAndThirdOfWindow - T.spacing.medium * 2,
-    flex: 1,
+    padding: T.spacing.small,
+    backgroundColor: T.color.transparent,
   },
 })
 
@@ -108,7 +118,14 @@ const optionsStyles: MenuOptionsCustomStyle = {
     backgroundColor: T.color.transparent,
     borderRadius: T.border.radius.roundedSmall,
     width: betweenHalfAndThirdOfWindow,
-    marginTop: T.size.medium + 5,
-    marginLeft: T.size.medium,
+    marginTop: T.spacing.medium + 5,
+    marginLeft: T.spacing.medium,
+    padding: T.spacing.small,
+  },
+  optionsWrapper: {
+    backgroundColor: T.color.transparent,
+  },
+  optionWrapper: {
+    backgroundColor: T.color.transparent,
   },
 }
