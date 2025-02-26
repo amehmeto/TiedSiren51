@@ -19,19 +19,35 @@ describe('PrismaBlockSessionRepository', () => {
     await extendedClient.blocklist.deleteMany()
   })
 
-  const prepareSessionPayload = () => {
+  const prepareSessionPayload = async () => {
     const sessionPayload = buildBlockSession()
     // @ts-expect-error - removing id for creation
     delete sessionPayload.id
+
+    // Create required device first
+    await extendedClient.device.create({
+      data: {
+        id: 'test-device-id',
+        type: 'test-type',
+        name: 'Test Device',
+      },
+    })
+
     return {
       ...sessionPayload,
       blocklists: [],
-      devices: [],
+      devices: [
+        {
+          id: 'test-device-id',
+          type: 'test-type',
+          name: 'Test Device',
+        },
+      ],
     }
   }
 
   it('should create a block session', async () => {
-    const sessionPayload = prepareSessionPayload()
+    const sessionPayload = await prepareSessionPayload()
     const created = await repository.create(sessionPayload)
 
     expect(created).toStrictEqual({
@@ -41,7 +57,7 @@ describe('PrismaBlockSessionRepository', () => {
   })
 
   it('should find a block session by id', async () => {
-    const sessionPayload = prepareSessionPayload()
+    const sessionPayload = await prepareSessionPayload()
     const created = await repository.create(sessionPayload)
 
     const found = await repository.findById(created.id)
@@ -54,7 +70,7 @@ describe('PrismaBlockSessionRepository', () => {
   })
 
   it('should update a block session', async () => {
-    const sessionPayload = prepareSessionPayload()
+    const sessionPayload = await prepareSessionPayload()
     const created = await repository.create(sessionPayload)
 
     const updateSessionPayload: UpdatePayload<BlockSession> = {
@@ -72,7 +88,7 @@ describe('PrismaBlockSessionRepository', () => {
   })
 
   it('should delete a block session', async () => {
-    const sessionPayload = prepareSessionPayload()
+    const sessionPayload = await prepareSessionPayload()
     const created = await repository.create(sessionPayload)
     await repository.delete(created.id)
 

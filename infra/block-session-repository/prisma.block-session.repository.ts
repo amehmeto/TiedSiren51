@@ -27,7 +27,12 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
       }))
 
       const deviceIds = sessionPayload.devices.map((d) => ({
-        id: d.id,
+        where: { id: d.id },
+        create: {
+          id: d.id,
+          type: d.type,
+          name: d.name,
+        },
       }))
 
       const created = await this.prisma.blockSession.create({
@@ -45,7 +50,7 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
             connectOrCreate: blocklistIds,
           },
           devices: {
-            connect: deviceIds,
+            connectOrCreate: deviceIds,
           },
         },
         include: {
