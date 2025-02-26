@@ -1,17 +1,14 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { PrismaClient } from '@prisma/client'
 import { PrismaBlocklistRepository } from './prisma.blocklist.repository'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
+import { extendedClient } from '@/myDbModule'
 
 describe('PrismaBlocklistRepository', () => {
-  let prisma: PrismaClient
   let repository: PrismaBlocklistRepository
 
   beforeEach(async () => {
-    prisma = new PrismaClient()
-    await prisma.$connect()
-    repository = new PrismaBlocklistRepository(prisma)
-    await prisma.blocklist.deleteMany()
+    repository = new PrismaBlocklistRepository()
+    await extendedClient.blocklist.deleteMany()
   })
 
   it('should create a blocklist', async () => {

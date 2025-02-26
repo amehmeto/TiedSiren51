@@ -4,16 +4,14 @@ import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { UpdatePayload } from '@/core/ports/update.payload'
+import { extendedClient } from '@/myDbModule'
 
 describe('PrismaBlockSessionRepository', () => {
-  let prisma: PrismaClient
   let repository: PrismaBlockSessionRepository
 
   beforeEach(async () => {
-    prisma = new PrismaClient()
-    await prisma.$connect()
-    repository = new PrismaBlockSessionRepository(prisma)
-    await prisma.blockSession.deleteMany()
+    repository = new PrismaBlockSessionRepository()
+    await extendedClient.blockSession.deleteMany()
   })
 
   const prepareSessionPayload = () => {

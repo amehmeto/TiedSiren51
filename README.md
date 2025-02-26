@@ -1,50 +1,189 @@
-# Welcome to your Expo app 👋
+# TiedSiren51 - Expo Mobile App
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+A React Native mobile application built with Expo, featuring authentication, block sessions management, and more.
 
-## Get started
+## Prerequisites
 
-1. Install dependencies
+- Node.js (v18 or newer recommended)
+- Yarn package manager
+- Expo CLI (`yarn global add expo-cli`)
+- iOS Simulator (for Mac users) or Android Studio (for Android development)
+
+## Installation
+
+1. Clone the repository
 
    ```bash
-   npm install
+   git clone <repository-url>
+   cd tiedsiren51
    ```
 
-2. Start the app
+2. Install dependencies
 
    ```bash
-    npx expo start
+   yarn install
    ```
 
-In the output, you'll find options to open the app in a
+3. Set up Prisma (if using database features)
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+   Run Expo prebuild:
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+   ```bash
+   yarn prebuild
+   ```
 
-## Get a fresh project
+   After initializing Prisma:
 
-When you're ready, run:
+   - Generate Prisma Client:
+     ```bash
+     npx prisma generate
+     ```
+   - Run migrations:
+     ```bash
+     npx prisma migrate dev
+     ```
+
+## Development
+
+Start the development server:
 
 ```bash
-npm run reset-project
+yarn start
 ```
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+### Platform-Specific Development
 
-## Learn more
+```bash
+# iOS
+yarn ios
 
-To learn more about developing your project with Expo, look at the following resources:
+# Android
+yarn android
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+# Web
+yarn web
 
-## Join the community
+# Electron
+yarn electron:dev
+```
 
-Join our community of developers creating universal apps.
+## Testing
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+The project uses Vitest for testing. Available test commands:
+
+```bash
+# Run tests in watch mode
+yarn test
+
+# Run tests once (pre-push)
+yarn test:prepush
+
+# Run tests with coverage
+yarn test:cov
+
+# Run E2E tests with Maestro
+yarn test:e2e
+```
+
+## Code Quality
+
+```bash
+# Type checking
+yarn typecheck
+
+# Lint code
+yarn lint
+
+# Fix linting issues
+yarn lint:fix
+```
+
+## Building for Production
+
+```bash
+# Prebuild for all platforms
+yarn prebuild
+
+# Build for all platforms
+yarn build
+
+# Build for Android
+yarn build:android
+yarn build:android:local  # Local build
+yarn build:android:apk    # Generate APK
+
+# Build for iOS
+yarn build:ios
+yarn build:ios:simulator  # Build for iOS simulator
+```
+
+## Project Structure
+
+```
+├── app/                    # Main application code
+│   ├── (auth)/            # Authentication screens
+│   ├── (tabs)/            # Tab-based screens
+│   └── _layout.tsx        # Root layout configuration
+├── assets/                # Static assets
+├── prisma/                # Prisma schema and migrations
+├── tests/                 # Test files
+├── ui/                    # UI components
+└── core/                  # Core business logic
+```
+
+## Key Dependencies
+
+- **Frontend**:
+
+  - `expo`: ^51.0.36
+  - `react`: 18.2.0
+  - `react-native`: 0.74.5
+  - `react-native-elements`: ^3.4.3
+  - `expo-router`: ~3.5.23
+
+- **State Management**:
+
+  - `@reduxjs/toolkit`: ^2.2.5
+  - `react-redux`: ^9.1.2
+
+- **Forms & Validation**:
+
+  - `formik`: ^2.4.5
+  - `zod`: ^3.23.8
+
+- **Database**:
+
+  - `pouchdb`: ^8.0.1
+  - `@prisma/client`
+
+- **Testing**:
+  - `vitest`: ^1.6.0
+  - `react-test-renderer`: 18.2.0
+
+## Available Scripts
+
+See the full list of available scripts in `package.json`. Key scripts include:
+
+- `yarn start`: Start the Expo development server
+- `yarn test`: Run tests
+- `yarn lint`: Run linting checks
+- `yarn build`: Build for all platforms
+
+## Git Hooks
+
+The project uses Husky for git hooks:
+
+- Pre-commit: Runs linting and type checking
+- Pre-push: Runs tests
+
+## Contributing
+
+1. Fork the repository
+2. Create your feature branch (`git checkout -b feature/amazing-feature`)
+3. Commit your changes (`git commit -m 'Add some amazing feature'`)
+4. Push to the branch (`git push origin feature/amazing-feature`)
+5. Open a Pull Request
+
+## License
+
+This project is licensed under the MIT License - see the LICENSE file for details.

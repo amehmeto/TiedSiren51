@@ -1,3 +1,9 @@
+# Cerberus Workflow
+# Named after the three-headed hound guarding the gates of the underworld.
+# Like its mythological counterpart, this workflow acts as a guardian,
+# ensuring code quality through multiple checks (tests, builds, lint)
+# before allowing passage to the next stage.
+
 name: Cerberus
 
 on: [pull_request]
@@ -60,7 +66,6 @@ jobs:
         run: yarn build:android:local --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-#
 #  smoke-tests:
 #    needs: build
 #    runs-on: ubuntu-latest
