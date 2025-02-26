@@ -1,16 +1,13 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { PrismaClient } from '@prisma/client'
 import { PrismaRemoteDeviceRepository } from './prisma.remote-device.repository'
+import { extendedClient } from '@/myDbModule'
 
 describe('PrismaRemoteDeviceRepository', () => {
-  let prisma: PrismaClient
   let repository: PrismaRemoteDeviceRepository
 
   beforeEach(async () => {
-    prisma = new PrismaClient()
-    await prisma.$connect()
-    repository = new PrismaRemoteDeviceRepository(prisma)
-    await prisma.device.deleteMany()
+    repository = new PrismaRemoteDeviceRepository()
+    await extendedClient.device.deleteMany()
   })
 
   it('should find all remote devices', async () => {

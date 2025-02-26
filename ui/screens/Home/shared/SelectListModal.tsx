@@ -35,7 +35,12 @@ export function SelectListModal(
 ) {
   const router = useRouter()
   const availableItems =
-    props.listType === 'devices' ? [currentDevice, ...props.items] : props.items
+    props.listType === 'devices'
+      ? [
+          currentDevice,
+          ...props.items.filter((item) => item.id !== currentDevice.id),
+        ]
+      : props.items
   const [selectedItems, setSelectedItems] = useState<(Blocklist | Device)[]>(
     props.listType === 'devices' ? [currentDevice] : [],
   )

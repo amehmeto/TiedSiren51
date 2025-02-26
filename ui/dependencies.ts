@@ -15,9 +15,10 @@ import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-d
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.blocklist.repository'
 import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/prisma.block-session.repository'
+import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
 
 export const deviceRepository: RemoteDeviceRepository =
-  new FakeDataDeviceRepository()
+  new PrismaRemoteDeviceRepository() //FakeDataDeviceRepository()
 
 export const dependencies: Dependencies = {
   authGateway: new FakeAuthGateway(),

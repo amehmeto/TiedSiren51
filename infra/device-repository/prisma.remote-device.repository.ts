@@ -1,13 +1,10 @@
-import { PrismaClient, Device as PrismaDevice } from '@prisma/client'
+import { Device as PrismaDevice } from '@prisma/client'
 import { Device } from '@/core/device/device'
 import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
+import { extendedClient } from '@/myDbModule'
 
 export class PrismaRemoteDeviceRepository implements RemoteDeviceRepository {
-  private prisma: PrismaClient
-
-  constructor(prisma?: PrismaClient) {
-    this.prisma = prisma || new PrismaClient()
-  }
+  private prisma = extendedClient
 
   async findAll(): Promise<Device[]> {
     const devices = await this.prisma.device.findMany()

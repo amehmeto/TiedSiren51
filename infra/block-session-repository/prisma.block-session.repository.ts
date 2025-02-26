@@ -27,12 +27,7 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
       }))
 
       const deviceIds = sessionPayload.devices.map((d) => ({
-        where: { id: d.id },
-        create: {
-          id: d.id,
-          type: d.type,
-          name: d.name,
-        },
+        id: d.id,
       }))
 
       const created = await this.prisma.blockSession.create({
@@ -50,7 +45,7 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
             connectOrCreate: blocklistIds,
           },
           devices: {
-            connectOrCreate: deviceIds,
+            connect: deviceIds,
           },
         },
         include: {
@@ -188,17 +183,6 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
       })
     } catch (error) {
       console.error('Delete error:', error)
-      throw error
-    }
-  }
-
-  // Add this method to help with debugging
-  async checkConnection(): Promise<void> {
-    try {
-      await this.prisma.$queryRaw`SELECT 1`
-      console.log('Database connection successful')
-    } catch (error) {
-      console.error('Database connection failed:', error)
       throw error
     }
   }
