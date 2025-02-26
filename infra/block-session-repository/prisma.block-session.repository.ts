@@ -5,6 +5,7 @@ import { UpdatePayload } from '@/core/ports/update.payload'
 import { CreatePayload } from '@/core/ports/create.payload'
 import { extendedClient } from '@/myDbModule'
 import { Sirens } from '@/core/siren/sirens'
+import uuid from 'react-native-uuid'
 
 export class PrismaBlockSessionRepository implements BlockSessionRepository {
   private prisma = extendedClient
@@ -15,12 +16,28 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
     try {
       console.log('Creating block session:', sessionPayload)
 
-      // Extract the IDs for many-to-many relations
-      const blocklistIds = sessionPayload.blocklists.map((b) => ({ id: b.id }))
-      const deviceIds = sessionPayload.devices.map((d) => ({ id: d.id }))
+      // Create or connect blocklists and devices
+      const blocklistIds = sessionPayload.blocklists.map((b) => ({
+        where: { id: b.id },
+        create: {
+          id: b.id,
+          name: b.name,
+          sirens: JSON.stringify(b.sirens || {}),
+        },
+      }))
+
+      const deviceIds = sessionPayload.devices.map((d) => ({
+        where: { id: d.id },
+        create: {
+          id: d.id,
+          type: d.type,
+          name: d.name,
+        },
+      }))
 
       const created = await this.prisma.blockSession.create({
         data: {
+          id: String(uuid.v4()),
           name: sessionPayload.name,
           startedAt: sessionPayload.startedAt,
           endedAt: sessionPayload.endedAt,
@@ -30,10 +47,10 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
             sessionPayload.blockingConditions || [],
           ),
           blocklists: {
-            connect: blocklistIds,
+            connectOrCreate: blocklistIds,
           },
           devices: {
-            connect: deviceIds,
+            connectOrCreate: deviceIds,
           },
         },
         include: {
@@ -42,23 +59,27 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
         },
       })
 
-      return {
-        id: created.id,
-        name: created.name,
-        startedAt: created.startedAt,
-        endedAt: created.endedAt,
-        startNotificationId: created.startNotificationId,
-        endNotificationId: created.endNotificationId,
-        blockingConditions: JSON.parse(created.blockingConditions),
-        blocklists: created.blocklists.map((b) => ({
-          ...b,
-          sirens: JSON.parse(b.sirens) as Sirens,
-        })),
-        devices: created.devices,
-      } as BlockSession
+      return this.mapToBlockSession(created)
     } catch (error) {
       console.error('Create error:', error)
       throw error
+    }
+  }
+
+  private mapToBlockSession(dbSession: any): BlockSession {
+    return {
+      id: dbSession.id,
+      name: dbSession.name,
+      startedAt: dbSession.startedAt,
+      endedAt: dbSession.endedAt,
+      startNotificationId: dbSession.startNotificationId,
+      endNotificationId: dbSession.endNotificationId,
+      blockingConditions: JSON.parse(dbSession.blockingConditions),
+      blocklists: dbSession.blocklists.map((b: any) => ({
+        ...b,
+        sirens: JSON.parse(b.sirens) as Sirens,
+      })),
+      devices: dbSession.devices,
     }
   }
 
@@ -167,6 +188,17 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
       })
     } catch (error) {
       console.error('Delete error:', error)
+      throw error
+    }
+  }
+
+  // Add this method to help with debugging
+  async checkConnection(): Promise<void> {
+    try {
+      await this.prisma.$queryRaw`SELECT 1`
+      console.log('Database connection successful')
+    } catch (error) {
+      console.error('Database connection failed:', error)
       throw error
     }
   }

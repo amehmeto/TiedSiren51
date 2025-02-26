@@ -50,6 +50,50 @@ export async function initializeDb() {
       `
       console.log('Blocklist table created/verified')
 
+      // Create Device table
+      await baseClient.$executeRaw`
+        CREATE TABLE IF NOT EXISTS "Device" (
+          "id" TEXT PRIMARY KEY NOT NULL,
+          "type" TEXT NOT NULL,
+          "name" TEXT NOT NULL
+        );
+      `
+
+      // Create BlockSession table
+      await baseClient.$executeRaw`
+        CREATE TABLE IF NOT EXISTS "BlockSession" (
+          "id" TEXT PRIMARY KEY NOT NULL,
+          "name" TEXT NOT NULL,
+          "startedAt" TEXT NOT NULL,
+          "endedAt" TEXT NOT NULL,
+          "startNotificationId" TEXT NOT NULL,
+          "endNotificationId" TEXT NOT NULL,
+          "blockingConditions" TEXT NOT NULL,
+          "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+          "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+        );
+      `
+      console.log('BlockSession table created/verified')
+
+      // Add junction tables for many-to-many relationships
+      await baseClient.$executeRaw`
+        CREATE TABLE IF NOT EXISTS "_BlockSessionToBlocklist" (
+          "A" TEXT NOT NULL,
+          "B" TEXT NOT NULL,
+          FOREIGN KEY ("A") REFERENCES "BlockSession"("id"),
+          FOREIGN KEY ("B") REFERENCES "Blocklist"("id")
+        );
+      `
+
+      await baseClient.$executeRaw`
+        CREATE TABLE IF NOT EXISTS "_BlockSessionToDevice" (
+          "A" TEXT NOT NULL,
+          "B" TEXT NOT NULL,
+          FOREIGN KEY ("A") REFERENCES "BlockSession"("id"),
+          FOREIGN KEY ("B") REFERENCES "Device"("id")
+        );
+      `
+
       // Load existing data
       const lists = await baseClient.blocklist.findMany()
       console.log(

@@ -21,7 +21,7 @@ export const deviceRepository: RemoteDeviceRepository =
 
 export const dependencies: Dependencies = {
   authGateway: new FakeAuthGateway(),
-  blockSessionRepository: new PrismaBlockSessionRepository(), // new PouchdbBlockSessionRepository(),
+  blockSessionRepository: new PrismaBlockSessionRepository(), // new PrismaBlockSessionRepository(),
   blocklistRepository: new PrismaBlocklistRepository(), // Pass PrismaClient instance
   sirenTier: new InMemorySirenTier(),
   dateProvider: new RealDateProvider(),

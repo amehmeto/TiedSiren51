@@ -17,6 +17,8 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { initializeDb, closeDb, extendedClient } from '@/myDbModule'
 import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.blocklist.repository'
 import { setBlocklists } from '@/core/blocklist/blocklist.slice'
+import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/prisma.block-session.repository'
+import { setBlockSessions } from '@/core/block-session/block-session.slice'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -84,9 +86,21 @@ function useStoreInitialization() {
     const initializeStore = async () => {
       try {
         const newStore = await storePromise
+
+        // Initialize repositories
         const blocklistRepository = new PrismaBlocklistRepository()
-        const blocklists = await blocklistRepository.findAll()
+        const blockSessionRepository = new PrismaBlockSessionRepository()
+
+        // Load initial data
+        const [blocklists, blockSessions] = await Promise.all([
+          blocklistRepository.findAll(),
+          blockSessionRepository.findAll(),
+        ])
+
+        // Update store with initial data
         newStore.dispatch(setBlocklists(blocklists))
+        newStore.dispatch(setBlockSessions(blockSessions))
+
         setStore(newStore)
       } catch (error) {
         console.error('Store initialization error:', error)
