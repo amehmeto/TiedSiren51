@@ -1,5 +1,4 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { PrismaClient } from '@prisma/client'
 import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
@@ -11,7 +10,13 @@ describe('PrismaBlockSessionRepository', () => {
 
   beforeEach(async () => {
     repository = new PrismaBlockSessionRepository()
+    // Clear junction tables first
+    await extendedClient.$executeRaw`DELETE FROM "_BlockSessionToDevice"`
+    await extendedClient.$executeRaw`DELETE FROM "_BlockSessionToBlocklist"`
+    // Then clear main tables
     await extendedClient.blockSession.deleteMany()
+    await extendedClient.device.deleteMany()
+    await extendedClient.blocklist.deleteMany()
   })
 
   const prepareSessionPayload = () => {
@@ -72,7 +77,7 @@ describe('PrismaBlockSessionRepository', () => {
     await repository.delete(created.id)
 
     await expect(repository.findById(created.id)).rejects.toThrow(
-      `BlockSession with id ${created.id} not found`,
+      `BlockSession ${created.id} not found`,
     )
   })
 })

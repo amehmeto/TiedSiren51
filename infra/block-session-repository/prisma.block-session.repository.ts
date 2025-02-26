@@ -178,6 +178,16 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
 
   async delete(id: string): Promise<void> {
     try {
+      // First disconnect all relationships
+      await this.prisma.blockSession.update({
+        where: { id },
+        data: {
+          blocklists: { set: [] },
+          devices: { set: [] },
+        },
+      })
+
+      // Then delete the session
       await this.prisma.blockSession.delete({
         where: { id },
       })

@@ -6,6 +6,7 @@ import * as FileSystem from 'expo-file-system'
 const DB_NAME = 'app.db'
 const DB_PATH = `${FileSystem.documentDirectory}${DB_NAME}`
 
+// Initialize Prisma client with logging and database configuration
 export const baseClient = new PrismaClient({
   log: [
     { emit: 'stdout', level: 'query' },
@@ -20,102 +21,16 @@ export const baseClient = new PrismaClient({
   },
 })
 
+// Add reactive hooks extension for React Native
 export const extendedClient = baseClient.$extends(reactiveHooksExtension())
 
+// Initialize database and create tables
 export async function initializeDb() {
   try {
-    // First check if database file exists
-    const fileInfo = await FileSystem.getInfoAsync(DB_PATH)
-    console.log('Database path:', DB_PATH)
-
-    if (!fileInfo.exists) {
-      console.log('Creating new database file...')
-      await FileSystem.writeAsStringAsync(DB_PATH, '')
-    } else {
-      console.log('Database file exists')
-    }
-
-    // Connect to database
-    await baseClient.$connect()
-    console.log('Connected to database')
-
-    try {
-      // Create Blocklist table
-      await baseClient.$executeRaw`
-        CREATE TABLE IF NOT EXISTS "Blocklist" (
-          "id" TEXT PRIMARY KEY NOT NULL,
-          "name" TEXT NOT NULL,
-          "sirens" TEXT NOT NULL
-        );
-      `
-      console.log('Blocklist table created/verified')
-
-      // Create Device table
-      await baseClient.$executeRaw`
-        CREATE TABLE IF NOT EXISTS "Device" (
-          "id" TEXT PRIMARY KEY NOT NULL,
-          "type" TEXT NOT NULL,
-          "name" TEXT NOT NULL
-        );
-      `
-
-      // Create BlockSession table
-      await baseClient.$executeRaw`
-        CREATE TABLE IF NOT EXISTS "BlockSession" (
-          "id" TEXT PRIMARY KEY NOT NULL,
-          "name" TEXT NOT NULL,
-          "startedAt" TEXT NOT NULL,
-          "endedAt" TEXT NOT NULL,
-          "startNotificationId" TEXT NOT NULL,
-          "endNotificationId" TEXT NOT NULL,
-          "blockingConditions" TEXT NOT NULL,
-          "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
-          "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
-        );
-      `
-      console.log('BlockSession table created/verified')
-
-      // Add junction tables for many-to-many relationships
-      await baseClient.$executeRaw`
-        CREATE TABLE IF NOT EXISTS "_BlockSessionToBlocklist" (
-          "A" TEXT NOT NULL,
-          "B" TEXT NOT NULL,
-          FOREIGN KEY ("A") REFERENCES "BlockSession"("id"),
-          FOREIGN KEY ("B") REFERENCES "Blocklist"("id")
-        );
-      `
-
-      await baseClient.$executeRaw`
-        CREATE TABLE IF NOT EXISTS "_BlockSessionToDevice" (
-          "A" TEXT NOT NULL,
-          "B" TEXT NOT NULL,
-          FOREIGN KEY ("A") REFERENCES "BlockSession"("id"),
-          FOREIGN KEY ("B") REFERENCES "Device"("id")
-        );
-      `
-
-      // Load existing data
-      const lists = await baseClient.blocklist.findMany()
-      console.log(
-        'Loaded blocklists:',
-        lists.map((list) => ({
-          id: list.id,
-          name: list.name,
-          sirensCount: JSON.parse(list.sirens || '[]').length,
-        })),
-      )
-
-      // Verify table structure
-      const count = await baseClient.blocklist.count()
-      console.log('Initial blocklist count:', count)
-
-      // Trigger initial subscription refresh
-      await extendedClient.$refreshSubscriptions()
-    } catch (tableError) {
-      console.error('Error creating/verifying table:', tableError)
-      throw tableError
-    }
-
+    await ensureDatabaseFile()
+    await connectToDatabase()
+    await createTables()
+    await loadInitialData()
     console.log('Database initialization complete')
   } catch (error) {
     console.error('Database initialization failed:', error)
@@ -123,6 +38,115 @@ export async function initializeDb() {
   }
 }
 
+// Ensure database file exists
+async function ensureDatabaseFile() {
+  const fileInfo = await FileSystem.getInfoAsync(DB_PATH)
+  console.log('Database path:', DB_PATH)
+
+  if (!fileInfo.exists) {
+    console.log('Creating new database file...')
+    await FileSystem.writeAsStringAsync(DB_PATH, '')
+  } else {
+    console.log('Database file exists')
+  }
+}
+
+// Connect to database and enable foreign keys
+async function connectToDatabase() {
+  await baseClient.$connect()
+  console.log('Connected to database')
+  await baseClient.$executeRaw`PRAGMA foreign_keys = ON;`
+}
+
+// Create all necessary tables
+async function createTables() {
+  try {
+    await baseClient.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "Blocklist" (
+        "id" TEXT PRIMARY KEY NOT NULL,
+        "name" TEXT NOT NULL,
+        "sirens" TEXT NOT NULL
+      );
+    `
+    console.log('Blocklist table created/verified')
+
+    await baseClient.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "Device" (
+        "id" TEXT PRIMARY KEY NOT NULL,
+        "type" TEXT NOT NULL,
+        "name" TEXT NOT NULL
+      );
+    `
+    console.log('Device table created/verified')
+
+    await baseClient.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "BlockSession" (
+        "id" TEXT PRIMARY KEY NOT NULL,
+        "name" TEXT NOT NULL,
+        "startedAt" TEXT NOT NULL,
+        "endedAt" TEXT NOT NULL,
+        "startNotificationId" TEXT NOT NULL,
+        "endNotificationId" TEXT NOT NULL,
+        "blockingConditions" TEXT NOT NULL,
+        "createdAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+        "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `
+    console.log('BlockSession table created/verified')
+
+    await createJunctionTables()
+  } catch (tableError) {
+    console.error('Error creating/verifying tables:', tableError)
+    throw tableError
+  }
+}
+
+// Create junction tables with CASCADE delete
+async function createJunctionTables() {
+  await baseClient.$executeRaw`
+    CREATE TABLE IF NOT EXISTS "_BlockSessionToBlocklist" (
+      "A" TEXT NOT NULL,
+      "B" TEXT NOT NULL,
+      FOREIGN KEY ("A") REFERENCES "BlockSession"("id") ON DELETE CASCADE,
+      FOREIGN KEY ("B") REFERENCES "Blocklist"("id") ON DELETE CASCADE
+    );
+  `
+
+  await baseClient.$executeRaw`
+    CREATE TABLE IF NOT EXISTS "_BlockSessionToDevice" (
+      "A" TEXT NOT NULL,
+      "B" TEXT NOT NULL,
+      FOREIGN KEY ("A") REFERENCES "BlockSession"("id") ON DELETE CASCADE,
+      FOREIGN KEY ("B") REFERENCES "Device"("id") ON DELETE CASCADE
+    );
+  `
+  console.log('Junction tables created/verified')
+}
+
+// Load and verify initial data
+async function loadInitialData() {
+  try {
+    const lists = await baseClient.blocklist.findMany()
+    console.log(
+      'Loaded blocklists:',
+      lists.map((list) => ({
+        id: list.id,
+        name: list.name,
+        sirensCount: JSON.parse(list.sirens || '[]').length,
+      })),
+    )
+
+    const count = await baseClient.blocklist.count()
+    console.log('Initial blocklist count:', count)
+
+    await extendedClient.$refreshSubscriptions()
+  } catch (error) {
+    console.error('Error loading initial data:', error)
+    throw error
+  }
+}
+
+// Close database connection
 export async function closeDb() {
   try {
     await baseClient.$disconnect()
@@ -132,7 +156,7 @@ export async function closeDb() {
   }
 }
 
-// Add debug function with more details
+// Debug function for database inspection
 export async function debugDatabase() {
   try {
     const count = await baseClient.blocklist.count()
@@ -151,7 +175,6 @@ export async function debugDatabase() {
       )
     }
 
-    // Check table structure
     const tableInfo = await baseClient.$executeRaw`
       PRAGMA table_info(Blocklist);
     `

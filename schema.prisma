@@ -16,28 +16,28 @@ model User {
 }
 
 model BlockSession {
-  id                  String    @id @default(uuid())
+  id                  String      @id @default(uuid())
   name                String
   startedAt           String
   endedAt             String
   startNotificationId String
   endNotificationId   String
-  blockingConditions  String    // JSON string of BlockingConditions[]
-  blocklists         Blocklist[]
-  devices            Device[]
-  createdAt          DateTime  @default(now())
-  updatedAt          DateTime  @default(now()) @updatedAt
+  blockingConditions  String      // JSON string of BlockingConditions[]
+  blocklists         Blocklist[]  
+  devices            Device[]     
+  createdAt          DateTime     @default(now())
+  updatedAt          DateTime     @default(now()) @updatedAt
 }
 
 model Blocklist {
-  id        String    @id @default(uuid())
+  id        String         @id @default(uuid())
   name      String
-  sirens    String     // Add default empty JSON object
+  sirens    String         // JSON string
   sessions  BlockSession[]
 }
 
 model Device {
-  id        String    @id @default(uuid())
+  id        String         @id @default(uuid())
   type      String
   name      String
   sessions  BlockSession[]
