@@ -1,4 +1,4 @@
-import { Pressable, StyleSheet, Text, View, Platform } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { useState } from 'react'
 import { useDispatch } from 'react-redux'
@@ -33,11 +33,6 @@ export function BlocklistCard(
       action: () => {
         setRenameModalVisible(true)
       },
-      textStyle: {
-        color: T.color.text,
-        fontSize: T.size.small,
-        marginRight: T.spacing.small,
-      },
     },
     {
       name: 'Edit',
@@ -48,11 +43,6 @@ export function BlocklistCard(
           params: { blocklistId: props.blocklist.id },
         })
       },
-      textStyle: {
-        color: T.color.text,
-        fontSize: T.size.small,
-        marginRight: T.spacing.small,
-      },
     },
     {
       name: 'Duplicate',
@@ -60,22 +50,12 @@ export function BlocklistCard(
       action: () => {
         setIsDuplicateModalVisible(true)
       },
-      textStyle: {
-        color: T.color.text,
-        fontSize: T.size.small,
-        marginRight: T.spacing.small,
-      },
     },
     {
       name: 'Delete',
       iconName: 'trash-outline' as const,
       action: () => {
         dispatch(deleteBlocklist(props.blocklist.id))
-      },
-      textStyle: {
-        color: T.color.text,
-        fontSize: T.size.small,
-        marginRight: T.spacing.small,
       },
     },
   ]
@@ -97,7 +77,7 @@ export function BlocklistCard(
               {props.blocklist.totalBlocks}
             </Text>
           </View>
-          <ThreeDotMenu menuOptions={blocklistCardMenu} />
+          <ThreeDotMenu menuOptions={blocklistCardMenu} style={styles.menu} />
         </TiedSBlurView>
       </Pressable>
 
@@ -155,5 +135,10 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     flexDirection: 'column',
+  },
+  menu: {
+    color: T.color.text,
+    fontSize: T.size.small,
+    marginRight: T.spacing.small,
   },
 })

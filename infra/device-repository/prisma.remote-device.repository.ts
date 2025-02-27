@@ -1,7 +1,7 @@
 import { Device as PrismaDevice } from '@prisma/client'
 import { Device } from '@/core/device/device'
 import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
-import { extendedClient } from '@/myDbModule'
+import { extendedClient } from '@/infra/directory/myDbModule'
 
 export class PrismaRemoteDeviceRepository implements RemoteDeviceRepository {
   private prisma = extendedClient

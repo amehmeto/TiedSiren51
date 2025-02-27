@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { PrismaBlocklistRepository } from './prisma.blocklist.repository'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
-import { extendedClient } from '@/myDbModule'
+import { extendedClient } from '@/infra/directory/myDbModule'
 
 describe('PrismaBlocklistRepository', () => {
   let repository: PrismaBlocklistRepository

@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { PrismaSirensRepository } from './prisma.sirens-repository'
-import { extendedClient } from '@/myDbModule'
+import { extendedClient } from '@/infra/directory/myDbModule'
 
 describe('PrismaSirensRepository', () => {
   let repository: PrismaSirensRepository

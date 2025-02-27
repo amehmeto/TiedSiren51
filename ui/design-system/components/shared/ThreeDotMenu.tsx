@@ -12,7 +12,6 @@ import {
   StyleProp,
   StyleSheet,
   Text,
-  TextStyle,
   ViewStyle,
 } from 'react-native'
 import { T } from '@/ui/design-system/theme'
@@ -27,23 +26,19 @@ type TiedSMenu = {
   name: string
   iconName: IconName
   action: () => void
-  textStyle?: StyleProp<TextStyle>
 }
 
 function TiedSMenuOption(props: {
   optionName: TiedSMenu['name']
   iconName: TiedSMenu['iconName']
-  textStyle?: StyleProp<TextStyle>
 }) {
   return (
     <MenuOption value={props.optionName} style={styles.menuOption}>
-      <Text style={[styles.menuOptionText, props.textStyle]}>
-        {props.optionName}
-      </Text>
+      <Text style={[styles.menuOptionText]}>{props.optionName}</Text>
       <Ionicons
         name={props.iconName}
         size={T.size.large}
-        color={T.color.text}
+        color={T.color.white}
       />
     </MenuOption>
   )
@@ -77,7 +72,6 @@ export function ThreeDotMenu(props: {
               key={option.name}
               optionName={option.name}
               iconName={option.iconName}
-              textStyle={option.textStyle}
             />
           ))}
         </TiedSBlurView>
@@ -90,7 +84,7 @@ const betweenHalfAndThirdOfWindow = Dimensions.get('window').width / 2.5
 
 const styles = StyleSheet.create({
   menuOptionText: {
-    color: T.color.text,
+    color: T.color.white,
     fontSize: T.size.small,
     flex: 1,
   },
@@ -100,7 +94,6 @@ const styles = StyleSheet.create({
     margin: T.spacing.none,
     marginTop: T.spacing.none,
     marginBottom: T.spacing.none,
-    backgroundColor: T.color.transparent,
   },
   menuOption: {
     display: 'flex',
@@ -121,11 +114,5 @@ const optionsStyles: MenuOptionsCustomStyle = {
     marginTop: T.spacing.medium + 5,
     marginLeft: T.spacing.medium,
     padding: T.spacing.small,
-  },
-  optionsWrapper: {
-    backgroundColor: T.color.transparent,
-  },
-  optionWrapper: {
-    backgroundColor: T.color.transparent,
   },
 }

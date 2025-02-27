@@ -13,16 +13,16 @@ import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.r
 import { PrismaSirensRepository } from '../infra/sirens-repository/prisma.sirens-repository'
 
 export const deviceRepository: RemoteDeviceRepository =
-  new PrismaRemoteDeviceRepository() //FakeDataDeviceRepository()
+  new PrismaRemoteDeviceRepository()
 
 export const dependencies: Dependencies = {
   authGateway: new FakeAuthGateway(),
-  blockSessionRepository: new PrismaBlockSessionRepository(), // new PrismaBlockSessionRepository(),
-  blocklistRepository: new PrismaBlocklistRepository(), // Pass PrismaClient instance
+  blockSessionRepository: new PrismaBlockSessionRepository(),
+  blocklistRepository: new PrismaBlocklistRepository(),
   sirenTier: new InMemorySirenTier(),
   dateProvider: new RealDateProvider(),
   installedAppRepository: new FakeDataInstalledAppsRepository(),
-  sirensRepository: new PrismaSirensRepository(), //FakeDataSirensRepository
+  sirensRepository: new PrismaSirensRepository(),
   notificationService: new ExpoNotificationService(),
   backgroundTaskService: new RealBackgroundTaskService(),
 }

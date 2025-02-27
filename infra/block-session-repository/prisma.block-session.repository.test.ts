@@ -3,7 +3,7 @@ import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { UpdatePayload } from '@/core/ports/update.payload'
-import { extendedClient } from '@/myDbModule'
+import { extendedClient } from '@/infra/directory/myDbModule'
 
 describe.skip('PrismaBlockSessionRepository', () => {
   let repository: PrismaBlockSessionRepository

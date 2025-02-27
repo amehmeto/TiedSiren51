@@ -1,11 +1,29 @@
-/* eslint-disable no-console */
 import { BlockSession } from '@/core/block-session/block.session'
 import { BlockSessionRepository } from '@/core/ports/block-session.repository'
 import { UpdatePayload } from '@/core/ports/update.payload'
 import { CreatePayload } from '@/core/ports/create.payload'
-import { extendedClient } from '@/myDbModule'
-import { Sirens } from '@/core/siren/sirens'
+import { extendedClient } from '@/infra/directory/myDbModule'
 import uuid from 'react-native-uuid'
+
+type DbBlockSession = {
+  id: string
+  name: string
+  startedAt: string
+  endedAt: string
+  startNotificationId: string
+  endNotificationId: string
+  blockingConditions: string
+  blocklists: {
+    id: string
+    name: string
+    sirens: string
+  }[]
+  devices: {
+    id: string
+    type: string
+    name: string
+  }[]
+}
 
 export class PrismaBlockSessionRepository implements BlockSessionRepository {
   private prisma = extendedClient
@@ -13,60 +31,52 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
   async create(
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
-    try {
-      console.log('Creating block session:', sessionPayload)
+    const blocklistIds = sessionPayload.blocklists.map((b) => ({
+      where: { id: b.id },
+      create: {
+        id: b.id,
+        name: b.name,
+        sirens: JSON.stringify(b.sirens || {}),
+      },
+    }))
 
-      // Create or connect blocklists and devices
-      const blocklistIds = sessionPayload.blocklists.map((b) => ({
-        where: { id: b.id },
-        create: {
-          id: b.id,
-          name: b.name,
-          sirens: JSON.stringify(b.sirens || {}),
-        },
-      }))
+    const deviceIds = sessionPayload.devices.map((d) => ({
+      where: { id: d.id },
+      create: {
+        id: d.id,
+        type: d.type,
+        name: d.name,
+      },
+    }))
 
-      const deviceIds = sessionPayload.devices.map((d) => ({
-        where: { id: d.id },
-        create: {
-          id: d.id,
-          type: d.type,
-          name: d.name,
+    const created = await this.prisma.blockSession.create({
+      data: {
+        id: String(uuid.v4()),
+        name: sessionPayload.name,
+        startedAt: sessionPayload.startedAt,
+        endedAt: sessionPayload.endedAt,
+        startNotificationId: sessionPayload.startNotificationId,
+        endNotificationId: sessionPayload.endNotificationId,
+        blockingConditions: JSON.stringify(
+          sessionPayload.blockingConditions || [],
+        ),
+        blocklists: {
+          connectOrCreate: blocklistIds,
         },
-      }))
+        devices: {
+          connectOrCreate: deviceIds,
+        },
+      },
+      include: {
+        blocklists: true,
+        devices: true,
+      },
+    })
 
-      const created = await this.prisma.blockSession.create({
-        data: {
-          id: String(uuid.v4()),
-          name: sessionPayload.name,
-          startedAt: sessionPayload.startedAt,
-          endedAt: sessionPayload.endedAt,
-          startNotificationId: sessionPayload.startNotificationId,
-          endNotificationId: sessionPayload.endNotificationId,
-          blockingConditions: JSON.stringify(
-            sessionPayload.blockingConditions || [],
-          ),
-          blocklists: {
-            connectOrCreate: blocklistIds,
-          },
-          devices: {
-            connectOrCreate: deviceIds,
-          },
-        },
-        include: {
-          blocklists: true,
-          devices: true,
-        },
-      })
-
-      return this.mapToBlockSession(created)
-    } catch (error) {
-      console.error('Create error:', error)
-      throw error
-    }
+    return this.mapToBlockSession(created)
   }
 
-  private mapToBlockSession(dbSession: any): BlockSession {
+  private mapToBlockSession(dbSession: DbBlockSession): BlockSession {
     return {
       id: dbSession.id,
       name: dbSession.name,
@@ -75,130 +85,81 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
       startNotificationId: dbSession.startNotificationId,
       endNotificationId: dbSession.endNotificationId,
       blockingConditions: JSON.parse(dbSession.blockingConditions),
-      blocklists: dbSession.blocklists.map((b: any) => ({
+      blocklists: dbSession.blocklists.map((b) => ({
         ...b,
-        sirens: JSON.parse(b.sirens) as Sirens,
+        sirens: JSON.parse(b.sirens),
       })),
       devices: dbSession.devices,
     }
   }
 
   async findAll(): Promise<BlockSession[]> {
-    try {
-      console.log('Fetching block sessions...')
-      const sessions = await this.prisma.blockSession.findMany({
-        include: {
-          blocklists: true,
-          devices: true,
-        },
-      })
+    const sessions = await this.prisma.blockSession.findMany({
+      include: {
+        blocklists: true,
+        devices: true,
+      },
+    })
 
-      return sessions.map((session) => ({
-        id: session.id,
-        name: session.name,
-        startedAt: session.startedAt,
-        endedAt: session.endedAt,
-        startNotificationId: session.startNotificationId,
-        endNotificationId: session.endNotificationId,
-        blockingConditions: JSON.parse(session.blockingConditions),
-        blocklists: session.blocklists.map((b) => ({
-          ...b,
-          sirens: JSON.parse(b.sirens) as Sirens,
-        })),
-        devices: session.devices,
-      }))
-    } catch (error) {
-      console.error('FindAll error:', error)
-      throw error
-    }
+    return sessions.map(this.mapToBlockSession)
   }
 
   async findById(id: string): Promise<BlockSession> {
-    try {
-      const session = await this.prisma.blockSession.findUnique({
-        where: { id },
-        include: {
-          blocklists: true,
-          devices: true,
-        },
-      })
+    const session = await this.prisma.blockSession.findUnique({
+      where: { id },
+      include: {
+        blocklists: true,
+        devices: true,
+      },
+    })
 
-      if (!session) {
-        throw new Error(`BlockSession ${id} not found`)
-      }
-
-      return {
-        id: session.id,
-        name: session.name,
-        startedAt: session.startedAt,
-        endedAt: session.endedAt,
-        startNotificationId: session.startNotificationId,
-        endNotificationId: session.endNotificationId,
-        blockingConditions: JSON.parse(session.blockingConditions),
-        blocklists: session.blocklists.map((b) => ({
-          ...b,
-          sirens: JSON.parse(b.sirens) as Sirens,
-        })),
-        devices: session.devices,
-      } as BlockSession
-    } catch (error) {
-      console.error('FindById error:', error)
-      throw error
+    if (!session) {
+      throw new Error(`Session with id ${id} not found`)
     }
+
+    return this.mapToBlockSession(session)
   }
 
   async update(payload: UpdatePayload<BlockSession>): Promise<void> {
-    try {
-      const blocklistIds = payload.blocklists?.map((b) => ({ id: b.id }))
-      const deviceIds = payload.devices?.map((d) => ({ id: d.id }))
+    const blocklistIds = payload.blocklists?.map((b) => ({ id: b.id }))
+    const deviceIds = payload.devices?.map((d) => ({ id: d.id }))
 
-      await this.prisma.blockSession.update({
-        where: { id: payload.id },
-        data: {
-          name: payload.name,
-          startedAt: payload.startedAt,
-          endedAt: payload.endedAt,
-          startNotificationId: payload.startNotificationId,
-          endNotificationId: payload.endNotificationId,
-          blockingConditions: payload.blockingConditions
-            ? JSON.stringify(payload.blockingConditions)
-            : undefined,
-          blocklists: blocklistIds
-            ? {
-                set: blocklistIds,
-              }
-            : undefined,
-          devices: deviceIds
-            ? {
-                set: deviceIds,
-              }
-            : undefined,
-        },
-      })
-    } catch (error) {
-      console.error('Update error:', error)
-      throw error
-    }
+    await this.prisma.blockSession.update({
+      where: { id: payload.id },
+      data: {
+        name: payload.name,
+        startedAt: payload.startedAt,
+        endedAt: payload.endedAt,
+        startNotificationId: payload.startNotificationId,
+        endNotificationId: payload.endNotificationId,
+        blockingConditions: payload.blockingConditions
+          ? JSON.stringify(payload.blockingConditions)
+          : undefined,
+        blocklists: blocklistIds
+          ? {
+              set: blocklistIds,
+            }
+          : undefined,
+        devices: deviceIds
+          ? {
+              set: deviceIds,
+            }
+          : undefined,
+      },
+    })
   }
 
   async delete(id: string): Promise<void> {
-    try {
-      // First disconnect all relationships
-      await this.prisma.blockSession.update({
-        where: { id },
-        data: {
-          blocklists: { set: [] },
-          devices: { set: [] },
-        },
-      })
+    await this.prisma.blockSession.update({
+      where: { id },
+      data: {
+        blocklists: { set: [] },
+        devices: { set: [] },
+      },
+    })
 
-      // Then delete the session
-      await this.prisma.blockSession.delete({
-        where: { id },
-      })
-    } catch (error) {
-      console.error('Delete error:', error)
-      throw error
-    }
+    await this.prisma.blockSession.delete({
+      where: { id },
+    })
   }
 }
