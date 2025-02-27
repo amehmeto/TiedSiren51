@@ -2,6 +2,7 @@
 import { PrismaClient } from '@prisma/client/react-native'
 import { reactiveHooksExtension } from '@prisma/react-native'
 import * as FileSystem from 'expo-file-system'
+import { Platform } from 'react-native'
 
 const DB_NAME = 'app.db'
 const DB_PATH = `${FileSystem.documentDirectory}${DB_NAME}`
@@ -45,7 +46,25 @@ async function ensureDatabaseFile() {
 
   if (!fileInfo.exists) {
     console.log('Creating new database file...')
-    await FileSystem.writeAsStringAsync(DB_PATH, '')
+    // Create an empty file with write permissions
+    await FileSystem.writeAsStringAsync(DB_PATH, '', {
+      encoding: FileSystem.EncodingType.UTF8,
+    })
+
+    // Ensure write permissions (iOS specific)
+    await FileSystem.makeDirectoryAsync(
+      FileSystem.documentDirectory as string,
+      {
+        intermediates: true,
+      },
+    ).catch((err) => console.log('Directory already exists'))
+
+    // Set file permissions
+    if (Platform.OS === 'ios') {
+      await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync(
+        FileSystem.documentDirectory,
+      ).catch((err) => console.error('Error requesting permissions:', err))
+    }
   } else {
     console.log('Database file exists')
   }
