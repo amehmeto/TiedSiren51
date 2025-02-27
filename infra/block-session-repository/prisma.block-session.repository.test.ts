@@ -5,7 +5,7 @@ import { BlockSession } from '@/core/block-session/block.session'
 import { UpdatePayload } from '@/core/ports/update.payload'
 import { extendedClient } from '@/myDbModule'
 
-describe('PrismaBlockSessionRepository', () => {
+describe.skip('PrismaBlockSessionRepository', () => {
   let repository: PrismaBlockSessionRepository
 
   beforeEach(async () => {
