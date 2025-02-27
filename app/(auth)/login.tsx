@@ -47,44 +47,44 @@ export default function LoginScreen() {
         text="CONTINUE WITH GOOGLE"
         onPress={() => dispatch(authenticateWithGoogle())}
       />
-        <TiedSSocialButton
-          iconName="logo-apple"
-          text="CONTINUE WITH APPLE"
-          onPress={() => dispatch(authenticateWithApple())}
-        />
-        <Text style={styles.orText}>{'OR'}</Text>
-        <TiedSTextInput
-          placeholder={'Your Email'}
-          placeholderTextColor={T.color.grey}
-          value={email}
-          onChange={(e) =>
-            setCredentials((prev) => ({ ...prev, email: e.nativeEvent.text }))
-          }
-        />
-        <TiedSTextInput
-          placeholder="Create Password"
-          placeholderTextColor={T.color.grey}
-          value={password}
-          hasPasswordToggle={true}
-          onChange={(e) =>
-            setCredentials((prev) => ({
-              ...prev,
-              password: e.nativeEvent.text,
-            }))
-          }
-        />
-        <TiedSButton
-          onPress={() => dispatch(authenticateWithEmail({ email, password }))}
-          text={'LOG IN'}
-          style={styles.button}
-        />
-        <Text
-          style={styles.subtext}
-          onPress={() => router.push('/(auth)/forgot-password')}
-        >
-          {'Forgot your password?'}
-        </Text>
-      </View>
+      <TiedSSocialButton
+        iconName="logo-apple"
+        text="CONTINUE WITH APPLE"
+        onPress={() => dispatch(authenticateWithApple())}
+      />
+      <Text style={styles.orText}>{'OR'}</Text>
+      <TiedSTextInput
+        placeholder={'Your Email'}
+        placeholderTextColor={T.color.grey}
+        value={email}
+        onChange={(e) =>
+          setCredentials((prev) => ({ ...prev, email: e.nativeEvent.text }))
+        }
+      />
+      <TiedSTextInput
+        placeholder="Create Password"
+        placeholderTextColor={T.color.grey}
+        value={password}
+        hasPasswordToggle={true}
+        onChange={(e) =>
+          setCredentials((prev) => ({
+            ...prev,
+            password: e.nativeEvent.text,
+          }))
+        }
+      />
+      <TiedSButton
+        onPress={() => dispatch(authenticateWithEmail({ email, password }))}
+        text={'LOG IN'}
+        style={styles.button}
+      />
+      <Text
+        style={styles.subtext}
+        onPress={() => router.push('/(auth)/forgot-password')}
+      >
+        {'Forgot your password?'}
+      </Text>
+    </View>
   )
 }
 
