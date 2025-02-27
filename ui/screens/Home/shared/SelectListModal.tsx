@@ -34,22 +34,25 @@ export function SelectListModal(
   }>,
 ) {
   const router = useRouter()
+
   const availableItems =
     props.listType === 'devices'
       ? [
-          currentDevice,
-          ...props.items.filter((item) => item.id !== currentDevice.id),
+          ...new Map(
+            [currentDevice, ...props.items].map((item) => [item.id, item]),
+          ).values(),
         ]
       : props.items
 
-  const [selectedItems, setSelectedItems] = useState<(Blocklist | Device)[]>(
-    props.listType === 'devices' ? [currentDevice] : [],
-  )
+  const [selectedItems, setSelectedItems] = useState<(Blocklist | Device)[]>([])
 
   useEffect(() => {
     setSelectedItems((currentItems) => {
-      if (props.listType === 'devices' && currentItems.length === 0) {
-        return [currentDevice]
+      if (props.listType === 'devices') {
+        const uniqueSelections = new Map(
+          [...currentItems, currentDevice].map((item) => [item.id, item]),
+        )
+        return Array.from(uniqueSelections.values())
       }
       if (props.listType === 'blocklists') {
         return []
