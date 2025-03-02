@@ -1,7 +1,7 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { PrismaBlocklistRepository } from './prisma.blocklist.repository'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
-import { extendedClient } from '@/infra/directory/myDbModule'
+import { extendedClient } from '@/infra/prisma/databaseService'
 
 describe('PrismaBlocklistRepository', () => {
   let repository: PrismaBlocklistRepository
@@ -35,8 +35,31 @@ describe('PrismaBlocklistRepository', () => {
   })
 
   it('should find all current blocklists', async () => {
-    const currentBlocklists = await repository.findAll()
-    expect(currentBlocklists).toStrictEqual([])
+    const testBlocklists = [
+      { name: 'Blocklist 1', sirens: buildBlocklist().sirens },
+      { name: 'Blocklist 2', sirens: buildBlocklist().sirens },
+      { name: 'Blocklist 3', sirens: buildBlocklist().sirens },
+    ]
+
+    const createdBlocklists = []
+    for (const blocklist of testBlocklists) {
+      const created = await repository.create(blocklist)
+      createdBlocklists.push(created)
+    }
+
+    const foundBlocklists = await repository.findAll()
+
+    expect(foundBlocklists).toHaveLength(createdBlocklists.length)
+
+    for (const createdBlocklist of createdBlocklists) {
+      expect(foundBlocklists).toContainEqual(
+        expect.objectContaining({
+          id: createdBlocklist.id,
+          name: createdBlocklist.name,
+          sirens: createdBlocklist.sirens,
+        }),
+      )
+    }
   })
 
   it('should update a blocklist', async () => {

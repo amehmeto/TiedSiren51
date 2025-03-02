@@ -2,7 +2,7 @@ import { Blocklist } from '@/core/blocklist/blocklist'
 import { BlocklistRepository } from '@/core/ports/blocklist.repository'
 import { CreatePayload } from '@/core/ports/create.payload'
 import { UpdatePayload } from '@/core/ports/update.payload'
-import { extendedClient } from '@/infra/directory/myDbModule'
+import { extendedClient } from '@/infra/prisma/databaseService'
 
 type DbBlocklist = {
   id: string

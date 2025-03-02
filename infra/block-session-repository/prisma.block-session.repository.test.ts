@@ -3,7 +3,7 @@ import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { UpdatePayload } from '@/core/ports/update.payload'
-import { extendedClient } from '@/infra/directory/myDbModule'
+import { extendedClient } from '@/infra/prisma/databaseService'
 
 describe.skip('PrismaBlockSessionRepository', () => {
   let repository: PrismaBlockSessionRepository
@@ -24,7 +24,6 @@ describe.skip('PrismaBlockSessionRepository', () => {
     // @ts-expect-error - removing id for creation
     delete sessionPayload.id
 
-    // Create required device first
     await extendedClient.device.create({
       data: {
         id: 'test-device-id',
@@ -65,8 +64,55 @@ describe.skip('PrismaBlockSessionRepository', () => {
   })
 
   it('should find all current block sessions', async () => {
-    const currentSessions = await repository.findAll()
-    expect(currentSessions).toHaveLength(0)
+    const sessionNames = [
+      'Morning Session',
+      'Afternoon Session',
+      'Evening Session',
+    ]
+    const createdSessions = []
+
+    await extendedClient.device.create({
+      data: {
+        id: 'test-device-id',
+        type: 'test-type',
+        name: 'Test Device',
+      },
+    })
+
+    const testDevice = {
+      id: 'test-device-id',
+      type: 'test-type',
+      name: 'Test Device',
+    }
+
+    for (const name of sessionNames) {
+      const sessionPayload = await prepareSessionPayload()
+      const sessionWithCustomName = {
+        ...sessionPayload,
+        name,
+      }
+
+      const created = await repository.create(sessionWithCustomName)
+      createdSessions.push(created)
+    }
+
+    const foundSessions = await repository.findAll()
+
+    expect(foundSessions).toHaveLength(createdSessions.length)
+
+    for (const createdSession of createdSessions) {
+      expect(foundSessions).toContainEqual(
+        expect.objectContaining({
+          id: createdSession.id,
+          name: createdSession.name,
+          startedAt: createdSession.startedAt,
+          endedAt: createdSession.endedAt,
+          devices: expect.arrayContaining([
+            expect.objectContaining(testDevice),
+          ]),
+        }),
+      )
+    }
   })
 
   it('should update a block session', async () => {

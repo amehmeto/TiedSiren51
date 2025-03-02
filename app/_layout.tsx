@@ -17,7 +17,7 @@ import {
   initializeDb,
   closeDb,
   extendedClient,
-} from '@/infra/directory/myDbModule'
+} from '@/infra/prisma/databaseService'
 import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.blocklist.repository'
 import { setBlocklists } from '@/core/blocklist/blocklist.slice'
 import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/prisma.block-session.repository'

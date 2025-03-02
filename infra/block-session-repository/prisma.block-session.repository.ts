@@ -2,7 +2,7 @@ import { BlockSession } from '@/core/block-session/block.session'
 import { BlockSessionRepository } from '@/core/ports/block-session.repository'
 import { UpdatePayload } from '@/core/ports/update.payload'
 import { CreatePayload } from '@/core/ports/create.payload'
-import { extendedClient } from '@/infra/directory/myDbModule'
+import { extendedClient } from '@/infra/prisma/databaseService'
 import uuid from 'react-native-uuid'
 
 type DbBlockSession = {
