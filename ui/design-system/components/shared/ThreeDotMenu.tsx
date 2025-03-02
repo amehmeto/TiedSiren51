@@ -34,7 +34,7 @@ function TiedSMenuOption(props: {
 }) {
   return (
     <MenuOption value={props.optionName} style={styles.menuOption}>
-      <Text style={styles.menuOptionText}>{props.optionName}</Text>
+      <Text style={[styles.menuOptionText]}>{props.optionName}</Text>
       <Ionicons
         name={props.iconName}
         size={T.size.large}
@@ -62,7 +62,7 @@ export function ThreeDotMenu(props: {
         <Ionicons
           name={'ellipsis-horizontal'}
           size={T.size.large}
-          color={T.color.white}
+          color={T.color.text}
         />
       </MenuTrigger>
       <MenuOptions customStyles={optionsStyles}>
@@ -86,6 +86,7 @@ const styles = StyleSheet.create({
   menuOptionText: {
     color: T.color.white,
     fontSize: T.size.small,
+    flex: 1,
   },
   menuOptions: {
     flexDirection: 'column',
@@ -98,8 +99,10 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
     width: betweenHalfAndThirdOfWindow - T.spacing.medium * 2,
-    flex: 1,
+    padding: T.spacing.small,
+    backgroundColor: T.color.transparent,
   },
 })
 
@@ -108,7 +111,8 @@ const optionsStyles: MenuOptionsCustomStyle = {
     backgroundColor: T.color.transparent,
     borderRadius: T.border.radius.roundedSmall,
     width: betweenHalfAndThirdOfWindow,
-    marginTop: T.size.medium + 5,
-    marginLeft: T.size.medium,
+    marginTop: T.spacing.medium + 5,
+    marginLeft: T.spacing.medium,
+    padding: T.spacing.small,
   },
 }

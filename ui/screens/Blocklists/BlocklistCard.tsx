@@ -77,7 +77,7 @@ export function BlocklistCard(
               {props.blocklist.totalBlocks}
             </Text>
           </View>
-          <ThreeDotMenu menuOptions={blocklistCardMenu} />
+          <ThreeDotMenu menuOptions={blocklistCardMenu} style={styles.menu} />
         </TiedSBlurView>
       </Pressable>
 
@@ -135,5 +135,10 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     flexDirection: 'column',
+  },
+  menu: {
+    color: T.color.text,
+    fontSize: T.size.small,
+    marginRight: T.spacing.small,
   },
 })

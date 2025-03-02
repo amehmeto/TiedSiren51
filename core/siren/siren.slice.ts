@@ -18,7 +18,11 @@ export const sirenSlice = createSlice({
       keywords: [],
     } as Sirens,
   },
-  reducers: {},
+  reducers: {
+    setSirens: (state, action) => {
+      state.availableSirens = action.payload
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(fetchAvailableSirens.fulfilled, (state, action) => {
@@ -36,3 +40,6 @@ export const sirenSlice = createSlice({
       })
   },
 })
+
+export const { setSirens } = sirenSlice.actions
+export default sirenSlice.reducer
