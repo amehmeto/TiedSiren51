@@ -36,12 +36,13 @@ The initial Prisma implementation provides basic local-first database functional
 - Plan for handling schema changes across app updates
 - Critical for app updates without data loss
 
-### 5. Testing Coverage 🧪
+### 5. Testing Coverage \U0001F9EA
 **Priority: Medium** | **Effort: High**
 - Add integration tests
 - Test edge cases for JSON fields
 - Test concurrent operations
 - Current unit tests might miss real-world scenarios
+- Resolve excluded Prisma tests (pattern: 'infra/**/prisma.*.test.ts') that are temporarily disabled due to incompatibility issues between the @prisma/react-native module and react-native-url-polyfill with the current test setup
 
 ### 6. Performance Optimization 🚀
 **Priority: Low** | **Effort: High**

@@ -12,7 +12,7 @@
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts,tsx}\" && prettier \"**/*.{js,ts,tsx}\"",
     "lint:fix": "tsc --noEmit && eslint --fix \"**/*.{js,ts,tsx}\" && prettier --write \"**/*.{js,ts,tsx}\"",
     "test": "vitest",
-    "test:prepush": "prisma generate && vitest --run",
+    "test:prepush": "vitest --run",
     "test:cov": "c8 vitest --run",
     "typecheck": "tsc --noEmit",
     "prebuild": "npx expo prebuild",
@@ -101,7 +101,8 @@
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.6.0",
     "vitest-tsconfig-paths": "^3.4.1",
-    "wait-on": "^7.2.0"
+    "wait-on": "^7.2.0",
+    "prisma": "^5.22.0"
   },
   "private": true
 }

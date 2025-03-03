@@ -9,7 +9,11 @@ import { updateBlockSession } from './usecases/update-block-session.usecase'
 export const blockSessionSlice = createSlice({
   name: 'blockSession',
   initialState: blockSessionAdapter.getInitialState(),
-  reducers: {},
+  reducers: {
+    setBlockSessions: (state, action) => {
+      blockSessionAdapter.setAll(state, action.payload)
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(createBlockSession.fulfilled, (state, action) => {
@@ -35,3 +39,7 @@ export const blockSessionSlice = createSlice({
       })
   },
 })
+
+// Export the action
+export const { setBlockSessions } = blockSessionSlice.actions
+export default blockSessionSlice.reducer

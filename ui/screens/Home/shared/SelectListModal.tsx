@@ -9,7 +9,7 @@ import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { useRouter } from 'expo-router'
 
 const currentDevice: Device = {
-  id: ExpoDevice.modelId ?? 'unknown',
+  id: ExpoDevice.modelId ?? 'unknown-current',
   type: ExpoDevice.deviceType?.toString() ?? 'unknown',
   name: generateDeviceName(),
 }
@@ -34,14 +34,31 @@ export function SelectListModal(
   }>,
 ) {
   const router = useRouter()
+
   const availableItems =
-    props.listType === 'devices' ? [currentDevice, ...props.items] : props.items
-  const [selectedItems, setSelectedItems] = useState<(Blocklist | Device)[]>(
-    props.listType === 'devices' ? [currentDevice] : [],
-  )
+    props.listType === 'devices'
+      ? [
+          ...new Map(
+            [currentDevice, ...props.items].map((item) => [item.id, item]),
+          ).values(),
+        ]
+      : props.items
+
+  const [selectedItems, setSelectedItems] = useState<(Blocklist | Device)[]>([])
 
   useEffect(() => {
-    setSelectedItems(props.listType === 'devices' ? [currentDevice] : [])
+    setSelectedItems((currentItems) => {
+      if (props.listType === 'devices') {
+        const uniqueSelections = new Map(
+          [...currentItems, currentDevice].map((item) => [item.id, item]),
+        )
+        return Array.from(uniqueSelections.values())
+      }
+      if (props.listType === 'blocklists') {
+        return []
+      }
+      return currentItems
+    })
   }, [props.listType])
 
   const saveList = () => {
@@ -65,14 +82,15 @@ export function SelectListModal(
   return (
     <TiedSModal isVisible={props.visible} onRequestClose={props.onRequestClose}>
       <View>
-        {props.items.length === 0 && (
+        {props.items.length === 0 && props.listType !== 'devices' && (
           <Text style={styles.itemText}>No {props.listType} available</Text>
         )}
 
         <FlatList
           data={availableItems}
+          keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
-            <View key={item.id} style={styles.item}>
+            <View style={styles.item}>
               <Text style={styles.itemText}>{item.name}</Text>
               <Switch
                 style={styles.itemSelector}
@@ -82,7 +100,7 @@ export function SelectListModal(
             </View>
           )}
         />
-        {false ? (
+        {props.listType === 'blocklists' ? (
           <TiedSButton
             style={styles.button}
             onPress={() => {

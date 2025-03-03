@@ -1,13 +1,11 @@
-import { PrismaClient, Siren as PrismaSiren } from '@prisma/client'
+import { Siren as PrismaSiren } from '@prisma/client'
 import { AndroidSiren, Sirens } from '@/core/siren/sirens'
 import { SirensRepository } from '@/core/ports/sirens.repository'
+import { extendedClient } from '@/infra/prisma/databaseService'
+import uuid from 'react-native-uuid'
 
 export class PrismaSirensRepository implements SirensRepository {
-  private prisma: PrismaClient
-
-  constructor(prisma?: PrismaClient) {
-    this.prisma = prisma || new PrismaClient()
-  }
+  private prisma = extendedClient
 
   async getSelectableSirens(): Promise<Sirens> {
     const sirens = await this.prisma.siren.findMany()
@@ -35,6 +33,7 @@ export class PrismaSirensRepository implements SirensRepository {
   async addKeywordToSirens(keyword: string): Promise<void> {
     await this.prisma.siren.create({
       data: {
+        id: String(uuid.v4()),
         type: 'keyword',
         value: keyword,
       },
@@ -44,6 +43,7 @@ export class PrismaSirensRepository implements SirensRepository {
   async addWebsiteToSirens(website: string): Promise<void> {
     await this.prisma.siren.create({
       data: {
+        id: String(uuid.v4()),
         type: 'website',
         value: website,
       },
@@ -53,6 +53,7 @@ export class PrismaSirensRepository implements SirensRepository {
   async addAndroidSirenToSirens(androidSiren: AndroidSiren): Promise<void> {
     await this.prisma.siren.create({
       data: {
+        id: String(uuid.v4()),
         type: 'android',
         value: androidSiren.packageName,
         name: androidSiren.appName,

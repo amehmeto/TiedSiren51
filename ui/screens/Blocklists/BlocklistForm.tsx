@@ -1,4 +1,3 @@
-/* eslint-disable no-console */
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { AndroidSiren, Sirens, SirenType } from '@/core/siren/sirens'
@@ -24,7 +23,6 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { z } from 'zod'
 import { blocklistSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
 import { ErrorMessages } from '@/ui/error-messages.type'
-import { dependencies } from '@/ui/dependencies'
 
 export type BlocklistScreenProps = {
   mode: 'create' | 'edit'
@@ -70,18 +68,9 @@ export function BlocklistForm({
   ]
 
   useEffect(() => {
-    const initialize = async () => {
-      await dispatch(fetchAvailableSirens())
-      if (mode === 'edit' && blocklistId) {
-        const existingBlocklist =
-          await dependencies.blocklistRepository.findById(blocklistId)
-        if (existingBlocklist) {
-          setBlocklist(existingBlocklist)
-        }
-      }
-    }
-    initialize()
-  }, [mode, blocklistId, dispatch])
+    dispatch(fetchAvailableSirens())
+    if (mode === 'edit' && blocklistFromState) setBlocklist(blocklistFromState)
+  }, [mode, blocklistFromState, dispatch])
 
   function toggleTextSiren(sirenType: keyof Sirens, sirenId: string) {
     setBlocklist((prevBlocklist) => {
