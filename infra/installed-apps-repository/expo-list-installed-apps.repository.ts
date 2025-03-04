@@ -1,4 +1,3 @@
-/* eslint-disable import/no-unresolved */
 import { InstalledAppRepository } from '@/core/ports/installed-app.repository'
 import { InstalledApp as AppModel } from '@/core/installed-app/InstalledApp'
 import * as ExpoListInstalledApps from '@amehmeto/expo-list-installed-apps'
