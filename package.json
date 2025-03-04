@@ -63,6 +63,7 @@
     "expo-web-browser": "~13.0.3",
     "formik": "^2.4.5",
     "pouchdb": "^8.0.1",
+    "prisma": "^5.22.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.5",
@@ -101,8 +102,7 @@
     "vite-tsconfig-paths": "^4.3.2",
     "vitest": "^1.6.0",
     "vitest-tsconfig-paths": "^3.4.1",
-    "wait-on": "^7.2.0",
-    "prisma": "^5.22.0"
+    "wait-on": "^7.2.0"
   },
   "private": true
 }
