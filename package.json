@@ -1,5 +1,6 @@
 {
-  "name": "tiedsiren51",
+"type": "module",
+"name": "tiedsiren51",
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
