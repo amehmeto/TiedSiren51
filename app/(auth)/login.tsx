@@ -10,7 +10,6 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-google.usecase'
-import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { authenticateWithApple } from '@/core/auth/usecases/authenticate-with-apple.usecase'
 import { authenticateWithEmail } from '@/core/auth/usecases/authenticate-with-email.usecase'
 
@@ -40,54 +39,52 @@ export default function LoginScreen() {
   }, [isUserAuthenticated, router])
 
   return (
-    <TiedSLinearBackground>
-      <View style={styles.container}>
-        <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
-        <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
-        <TiedSSocialButton
-          iconName="logo-google"
-          text="CONTINUE WITH GOOGLE"
-          onPress={() => dispatch(authenticateWithGoogle())}
-        />
-        <TiedSSocialButton
-          iconName="logo-apple"
-          text="CONTINUE WITH APPLE"
-          onPress={() => dispatch(authenticateWithApple())}
-        />
-        <Text style={styles.orText}>{'OR'}</Text>
-        <TiedSTextInput
-          placeholder={'Your Email'}
-          placeholderTextColor={T.color.grey}
-          value={email}
-          onChange={(e) =>
-            setCredentials((prev) => ({ ...prev, email: e.nativeEvent.text }))
-          }
-        />
-        <TiedSTextInput
-          placeholder="Create Password"
-          placeholderTextColor={T.color.grey}
-          value={password}
-          hasPasswordToggle={true}
-          onChange={(e) =>
-            setCredentials((prev) => ({
-              ...prev,
-              password: e.nativeEvent.text,
-            }))
-          }
-        />
-        <TiedSButton
-          onPress={() => dispatch(authenticateWithEmail({ email, password }))}
-          text={'LOG IN'}
-          style={styles.button}
-        />
-        <Text
-          style={styles.subtext}
-          onPress={() => router.push('/(auth)/forgot-password')}
-        >
-          {'Forgot your password?'}
-        </Text>
-      </View>
-    </TiedSLinearBackground>
+    <View style={styles.container}>
+      <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
+      <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
+      <TiedSSocialButton
+        iconName="logo-google"
+        text="CONTINUE WITH GOOGLE"
+        onPress={() => dispatch(authenticateWithGoogle())}
+      />
+      <TiedSSocialButton
+        iconName="logo-apple"
+        text="CONTINUE WITH APPLE"
+        onPress={() => dispatch(authenticateWithApple())}
+      />
+      <Text style={styles.orText}>{'OR'}</Text>
+      <TiedSTextInput
+        placeholder={'Your Email'}
+        placeholderTextColor={T.color.grey}
+        value={email}
+        onChange={(e) =>
+          setCredentials((prev) => ({ ...prev, email: e.nativeEvent.text }))
+        }
+      />
+      <TiedSTextInput
+        placeholder="Create Password"
+        placeholderTextColor={T.color.grey}
+        value={password}
+        hasPasswordToggle={true}
+        onChange={(e) =>
+          setCredentials((prev) => ({
+            ...prev,
+            password: e.nativeEvent.text,
+          }))
+        }
+      />
+      <TiedSButton
+        onPress={() => dispatch(authenticateWithEmail({ email, password }))}
+        text={'LOG IN'}
+        style={styles.button}
+      />
+      <Text
+        style={styles.subtext}
+        onPress={() => router.push('/(auth)/forgot-password')}
+      >
+        {'Forgot your password?'}
+      </Text>
+    </View>
   )
 }
 

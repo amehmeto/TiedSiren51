@@ -1,8 +1,6 @@
-import { defineConfig } from 'vite'
 import tsconfigPaths from 'vite-tsconfig-paths'
 
-export default defineConfig({
-  plugins: [tsconfigPaths()],
+export default {
   test: {
     server: {
       deps: {
@@ -11,7 +9,10 @@ export default defineConfig({
           '@prisma/client',
           '@prisma/react-native',
         ],
+        interopDefault: true,
       },
     },
+    exclude: ['infra/**/prisma.*.test.ts', '**/node_modules/**'],
   },
-})
+  plugins: [tsconfigPaths()],
+}

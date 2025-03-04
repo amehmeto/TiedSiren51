@@ -4,7 +4,6 @@
 expo-env.d.ts
 # @end expo-cli
 
-
 # Learn more https://docs.github.com/en/get-started/getting-started-with-git/ignoring-files
 
 # dependencies
@@ -54,10 +53,6 @@ yarn-error.*
 
 coverage/
 
-# Expo
-
-.expo
-
 # Android
 #
 android/.gradle
@@ -82,4 +77,12 @@ pdb-remote-devices/
 pdb-devices/
 pdb-sirens/
 
+# Prisma
+prisma/*.db
+*.db-journal
+*.db
+app.db
+
+# IDE
 .idea/
+.vscode/
