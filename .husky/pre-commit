@@ -1,6 +1,4 @@
 sh .husky/scripts/no-commits-on-main-demo.sh
 sh .husky/scripts/no-package-lock-json-file.sh
 
-npx prisma generate
-
 npx lint-staged
