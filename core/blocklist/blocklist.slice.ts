@@ -9,7 +9,11 @@ import { deleteBlocklist } from './usecases/delete-blocklist.usecase'
 export const blocklistSlice = createSlice({
   name: 'blocklist',
   initialState: blocklistAdapter.getInitialState(),
-  reducers: {},
+  reducers: {
+    setBlocklists: (state, action) => {
+      blocklistAdapter.setAll(state, action.payload)
+    },
+  },
   extraReducers(builder) {
     builder
       .addCase(createBlocklist.fulfilled, (state, action) => {
@@ -35,3 +39,5 @@ export const blocklistSlice = createSlice({
       })
   },
 })
+
+export const { setBlocklists } = blocklistSlice.actions

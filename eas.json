@@ -30,7 +30,7 @@
     "preview": {
       "node": "18.18.2",
       "env": {
-       "NODE_ENV": "preview",
+       "NODE_ENV": "test",
         "EXPO_ROUTER_APP_ROOT": "./app"
       },
       "developmentClient": false,
