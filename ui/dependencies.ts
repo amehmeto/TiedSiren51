@@ -1,4 +1,3 @@
-import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
 import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
 import { FakeDataDeviceRepository } from '@/infra/device-repository/fake-data.device.repository'
 import { RealDateProvider } from '@/infra/date-provider/real.date-provider'
@@ -10,6 +9,7 @@ import { RealBackgroundTaskService } from '@/infra/background-task-service/real.
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
+import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-repository/expo-list-installed-apps.repository'
 
 export const deviceRepository: RemoteDeviceRepository =
   new FakeDataDeviceRepository()
@@ -20,7 +20,7 @@ export const dependencies: Dependencies = {
   blocklistRepository: new FakeDataBlocklistRepository(), //PouchdbBlocklistRepository(),
   sirenTier: new InMemorySirenTier(),
   dateProvider: new RealDateProvider(),
-  installedAppRepository: new FakeDataInstalledAppsRepository(),
+  installedAppRepository: new ExpoListInstalledAppsRepository(),
   sirensRepository: new FakeDataSirensRepository(),
   notificationService: new ExpoNotificationService(),
   backgroundTaskService: new RealBackgroundTaskService(),
