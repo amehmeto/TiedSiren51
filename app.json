@@ -21,7 +21,8 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#0C207A"
       },
-      "package": "com.tiedsiren.tiedsiren"
+      "package": "com.tiedsiren.tiedsiren",
+      "permissions": ["QUERY_ALL_PACKAGES"]
     },
     "web": {
       "bundler": "metro",

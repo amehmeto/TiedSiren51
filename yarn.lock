@@ -7,6 +7,10 @@
   resolved "https://registry.npmjs.org/@0no-co/graphql.web/-/graphql.web-1.1.1.tgz"
   integrity sha512-F2i3xdycesw78QCOBHmpTn7eaD2iNXGwB2gkfwxcOfBbeauYpr8RBSyJOkDrFtKtVRMclg8Sg3n1ip0ACyUuag==
 
+"@amehmeto/expo-list-installed-apps@https://github.com/amehmeto/expo-list-installed-apps.git":
+  version "0.1.0"
+  resolved "https://github.com/amehmeto/expo-list-installed-apps.git#e53947e34ed7c8e04b9bd85249cabe67f2659427"
+
 "@ampproject/remapping@^2.2.0":
   version "2.3.0"
   resolved "https://registry.npmjs.org/@ampproject/remapping/-/remapping-2.3.0.tgz"
@@ -1502,7 +1506,7 @@
 
 "@prisma/client@5.22.0":
   version "5.22.0"
-  resolved "https://registry.npmjs.org/@prisma/client/-/client-5.22.0.tgz"
+  resolved "https://registry.yarnpkg.com/@prisma/client/-/client-5.22.0.tgz#da1ca9c133fbefe89e0da781c75e1c59da5f8802"
   integrity sha512-M0SVXfyHnQREBKxCgyo7sffrKttwE6R8PMq330MIUF0pTwjUhLbW84pFDlf06B27XyCR++VtjugEnIHdr07SVA==
 
 "@prisma/debug@5.22.0":
@@ -1543,7 +1547,7 @@
 
 "@prisma/react-native@^6.0.1":
   version "6.0.1"
-  resolved "https://registry.npmjs.org/@prisma/react-native/-/react-native-6.0.1.tgz"
+  resolved "https://registry.yarnpkg.com/@prisma/react-native/-/react-native-6.0.1.tgz#b4f5e09f96c8e311f2a60e706448b363d58a4a3c"
   integrity sha512-X144mzLdSJeBdJ6N3TwpUUObnPdO308a1pkPSgChMiJU7YZyXsIG/3SqUchd5Fe8X/2Vl07ZqJVqz9NZtXC2lg==
   dependencies:
     react-native-quick-base64 "^2.0.8"

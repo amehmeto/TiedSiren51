@@ -1,4 +1,5 @@
 appId: com.tiedsiren.tiedsiren
+# Test: Create a blocklist by selecting Android System app
 ---
 - launchApp
 - assertVisible: "Let's make it productive"
@@ -15,8 +16,9 @@ appId: com.tiedsiren.tiedsiren
 - tapOn:
     id: 'addBlocklistName'
 - inputText: 'My New Blocklist'
+# Select any app from the list (using regex pattern to match any app)
 - tapOn:
-    id: 'siren-android-com.example.youtube'
+    id: 'siren-ANDROID-.*'
 # Save the blocklist
 - tapOn: 'Save Blocklist'
 - assertVisible: 'Blocklist'
