@@ -18,12 +18,7 @@ import {
   closeDb,
   extendedClient,
 } from '@/infra/prisma/databaseService'
-import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.blocklist.repository'
-import { setBlocklists } from '@/core/blocklist/blocklist.slice'
-import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/prisma.block-session.repository'
-import { setBlockSessions } from '@/core/block-session/block-session.slice'
-import { PrismaSirensRepository } from '@/infra/sirens-repository/prisma.sirens-repository'
-import { setSirens } from '@/core/siren/siren.slice'
+import { loadInitialData } from '@/core/auth/usecases/load-initial-data.usecase'
 
 const notificationHandlerConfig = {
   handleNotification: async () => ({
@@ -105,22 +100,7 @@ function useDatabase() {
 }
 
 async function loadInitialStoreData(store: AppStore) {
-  const repositories = {
-    blocklist: new PrismaBlocklistRepository(),
-    blockSession: new PrismaBlockSessionRepository(),
-    sirens: new PrismaSirensRepository(),
-  }
-
-  const [blocklists, blockSessions, sirens] = await Promise.all([
-    repositories.blocklist.findAll(),
-    repositories.blockSession.findAll(),
-    repositories.sirens.getSelectableSirens(),
-  ])
-
-  store.dispatch(setBlocklists(blocklists))
-  store.dispatch(setBlockSessions(blockSessions))
-  store.dispatch(setSirens(sirens))
-
+  await store.dispatch(loadInitialData()).unwrap()
   return store
 }
 
