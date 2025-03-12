@@ -3,13 +3,13 @@ import { Blocklist } from '@/core/blocklist/blocklist'
 import { BlockSession } from '@/core/block-session/block.session'
 import { Sirens } from '@/core/siren/sirens'
 
-interface InitialData {
+type InitialData = {
   blocklists: Blocklist[]
   blockSessions: BlockSession[]
   sirens: Sirens
 }
 
-export const loadInitialData = createAppAsyncThunk(
+export const loadInitialData = createAppAsyncThunk<InitialData>(
   'auth/loadInitialData',
   async (
     _,
@@ -27,6 +27,6 @@ export const loadInitialData = createAppAsyncThunk(
       blocklists,
       blockSessions,
       sirens,
-    } as InitialData
+    }
   },
 )
