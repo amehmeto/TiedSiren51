@@ -5,7 +5,7 @@ import { duplicateBlockSession } from './usecases/duplicate-block-session.usecas
 import { renameBlockSession } from './usecases/rename-block-session.usecase'
 import { deleteBlockSession } from './usecases/delete-block-session.usecase'
 import { updateBlockSession } from './usecases/update-block-session.usecase'
-import { loadInitialData } from '../auth/usecases/load-initial-data.usecase'
+import { loadUser } from '../auth/usecases/load-user.usecase'
 
 export const blockSessionSlice = createSlice({
   name: 'blockSession',
@@ -17,7 +17,7 @@ export const blockSessionSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(loadInitialData.fulfilled, (state, action) => {
+      .addCase(loadUser.fulfilled, (state, action) => {
         blockSessionAdapter.setAll(state, action.payload.blockSessions)
       })
       .addCase(createBlockSession.fulfilled, (state, action) => {

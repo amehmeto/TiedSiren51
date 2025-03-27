@@ -4,7 +4,7 @@ import { Sirens } from './sirens'
 import { addKeywordToSirens } from './usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from './usecases/add-website-to-sirens.usecase'
 import { tieSirens } from './usecases/tie-sirens.usecase'
-import { loadInitialData } from '../auth/usecases/load-initial-data.usecase'
+import { loadUser } from '../auth/usecases/load-user.usecase'
 
 export const sirenSlice = createSlice({
   name: 'siren',
@@ -26,7 +26,7 @@ export const sirenSlice = createSlice({
   },
   extraReducers(builder) {
     builder
-      .addCase(loadInitialData.fulfilled, (state, action) => {
+      .addCase(loadUser.fulfilled, (state, action) => {
         state.availableSirens = action.payload.sirens
       })
       .addCase(fetchAvailableSirens.fulfilled, (state, action) => {

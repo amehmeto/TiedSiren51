@@ -18,7 +18,7 @@ import {
   closeDb,
   extendedClient,
 } from '@/infra/prisma/databaseService'
-import { loadInitialData } from '@/core/auth/usecases/load-initial-data.usecase'
+import { loadUser } from '@/core/auth/usecases/load-user.usecase'
 
 const notificationHandlerConfig = {
   handleNotification: async () => ({
@@ -100,7 +100,7 @@ function useDatabase() {
 }
 
 async function loadInitialStoreData(store: AppStore) {
-  await store.dispatch(loadInitialData()).unwrap()
+  await store.dispatch(loadUser()).unwrap()
   return store
 }
 
