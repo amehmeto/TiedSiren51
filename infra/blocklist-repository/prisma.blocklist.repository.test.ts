@@ -1,14 +1,19 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { PrismaBlocklistRepository } from './prisma.blocklist.repository'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
-import { extendedClient } from '@/infra/prisma/databaseService'
+import { appStorage } from '@/infra/__abstract__/app-storage'
+import { PrismaAppStorage } from '@/infra/prisma/databaseService'
+
+type ExtendedPrismaClient = ReturnType<PrismaAppStorage['getExtendedClient']>
 
 describe('PrismaBlocklistRepository', () => {
   let repository: PrismaBlocklistRepository
+  let prisma: ExtendedPrismaClient
 
   beforeEach(async () => {
     repository = new PrismaBlocklistRepository()
-    await extendedClient.blocklist.deleteMany()
+    prisma = (appStorage as PrismaAppStorage).getExtendedClient()
+    await prisma.blocklist.deleteMany()
   })
 
   it('should create a blocklist', async () => {

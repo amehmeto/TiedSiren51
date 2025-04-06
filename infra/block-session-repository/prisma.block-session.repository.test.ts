@@ -3,20 +3,25 @@ import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { UpdatePayload } from '@/core/ports/update.payload'
-import { extendedClient } from '@/infra/prisma/databaseService'
+import { appStorage } from '@/infra/__abstract__/app-storage'
+import { PrismaAppStorage } from '@/infra/prisma/databaseService'
 
-describe.skip('PrismaBlockSessionRepository', () => {
+type ExtendedPrismaClient = ReturnType<PrismaAppStorage['getExtendedClient']>
+
+describe('PrismaBlockSessionRepository', () => {
   let repository: PrismaBlockSessionRepository
+  let prisma: ExtendedPrismaClient
 
   beforeEach(async () => {
     repository = new PrismaBlockSessionRepository()
+    prisma = (appStorage as PrismaAppStorage).getExtendedClient()
     // Clear junction tables first
-    await extendedClient.$executeRaw`DELETE FROM "_BlockSessionToDevice"`
-    await extendedClient.$executeRaw`DELETE FROM "_BlockSessionToBlocklist"`
+    await prisma.$executeRaw`DELETE FROM "_BlockSessionToDevice"`
+    await prisma.$executeRaw`DELETE FROM "_BlockSessionToBlocklist"`
     // Then clear main tables
-    await extendedClient.blockSession.deleteMany()
-    await extendedClient.device.deleteMany()
-    await extendedClient.blocklist.deleteMany()
+    await prisma.blockSession.deleteMany()
+    await prisma.device.deleteMany()
+    await prisma.blocklist.deleteMany()
   })
 
   const prepareSessionPayload = async () => {
@@ -24,7 +29,7 @@ describe.skip('PrismaBlockSessionRepository', () => {
     // @ts-expect-error - removing id for creation
     delete sessionPayload.id
 
-    await extendedClient.device.create({
+    await prisma.device.create({
       data: {
         id: 'test-device-id',
         type: 'test-type',
@@ -71,7 +76,7 @@ describe.skip('PrismaBlockSessionRepository', () => {
     ]
     const createdSessions = []
 
-    await extendedClient.device.create({
+    await prisma.device.create({
       data: {
         id: 'test-device-id',
         type: 'test-type',

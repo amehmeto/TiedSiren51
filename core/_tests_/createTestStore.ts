@@ -11,6 +11,7 @@ import { InMemorySirenTier } from '@/infra/siren-tier/in-memory-siren.tier'
 import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { FakeDataDeviceRepository } from '@/infra/device-repository/fake-data.device.repository'
+import { mockAppStorage } from './mock-app-storage'
 
 export const createTestStore = (
   {
@@ -19,6 +20,7 @@ export const createTestStore = (
     blockSessionRepository = new FakeDataBlockSessionRepository(),
     blocklistRepository = new FakeDataBlocklistRepository(),
     dateProvider = new StubDateProvider(),
+    appStorage = mockAppStorage,
     deviceRepository = new FakeDataDeviceRepository(),
     installedAppRepository = new FakeDataInstalledAppsRepository(),
     notificationService = new FakeNotificationService(),
@@ -34,6 +36,7 @@ export const createTestStore = (
       blockSessionRepository,
       blocklistRepository,
       dateProvider,
+      appStorage,
       deviceRepository,
       installedAppRepository,
       notificationService,

@@ -2,8 +2,9 @@ import { BlockSession } from '@/core/block-session/block.session'
 import { BlockSessionRepository } from '@/core/ports/block-session.repository'
 import { UpdatePayload } from '@/core/ports/update.payload'
 import { CreatePayload } from '@/core/ports/create.payload'
-import { extendedClient } from '@/infra/prisma/databaseService'
 import uuid from 'react-native-uuid'
+import { appStorage } from '../__abstract__/app-storage'
+import { PrismaAppStorage } from '../prisma/databaseService'
 
 type DbBlockSession = {
   id: string
@@ -26,7 +27,9 @@ type DbBlockSession = {
 }
 
 export class PrismaBlockSessionRepository implements BlockSessionRepository {
-  private prisma = extendedClient
+  private get prisma() {
+    return (appStorage as PrismaAppStorage).getExtendedClient()
+  }
 
   async create(
     sessionPayload: CreatePayload<BlockSession>,

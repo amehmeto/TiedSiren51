@@ -2,7 +2,8 @@ import { Blocklist } from '@/core/blocklist/blocklist'
 import { BlocklistRepository } from '@/core/ports/blocklist.repository'
 import { CreatePayload } from '@/core/ports/create.payload'
 import { UpdatePayload } from '@/core/ports/update.payload'
-import { extendedClient } from '@/infra/prisma/databaseService'
+import { appStorage } from '@/infra/__abstract__/app-storage'
+import { PrismaAppStorage } from '@/infra/prisma/databaseService'
 
 type DbBlocklist = {
   id: string
@@ -11,7 +12,9 @@ type DbBlocklist = {
 }
 
 export class PrismaBlocklistRepository implements BlocklistRepository {
-  private prisma = extendedClient
+  private get prisma() {
+    return (appStorage as PrismaAppStorage).getExtendedClient()
+  }
 
   async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
     const created = await this.prisma.blocklist.create({

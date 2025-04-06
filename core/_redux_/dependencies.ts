@@ -8,6 +8,7 @@ import { NotificationService } from '../ports/notification.service'
 import { BackgroundTaskService } from '../ports/background-task.service'
 import { AuthGateway } from '@/core/ports/auth.gateway'
 import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
+import { AppStorage } from '@/core/ports/app-storage'
 
 export type Dependencies = {
   authGateway: AuthGateway
@@ -15,6 +16,7 @@ export type Dependencies = {
   blockSessionRepository: BlockSessionRepository
   blocklistRepository: BlocklistRepository
   dateProvider: DateProvider
+  appStorage: AppStorage
   deviceRepository: RemoteDeviceRepository
   installedAppRepository: InstalledAppRepository
   notificationService: NotificationService

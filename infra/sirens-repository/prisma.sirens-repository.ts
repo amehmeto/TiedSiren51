@@ -1,11 +1,14 @@
 import { Siren as PrismaSiren } from '@prisma/client'
 import { AndroidSiren, Sirens } from '@/core/siren/sirens'
 import { SirensRepository } from '@/core/ports/sirens.repository'
-import { extendedClient } from '@/infra/prisma/databaseService'
 import uuid from 'react-native-uuid'
+import { appStorage } from '../__abstract__/app-storage'
+import { PrismaAppStorage } from '../prisma/databaseService'
 
 export class PrismaSirensRepository implements SirensRepository {
-  private prisma = extendedClient
+  private get prisma() {
+    return (appStorage as PrismaAppStorage).getExtendedClient()
+  }
 
   async getSelectableSirens(): Promise<Sirens> {
     const sirens = await this.prisma.siren.findMany()

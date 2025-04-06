@@ -1,13 +1,18 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { PrismaSirensRepository } from './prisma.sirens-repository'
-import { extendedClient } from '@/infra/prisma/databaseService'
+import { appStorage } from '@/infra/__abstract__/app-storage'
+import { PrismaAppStorage } from '@/infra/prisma/databaseService'
+
+type ExtendedPrismaClient = ReturnType<PrismaAppStorage['getExtendedClient']>
 
 describe('PrismaSirensRepository', () => {
   let repository: PrismaSirensRepository
+  let prisma: ExtendedPrismaClient
 
   beforeEach(async () => {
     repository = new PrismaSirensRepository()
-    await extendedClient.siren.deleteMany()
+    prisma = (appStorage as PrismaAppStorage).getExtendedClient()
+    await prisma.siren.deleteMany()
   })
 
   it('should init selectable sirens when empty', async () => {

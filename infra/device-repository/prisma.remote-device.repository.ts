@@ -1,10 +1,13 @@
 import { Device as PrismaDevice } from '@prisma/client'
 import { Device } from '@/core/device/device'
 import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
-import { extendedClient } from '@/infra/prisma/databaseService'
+import { appStorage } from '../__abstract__/app-storage'
+import { PrismaAppStorage } from '../prisma/databaseService'
 
 export class PrismaRemoteDeviceRepository implements RemoteDeviceRepository {
-  private prisma = extendedClient
+  private get prisma() {
+    return (appStorage as PrismaAppStorage).getExtendedClient()
+  }
 
   async findAll(): Promise<Device[]> {
     const devices = await this.prisma.device.findMany()
