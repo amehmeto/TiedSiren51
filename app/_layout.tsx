@@ -12,8 +12,7 @@ import { T } from '@/ui/design-system/theme'
 import { Stack, useRouter } from 'expo-router'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { loadUser } from '@/core/auth/usecases/load-user.usecase'
-import { createStore } from '@/core/_redux_/createStore'
+import { initializeApp } from '@/core/app/usecases/initialize-app.usecase'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -23,18 +22,11 @@ Notifications.setNotificationHandler({
   }),
 })
 
-// Enhanced error handling that logs instead of throwing in non-dev
-const handleError = (error: unknown, context: string) => {
+const handleUIError = (error: unknown, context: string) => {
   const errorMessage = `${context}: ${error instanceof Error ? error.message : String(error)}`
-
-  if (__DEV__) {
-    alert(errorMessage)
-  }
-
   return errorMessage
 }
 
-// Combined initialization of database and store
 function useAppInitialization() {
   const [store, setStore] = useState<AppStore | null>(null)
   const [error, setError] = useState<string | null>(null)
@@ -42,42 +34,31 @@ function useAppInitialization() {
 
   useEffect(() => {
     let isMounted = true
-
-    const initializeApp = async () => {
-      try {
-        // First initialize database
-        await dependencies.appStorage.initialize()
-
-        // Then create store with initialized dependencies
-        const newStore = createStore(dependencies)
-
-        // Load user data
-        await newStore.dispatch(loadUser()).unwrap()
-
+    initializeApp(dependencies)
+      .then((initializedStore: AppStore) => {
         if (isMounted) {
-          setStore(newStore)
+          setStore(initializedStore)
           setError(null)
         }
-      } catch (error) {
-        const errorMessage = handleError(error, 'App initialization failed')
+      })
+      .catch((initError: unknown) => {
+        const errorMessage = handleUIError(
+          initError,
+          'App initialization failed',
+        )
         if (isMounted) {
           setError(errorMessage)
         }
-      } finally {
+      })
+      .finally(() => {
         if (isMounted) {
           setIsInitializing(false)
         }
-      }
-    }
-
-    initializeApp()
+      })
 
     return () => {
       isMounted = false
-      // Cleanup
-      if (store) {
-        dependencies.appStorage.disconnect()
-      }
+      dependencies.appStorage.disconnect()
     }
   }, [])
 
@@ -100,7 +81,7 @@ export default function App() {
 
     if (Platform.OS === 'android') {
       NavigationBar.setBackgroundColorAsync(T.color.darkBlue).catch((error) =>
-        handleError(error, 'Navigation bar color setting failed'),
+        handleUIError(error, 'Navigation bar color setting failed'),
       )
     }
 
@@ -108,7 +89,7 @@ export default function App() {
     dependencies.backgroundTaskService
       .initialize(store)
       .catch((error) =>
-        handleError(error, 'Background task initialization failed'),
+        handleUIError(error, 'Background task initialization failed'),
       )
   }, [store])
 
@@ -118,7 +99,6 @@ export default function App() {
     router.replace(isAuthenticated ? '/home' : '/register')
   }, [store, isInitializing, isAuthenticated, router])
 
-  // Show a loading or error screen
   if (isInitializing || !store) {
     return (
       <SafeAreaProvider>

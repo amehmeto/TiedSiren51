@@ -7,8 +7,6 @@ import { AppStorage } from '@/core/ports/app-storage'
 const DB_NAME = 'app.db'
 const DB_PATH = `${FileSystem.documentDirectory}${DB_NAME}`
 
-// Define a more generic type that includes both the PrismaClient
-// and the additional methods from reactiveHooksExtension
 type ExtendedPrismaClient = Omit<PrismaClient, '$extends'> & {
   $refreshSubscriptions: () => Promise<void>
 }

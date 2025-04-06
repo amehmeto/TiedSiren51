@@ -101,24 +101,22 @@ export function SelectListModal(
           )}
         />
         {props.listType === 'blocklists' ? (
-          <View style={styles.buttonsContainer}>
-            {props.items.length === 0 ? (
-              <TiedSButton
-                style={styles.button}
-                onPress={() => {
-                  router.push('/(tabs)/blocklists/create-blocklist-screen')
-                  props.onRequestClose()
-                }}
-                text={'CREATE BLOCKLIST'}
-              />
-            ) : (
-              <TiedSButton
-                style={styles.button}
-                onPress={saveList}
-                text={'SAVE'}
-              />
-            )}
-          </View>
+          props.items.length === 0 ? (
+            <TiedSButton
+              style={styles.button}
+              onPress={() => {
+                router.push('/(tabs)/blocklists/create-blocklist-screen')
+                props.onRequestClose()
+              }}
+              text={'CREATE BLOCKLIST'}
+            />
+          ) : (
+            <TiedSButton
+              style={styles.button}
+              onPress={saveList}
+              text={'SAVE'}
+            />
+          )
         ) : (
           <TiedSButton style={styles.button} onPress={saveList} text={'SAVE'} />
         )}
@@ -140,8 +138,4 @@ const styles = StyleSheet.create({
     marginTop: T.spacing.medium,
   },
   itemSelector: { marginLeft: T.spacing.medium },
-  buttonsContainer: {
-    flexDirection: 'column',
-    alignItems: 'center',
-  },
 })

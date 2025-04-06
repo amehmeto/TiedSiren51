@@ -6,7 +6,6 @@ import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.bu
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { dependencies } from '@/ui/dependencies'
 
-// This function is used for manual testing with predefined state
 export async function preloadedStateForManualTesting() {
   const { dateProvider, blocklistRepository, blockSessionRepository } =
     dependencies
