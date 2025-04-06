@@ -10,32 +10,35 @@ import { FakeNotificationService } from '@/infra/notification-service/fake.notif
 import { InMemorySirenTier } from '@/infra/siren-tier/in-memory-siren.tier'
 import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
+import { FakeDataDeviceRepository } from '@/infra/device-repository/fake-data.device.repository'
 
 export const createTestStore = (
   {
     authGateway = new FakeAuthGateway(),
+    backgroundTaskService = new FakeBackgroundTaskService(),
     blockSessionRepository = new FakeDataBlockSessionRepository(),
     blocklistRepository = new FakeDataBlocklistRepository(),
-    sirenTier = new InMemorySirenTier(),
     dateProvider = new StubDateProvider(),
+    deviceRepository = new FakeDataDeviceRepository(),
     installedAppRepository = new FakeDataInstalledAppsRepository(),
-    sirensRepository = new FakeDataSirensRepository(),
     notificationService = new FakeNotificationService(),
-    backgroundTaskService = new FakeBackgroundTaskService(),
+    sirenTier = new InMemorySirenTier(),
+    sirensRepository = new FakeDataSirensRepository(),
   }: Partial<Dependencies> = {},
   preloadedState?: Partial<ReturnType<typeof rootReducer>>,
 ) =>
   createStore(
     {
       authGateway,
+      backgroundTaskService,
       blockSessionRepository,
       blocklistRepository,
-      sirenTier,
       dateProvider,
+      deviceRepository,
       installedAppRepository,
-      sirensRepository,
       notificationService,
-      backgroundTaskService,
+      sirenTier,
+      sirensRepository,
     },
     preloadedState,
   )
