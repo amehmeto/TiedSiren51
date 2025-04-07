@@ -1,9 +1,8 @@
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import { MenuProvider } from 'react-native-popup-menu'
 import * as Notifications from 'expo-notifications'
 import { StatusBar } from 'expo-status-bar'
-import { AppStore } from '@/core/_redux_/createStore'
 import { tieSirens } from '@/core/siren/usecases/tie-sirens.usecase'
 import { dependencies } from '@/ui/dependencies'
 import * as NavigationBar from 'expo-navigation-bar'
@@ -12,7 +11,8 @@ import { T } from '@/ui/design-system/theme'
 import { Stack, useRouter } from 'expo-router'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { initializeApp } from '@/ui/initializeApp'
+import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
+import { handleUIError } from '@/ui/utils/handleUIError'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -22,47 +22,10 @@ Notifications.setNotificationHandler({
   }),
 })
 
-const handleUIError = (error: unknown, context: string) => {
-  return `${context}: ${error instanceof Error ? error.message : String(error)}`
-}
-
-function useAppInitialization() {
-  const [store, setStore] = useState<AppStore | null>(null)
-  const [error, setError] = useState<string | null>(null)
-  const [isInitializing, setIsInitializing] = useState(true)
-
-  useEffect(() => {
-    let isMounted = true
-    initializeApp(dependencies)
-      .then((initializedStore: AppStore) => {
-        if (isMounted) {
-          setStore(initializedStore)
-          setError(null)
-        }
-      })
-      .catch((initError: unknown) => {
-        const errorMessage = handleUIError(
-          initError,
-          'App initialization failed',
-        )
-        if (isMounted) setError(errorMessage)
-      })
-      .finally(() => {
-        if (isMounted) setIsInitializing(false)
-      })
-
-    return () => {
-      isMounted = false
-    }
-  }, [])
-
-  return { store, error, isInitializing }
-}
-
 export default function App() {
   const { store, error, isInitializing } = useAppInitialization()
   const router = useRouter()
-  // TODO: should be retrieve from the store
+  // TODO: should be retrieved from the store
   const isAuthenticated = false
 
   useEffect(() => {
