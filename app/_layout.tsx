@@ -12,7 +12,7 @@ import { T } from '@/ui/design-system/theme'
 import { Stack, useRouter } from 'expo-router'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { initializeApp } from '@/core/app/usecases/initialize-app.usecase'
+import { initializeApp } from '@/ui/initializeApp'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -23,8 +23,7 @@ Notifications.setNotificationHandler({
 })
 
 const handleUIError = (error: unknown, context: string) => {
-  const errorMessage = `${context}: ${error instanceof Error ? error.message : String(error)}`
-  return errorMessage
+  return `${context}: ${error instanceof Error ? error.message : String(error)}`
 }
 
 function useAppInitialization() {
@@ -46,28 +45,18 @@ function useAppInitialization() {
           initError,
           'App initialization failed',
         )
-        if (isMounted) {
-          setError(errorMessage)
-        }
+        if (isMounted) setError(errorMessage)
       })
       .finally(() => {
-        if (isMounted) {
-          setIsInitializing(false)
-        }
+        if (isMounted) setIsInitializing(false)
       })
 
     return () => {
       isMounted = false
-      dependencies.appStorage.disconnect()
     }
   }, [])
 
   return { store, error, isInitializing }
-}
-
-const commonStackScreenOptions = {
-  header: () => null,
-  contentStyle: { backgroundColor: 'transparent' },
 }
 
 export default function App() {
@@ -136,12 +125,20 @@ export default function App() {
         <MenuProvider>
           <StatusBar style={'auto'} />
           <TiedSLinearBackground>
-            <Stack screenOptions={commonStackScreenOptions}>
+            <Stack
+              screenOptions={{
+                header: () => null,
+                contentStyle: { backgroundColor: 'transparent' },
+              }}
+            >
               {routes.map((route) => (
                 <Stack.Screen
                   key={route}
                   name={route}
-                  options={commonStackScreenOptions}
+                  options={{
+                    header: () => null,
+                    contentStyle: { backgroundColor: 'transparent' },
+                  }}
                 />
               ))}
             </Stack>

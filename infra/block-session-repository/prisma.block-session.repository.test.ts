@@ -3,33 +3,31 @@ import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { UpdatePayload } from '@/core/ports/update.payload'
-import { appStorage } from '@/infra/__abstract__/app-storage'
-import { PrismaAppStorage } from '@/infra/prisma/databaseService'
-
-type ExtendedPrismaClient = ReturnType<PrismaAppStorage['getExtendedClient']>
+import { PrismaClient } from '@prisma/client/react-native'
 
 describe('PrismaBlockSessionRepository', () => {
   let repository: PrismaBlockSessionRepository
-  let prisma: ExtendedPrismaClient
+  let prismaClient: PrismaClient
 
   beforeEach(async () => {
     repository = new PrismaBlockSessionRepository()
-    prisma = (appStorage as PrismaAppStorage).getExtendedClient()
+    await repository.initialize()
+    prismaClient = repository.getClient()
+
     // Clear junction tables first
-    await prisma.$executeRaw`DELETE FROM "_BlockSessionToDevice"`
-    await prisma.$executeRaw`DELETE FROM "_BlockSessionToBlocklist"`
+    await prismaClient.$executeRaw`DELETE FROM "_BlockSessionToDevice"`
+    await prismaClient.$executeRaw`DELETE FROM "_BlockSessionToBlocklist"`
     // Then clear main tables
-    await prisma.blockSession.deleteMany()
-    await prisma.device.deleteMany()
-    await prisma.blocklist.deleteMany()
+    await prismaClient.blockSession.deleteMany()
+    await prismaClient.device.deleteMany()
+    await prismaClient.blocklist.deleteMany()
   })
 
   const prepareSessionPayload = async () => {
     const sessionPayload = buildBlockSession()
     // @ts-expect-error - removing id for creation
     delete sessionPayload.id
-
-    await prisma.device.create({
+    await prismaClient.device.create({
       data: {
         id: 'test-device-id',
         type: 'test-type',
@@ -75,8 +73,7 @@ describe('PrismaBlockSessionRepository', () => {
       'Evening Session',
     ]
     const createdSessions = []
-
-    await prisma.device.create({
+    await prismaClient.device.create({
       data: {
         id: 'test-device-id',
         type: 'test-type',

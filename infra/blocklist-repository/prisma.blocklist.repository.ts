@@ -2,8 +2,7 @@ import { Blocklist } from '@/core/blocklist/blocklist'
 import { BlocklistRepository } from '@/core/ports/blocklist.repository'
 import { CreatePayload } from '@/core/ports/create.payload'
 import { UpdatePayload } from '@/core/ports/update.payload'
-import { appStorage } from '@/infra/__abstract__/app-storage'
-import { PrismaAppStorage } from '@/infra/prisma/databaseService'
+import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
 
 type DbBlocklist = {
   id: string
@@ -11,13 +10,12 @@ type DbBlocklist = {
   sirens: string
 }
 
-export class PrismaBlocklistRepository implements BlocklistRepository {
-  private get prisma() {
-    return (appStorage as PrismaAppStorage).getExtendedClient()
-  }
-
+export class PrismaBlocklistRepository
+  extends PrismaRepository
+  implements BlocklistRepository
+{
   async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
-    const created = await this.prisma.blocklist.create({
+    const created = await this.baseClient.blocklist.create({
       data: {
         name: blocklistPayload.name,
         sirens: JSON.stringify(
@@ -38,12 +36,12 @@ export class PrismaBlocklistRepository implements BlocklistRepository {
   }
 
   async findAll(): Promise<Blocklist[]> {
-    const blocklists = await this.prisma.blocklist.findMany()
+    const blocklists = await this.baseClient.blocklist.findMany()
     return blocklists.map(this.mapToBlocklist)
   }
 
   async update(payload: UpdatePayload<Blocklist>): Promise<void> {
-    await this.prisma.blocklist.update({
+    await this.baseClient.blocklist.update({
       where: { id: payload.id },
       data: {
         name: payload.name,
@@ -53,7 +51,7 @@ export class PrismaBlocklistRepository implements BlocklistRepository {
   }
 
   async findById(id: string): Promise<Blocklist> {
-    const blocklist = await this.prisma.blocklist.findUnique({
+    const blocklist = await this.baseClient.blocklist.findUnique({
       where: { id },
     })
 
@@ -65,7 +63,7 @@ export class PrismaBlocklistRepository implements BlocklistRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.blocklist.delete({
+    await this.baseClient.blocklist.delete({
       where: { id },
     })
   }

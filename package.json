@@ -10,6 +10,7 @@
     "web": "expo start --web",
     "electron:start": "electron electron.js",
     "electron:dev": "concurrently \"BROWSER=none yarn web --port 19006\" \"wait-on http://localhost:19006 && yarn electron:start\"",
+    "tsc": "tsc --noEmit",
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts,tsx}\" && prettier \"**/*.{js,ts,tsx}\"",
     "lint:fix": "tsc --noEmit && eslint --fix \"**/*.{js,ts,tsx}\" && prettier --write \"**/*.{js,ts,tsx}\"",
     "test": "vitest",

@@ -9,7 +9,6 @@ import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.b
 import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/prisma.block-session.repository'
 import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
 import { PrismaSirensRepository } from '@/infra/sirens-repository/prisma.sirens-repository'
-import { appStorage } from '@/infra/__abstract__/app-storage'
 
 const mobileDependencies = {
   authGateway: new FakeAuthGateway(),
@@ -22,7 +21,6 @@ const mobileDependencies = {
   sirensRepository: new PrismaSirensRepository(),
   notificationService: new ExpoNotificationService(),
   backgroundTaskService: new RealBackgroundTaskService(),
-  appStorage: appStorage,
 }
 
 export const dependencies: Dependencies = mobileDependencies

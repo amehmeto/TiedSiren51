@@ -1,23 +1,16 @@
 import { PrismaClient } from '@prisma/client/react-native'
-import { reactiveHooksExtension } from '@prisma/react-native'
 import * as FileSystem from 'expo-file-system'
 import { Platform } from 'react-native'
-import { AppStorage } from '@/core/ports/app-storage'
 
-const DB_NAME = 'app.db'
-const DB_PATH = `${FileSystem.documentDirectory}${DB_NAME}`
-
-type ExtendedPrismaClient = Omit<PrismaClient, '$extends'> & {
-  $refreshSubscriptions: () => Promise<void>
-}
-
-export class PrismaAppStorage implements AppStorage {
-  private static _instance: PrismaAppStorage
+export abstract class PrismaRepository {
   private _isInitialized = false
-  private baseClient: PrismaClient
-  private extendedClient: ExtendedPrismaClient
+  private readonly dbName = 'app.db'
+  private readonly dbPath: string
+  public readonly baseClient: PrismaClient
 
-  private constructor() {
+  public constructor() {
+    this.dbPath = `${FileSystem.documentDirectory}${this.dbName}`
+
     this.baseClient = new PrismaClient({
       log: [
         { emit: 'stdout', level: 'query' },
@@ -27,20 +20,10 @@ export class PrismaAppStorage implements AppStorage {
       ],
       datasources: {
         db: {
-          url: `file:${DB_PATH}`,
+          url: `file:${this.dbPath}`,
         },
       },
     })
-    this.extendedClient = this.baseClient.$extends(
-      reactiveHooksExtension(),
-    ) as unknown as ExtendedPrismaClient
-  }
-
-  public static getInstance(): PrismaAppStorage {
-    if (!PrismaAppStorage._instance) {
-      PrismaAppStorage._instance = new PrismaAppStorage()
-    }
-    return PrismaAppStorage._instance
   }
 
   public async initialize(): Promise<void> {
@@ -52,23 +35,10 @@ export class PrismaAppStorage implements AppStorage {
       await this.loadInitialData()
       this._isInitialized = true
     } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Database initialization error:', error)
       throw new Error(`Failed to initialize database: ${error}`)
     }
-  }
-
-  public isInitialized(): boolean {
-    return this._isInitialized
-  }
-
-  public async disconnect(): Promise<void> {
-    if (!this._isInitialized) return
-    await this.baseClient.$disconnect()
-    this._isInitialized = false
-  }
-
-  public async refresh(): Promise<void> {
-    if (!this._isInitialized) return
-    await this.extendedClient.$refreshSubscriptions()
   }
 
   public getClient(): PrismaClient {
@@ -78,36 +48,30 @@ export class PrismaAppStorage implements AppStorage {
     return this.baseClient
   }
 
-  public getExtendedClient(): ExtendedPrismaClient {
-    if (!this._isInitialized) {
-      throw new Error('Database not initialized')
-    }
-    return this.extendedClient
-  }
-
   private async ensureDatabaseFile(): Promise<void> {
-    const fileInfo = await FileSystem.getInfoAsync(DB_PATH)
+    try {
+      const fileInfo = await FileSystem.getInfoAsync(this.dbPath)
 
-    if (fileInfo.exists) {
-      return
-    }
+      if (!fileInfo.exists) {
+        const dirPath = this.dbPath.substring(0, this.dbPath.lastIndexOf('/'))
+        await FileSystem.makeDirectoryAsync(dirPath, { intermediates: true })
 
-    await FileSystem.writeAsStringAsync(DB_PATH, '', {
-      encoding: FileSystem.EncodingType.UTF8,
-    })
+        await FileSystem.writeAsStringAsync(this.dbPath, '', {
+          encoding: FileSystem.EncodingType.UTF8,
+        })
+      }
 
-    if (!FileSystem.documentDirectory) {
-      throw new Error('Document directory is not available')
-    }
-
-    await FileSystem.makeDirectoryAsync(FileSystem.documentDirectory, {
-      intermediates: true,
-    })
-
-    if (Platform.OS === 'ios') {
-      await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync(
-        FileSystem.documentDirectory,
-      )
+      if (Platform.OS === 'android') {
+        const result =
+          await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync()
+        if (!result.granted) {
+          throw new Error('Storage permission not granted')
+        }
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error ensuring database file:', error)
+      throw error
     }
   }
 
@@ -186,22 +150,5 @@ export class PrismaAppStorage implements AppStorage {
   private async loadInitialData(): Promise<void> {
     await this.baseClient.siren.findMany()
     await this.baseClient.blocklist.findMany()
-    await this.extendedClient.$refreshSubscriptions()
-  }
-
-  public async getDatabaseInfo(): Promise<any> {
-    const [count, lists, tableInfo] = await Promise.all([
-      this.baseClient.blocklist.count(),
-      this.baseClient.blocklist.findMany(),
-      this.baseClient.$executeRaw`PRAGMA table_info(Blocklist);`,
-    ])
-
-    return {
-      blocklistCount: count,
-      blocklists: count > 0 ? lists : [],
-      tableStructure: tableInfo,
-    }
   }
 }
-
-export const appStorage = PrismaAppStorage.getInstance()

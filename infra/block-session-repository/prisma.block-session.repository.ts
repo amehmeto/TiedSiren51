@@ -3,8 +3,7 @@ import { BlockSessionRepository } from '@/core/ports/block-session.repository'
 import { UpdatePayload } from '@/core/ports/update.payload'
 import { CreatePayload } from '@/core/ports/create.payload'
 import uuid from 'react-native-uuid'
-import { appStorage } from '../__abstract__/app-storage'
-import { PrismaAppStorage } from '../prisma/databaseService'
+import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
 
 type DbBlockSession = {
   id: string
@@ -26,11 +25,10 @@ type DbBlockSession = {
   }[]
 }
 
-export class PrismaBlockSessionRepository implements BlockSessionRepository {
-  private get prisma() {
-    return (appStorage as PrismaAppStorage).getExtendedClient()
-  }
-
+export class PrismaBlockSessionRepository
+  extends PrismaRepository
+  implements BlockSessionRepository
+{
   async create(
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
@@ -52,7 +50,7 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
       },
     }))
 
-    const created = await this.prisma.blockSession.create({
+    const created = await this.baseClient.blockSession.create({
       data: {
         id: String(uuid.v4()),
         name: sessionPayload.name,
@@ -97,7 +95,7 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
   }
 
   async findAll(): Promise<BlockSession[]> {
-    const sessions = await this.prisma.blockSession.findMany({
+    const sessions = await this.baseClient.blockSession.findMany({
       include: {
         blocklists: true,
         devices: true,
@@ -108,7 +106,7 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
   }
 
   async findById(id: string): Promise<BlockSession> {
-    const session = await this.prisma.blockSession.findUnique({
+    const session = await this.baseClient.blockSession.findUnique({
       where: { id },
       include: {
         blocklists: true,
@@ -127,7 +125,7 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
     const blocklistIds = payload.blocklists?.map((b) => ({ id: b.id }))
     const deviceIds = payload.devices?.map((d) => ({ id: d.id }))
 
-    await this.prisma.blockSession.update({
+    await this.baseClient.blockSession.update({
       where: { id: payload.id },
       data: {
         name: payload.name,
@@ -153,7 +151,7 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
   }
 
   async delete(id: string): Promise<void> {
-    await this.prisma.blockSession.update({
+    await this.baseClient.blockSession.update({
       where: { id },
       data: {
         blocklists: { set: [] },
@@ -161,7 +159,7 @@ export class PrismaBlockSessionRepository implements BlockSessionRepository {
       },
     })
 
-    await this.prisma.blockSession.delete({
+    await this.baseClient.blockSession.delete({
       where: { id },
     })
   }
