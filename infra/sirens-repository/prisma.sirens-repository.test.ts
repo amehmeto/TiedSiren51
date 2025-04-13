@@ -6,7 +6,8 @@ describe('PrismaSirensRepository', () => {
 
   beforeEach(async () => {
     repository = new PrismaSirensRepository()
-    await repository.baseClient.siren.deleteMany()
+    await repository.initialize()
+    await repository.resetForTesting()
   })
 
   it('should init selectable sirens when empty', async () => {

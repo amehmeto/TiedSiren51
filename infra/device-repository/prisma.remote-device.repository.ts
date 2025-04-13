@@ -7,10 +7,6 @@ export class PrismaRemoteDeviceRepository
   extends PrismaRepository
   implements RemoteDeviceRepository
 {
-  constructor() {
-    super()
-  }
-
   async findAll(): Promise<Device[]> {
     const devices = await this.baseClient.device.findMany()
     return devices.map((device: PrismaDevice) => ({
@@ -18,5 +14,13 @@ export class PrismaRemoteDeviceRepository
       name: device.name,
       type: device.type,
     }))
+  }
+  public async resetForTesting(): Promise<void> {
+    await this.baseClient.device.deleteMany()
+  }
+  public async createDeviceForTesting(device: Device): Promise<void> {
+    await this.baseClient.device.create({
+      data: device,
+    })
   }
 }

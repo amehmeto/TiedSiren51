@@ -62,4 +62,8 @@ export class PrismaSirensRepository
       },
     })
   }
+
+  public async resetForTesting(): Promise<void> {
+    await this.baseClient.siren.deleteMany()
+  }
 }

@@ -1,23 +1,22 @@
 import { PrismaClient } from '@prisma/client/react-native'
 import * as FileSystem from 'expo-file-system'
 import { Platform } from 'react-native'
+import '@prisma/react-native'
 
 export abstract class PrismaRepository {
   private _isInitialized = false
   private readonly dbName = 'app.db'
   private readonly dbPath: string
-  public readonly baseClient: PrismaClient
+  protected baseClient: PrismaClient
 
   public constructor() {
-    this.dbPath = `${FileSystem.documentDirectory}${this.dbName}`
+    this.dbPath =
+      Platform.OS === 'android'
+        ? `${FileSystem.documentDirectory}databases/${this.dbName}`
+        : `${FileSystem.documentDirectory}${this.dbName}`
 
     this.baseClient = new PrismaClient({
-      log: [
-        { emit: 'stdout', level: 'query' },
-        { emit: 'stdout', level: 'info' },
-        { emit: 'stdout', level: 'warn' },
-        { emit: 'stdout', level: 'error' },
-      ],
+      log: [{ emit: 'stdout', level: 'error' }],
       datasources: {
         db: {
           url: `file:${this.dbPath}`,
@@ -61,14 +60,6 @@ export abstract class PrismaRepository {
           encoding: FileSystem.EncodingType.UTF8,
         })
       }
-
-      if (Platform.OS === 'android') {
-        const result =
-          await FileSystem.StorageAccessFramework.requestDirectoryPermissionsAsync()
-        if (!result.granted) {
-          throw new Error('Storage permission not granted')
-        }
-      }
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error ensuring database file:', error)
@@ -77,13 +68,25 @@ export abstract class PrismaRepository {
   }
 
   private async connectToDatabase(): Promise<void> {
-    await this.baseClient.$connect()
-    await this.baseClient.$executeRaw`PRAGMA foreign_keys = ON;`
+    try {
+      await this.baseClient.$connect()
+      await this.baseClient.$executeRaw`PRAGMA foreign_keys = ON;`
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error connecting to database:', error)
+      throw error
+    }
   }
 
   private async createAllTables(): Promise<void> {
-    await this.createMainTables()
-    await this.createJunctionTables()
+    try {
+      await this.createMainTables()
+      await this.createJunctionTables()
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error creating tables:', error)
+      throw error
+    }
   }
 
   private async createMainTables(): Promise<void> {
@@ -149,7 +152,21 @@ export abstract class PrismaRepository {
   }
 
   private async loadInitialData(): Promise<void> {
-    await this.baseClient.siren.findMany()
-    await this.baseClient.blocklist.findMany()
+    try {
+      await this.baseClient.siren.findMany()
+      await this.baseClient.blocklist.findMany()
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error loading initial data:', error)
+      // Don't throw here as this is not critical
+    }
+  }
+
+  /**
+   * Method used for testing purposes to clean the database
+   */
+  public async resetForTesting(): Promise<void> {
+    // This method will be implemented by child classes
+    throw new Error('resetForTesting not implemented')
   }
 }

@@ -7,7 +7,8 @@ describe('PrismaBlocklistRepository', () => {
 
   beforeEach(async () => {
     repository = new PrismaBlocklistRepository()
-    await repository.baseClient.blocklist.deleteMany()
+    await repository.initialize()
+    await repository.resetForTesting()
   })
 
   it('should create a blocklist', async () => {

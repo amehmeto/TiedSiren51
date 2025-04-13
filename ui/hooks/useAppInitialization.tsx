@@ -3,6 +3,8 @@ import { AppStore } from '@/core/_redux_/createStore'
 import { initializeApp } from '@/ui/initializeApp'
 import { dependencies } from '@/ui/dependencies'
 import { handleUIError } from '@/ui/utils/handleUIError'
+import * as FileSystem from 'expo-file-system'
+import { Platform } from 'react-native'
 
 export function useAppInitialization() {
   const [store, setStore] = useState<AppStore | null>(null)
@@ -11,23 +13,38 @@ export function useAppInitialization() {
 
   useEffect(() => {
     let isMounted = true
-    initializeApp(dependencies)
-      .then((initializedStore: AppStore) => {
+
+    async function init() {
+      try {
+        const dbDir =
+          Platform.OS === 'android'
+            ? `${FileSystem.documentDirectory}databases`
+            : `${FileSystem.documentDirectory}SQLite`
+
+        const dirInfo = await FileSystem.getInfoAsync(dbDir)
+
+        if (!dirInfo.exists) {
+          await FileSystem.makeDirectoryAsync(dbDir, { intermediates: true })
+        }
+
+        const initializedStore = await initializeApp(dependencies)
+
         if (isMounted) {
           setStore(initializedStore)
           setError(null)
         }
-      })
-      .catch((initError: unknown) => {
+      } catch (initError: unknown) {
         const errorMessage = handleUIError(
           initError,
           'App initialization failed',
         )
         if (isMounted) setError(errorMessage)
-      })
-      .finally(() => {
+      } finally {
         if (isMounted) setIsInitializing(false)
-      })
+      }
+    }
+
+    init()
 
     return () => {
       isMounted = false

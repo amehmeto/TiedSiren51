@@ -6,7 +6,8 @@ describe('PrismaRemoteDeviceRepository', () => {
 
   beforeEach(async () => {
     repository = new PrismaRemoteDeviceRepository()
-    await repository.baseClient.device.deleteMany()
+    await repository.initialize()
+    await repository.resetForTesting()
   })
 
   it('should find all remote devices', async () => {
@@ -17,9 +18,7 @@ describe('PrismaRemoteDeviceRepository', () => {
     ]
 
     for (const device of testDevices) {
-      await repository.baseClient.device.create({
-        data: device,
-      })
+      await repository.createDeviceForTesting(device)
     }
 
     const devices = await repository.findAll()
