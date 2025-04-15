@@ -4,10 +4,6 @@ export class PrismaDatabaseService
   extends PrismaRepository
   implements DatabaseService
 {
-  constructor() {
-    super()
-  }
-
   getDbPath(): string {
     return super.getDbPath()
   }
