@@ -10,6 +10,7 @@ import { AuthGateway } from '@/core/ports/auth.gateway'
 import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
 
 export type Dependencies = {
+  databaseService: DatabaseService
   authGateway: AuthGateway
   backgroundTaskService: BackgroundTaskService
   blockSessionRepository: BlockSessionRepository

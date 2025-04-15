@@ -10,12 +10,13 @@ export abstract class PrismaRepository {
   protected baseClient: PrismaClient
 
   public constructor() {
-    this.dbPath =
-      Platform.OS === 'android'
-        ? `${FileSystem.documentDirectory}databases/${this.dbName}`
-        : `${FileSystem.documentDirectory}${this.dbName}`
+    this.dbPath = this.getDbPath()
+    this.baseClient = this.getPrismaClient()
+    this.initialize()
+  }
 
-    this.baseClient = new PrismaClient({
+  private getPrismaClient() {
+    return new PrismaClient({
       log: [{ emit: 'stdout', level: 'error' }],
       datasources: {
         db: {
@@ -23,6 +24,12 @@ export abstract class PrismaRepository {
         },
       },
     })
+  }
+
+  public getDbPath() {
+    return Platform.OS === 'android'
+      ? `${FileSystem.documentDirectory}databases/${this.dbName}`
+      : `${FileSystem.documentDirectory}${this.dbName}`
   }
 
   public async initialize(): Promise<void> {
@@ -158,13 +165,9 @@ export abstract class PrismaRepository {
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error loading initial data:', error)
-      // Don't throw here as this is not critical
     }
   }
 
-  /**
-   * Method used for testing purposes to clean the database
-   */
   public async resetForTesting(): Promise<void> {
     // This method will be implemented by child classes
     throw new Error('resetForTesting not implemented')

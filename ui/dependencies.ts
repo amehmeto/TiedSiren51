@@ -9,8 +9,10 @@ import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.b
 import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/prisma.block-session.repository'
 import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
 import { PrismaSirensRepository } from '@/infra/sirens-repository/prisma.sirens-repository'
+import { PrismaDatabaseService } from '@/infra/database-service/prisma.database.service'
 
 const mobileDependencies = {
+  databaseService: new PrismaDatabaseService(),
   authGateway: new FakeAuthGateway(),
   blockSessionRepository: new PrismaBlockSessionRepository(),
   blocklistRepository: new PrismaBlocklistRepository(),

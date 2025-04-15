@@ -1,7 +1,6 @@
 import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import { MenuProvider } from 'react-native-popup-menu'
-import * as Notifications from 'expo-notifications'
 import { StatusBar } from 'expo-status-bar'
 import { tieSirens } from '@/core/siren/usecases/tie-sirens.usecase'
 import { dependencies } from '@/ui/dependencies'
@@ -13,14 +12,6 @@ import { TiedSLinearBackground } from '@/ui/design-system/components/shared/Tied
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
 import { handleUIError } from '@/ui/utils/handleUIError'
-
-Notifications.setNotificationHandler({
-  handleNotification: async () => ({
-    shouldShowAlert: true,
-    shouldPlaySound: false,
-    shouldSetBadge: false,
-  }),
-})
 
 export default function App() {
   const { store, error, isInitializing } = useAppInitialization()
@@ -38,6 +29,8 @@ export default function App() {
     }
 
     store.dispatch(tieSirens())
+    dependencies.databaseService.initialize()
+    dependencies.notificationService.initialize()
     dependencies.backgroundTaskService
       .initialize(store)
       .catch((error) =>

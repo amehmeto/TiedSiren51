@@ -1,10 +1,8 @@
 import { useEffect, useState } from 'react'
-import { AppStore } from '@/core/_redux_/createStore'
-import { initializeApp } from '@/ui/initializeApp'
+import { AppStore, createStore } from '@/core/_redux_/createStore'
 import { dependencies } from '@/ui/dependencies'
 import { handleUIError } from '@/ui/utils/handleUIError'
-import * as FileSystem from 'expo-file-system'
-import { Platform } from 'react-native'
+import { loadUser } from '@/core/auth/usecases/load-user.usecase'
 
 export function useAppInitialization() {
   const [store, setStore] = useState<AppStore | null>(null)
@@ -16,21 +14,13 @@ export function useAppInitialization() {
 
     async function init() {
       try {
-        const dbDir =
-          Platform.OS === 'android'
-            ? `${FileSystem.documentDirectory}databases`
-            : `${FileSystem.documentDirectory}SQLite`
+        await dependencies.databaseService.initialize()
 
-        const dirInfo = await FileSystem.getInfoAsync(dbDir)
-
-        if (!dirInfo.exists) {
-          await FileSystem.makeDirectoryAsync(dbDir, { intermediates: true })
-        }
-
-        const initializedStore = await initializeApp(dependencies)
+        const store = createStore(dependencies)
 
         if (isMounted) {
-          setStore(initializedStore)
+          setStore(store)
+          store.dispatch(loadUser())
           setError(null)
         }
       } catch (initError: unknown) {

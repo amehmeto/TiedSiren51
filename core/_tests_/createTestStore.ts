@@ -11,6 +11,7 @@ import { InMemorySirenTier } from '@/infra/siren-tier/in-memory-siren.tier'
 import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { FakeDataDeviceRepository } from '@/infra/device-repository/fake-data.device.repository'
+import { StubDatabaseService } from '@/infra/database-service/stub.database.service'
 
 export const createTestStore = (
   {
@@ -18,6 +19,7 @@ export const createTestStore = (
     backgroundTaskService = new FakeBackgroundTaskService(),
     blockSessionRepository = new FakeDataBlockSessionRepository(),
     blocklistRepository = new FakeDataBlocklistRepository(),
+    databaseService = new StubDatabaseService(),
     dateProvider = new StubDateProvider(),
     deviceRepository = new FakeDataDeviceRepository(),
     installedAppRepository = new FakeDataInstalledAppsRepository(),
@@ -29,6 +31,7 @@ export const createTestStore = (
 ) =>
   createStore(
     {
+      databaseService,
       authGateway,
       backgroundTaskService,
       blockSessionRepository,
