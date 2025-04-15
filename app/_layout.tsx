@@ -2,16 +2,11 @@ import { useEffect } from 'react'
 import { Provider } from 'react-redux'
 import { MenuProvider } from 'react-native-popup-menu'
 import { StatusBar } from 'expo-status-bar'
-import { tieSirens } from '@/core/siren/usecases/tie-sirens.usecase'
-import { dependencies } from '@/ui/dependencies'
-import * as NavigationBar from 'expo-navigation-bar'
-import { Platform, Text, View } from 'react-native'
-import { T } from '@/ui/design-system/theme'
+import { Text, View } from 'react-native'
 import { Stack, useRouter } from 'expo-router'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
-import { handleUIError } from '@/ui/utils/handleUIError'
 
 export default function App() {
   const { store, error, isInitializing } = useAppInitialization()
@@ -20,27 +15,7 @@ export default function App() {
   const isAuthenticated = false
 
   useEffect(() => {
-    if (!store) return
-
-    if (Platform.OS === 'android') {
-      NavigationBar.setBackgroundColorAsync(T.color.darkBlue).catch((error) =>
-        handleUIError(error, 'Navigation bar color setting failed'),
-      )
-    }
-
-    store.dispatch(tieSirens())
-    dependencies.databaseService.initialize()
-    dependencies.notificationService.initialize()
-    dependencies.backgroundTaskService
-      .initialize(store)
-      .catch((error) =>
-        handleUIError(error, 'Background task initialization failed'),
-      )
-  }, [store])
-
-  useEffect(() => {
-    if (!store || isInitializing) return
-
+    if (isInitializing || !store) return
     router.replace(isAuthenticated ? '/home' : '/register')
   }, [store, isInitializing, isAuthenticated, router])
 

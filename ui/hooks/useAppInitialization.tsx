@@ -2,6 +2,10 @@ import { useEffect, useState } from 'react'
 import { AppStore, createStore } from '@/core/_redux_/createStore'
 import { dependencies } from '@/ui/dependencies'
 import { handleUIError } from '@/ui/utils/handleUIError'
+import { tieSirens } from '@/core/siren/usecases/tie-sirens.usecase'
+import * as NavigationBar from 'expo-navigation-bar'
+import { Platform } from 'react-native'
+import { T } from '@/ui/design-system/theme'
 import { loadUser } from '@/core/auth/usecases/load-user.usecase'
 
 export function useAppInitialization() {
@@ -9,28 +13,48 @@ export function useAppInitialization() {
   const [error, setError] = useState<string | null>(null)
   const [isInitializing, setIsInitializing] = useState(true)
 
+  const initializeServices = async (appStore: AppStore) => {
+    try {
+      await dependencies.databaseService.initialize()
+      await dependencies.notificationService.initialize()
+
+      await dependencies.backgroundTaskService.initialize(appStore)
+
+      await appStore.dispatch(tieSirens())
+      await appStore.dispatch(loadUser())
+
+      if (Platform.OS === 'android') {
+        await NavigationBar.setBackgroundColorAsync(T.color.darkBlue).catch(
+          (error) => {
+            handleUIError(error, 'Navigation bar color setting failed')
+          },
+        )
+      }
+
+      setError(null)
+    } catch (error) {
+      const errorMessage = handleUIError(error, 'Service initialization failed')
+      setError(errorMessage)
+    } finally {
+      setIsInitializing(false)
+    }
+  }
+
   useEffect(() => {
     let isMounted = true
 
-    async function init() {
+    const init = async () => {
       try {
-        await dependencies.databaseService.initialize()
+        const appStore = createStore(dependencies)
+        if (!isMounted) return
 
-        const store = createStore(dependencies)
-
-        if (isMounted) {
-          setStore(store)
-          store.dispatch(loadUser())
-          setError(null)
-        }
-      } catch (initError: unknown) {
-        const errorMessage = handleUIError(
-          initError,
-          'App initialization failed',
-        )
-        if (isMounted) setError(errorMessage)
-      } finally {
-        if (isMounted) setIsInitializing(false)
+        setStore(appStore)
+        await initializeServices(appStore)
+      } catch (error) {
+        if (!isMounted) return
+        const errorMessage = handleUIError(error, 'Store creation failed')
+        setError(errorMessage)
+        setIsInitializing(false)
       }
     }
 
