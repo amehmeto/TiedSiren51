@@ -9,10 +9,9 @@ import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
 
 export default function App() {
-  const { store, error, isInitializing } = useAppInitialization()
+  const { store, error, isInitializing, isAuthenticated } =
+    useAppInitialization()
   const router = useRouter()
-  // TODO: should be retrieved from the store
-  const isAuthenticated = false
 
   useEffect(() => {
     if (isInitializing || !store) return

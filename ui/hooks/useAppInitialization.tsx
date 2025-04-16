@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useLayoutEffect, useState } from 'react'
 import { AppStore, createStore } from '@/core/_redux_/createStore'
 import { dependencies } from '@/ui/dependencies'
 import { handleUIError } from '@/ui/utils/handleUIError'
@@ -12,16 +12,19 @@ export function useAppInitialization() {
   const [store, setStore] = useState<AppStore | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isInitializing, setIsInitializing] = useState(true)
+  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   const initializeServices = async (appStore: AppStore) => {
     try {
       await dependencies.databaseService.initialize()
       await dependencies.notificationService.initialize()
-
       await dependencies.backgroundTaskService.initialize(appStore)
 
       await appStore.dispatch(tieSirens())
       await appStore.dispatch(loadUser())
+
+      const state = appStore.getState()
+      setIsAuthenticated(state.auth?.authUser !== null)
 
       if (Platform.OS === 'android') {
         await NavigationBar.setBackgroundColorAsync(T.color.darkBlue).catch(
@@ -40,7 +43,7 @@ export function useAppInitialization() {
     }
   }
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     let isMounted = true
 
     const init = async () => {
@@ -65,5 +68,5 @@ export function useAppInitialization() {
     }
   }, [])
 
-  return { store, error, isInitializing }
+  return { store, error, isInitializing, isAuthenticated }
 }
