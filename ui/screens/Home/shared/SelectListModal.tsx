@@ -100,23 +100,15 @@ export function SelectListModal(
             </View>
           )}
         />
-        {props.listType === 'blocklists' ? (
-          props.items.length === 0 ? (
-            <TiedSButton
-              style={styles.button}
-              onPress={() => {
-                router.push('/(tabs)/blocklists/create-blocklist-screen')
-                props.onRequestClose()
-              }}
-              text={'CREATE BLOCKLIST'}
-            />
-          ) : (
-            <TiedSButton
-              style={styles.button}
-              onPress={saveList}
-              text={'SAVE'}
-            />
-          )
+        {props.listType === 'blocklists' && props.items.length === 0 ? (
+          <TiedSButton
+            style={styles.button}
+            onPress={() => {
+              router.push('/(tabs)/blocklists/create-blocklist-screen')
+              props.onRequestClose()
+            }}
+            text={'CREATE BLOCKLIST'}
+          />
         ) : (
           <TiedSButton style={styles.button} onPress={saveList} text={'SAVE'} />
         )}

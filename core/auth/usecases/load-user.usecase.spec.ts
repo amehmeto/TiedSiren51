@@ -1,15 +1,14 @@
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
-import {
-  BlockSession,
-  BlockingConditions,
-} from '@/core/block-session/block.session'
+import { BlockSession } from '@/core/block-session/block.session'
 import { Sirens } from '@/core/siren/sirens'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
 import { FakeDataSirensRepository } from '@/infra/sirens-repository/fake-data.sirens-repository'
 import { describe, expect, test } from 'vitest'
 import { loadUser } from './load-user.usecase'
+import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
+import { buildSirens } from '@/core/_tests_/data-builders/sirens.builder'
 
 describe('loadUser usecase', () => {
   test('should load user data from repositories', async () => {
@@ -17,29 +16,12 @@ describe('loadUser usecase', () => {
       buildBlocklist({ id: 'blocklist-1', name: 'Test Blocklist' }),
     ]
 
-    const mockBlockSessions = [
-      {
-        id: 'session-1',
-        name: 'Test Session',
-        blocklists: [],
-        devices: [],
-        startedAt: '2023-01-01T00:00:00Z',
-        endedAt: '2023-01-02T00:00:00Z',
-        startNotificationId: 'start-1',
-        endNotificationId: 'end-1',
-        blockingConditions: [BlockingConditions.TIME],
-      },
-    ] as unknown as BlockSession[]
+    const mockBlockSessions = [buildBlockSession({ id: 'session-1' })]
 
-    const mockSirens: Sirens = {
-      android: [],
-      ios: [],
-      windows: [],
-      macos: [],
-      linux: [],
+    const mockSirens = buildSirens({
       websites: ['example.com'],
       keywords: ['test'],
-    }
+    })
 
     const blocklistRepository = new FakeDataBlocklistRepository()
     const blockSessionRepository = new FakeDataBlockSessionRepository()

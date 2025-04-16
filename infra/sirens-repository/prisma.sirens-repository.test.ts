@@ -1,20 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { PrismaSirensRepository } from './prisma.sirens-repository'
 
-// Create a test-specific subclass that extends the production repository
-class TestPrismaSirensRepository extends PrismaSirensRepository {
-  async reset(): Promise<void> {
-    await this.baseClient.siren.deleteMany()
-  }
-}
-
 describe('PrismaSirensRepository', () => {
-  let repository: TestPrismaSirensRepository
+  let repository: PrismaSirensRepository
 
   beforeEach(async () => {
-    repository = new TestPrismaSirensRepository()
+    repository = new PrismaSirensRepository()
     await repository.initialize()
-    await repository.reset()
   })
 
   it('should init selectable sirens when empty', async () => {

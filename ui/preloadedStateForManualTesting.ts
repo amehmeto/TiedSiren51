@@ -5,6 +5,7 @@ import {
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { dependencies } from '@/ui/dependencies'
+import { createStore } from '@/core/_redux_/createStore'
 
 export async function preloadedStateForManualTesting() {
   const { dateProvider, blocklistRepository, blockSessionRepository } =
@@ -42,3 +43,9 @@ export async function preloadedStateForManualTesting() {
     )
   return preloadedState
 }
+
+/*export const storePromise = preloadedStateForManualTesting().then(
+  (preloadedState) => createStore(dependencies, preloadedState.getState()),
+)*/
+
+export const storePromise = Promise.resolve(createStore(dependencies))
