@@ -34,4 +34,8 @@ export class FakeNotificationService implements NotificationService {
     this.lastCancelledNotificationIds.push(notificationId)
     return Promise.resolve()
   }
+
+  initialize(): Promise<void> {
+    return Promise.resolve(undefined)
+  }
 }

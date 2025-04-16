@@ -10,10 +10,10 @@ import {
   instagramAndroidSiren,
 } from '@/core/_tests_/data-builders/android-siren.builder'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
-import { GenericInMemoryRepository } from '../__abstract__/generic-in-memory.repository'
+import { InMemoryRepository } from '../__abstract__/in-memory.repository'
 
 export class FakeDataBlockSessionRepository
-  extends GenericInMemoryRepository<BlockSession>
+  extends InMemoryRepository<BlockSession>
   implements BlockSessionRepository
 {
   entities: Map<string, BlockSession> = new Map(

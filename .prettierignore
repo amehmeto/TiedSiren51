@@ -1,0 +1,13 @@
+# Ignore Expo environment type declarations
+expo-env.d.ts
+
+# Common folders to ignore
+node_modules
+build
+dist
+.expo
+.expo-shared
+
+# Generated files
+*.generated.*
+

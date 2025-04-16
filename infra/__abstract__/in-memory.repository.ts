@@ -2,7 +2,7 @@ import uuid from 'react-native-uuid'
 import { UpdatePayload } from '@/core/ports/update.payload'
 import { CreatePayload } from '@/core/ports/create.payload'
 
-export class GenericInMemoryRepository<T extends { id: string }> {
+export class InMemoryRepository<T extends { id: string }> {
   entities: Map<string, T> = new Map()
 
   async findById(id: string): Promise<T> {

@@ -100,7 +100,7 @@ export function SelectListModal(
             </View>
           )}
         />
-        {props.listType === 'blocklists' ? (
+        {props.listType === 'blocklists' && props.items.length === 0 ? (
           <TiedSButton
             style={styles.button}
             onPress={() => {

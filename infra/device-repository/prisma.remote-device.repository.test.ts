@@ -1,13 +1,26 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { PrismaRemoteDeviceRepository } from './prisma.remote-device.repository'
-import { extendedClient } from '@/infra/prisma/databaseService'
+import { Device } from '@/core/device/device'
+
+class TestPrismaRemoteDeviceRepository extends PrismaRemoteDeviceRepository {
+  async reset(): Promise<void> {
+    await this.baseClient.device.deleteMany()
+  }
+
+  async createDeviceForTesting(device: Device): Promise<void> {
+    await this.baseClient.device.create({
+      data: device,
+    })
+  }
+}
 
 describe('PrismaRemoteDeviceRepository', () => {
-  let repository: PrismaRemoteDeviceRepository
+  let repository: TestPrismaRemoteDeviceRepository
 
   beforeEach(async () => {
-    repository = new PrismaRemoteDeviceRepository()
-    await extendedClient.device.deleteMany()
+    repository = new TestPrismaRemoteDeviceRepository()
+    await repository.initialize()
+    await repository.reset()
   })
 
   it('should find all remote devices', async () => {
@@ -18,9 +31,7 @@ describe('PrismaRemoteDeviceRepository', () => {
     ]
 
     for (const device of testDevices) {
-      await extendedClient.device.create({
-        data: device,
-      })
+      await repository.createDeviceForTesting(device)
     }
 
     const devices = await repository.findAll()

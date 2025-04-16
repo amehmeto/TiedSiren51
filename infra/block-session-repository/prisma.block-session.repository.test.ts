@@ -3,28 +3,31 @@ import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { UpdatePayload } from '@/core/ports/update.payload'
-import { extendedClient } from '@/infra/prisma/databaseService'
+import { PrismaClient } from '@prisma/client/react-native'
 
-describe.skip('PrismaBlockSessionRepository', () => {
+describe('PrismaBlockSessionRepository', () => {
   let repository: PrismaBlockSessionRepository
+  let prismaClient: PrismaClient
 
   beforeEach(async () => {
     repository = new PrismaBlockSessionRepository()
+    await repository.initialize()
+    prismaClient = repository.getClient()
+
     // Clear junction tables first
-    await extendedClient.$executeRaw`DELETE FROM "_BlockSessionToDevice"`
-    await extendedClient.$executeRaw`DELETE FROM "_BlockSessionToBlocklist"`
+    await prismaClient.$executeRaw`DELETE FROM "_BlockSessionToDevice"`
+    await prismaClient.$executeRaw`DELETE FROM "_BlockSessionToBlocklist"`
     // Then clear main tables
-    await extendedClient.blockSession.deleteMany()
-    await extendedClient.device.deleteMany()
-    await extendedClient.blocklist.deleteMany()
+    await prismaClient.blockSession.deleteMany()
+    await prismaClient.device.deleteMany()
+    await prismaClient.blocklist.deleteMany()
   })
 
   const prepareSessionPayload = async () => {
     const sessionPayload = buildBlockSession()
     // @ts-expect-error - removing id for creation
     delete sessionPayload.id
-
-    await extendedClient.device.create({
+    await prismaClient.device.create({
       data: {
         id: 'test-device-id',
         type: 'test-type',
@@ -70,8 +73,7 @@ describe.skip('PrismaBlockSessionRepository', () => {
       'Evening Session',
     ]
     const createdSessions = []
-
-    await extendedClient.device.create({
+    await prismaClient.device.create({
       data: {
         id: 'test-device-id',
         type: 'test-type',
