@@ -3,6 +3,8 @@ sh .husky/scripts/branch-name-check.sh
 sh .husky/scripts/uncommitted-files-check.sh
 
 yarn test:cov
+echo ""
+
 npx expo-doctor
 
 exec < /dev/tty  # Redirect input to terminal
