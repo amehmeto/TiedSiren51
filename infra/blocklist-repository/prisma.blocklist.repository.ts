@@ -67,9 +67,6 @@ export class PrismaBlocklistRepository
       where: { id },
     })
   }
-  public async resetForTesting(): Promise<void> {
-    await this.baseClient.blocklist.deleteMany()
-  }
 
   private mapToBlocklist(dbBlocklist: DbBlocklist): Blocklist {
     return {

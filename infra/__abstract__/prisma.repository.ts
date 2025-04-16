@@ -167,9 +167,4 @@ export abstract class PrismaRepository {
       console.error('Error loading initial data:', error)
     }
   }
-
-  public async resetForTesting(): Promise<void> {
-    // This method will be implemented by child classes
-    throw new Error('resetForTesting not implemented')
-  }
 }

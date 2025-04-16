@@ -15,14 +15,4 @@ export class PrismaRemoteDeviceRepository
       type: device.type,
     }))
   }
-
-  public async resetForTesting(): Promise<void> {
-    await this.baseClient.device.deleteMany()
-  }
-
-  public async createDeviceForTesting(device: Device): Promise<void> {
-    await this.baseClient.device.create({
-      data: device,
-    })
-  }
 }
