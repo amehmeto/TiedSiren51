@@ -2,19 +2,19 @@ import {
   Menu,
   MenuOption,
   MenuOptions,
-  MenuOptionsCustomStyle,
   MenuTrigger,
 } from 'react-native-popup-menu'
 import { Ionicons } from '@expo/vector-icons'
 import { TiedSBlurView } from './TiedSBlurView'
 import {
-  Dimensions,
   StyleProp,
   StyleSheet,
   Text,
   ViewStyle,
+  useWindowDimensions,
 } from 'react-native'
 import { T } from '@/ui/design-system/theme'
+import { useMemo } from 'react'
 
 type IconName =
   | 'text-outline'
@@ -48,6 +48,12 @@ export function ThreeDotMenu(props: {
   menuOptions: TiedSMenu[]
   style?: StyleProp<ViewStyle>
 }) {
+  const { width: windowWidth } = useWindowDimensions()
+
+  const menuWidth = useMemo(() => {
+    return Math.min(Math.max(windowWidth * 0.4, 160), windowWidth * 0.7)
+  }, [windowWidth])
+
   const selectMenuOption = (optionName: TiedSMenu['name']) => {
     const selectedOption = props.menuOptions.find(
       (option) => option.name === optionName,
@@ -55,6 +61,29 @@ export function ThreeDotMenu(props: {
     if (!selectedOption) throw new Error('Invalid menu option')
     selectedOption.action()
   }
+
+  const dynamicStyles = useMemo(
+    () => ({
+      menuOption: {
+        display: 'flex',
+        flexDirection: 'row',
+        justifyContent: 'space-between',
+        alignItems: 'center',
+        width: menuWidth - T.spacing.medium * 2,
+        padding: T.spacing.small,
+        backgroundColor: T.color.transparent,
+      },
+      optionsContainer: {
+        backgroundColor: T.color.transparent,
+        borderRadius: T.border.radius.roundedSmall,
+        width: menuWidth,
+        marginTop: T.spacing.medium + 5,
+        marginLeft: T.spacing.medium,
+        padding: T.spacing.small,
+      },
+    }),
+    [menuWidth],
+  )
 
   return (
     <Menu onSelect={selectMenuOption} style={[props.style]}>
@@ -65,7 +94,11 @@ export function ThreeDotMenu(props: {
           color={T.color.text}
         />
       </MenuTrigger>
-      <MenuOptions customStyles={optionsStyles}>
+      <MenuOptions
+        customStyles={{
+          optionsContainer: dynamicStyles.optionsContainer,
+        }}
+      >
         <TiedSBlurView style={styles.menuOptions}>
           {props.menuOptions.map((option) => (
             <TiedSMenuOption
@@ -79,8 +112,6 @@ export function ThreeDotMenu(props: {
     </Menu>
   )
 }
-// TODO: hacky, should be fixed by finding a way to apply width 100% and flex options
-const betweenHalfAndThirdOfWindow = Dimensions.get('window').width / 2.5
 
 const styles = StyleSheet.create({
   menuOptionText: {
@@ -100,19 +131,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    width: betweenHalfAndThirdOfWindow - T.spacing.medium * 2,
     padding: T.spacing.small,
     backgroundColor: T.color.transparent,
   },
 })
-
-const optionsStyles: MenuOptionsCustomStyle = {
-  optionsContainer: {
-    backgroundColor: T.color.transparent,
-    borderRadius: T.border.radius.roundedSmall,
-    width: betweenHalfAndThirdOfWindow,
-    marginTop: T.spacing.medium + 5,
-    marginLeft: T.spacing.medium,
-    padding: T.spacing.small,
-  },
-}
