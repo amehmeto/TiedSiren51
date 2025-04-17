@@ -39,8 +39,14 @@ jobs:
             });
             const prAuthor = pr.data.user.login;
             
-            // Check if PR is approved (excluding self-approvals)
-            const isApproved = reviews.data.some(review => 
+            // Define admin username - replace this with your actual GitHub username
+            const adminUsername = 'amehmeto';
+            
+            // Check if PR is from admin (automatic approval)
+            const isAdminPR = prAuthor === adminUsername;
+            
+            // Check if PR is approved (excluding self-approvals for non-admins)
+            const isApproved = isAdminPR || reviews.data.some(review => 
               review.state === 'APPROVED' && 
               review.user.login !== prAuthor
             );
@@ -49,8 +55,10 @@ jobs:
             core.setOutput('approved', isApproved.toString());
             
             // Create status check
-            const state = isApproved ? 'success' : 'pending';
-            const description = isApproved ? 'PR is approved' : 'Waiting for PR approval';
+            let state = isApproved ? 'success' : 'pending';
+            let description = isAdminPR ? 
+                              'Admin PR - automatically approved' : 
+                              (isApproved ? 'PR is approved' : 'Waiting for PR approval');
             
             github.rest.repos.createCommitStatus({
               owner: context.repo.owner,
