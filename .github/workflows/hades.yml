@@ -1,18 +1,69 @@
-# Hades
+# Hades Workflow
 # Named after the ruler of the underworld who judges souls.
 # Once code passes Cerberus's inspection, it enters Hades's domain
-# for internal testing and review, not yet ready for public release
-# but under careful scrutiny in this preview/testing realm.
+# for EAS build verification before being allowed to merge.
 
 name: Hades
 
 on:
-  push:
+  pull_request:
+    types: [labeled, synchronize]
     branches:
       - main
 
 jobs:
+  check-approval:
+    runs-on: ubuntu-latest
+    if: contains(github.event.pull_request.labels.*.name, 'ready-for-review')
+    outputs:
+      is_approved: ${{ steps.check-approval.outputs.approved }}
+    steps:
+      - name: Check PR approval status
+        id: check-approval
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            // Get PR reviews
+            const reviews = await github.rest.pulls.listReviews({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            
+            // Get PR author
+            const pr = await github.rest.pulls.get({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              pull_number: context.issue.number
+            });
+            const prAuthor = pr.data.user.login;
+            
+            // Check if PR is approved (excluding self-approvals)
+            const isApproved = reviews.data.some(review => 
+              review.state === 'APPROVED' && 
+              review.user.login !== prAuthor
+            );
+            
+            // Set output
+            core.setOutput('approved', isApproved.toString());
+            
+            // Create status check
+            const state = isApproved ? 'success' : 'pending';
+            const description = isApproved ? 'PR is approved' : 'Waiting for PR approval';
+            
+            github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.payload.pull_request.head.sha,
+              state: state,
+              context: 'PR Approval Check',
+              description: description
+            });
+
   build-preview:
+    needs: check-approval
+    if: needs.check-approval.outputs.is_approved == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -35,12 +86,38 @@ jobs:
           eas-version: latest
           expo-version: '6.3.10'
           token: ${{ secrets.EXPO_TOKEN }}
-          expo-cache: false
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
 
       - name: Trigger Preview Build
-        run: eas build -p android --profile preview
+        id: eas-build
+        run: |
+          BUILD_INFO=$(eas build -p android --profile preview --non-interactive --json)
+          echo "BUILD_URL=$(echo $BUILD_INFO | jq -r '.url')" >> $GITHUB_OUTPUT
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+      # Create a required status check that can block merging
+      - name: Update PR Status
+        uses: actions/github-script@v6
+        with:
+          github-token: ${{secrets.GITHUB_TOKEN}}
+          script: |
+            github.rest.repos.createCommitStatus({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              sha: context.payload.pull_request.head.sha,
+              state: 'success',
+              context: 'EAS Build Verification',
+              description: 'EAS build completed successfully',
+              target_url: '${{ steps.eas-build.outputs.BUILD_URL }}'
+            });
+            
+            // Add comment with build info
+            github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+              body: `✅ EAS Build completed successfully!\nBuild URL: ${{ steps.eas-build.outputs.BUILD_URL }}`
+            });
