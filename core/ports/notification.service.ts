@@ -4,6 +4,7 @@ export type NotificationTrigger = {
 }
 
 export interface NotificationService {
+  initialize(): Promise<void>
   sendPushNotification(message: string): Promise<void>
   scheduleLocalNotification(
     title: string,

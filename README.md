@@ -9,6 +9,70 @@ A React Native mobile application built with Expo, featuring authentication, blo
 - Expo CLI (`yarn global add expo-cli`)
 - iOS Simulator (for Mac users) or Android Studio (for Android development)
 
+
+## Android Development Setup for macOS
+
+Setting up the Android development environment on macOS requires a few specific steps:
+
+### 1. Install Java Development Kit (OpenJDK 17)
+
+Android development requires a compatible Java version. OpenJDK 17 is recommended:
+
+```bash
+# Install OpenJDK 17 using Homebrew
+brew install openjdk@17
+
+# Verify installation
+java -version   # Should show Java 17
+javac -version  # Should show JavaC 17
+```
+
+### 2. Configure Java Environment
+
+The Homebrew-installed OpenJDK is "keg-only" and needs to be linked to your system:
+
+```bash
+# Add Java to your PATH in your shell configuration file (.zshrc or .bash_profile)
+echo 'export PATH="/opt/homebrew/opt/openjdk@17/bin:$PATH"' >> ~/.zshrc
+
+# Apply changes
+source ~/.zshrc
+```
+
+Alternatively, you may create a symlink (requires sudo access):
+
+```bash
+sudo ln -sfn /opt/homebrew/opt/openjdk@17/libexec/openjdk.jdk /Library/Java/JavaVirtualMachines/openjdk-17.jdk
+```
+
+### 3. Set up Android SDK
+
+Ensure Android Studio is installed. Then set up environment variables:
+
+```bash
+# Add Android SDK environment variables to your shell configuration
+echo 'export ANDROID_HOME="$HOME/Library/Android/sdk"' >> ~/.zshrc
+echo 'export PATH="$ANDROID_HOME/platform-tools:$PATH"' >> ~/.zshrc
+
+# Apply changes
+source ~/.zshrc
+
+# Verify by checking the environment variable
+echo $ANDROID_HOME  # Should show your Android SDK path
+```
+
+### 4. Verify Setup
+
+After setup, you should be able to run Android commands:
+
+```bash
+# Verify adb (Android Debug Bridge) is accessible
+adb --version
+
+# Run the Android app
+yarn android
+```
+
 ## Installation
 
 1. Clone the repository

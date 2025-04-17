@@ -2,7 +2,6 @@ import { RootState } from '@/core/_redux_/createStore'
 import { BlockSession } from '@/core/block-session/block.session'
 import { formatDistance } from 'date-fns'
 import { createSelector } from '@reduxjs/toolkit'
-
 import { selectActiveSessions } from '@/core/block-session/selectors/selectActiveSessions'
 import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAllBlockSessions'
 import { DateProvider } from '@/core/ports/port.date-provider'

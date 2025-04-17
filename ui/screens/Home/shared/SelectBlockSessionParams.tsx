@@ -2,7 +2,6 @@ import { useEffect, useState } from 'react'
 import { FormikProps } from 'formik'
 import { StyleSheet, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
-import { deviceRepository } from '@/ui/dependencies'
 import { Device } from '@/core/device/device'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
@@ -16,6 +15,7 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlockingCondition'
 import { FormError } from '@/ui/screens/Home/shared/FormError'
 import { FieldErrors } from '@/ui/screens/Home/shared/FieldErrors'
+import { dependencies } from '@/ui/dependencies'
 
 export function SelectBlockSessionParams({
   form,
@@ -33,7 +33,7 @@ export function SelectBlockSessionParams({
   )
 
   useEffect(() => {
-    deviceRepository.findAll().then((devices) => {
+    dependencies.deviceRepository.findAll().then((devices) => {
       setDevices(devices)
     })
   }, [])

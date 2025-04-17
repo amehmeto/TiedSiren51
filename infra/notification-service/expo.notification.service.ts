@@ -4,6 +4,16 @@ import Constants from 'expo-constants'
 import { Platform } from 'react-native'
 
 export class ExpoNotificationService implements NotificationService {
+  async initialize(): Promise<void> {
+    Notifications.setNotificationHandler({
+      handleNotification: async () => ({
+        shouldShowAlert: true,
+        shouldPlaySound: false,
+        shouldSetBadge: false,
+      }),
+    })
+  }
+
   async requestNotificationPermissions(): Promise<void> {
     const { status: existingStatus } = await Notifications.getPermissionsAsync()
     let finalStatus = existingStatus
