@@ -22,8 +22,6 @@ export function SelectBlockSessionParams({
 }: {
   form: FormikProps<Session>
 }) {
-  // TODO: It was a mistake from my side, I shouldn't have destructured form here. It complicates things unnecessarily.
-  const { handleChange, handleBlur, handleSubmit, setFieldValue, values } = form
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
@@ -48,25 +46,25 @@ export function SelectBlockSessionParams({
     <View>
       <TiedSBlurView style={styles.blockSession}>
         <ChooseName
-          values={values}
-          onChange={handleChange('name')}
-          setFieldValue={setFieldValue}
-          onBlur={() => handleBlur('name')}
+          values={form.values}
+          onChange={form.handleChange('name')}
+          setFieldValue={form.setFieldValue}
+          onBlur={() => form.handleBlur('name')}
         />
         {hasFieldError('name') && <FormError error={form.errors.name} />}
         <SelectFromList
-          values={values}
+          values={form.values}
           listType={'blocklists'}
-          setFieldValue={setFieldValue}
+          setFieldValue={form.setFieldValue}
           items={blocklists}
         />
         {hasFieldError('blocklists') && (
           <FieldErrors errors={form.errors} fieldName={'blocklists'} />
         )}
         <SelectFromList
-          values={values}
+          values={form.values}
           listType={'devices'}
-          setFieldValue={setFieldValue}
+          setFieldValue={form.setFieldValue}
           items={devices}
         />
         {hasFieldError('devices') && (
@@ -75,10 +73,10 @@ export function SelectBlockSessionParams({
         <SelectTime
           timeField={'startedAt'}
           setIsTimePickerVisible={setIsStartTimePickerVisible}
-          values={values}
+          values={form.values}
           isTimePickerVisible={isStartTimePickerVisible}
-          setFieldValue={setFieldValue}
-          handleChange={handleChange}
+          setFieldValue={form.setFieldValue}
+          handleChange={form.handleChange}
         />
         {hasFieldError('startedAt') && (
           <FormError error={form.errors.startedAt} />
@@ -86,10 +84,10 @@ export function SelectBlockSessionParams({
         <SelectTime
           timeField={'endedAt'}
           setIsTimePickerVisible={setIsEndTimePickerVisible}
-          values={values}
+          values={form.values}
           isTimePickerVisible={isEndTimePickerVisible}
-          setFieldValue={setFieldValue}
-          handleChange={handleChange}
+          setFieldValue={form.setFieldValue}
+          handleChange={form.handleChange}
         />
         {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
         <SelectBlockingCondition form={form} />
@@ -98,7 +96,7 @@ export function SelectBlockSessionParams({
         )}
       </TiedSBlurView>
 
-      <TiedSButton text={'START'} onPress={() => handleSubmit()} />
+      <TiedSButton text={'START'} onPress={() => form.handleSubmit()} />
     </View>
   )
 }
