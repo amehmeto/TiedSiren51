@@ -33,7 +33,7 @@ jobs:
         uses: expo/expo-github-action@v8
         with:
           eas-version: latest
-          expo-version: '6.3.10'
+          expo-version: '51.0.39'
           token: ${{ secrets.EXPO_TOKEN }}
           expo-cache: false
 
