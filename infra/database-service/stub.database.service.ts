@@ -1,3 +1,5 @@
+import { DatabaseService } from '@/core/ports/database.service'
+
 export class StubDatabaseService implements DatabaseService {
   getDbPath(): string {
     return ''
