@@ -7,15 +7,19 @@ import { SirensRepository } from '../ports/sirens.repository'
 import { NotificationService } from '../ports/notification.service'
 import { BackgroundTaskService } from '../ports/background-task.service'
 import { AuthGateway } from '@/core/ports/auth.gateway'
+import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
+import { DatabaseService } from '@/core/ports/database.service'
 
 export type Dependencies = {
+  databaseService: DatabaseService
   authGateway: AuthGateway
+  backgroundTaskService: BackgroundTaskService
   blockSessionRepository: BlockSessionRepository
   blocklistRepository: BlocklistRepository
-  sirenTier: SirenTier
   dateProvider: DateProvider
+  deviceRepository: RemoteDeviceRepository
   installedAppRepository: InstalledAppRepository
-  sirensRepository: SirensRepository
   notificationService: NotificationService
-  backgroundTaskService: BackgroundTaskService
+  sirenTier: SirenTier
+  sirensRepository: SirensRepository
 }

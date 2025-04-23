@@ -5,6 +5,7 @@ import { updateBlocklist } from './usecases/update-blocklist.usecase'
 import { renameBlocklist } from './usecases/rename-blocklist.usecase'
 import { duplicateBlocklist } from './usecases/duplicate-blocklist.usecase'
 import { deleteBlocklist } from './usecases/delete-blocklist.usecase'
+import { loadUser } from '../auth/usecases/load-user.usecase'
 
 export const blocklistSlice = createSlice({
   name: 'blocklist',
@@ -16,6 +17,9 @@ export const blocklistSlice = createSlice({
   },
   extraReducers(builder) {
     builder
+      .addCase(loadUser.fulfilled, (state, action) => {
+        blocklistAdapter.setAll(state, action.payload.blocklists)
+      })
       .addCase(createBlocklist.fulfilled, (state, action) => {
         blocklistAdapter.addOne(state, action.payload)
       })
