@@ -22,6 +22,7 @@
         "backgroundColor": "#0C207A"
       },
       "package": "com.tiedsiren.tiedsiren",
+      "permissions": ["QUERY_ALL_PACKAGES"],
       "permissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE"

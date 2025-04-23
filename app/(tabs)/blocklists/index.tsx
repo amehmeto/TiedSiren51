@@ -1,3 +1,4 @@
+/* eslint-disable no-switch-statements/no-switch */
 import { useSelector } from 'react-redux'
 import React, { ReactNode } from 'react'
 import {
