@@ -67,13 +67,11 @@ export function BlocklistForm({
   const [errors, setErrors] = useState<ErrorMessages>({})
   const [index, setIndex] = useState(0)
 
-  const routes = useMemo(() => {
-    return [
-      { key: 'apps', title: 'Apps' },
-      { key: 'websites', title: 'Websites' },
-      { key: 'keywords', title: 'Keywords' },
-    ]
-  }, [])
+  const routes = [
+    { key: 'apps', title: 'Apps' },
+    { key: 'websites', title: 'Websites' },
+    { key: 'keywords', title: 'Keywords' },
+  ]
 
   useEffect(() => {
     dispatch(fetchAvailableSirens())
@@ -85,9 +83,8 @@ export function BlocklistForm({
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
         if (
-          !(
-            sirenType === SirenType.WEBSITES || sirenType === SirenType.KEYWORDS
-          )
+          sirenType !== SirenType.WEBSITES &&
+          sirenType !== SirenType.KEYWORDS
         )
           return prevBlocklist
 
@@ -141,43 +138,41 @@ export function BlocklistForm({
         title: string
       }
     }) => {
-      switch (route.key) {
-        case 'apps':
-          return (
-            <AppsSelectionScene
-              data={selectableSirens.android}
-              toggleAppSiren={toggleAppSiren}
-              isSirenSelected={isSirenSelected}
-            />
-          )
-
-        case 'websites':
-          return (
-            <TextInputSelectionScene
-              onSubmitEditing={(event) =>
-                dispatch(addWebsiteToSirens(event.nativeEvent.text))
-              }
-              sirenType={SirenType.WEBSITES}
-              placeholder={'Add websites...'}
-              data={selectableSirens.websites}
-              toggleSiren={toggleTextSiren}
-              isSirenSelected={isSirenSelected}
-            />
-          )
-        case 'keywords':
-          return (
-            <TextInputSelectionScene
-              onSubmitEditing={(event) =>
-                dispatch(addKeywordToSirens(event.nativeEvent.text))
-              }
-              sirenType={SirenType.KEYWORDS}
-              placeholder={'Add keywords...'}
-              data={selectableSirens.keywords}
-              toggleSiren={toggleTextSiren}
-              isSirenSelected={isSirenSelected}
-            />
-          )
+      const scenes = {
+        apps: () => (
+          <AppsSelectionScene
+            data={selectableSirens.android}
+            toggleAppSiren={toggleAppSiren}
+            isSirenSelected={isSirenSelected}
+          />
+        ),
+        websites: () => (
+          <TextInputSelectionScene
+            onSubmitEditing={(event) =>
+              dispatch(addWebsiteToSirens(event.nativeEvent.text))
+            }
+            sirenType={SirenType.WEBSITES}
+            placeholder={'Add websites...'}
+            data={selectableSirens.websites}
+            toggleSiren={toggleTextSiren}
+            isSirenSelected={isSirenSelected}
+          />
+        ),
+        keywords: () => (
+          <TextInputSelectionScene
+            onSubmitEditing={(event) =>
+              dispatch(addKeywordToSirens(event.nativeEvent.text))
+            }
+            sirenType={SirenType.KEYWORDS}
+            placeholder={'Add keywords...'}
+            data={selectableSirens.keywords}
+            toggleSiren={toggleTextSiren}
+            isSirenSelected={isSirenSelected}
+          />
+        ),
       }
+
+      return scenes[route.key as keyof typeof scenes]()
     },
     [
       dispatch,
@@ -223,7 +218,7 @@ export function BlocklistForm({
     router.push('/(tabs)/blocklists')
   }, [blocklist, mode, dispatch, router, validateForm])
 
-  const navigationState = useMemo(() => ({ index, routes }), [index, routes])
+  const navigationState = { index, routes }
   const initialLayout = useMemo(
     () => ({ width: Dimensions.get('window').width }),
     [],

@@ -1,3 +1,4 @@
+/* eslint-disable no-switch-statements/no-switch */
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { Image, StyleSheet, Text } from 'react-native'
 import 'react-native-gesture-handler'
