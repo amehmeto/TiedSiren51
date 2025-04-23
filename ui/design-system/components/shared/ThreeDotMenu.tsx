@@ -51,7 +51,14 @@ export function ThreeDotMenu(props: {
   const { width: windowWidth } = useWindowDimensions()
 
   const menuWidth = useMemo(() => {
-    return Math.min(Math.max(windowWidth * 0.4, 160), windowWidth * 0.7)
+    const fortyPercent = windowWidth * 0.4
+    const seventyPercent = windowWidth * 0.7
+    const minWidth = 160
+
+    const lowerBound = Math.max(fortyPercent, minWidth)
+    const clampedWidth = Math.min(lowerBound, seventyPercent)
+
+    return clampedWidth
   }, [windowWidth])
 
   const selectMenuOption = (optionName: TiedSMenu['name']) => {
