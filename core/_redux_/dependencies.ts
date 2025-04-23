@@ -8,6 +8,7 @@ import { NotificationService } from '../ports/notification.service'
 import { BackgroundTaskService } from '../ports/background-task.service'
 import { AuthGateway } from '@/core/ports/auth.gateway'
 import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
+import { DatabaseService } from '@/core/ports/database.service'
 
 export type Dependencies = {
   databaseService: DatabaseService
