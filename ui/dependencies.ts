@@ -19,7 +19,7 @@ const mobileDependencies = {
   sirenTier: new InMemorySirenTier(),
   dateProvider: new RealDateProvider(),
   deviceRepository: new PrismaRemoteDeviceRepository(),
-  installedAppRepository: new ExpoListInstalledAppsRepository(),
+  installedAppRepository: new ExpoListInstalledAppsRepository(true),
   sirensRepository: new PrismaSirensRepository(),
   notificationService: new ExpoNotificationService(),
   backgroundTaskService: new RealBackgroundTaskService(),

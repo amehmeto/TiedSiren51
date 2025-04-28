@@ -49,6 +49,8 @@ export function BlocklistForm({
     blocklistId ? selectBlocklistById(blocklistId, state) : undefined,
   )
 
+  const loading = useSelector((state: RootState) => state.siren.loading)
+
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
     {
       name: '',
@@ -144,6 +146,7 @@ export function BlocklistForm({
             data={selectableSirens.android}
             toggleAppSiren={toggleAppSiren}
             isSirenSelected={isSirenSelected}
+            isLoading={loading}
           />
         ),
         websites: () => (
@@ -180,6 +183,7 @@ export function BlocklistForm({
       toggleAppSiren,
       toggleTextSiren,
       isSirenSelected,
+      loading,
     ],
   )
 

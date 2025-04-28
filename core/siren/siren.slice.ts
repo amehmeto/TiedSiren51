@@ -18,6 +18,7 @@ export const sirenSlice = createSlice({
       websites: [],
       keywords: [],
     } as Sirens,
+    loading: false,
   },
   reducers: {
     setSirens: (state, action) => {
@@ -28,9 +29,17 @@ export const sirenSlice = createSlice({
     builder
       .addCase(loadUser.fulfilled, (state, action) => {
         state.availableSirens = action.payload.sirens
+        state.loading = false
+      })
+      .addCase(fetchAvailableSirens.pending, (state) => {
+        state.loading = true
       })
       .addCase(fetchAvailableSirens.fulfilled, (state, action) => {
         state.availableSirens = action.payload
+        state.loading = false
+      })
+      .addCase(fetchAvailableSirens.rejected, (state) => {
+        state.loading = false
       })
       .addCase(addKeywordToSirens.fulfilled, (state, action) => {
         state.availableSirens.keywords.push(action.payload)
