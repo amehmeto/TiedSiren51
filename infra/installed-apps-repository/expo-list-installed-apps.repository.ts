@@ -21,6 +21,7 @@ const isSystemApp = (packageName: string): boolean => {
     'com.asus.',
     'com.sony.',
     'com.nokia.',
+    'com.sec.',
   ]
 
   const knownSystemApps = [
