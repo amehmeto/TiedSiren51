@@ -24,15 +24,42 @@ function greetUser(now: Date) {
 }
 
 function generateTimeInfo(dateProvider: DateProvider, session: BlockSession) {
-  const start = dateProvider.recoverDate(session.startedAt)
-  const end = dateProvider.recoverDate(session.endedAt)
   const now = dateProvider.getNow()
-  return isActive(dateProvider, session)
-    ? 'Ends ' +
-        formatDistance(end, now, {
-          addSuffix: true,
-        })
-    : 'Starts at ' + dateProvider.toHHmm(start)
+  const nowHHmm = dateProvider.toHHmm(now)
+  const isOvernight = session.startedAt > session.endedAt
+
+  if (isActive(dateProvider, session)) {
+    let end
+
+    if (isOvernight) {
+      // For overnight sessions, we need to ensure the end time is set to tomorrow
+      // if current time is after midnight
+      if (nowHHmm < session.endedAt) {
+        // We're past midnight but before end time (e.g., 2 AM and end time is 7 AM)
+        end = dateProvider.recoverDate(session.endedAt)
+      } else {
+        // We're before midnight (e.g., 23:00 and end time is 7 AM tomorrow)
+        // Create tomorrow's date for the end time
+        const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+        tomorrow.setHours(
+          parseInt(session.endedAt.split(':')[0], 10),
+          parseInt(session.endedAt.split(':')[1], 10),
+          0,
+          0,
+        )
+        end = tomorrow
+      }
+    } else {
+      // Regular session (same day)
+      end = dateProvider.recoverDate(session.endedAt)
+    }
+
+    return 'Ends ' + formatDistance(end, now, { addSuffix: true })
+  } else {
+    // For scheduled sessions, just show the start time
+    const start = dateProvider.recoverDate(session.startedAt)
+    return 'Starts at ' + dateProvider.toHHmm(start)
+  }
 }
 
 function formatToViewModel(
@@ -94,7 +121,7 @@ export const selectHomeViewModel = createSelector(
       dateProvider,
     )
 
-    const scheduledSessions = selectScheduledSessions(
+    const scheduledSessions: BlockSession[] = selectScheduledSessions(
       dateProvider,
       blockSession,
     )
