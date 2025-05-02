@@ -12,4 +12,5 @@ export interface NotificationService {
     trigger: NotificationTrigger,
   ): Promise<string>
   cancelScheduledNotifications(notificationId: string): Promise<void>
+  startSessionStatusMonitoring(checkInterval?: number): () => void
 }

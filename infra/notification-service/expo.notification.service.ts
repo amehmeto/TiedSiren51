@@ -2,6 +2,16 @@ import * as Notifications from 'expo-notifications'
 import { NotificationService } from '@/core/ports/notification.service'
 import Constants from 'expo-constants'
 import { Platform } from 'react-native'
+import { AppDispatch } from '@/core/_redux_/createStore'
+import { checkAndNotifySessionChanges } from '@/core/block-session/usecases/handle-session-status-change.usecase'
+import { dependencies } from '@/ui/dependencies'
+
+// Store reference to be injected
+let dispatch: AppDispatch | null = null
+
+export function setDispatch(appDispatch: AppDispatch): void {
+  dispatch = appDispatch
+}
 
 export class ExpoNotificationService implements NotificationService {
   async initialize(): Promise<void> {
@@ -96,5 +106,42 @@ export class ExpoNotificationService implements NotificationService {
 
   async cancelScheduledNotifications(notificationId: string): Promise<void> {
     await Notifications.cancelScheduledNotificationAsync(notificationId)
+  }
+
+  startSessionStatusMonitoring(checkInterval = 3000): () => void {
+    const { dateProvider, blockSessionRepository } = dependencies
+
+    if (!dispatch) {
+      throw new Error(
+        'Dispatch function not set. Call setDispatch before starting monitoring.',
+      )
+    }
+
+    // Start the monitoring interval
+    const intervalId = setInterval(async () => {
+      if (!dispatch) return
+
+      // Get current sessions from the repository
+      const appDispatch = dispatch
+      const blockSessions = await blockSessionRepository.findAll()
+
+      // Check for session status changes and send notifications
+      checkAndNotifySessionChanges(
+        appDispatch,
+        dateProvider,
+        blockSessions,
+      ).catch((error) => {
+        // Handle error silently in production
+        if (__DEV__) {
+          // eslint-disable-next-line no-console
+          console.warn('Error checking session status:', error)
+        }
+      })
+    }, checkInterval)
+
+    // Return a function that can be used to stop monitoring
+    return () => {
+      clearInterval(intervalId)
+    }
   }
 }

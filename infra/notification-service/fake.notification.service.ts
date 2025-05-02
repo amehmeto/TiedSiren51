@@ -38,4 +38,16 @@ export class FakeNotificationService implements NotificationService {
   initialize(): Promise<void> {
     return Promise.resolve(undefined)
   }
+
+  startSessionStatusMonitoring(checkInterval?: number): () => void {
+    // eslint-disable-next-line no-console
+    console.log(
+      `[Fake] Session status monitoring started with interval: ${checkInterval ?? 3000}ms`,
+    )
+
+    return () => {
+      // eslint-disable-next-line no-console
+      console.log('[Fake] Session status monitoring stopped')
+    }
+  }
 }

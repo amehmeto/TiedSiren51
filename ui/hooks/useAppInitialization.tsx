@@ -7,6 +7,7 @@ import * as NavigationBar from 'expo-navigation-bar'
 import { Platform } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { loadUser } from '@/core/auth/usecases/load-user.usecase'
+import { setDispatch } from '@/infra/notification-service/expo.notification.service'
 
 export function useAppInitialization() {
   const [store, setStore] = useState<AppStore | null>(null)
@@ -19,6 +20,10 @@ export function useAppInitialization() {
       await dependencies.databaseService.initialize()
       await dependencies.notificationService.initialize()
       await dependencies.backgroundTaskService.initialize(appStore)
+
+      // Set the dispatch for notification service and start session monitoring
+      setDispatch(appStore.dispatch)
+      dependencies.notificationService.startSessionStatusMonitoring()
 
       await appStore.dispatch(tieSirens())
       await appStore.dispatch(loadUser())
