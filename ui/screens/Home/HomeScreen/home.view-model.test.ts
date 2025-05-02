@@ -313,6 +313,79 @@ describe('Home View Model', () => {
     },
   )
 
+  it('should detect overnight session as active when current time is between 22:29 and 7:00', () => {
+    // Test case 1: Current time is 23:30 (after start, before midnight)
+    const nightSession = buildBlockSession({
+      id: 'night-session-id',
+      name: 'Sleeping time',
+      startedAt: '22:29',
+      endedAt: '07:00',
+    })
+
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withBlockSessions([nightSession]).build(),
+    )
+
+    // Set time to 23:30 (after start, before midnight)
+    const eveningTime = new Date()
+    eveningTime.setHours(23, 30, 0, 0)
+    dateProvider.now = eveningTime
+
+    let homeViewModel = selectHomeViewModel(
+      store.getState(),
+      eveningTime,
+      dateProvider,
+    )
+
+    // The session should be active at 23:30
+    expect(homeViewModel.type).toBe(
+      HomeViewModel.WithActiveWithoutScheduledSessions,
+    )
+    expect(homeViewModel.activeSessions.title).toBe(
+      SessionBoardTitle.ACTIVE_SESSIONS,
+    )
+
+    // Check if activeSessions has blockSessions property
+    if ('blockSessions' in homeViewModel.activeSessions) {
+      expect(homeViewModel.activeSessions.blockSessions[0].name).toBe(
+        'Sleeping time',
+      )
+    } else {
+      // This should fail if the session isn't active
+      expect('blockSessions' in homeViewModel.activeSessions).toBe(true)
+    }
+
+    // Test case 2: Current time is 6:00 AM (after midnight, before end)
+    const morningTime = new Date()
+    morningTime.setHours(6, 0, 0, 0)
+    dateProvider.now = morningTime
+
+    homeViewModel = selectHomeViewModel(
+      store.getState(),
+      morningTime,
+      dateProvider,
+    )
+
+    // The session should still be active at 6:00 AM
+    expect(homeViewModel.type).toBe(
+      HomeViewModel.WithActiveWithoutScheduledSessions,
+    )
+    expect(homeViewModel.activeSessions.title).toBe(
+      SessionBoardTitle.ACTIVE_SESSIONS,
+    )
+
+    // Check if activeSessions has blockSessions property
+    if ('blockSessions' in homeViewModel.activeSessions) {
+      expect(homeViewModel.activeSessions.blockSessions[0].name).toBe(
+        'Sleeping time',
+      )
+    } else {
+      // This should fail if the session isn't active
+      expect('blockSessions' in homeViewModel.activeSessions).toBe(true)
+    }
+  })
+
   it.each([
     [Greetings.GoodMorning, 'from 06:00 to 11:59', '06:00'],
     [Greetings.GoodMorning, 'from 06 to 11:59', '08:50'],
