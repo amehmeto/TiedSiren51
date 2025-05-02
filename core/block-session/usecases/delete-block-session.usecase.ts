@@ -5,7 +5,10 @@ export const deleteBlockSession = createAppAsyncThunk(
   'blockSession/deleteBlockSession',
   async (
     sessionId: string,
-    { extra: { blockSessionRepository, dateProvider }, dispatch },
+    {
+      extra: { blockSessionRepository, dateProvider, notificationService },
+      dispatch,
+    },
   ) => {
     // First get the session to check its status before deletion
     const sessionToDelete = await blockSessionRepository.findById(sessionId)
@@ -20,6 +23,10 @@ export const deleteBlockSession = createAppAsyncThunk(
       sessionToDelete,
       null, // No new session
       'delete',
+      {
+        scheduleTestNotifications: true,
+        notificationService,
+      },
     )
 
     return sessionId

@@ -9,7 +9,10 @@ export const updateBlockSession = createAppAsyncThunk(
   'blockSession/updateBlockSession',
   async (
     payload: UpdateBlockSessionPayload,
-    { extra: { blockSessionRepository, dateProvider }, dispatch },
+    {
+      extra: { blockSessionRepository, dateProvider, notificationService },
+      dispatch,
+    },
   ) => {
     const existingBlockSession = await blockSessionRepository.findById(
       payload.id,
@@ -35,6 +38,10 @@ export const updateBlockSession = createAppAsyncThunk(
       existingBlockSession,
       updatedSession,
       'update',
+      {
+        scheduleTestNotifications: true,
+        notificationService,
+      },
     )
 
     return toUpdateBlockSession

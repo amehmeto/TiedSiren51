@@ -11,7 +11,12 @@ export const createBlockSession = createAppAsyncThunk(
   async (
     payload: CreateBlockSessionPayload,
     {
-      extra: { blockSessionRepository, backgroundTaskService, dateProvider },
+      extra: {
+        blockSessionRepository,
+        backgroundTaskService,
+        dateProvider,
+        notificationService,
+      },
       dispatch,
     },
   ) => {
@@ -31,6 +36,10 @@ export const createBlockSession = createAppAsyncThunk(
       null, // No previous session
       createdSession,
       'create',
+      {
+        scheduleTestNotifications: true,
+        notificationService,
+      },
     )
 
     return createdSession

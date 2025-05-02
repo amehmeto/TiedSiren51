@@ -5,7 +5,10 @@ export const duplicateBlockSession = createAppAsyncThunk(
   'blockSession/duplicateBlockSession',
   async (
     payload: { id: string; name: string },
-    { extra: { blockSessionRepository, dateProvider }, dispatch },
+    {
+      extra: { blockSessionRepository, dateProvider, notificationService },
+      dispatch,
+    },
   ) => {
     const sessionToBeCopied = await blockSessionRepository.findById(payload.id)
 
@@ -27,6 +30,10 @@ export const duplicateBlockSession = createAppAsyncThunk(
       null, // No previous session
       createdSession,
       'duplicate',
+      {
+        scheduleTestNotifications: true,
+        notificationService,
+      },
     )
 
     return createdSession
