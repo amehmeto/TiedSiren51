@@ -1,11 +1,27 @@
 import { createAppAsyncThunk } from '../../_redux_/create-app-thunk'
+import { handleSessionStatusChangeForCrud } from './handle-session-status-change.usecase'
 
 export const deleteBlockSession = createAppAsyncThunk(
   'blockSession/deleteBlockSession',
-  async (sessionId: string, { extra: { blockSessionRepository } }) => {
-    // Just delete the session without canceling notifications
-    // as we're now using real-time notifications
+  async (
+    sessionId: string,
+    { extra: { blockSessionRepository, dateProvider }, dispatch },
+  ) => {
+    // First get the session to check its status before deletion
+    const sessionToDelete = await blockSessionRepository.findById(sessionId)
+
+    // Delete the session
     await blockSessionRepository.delete(sessionId)
+
+    // Handle notification for the deleted session
+    await handleSessionStatusChangeForCrud(
+      dispatch,
+      dateProvider,
+      sessionToDelete,
+      null, // No new session
+      'delete',
+    )
+
     return sessionId
   },
 )

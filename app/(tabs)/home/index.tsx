@@ -1,4 +1,5 @@
 /* eslint-disable no-switch-statements/no-switch */
+/* eslint-disable no-console */
 import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { Image, StyleSheet, Text } from 'react-native'
 import 'react-native-gesture-handler'
@@ -9,7 +10,7 @@ import {
   SessionBoardTitle,
   ViewModelBlockSession,
 } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
-import { useSelector } from 'react-redux'
+import { useSelector, useDispatch } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 import { NoSessionBoard } from '@/ui/screens/Home/HomeScreen/NoSessionBoard'
@@ -19,101 +20,24 @@ import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { T } from '@/ui/design-system/theme'
 import { useRouter } from 'expo-router'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { checkAndNotifySessionChanges } from '@/core/block-session/usecases/handle-session-status-change.usecase'
+import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAllBlockSessions'
 
-// A map to track notifications sent to avoid duplicates
-// We store this outside the component to persist across renders
-const notifiedSessionsMap = new Map<string, { start: boolean; end: boolean }>()
+// How often to update the UI clock (in milliseconds)
+const UI_UPDATE_INTERVAL = 1000 // Update UI every second
 
-/**
- * Sends real-time notifications for session status changes but avoids duplicates
- * by tracking which notifications have already been sent
- */
-async function handleSessionStatusChanges(
-  viewModel: HomeViewModelType,
-  previousActiveSessionsRef: React.MutableRefObject<ViewModelBlockSession[]>,
-  forceRefresh: () => void,
-) {
-  const { notificationService } = dependencies
-
-  // Get current active sessions
-  const currentActiveSessions =
-    viewModel.activeSessions.title === SessionBoardTitle.ACTIVE_SESSIONS
-      ? viewModel.activeSessions.blockSessions
-      : []
-
-  // Get previous active sessions
-  const previousActiveSessions = previousActiveSessionsRef.current
-
-  // Find sessions that just became active (weren't active before)
-  const newlyActiveSessions = currentActiveSessions.filter(
-    (currentSession) =>
-      !previousActiveSessions.some(
-        (prevSession) => prevSession.id === currentSession.id,
-      ),
-  )
-
-  // Find sessions that just ended (were active before but aren't now)
-  const justEndedSessions = previousActiveSessions.filter(
-    (prevSession) =>
-      !currentActiveSessions.some(
-        (currentSession) => currentSession.id === prevSession.id,
-      ),
-  )
-
-  // Send notifications for newly active sessions
-  for (const session of newlyActiveSessions) {
-    // Check if we've already sent a start notification for this session
-    const sessionStatus = notifiedSessionsMap.get(session.id) || {
-      start: false,
-      end: false,
-    }
-
-    if (!sessionStatus.start) {
-      await notificationService.scheduleLocalNotification(
-        'Tied Siren',
-        `Session "${session.name}" has started`,
-        { seconds: 1 },
-      )
-
-      // Mark this session as having received a start notification
-      notifiedSessionsMap.set(session.id, { ...sessionStatus, start: true })
-    }
-  }
-
-  // Send notifications for ended sessions
-  for (const session of justEndedSessions) {
-    // Check if we've already sent an end notification for this session
-    const sessionStatus = notifiedSessionsMap.get(session.id) || {
-      start: false,
-      end: false,
-    }
-
-    if (!sessionStatus.end) {
-      await notificationService.scheduleLocalNotification(
-        'Tied Siren',
-        `Session "${session.name}" has ended`,
-        { seconds: 1 },
-      )
-
-      // Mark this session as having received an end notification
-      notifiedSessionsMap.set(session.id, { ...sessionStatus, end: true })
-    }
-  }
-
-  // Force UI refresh to ensure correct session placement in UI
-  if (newlyActiveSessions.length > 0 || justEndedSessions.length > 0) {
-    forceRefresh()
-  }
-
-  // Update reference to current active sessions for next check
-  previousActiveSessionsRef.current = currentActiveSessions
-}
+// How often to check for session status changes (in milliseconds)
+const SESSION_CHECK_INTERVAL = 3000 // Check session status every 3 seconds
 
 export default function HomeScreen() {
   const router = useRouter()
+  const dispatch = useDispatch()
   const { dateProvider } = dependencies
   const [now, setNow] = useState<Date>(dateProvider.getNow())
   const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  // Track when the last session check was performed
+  const lastSessionCheckRef = useRef<number>(0)
 
   // Force a refresh of the view model by incrementing the refreshTrigger
   const forceRefresh = () => setRefreshTrigger((prev) => prev + 1)
@@ -123,23 +47,48 @@ export default function HomeScreen() {
     ReturnType<typeof selectHomeViewModel>
   >((rootState) => selectHomeViewModel(rootState, now, dateProvider))
 
+  // Get all block sessions for real-time notification checking
+  const blockSessionState = useSelector(
+    (state: RootState) => state.blockSession,
+  )
+  const allBlockSessions = selectAllBlockSessions(blockSessionState)
+
   const previousActiveSessionsRef = useRef<ViewModelBlockSession[]>([])
 
-  // Update the time every second to refresh the view
+  // Update the time regularly to refresh the view and check session status
   useEffect(() => {
     const intervalId = setInterval(() => {
+      // Update the current time
       setNow(dateProvider.getNow())
-    }, 1_000)
-    return () => clearInterval(intervalId)
-  }, [dateProvider])
 
-  // Check for session status changes and send notifications
+      // Check if it's time to check for session changes
+      const currentTime = Date.now()
+      if (currentTime - lastSessionCheckRef.current >= SESSION_CHECK_INTERVAL) {
+        // Update the last check time
+        lastSessionCheckRef.current = currentTime
+
+        // Check if any sessions have just started or ended and send notifications
+        checkAndNotifySessionChanges(dispatch, dateProvider, allBlockSessions)
+          .then(() => {
+            // Force refresh after checking for session changes
+            forceRefresh()
+          })
+          .catch((error) => {
+            console.error('Error checking session status:', error)
+          })
+      }
+    }, UI_UPDATE_INTERVAL)
+
+    return () => clearInterval(intervalId)
+  }, [dateProvider, dispatch, allBlockSessions])
+
+  // Track current active sessions for UI updates
   useEffect(() => {
-    handleSessionStatusChanges(
-      viewModel,
-      previousActiveSessionsRef,
-      forceRefresh,
-    )
+    const currentActiveSessions =
+      viewModel.activeSessions.title === SessionBoardTitle.ACTIVE_SESSIONS
+        ? viewModel.activeSessions.blockSessions
+        : []
+    previousActiveSessionsRef.current = currentActiveSessions
   }, [viewModel, refreshTrigger])
 
   const [activeSessionsNode, scheduledSessionsNode]: ReactNode[] = (() => {
