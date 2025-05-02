@@ -8,6 +8,7 @@ import { Platform } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { loadUser } from '@/core/auth/usecases/load-user.usecase'
 import { setDispatch } from '@/infra/notification-service/expo.notification.service'
+import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
 
 export function useAppInitialization() {
   const [store, setStore] = useState<AppStore | null>(null)
@@ -21,9 +22,19 @@ export function useAppInitialization() {
       await dependencies.notificationService.initialize()
       await dependencies.backgroundTaskService.initialize(appStore)
 
-      // Set the dispatch for notification service and start session monitoring
+      // Set the dispatch for notification service
       setDispatch(appStore.dispatch)
-      dependencies.notificationService.startSessionStatusMonitoring()
+
+      // Set required dependencies for notification service
+      const notificationService =
+        dependencies.notificationService as ExpoNotificationService
+      notificationService.setDependencies(
+        dependencies.dateProvider,
+        dependencies.blockSessionRepository,
+      )
+
+      // Start session monitoring
+      notificationService.startSessionStatusMonitoring()
 
       await appStore.dispatch(tieSirens())
       await appStore.dispatch(loadUser())

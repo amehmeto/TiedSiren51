@@ -1,10 +1,14 @@
 import * as Notifications from 'expo-notifications'
-import { NotificationService } from '@/core/ports/notification.service'
+import {
+  NotificationService,
+  NotificationTrigger,
+} from '@/core/ports/notification.service'
 import Constants from 'expo-constants'
 import { Platform } from 'react-native'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { checkAndNotifySessionChanges } from '@/core/block-session/usecases/handle-session-status-change.usecase'
-import { dependencies } from '@/ui/dependencies'
+import { DateProvider } from '@/core/ports/port.date-provider'
+import { BlockSessionRepository } from '@/core/ports/block-session.repository'
 
 // Store reference to be injected
 let dispatch: AppDispatch | null = null
@@ -14,6 +18,18 @@ export function setDispatch(appDispatch: AppDispatch): void {
 }
 
 export class ExpoNotificationService implements NotificationService {
+  private dateProvider?: DateProvider
+  private blockSessionRepository?: BlockSessionRepository
+
+  // These dependencies will be set when startSessionStatusMonitoring is called
+  setDependencies(
+    dateProvider: DateProvider,
+    blockSessionRepository: BlockSessionRepository,
+  ): void {
+    this.dateProvider = dateProvider
+    this.blockSessionRepository = blockSessionRepository
+  }
+
   async initialize(): Promise<void> {
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
@@ -87,7 +103,7 @@ export class ExpoNotificationService implements NotificationService {
   async scheduleLocalNotification(
     title: string,
     body: string,
-    trigger: Notifications.NotificationTriggerInput,
+    trigger: NotificationTrigger,
   ): Promise<string> {
     if (Platform.OS === 'web')
       return 'Local notifications are not supported on web'
@@ -109,7 +125,11 @@ export class ExpoNotificationService implements NotificationService {
   }
 
   startSessionStatusMonitoring(checkInterval = 3000): () => void {
-    const { dateProvider, blockSessionRepository } = dependencies
+    if (!this.dateProvider || !this.blockSessionRepository) {
+      throw new Error(
+        'Dependencies not set. Call setDependencies before starting monitoring.',
+      )
+    }
 
     if (!dispatch) {
       throw new Error(
@@ -119,16 +139,17 @@ export class ExpoNotificationService implements NotificationService {
 
     // Start the monitoring interval
     const intervalId = setInterval(async () => {
-      if (!dispatch) return
+      if (!dispatch || !this.dateProvider || !this.blockSessionRepository)
+        return
 
       // Get current sessions from the repository
       const appDispatch = dispatch
-      const blockSessions = await blockSessionRepository.findAll()
+      const blockSessions = await this.blockSessionRepository.findAll()
 
       // Check for session status changes and send notifications
       checkAndNotifySessionChanges(
         appDispatch,
-        dateProvider,
+        this.dateProvider,
         blockSessions,
       ).catch((error) => {
         // Handle error silently in production
