@@ -1,6 +1,5 @@
 import { createAppAsyncThunk } from '../../_redux_/create-app-thunk'
 import { BlockSession } from '../block.session'
-import { differenceInSeconds } from 'date-fns'
 
 export type CreateBlockSessionPayload = Omit<
   BlockSession,
@@ -10,39 +9,16 @@ export const createBlockSession = createAppAsyncThunk(
   'blockSession/createBlockSession',
   async (
     payload: CreateBlockSessionPayload,
-    {
-      extra: {
-        blockSessionRepository,
-        notificationService,
-        dateProvider,
-        backgroundTaskService,
-      },
-    },
+    { extra: { blockSessionRepository, backgroundTaskService } },
   ) => {
     await backgroundTaskService.scheduleTask('tie-sirens')
-    const now = dateProvider.getNow()
-    const startedAt = dateProvider.recoverDate(payload.startedAt)
-    const endedAt = dateProvider.recoverDate(payload.endedAt)
-    const startNotificationId =
-      await notificationService.scheduleLocalNotification(
-        'Tied Siren',
-        `Block session "${payload.name}" has started`,
-        {
-          seconds: differenceInSeconds(startedAt, now),
-        },
-      )
-    const endNotificationId =
-      await notificationService.scheduleLocalNotification(
-        'Tied Siren',
-        `Block session "${payload.name}" has ended`,
-        {
-          seconds: differenceInSeconds(endedAt, now),
-        },
-      )
+
+    // Create the block session without notification IDs
+    // Real-time notifications will be handled by the home screen
     return blockSessionRepository.create({
       ...payload,
-      startNotificationId,
-      endNotificationId,
+      startNotificationId: '', // Using empty string as we don't schedule notifications here anymore
+      endNotificationId: '', // Using empty string as we don't schedule notifications here anymore
     })
   },
 )

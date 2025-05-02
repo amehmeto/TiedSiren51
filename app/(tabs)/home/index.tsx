@@ -1,11 +1,5 @@
 /* eslint-disable no-switch-statements/no-switch */
-import React, {
-  ReactNode,
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-} from 'react'
+import React, { ReactNode, useEffect, useRef, useState } from 'react'
 import { Image, StyleSheet, Text } from 'react-native'
 import 'react-native-gesture-handler'
 import { dependencies } from '@/ui/dependencies'
@@ -26,193 +20,170 @@ import { T } from '@/ui/design-system/theme'
 import { useRouter } from 'expo-router'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 
-enum NotificationConfig {
-  COOLDOWN_MS = 5000, // 5 seconds between notifications
-  NOTIFICATION_DELAY_SECONDS = 1,
-  CLOCK_UPDATE_INTERVAL_MS = 1000,
-}
+// A map to track notifications sent to avoid duplicates
+// We store this outside the component to persist across renders
+const notifiedSessionsMap = new Map<string, { start: boolean; end: boolean }>()
 
-enum AppStrings {
-  APP_NAME = 'Tied Siren',
-  SESSION_STARTED = 'started',
-  SESSION_ENDED = 'ended',
-  CTA_TEXT = 'CREATE A BLOCK SESSION',
-  MOTIVATIONAL_TEXT = "Let's make it productive",
-}
-
-enum NotificationPrefixType {
-  START = 'start',
-  END = 'end',
-}
-
-const sentNotifications = new Set<string>()
-let lastNotificationTime = 0
-
-const createNotificationKey = (
-  prefix: NotificationPrefixType,
-  session: ViewModelBlockSession,
-) => {
-  return `${prefix}_blockSession_${session.id}_${session.name}`
-}
-
-const isSessionInArray = (
-  session: ViewModelBlockSession,
-  sessionsArray: ViewModelBlockSession[],
-) => sessionsArray.some((item) => item.id === session.id)
-
-async function sendSessionNotification(
-  session: ViewModelBlockSession,
-  action: AppStrings.SESSION_STARTED | AppStrings.SESSION_ENDED,
-  notificationService: any,
-): Promise<boolean> {
-  const prefix =
-    action === AppStrings.SESSION_STARTED
-      ? NotificationPrefixType.START
-      : NotificationPrefixType.END
-
-  const notificationKey = createNotificationKey(prefix, session)
-
-  if (sentNotifications.has(notificationKey)) {
-    return false
-  }
-
-  await notificationService.scheduleLocalNotification(
-    AppStrings.APP_NAME,
-    `Session ${session.name} has ${action}`,
-    { seconds: NotificationConfig.NOTIFICATION_DELAY_SECONDS },
-  )
-
-  sentNotifications.add(notificationKey)
-  return true
-}
-
-async function manageSessionNotifications(
+/**
+ * Sends real-time notifications for session status changes but avoids duplicates
+ * by tracking which notifications have already been sent
+ */
+async function handleSessionStatusChanges(
   viewModel: HomeViewModelType,
   previousActiveSessionsRef: React.MutableRefObject<ViewModelBlockSession[]>,
-): Promise<void> {
+  forceRefresh: () => void,
+) {
   const { notificationService } = dependencies
-  const now = Date.now()
 
-  if (now - lastNotificationTime < NotificationConfig.COOLDOWN_MS) {
-    return
-  }
-
+  // Get current active sessions
   const currentActiveSessions =
     viewModel.activeSessions.title === SessionBoardTitle.ACTIVE_SESSIONS
       ? viewModel.activeSessions.blockSessions
       : []
 
+  // Get previous active sessions
   const previousActiveSessions = previousActiveSessionsRef.current
 
-  const newActiveSessions = currentActiveSessions.filter(
-    (session) => !isSessionInArray(session, previousActiveSessions),
+  // Find sessions that just became active (weren't active before)
+  const newlyActiveSessions = currentActiveSessions.filter(
+    (currentSession) =>
+      !previousActiveSessions.some(
+        (prevSession) => prevSession.id === currentSession.id,
+      ),
   )
 
-  const endedSessions = previousActiveSessions.filter(
-    (session) => !isSessionInArray(session, currentActiveSessions),
+  // Find sessions that just ended (were active before but aren't now)
+  const justEndedSessions = previousActiveSessions.filter(
+    (prevSession) =>
+      !currentActiveSessions.some(
+        (currentSession) => currentSession.id === prevSession.id,
+      ),
   )
 
-  let notificationWasSent = false
+  // Send notifications for newly active sessions
+  for (const session of newlyActiveSessions) {
+    // Check if we've already sent a start notification for this session
+    const sessionStatus = notifiedSessionsMap.get(session.id) || {
+      start: false,
+      end: false,
+    }
 
-  for (const session of newActiveSessions) {
-    const didSend = await sendSessionNotification(
-      session,
-      AppStrings.SESSION_STARTED,
-      notificationService,
-    )
-    notificationWasSent = notificationWasSent || didSend
+    if (!sessionStatus.start) {
+      await notificationService.scheduleLocalNotification(
+        'Tied Siren',
+        `Session "${session.name}" has started`,
+        { seconds: 1 },
+      )
+
+      // Mark this session as having received a start notification
+      notifiedSessionsMap.set(session.id, { ...sessionStatus, start: true })
+    }
   }
 
-  for (const session of endedSessions) {
-    const didSend = await sendSessionNotification(
-      session,
-      AppStrings.SESSION_ENDED,
-      notificationService,
-    )
-    notificationWasSent = notificationWasSent || didSend
+  // Send notifications for ended sessions
+  for (const session of justEndedSessions) {
+    // Check if we've already sent an end notification for this session
+    const sessionStatus = notifiedSessionsMap.get(session.id) || {
+      start: false,
+      end: false,
+    }
+
+    if (!sessionStatus.end) {
+      await notificationService.scheduleLocalNotification(
+        'Tied Siren',
+        `Session "${session.name}" has ended`,
+        { seconds: 1 },
+      )
+
+      // Mark this session as having received an end notification
+      notifiedSessionsMap.set(session.id, { ...sessionStatus, end: true })
+    }
   }
 
-  if (notificationWasSent) {
-    lastNotificationTime = now
+  // Force UI refresh to ensure correct session placement in UI
+  if (newlyActiveSessions.length > 0 || justEndedSessions.length > 0) {
+    forceRefresh()
   }
 
+  // Update reference to current active sessions for next check
   previousActiveSessionsRef.current = currentActiveSessions
-}
-
-function renderSessionBoards(
-  viewModel: HomeViewModelType,
-): [ReactNode, ReactNode] {
-  switch (viewModel.type) {
-    case HomeViewModel.WithoutActiveNorScheduledSessions:
-      return [
-        <NoSessionBoard key={0} sessions={viewModel.activeSessions} />,
-        <NoSessionBoard key={1} sessions={viewModel.scheduledSessions} />,
-      ]
-    case HomeViewModel.WithActiveWithoutScheduledSessions:
-      return [
-        <SessionsBoard
-          key={0}
-          sessions={viewModel.activeSessions}
-          type={SessionType.ACTIVE}
-        />,
-        <NoSessionBoard key={1} sessions={viewModel.scheduledSessions} />,
-      ]
-    case HomeViewModel.WithoutActiveWithScheduledSessions:
-      return [
-        <NoSessionBoard key={0} sessions={viewModel.activeSessions} />,
-        <SessionsBoard
-          key={1}
-          sessions={viewModel.scheduledSessions}
-          type={SessionType.SCHEDULED}
-        />,
-      ]
-    case HomeViewModel.WithActiveAndScheduledSessions:
-      return [
-        <SessionsBoard
-          key={0}
-          sessions={viewModel.activeSessions}
-          type={SessionType.ACTIVE}
-        />,
-        <SessionsBoard
-          key={1}
-          sessions={viewModel.scheduledSessions}
-          type={SessionType.SCHEDULED}
-        />,
-      ]
-    default:
-      return exhaustiveGuard(viewModel)
-  }
 }
 
 export default function HomeScreen() {
   const router = useRouter()
   const { dateProvider } = dependencies
-  const [currentTime, setCurrentTime] = useState<Date>(dateProvider.getNow())
-  const previousActiveSessionsRef = useRef<ViewModelBlockSession[]>([])
+  const [now, setNow] = useState<Date>(dateProvider.getNow())
+  const [refreshTrigger, setRefreshTrigger] = useState(0)
+
+  // Force a refresh of the view model by incrementing the refreshTrigger
+  const forceRefresh = () => setRefreshTrigger((prev) => prev + 1)
 
   const viewModel = useSelector<
     RootState,
     ReturnType<typeof selectHomeViewModel>
-  >((rootState) => selectHomeViewModel(rootState, currentTime, dateProvider))
+  >((rootState) => selectHomeViewModel(rootState, now, dateProvider))
 
-  const handleSessionNotifications = useCallback(() => {
-    manageSessionNotifications(viewModel, previousActiveSessionsRef)
-  }, [viewModel])
+  const previousActiveSessionsRef = useRef<ViewModelBlockSession[]>([])
 
+  // Update the time every second to refresh the view
   useEffect(() => {
     const intervalId = setInterval(() => {
-      setCurrentTime(dateProvider.getNow())
-    }, NotificationConfig.CLOCK_UPDATE_INTERVAL_MS)
-
+      setNow(dateProvider.getNow())
+    }, 1_000)
     return () => clearInterval(intervalId)
   }, [dateProvider])
 
+  // Check for session status changes and send notifications
   useEffect(() => {
-    handleSessionNotifications()
-  }, [handleSessionNotifications])
+    handleSessionStatusChanges(
+      viewModel,
+      previousActiveSessionsRef,
+      forceRefresh,
+    )
+  }, [viewModel, refreshTrigger])
 
-  const [activeSessionsNode, scheduledSessionsNode] =
-    renderSessionBoards(viewModel)
+  const [activeSessionsNode, scheduledSessionsNode]: ReactNode[] = (() => {
+    switch (viewModel.type) {
+      case HomeViewModel.WithoutActiveNorScheduledSessions:
+        return [
+          <NoSessionBoard key={0} sessions={viewModel.activeSessions} />,
+          <NoSessionBoard key={1} sessions={viewModel.scheduledSessions} />,
+        ]
+      case HomeViewModel.WithActiveWithoutScheduledSessions:
+        return [
+          <SessionsBoard
+            key={0}
+            sessions={viewModel.activeSessions}
+            type={SessionType.ACTIVE}
+          />,
+          <NoSessionBoard key={1} sessions={viewModel.scheduledSessions} />,
+        ]
+      case HomeViewModel.WithoutActiveWithScheduledSessions:
+        return [
+          <NoSessionBoard key={0} sessions={viewModel.activeSessions} />,
+          <SessionsBoard
+            key={1}
+            sessions={viewModel.scheduledSessions}
+            type={SessionType.SCHEDULED}
+          />,
+        ]
+      case HomeViewModel.WithActiveAndScheduledSessions:
+        return [
+          <SessionsBoard
+            key={0}
+            sessions={viewModel.activeSessions}
+            type={SessionType.ACTIVE}
+          />,
+          <SessionsBoard
+            key={1}
+            sessions={viewModel.scheduledSessions}
+            type={SessionType.SCHEDULED}
+          />,
+        ]
+      default:
+        return exhaustiveGuard(viewModel)
+    }
+  })()
 
   return (
     <>
@@ -221,13 +192,13 @@ export default function HomeScreen() {
         source={require('@/assets/tiedsirenlogo.png')}
       />
       <Text style={styles.greetings}>{viewModel.greetings}</Text>
-      <Text style={styles.text}>{AppStrings.MOTIVATIONAL_TEXT}</Text>
+      <Text style={styles.text}>{"Let's make it productive"}</Text>
 
       {activeSessionsNode}
       {scheduledSessionsNode}
 
       <TiedSButton
-        text={AppStrings.CTA_TEXT}
+        text={'CREATE A BLOCK SESSION'}
         onPress={() => router.push('/(tabs)/home/create-block-session')}
       />
     </>
