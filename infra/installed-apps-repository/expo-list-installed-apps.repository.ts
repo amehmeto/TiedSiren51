@@ -1,11 +1,13 @@
 import { InstalledAppRepository } from '@/core/ports/installed-app.repository'
 import { InstalledApp as AppModel } from '@/core/installed-app/InstalledApp'
-import * as ExpoListInstalledApps from '@amehmeto/expo-list-installed-apps'
+import { listInstalledApps, AppType } from '@amehmeto/expo-list-installed-apps'
 import { InstalledApp } from '@amehmeto/expo-list-installed-apps/build/ExpoListInstalledApps.types'
 
 export class ExpoListInstalledAppsRepository implements InstalledAppRepository {
-  getInstalledApps(): Promise<AppModel[]> {
-    const installedApps = ExpoListInstalledApps.listInstalledApps()
+  async getInstalledApps(): Promise<AppModel[]> {
+    const installedApps = await listInstalledApps({
+      type: AppType.USER,
+    })
 
     const sortedApps = installedApps
       .sort((a: InstalledApp, b: InstalledApp) =>
