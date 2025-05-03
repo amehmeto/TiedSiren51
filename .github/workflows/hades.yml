@@ -39,6 +39,6 @@ jobs:
         run: yarn install --frozen-lockfile
 
       - name: Trigger Preview Build
-        run: eas build -p android --profile preview
+        run: eas build -p android --profile preview --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
