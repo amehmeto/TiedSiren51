@@ -36,6 +36,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
+      { hours: 13, minutes: 48 },
     ],
     [
       'one active session',
@@ -69,6 +70,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
+      { hours: 13, minutes: 48 },
     ],
     [
       'one active session',
@@ -102,6 +104,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
+      { hours: 13, minutes: 48 },
     ],
     [
       'one active session that has just started',
@@ -135,6 +138,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
+      { hours: 13, minutes: 48 },
     ],
     [
       'one active session that has started the day before',
@@ -168,6 +172,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
+      { hours: 13, minutes: 48 },
     ],
     [
       'two sessions',
@@ -214,6 +219,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
+      { hours: 13, minutes: 48 },
     ],
     [
       'one scheduled session and 0 active session',
@@ -247,6 +253,7 @@ describe('Home View Model', () => {
           ],
         },
       },
+      { hours: 13, minutes: 48 },
     ],
     [
       'one scheduled session and 1 active session',
@@ -294,13 +301,150 @@ describe('Home View Model', () => {
           ],
         },
       },
+      { hours: 13, minutes: 48 },
+    ],
+    [
+      'overnight session (evening) when current time is after start but before midnight',
+      stateBuilder()
+        .withBlockSessions([
+          buildBlockSession({
+            id: 'night-session-id',
+            name: 'Sleeping time',
+            startedAt: '22:29',
+            endedAt: '07:00',
+          }),
+        ])
+        .build(),
+      {
+        type: HomeViewModel.WithActiveWithoutScheduledSessions,
+        greetings: Greetings.GoodNight,
+        activeSessions: {
+          title: 'ACTIVE SESSIONS',
+          blockSessions: [
+            {
+              id: 'night-session-id',
+              name: 'Sleeping time',
+              minutesLeft: expect.stringContaining('Ends'),
+              blocklists: 1,
+              devices: 2,
+            },
+          ],
+        },
+        scheduledSessions: {
+          title: SessionBoardTitle.NO_SCHEDULED_SESSIONS,
+          message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
+        },
+      },
+      { hours: 23, minutes: 30 },
+    ],
+    [
+      'overnight session (morning) when current time is after midnight but before end',
+      stateBuilder()
+        .withBlockSessions([
+          buildBlockSession({
+            id: 'night-session-id',
+            name: 'Sleeping time',
+            startedAt: '22:29',
+            endedAt: '07:00',
+          }),
+        ])
+        .build(),
+      {
+        type: HomeViewModel.WithActiveWithoutScheduledSessions,
+        greetings: Greetings.GoodMorning,
+        activeSessions: {
+          title: 'ACTIVE SESSIONS',
+          blockSessions: [
+            {
+              id: 'night-session-id',
+              name: 'Sleeping time',
+              minutesLeft: expect.stringContaining('Ends'),
+              blocklists: 1,
+              devices: 2,
+            },
+          ],
+        },
+        scheduledSessions: {
+          title: SessionBoardTitle.NO_SCHEDULED_SESSIONS,
+          message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
+        },
+      },
+      { hours: 6, minutes: 0 },
+    ],
+    [
+      'overnight session when current time is before start',
+      stateBuilder()
+        .withBlockSessions([
+          buildBlockSession({
+            id: 'night-session-id',
+            name: 'Sleeping time',
+            startedAt: '22:29',
+            endedAt: '07:00',
+          }),
+        ])
+        .build(),
+      {
+        type: HomeViewModel.WithoutActiveWithScheduledSessions,
+        greetings: Greetings.GoodEvening,
+        activeSessions: {
+          title: SessionBoardTitle.NO_ACTIVE_SESSIONS,
+          message: SessionBoardMessage.NO_ACTIVE_SESSIONS,
+        },
+        scheduledSessions: {
+          title: 'SCHEDULED SESSIONS',
+          blockSessions: [
+            {
+              id: 'night-session-id',
+              name: 'Sleeping time',
+              minutesLeft: 'Starts at 22:29',
+              blocklists: 1,
+              devices: 2,
+            },
+          ],
+        },
+      },
+      { hours: 21, minutes: 0 },
+    ],
+    [
+      'overnight session when current time is after end',
+      stateBuilder()
+        .withBlockSessions([
+          buildBlockSession({
+            id: 'night-session-id',
+            name: 'Sleeping time',
+            startedAt: '22:29',
+            endedAt: '07:00',
+          }),
+        ])
+        .build(),
+      {
+        type: HomeViewModel.WithoutActiveWithScheduledSessions,
+        greetings: Greetings.GoodMorning,
+        activeSessions: {
+          title: SessionBoardTitle.NO_ACTIVE_SESSIONS,
+          message: SessionBoardMessage.NO_ACTIVE_SESSIONS,
+        },
+        scheduledSessions: {
+          title: 'SCHEDULED SESSIONS',
+          blockSessions: [
+            {
+              id: 'night-session-id',
+              name: 'Sleeping time',
+              minutesLeft: 'Starts at 22:29',
+              blocklists: 1,
+              devices: 2,
+            },
+          ],
+        },
+      },
+      { hours: 8, minutes: 0 },
     ],
   ])(
     'Example: there is %s',
-    (_, preloadedState: PreloadedState, expectedViewModel) => {
+    (_, preloadedState: PreloadedState, expectedViewModel, timeSettings) => {
       const store = createTestStore({}, preloadedState)
       const now = new Date()
-      now.setHours(13, 48, 0, 0)
+      now.setHours(timeSettings.hours, timeSettings.minutes, 0, 0)
       dateProvider.now = now
 
       const homeViewModel = selectHomeViewModel(

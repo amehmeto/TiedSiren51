@@ -24,15 +24,45 @@ function greetUser(now: Date) {
 }
 
 function generateTimeInfo(dateProvider: DateProvider, session: BlockSession) {
-  const start = dateProvider.recoverDate(session.startedAt)
-  const end = dateProvider.recoverDate(session.endedAt)
   const now = dateProvider.getNow()
-  return isActive(dateProvider, session)
-    ? 'Ends ' +
-        formatDistance(end, now, {
-          addSuffix: true,
-        })
-    : 'Starts at ' + dateProvider.toHHmm(start)
+  const nowHHmm = dateProvider.toHHmm(now)
+  const isOvernight = session.startedAt > session.endedAt
+  const isSessionActive = isActive(dateProvider, session)
+
+  // Handle active sessions
+  const calculateEndTime = () => {
+    // For overnight sessions
+    const isAfterMidnightBeforeEnd = isOvernight && nowHHmm < session.endedAt
+
+    // Use today's date for end time if we're after midnight but before end
+    const todayEnd = dateProvider.recoverDate(session.endedAt)
+
+    // For before midnight case, create tomorrow's date
+    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+    tomorrow.setHours(
+      parseInt(session.endedAt.split(':')[0], 10),
+      parseInt(session.endedAt.split(':')[1], 10),
+      0,
+      0,
+    )
+
+    // Use today's end time or tomorrow's based on condition
+    const endTime = isOvernight
+      ? isAfterMidnightBeforeEnd
+        ? todayEnd
+        : tomorrow
+      : todayEnd
+
+    return 'Ends ' + formatDistance(endTime, now, { addSuffix: true })
+  }
+
+  // For scheduled sessions
+  const calculateStartTime = () => {
+    const start = dateProvider.recoverDate(session.startedAt)
+    return 'Starts at ' + dateProvider.toHHmm(start)
+  }
+
+  return isSessionActive ? calculateEndTime() : calculateStartTime()
 }
 
 function formatToViewModel(
@@ -94,7 +124,7 @@ export const selectHomeViewModel = createSelector(
       dateProvider,
     )
 
-    const scheduledSessions = selectScheduledSessions(
+    const scheduledSessions: BlockSession[] = selectScheduledSessions(
       dateProvider,
       blockSession,
     )
