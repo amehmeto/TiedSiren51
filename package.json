@@ -15,6 +15,7 @@
     "test": "vitest",
     "test:prepush": "vitest --run",
     "test:cov": "c8 vitest --run",
+    "test:e2e": "maestro test maestro/",
     "prebuild": "npx expo prebuild",
     "prebuild:android": "npx expo prebuild --platform android",
     "prebuild:ios": "npx expo prebuild --platform ios",
@@ -29,7 +30,6 @@
     "prepare": "husky",
     "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
     "expo:lint": "expo lint",
-    "test:e2e": "maestro test maestro/",
     "generate:schema": "npx prisma generate"
   },
   "lint-staged": {
