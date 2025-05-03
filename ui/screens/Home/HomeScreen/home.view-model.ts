@@ -27,39 +27,42 @@ function generateTimeInfo(dateProvider: DateProvider, session: BlockSession) {
   const now = dateProvider.getNow()
   const nowHHmm = dateProvider.toHHmm(now)
   const isOvernight = session.startedAt > session.endedAt
+  const isSessionActive = isActive(dateProvider, session)
 
-  if (isActive(dateProvider, session)) {
-    let end
+  // Handle active sessions
+  const calculateEndTime = () => {
+    // For overnight sessions
+    const isAfterMidnightBeforeEnd = isOvernight && nowHHmm < session.endedAt
 
-    if (isOvernight) {
-      // For overnight sessions, we need to ensure the end time is set to tomorrow
-      // if current time is after midnight
-      if (nowHHmm < session.endedAt) {
-        // We're past midnight but before end time (e.g., 2 AM and end time is 7 AM)
-        end = dateProvider.recoverDate(session.endedAt)
-      } else {
-        // We're before midnight (e.g., 23:00 and end time is 7 AM tomorrow)
-        // Create tomorrow's date for the end time
-        const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
-        tomorrow.setHours(
-          parseInt(session.endedAt.split(':')[0], 10),
-          parseInt(session.endedAt.split(':')[1], 10),
-          0,
-          0,
-        )
-        end = tomorrow
-      }
-    } else {
-      // Regular session (same day)
-      end = dateProvider.recoverDate(session.endedAt)
-    }
+    // Use today's date for end time if we're after midnight but before end
+    const todayEnd = dateProvider.recoverDate(session.endedAt)
 
-    return 'Ends ' + formatDistance(end, now, { addSuffix: true })
-  } else {
-    // For scheduled sessions, just show the start time
+    // For before midnight case, create tomorrow's date
+    const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+    tomorrow.setHours(
+      parseInt(session.endedAt.split(':')[0], 10),
+      parseInt(session.endedAt.split(':')[1], 10),
+      0,
+      0,
+    )
+
+    // Use today's end time or tomorrow's based on condition
+    const endTime = isOvernight
+      ? isAfterMidnightBeforeEnd
+        ? todayEnd
+        : tomorrow
+      : todayEnd
+
+    return 'Ends ' + formatDistance(endTime, now, { addSuffix: true })
+  }
+
+  // For scheduled sessions
+  const calculateStartTime = () => {
     const start = dateProvider.recoverDate(session.startedAt)
     return 'Starts at ' + dateProvider.toHHmm(start)
   }
+
+  return isSessionActive ? calculateEndTime() : calculateStartTime()
 }
 
 function formatToViewModel(
