@@ -2,7 +2,10 @@ import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
 
 export class FakeAuthGateway implements AuthGateway {
-  willSucceedForUser!: AuthUser
+  willSucceedForUser: AuthUser = {
+    id: 'fake-user-id',
+    username: 'Fake User',
+  }
   onAuthStatusChangedListener!: (user: AuthUser) => void
 
   authenticateWithGoogle(): Promise<AuthUser> {
