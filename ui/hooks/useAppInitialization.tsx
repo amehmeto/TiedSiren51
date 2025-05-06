@@ -7,12 +7,12 @@ import * as NavigationBar from 'expo-navigation-bar'
 import { Platform } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { loadUser } from '@/core/auth/usecases/load-user.usecase'
+import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 
 export function useAppInitialization() {
   const [store, setStore] = useState<AppStore | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [isInitializing, setIsInitializing] = useState(true)
-  const [isAuthenticated, setIsAuthenticated] = useState(false)
 
   const initializeServices = async (appStore: AppStore) => {
     try {
@@ -22,9 +22,6 @@ export function useAppInitialization() {
 
       await appStore.dispatch(tieSirens())
       await appStore.dispatch(loadUser())
-
-      const state = appStore.getState()
-      setIsAuthenticated(state.auth?.authUser !== null)
 
       if (Platform.OS === 'android') {
         await NavigationBar.setBackgroundColorAsync(T.color.darkBlue).catch(
@@ -67,6 +64,10 @@ export function useAppInitialization() {
       isMounted = false
     }
   }, [])
+
+  const isAuthenticated = store
+    ? selectIsUserAuthenticated(store.getState())
+    : false
 
   return { store, error, isInitializing, isAuthenticated }
 }
