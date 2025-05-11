@@ -7,12 +7,9 @@ export function isActive(dateProvider: DateProvider, session: BlockSession) {
   const nowHHmm = dateProvider.toHHmm(now)
   const isOvernight = session.startedAt > session.endedAt
 
-  // For overnight sessions, use HH:MM string comparison
-  // If current time is after start OR before end, it's active
   const isActiveOvernight =
     isOvernight && (nowHHmm >= session.startedAt || nowHHmm < session.endedAt)
 
-  // For regular sessions, use date comparison
   const start = dateProvider.recoverDate(session.startedAt)
   const end = dateProvider.recoverDate(session.endedAt)
   const isActiveRegular =
