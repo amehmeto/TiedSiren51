@@ -34,20 +34,17 @@ function generateEndTime(
 
   const todayEnd = dateProvider.recoverDate(session.endedAt)
 
-  const tomorrow = new Date(now.getTime() + 24 * 60 * 60 * 1000)
-  tomorrow.setHours(
-    parseInt(session.endedAt.split(':')[0], 10),
-    parseInt(session.endedAt.split(':')[1], 10),
-    0,
-    0,
-  )
-  const endTime = isOvernight
-    ? isAfterMidnightBeforeEnd
-      ? todayEnd
-      : tomorrow
-    : todayEnd
+  if (!isOvernight || (isOvernight && isAfterMidnightBeforeEnd)) {
+    return 'Ends ' + formatDistance(todayEnd, now, { addSuffix: true })
+  }
 
-  return 'Ends ' + formatDistance(endTime, now, { addSuffix: true })
+  const tomorrowEnd = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+  const [hourStr, minuteStr] = session.endedAt.split(':')
+  const hour = parseInt(hourStr, 10)
+  const minute = parseInt(minuteStr, 10)
+  tomorrowEnd.setHours(hour, minute, 0, 0)
+
+  return 'Ends ' + formatDistance(tomorrowEnd, now, { addSuffix: true })
 }
 
 function generateStartTime(
