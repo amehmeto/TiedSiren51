@@ -7,6 +7,7 @@ import {
 import { rootReducer } from './rootReducer'
 import { Dependencies } from './dependencies'
 import { onUserLoggedInListener } from '@/core/auth/listenners/on-user-logged-in.listener'
+import { onUserLoggedOutListener } from '@/core/auth/listenners/on-user-logged-out.listener'
 
 export type PreloadedState = Partial<RootState>
 
@@ -32,6 +33,11 @@ export const createStore = (
   })
 
   onUserLoggedInListener({
+    store,
+    authGateway: dependencies.authGateway,
+  })
+
+  onUserLoggedOutListener({
     store,
     authGateway: dependencies.authGateway,
   })

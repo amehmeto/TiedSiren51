@@ -7,6 +7,7 @@ export class FakeAuthGateway implements AuthGateway {
     username: 'Fake User',
   }
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
+  private onUserLoggedOutListener: (() => void) | null = null
 
   authenticateWithGoogle(): Promise<AuthUser> {
     return Promise.resolve(this.willSucceedForUser)
@@ -14,6 +15,10 @@ export class FakeAuthGateway implements AuthGateway {
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {
     this.onUserLoggedInListener = listener
+  }
+
+  onUserLoggedOut(listener: () => void): void {
+    this.onUserLoggedOutListener = listener
   }
 
   authenticateWithApple(): Promise<AuthUser> {
@@ -27,5 +32,17 @@ export class FakeAuthGateway implements AuthGateway {
   simulateUserLoggedIn(authUser: AuthUser) {
     if (!this.onUserLoggedInListener) return
     this.onUserLoggedInListener(authUser)
+  }
+
+  async logOut(): Promise<void> {
+    if (this.onUserLoggedOutListener) {
+      this.onUserLoggedOutListener()
+    }
+    return Promise.resolve()
+  }
+
+  simulateUserLoggedOut() {
+    if (!this.onUserLoggedOutListener) return
+    this.onUserLoggedOutListener()
   }
 }
