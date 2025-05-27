@@ -13,6 +13,9 @@ export const onAuthStatusChangedListener = ({
 }) => {
   authGateway.onAuthStatusChanged((user) => {
     store.dispatch(userAuthenticated(user))
+
+    if (!user) return
+
     store.dispatch(loadUser())
     store.dispatch(tieSirens())
   })
