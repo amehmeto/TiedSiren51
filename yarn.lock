@@ -7,9 +7,9 @@
   resolved "https://registry.npmjs.org/@0no-co/graphql.web/-/graphql.web-1.1.1.tgz"
   integrity sha512-F2i3xdycesw78QCOBHmpTn7eaD2iNXGwB2gkfwxcOfBbeauYpr8RBSyJOkDrFtKtVRMclg8Sg3n1ip0ACyUuag==
 
-"@amehmeto/expo-list-installed-apps@https://github.com/amehmeto/expo-list-installed-apps.git#feature/filter-user-and-system-apps":
+"@amehmeto/expo-list-installed-apps@https://github.com/amehmeto/expo-list-installed-apps.git":
   version "0.2.1"
-  resolved "https://github.com/amehmeto/expo-list-installed-apps.git#0e4085132e69299cd0a34d8e7a8bac0a48b50917"
+  resolved "https://github.com/amehmeto/expo-list-installed-apps.git#1e972e8d91ae4a7e5509a9cf5b566030a0d4173b"
 
 "@ampproject/remapping@^2.2.0":
   version "2.3.0"
