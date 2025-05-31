@@ -13,7 +13,6 @@ export function WebTimePicker(
     const time = event.target.value
     props.handleChange(time)
     props.setTime(time)
-    props.setIsTimePickerVisible(true)
   }
 
   return (
@@ -23,6 +22,8 @@ export function WebTimePicker(
         type={'time'}
         value={props.chosenTime}
         onChange={handleTimeChange}
+        required
+        pattern="[0-2][0-9]:[0-5][0-9]"
       />
       <button
         type={'button'}

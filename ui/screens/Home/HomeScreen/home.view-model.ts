@@ -23,16 +23,43 @@ function greetUser(now: Date) {
   return Greetings.GoodNight
 }
 
-function generateTimeInfo(dateProvider: DateProvider, session: BlockSession) {
-  const start = dateProvider.recoverDate(session.startedAt)
-  const end = dateProvider.recoverDate(session.endedAt)
+function generateEndTime(
+  dateProvider: DateProvider,
+  session: BlockSession,
+): string {
   const now = dateProvider.getNow()
-  return isActive(dateProvider, session)
-    ? 'Ends ' +
-        formatDistance(end, now, {
-          addSuffix: true,
-        })
-    : 'Starts at ' + dateProvider.toHHmm(start)
+  const nowHHmm = dateProvider.toHHmm(now)
+  const isOvernight = session.startedAt > session.endedAt
+  const isAfterMidnightBeforeEnd = isOvernight && nowHHmm < session.endedAt
+
+  const todayEnd = dateProvider.recoverDate(session.endedAt)
+
+  if (!isOvernight || (isOvernight && isAfterMidnightBeforeEnd)) {
+    return 'Ends ' + formatDistance(todayEnd, now, { addSuffix: true })
+  }
+
+  const tomorrowEnd = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+  const [hourStr, minuteStr] = session.endedAt.split(':')
+  const hour = parseInt(hourStr, 10)
+  const minute = parseInt(minuteStr, 10)
+  tomorrowEnd.setHours(hour, minute, 0, 0)
+
+  return 'Ends ' + formatDistance(tomorrowEnd, now, { addSuffix: true })
+}
+
+function generateStartTime(
+  dateProvider: DateProvider,
+  session: BlockSession,
+): string {
+  const start = dateProvider.recoverDate(session.startedAt)
+  return 'Starts at ' + dateProvider.toHHmm(start)
+}
+
+function generateTimeInfo(dateProvider: DateProvider, session: BlockSession) {
+  const isSessionActive = isActive(dateProvider, session)
+  return isSessionActive
+    ? generateEndTime(dateProvider, session)
+    : generateStartTime(dateProvider, session)
 }
 
 function formatToViewModel(
