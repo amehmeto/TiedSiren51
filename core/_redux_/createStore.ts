@@ -6,7 +6,7 @@ import {
 } from '@reduxjs/toolkit'
 import { rootReducer } from './rootReducer'
 import { Dependencies } from './dependencies'
-import { onAuthStatusChangedListener } from '@/core/auth/listenners/on-auth-status-changed.listener'
+import { onUserLoggedInListener } from '@/core/auth/listenners/on-user-logged-in.listener'
 
 export type PreloadedState = Partial<RootState>
 
@@ -31,7 +31,7 @@ export const createStore = (
     preloadedState,
   })
 
-  onAuthStatusChangedListener({
+  onUserLoggedInListener({
     store,
     authGateway: dependencies.authGateway,
   })

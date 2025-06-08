@@ -20,7 +20,7 @@ export class FakeStorageAuthGateway implements AuthGateway {
     try {
       const authUser = await this.fakeAuthGateway.authenticateWithApple()
       await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
-      this.fakeAuthGateway.onAuthStatusChangedListener(authUser)
+      this.fakeAuthGateway.simulateUserLoggedIn(authUser)
       return authUser
     } catch (error) {
       throw error
@@ -31,15 +31,15 @@ export class FakeStorageAuthGateway implements AuthGateway {
     try {
       const authUser = await this.fakeAuthGateway.authenticateWithGoogle()
       await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
-      this.fakeAuthGateway.onAuthStatusChangedListener(authUser)
+      this.fakeAuthGateway.simulateUserLoggedIn(authUser)
       return authUser
     } catch (error) {
       throw error
     }
   }
 
-  onAuthStatusChanged(listener: (user: AuthUser) => void): void {
-    this.fakeAuthGateway.onAuthStatusChanged(listener)
+  onUserLoggedIn(listener: (user: AuthUser) => void): void {
+    this.fakeAuthGateway.onUserLoggedIn(listener)
   }
 
   private async verifyUserIsAuthenticated(): Promise<void> {
@@ -48,7 +48,7 @@ export class FakeStorageAuthGateway implements AuthGateway {
 
       if (maybeAuthUser !== null) {
         const parsedAuthUser = JSON.parse(maybeAuthUser)
-        this.fakeAuthGateway.simulateAuthStatusChanged(parsedAuthUser)
+        this.fakeAuthGateway.simulateUserLoggedIn(parsedAuthUser)
       }
     } catch (error) {
       // eslint-disable-next-line no-console
