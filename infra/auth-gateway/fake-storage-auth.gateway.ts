@@ -21,6 +21,7 @@ export class FakeStorageAuthGateway implements AuthGateway {
       const authUser = await this.fakeAuthGateway.authenticateWithApple()
       await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
       this.fakeAuthGateway.simulateUserLoggedIn(authUser)
+      this.fakeAuthGateway.simulateUserLoggedIn(authUser)
       return authUser
     } catch (error) {
       throw error
