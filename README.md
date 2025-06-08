@@ -4,6 +4,25 @@
 
 # TiedSiren51 - Expo Mobile App
 
+## Code Coverage
+
+This project tracks code coverage to maintain quality. Use these commands:
+
+- `yarn test:cov` - Run tests with coverage report
+- `yarn test:cov:track` - Run tests and track coverage history locally
+- `yarn test:cov:history` - View coverage history
+
+**Current Coverage: 98.83%** 📊
+
+### Automated PR Coverage
+
+Every pull request automatically gets a coverage comparison comment showing:
+- Coverage changes compared to the base branch
+- Visual indicators (📈/📉) for improvements/regressions
+- Detailed breakdown by metric (statements, functions, branches, lines)
+
+The GitHub Action runs on every PR and updates the comment automatically.
+
 A React Native mobile application built with Expo, featuring authentication, block sessions management, and more.
 
 ## Prerequisites
