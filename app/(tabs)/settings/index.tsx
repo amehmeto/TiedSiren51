@@ -13,7 +13,7 @@ export default function SettingsScreen() {
     // Add your logout logic here (e.g., clear tokens, reset state)
 
     dispatch(logOut())
-    router.replace('/login')
+    router.replace('/(auth)/register')
   }
 
   return (
