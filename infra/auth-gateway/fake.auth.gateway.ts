@@ -2,13 +2,19 @@ import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
 
 export class FakeAuthGateway implements AuthGateway {
-  willSucceedForUser!: AuthUser
+  willSucceedForUser: AuthUser = {
+    id: 'fake-user-id',
+    username: 'Fake User',
+  }
+  private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   authenticateWithGoogle(): Promise<AuthUser> {
     return Promise.resolve(this.willSucceedForUser)
   }
 
-  onAuthStateChanged(listener: (user: AuthUser) => void): void {}
+  onUserLoggedIn(listener: (user: AuthUser) => void): void {
+    this.onUserLoggedInListener = listener
+  }
 
   authenticateWithApple(): Promise<AuthUser> {
     return Promise.resolve(this.willSucceedForUser)
@@ -16,5 +22,10 @@ export class FakeAuthGateway implements AuthGateway {
 
   authenticateWithEmail(email: string, password: string): Promise<AuthUser> {
     return Promise.resolve(this.willSucceedForUser)
+  }
+
+  simulateUserLoggedIn(authUser: AuthUser) {
+    if (!this.onUserLoggedInListener) return
+    this.onUserLoggedInListener(authUser)
   }
 }
