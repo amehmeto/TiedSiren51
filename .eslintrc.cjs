@@ -7,5 +7,6 @@ module.exports = {
     'prettier/prettier': 'error',
     'no-console': 'error',
     'no-switch-statements/no-switch': 'error',
+    'lines-between-class-members': ['error', 'always'],
   },
 }

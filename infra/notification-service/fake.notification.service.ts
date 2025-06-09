@@ -10,6 +10,7 @@ export class FakeNotificationService implements NotificationService {
     body: string
     trigger: NotificationTrigger
   }[] = []
+
   lastCancelledNotificationIds: string[] = []
 
   async sendPushNotification(message: string): Promise<void> {

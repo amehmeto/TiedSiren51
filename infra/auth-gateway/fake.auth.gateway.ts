@@ -6,7 +6,9 @@ export class FakeAuthGateway implements AuthGateway {
     id: 'fake-user-id',
     username: 'Fake User',
   }
+
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
+
   private onUserLoggedOutListener: (() => void) | null = null
 
   authenticateWithGoogle(): Promise<AuthUser> {
