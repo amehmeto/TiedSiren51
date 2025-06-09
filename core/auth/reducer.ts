@@ -6,7 +6,7 @@ import { authenticateWithEmail } from '@/core/auth/usecases/authenticate-with-em
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 
 export type AuthState = {
-  authUser: AuthUser
+  authUser: AuthUser | null
 }
 
 export const userAuthenticated = createAction<AuthUser>(

@@ -42,6 +42,15 @@ export class FakeStorageAuthGateway implements AuthGateway {
     this.fakeAuthGateway.onUserLoggedIn(listener)
   }
 
+  onUserLoggedOut(listener: () => void): void {
+    this.fakeAuthGateway.onUserLoggedOut(listener)
+  }
+
+  async logOut(): Promise<void> {
+    await AsyncStorage.removeItem('fake-auth-user')
+    return this.fakeAuthGateway.logOut()
+  }
+
   private async verifyUserIsAuthenticated(): Promise<void> {
     try {
       const maybeAuthUser = await AsyncStorage.getItem('fake-auth-user')
