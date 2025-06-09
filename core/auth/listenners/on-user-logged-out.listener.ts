@@ -1,8 +1,7 @@
 import { AppStore } from '@/core/_redux_/createStore'
 import { AuthGateway } from '@/core/ports/auth.gateway'
-import { userAuthenticated } from '@/core/auth/reducer'
+import { userLoggedOut } from '@/core/auth/reducer'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
-import { AuthUser } from '../authUser'
 
 export const onUserLoggedOutListener = ({
   store,
@@ -12,7 +11,7 @@ export const onUserLoggedOutListener = ({
   authGateway: AuthGateway
 }) => {
   authGateway.onUserLoggedOut(() => {
-    store.dispatch(userAuthenticated(null as unknown as AuthUser))
+    store.dispatch(userLoggedOut())
     store.dispatch(logOut())
   })
 }
