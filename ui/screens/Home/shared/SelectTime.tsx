@@ -12,6 +12,11 @@ import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
   return `${hours}:${minutes}`
 }*/
 
+function formatTimeString(time: string): string {
+  const [hours, minutes] = time.split(':').map(Number)
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+}
+
 export function SelectTime({
   timeField = 'startedAt', // Default to 'startedAt'
   setIsTimePickerVisible,
@@ -40,6 +45,11 @@ export function SelectTime({
       ? (values.startedAt ?? `Select start time...`)
       : (values.endedAt ?? `Select end time...`)
 
+  const handleTimeChange = (time: string) => {
+    const formattedTime = formatTimeString(time)
+    setFieldValue(timeField, formattedTime)
+  }
+
   return (
     <>
       <View style={styles.param}>
@@ -56,9 +66,7 @@ export function SelectTime({
             <WebTimePicker
               chosenTime={chosenTime}
               handleChange={() => handleChange(timeField)}
-              setTime={(chosenTime: string) => {
-                setFieldValue(timeField, chosenTime)
-              }}
+              setTime={handleTimeChange}
               setIsTimePickerVisible={setIsTimePickerVisible}
             />
           )
@@ -68,7 +76,7 @@ export function SelectTime({
             is24Hour={true}
             mode="time"
             onConfirm={(date) => {
-              setFieldValue(timeField, dateProvider.toHHmm(date))
+              handleTimeChange(dateProvider.toHHmm(date))
               setIsTimePickerVisible(false)
             }}
             onCancel={() => setIsTimePickerVisible(false)}
