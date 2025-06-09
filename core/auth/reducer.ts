@@ -6,12 +6,14 @@ import { authenticateWithEmail } from '@/core/auth/usecases/authenticate-with-em
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 
 export type AuthState = {
-  authUser: AuthUser
+  authUser: AuthUser | null
 }
 
 export const userAuthenticated = createAction<AuthUser>(
   'auth/userAuthenticated',
 )
+
+export const userLoggedOut = createAction('auth/userLoggedOut')
 
 export const reducer = createReducer<AuthState>(
   {
@@ -21,6 +23,9 @@ export const reducer = createReducer<AuthState>(
     builder
       .addCase(userAuthenticated, (state, action) => {
         state.authUser = action.payload
+      })
+      .addCase(userLoggedOut, (state) => {
+        state.authUser = null
       })
       .addCase(authenticateWithGoogle.fulfilled, (state, action) => {
         state.authUser = action.payload

@@ -5,8 +5,11 @@ import '@prisma/react-native'
 
 export abstract class PrismaRepository {
   private _isInitialized = false
+
   private readonly dbName = 'app.db'
+
   private readonly dbPath: string
+
   protected baseClient: PrismaClient
 
   public constructor() {
