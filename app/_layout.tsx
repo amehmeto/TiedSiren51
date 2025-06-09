@@ -7,18 +7,21 @@ import { Stack, useRouter } from 'expo-router'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
+import { createStore } from '@/core/_redux_/createStore'
+import { dependencies } from '@/ui/dependencies'
+
+const store = createStore(dependencies)
 
 export default function App() {
-  const { store, error, isInitializing, isAuthenticated } =
-    useAppInitialization()
+  const { error, isInitializing, isAuthenticated } = useAppInitialization(store)
   const router = useRouter()
 
   useEffect(() => {
-    if (isInitializing || !store) return
+    if (isInitializing) return
     router.replace(isAuthenticated ? '/home' : '/register')
-  }, [store, isInitializing, isAuthenticated, router])
+  }, [isInitializing, isAuthenticated, router])
 
-  if (isInitializing || !store) {
+  if (isInitializing) {
     return (
       <SafeAreaProvider>
         <View
