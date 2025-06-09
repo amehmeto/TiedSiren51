@@ -1,7 +1,10 @@
 import { z } from 'zod'
+import { isEmptyString } from './is-empty-string'
 
-function isEmptyString(val: string | null) {
-  return val !== null && val.trim() !== ''
+function isValidTimeFormat(time: string | null): boolean {
+  if (!time) return false
+  const timeRegex = /^([0-1][0-9]|2[0-3]):[0-5][0-9]$/
+  return timeRegex.test(time)
 }
 
 export const blockSessionSchema = z.object({
@@ -33,12 +36,18 @@ export const blockSessionSchema = z.object({
     .nullable()
     .refine((val) => isEmptyString(val), {
       message: 'A start time must be provided',
+    })
+    .refine((val) => val === null || isValidTimeFormat(val), {
+      message: 'Start time must be in HH:mm format (e.g. 07:00)',
     }),
   endedAt: z
     .string()
     .nullable()
     .refine((val) => isEmptyString(val), {
       message: 'An end time must be provided',
+    })
+    .refine((val) => val === null || isValidTimeFormat(val), {
+      message: 'End time must be in HH:mm format (e.g. 07:00)',
     }),
   blockingConditions: z
     .array(z.string())

@@ -3,12 +3,17 @@ import { BlockSession } from '../block.session'
 import { isBefore } from 'date-fns'
 
 export function isActive(dateProvider: DateProvider, session: BlockSession) {
-  const start =
-    session.startedAt > session.endedAt
-      ? dateProvider.recoverYesterdayDate(session.startedAt)
-      : dateProvider.recoverDate(session.startedAt)
-  const end = dateProvider.recoverDate(session.endedAt)
   const now = dateProvider.getNow()
+  const nowHHmm = dateProvider.toHHmm(now)
+  const isOvernight = session.startedAt > session.endedAt
 
-  return !isBefore(now, start) && isBefore(now, end)
+  const isActiveOvernight =
+    isOvernight && (nowHHmm >= session.startedAt || nowHHmm < session.endedAt)
+
+  const start = dateProvider.recoverDate(session.startedAt)
+  const end = dateProvider.recoverDate(session.endedAt)
+  const isActiveRegular =
+    !isOvernight && !isBefore(now, start) && isBefore(now, end)
+
+  return isActiveOvernight || isActiveRegular
 }
