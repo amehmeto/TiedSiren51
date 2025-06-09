@@ -53,6 +53,9 @@ yarn-error.*
 
 coverage/
 
+# Coverage tracking
+coverage-history.json
+
 # Android
 #
 android/.gradle
