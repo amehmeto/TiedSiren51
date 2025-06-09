@@ -1,5 +1,5 @@
 import { useLayoutEffect, useState } from 'react'
-import { AppStore, createStore } from '@/core/_redux_/createStore'
+import { AppStore } from '@/core/_redux_/createStore'
 import { dependencies } from '@/ui/dependencies'
 import { handleUIError } from '@/ui/utils/handleUIError'
 import { tieSirens } from '@/core/siren/usecases/tie-sirens.usecase'
@@ -9,8 +9,7 @@ import { T } from '@/ui/design-system/theme'
 import { loadUser } from '@/core/auth/usecases/load-user.usecase'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 
-export function useAppInitialization() {
-  const [store, setStore] = useState<AppStore | null>(null)
+export function useAppInitialization(store: AppStore) {
   const [error, setError] = useState<string | null>(null)
   const [isInitializing, setIsInitializing] = useState(true)
 
@@ -45,11 +44,9 @@ export function useAppInitialization() {
 
     const init = async () => {
       try {
-        const appStore = createStore(dependencies)
+        await initializeServices(store)
         if (!isMounted) return
-
-        setStore(appStore)
-        await initializeServices(appStore)
+        setError(null)
       } catch (error) {
         if (!isMounted) return
         const errorMessage = handleUIError(error, 'Store creation failed')
@@ -63,11 +60,9 @@ export function useAppInitialization() {
     return () => {
       isMounted = false
     }
-  }, [])
+  }, [store])
 
-  const isAuthenticated = store
-    ? selectIsUserAuthenticated(store.getState())
-    : false
+  const isAuthenticated = selectIsUserAuthenticated(store.getState())
 
-  return { store, error, isInitializing, isAuthenticated }
+  return { error, isInitializing, isAuthenticated }
 }
