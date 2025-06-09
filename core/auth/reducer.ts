@@ -13,8 +13,6 @@ export const userAuthenticated = createAction<AuthUser>(
   'auth/userAuthenticated',
 )
 
-export const userLoggedOut = createAction('auth/userLoggedOut')
-
 export const reducer = createReducer<AuthState>(
   {
     authUser: null,
@@ -23,9 +21,6 @@ export const reducer = createReducer<AuthState>(
     builder
       .addCase(userAuthenticated, (state, action) => {
         state.authUser = action.payload
-      })
-      .addCase(userLoggedOut, (state) => {
-        state.authUser = null
       })
       .addCase(authenticateWithGoogle.fulfilled, (state, action) => {
         state.authUser = action.payload
