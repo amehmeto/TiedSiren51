@@ -1,4 +1,4 @@
-import { useLayoutEffect, useState } from 'react'
+import { useEffect, useState } from 'react'
 import { AppStore } from '@/core/_redux_/createStore'
 import { dependencies } from '@/ui/dependencies'
 import { handleUIError } from '@/ui/utils/handleUIError'
@@ -39,7 +39,7 @@ export function useAppInitialization(store: AppStore) {
     }
   }
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     let isMounted = true
 
     const init = async () => {
