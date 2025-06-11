@@ -11,6 +11,7 @@ import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.r
 import { PrismaSirensRepository } from '@/infra/sirens-repository/prisma.sirens-repository'
 import { PrismaDatabaseService } from '@/infra/database-service/prisma.database.service'
 import { FakeStorageAuthGateway } from '@/infra/auth-gateway/fake-storage-auth.gateway'
+import { FirebaseAuthGateway } from '@/infra/auth-gateway/firebase.auth.gateway'
 
 const fakeAuthGateway = new FakeAuthGateway()
 fakeAuthGateway.willSucceedForUser = {
@@ -20,7 +21,7 @@ fakeAuthGateway.willSucceedForUser = {
 
 const mobileDependencies = {
   databaseService: new PrismaDatabaseService(),
-  authGateway: new FakeStorageAuthGateway(fakeAuthGateway),
+  authGateway: new FirebaseAuthGateway(),
   blockSessionRepository: new PrismaBlockSessionRepository(),
   blocklistRepository: new PrismaBlocklistRepository(),
   sirenTier: new InMemorySirenTier(),

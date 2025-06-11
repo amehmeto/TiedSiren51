@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
@@ -16,6 +16,8 @@ import { authenticateWithEmail } from '@/core/auth/usecases/authenticate-with-em
 export default function SignUpScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   const handleClose = () => {
     if (router.canGoBack()) {
@@ -47,18 +49,22 @@ export default function SignUpScreen() {
         <TiedSTextInput
           placeholder={'Your Email'}
           placeholderTextColor={T.color.grey}
+          value={email}
+          onChangeText={setEmail}
         />
         <TiedSTextInput
           placeholder="Create Password"
           placeholderTextColor={T.color.grey}
           hasPasswordToggle={true}
+          value={password}
+          onChangeText={setPassword}
         />
         <TiedSButton
           onPress={() =>
             dispatch(
               authenticateWithEmail({
-                email: 'dummy@user.fr',
-                password: 'azerty',
+                email,
+                password,
               }),
             )
           }

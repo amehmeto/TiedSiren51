@@ -6,5 +6,6 @@ export interface AuthGateway {
   authenticateWithGoogle(): Promise<AuthUser>
   authenticateWithApple(): Promise<AuthUser>
   authenticateWithEmail(email: string, password: string): Promise<AuthUser>
+  signInWithEmail(email: string, password: string): Promise<AuthUser>
   logOut(): Promise<void>
 }

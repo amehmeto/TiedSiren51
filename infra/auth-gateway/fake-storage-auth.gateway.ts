@@ -16,6 +16,11 @@ export class FakeStorageAuthGateway implements AuthGateway {
     //return Promise.resolve(undefined)
   }
 
+  signInWithEmail(email: string, password: string): Promise<AuthUser> {
+    throw new Error('Method not implemented.')
+    //return Promise.resolve(undefined)
+  }
+
   async authenticateWithApple(): Promise<AuthUser> {
     try {
       const authUser = await this.fakeAuthGateway.authenticateWithApple()

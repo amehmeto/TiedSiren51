@@ -31,6 +31,10 @@ export class FakeAuthGateway implements AuthGateway {
     return Promise.resolve(this.willSucceedForUser)
   }
 
+  signInWithEmail(email: string, password: string): Promise<AuthUser> {
+    return Promise.resolve(this.willSucceedForUser)
+  }
+
   simulateUserLoggedIn(authUser: AuthUser) {
     if (!this.onUserLoggedInListener) return
     this.onUserLoggedInListener(authUser)
