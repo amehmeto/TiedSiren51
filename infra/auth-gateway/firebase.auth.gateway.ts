@@ -2,25 +2,29 @@ import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
 import { initializeApp } from 'firebase/app'
 import {
-  getAuth,
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
   signOut,
   onAuthStateChanged,
   User,
+  initializeAuth,
+  getReactNativePersistence,
+  Auth,
 } from 'firebase/auth'
 import { firebaseConfig } from '../firebase/firebaseConfig'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export class FirebaseAuthGateway implements AuthGateway {
-  private auth
+  private auth!: Auth
+
+  private readonly firebaseConfig = firebaseConfig
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
 
   constructor() {
-    const app = initializeApp(firebaseConfig)
-    this.auth = getAuth(app)
+    this.initializeFirebase()
     onAuthStateChanged(this.auth, (user: User | null) => {
       if (user && this.onUserLoggedInListener) {
         this.onUserLoggedInListener({
@@ -32,6 +36,13 @@ export class FirebaseAuthGateway implements AuthGateway {
       if (!user && this.onUserLoggedOutListener) {
         this.onUserLoggedOutListener()
       }
+    })
+  }
+
+  private initializeFirebase() {
+    const app = initializeApp(this.firebaseConfig)
+    this.auth = initializeAuth(app, {
+      persistence: getReactNativePersistence(AsyncStorage),
     })
   }
 
