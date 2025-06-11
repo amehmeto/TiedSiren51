@@ -62,7 +62,7 @@ export class FirebaseAuthGateway implements AuthGateway {
     )
     return {
       id: result.user.uid,
-      username: result.user.email ?? result.user.uid,
+      username: result.user.displayName ?? '',
     }
   }
 
