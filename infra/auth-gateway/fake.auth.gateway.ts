@@ -11,7 +11,7 @@ export class FakeAuthGateway implements AuthGateway {
 
   private onUserLoggedOutListener: (() => void) | null = null
 
-  authenticateWithGoogle(): Promise<AuthUser> {
+  signInWithGoogle(): Promise<AuthUser> {
     return Promise.resolve(this.willSucceedForUser)
   }
 
@@ -23,11 +23,11 @@ export class FakeAuthGateway implements AuthGateway {
     this.onUserLoggedOutListener = listener
   }
 
-  authenticateWithApple(): Promise<AuthUser> {
+  signInWithApple(): Promise<AuthUser> {
     return Promise.resolve(this.willSucceedForUser)
   }
 
-  authenticateWithEmail(email: string, password: string): Promise<AuthUser> {
+  signUpWithEmail(email: string, password: string): Promise<AuthUser> {
     return Promise.resolve(this.willSucceedForUser)
   }
 

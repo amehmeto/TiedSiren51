@@ -8,10 +8,10 @@ import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSClos
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { useDispatch } from 'react-redux'
-import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-google.usecase'
+import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { AppDispatch } from '@/core/_redux_/createStore'
-import { authenticateWithApple } from '@/core/auth/usecases/authenticate-with-apple.usecase'
-import { authenticateWithEmail } from '@/core/auth/usecases/authenticate-with-email.usecase'
+import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
+import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
 
 export default function SignUpScreen() {
   const router = useRouter()
@@ -38,12 +38,12 @@ export default function SignUpScreen() {
         <TiedSSocialButton
           iconName="logo-google"
           text="CONTINUE WITH GOOGLE"
-          onPress={() => dispatch(authenticateWithGoogle())}
+          onPress={() => dispatch(signInWithGoogle())}
         />
         <TiedSSocialButton
           iconName="logo-apple"
           text="CONTINUE WITH APPLE"
-          onPress={() => dispatch(authenticateWithApple())}
+          onPress={() => dispatch(signInWithApple())}
         />
         <Text style={styles.orText}>{'OR'}</Text>
         <TiedSTextInput
@@ -62,7 +62,7 @@ export default function SignUpScreen() {
         <TiedSButton
           onPress={() =>
             dispatch(
-              authenticateWithEmail({
+              signUpWithEmail({
                 email,
                 password,
               }),
