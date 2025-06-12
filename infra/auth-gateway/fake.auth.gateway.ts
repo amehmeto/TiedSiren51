@@ -4,7 +4,7 @@ import { AuthUser } from '@/core/auth/authUser'
 export class FakeAuthGateway implements AuthGateway {
   willSucceedForUser: AuthUser = {
     id: 'fake-user-id',
-    username: 'Fake User',
+    email: 'fake-user@gmail.com',
   }
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null

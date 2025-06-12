@@ -11,6 +11,7 @@ describe('Feature: Authenticate with Email', () => {
   it('should authenticate with Email successfully', async () => {
     fixture.given.authenticationWithEmailWillSucceedForUser({
       id: 'auth-user-id',
+      email: 'amehmeto@gmail.com',
       username: 'Arthur',
     })
 
@@ -18,6 +19,7 @@ describe('Feature: Authenticate with Email', () => {
 
     fixture.then.userShouldBeAuthenticated({
       id: 'auth-user-id',
+      email: 'amehmeto@gmail.com',
       username: 'Arthur',
     })
   })

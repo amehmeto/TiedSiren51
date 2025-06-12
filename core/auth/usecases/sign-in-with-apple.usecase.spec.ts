@@ -11,6 +11,7 @@ describe('Feature: Authenticate with Apple', () => {
   it('should authenticate with Apple successfully', async () => {
     fixture.given.authenticationWithAppleWillSucceedForUser({
       id: 'auth-user-id',
+      email: 'steeve@gmail.com',
       username: 'Steeve',
     })
 
@@ -18,6 +19,7 @@ describe('Feature: Authenticate with Apple', () => {
 
     fixture.then.userShouldBeAuthenticated({
       id: 'auth-user-id',
+      email: 'steeve@gmail.com',
       username: 'Steeve',
     })
   })

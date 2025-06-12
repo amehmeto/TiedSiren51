@@ -11,6 +11,7 @@ describe('Feature: Authenticate with Google', () => {
   it('should authenticate with Google successfully', async () => {
     fixture.given.authenticationWithGoogleWillSucceedForUser({
       id: 'auth-user-id',
+      email: 'elon@gmail.com',
       username: 'Elon',
     })
 
@@ -18,6 +19,7 @@ describe('Feature: Authenticate with Google', () => {
 
     fixture.then.userShouldBeAuthenticated({
       id: 'auth-user-id',
+      email: 'elon@gmail.com',
       username: 'Elon',
     })
   })

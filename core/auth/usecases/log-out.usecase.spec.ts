@@ -11,6 +11,7 @@ describe('Feature: Log out', () => {
   it('should log out successfully', async () => {
     fixture.given.authUserIs({
       id: 'fake-joe-id',
+      email: 'joe@gmail.com',
       username: 'Joe',
     })
 

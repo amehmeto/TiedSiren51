@@ -38,7 +38,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       if (user && this.onUserLoggedInListener) {
         this.onUserLoggedInListener({
           id: user.uid,
-          username: user.email ?? user.uid,
+          email: user.email ?? '',
         })
         return
       }
@@ -52,7 +52,7 @@ export class FirebaseAuthGateway implements AuthGateway {
     const result = await signInWithEmailAndPassword(this.auth, email, password)
     return {
       id: result.user.uid,
-      username: email.split('@')[0],
+      email: result.user.email ?? '',
     }
   }
 
@@ -64,7 +64,7 @@ export class FirebaseAuthGateway implements AuthGateway {
     )
     return {
       id: result.user.uid,
-      username: email.split('@')[0],
+      email: result.user.email ?? '',
     }
   }
 
