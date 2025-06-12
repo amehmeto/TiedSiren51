@@ -1,6 +1,6 @@
 import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
-import { initializeApp } from 'firebase/app'
+import { initializeApp, getApps, getApp } from 'firebase/app'
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -9,22 +9,31 @@ import {
   User,
   initializeAuth,
   getReactNativePersistence,
+  getAuth,
   Auth,
 } from 'firebase/auth'
 import { firebaseConfig } from '../firebase/firebaseConfig'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 
-export class FirebaseAuthGateway implements AuthGateway {
-  private auth!: Auth
+const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
 
-  private readonly firebaseConfig = firebaseConfig
+let auth: Auth
+try {
+  auth = getAuth(app)
+} catch {
+  auth = initializeAuth(app, {
+    persistence: getReactNativePersistence(AsyncStorage),
+  })
+}
+
+export class FirebaseAuthGateway implements AuthGateway {
+  private auth = auth
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
 
   constructor() {
-    this.initializeFirebase()
     onAuthStateChanged(this.auth, (user: User | null) => {
       if (user && this.onUserLoggedInListener) {
         this.onUserLoggedInListener({
@@ -39,18 +48,11 @@ export class FirebaseAuthGateway implements AuthGateway {
     })
   }
 
-  private initializeFirebase() {
-    const app = initializeApp(this.firebaseConfig)
-    this.auth = initializeAuth(app, {
-      persistence: getReactNativePersistence(AsyncStorage),
-    })
-  }
-
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
     const result = await signInWithEmailAndPassword(this.auth, email, password)
     return {
       id: result.user.uid,
-      username: result.user.email ?? result.user.uid,
+      username: email.split('@')[0],
     }
   }
 
@@ -62,7 +64,7 @@ export class FirebaseAuthGateway implements AuthGateway {
     )
     return {
       id: result.user.uid,
-      username: result.user.displayName ?? '',
+      username: email.split('@')[0],
     }
   }
 

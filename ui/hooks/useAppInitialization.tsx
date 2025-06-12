@@ -8,6 +8,7 @@ import { Platform } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { loadUser } from '@/core/auth/usecases/load-user.usecase'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
+import { useSelector } from 'react-redux'
 
 export function useAppInitialization(store: AppStore) {
   const [error, setError] = useState<string | null>(null)
@@ -62,7 +63,7 @@ export function useAppInitialization(store: AppStore) {
     }
   }, [store])
 
-  const isAuthenticated = selectIsUserAuthenticated(store.getState())
+  const isAuthenticated = useSelector(selectIsUserAuthenticated)
 
   return { error, isInitializing, isAuthenticated }
 }
