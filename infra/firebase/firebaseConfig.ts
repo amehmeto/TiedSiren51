@@ -7,3 +7,5 @@ export const firebaseConfig = {
   appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
   measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
 } as const
+
+export type FirebaseConfig = typeof firebaseConfig

@@ -1,6 +1,6 @@
 import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
-import { initializeApp, getApps, getApp } from 'firebase/app'
+import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app'
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -12,28 +12,56 @@ import {
   getAuth,
   Auth,
 } from 'firebase/auth'
-import { firebaseConfig } from '../firebase/firebaseConfig'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
-const app = getApps().length ? getApp() : initializeApp(firebaseConfig)
-
-let auth: Auth
-try {
-  auth = getAuth(app)
-} catch {
-  auth = initializeAuth(app, {
-    persistence: getReactNativePersistence(AsyncStorage),
-  })
-}
+import type { FirebaseConfig } from '../firebase/firebaseConfig'
 
 export class FirebaseAuthGateway implements AuthGateway {
-  private auth = auth
+  private readonly firebaseConfig: FirebaseConfig
+
+  private readonly auth: Auth
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
 
-  constructor() {
+  private constructor(config: FirebaseConfig) {
+    this.firebaseConfig = config
+    const app = this.initializeApp()
+    this.auth = this.initializeAuth(app)
+    this.setupAuthStateListener()
+  }
+
+  public static create(config: FirebaseConfig): FirebaseAuthGateway {
+    return new FirebaseAuthGateway(config)
+  }
+
+  public static createWithDefaultConfig(): FirebaseAuthGateway {
+    const { firebaseConfig } = require('../firebase/firebaseConfig')
+    return new FirebaseAuthGateway(firebaseConfig)
+  }
+
+  private initializeApp(): FirebaseApp {
+    return getApps().length ? getApp() : initializeApp(this.firebaseConfig)
+  }
+
+  private initializeAuth(app: FirebaseApp): Auth {
+    try {
+      return initializeAuth(app, {
+        persistence: getReactNativePersistence(AsyncStorage),
+      })
+    } catch (error) {
+      if (
+        error instanceof Error &&
+        'code' in error &&
+        error.code === 'auth/already-initialized'
+      ) {
+        return getAuth(app)
+      }
+      throw error
+    }
+  }
+
+  private setupAuthStateListener(): void {
     onAuthStateChanged(this.auth, (user: User | null) => {
       if (user && this.onUserLoggedInListener) {
         this.onUserLoggedInListener({
