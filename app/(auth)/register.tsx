@@ -15,9 +15,7 @@ export default function RegisterScreen() {
   const router = useRouter()
 
   useEffect(() => {
-    if (isUserAuthenticated) {
-      router.push('/')
-    }
+    if (isUserAuthenticated) router.push('/')
   }, [isUserAuthenticated, router])
 
   return (

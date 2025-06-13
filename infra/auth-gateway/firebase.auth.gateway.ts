@@ -13,9 +13,28 @@ import {
   Auth,
 } from 'firebase/auth'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import type { FirebaseConfig } from '../firebase/firebaseConfig'
+
+type FirebaseConfig = {
+  apiKey: string
+  authDomain: string
+  projectId: string
+  storageBucket: string
+  messagingSenderId: string
+  appId: string
+  measurementId: string
+}
 
 export class FirebaseAuthGateway implements AuthGateway {
+  private static readonly FIREBASE_CONFIG: FirebaseConfig = {
+    apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY!,
+    authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN!,
+    projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID!,
+    storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET!,
+    messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
+    appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID!,
+    measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID!,
+  }
+
   private readonly firebaseConfig: FirebaseConfig
 
   private readonly auth: Auth
@@ -24,20 +43,11 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   private onUserLoggedOutListener: (() => void) | null = null
 
-  private constructor(config: FirebaseConfig) {
-    this.firebaseConfig = config
+  public constructor() {
+    this.firebaseConfig = FirebaseAuthGateway.FIREBASE_CONFIG
     const app = this.initializeApp()
     this.auth = this.initializeAuth(app)
     this.setupAuthStateListener()
-  }
-
-  public static create(config: FirebaseConfig): FirebaseAuthGateway {
-    return new FirebaseAuthGateway(config)
-  }
-
-  public static createWithDefaultConfig(): FirebaseAuthGateway {
-    const { firebaseConfig } = require('../firebase/firebaseConfig')
-    return new FirebaseAuthGateway(firebaseConfig)
   }
 
   private initializeApp(): FirebaseApp {

@@ -13,7 +13,7 @@ import { FirebaseAuthGateway } from '@/infra/auth-gateway/firebase.auth.gateway'
 
 const mobileDependencies = {
   databaseService: new PrismaDatabaseService(),
-  authGateway: FirebaseAuthGateway.createWithDefaultConfig(),
+  authGateway: new FirebaseAuthGateway(),
   blockSessionRepository: new PrismaBlockSessionRepository(),
   blocklistRepository: new PrismaBlocklistRepository(),
   sirenTier: new InMemorySirenTier(),
