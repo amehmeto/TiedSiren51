@@ -6,10 +6,11 @@ import { AppStore } from '@/core/_redux_/createStore'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { AuthUser } from '@/core/auth/authUser'
-import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-google.usecase'
 import { expect } from 'vitest'
-import { authenticateWithApple } from '@/core/auth/usecases/authenticate-with-apple.usecase'
-import { authenticateWithEmail } from '@/core/auth/usecases/authenticate-with-email.usecase'
+import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
+import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
+import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
+import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 
 export function authentificationFixture(
@@ -37,14 +38,17 @@ export function authentificationFixture(
       },
     },
     when: {
-      async authenticateWithGoogle() {
-        return store.dispatch(authenticateWithGoogle())
+      async signInWithGoogle() {
+        return store.dispatch(signInWithGoogle())
       },
-      async authenticateWithApple() {
-        return store.dispatch(authenticateWithApple())
+      async signInWithApple() {
+        return store.dispatch(signInWithApple())
       },
-      authenticateWithEmail(email: string, password: string) {
-        return store.dispatch(authenticateWithEmail({ email, password }))
+      signUpWithEmail(email: string, password: string) {
+        return store.dispatch(signUpWithEmail({ email, password }))
+      },
+      signInWithEmail(email: string, password: string) {
+        return store.dispatch(signInWithEmail({ email, password }))
       },
       logOut() {
         store = createTestStore(

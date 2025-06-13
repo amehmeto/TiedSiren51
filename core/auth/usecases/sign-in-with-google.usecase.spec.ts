@@ -1,24 +1,26 @@
 import { beforeEach, describe, it } from 'vitest'
 import { authentificationFixture } from '@/core/auth/authentification.fixture'
 
-describe('Feature: Authenticate with Email', () => {
+describe('Feature: Authenticate with Google', () => {
   let fixture: ReturnType<typeof authentificationFixture>
 
   beforeEach(() => {
     fixture = authentificationFixture()
   })
 
-  it('should authenticate with Email successfully', async () => {
-    fixture.given.authenticationWithEmailWillSucceedForUser({
+  it('should authenticate with Google successfully', async () => {
+    fixture.given.authenticationWithGoogleWillSucceedForUser({
       id: 'auth-user-id',
-      username: 'Arthur',
+      email: 'elon@gmail.com',
+      username: 'Elon',
     })
 
-    await fixture.when.authenticateWithEmail('amehmeto@gmail.com', 'qwerty1234')
+    await fixture.when.signInWithGoogle()
 
     fixture.then.userShouldBeAuthenticated({
       id: 'auth-user-id',
-      username: 'Arthur',
+      email: 'elon@gmail.com',
+      username: 'Elon',
     })
   })
 })

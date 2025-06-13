@@ -11,14 +11,12 @@ export class FakeStorageAuthGateway implements AuthGateway {
     )
   }
 
-  authenticateWithEmail(email: string, password: string): Promise<AuthUser> {
-    throw new Error('Method not implemented.')
-    //return Promise.resolve(undefined)
-  }
-
-  async authenticateWithApple(): Promise<AuthUser> {
+  async signUpWithEmail(email: string, password: string): Promise<AuthUser> {
     try {
-      const authUser = await this.fakeAuthGateway.authenticateWithApple()
+      const authUser = await this.fakeAuthGateway.signUpWithEmail(
+        email,
+        password,
+      )
       await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
       this.fakeAuthGateway.simulateUserLoggedIn(authUser)
       return authUser
@@ -27,9 +25,34 @@ export class FakeStorageAuthGateway implements AuthGateway {
     }
   }
 
-  async authenticateWithGoogle(): Promise<AuthUser> {
+  async signInWithEmail(email: string, password: string): Promise<AuthUser> {
     try {
-      const authUser = await this.fakeAuthGateway.authenticateWithGoogle()
+      const authUser = await this.fakeAuthGateway.signInWithEmail(
+        email,
+        password,
+      )
+      await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
+      this.fakeAuthGateway.simulateUserLoggedIn(authUser)
+      return authUser
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async signInWithApple(): Promise<AuthUser> {
+    try {
+      const authUser = await this.fakeAuthGateway.signInWithApple()
+      await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
+      this.fakeAuthGateway.simulateUserLoggedIn(authUser)
+      return authUser
+    } catch (error) {
+      throw error
+    }
+  }
+
+  async signInWithGoogle(): Promise<AuthUser> {
+    try {
+      const authUser = await this.fakeAuthGateway.signInWithGoogle()
       await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
       this.fakeAuthGateway.simulateUserLoggedIn(authUser)
       return authUser

@@ -12,6 +12,7 @@ describe('onUserLoggedIn listener', () => {
 
     authGateway.simulateUserLoggedIn({
       id: 'wesh alors',
+      email: 'jul@gmail.com',
       username: 'Jul',
     })
     const dispatchedActions = store.getActions()
@@ -19,6 +20,7 @@ describe('onUserLoggedIn listener', () => {
     expect(dispatchedActions).toContainEqual(
       userAuthenticated({
         id: 'wesh alors',
+        email: 'jul@gmail.com',
         username: 'Jul',
       }),
     )

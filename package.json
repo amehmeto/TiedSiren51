@@ -66,6 +66,7 @@
     "expo-system-ui": "~3.0.7",
     "expo-task-manager": "^11.8.2",
     "expo-web-browser": "~13.0.3",
+    "firebase": "^11.9.1",
     "formik": "^2.4.5",
     "pouchdb": "^8.0.1",
     "prisma": "^5.22.0",

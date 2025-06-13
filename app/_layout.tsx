@@ -13,6 +13,16 @@ import { dependencies } from '@/ui/dependencies'
 const store = createStore(dependencies)
 
 export default function App() {
+  return (
+    <SafeAreaProvider>
+      <Provider store={store}>
+        <AppWithInitialization />
+      </Provider>
+    </SafeAreaProvider>
+  )
+}
+
+function AppWithInitialization() {
   const { error, isInitializing, isAuthenticated } = useAppInitialization(store)
   const router = useRouter()
 
@@ -23,24 +33,22 @@ export default function App() {
 
   if (isInitializing) {
     return (
-      <SafeAreaProvider>
-        <View
-          style={{
-            flex: 1,
-            justifyContent: 'center',
-            alignItems: 'center',
-            backgroundColor: '#1e293b',
-          }}
-        >
-          <Text style={{ color: 'white', fontSize: 18 }}>
-            {isInitializing
-              ? 'Loading...'
-              : error
-                ? `Error: ${error}`
-                : 'Initializing...'}
-          </Text>
-        </View>
-      </SafeAreaProvider>
+      <View
+        style={{
+          flex: 1,
+          justifyContent: 'center',
+          alignItems: 'center',
+          backgroundColor: '#1e293b',
+        }}
+      >
+        <Text style={{ color: 'white', fontSize: 18 }}>
+          {isInitializing
+            ? 'Loading...'
+            : error
+              ? `Error: ${error}`
+              : 'Initializing...'}
+        </Text>
+      </View>
     )
   }
 
@@ -53,31 +61,27 @@ export default function App() {
   ]
 
   return (
-    <SafeAreaProvider>
-      <Provider store={store}>
-        <MenuProvider>
-          <StatusBar style={'auto'} />
-          <TiedSLinearBackground>
-            <Stack
-              screenOptions={{
+    <MenuProvider>
+      <StatusBar style={'auto'} />
+      <TiedSLinearBackground>
+        <Stack
+          screenOptions={{
+            header: () => null,
+            contentStyle: { backgroundColor: 'transparent' },
+          }}
+        >
+          {routes.map((route) => (
+            <Stack.Screen
+              key={route}
+              name={route}
+              options={{
                 header: () => null,
                 contentStyle: { backgroundColor: 'transparent' },
               }}
-            >
-              {routes.map((route) => (
-                <Stack.Screen
-                  key={route}
-                  name={route}
-                  options={{
-                    header: () => null,
-                    contentStyle: { backgroundColor: 'transparent' },
-                  }}
-                />
-              ))}
-            </Stack>
-          </TiedSLinearBackground>
-        </MenuProvider>
-      </Provider>
-    </SafeAreaProvider>
+            />
+          ))}
+        </Stack>
+      </TiedSLinearBackground>
+    </MenuProvider>
   )
 }

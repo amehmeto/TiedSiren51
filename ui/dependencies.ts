@@ -3,24 +3,17 @@ import { Dependencies } from '@/core/_redux_/dependencies'
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
 import { InMemorySirenTier } from '@/infra/siren-tier/in-memory-siren.tier'
 import { RealBackgroundTaskService } from '@/infra/background-task-service/real.background-task.service'
-import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-repository/expo-list-installed-apps.repository'
 import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.blocklist.repository'
 import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/prisma.block-session.repository'
 import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
 import { PrismaSirensRepository } from '@/infra/sirens-repository/prisma.sirens-repository'
 import { PrismaDatabaseService } from '@/infra/database-service/prisma.database.service'
-import { FakeStorageAuthGateway } from '@/infra/auth-gateway/fake-storage-auth.gateway'
-
-const fakeAuthGateway = new FakeAuthGateway()
-fakeAuthGateway.willSucceedForUser = {
-  id: 'for preview',
-  username: 'Super Tester',
-}
+import { FirebaseAuthGateway } from '@/infra/auth-gateway/firebase.auth.gateway'
 
 const mobileDependencies = {
   databaseService: new PrismaDatabaseService(),
-  authGateway: new FakeStorageAuthGateway(fakeAuthGateway),
+  authGateway: new FirebaseAuthGateway(),
   blockSessionRepository: new PrismaBlockSessionRepository(),
   blocklistRepository: new PrismaBlocklistRepository(),
   sirenTier: new InMemorySirenTier(),

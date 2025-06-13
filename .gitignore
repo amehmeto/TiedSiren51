@@ -86,6 +86,9 @@ prisma/*.db
 *.db
 app.db
 
+# env
+.env
+
 # IDE
 .idea/
 .vscode/

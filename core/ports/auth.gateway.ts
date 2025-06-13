@@ -3,8 +3,9 @@ import { AuthUser } from '@/core/auth/authUser'
 export interface AuthGateway {
   onUserLoggedIn(listener: (user: AuthUser) => void): void
   onUserLoggedOut(listener: () => void): void
-  authenticateWithGoogle(): Promise<AuthUser>
-  authenticateWithApple(): Promise<AuthUser>
-  authenticateWithEmail(email: string, password: string): Promise<AuthUser>
+  signInWithGoogle(): Promise<AuthUser>
+  signInWithApple(): Promise<AuthUser>
+  signUpWithEmail(email: string, password: string): Promise<AuthUser>
+  signInWithEmail(email: string, password: string): Promise<AuthUser>
   logOut(): Promise<void>
 }

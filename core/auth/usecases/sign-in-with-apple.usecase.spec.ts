@@ -11,13 +11,15 @@ describe('Feature: Authenticate with Apple', () => {
   it('should authenticate with Apple successfully', async () => {
     fixture.given.authenticationWithAppleWillSucceedForUser({
       id: 'auth-user-id',
+      email: 'steeve@gmail.com',
       username: 'Steeve',
     })
 
-    await fixture.when.authenticateWithApple()
+    await fixture.when.signInWithApple()
 
     fixture.then.userShouldBeAuthenticated({
       id: 'auth-user-id',
+      email: 'steeve@gmail.com',
       username: 'Steeve',
     })
   })

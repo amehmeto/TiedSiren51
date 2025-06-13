@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
@@ -8,14 +8,16 @@ import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSClos
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { useDispatch } from 'react-redux'
-import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-google.usecase'
+import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { AppDispatch } from '@/core/_redux_/createStore'
-import { authenticateWithApple } from '@/core/auth/usecases/authenticate-with-apple.usecase'
-import { authenticateWithEmail } from '@/core/auth/usecases/authenticate-with-email.usecase'
+import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
+import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
 
 export default function SignUpScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
 
   const handleClose = () => {
     if (router.canGoBack()) {
@@ -36,29 +38,33 @@ export default function SignUpScreen() {
         <TiedSSocialButton
           iconName="logo-google"
           text="CONTINUE WITH GOOGLE"
-          onPress={() => dispatch(authenticateWithGoogle())}
+          onPress={() => dispatch(signInWithGoogle())}
         />
         <TiedSSocialButton
           iconName="logo-apple"
           text="CONTINUE WITH APPLE"
-          onPress={() => dispatch(authenticateWithApple())}
+          onPress={() => dispatch(signInWithApple())}
         />
         <Text style={styles.orText}>{'OR'}</Text>
         <TiedSTextInput
           placeholder={'Your Email'}
           placeholderTextColor={T.color.grey}
+          value={email}
+          onChangeText={setEmail}
         />
         <TiedSTextInput
           placeholder="Create Password"
           placeholderTextColor={T.color.grey}
           hasPasswordToggle={true}
+          value={password}
+          onChangeText={setPassword}
         />
         <TiedSButton
           onPress={() =>
             dispatch(
-              authenticateWithEmail({
-                email: 'dummy@user.fr',
-                password: 'azerty',
+              signUpWithEmail({
+                email,
+                password,
               }),
             )
           }
