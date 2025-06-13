@@ -4,14 +4,14 @@ import { AuthUser } from '@/core/auth/authUser'
 export class FakeAuthGateway implements AuthGateway {
   willSucceedForUser: AuthUser = {
     id: 'fake-user-id',
-    email: 'fake-user@gmail.com',
+    username: 'Fake User',
   }
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
 
-  signInWithGoogle(): Promise<AuthUser> {
+  authenticateWithGoogle(): Promise<AuthUser> {
     return Promise.resolve(this.willSucceedForUser)
   }
 
@@ -23,15 +23,11 @@ export class FakeAuthGateway implements AuthGateway {
     this.onUserLoggedOutListener = listener
   }
 
-  signInWithApple(): Promise<AuthUser> {
+  authenticateWithApple(): Promise<AuthUser> {
     return Promise.resolve(this.willSucceedForUser)
   }
 
-  signUpWithEmail(email: string, password: string): Promise<AuthUser> {
-    return Promise.resolve(this.willSucceedForUser)
-  }
-
-  signInWithEmail(email: string, password: string): Promise<AuthUser> {
+  authenticateWithEmail(email: string, password: string): Promise<AuthUser> {
     return Promise.resolve(this.willSucceedForUser)
   }
 

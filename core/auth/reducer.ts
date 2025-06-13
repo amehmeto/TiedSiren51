@@ -1,10 +1,9 @@
 import { createAction, createReducer } from '@reduxjs/toolkit'
-import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
+import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-google.usecase'
 import { AuthUser } from '@/core/auth/authUser'
-import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
-import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
+import { authenticateWithApple } from '@/core/auth/usecases/authenticate-with-apple.usecase'
+import { authenticateWithEmail } from '@/core/auth/usecases/authenticate-with-email.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
-import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
 
 export type AuthState = {
   authUser: AuthUser | null
@@ -23,16 +22,13 @@ export const reducer = createReducer<AuthState>(
       .addCase(userAuthenticated, (state, action) => {
         state.authUser = action.payload
       })
-      .addCase(signInWithGoogle.fulfilled, (state, action) => {
+      .addCase(authenticateWithGoogle.fulfilled, (state, action) => {
         state.authUser = action.payload
       })
-      .addCase(signInWithApple.fulfilled, (state, action) => {
+      .addCase(authenticateWithApple.fulfilled, (state, action) => {
         state.authUser = action.payload
       })
-      .addCase(signInWithEmail.fulfilled, (state, action) => {
-        state.authUser = action.payload
-      })
-      .addCase(signUpWithEmail.fulfilled, (state, action) => {
+      .addCase(authenticateWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
       })
       .addCase(logOut.fulfilled, (state) => {

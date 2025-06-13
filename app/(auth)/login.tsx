@@ -9,9 +9,9 @@ import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialB
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
-import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
-import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
-import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
+import { authenticateWithGoogle } from '@/core/auth/usecases/authenticate-with-google.usecase'
+import { authenticateWithApple } from '@/core/auth/usecases/authenticate-with-apple.usecase'
+import { authenticateWithEmail } from '@/core/auth/usecases/authenticate-with-email.usecase'
 
 export default function LoginScreen() {
   const router = useRouter()
@@ -45,12 +45,12 @@ export default function LoginScreen() {
       <TiedSSocialButton
         iconName="logo-google"
         text="CONTINUE WITH GOOGLE"
-        onPress={() => dispatch(signInWithGoogle())}
+        onPress={() => dispatch(authenticateWithGoogle())}
       />
       <TiedSSocialButton
         iconName="logo-apple"
         text="CONTINUE WITH APPLE"
-        onPress={() => dispatch(signInWithApple())}
+        onPress={() => dispatch(authenticateWithApple())}
       />
       <Text style={styles.orText}>{'OR'}</Text>
       <TiedSTextInput
@@ -74,7 +74,7 @@ export default function LoginScreen() {
         }
       />
       <TiedSButton
-        onPress={() => dispatch(signInWithEmail({ email, password }))}
+        onPress={() => dispatch(authenticateWithEmail({ email, password }))}
         text={'LOG IN'}
         style={styles.button}
       />
