@@ -13,29 +13,12 @@ import {
   Auth,
 } from 'firebase/auth'
 import AsyncStorage from '@react-native-async-storage/async-storage'
-
-type FirebaseConfig = {
-  apiKey: string
-  authDomain: string
-  projectId: string
-  storageBucket: string
-  messagingSenderId: string
-  appId: string
-  measurementId: string
-}
+import { firebaseConfig } from './firebaseConfig'
 
 export class FirebaseAuthGateway implements AuthGateway {
-  private static readonly FIREBASE_CONFIG: FirebaseConfig = {
-    apiKey: process.env.EXPO_PUBLIC_FIREBASE_API_KEY!,
-    authDomain: process.env.EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN!,
-    projectId: process.env.EXPO_PUBLIC_FIREBASE_PROJECT_ID!,
-    storageBucket: process.env.EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET!,
-    messagingSenderId: process.env.EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID!,
-    appId: process.env.EXPO_PUBLIC_FIREBASE_APP_ID!,
-    measurementId: process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID!,
-  }
+  private static readonly FIREBASE_CONFIG = firebaseConfig
 
-  private readonly firebaseConfig: FirebaseConfig
+  private readonly firebaseConfig: typeof firebaseConfig
 
   private readonly auth: Auth
 
