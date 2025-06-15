@@ -12,6 +12,7 @@ import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAut
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
+import { clearAuthError } from '@/core/auth/reducer'
 
 export default function LoginScreen() {
   const router = useRouter()
@@ -20,6 +21,19 @@ export default function LoginScreen() {
     email: string
     password: string
   }>({ email: '', password: '' })
+  const errorMessage = useSelector(
+    (state: RootState) => state.auth.errorMessage,
+  )
+
+  const handleEmailChange = (text: string) => {
+    setCredentials((prev) => ({ ...prev, email: text }))
+    dispatch(clearAuthError())
+  }
+
+  const handlePasswordChange = (text: string) => {
+    setCredentials((prev) => ({ ...prev, password: text }))
+    dispatch(clearAuthError())
+  }
 
   const handleClose = () => {
     if (router.canGoBack()) {
@@ -57,21 +71,14 @@ export default function LoginScreen() {
         placeholder={'Your Email'}
         placeholderTextColor={T.color.grey}
         value={email}
-        onChange={(e) =>
-          setCredentials((prev) => ({ ...prev, email: e.nativeEvent.text }))
-        }
+        onChangeText={handleEmailChange}
       />
       <TiedSTextInput
         placeholder="Create Password"
         placeholderTextColor={T.color.grey}
         value={password}
         hasPasswordToggle={true}
-        onChange={(e) =>
-          setCredentials((prev) => ({
-            ...prev,
-            password: e.nativeEvent.text,
-          }))
-        }
+        onChangeText={handlePasswordChange}
       />
       <TiedSButton
         onPress={() => dispatch(signInWithEmail({ email, password }))}
@@ -84,6 +91,7 @@ export default function LoginScreen() {
       >
         {'Forgot your password?'}
       </Text>
+      {errorMessage && <Text style={styles.errorMessage}>{errorMessage}</Text>}
     </View>
   )
 }
@@ -136,5 +144,10 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontSize: T.font.size.regular,
     marginBottom: T.spacing.large,
+  },
+  errorMessage: {
+    color: T.color.red,
+    fontSize: T.font.size.regular,
+    marginVertical: T.spacing.medium,
   },
 })

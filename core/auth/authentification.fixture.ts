@@ -28,7 +28,10 @@ export function authentificationFixture(
       authenticationWithAppleWillSucceedForUser(authUser: AuthUser) {
         authGateway.willSucceedForUser = authUser
       },
-      authenticationWithEmailWillSucceedForUser(authUser: AuthUser) {
+      signInWithEmailWillSucceedForUser(authUser: AuthUser) {
+        authGateway.willSucceedForUser = authUser
+      },
+      signUpWithEmailWillSucceedForUser(authUser: AuthUser) {
         authGateway.willSucceedForUser = authUser
       },
       authUserIs(authUser: AuthUser) {
@@ -65,6 +68,13 @@ export function authentificationFixture(
       },
       userShouldNotBeAuthenticated() {
         const expectedState = stateBuilder().withoutAuthUser({}).build()
+        expect(store.getState()).toEqual(expectedState)
+      },
+      userShouldNotBeAuthenticatedWithInvalidEmail(errorMessage: string) {
+        const expectedState = stateBuilder()
+          .withoutAuthUser({})
+          .withErrorMessage(errorMessage)
+          .build()
         expect(store.getState()).toEqual(expectedState)
       },
     },
