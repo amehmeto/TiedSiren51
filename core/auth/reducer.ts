@@ -8,15 +8,19 @@ import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
 
 export type AuthState = {
   authUser: AuthUser | null
+  errorMessage: string | null
 }
 
 export const userAuthenticated = createAction<AuthUser>(
   'auth/userAuthenticated',
 )
 
+export const clearAuthError = createAction('auth/clearError')
+
 export const reducer = createReducer<AuthState>(
   {
     authUser: null,
+    errorMessage: null,
   },
   (builder) => {
     builder
@@ -31,12 +35,23 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(signInWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
+        state.errorMessage = null
+      })
+      .addCase(signInWithEmail.rejected, (state, action) => {
+        state.errorMessage = action.payload as string
       })
       .addCase(signUpWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
+        state.errorMessage = null
+      })
+      .addCase(signUpWithEmail.rejected, (state, action) => {
+        state.errorMessage = action.payload as string
       })
       .addCase(logOut.fulfilled, (state) => {
         state.authUser = null
+      })
+      .addCase(clearAuthError, (state) => {
+        state.errorMessage = null
       })
   },
 )

@@ -7,17 +7,21 @@ import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextIn
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
+import { clearAuthError } from '@/core/auth/reducer'
 
 export default function SignUpScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
+  const errorMessage = useSelector(
+    (state: RootState) => state.auth.errorMessage,
+  )
 
   const handleClose = () => {
     if (router.canGoBack()) {
@@ -28,6 +32,16 @@ export default function SignUpScreen() {
     if (Platform.OS === 'ios') {
       router.replace('/(auth)/login')
     }
+  }
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text)
+    dispatch(clearAuthError())
+  }
+
+  const handlePasswordChange = (text: string) => {
+    setPassword(text)
+    dispatch(clearAuthError())
   }
 
   return (
@@ -50,14 +64,14 @@ export default function SignUpScreen() {
           placeholder={'Your Email'}
           placeholderTextColor={T.color.grey}
           value={email}
-          onChangeText={setEmail}
+          onChangeText={handleEmailChange}
         />
         <TiedSTextInput
           placeholder="Create Password"
           placeholderTextColor={T.color.grey}
           hasPasswordToggle={true}
           value={password}
-          onChangeText={setPassword}
+          onChangeText={handlePasswordChange}
         />
         <TiedSButton
           onPress={() =>
@@ -70,6 +84,9 @@ export default function SignUpScreen() {
           }
           text={'CREATE YOUR ACCOUNT'}
         />
+        {errorMessage && (
+          <Text style={styles.errorMessage}>{errorMessage}</Text>
+        )}
       </View>
     </TiedSLinearBackground>
   )
@@ -89,6 +106,11 @@ const styles = StyleSheet.create({
   },
   orText: {
     color: T.color.text,
+    fontSize: T.font.size.regular,
+    marginVertical: T.spacing.medium,
+  },
+  errorMessage: {
+    color: T.color.red,
     fontSize: T.font.size.regular,
     marginVertical: T.spacing.medium,
   },
