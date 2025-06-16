@@ -23,4 +23,12 @@ describe('Feature: Authenticate with Email', () => {
       username: 'Arthur',
     })
   })
+
+  it('should not authenticate with Email if invalid credentials', async () => {
+    fixture.given.authenticationWithEmailWillFail()
+
+    await fixture.when.signUpWithEmail('amehmeto', 'qwerty1234')
+
+    fixture.then.userShouldNotBeAuthenticated()
+  })
 })
