@@ -36,6 +36,9 @@ export function authentificationFixture(
           stateBuilder.withAuthUser(authUser),
         )
       },
+      authenticationWithEmailWillFail() {
+        authGateway.willFailForUser = true
+      },
     },
     when: {
       async signInWithGoogle() {

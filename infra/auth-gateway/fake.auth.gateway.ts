@@ -7,6 +7,8 @@ export class FakeAuthGateway implements AuthGateway {
     email: 'fake-user@gmail.com',
   }
 
+  willFailForUser: boolean = false
+
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
@@ -28,6 +30,10 @@ export class FakeAuthGateway implements AuthGateway {
   }
 
   signUpWithEmail(email: string, password: string): Promise<AuthUser> {
+    if (this.willFailForUser) {
+      return Promise.reject(new Error('Please correct your email address'))
+    }
+
     return Promise.resolve(this.willSucceedForUser)
   }
 
