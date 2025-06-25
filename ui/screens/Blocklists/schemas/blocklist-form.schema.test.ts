@@ -1,20 +1,21 @@
-import { describe, it } from 'vitest'
-import { blocklistFormFixture, Blocklist } from './blocklist-form.fixture'
-
-const validBlocklist: Blocklist = {
-  name: 'Test Blocklist',
-  sirens: {
-    android: [{ packageName: 'com.example.app' }],
-    websites: [],
-    keywords: [],
-  },
-}
+import { beforeEach, describe, it } from 'vitest'
+import {
+  blocklistFormFixture,
+  BlocklistBuilder,
+  createValidBlocklist,
+} from './blocklist-form.fixture'
 
 describe('blocklistSchema', () => {
+  let fixture: ReturnType<typeof blocklistFormFixture>
+
+  beforeEach(() => {
+    fixture = blocklistFormFixture()
+  })
+
   describe('Basic field validation', () => {
     it('should pass with valid data', () => {
-      const fixture = blocklistFormFixture()
-      fixture.given.field('name', validBlocklist.name)
+      const validBlocklist = createValidBlocklist()
+      fixture.given.withName(validBlocklist.name)
       fixture.given.sirens(validBlocklist.sirens)
       fixture.when.validate()
       fixture.then.shouldBeValid()
@@ -23,14 +24,14 @@ describe('blocklistSchema', () => {
     it.each([
       {
         field: 'name',
-        value: '',
+        testDescription: 'empty name',
+        setup: () => fixture.given.withEmptyName(),
         expectedMessage: 'Blocklist name must be provided',
       },
     ])(
-      'should fail when $field is invalid',
-      ({ field, value, expectedMessage }) => {
-        const fixture = blocklistFormFixture()
-        fixture.given.field(field as keyof Blocklist, value)
+      'should fail when $testDescription',
+      ({ field, setup, expectedMessage }) => {
+        setup()
         fixture.when.validate()
         fixture.then.shouldBeInvalidWithMessage(field, expectedMessage)
       },
@@ -39,7 +40,6 @@ describe('blocklistSchema', () => {
 
   describe('Sirens validation', () => {
     it('should fail when all sirens are empty', () => {
-      const fixture = blocklistFormFixture()
       fixture.given.sirens({ android: [], websites: [], keywords: [] })
       fixture.when.validate()
       fixture.then.shouldBeInvalidWithMessage(
@@ -51,29 +51,26 @@ describe('blocklistSchema', () => {
     it.each([
       {
         description: 'only websites selected',
-        sirens: { android: [], websites: ['example.com'], keywords: [] },
+        sirens: new BlocklistBuilder().withWebsites(['example.com']).build()
+          .sirens,
       },
       {
         description: 'only keywords selected',
-        sirens: { android: [], websites: [], keywords: ['focus'] },
+        sirens: new BlocklistBuilder().withKeywords(['focus']).build().sirens,
       },
       {
         description: 'only android selected',
-        sirens: {
-          android: [{ packageName: 'com.example.app' }],
-          websites: [],
-          keywords: [],
-        },
+        sirens: new BlocklistBuilder()
+          .withAndroidApps([{ packageName: 'com.example.app' }])
+          .build().sirens,
       },
     ])('should pass when $description', ({ sirens }) => {
-      const fixture = blocklistFormFixture()
       fixture.given.sirens(sirens)
       fixture.when.validate()
       fixture.then.shouldBeValid()
     })
 
     it('should fail when all sirens missing', () => {
-      const fixture = blocklistFormFixture()
       fixture.given.sirens({})
       fixture.when.validate()
       fixture.then.shouldBeInvalidWithMessage(

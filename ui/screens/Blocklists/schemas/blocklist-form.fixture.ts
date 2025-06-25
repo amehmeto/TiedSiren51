@@ -4,6 +4,50 @@ import { z } from 'zod'
 
 export type Blocklist = z.infer<typeof blocklistSchema>
 
+export class BlocklistBuilder {
+  private blocklist: Blocklist = {
+    name: '',
+    sirens: {
+      android: [],
+      websites: [],
+      keywords: [],
+    },
+  }
+
+  withName(name: string): BlocklistBuilder {
+    this.blocklist.name = name
+    return this
+  }
+
+  withAndroidApps(apps: { packageName: string }[]): BlocklistBuilder {
+    this.blocklist.sirens.android = apps
+    return this
+  }
+
+  withWebsites(websites: string[]): BlocklistBuilder {
+    this.blocklist.sirens.websites = websites
+    return this
+  }
+
+  withKeywords(keywords: string[]): BlocklistBuilder {
+    this.blocklist.sirens.keywords = keywords
+    return this
+  }
+
+  build(): Blocklist {
+    return { ...this.blocklist }
+  }
+}
+
+export function createValidBlocklist(): Blocklist {
+  return new BlocklistBuilder()
+    .withName('Test Blocklist')
+    .withAndroidApps([{ packageName: 'com.example.app' }])
+    .withWebsites([])
+    .withKeywords([])
+    .build()
+}
+
 export function blocklistFormFixture() {
   let blocklistData: Blocklist = {
     name: 'Test Blocklist',
@@ -17,8 +61,11 @@ export function blocklistFormFixture() {
 
   return {
     given: {
-      field<K extends keyof Blocklist>(field: K, value: Blocklist[K]) {
-        blocklistData = { ...blocklistData, [field]: value }
+      withName(name: string) {
+        blocklistData = { ...blocklistData, name }
+      },
+      withEmptyName() {
+        blocklistData = { ...blocklistData, name: '' }
       },
       sirens(sirens: Blocklist['sirens']) {
         blocklistData = { ...blocklistData, sirens }
