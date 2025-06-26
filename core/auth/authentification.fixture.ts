@@ -28,16 +28,19 @@ export function authentificationFixture(
       authenticationWithAppleWillSucceedForUser(authUser: AuthUser) {
         authGateway.willSucceedForUser = authUser
       },
-      authenticationWithEmailWillSucceedForUser(authUser: AuthUser) {
+      authenticationWithEmailWillSucceedForUser(
+        authUser: AuthUser,
+        password?: string,
+      ) {
         authGateway.willSucceedForUser = authUser
+        if (password) {
+          authGateway.setExpectedCredentials(authUser.email, password)
+        }
       },
       authUserIs(authUser: AuthUser) {
         testStateBuilderProvider.setState((stateBuilder) =>
           stateBuilder.withAuthUser(authUser),
         )
-      },
-      authenticationWithEmailWillFail() {
-        authGateway.willFailForUser = true
       },
     },
     when: {

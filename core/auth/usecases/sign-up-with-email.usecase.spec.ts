@@ -9,11 +9,14 @@ describe('Feature: Authenticate with Email', () => {
   })
 
   it('should authenticate with Email successfully', async () => {
-    fixture.given.authenticationWithEmailWillSucceedForUser({
-      id: 'auth-user-id',
-      email: 'amehmeto@gmail.com',
-      username: 'Arthur',
-    })
+    fixture.given.authenticationWithEmailWillSucceedForUser(
+      {
+        id: 'auth-user-id',
+        email: 'amehmeto@gmail.com',
+        username: 'Arthur',
+      },
+      'qwerty1234',
+    )
 
     await fixture.when.signUpWithEmail('amehmeto@gmail.com', 'qwerty1234')
 
@@ -24,10 +27,17 @@ describe('Feature: Authenticate with Email', () => {
     })
   })
 
-  it('should not authenticate with Email if invalid credentials', async () => {
-    fixture.given.authenticationWithEmailWillFail()
+  it('rejects authentication when the password is wrong', async () => {
+    fixture.given.authenticationWithEmailWillSucceedForUser(
+      {
+        id: 'auth-user-id',
+        email: 'amehmeto@gmail.com',
+        username: 'Arthur',
+      },
+      'correctPassword123',
+    )
 
-    await fixture.when.signUpWithEmail('amehmeto', 'qwerty1234')
+    await fixture.when.signUpWithEmail('amehmeto@gmail.com', 'wrongPassword!')
 
     fixture.then.userShouldNotBeAuthenticated()
   })
