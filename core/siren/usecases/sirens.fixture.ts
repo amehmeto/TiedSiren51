@@ -10,7 +10,6 @@ import { FakeDataSirensRepository } from '@/infra/sirens-repository/fake-data.si
 import { addKeywordToSirens } from './add-keyword-to-sirens.usecase'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
 import { addWebsiteToSirens } from './add-website-to-sirens.usecase'
-
 export function sirensFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ) {
