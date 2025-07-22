@@ -1,28 +1,11 @@
-import { blocklistSchema } from './blocklist-form.schema'
 import { expect } from 'vitest'
 import { z } from 'zod'
+import { blocklistSchema } from './blocklist-form.schema'
 import { buildBlocklist } from '../../../../core/_tests_/data-builders/blocklist.builder'
 
 export type Blocklist = z.infer<typeof blocklistSchema>
 
-export function buildBlocklistForm(
-  overrides: Partial<Blocklist> = {},
-): Blocklist {
-  const domainBlocklist = buildBlocklist()
-
-  const defaultFormData: Blocklist = {
-    name: domainBlocklist.name,
-    sirens: {
-      android: domainBlocklist.sirens.android,
-      websites: domainBlocklist.sirens.websites,
-      keywords: domainBlocklist.sirens.keywords,
-    },
-  }
-
-  return { ...defaultFormData, ...overrides }
-}
-
-export function convertToForm(
+function convertToForm(
   blocklistConfig: Parameters<typeof buildBlocklist>[0] = {},
 ): Blocklist {
   const domainBlocklist = buildBlocklist(blocklistConfig)
@@ -38,13 +21,13 @@ export function convertToForm(
 }
 
 export function blocklistFormFixture() {
-  let blocklistData: Blocklist = buildBlocklistForm()
+  let blocklistData: Blocklist = convertToForm()
   let validationResult: ReturnType<typeof blocklistSchema.safeParse> | undefined
 
   return {
     given: {
       withOverrides: (overrides: Partial<Blocklist>) => {
-        blocklistData = buildBlocklistForm(overrides)
+        blocklistData = { ...convertToForm(), ...overrides }
       },
       fromConfig: (
         blocklistConfig: Parameters<typeof buildBlocklist>[0] = {},
