@@ -9,23 +9,13 @@ describe('blocklistSchema', () => {
   })
 
   it('should pass with valid form', () => {
-    fixture.given.withOverrides({
-      name: 'Test',
-      sirens: {
-        android: [{ packageName: 'com.example' }],
-        websites: [],
-        keywords: [],
-      },
-    })
+    fixture.given.blocklistWithAllRequiredFields()
     fixture.when.validate()
     fixture.then.shouldBeValid()
   })
 
   it('should fail with empty name', () => {
-    fixture.given.withOverrides({
-      name: '',
-      sirens: { android: [], websites: [], keywords: [] },
-    })
+    fixture.given.blocklistWithEmptyName()
     fixture.when.validate()
     fixture.then.shouldBeInvalidWithMessage(
       'name',
@@ -34,10 +24,7 @@ describe('blocklistSchema', () => {
   })
 
   it('should fail if all sirens are empty', () => {
-    fixture.given.withOverrides({
-      name: 'Test',
-      sirens: { android: [], websites: [], keywords: [] },
-    })
+    fixture.given.blocklistWithNoSirensSelected()
     fixture.when.validate()
     fixture.then.shouldBeInvalidWithMessage(
       'sirens',
@@ -45,19 +32,8 @@ describe('blocklistSchema', () => {
     )
   })
 
-  it('should pass using blocklist config', () => {
-    fixture.given.fromConfig({
-      name: 'Social Block',
-      sirens: {
-        android: [],
-        ios: [],
-        linux: [],
-        macos: [],
-        windows: [],
-        websites: ['facebook.com'],
-        keywords: ['social'],
-      },
-    })
+  it('should pass using blocklist config with websites and keywords', () => {
+    fixture.given.blocklistWithWebsitesAndKeywords()
     fixture.when.validate()
     fixture.then.shouldBeValid()
   })

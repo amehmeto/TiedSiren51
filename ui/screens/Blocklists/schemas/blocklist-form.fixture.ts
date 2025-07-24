@@ -3,36 +3,72 @@ import { z } from 'zod'
 import { blocklistSchema } from './blocklist-form.schema'
 import { buildBlocklist } from '../../../../core/_tests_/data-builders/blocklist.builder'
 
-export type Blocklist = z.infer<typeof blocklistSchema>
+export type BlockFormData = z.infer<typeof blocklistSchema>
 
-function convertToForm(
-  blocklistConfig: Parameters<typeof buildBlocklist>[0] = {},
-): Blocklist {
-  const domainBlocklist = buildBlocklist(blocklistConfig)
+function buildFormDataFromUserInput(
+  blockSettings: Parameters<typeof buildBlocklist>[0] = {},
+): BlockFormData {
+  const systemGeneratedBlocklist = buildBlocklist(blockSettings)
 
   return {
-    name: domainBlocklist.name,
+    name: systemGeneratedBlocklist.name,
     sirens: {
-      android: domainBlocklist.sirens.android,
-      websites: domainBlocklist.sirens.websites,
-      keywords: domainBlocklist.sirens.keywords,
+      android: systemGeneratedBlocklist.sirens.android,
+      websites: systemGeneratedBlocklist.sirens.websites,
+      keywords: systemGeneratedBlocklist.sirens.keywords,
     },
   }
 }
 
 export function blocklistFormFixture() {
-  let blocklistData: Blocklist = convertToForm()
+  let blocklistData: BlockFormData
   let validationResult: ReturnType<typeof blocklistSchema.safeParse> | undefined
 
   return {
     given: {
-      withOverrides: (overrides: Partial<Blocklist>) => {
-        blocklistData = { ...convertToForm(), ...overrides }
+      blocklistWithAllRequiredFields: () => {
+        blocklistData = {
+          name: 'Test',
+          sirens: {
+            android: [{ packageName: 'com.example' }],
+            websites: [],
+            keywords: [],
+          },
+        }
       },
-      fromConfig: (
-        blocklistConfig: Parameters<typeof buildBlocklist>[0] = {},
-      ) => {
-        blocklistData = convertToForm(blocklistConfig)
+      blocklistWithEmptyName: () => {
+        blocklistData = {
+          name: '',
+          sirens: {
+            android: [],
+            websites: [],
+            keywords: [],
+          },
+        }
+      },
+      blocklistWithNoSirensSelected: () => {
+        blocklistData = {
+          name: 'Test',
+          sirens: {
+            android: [],
+            websites: [],
+            keywords: [],
+          },
+        }
+      },
+      blocklistWithWebsitesAndKeywords: () => {
+        blocklistData = buildFormDataFromUserInput({
+          name: 'Social Block',
+          sirens: {
+            android: [],
+            ios: [],
+            linux: [],
+            macos: [],
+            windows: [],
+            websites: ['facebook.com'],
+            keywords: ['social'],
+          },
+        })
       },
     },
     when: {
