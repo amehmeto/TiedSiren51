@@ -5,17 +5,17 @@ import { buildBlocklist } from '../../../../core/_tests_/data-builders/blocklist
 
 export type BlockFormData = z.infer<typeof blocklistSchema>
 
-function buildFormDataFromUserInput(
-  blockSettings: Parameters<typeof buildBlocklist>[0] = {},
+function buildValidBlocklistFormData(
+  overrides: Parameters<typeof buildBlocklist>[0] = {},
 ): BlockFormData {
-  const systemGeneratedBlocklist = buildBlocklist(blockSettings)
+  const blocklist = buildBlocklist(overrides)
 
   return {
-    name: systemGeneratedBlocklist.name,
+    name: blocklist.name,
     sirens: {
-      android: systemGeneratedBlocklist.sirens.android,
-      websites: systemGeneratedBlocklist.sirens.websites,
-      keywords: systemGeneratedBlocklist.sirens.keywords,
+      android: blocklist.sirens.android,
+      websites: blocklist.sirens.websites,
+      keywords: blocklist.sirens.keywords,
     },
   }
 }
@@ -57,7 +57,7 @@ export function blocklistFormFixture() {
         }
       },
       blocklistWithWebsitesAndKeywords: () => {
-        blocklistData = buildFormDataFromUserInput({
+        blocklistData = buildValidBlocklistFormData({
           name: 'Social Block',
           sirens: {
             android: [],
