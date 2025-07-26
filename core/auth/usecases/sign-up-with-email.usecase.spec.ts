@@ -27,14 +27,14 @@ describe('Feature: Authenticate with Email', () => {
     })
   })
 
-  it('rejects authentication when the password is wrong', async () => {
-    fixture.given.authenticationWithEmailWillSucceedForUser(
+  it('does not authenticate user when credentials are invalid', async () => {
+    fixture.given.authenticationWithEmailWillFailForUser(
       {
         id: 'auth-user-id',
         email: 'amehmeto@gmail.com',
         username: 'Arthur',
       },
-      'correctPassword123',
+      'wrongPassword!',
     )
 
     await fixture.when.signUpWithEmail('amehmeto@gmail.com', 'wrongPassword!')

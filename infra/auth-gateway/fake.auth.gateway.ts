@@ -7,17 +7,15 @@ export class FakeAuthGateway implements AuthGateway {
     email: 'fake-user@gmail.com',
   }
 
-  private expectedCredentials = {
-    email: 'fake-user@gmail.com',
-    password: 'fake-123456',
-  }
+  private shouldSucceed: (email: string, password: string) => boolean = () =>
+    true
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
 
-  setExpectedCredentials(email: string, password: string) {
-    this.expectedCredentials = { email, password }
+  setAuthenticationLogic(fn: (email: string, password: string) => boolean) {
+    this.shouldSucceed = fn
   }
 
   signInWithGoogle(): Promise<AuthUser> {
@@ -37,20 +35,14 @@ export class FakeAuthGateway implements AuthGateway {
   }
 
   signUpWithEmail(email: string, password: string): Promise<AuthUser> {
-    if (
-      this.expectedCredentials.email === email &&
-      this.expectedCredentials.password === password
-    ) {
+    if (this.shouldSucceed(email, password)) {
       return Promise.resolve(this.willSucceedForUser)
     }
     return Promise.reject(new Error('Invalid credentials'))
   }
 
   signInWithEmail(email: string, password: string): Promise<AuthUser> {
-    if (
-      this.expectedCredentials.email === email &&
-      this.expectedCredentials.password === password
-    ) {
+    if (this.shouldSucceed(email, password)) {
       return Promise.resolve(this.willSucceedForUser)
     }
     return Promise.reject(new Error('Invalid credentials'))
