@@ -2,24 +2,36 @@ import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
 
 export class FakeAuthGateway implements AuthGateway {
-  willSucceedForUser: AuthUser = {
+  willResult: AuthUser | Error = {
     id: 'fake-user-id',
     email: 'fake-user@gmail.com',
   }
-
-  private shouldSucceed: (email: string, password: string) => boolean = () =>
-    true
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
 
-  setAuthenticationLogic(fn: (email: string, password: string) => boolean) {
-    this.shouldSucceed = fn
+  private resolveResult(): Promise<AuthUser> {
+    if (this.willResult instanceof Error) {
+      return Promise.reject(this.willResult)
+    }
+    return Promise.resolve(this.willResult)
   }
 
   signInWithGoogle(): Promise<AuthUser> {
-    return Promise.resolve(this.willSucceedForUser)
+    return this.resolveResult()
+  }
+
+  signInWithApple(): Promise<AuthUser> {
+    return this.resolveResult()
+  }
+
+  signUpWithEmail(email: string, password: string): Promise<AuthUser> {
+    return this.resolveResult()
+  }
+
+  signInWithEmail(email: string, password: string): Promise<AuthUser> {
+    return this.resolveResult()
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {
@@ -30,29 +42,6 @@ export class FakeAuthGateway implements AuthGateway {
     this.onUserLoggedOutListener = listener
   }
 
-  signInWithApple(): Promise<AuthUser> {
-    return Promise.resolve(this.willSucceedForUser)
-  }
-
-  signUpWithEmail(email: string, password: string): Promise<AuthUser> {
-    if (this.shouldSucceed(email, password)) {
-      return Promise.resolve(this.willSucceedForUser)
-    }
-    return Promise.reject(new Error('Invalid credentials'))
-  }
-
-  signInWithEmail(email: string, password: string): Promise<AuthUser> {
-    if (this.shouldSucceed(email, password)) {
-      return Promise.resolve(this.willSucceedForUser)
-    }
-    return Promise.reject(new Error('Invalid credentials'))
-  }
-
-  simulateUserLoggedIn(authUser: AuthUser) {
-    if (!this.onUserLoggedInListener) return
-    this.onUserLoggedInListener(authUser)
-  }
-
   async logOut(): Promise<void> {
     if (this.onUserLoggedOutListener) {
       this.onUserLoggedOutListener()
@@ -60,8 +49,11 @@ export class FakeAuthGateway implements AuthGateway {
     return Promise.resolve()
   }
 
+  simulateUserLoggedIn(authUser: AuthUser) {
+    this.onUserLoggedInListener?.(authUser)
+  }
+
   simulateUserLoggedOut() {
-    if (!this.onUserLoggedOutListener) return
-    this.onUserLoggedOutListener()
+    this.onUserLoggedOutListener?.()
   }
 }

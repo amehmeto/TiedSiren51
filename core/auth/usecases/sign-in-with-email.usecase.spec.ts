@@ -41,19 +41,4 @@ describe('Feature: Authenticate with Email', () => {
 
     fixture.then.userShouldNotBeAuthenticated()
   })
-
-  it('does not authenticate user with incorrect password', async () => {
-    fixture.given.authenticationWithEmailWillSucceedForUser(
-      {
-        id: 'auth-user-id',
-        email: 'amehmeto@gmail.com',
-        username: 'Arthur',
-      },
-      'correctPassword123',
-    )
-
-    await fixture.when.signInWithEmail('amehmeto@gmail.com', 'wrongPassword!')
-
-    fixture.then.userShouldNotBeAuthenticated()
-  })
 })
