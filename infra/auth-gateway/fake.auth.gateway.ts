@@ -2,17 +2,29 @@ import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
 
 export class FakeAuthGateway implements AuthGateway {
-  willSucceedForUser: AuthUser = {
+  willResultWith: Promise<AuthUser> = Promise.resolve({
     id: 'fake-user-id',
     email: 'fake-user@gmail.com',
-  }
+  })
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
 
   signInWithGoogle(): Promise<AuthUser> {
-    return Promise.resolve(this.willSucceedForUser)
+    return this.willResultWith
+  }
+
+  signInWithApple(): Promise<AuthUser> {
+    return this.willResultWith
+  }
+
+  signUpWithEmail(email: string, password: string): Promise<AuthUser> {
+    return this.willResultWith
+  }
+
+  signInWithEmail(email: string, password: string): Promise<AuthUser> {
+    return this.willResultWith
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {
@@ -23,23 +35,6 @@ export class FakeAuthGateway implements AuthGateway {
     this.onUserLoggedOutListener = listener
   }
 
-  signInWithApple(): Promise<AuthUser> {
-    return Promise.resolve(this.willSucceedForUser)
-  }
-
-  signUpWithEmail(email: string, password: string): Promise<AuthUser> {
-    return Promise.resolve(this.willSucceedForUser)
-  }
-
-  signInWithEmail(email: string, password: string): Promise<AuthUser> {
-    return Promise.resolve(this.willSucceedForUser)
-  }
-
-  simulateUserLoggedIn(authUser: AuthUser) {
-    if (!this.onUserLoggedInListener) return
-    this.onUserLoggedInListener(authUser)
-  }
-
   async logOut(): Promise<void> {
     if (this.onUserLoggedOutListener) {
       this.onUserLoggedOutListener()
@@ -47,8 +42,11 @@ export class FakeAuthGateway implements AuthGateway {
     return Promise.resolve()
   }
 
+  simulateUserLoggedIn(authUser: AuthUser) {
+    this.onUserLoggedInListener?.(authUser)
+  }
+
   simulateUserLoggedOut() {
-    if (!this.onUserLoggedOutListener) return
-    this.onUserLoggedOutListener()
+    this.onUserLoggedOutListener?.()
   }
 }

@@ -23,13 +23,24 @@ export function authentificationFixture(
   return {
     given: {
       authenticationWithGoogleWillSucceedForUser(authUser: AuthUser) {
-        authGateway.willSucceedForUser = authUser
+        authGateway.willResultWith = Promise.resolve(authUser)
       },
       authenticationWithAppleWillSucceedForUser(authUser: AuthUser) {
-        authGateway.willSucceedForUser = authUser
+        authGateway.willResultWith = Promise.resolve(authUser)
       },
-      authenticationWithEmailWillSucceedForUser(authUser: AuthUser) {
-        authGateway.willSucceedForUser = authUser
+      authenticationWithEmailWillSucceedForUser(
+        authUser: AuthUser,
+        _password: string,
+      ) {
+        authGateway.willResultWith = Promise.resolve(authUser)
+      },
+      authenticationWithEmailWillFailForUser(
+        _authUser: AuthUser,
+        _password: string,
+      ) {
+        authGateway.willResultWith = Promise.reject(
+          new Error('Invalid credentials'),
+        )
       },
       authUserIs(authUser: AuthUser) {
         testStateBuilderProvider.setState((stateBuilder) =>
