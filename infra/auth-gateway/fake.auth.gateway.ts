@@ -2,36 +2,29 @@ import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
 
 export class FakeAuthGateway implements AuthGateway {
-  willResult: AuthUser | Error = {
+  willResultWith: Promise<AuthUser> = Promise.resolve({
     id: 'fake-user-id',
     email: 'fake-user@gmail.com',
-  }
+  })
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
 
-  private resolveResult(): Promise<AuthUser> {
-    if (this.willResult instanceof Error) {
-      return Promise.reject(this.willResult)
-    }
-    return Promise.resolve(this.willResult)
-  }
-
   signInWithGoogle(): Promise<AuthUser> {
-    return this.resolveResult()
+    return this.willResultWith
   }
 
   signInWithApple(): Promise<AuthUser> {
-    return this.resolveResult()
+    return this.willResultWith
   }
 
   signUpWithEmail(email: string, password: string): Promise<AuthUser> {
-    return this.resolveResult()
+    return this.willResultWith
   }
 
   signInWithEmail(email: string, password: string): Promise<AuthUser> {
-    return this.resolveResult()
+    return this.willResultWith
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {
