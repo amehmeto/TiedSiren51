@@ -43,14 +43,18 @@ describe('Feature: Authenticate with Email', () => {
   })
 
   it('should fail with invalid email', async () => {
-    await expect(
-      fixture.when.signUpWithEmail('bademail', 'validPass123'),
-    ).rejects.toMatch('Invalid email address.')
+    const result = await fixture.when.signUpWithEmail(
+      'bademail',
+      'validPass123',
+    )
+    expect(result.payload).toMatch('Invalid email address.')
   })
 
   it('should fail with short password', async () => {
-    await expect(
-      fixture.when.signUpWithEmail('user@example.com', 'short'),
-    ).rejects.toMatch('Password must be at least 8 characters.')
+    const result = await fixture.when.signUpWithEmail(
+      'user@example.com',
+      'short',
+    )
+    expect(result.payload).toMatch('Password must be at least 8 characters.')
   })
 })
