@@ -20,6 +20,7 @@ export default function LoginScreen() {
     email: string
     password: string
   }>({ email: '', password: '' })
+  const [error, setError] = useState<string | null>(null)
 
   const handleClose = () => {
     if (router.canGoBack()) {
@@ -37,6 +38,14 @@ export default function LoginScreen() {
   useEffect(() => {
     if (isUserAuthenticated) router.push('/')
   }, [isUserAuthenticated, router])
+
+  const handleSignIn = async () => {
+    setError(null)
+    const resultAction = await dispatch(signInWithEmail({ email, password }))
+    if (signInWithEmail.rejected.match(resultAction)) {
+      setError(resultAction.payload as string)
+    }
+  }
 
   return (
     <View style={styles.container}>
@@ -74,10 +83,11 @@ export default function LoginScreen() {
         }
       />
       <TiedSButton
-        onPress={() => dispatch(signInWithEmail({ email, password }))}
+        onPress={handleSignIn}
         text={'LOG IN'}
         style={styles.button}
       />
+      {error && <Text style={styles.errorText}>{error}</Text>}
       <Text
         style={styles.subtext}
         onPress={() => router.push('/(auth)/forgot-password')}
@@ -134,6 +144,11 @@ const styles = StyleSheet.create({
   },
   subtext: {
     color: T.color.text,
+    fontSize: T.font.size.regular,
+    marginBottom: T.spacing.large,
+  },
+  errorText: {
+    color: T.color.red,
     fontSize: T.font.size.regular,
     marginBottom: T.spacing.large,
   },

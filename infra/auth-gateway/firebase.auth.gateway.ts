@@ -14,6 +14,7 @@ import {
 } from 'firebase/auth'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { firebaseConfig } from './firebaseConfig'
+import { displayErrorMessage } from './firebase-error-messages'
 
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
@@ -70,22 +71,34 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
-    const result = await signInWithEmailAndPassword(this.auth, email, password)
-    return {
-      id: result.user.uid,
-      email: result.user.email ?? '',
+    try {
+      const result = await signInWithEmailAndPassword(
+        this.auth,
+        email,
+        password,
+      )
+      return {
+        id: result.user.uid,
+        email: result.user.email ?? '',
+      }
+    } catch (error) {
+      throw new Error(displayErrorMessage(error))
     }
   }
 
   async signUpWithEmail(email: string, password: string): Promise<AuthUser> {
-    const result = await createUserWithEmailAndPassword(
-      this.auth,
-      email,
-      password,
-    )
-    return {
-      id: result.user.uid,
-      email: result.user.email ?? '',
+    try {
+      const result = await createUserWithEmailAndPassword(
+        this.auth,
+        email,
+        password,
+      )
+      return {
+        id: result.user.uid,
+        email: result.user.email ?? '',
+      }
+    } catch (error) {
+      throw new Error(displayErrorMessage(error))
     }
   }
 

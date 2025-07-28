@@ -1,18 +1,19 @@
-import { validateSignUpInput } from '../validators/validateSignUpInput'
-
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
 
 export const signUpWithEmail = createAppAsyncThunk(
   'auth/signUpWithEmail',
-  (
+  async (
     payload: { email: string; password: string },
     { extra: { authGateway }, rejectWithValue },
   ) => {
     const { email, password } = payload
-    const validationError = validateSignUpInput(email, password)
-    if (validationError) {
-      return rejectWithValue(validationError)
+    try {
+      return await authGateway.signUpWithEmail(email, password)
+    } catch (error) {
+      if (error instanceof Error) {
+        return rejectWithValue(error.message)
+      }
+      return rejectWithValue('Unknown error')
     }
-    return authGateway.signUpWithEmail(email, password)
   },
 )

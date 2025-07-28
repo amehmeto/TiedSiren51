@@ -41,4 +41,16 @@ describe('Feature: Authenticate with Email', () => {
 
     fixture.then.userShouldNotBeAuthenticated()
   })
+
+  it('should fail with invalid email', async () => {
+    fixture.when.signInWithEmail('bademail', 'validPass123')
+
+    fixture.then.userShouldNotBeAuthenticated()
+  })
+
+  it('should fail with short password', async () => {
+    fixture.when.signInWithEmail('user@example.com', 'short')
+
+    fixture.then.userShouldNotBeAuthenticated()
+  })
 })

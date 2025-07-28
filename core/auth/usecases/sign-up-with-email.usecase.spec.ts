@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
 import { authentificationFixture } from '@/core/auth/authentification.fixture'
 
 describe('Feature: Authenticate with Email', () => {
@@ -43,18 +43,14 @@ describe('Feature: Authenticate with Email', () => {
   })
 
   it('should fail with invalid email', async () => {
-    const result = await fixture.when.signUpWithEmail(
-      'bademail',
-      'validPass123',
-    )
-    expect(result.payload).toMatch('Invalid email address.')
+    fixture.when.signUpWithEmail('bademail', 'validPass123')
+
+    fixture.then.userShouldNotBeAuthenticated()
   })
 
   it('should fail with short password', async () => {
-    const result = await fixture.when.signUpWithEmail(
-      'user@example.com',
-      'short',
-    )
-    expect(result.payload).toMatch('Password must be at least 8 characters.')
+    fixture.when.signUpWithEmail('user@example.com', 'short')
+
+    fixture.then.userShouldNotBeAuthenticated()
   })
 })

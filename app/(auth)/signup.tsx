@@ -6,7 +6,6 @@ import {
   StyleSheet,
   Text,
   TouchableWithoutFeedback,
-  View,
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
@@ -20,7 +19,6 @@ import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.useca
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
-import { validateSignUpInput } from '@/core/auth/validators/validateSignUpInput'
 
 export default function SignUpScreen() {
   const router = useRouter()
@@ -42,11 +40,6 @@ export default function SignUpScreen() {
 
   const handleSignUp = async () => {
     setError(null)
-    const validationError = validateSignUpInput(email, password)
-    if (validationError) {
-      setError(validationError)
-      return
-    }
     try {
       const resultAction = await dispatch(signUpWithEmail({ email, password }))
       if (signUpWithEmail.rejected.match(resultAction)) {
