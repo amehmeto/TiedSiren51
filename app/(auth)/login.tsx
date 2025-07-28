@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Platform, StyleSheet, Text, View } from 'react-native'
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  TouchableWithoutFeedback,
+  Keyboard,
+} from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -48,53 +55,58 @@ export default function LoginScreen() {
   }
 
   return (
-    <View style={styles.container}>
-      <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
-      <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
-      <TiedSSocialButton
-        iconName="logo-google"
-        text="CONTINUE WITH GOOGLE"
-        onPress={() => dispatch(signInWithGoogle())}
-      />
-      <TiedSSocialButton
-        iconName="logo-apple"
-        text="CONTINUE WITH APPLE"
-        onPress={() => dispatch(signInWithApple())}
-      />
-      <Text style={styles.orText}>{'OR'}</Text>
-      <TiedSTextInput
-        placeholder={'Your Email'}
-        placeholderTextColor={T.color.grey}
-        value={email}
-        onChange={(e) =>
-          setCredentials((prev) => ({ ...prev, email: e.nativeEvent.text }))
-        }
-      />
-      <TiedSTextInput
-        placeholder="Create Password"
-        placeholderTextColor={T.color.grey}
-        value={password}
-        hasPasswordToggle={true}
-        onChange={(e) =>
-          setCredentials((prev) => ({
-            ...prev,
-            password: e.nativeEvent.text,
-          }))
-        }
-      />
-      <TiedSButton
-        onPress={handleSignIn}
-        text={'LOG IN'}
-        style={styles.button}
-      />
-      {error && <Text style={styles.errorText}>{error}</Text>}
-      <Text
-        style={styles.subtext}
-        onPress={() => router.push('/(auth)/forgot-password')}
+    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        {'Forgot your password?'}
-      </Text>
-    </View>
+        <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
+        <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
+        <TiedSSocialButton
+          iconName="logo-google"
+          text="CONTINUE WITH GOOGLE"
+          onPress={() => dispatch(signInWithGoogle())}
+        />
+        <TiedSSocialButton
+          iconName="logo-apple"
+          text="CONTINUE WITH APPLE"
+          onPress={() => dispatch(signInWithApple())}
+        />
+        <Text style={styles.orText}>{'OR'}</Text>
+        <TiedSTextInput
+          placeholder={'Your Email'}
+          placeholderTextColor={T.color.grey}
+          value={email}
+          onChange={(e) =>
+            setCredentials((prev) => ({ ...prev, email: e.nativeEvent.text }))
+          }
+        />
+        <TiedSTextInput
+          placeholder="Create Password"
+          placeholderTextColor={T.color.grey}
+          value={password}
+          hasPasswordToggle={true}
+          onChange={(e) =>
+            setCredentials((prev) => ({
+              ...prev,
+              password: e.nativeEvent.text,
+            }))
+          }
+        />
+        <TiedSButton
+          onPress={handleSignIn}
+          text={'LOG IN'}
+          style={styles.button}
+        />
+        {error && <Text style={styles.errorText}>{error}</Text>}
+        <Text
+          style={styles.subtext}
+          onPress={() => router.push('/(auth)/forgot-password')}
+        >
+          {'Forgot your password?'}
+        </Text>
+      </KeyboardAvoidingView>
+    </TouchableWithoutFeedback>
   )
 }
 
