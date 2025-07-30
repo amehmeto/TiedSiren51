@@ -48,39 +48,32 @@ export default function SignUpScreen() {
   }
 
   const handleSignUp = async () => {
-    // Clear previous errors
     dispatch(clearAuthError())
     setValidationErrors({})
 
-    // Client-side validation
     const validation = signUpSchema.safeParse(credentials)
     if (!validation.success) {
       const fieldErrors: Record<string, string> = {}
       validation.error.errors.forEach((error) => {
-        if (error.path[0]) {
-          fieldErrors[error.path[0] as string] = error.message
+        const key = error.path[0]
+        if (typeof key === 'string') {
+          fieldErrors[key] = error.message
         }
       })
       setValidationErrors(fieldErrors)
       return
     }
 
-    // Dispatch auth action with better naming
-    const authenticationAttempt = await dispatch(
-      signUpWithEmail(validation.data),
-    )
-
-    // Handle success (redirect will happen via auth state change)
-    if (signUpWithEmail.fulfilled.match(authenticationAttempt)) {
-      // Success handled by auth state listener
-    }
+    await dispatch(signUpWithEmail(validation.data))
   }
 
   const handleEmailChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, email: text }))
-    // Clear field error when user starts typing
     if (validationErrors.email) {
       setValidationErrors((prev) => ({ ...prev, email: '' }))
+    }
+    if (error) {
+      dispatch(clearAuthError())
     }
   }
 
@@ -88,6 +81,9 @@ export default function SignUpScreen() {
     setCredentials((prev) => ({ ...prev, password: text }))
     if (validationErrors.password) {
       setValidationErrors((prev) => ({ ...prev, password: '' }))
+    }
+    if (error) {
+      dispatch(clearAuthError())
     }
   }
 
@@ -113,11 +109,13 @@ export default function SignUpScreen() {
           <Text style={styles.orText}>{'OR'}</Text>
           <TiedSTextInput
             placeholder="Your Email"
+            accessibilityLabel="Email"
             placeholderTextColor={T.color.grey}
             value={credentials.email}
             onChangeText={handleEmailChange}
             keyboardType="email-address"
             autoCapitalize="none"
+            autoFocus
           />
           {validationErrors.email && (
             <Text style={styles.fieldErrorText}>{validationErrors.email}</Text>
@@ -125,11 +123,13 @@ export default function SignUpScreen() {
 
           <TiedSTextInput
             placeholder="Create Password"
+            accessibilityLabel="Password"
             placeholderTextColor={T.color.grey}
             hasPasswordToggle={true}
             value={credentials.password}
             onChangeText={handlePasswordChange}
-            secureTextEntry={true}
+            textContentType="newPassword"
+            autoComplete="new-password"
           />
           {validationErrors.password && (
             <Text style={styles.fieldErrorText}>
@@ -139,9 +139,19 @@ export default function SignUpScreen() {
           <TiedSButton
             onPress={handleSignUp}
             text={isLoading ? 'CREATING ACCOUNT...' : 'CREATE YOUR ACCOUNT'}
-            disabled={isLoading}
+            disabled={
+              isLoading || Object.values(validationErrors).some(Boolean)
+            }
           />
-          {error && <Text style={styles.errorText}>{error}</Text>}
+          {error && (
+            <Text
+              style={styles.errorText}
+              accessibilityLiveRegion="polite"
+              accessibilityRole="alert"
+            >
+              {error}
+            </Text>
+          )}
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
     </TiedSLinearBackground>

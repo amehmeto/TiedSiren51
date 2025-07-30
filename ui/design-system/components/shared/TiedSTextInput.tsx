@@ -19,6 +19,7 @@ interface TiedSTextInputProps extends TextInputProps {
 export function TiedSTextInput({
   label,
   hasPasswordToggle = false,
+  secureTextEntry,
   ...props
 }: TiedSTextInputProps) {
   const [isFocused, setIsFocused] = useState(false)
@@ -34,7 +35,9 @@ export function TiedSTextInput({
             { borderColor: isFocused ? T.color.lightBlue : T.color.white },
           ]}
           placeholderTextColor={T.color.white}
-          secureTextEntry={hasPasswordToggle && !isPasswordShown}
+          secureTextEntry={
+            hasPasswordToggle ? !isPasswordShown : secureTextEntry
+          }
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           {...props}

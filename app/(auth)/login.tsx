@@ -77,20 +77,17 @@ export default function LoginScreen() {
           placeholder={'Your Email'}
           placeholderTextColor={T.color.grey}
           value={email}
-          onChange={(e) =>
-            setCredentials((prev) => ({ ...prev, email: e.nativeEvent.text }))
+          onChangeText={(text) =>
+            setCredentials((prev) => ({ ...prev, email: text }))
           }
         />
         <TiedSTextInput
-          placeholder="Create Password"
+          placeholder="Enter Your Password"
           placeholderTextColor={T.color.grey}
           value={password}
           hasPasswordToggle={true}
-          onChange={(e) =>
-            setCredentials((prev) => ({
-              ...prev,
-              password: e.nativeEvent.text,
-            }))
+          onChangeText={(text) =>
+            setCredentials((prev) => ({ ...prev, password: text }))
           }
         />
         <TiedSButton

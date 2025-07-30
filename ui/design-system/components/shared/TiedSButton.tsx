@@ -15,9 +15,13 @@ export function TiedSButton(
       style={({ pressed }) => [
         styles.container,
         props.style,
+        props.disabled && styles.disabled,
         { opacity: pressed ? 0.5 : 1 },
       ]}
       onPress={props.onPress}
+      disabled={props.disabled}
+      accessibilityRole="button"
+      accessibilityState={{ disabled: !!props.disabled }}
     >
       {typeof props.text === 'string' ? (
         <Text style={styles.buttonText}>{props.text}</Text>
@@ -40,5 +44,9 @@ const styles = StyleSheet.create({
     color: T.color.text,
     textAlign: 'center',
     borderRadius: T.border.radius.roundedSmall,
+  },
+  disabled: {
+    backgroundColor: T.color.grey,
+    opacity: 0.6,
   },
 })
