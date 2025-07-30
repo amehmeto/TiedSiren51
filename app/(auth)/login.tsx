@@ -19,24 +19,17 @@ import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAut
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
+import { clearAuthError } from '@/core/auth/reducer'
+import { signInSchema } from '@/core/auth/validation/auth-schemas'
 
 export default function LoginScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const [{ email, password }, setCredentials] = useState<{
-    email: string
-    password: string
-  }>({ email: '', password: '' })
-  const [error, setError] = useState<string | null>(null)
-
-  const handleClose = () => {
-    if (router.canGoBack()) {
-      router.back()
-      return
-    }
-
-    if (Platform.OS === 'ios') router.replace('/(auth)/login')
-  }
+  const [credentials, setCredentials] = useState({ email: '', password: '' })
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({})
+  const { isLoading, error } = useSelector((state: RootState) => state.auth)
 
   const isUserAuthenticated = useSelector((state: RootState) =>
     selectIsUserAuthenticated(state),
@@ -46,11 +39,54 @@ export default function LoginScreen() {
     if (isUserAuthenticated) router.push('/')
   }, [isUserAuthenticated, router])
 
+  const handleClose = () => {
+    dispatch(clearAuthError())
+    if (router.canGoBack()) {
+      router.back()
+      return
+    }
+    if (Platform.OS === 'ios') {
+      router.replace('/(auth)/login')
+    }
+  }
+
   const handleSignIn = async () => {
-    setError(null)
-    const resultAction = await dispatch(signInWithEmail({ email, password }))
-    if (signInWithEmail.rejected.match(resultAction)) {
-      setError(resultAction.payload as string)
+    dispatch(clearAuthError())
+    setValidationErrors({})
+
+    const validation = signInSchema.safeParse(credentials)
+    if (!validation.success) {
+      const fieldErrors: Record<string, string> = {}
+      validation.error.errors.forEach((error) => {
+        const key = error.path[0]
+        if (typeof key === 'string') {
+          fieldErrors[key] = error.message
+        }
+      })
+      setValidationErrors(fieldErrors)
+      return
+    }
+
+    await dispatch(signInWithEmail(validation.data))
+  }
+
+  const handleEmailChange = (text: string) => {
+    setCredentials((prev) => ({ ...prev, email: text }))
+    if (validationErrors.email) {
+      setValidationErrors((prev) => ({ ...prev, email: '' }))
+    }
+    if (error) {
+      dispatch(clearAuthError())
+    }
+  }
+
+  const handlePasswordChange = (text: string) => {
+    setCredentials((prev) => ({ ...prev, password: text }))
+    if (validationErrors.password) {
+      setValidationErrors((prev) => ({ ...prev, password: '' }))
+    }
+    if (error) {
+      dispatch(clearAuthError())
     }
   }
 
@@ -74,28 +110,46 @@ export default function LoginScreen() {
         />
         <Text style={styles.orText}>{'OR'}</Text>
         <TiedSTextInput
-          placeholder={'Your Email'}
+          placeholder="Your Email"
+          accessibilityLabel="Email"
           placeholderTextColor={T.color.grey}
-          value={email}
-          onChangeText={(text) =>
-            setCredentials((prev) => ({ ...prev, email: text }))
-          }
+          value={credentials.email}
+          onChangeText={handleEmailChange}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoFocus
         />
+        {validationErrors.email && (
+          <Text style={styles.fieldErrorText}>{validationErrors.email}</Text>
+        )}
         <TiedSTextInput
           placeholder="Enter Your Password"
+          accessibilityLabel="Password"
           placeholderTextColor={T.color.grey}
-          value={password}
+          value={credentials.password}
           hasPasswordToggle={true}
-          onChangeText={(text) =>
-            setCredentials((prev) => ({ ...prev, password: text }))
-          }
+          onChangeText={handlePasswordChange}
+          textContentType="password"
+          autoComplete="current-password"
         />
+        {validationErrors.password && (
+          <Text style={styles.fieldErrorText}>{validationErrors.password}</Text>
+        )}
         <TiedSButton
           onPress={handleSignIn}
-          text={'LOG IN'}
+          text={isLoading ? 'LOGGING IN...' : 'LOG IN'}
           style={styles.button}
+          disabled={isLoading || Object.values(validationErrors).some(Boolean)}
         />
-        {error && <Text style={styles.errorText}>{error}</Text>}
+        {error && (
+          <Text
+            style={styles.errorText}
+            accessibilityLiveRegion="polite"
+            accessibilityRole="alert"
+          >
+            {error}
+          </Text>
+        )}
         <Text
           style={styles.subtext}
           onPress={() => router.push('/(auth)/forgot-password')}
@@ -114,32 +168,10 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: T.spacing.large,
   },
-  crossButton: {
-    position: 'absolute',
-    top: T.spacing.xx_large,
-    left: T.spacing.medium,
-    backgroundColor: 'transparent',
-  },
   subtitle: {
     color: T.color.text,
     fontSize: T.font.size.large,
     marginBottom: T.spacing.large,
-  },
-  socialButton: {
-    width: '90%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    padding: T.spacing.medium,
-    borderRadius: T.border.radius.roundedMedium,
-    marginBottom: T.spacing.medium,
-    backgroundColor: T.color.modalBackgroundColor,
-  },
-  socialButtonText: {
-    color: T.color.text,
-    fontSize: T.font.size.regular,
-    fontWeight: T.font.weight.bold,
-    marginLeft: T.spacing.medium,
   },
   orText: {
     color: T.color.text,
@@ -160,5 +192,11 @@ const styles = StyleSheet.create({
     color: T.color.red,
     fontSize: T.font.size.regular,
     marginBottom: T.spacing.large,
+  },
+  fieldErrorText: {
+    color: T.color.red,
+    fontSize: T.font.size.small,
+    marginTop: T.spacing.extraSmall,
+    alignSelf: 'flex-start',
   },
 })

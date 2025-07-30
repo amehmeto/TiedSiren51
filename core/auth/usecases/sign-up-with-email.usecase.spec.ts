@@ -36,15 +36,12 @@ describe('Feature: Authenticate with Email', () => {
     fixture.then.shouldBeLoading(false)
   })
   it('should show error when password is too weak', async () => {
-    // Arrange
     fixture.given.authGatewayWillRejectWith(
       'Password must be at least 6 characters.',
     )
 
-    // Act
     await fixture.when.signUpWithEmail('user@example.com', 'weak')
 
-    // Assert
     fixture.then.errorShouldBe('Password must be at least 6 characters.')
   })
 })
