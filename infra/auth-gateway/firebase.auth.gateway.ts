@@ -14,7 +14,6 @@ import {
 } from 'firebase/auth'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { firebaseConfig } from './firebaseConfig'
-import { displayErrorMessage } from './firebase-error-messages'
 
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
@@ -70,6 +69,32 @@ export class FirebaseAuthGateway implements AuthGateway {
     })
   }
 
+  private translateFirebaseError(error: unknown): string {
+    function isFirebaseError(
+      err: unknown,
+    ): err is { code: string; message: string } {
+      return (
+        typeof err === 'object' &&
+        err !== null &&
+        'code' in err &&
+        typeof (err as { code: unknown }).code === 'string' &&
+        'message' in err &&
+        typeof (err as { message: unknown }).message === 'string'
+      )
+    }
+    const firebaseErrorMessages: Record<string, string> = {
+      'auth/email-already-in-use': 'This email is already in use.',
+      'auth/invalid-email': 'Invalid email address.',
+      'auth/weak-password': 'Password must be at least 6 characters.',
+      'auth/invalid-credential': 'Invalid credentials.',
+    }
+    const firebaseMessage =
+      isFirebaseError(error) &&
+      (firebaseErrorMessages[error.code] ?? error.message)
+    const standardErrorMessage = error instanceof Error && error.message
+    return firebaseMessage || standardErrorMessage || 'Unknown error occurred.'
+  }
+
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
     try {
       const result = await signInWithEmailAndPassword(
@@ -82,7 +107,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         email: result.user.email ?? '',
       }
     } catch (error) {
-      throw new Error(displayErrorMessage(error))
+      throw new Error(this.translateFirebaseError(error))
     }
   }
 
@@ -98,7 +123,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         email: result.user.email ?? '',
       }
     } catch (error) {
-      throw new Error(displayErrorMessage(error))
+      throw new Error(this.translateFirebaseError(error))
     }
   }
 

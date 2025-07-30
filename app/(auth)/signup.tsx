@@ -14,20 +14,29 @@ import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextIn
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
+import { clearAuthError } from '@/core/auth/reducer'
+import { signUpSchema } from '@/core/auth/validation/auth-schemas'
 
 export default function SignUpScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [error, setError] = useState<string | null>(null)
+  const [credentials, setCredentials] = useState({
+    email: '',
+    password: '',
+  })
+  const [validationErrors, setValidationErrors] = useState<
+    Record<string, string>
+  >({})
+
+  const { isLoading, error } = useSelector((state: RootState) => state.auth)
 
   const handleClose = () => {
+    dispatch(clearAuthError())
     if (router.canGoBack()) {
       router.back()
       return
@@ -39,14 +48,46 @@ export default function SignUpScreen() {
   }
 
   const handleSignUp = async () => {
-    setError(null)
-    try {
-      const resultAction = await dispatch(signUpWithEmail({ email, password }))
-      if (signUpWithEmail.rejected.match(resultAction)) {
-        setError(resultAction.payload as string)
-      }
-    } catch (e) {
-      setError(e instanceof Error ? e.message : 'Unknown error')
+    // Clear previous errors
+    dispatch(clearAuthError())
+    setValidationErrors({})
+
+    // Client-side validation
+    const validation = signUpSchema.safeParse(credentials)
+    if (!validation.success) {
+      const fieldErrors: Record<string, string> = {}
+      validation.error.errors.forEach((error) => {
+        if (error.path[0]) {
+          fieldErrors[error.path[0] as string] = error.message
+        }
+      })
+      setValidationErrors(fieldErrors)
+      return
+    }
+
+    // Dispatch auth action with better naming
+    const authenticationAttempt = await dispatch(
+      signUpWithEmail(validation.data),
+    )
+
+    // Handle success (redirect will happen via auth state change)
+    if (signUpWithEmail.fulfilled.match(authenticationAttempt)) {
+      // Success handled by auth state listener
+    }
+  }
+
+  const handleEmailChange = (text: string) => {
+    setCredentials((prev) => ({ ...prev, email: text }))
+    // Clear field error when user starts typing
+    if (validationErrors.email) {
+      setValidationErrors((prev) => ({ ...prev, email: '' }))
+    }
+  }
+
+  const handlePasswordChange = (text: string) => {
+    setCredentials((prev) => ({ ...prev, password: text }))
+    if (validationErrors.password) {
+      setValidationErrors((prev) => ({ ...prev, password: '' }))
     }
   }
 
@@ -71,19 +112,35 @@ export default function SignUpScreen() {
           />
           <Text style={styles.orText}>{'OR'}</Text>
           <TiedSTextInput
-            placeholder={'Your Email'}
+            placeholder="Your Email"
             placeholderTextColor={T.color.grey}
-            value={email}
-            onChangeText={setEmail}
+            value={credentials.email}
+            onChangeText={handleEmailChange}
+            keyboardType="email-address"
+            autoCapitalize="none"
           />
+          {validationErrors.email && (
+            <Text style={styles.fieldErrorText}>{validationErrors.email}</Text>
+          )}
+
           <TiedSTextInput
             placeholder="Create Password"
             placeholderTextColor={T.color.grey}
             hasPasswordToggle={true}
-            value={password}
-            onChangeText={setPassword}
+            value={credentials.password}
+            onChangeText={handlePasswordChange}
+            secureTextEntry={true}
           />
-          <TiedSButton onPress={handleSignUp} text={'CREATE YOUR ACCOUNT'} />
+          {validationErrors.password && (
+            <Text style={styles.fieldErrorText}>
+              {validationErrors.password}
+            </Text>
+          )}
+          <TiedSButton
+            onPress={handleSignUp}
+            text={isLoading ? 'CREATING ACCOUNT...' : 'CREATE YOUR ACCOUNT'}
+            disabled={isLoading}
+          />
           {error && <Text style={styles.errorText}>{error}</Text>}
         </KeyboardAvoidingView>
       </TouchableWithoutFeedback>
@@ -112,5 +169,11 @@ const styles = StyleSheet.create({
     color: T.color.red,
     fontSize: T.font.size.regular,
     marginVertical: T.spacing.medium,
+  },
+  fieldErrorText: {
+    color: T.color.red,
+    fontSize: T.font.size.small,
+    marginTop: T.spacing.extraSmall,
+    alignSelf: 'flex-start',
   },
 })

@@ -7,6 +7,7 @@ export function TiedSButton(
     onPress: () => void
     text: string | ReactNode
     style?: StyleProp<ViewStyle>
+    disabled?: boolean
   }>,
 ) {
   return (

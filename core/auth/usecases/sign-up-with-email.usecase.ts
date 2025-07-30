@@ -1,4 +1,5 @@
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
+import { createAuthError } from '../authUser'
 
 export const signUpWithEmail = createAppAsyncThunk(
   'auth/signUpWithEmail',
@@ -11,9 +12,9 @@ export const signUpWithEmail = createAppAsyncThunk(
       return await authGateway.signUpWithEmail(email, password)
     } catch (error) {
       if (error instanceof Error) {
-        return rejectWithValue(error.message)
+        return rejectWithValue(createAuthError(error.message))
       }
-      return rejectWithValue('Unknown error')
+      return rejectWithValue(createAuthError('An unexpected error occurred'))
     }
   },
 )

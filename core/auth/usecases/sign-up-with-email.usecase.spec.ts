@@ -15,42 +15,36 @@ describe('Feature: Authenticate with Email', () => {
         email: 'amehmeto@gmail.com',
         username: 'Arthur',
       },
-      'qwerty1234',
+      'validPass123',
     )
 
-    await fixture.when.signUpWithEmail('amehmeto@gmail.com', 'qwerty1234')
+    await fixture.when.signUpWithEmail('amehmeto@gmail.com', 'validPass123')
 
     fixture.then.userShouldBeAuthenticated({
       id: 'auth-user-id',
       email: 'amehmeto@gmail.com',
       username: 'Arthur',
     })
+    fixture.then.shouldBeLoading(false)
   })
+  it('should show error when email is already in use', async () => {
+    fixture.given.authGatewayWillRejectWith('This email is already in use.')
 
-  it('does not authenticate user when credentials are invalid', async () => {
-    fixture.given.authenticationWithEmailWillFailForUser(
-      {
-        id: 'auth-user-id',
-        email: 'amehmeto@gmail.com',
-        username: 'Arthur',
-      },
-      'wrongPassword!',
+    await fixture.when.signUpWithEmail('existing@example.com', 'validPass123')
+
+    fixture.then.errorShouldBe('This email is already in use.')
+    fixture.then.shouldBeLoading(false)
+  })
+  it('should show error when password is too weak', async () => {
+    // Arrange
+    fixture.given.authGatewayWillRejectWith(
+      'Password must be at least 6 characters.',
     )
 
-    await fixture.when.signUpWithEmail('amehmeto@gmail.com', 'wrongPassword!')
+    // Act
+    await fixture.when.signUpWithEmail('user@example.com', 'weak')
 
-    fixture.then.userShouldNotBeAuthenticated()
-  })
-
-  it('should fail with invalid email', async () => {
-    fixture.when.signUpWithEmail('bademail', 'validPass123')
-
-    fixture.then.userShouldNotBeAuthenticated()
-  })
-
-  it('should fail with short password', async () => {
-    fixture.when.signUpWithEmail('user@example.com', 'short')
-
-    fixture.then.userShouldNotBeAuthenticated()
+    // Assert
+    fixture.then.errorShouldBe('Password must be at least 6 characters.')
   })
 })
