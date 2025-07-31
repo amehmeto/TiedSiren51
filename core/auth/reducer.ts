@@ -15,17 +15,7 @@ export type AuthState = {
 export const userAuthenticated = createAction<AuthUser>(
   'auth/userAuthenticated',
 )
-
 export const clearAuthError = createAction('auth/clearAuthError')
-
-function isAuthError(payload: unknown): payload is { message: string } {
-  return (
-    typeof payload === 'object' &&
-    payload !== null &&
-    'message' in payload &&
-    typeof (payload as { message: unknown }).message === 'string'
-  )
-}
 
 export const reducer = createReducer<AuthState>(
   {
@@ -40,16 +30,6 @@ export const reducer = createReducer<AuthState>(
         state.error = null
         state.isLoading = false
       })
-      .addCase(signInWithGoogle.fulfilled, (state, action) => {
-        state.authUser = action.payload
-        state.error = null
-        state.isLoading = false
-      })
-      .addCase(signInWithApple.fulfilled, (state, action) => {
-        state.authUser = action.payload
-        state.error = null
-        state.isLoading = false
-      })
       .addCase(signInWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
         state.error = null
@@ -60,11 +40,22 @@ export const reducer = createReducer<AuthState>(
         state.error = null
         state.isLoading = false
       })
+      .addCase(signInWithGoogle.fulfilled, (state, action) => {
+        state.authUser = action.payload
+        state.error = null
+        state.isLoading = false
+      })
+      .addCase(signInWithApple.fulfilled, (state, action) => {
+        state.authUser = action.payload
+        state.error = null
+        state.isLoading = false
+      })
       .addCase(logOut.fulfilled, (state) => {
         state.authUser = null
         state.error = null
         state.isLoading = false
       })
+
       .addCase(signInWithEmail.pending, (state) => {
         state.isLoading = true
         state.error = null
@@ -81,32 +72,32 @@ export const reducer = createReducer<AuthState>(
         state.isLoading = true
         state.error = null
       })
+
       .addCase(signInWithEmail.rejected, (state, action) => {
         state.isLoading = false
-        state.error = isAuthError(action.payload)
-          ? action.payload.message
-          : typeof action.payload === 'string'
-            ? action.payload
-            : 'Unknown error'
+        state.error =
+          typeof action.payload === 'string' ? action.payload : 'Sign in failed'
       })
       .addCase(signUpWithEmail.rejected, (state, action) => {
         state.isLoading = false
-        state.error = isAuthError(action.payload)
-          ? action.payload.message
-          : typeof action.payload === 'string'
-            ? action.payload
-            : 'Unknown error'
+        state.error =
+          typeof action.payload === 'string' ? action.payload : 'Sign up failed'
       })
       .addCase(signInWithGoogle.rejected, (state, action) => {
         state.isLoading = false
         state.error =
-          typeof action.payload === 'string' ? action.payload : 'Unknown error'
+          typeof action.payload === 'string'
+            ? action.payload
+            : 'Google sign in failed'
       })
       .addCase(signInWithApple.rejected, (state, action) => {
         state.isLoading = false
         state.error =
-          typeof action.payload === 'string' ? action.payload : 'Unknown error'
+          typeof action.payload === 'string'
+            ? action.payload
+            : 'Apple sign in failed'
       })
+
       .addCase(clearAuthError, (state) => {
         state.error = null
       })

@@ -1,5 +1,5 @@
 import { AuthGateway } from '@/core/ports/auth.gateway'
-import { AuthUser } from '@/core/auth/authUser'
+import { AuthUser, AuthError, createAuthError } from '@/core/auth/authUser'
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app'
 import {
   signInWithEmailAndPassword,
@@ -14,6 +14,19 @@ import {
 } from 'firebase/auth'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { firebaseConfig } from './firebaseConfig'
+
+function isFirebaseError(
+  error: unknown,
+): error is { code: string; message: string } {
+  return (
+    error !== null &&
+    typeof error === 'object' &&
+    'code' in error &&
+    'message' in error &&
+    typeof error['code'] === 'string' &&
+    typeof error['message'] === 'string'
+  )
+}
 
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
@@ -43,11 +56,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         persistence: getReactNativePersistence(AsyncStorage),
       })
     } catch (error) {
-      if (
-        error instanceof Error &&
-        'code' in error &&
-        error.code === 'auth/already-initialized'
-      ) {
+      if (isFirebaseError(error) && error.code === 'auth/already-initialized') {
         return getAuth(app)
       }
       throw error
@@ -69,30 +78,44 @@ export class FirebaseAuthGateway implements AuthGateway {
     })
   }
 
-  private translateFirebaseError(error: unknown): string {
-    function isFirebaseError(
-      err: unknown,
-    ): err is { code: string; message: string } {
-      return (
-        typeof err === 'object' &&
-        err !== null &&
-        'code' in err &&
-        typeof (err as { code: unknown }).code === 'string' &&
-        'message' in err &&
-        typeof (err as { message: unknown }).message === 'string'
-      )
+  private translateFirebaseError(error: unknown): AuthError {
+    const firebaseErrorMessages: Record<
+      string,
+      { message: string; field?: AuthError['field'] }
+    > = {
+      'auth/email-already-in-use': {
+        message: 'This email is already in use.',
+        field: 'email',
+      },
+      'auth/invalid-email': {
+        message: 'Invalid email address.',
+        field: 'email',
+      },
+      'auth/weak-password': {
+        message: 'Password must be at least 6 characters.',
+        field: 'password',
+      },
+      'auth/invalid-credential': {
+        message: 'Invalid credentials.',
+        field: 'general',
+      },
     }
-    const firebaseErrorMessages: Record<string, string> = {
-      'auth/email-already-in-use': 'This email is already in use.',
-      'auth/invalid-email': 'Invalid email address.',
-      'auth/weak-password': 'Password must be at least 6 characters.',
-      'auth/invalid-credential': 'Invalid credentials.',
+
+    if (isFirebaseError(error)) {
+      const errorConfig = firebaseErrorMessages[error.code]
+      if (errorConfig) {
+        return createAuthError(
+          errorConfig.message,
+          error.code,
+          errorConfig.field,
+        )
+      }
+      return createAuthError(error.message, error.code)
     }
-    const firebaseMessage =
-      isFirebaseError(error) &&
-      (firebaseErrorMessages[error.code] ?? error.message)
-    const standardErrorMessage = error instanceof Error && error.message
-    return firebaseMessage || standardErrorMessage || 'Unknown error occurred.'
+
+    return createAuthError(
+      error instanceof Error ? error.message : 'Unknown error occurred.',
+    )
   }
 
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
@@ -107,7 +130,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         email: result.user.email ?? '',
       }
     } catch (error) {
-      throw new Error(this.translateFirebaseError(error))
+      throw this.translateFirebaseError(error)
     }
   }
 
@@ -123,16 +146,16 @@ export class FirebaseAuthGateway implements AuthGateway {
         email: result.user.email ?? '',
       }
     } catch (error) {
-      throw new Error(this.translateFirebaseError(error))
+      throw this.translateFirebaseError(error)
     }
   }
 
   async signInWithGoogle(): Promise<AuthUser> {
-    throw new Error('Google auth not implemented yet')
+    throw createAuthError('Google auth not implemented yet')
   }
 
   async signInWithApple(): Promise<AuthUser> {
-    throw new Error('Apple auth not implemented yet')
+    throw createAuthError('Apple auth not implemented yet')
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {
@@ -144,6 +167,10 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   async logOut(): Promise<void> {
-    await signOut(this.auth)
+    try {
+      await signOut(this.auth)
+    } catch (error) {
+      throw this.translateFirebaseError(error)
+    }
   }
 }
