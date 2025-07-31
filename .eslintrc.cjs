@@ -8,5 +8,6 @@ module.exports = {
     'no-console': 'error',
     'no-switch-statements/no-switch': 'error',
     'lines-between-class-members': ['error', 'always'],
+    'no-else-return': 'warn',
   },
 }
