@@ -75,27 +75,19 @@ export const reducer = createReducer<AuthState>(
 
       .addCase(signInWithEmail.rejected, (state, action) => {
         state.isLoading = false
-        state.error =
-          typeof action.payload === 'string' ? action.payload : 'Sign in failed'
+        state.error = action.payload ?? null
       })
       .addCase(signUpWithEmail.rejected, (state, action) => {
         state.isLoading = false
-        state.error =
-          typeof action.payload === 'string' ? action.payload : 'Sign up failed'
+        state.error = action.payload ?? null
       })
       .addCase(signInWithGoogle.rejected, (state, action) => {
         state.isLoading = false
-        state.error =
-          typeof action.payload === 'string'
-            ? action.payload
-            : 'Google sign in failed'
+        state.error = action.payload ?? null
       })
       .addCase(signInWithApple.rejected, (state, action) => {
         state.isLoading = false
-        state.error =
-          typeof action.payload === 'string'
-            ? action.payload
-            : 'Apple sign in failed'
+        state.error = action.payload ?? null
       })
 
       .addCase(clearAuthError, (state) => {

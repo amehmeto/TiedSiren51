@@ -20,7 +20,7 @@ import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
 import { clearAuthError } from '@/core/auth/reducer'
-import { signUpSchema } from '@/core/auth/validation/auth-schemas'
+import { signUpSchema } from '@/ui/auth-schemas/auth-schemas'
 
 export default function SignUpScreen() {
   const router = useRouter()

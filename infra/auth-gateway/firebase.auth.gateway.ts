@@ -1,5 +1,6 @@
 import { AuthGateway } from '@/core/ports/auth.gateway'
-import { AuthUser, AuthError, createAuthError } from '@/core/auth/authUser'
+import { AuthUser } from '@/core/auth/authUser'
+import { AuthError, createAuthError } from '@/core/auth/authError'
 import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app'
 import {
   signInWithEmailAndPassword,
@@ -15,19 +16,6 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { firebaseConfig } from './firebaseConfig'
 
-function isFirebaseError(
-  error: unknown,
-): error is { code: string; message: string } {
-  return (
-    error !== null &&
-    typeof error === 'object' &&
-    'code' in error &&
-    'message' in error &&
-    typeof error['code'] === 'string' &&
-    typeof error['message'] === 'string'
-  )
-}
-
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
 
@@ -38,6 +26,19 @@ export class FirebaseAuthGateway implements AuthGateway {
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
+
+  private isFirebaseError(
+    error: unknown,
+  ): error is { code: string; message: string } {
+    return (
+      error !== null &&
+      typeof error === 'object' &&
+      'code' in error &&
+      'message' in error &&
+      typeof error['code'] === 'string' &&
+      typeof error['message'] === 'string'
+    )
+  }
 
   public constructor() {
     this.firebaseConfig = FirebaseAuthGateway.FIREBASE_CONFIG
@@ -56,7 +57,10 @@ export class FirebaseAuthGateway implements AuthGateway {
         persistence: getReactNativePersistence(AsyncStorage),
       })
     } catch (error) {
-      if (isFirebaseError(error) && error.code === 'auth/already-initialized') {
+      if (
+        this.isFirebaseError(error) &&
+        error.code === 'auth/already-initialized'
+      ) {
         return getAuth(app)
       }
       throw error
@@ -101,7 +105,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       },
     }
 
-    if (isFirebaseError(error)) {
+    if (this.isFirebaseError(error)) {
       const errorConfig = firebaseErrorMessages[error.code]
       if (errorConfig) {
         return createAuthError(

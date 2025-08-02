@@ -1,4 +1,4 @@
-import { AuthError } from './authUser'
+import { AuthError } from './authError'
 
 export function handleAuthError(error: unknown): string {
   if (error && typeof error === 'object' && 'message' in error) {

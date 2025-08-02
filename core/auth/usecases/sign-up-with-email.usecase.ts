@@ -1,7 +1,12 @@
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
 import { handleAuthError } from '../handleAuthError'
+import { AuthUser } from '../authUser'
 
-export const signUpWithEmail = createAppAsyncThunk(
+export const signUpWithEmail = createAppAsyncThunk<
+  AuthUser,
+  { email: string; password: string },
+  { rejectValue: string }
+>(
   'auth/signUpWithEmail',
   async (
     payload: { email: string; password: string },

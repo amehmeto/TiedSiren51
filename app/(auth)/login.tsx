@@ -20,7 +20,7 @@ import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.useca
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import { clearAuthError } from '@/core/auth/reducer'
-import { signInSchema } from '@/core/auth/validation/auth-schemas'
+import { signInSchema } from '@/ui/auth-schemas/auth-schemas'
 
 export default function LoginScreen() {
   const router = useRouter()
