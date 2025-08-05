@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -19,8 +19,13 @@ import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.useca
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
-import { clearAuthError } from '@/core/auth/reducer'
-import { signUpSchema } from '@/ui/auth-schemas/auth-schemas'
+import {
+  clearAuthError,
+  clearInputValidationError,
+  setValidationErrors,
+  clearValidationErrors,
+} from '@/core/auth/reducer'
+import { validateSignUpInput } from '@/ui/auth-schemas/validation-helper'
 
 export default function SignUpScreen() {
   const router = useRouter()
@@ -29,11 +34,15 @@ export default function SignUpScreen() {
     email: '',
     password: '',
   })
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string>
-  >({})
 
-  const { isLoading, error } = useSelector((state: RootState) => state.auth)
+  const { isLoading, error, validationErrors } = useSelector(
+    (state: RootState) => state.auth,
+  )
+
+  useEffect(() => {
+    dispatch(clearValidationErrors())
+    dispatch(clearAuthError())
+  }, [dispatch])
 
   const handleClose = () => {
     dispatch(clearAuthError())
@@ -49,28 +58,21 @@ export default function SignUpScreen() {
 
   const handleSignUp = async () => {
     dispatch(clearAuthError())
-    setValidationErrors({})
 
-    const validation = signUpSchema.safeParse(credentials)
-    if (!validation.success) {
-      const fieldErrors: Record<string, string> = {}
-      validation.error.errors.forEach((error) => {
-        const key = error.path[0]
-        if (typeof key === 'string') {
-          fieldErrors[key] = error.message
-        }
-      })
-      setValidationErrors(fieldErrors)
+    const validation = validateSignUpInput(credentials)
+
+    if (!validation.isValid) {
+      dispatch(setValidationErrors(validation.errors))
       return
     }
 
-    await dispatch(signUpWithEmail(validation.data))
+    await dispatch(signUpWithEmail(validation.data!))
   }
 
   const handleEmailChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, email: text }))
     if (validationErrors.email) {
-      setValidationErrors((prev) => ({ ...prev, email: '' }))
+      dispatch(clearInputValidationError('email'))
     }
     if (error) {
       dispatch(clearAuthError())
@@ -80,12 +82,14 @@ export default function SignUpScreen() {
   const handlePasswordChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, password: text }))
     if (validationErrors.password) {
-      setValidationErrors((prev) => ({ ...prev, password: '' }))
+      dispatch(clearInputValidationError('password'))
     }
     if (error) {
       dispatch(clearAuthError())
     }
   }
+
+  const hasValidationErrors = Object.values(validationErrors).some(Boolean)
 
   return (
     <TiedSLinearBackground>
@@ -139,9 +143,7 @@ export default function SignUpScreen() {
           <TiedSButton
             onPress={handleSignUp}
             text={isLoading ? 'CREATING ACCOUNT...' : 'CREATE YOUR ACCOUNT'}
-            disabled={
-              isLoading || Object.values(validationErrors).some(Boolean)
-            }
+            disabled={isLoading || hasValidationErrors}
           />
           {error && (
             <Text

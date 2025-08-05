@@ -1,4 +1,8 @@
+// ui/auth-schemas/auth-schemas.ts
 import { z } from 'zod'
+
+const CONTAINS_UPPERCASE_LOWERCASE_AND_DIGITS_REGEX_PATTERN =
+  /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/
 
 export const signUpSchema = z.object({
   email: z
@@ -9,7 +13,7 @@ export const signUpSchema = z.object({
     .string()
     .min(6, 'Password must be at least 6 characters')
     .regex(
-      /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)/,
+      CONTAINS_UPPERCASE_LOWERCASE_AND_DIGITS_REGEX_PATTERN,
       'Password must contain uppercase, lowercase and number',
     ),
 })

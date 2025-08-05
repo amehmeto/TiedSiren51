@@ -19,25 +19,35 @@ import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAut
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
-import { clearAuthError } from '@/core/auth/reducer'
-import { signInSchema } from '@/ui/auth-schemas/auth-schemas'
+import {
+  clearAuthError,
+  clearInputValidationError,
+  setValidationErrors,
+  clearValidationErrors,
+} from '@/core/auth/reducer'
+import { validateSignInInput } from '@/ui/auth-schemas/validation-helper'
 
 export default function LoginScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const [credentials, setCredentials] = useState({ email: '', password: '' })
-  const [validationErrors, setValidationErrors] = useState<
-    Record<string, string>
-  >({})
-  const { isLoading, error } = useSelector((state: RootState) => state.auth)
 
   const isUserAuthenticated = useSelector((state: RootState) =>
     selectIsUserAuthenticated(state),
   )
 
+  const { isLoading, error, validationErrors } = useSelector(
+    (state: RootState) => state.auth,
+  )
+
   useEffect(() => {
     if (isUserAuthenticated) router.push('/')
   }, [isUserAuthenticated, router])
+
+  useEffect(() => {
+    dispatch(clearValidationErrors())
+    dispatch(clearAuthError())
+  }, [dispatch])
 
   const handleClose = () => {
     dispatch(clearAuthError())
@@ -52,29 +62,24 @@ export default function LoginScreen() {
 
   const handleSignIn = async () => {
     dispatch(clearAuthError())
-    setValidationErrors({})
 
-    const validation = signInSchema.safeParse(credentials)
-    if (!validation.success) {
-      const fieldErrors: Record<string, string> = {}
-      validation.error.errors.forEach((error) => {
-        const key = error.path[0]
-        if (typeof key === 'string') {
-          fieldErrors[key] = error.message
-        }
-      })
-      setValidationErrors(fieldErrors)
+    const validation = validateSignInInput(credentials)
+
+    if (!validation.isValid) {
+      dispatch(setValidationErrors(validation.errors))
       return
     }
 
-    await dispatch(signInWithEmail(validation.data))
+    await dispatch(signInWithEmail(validation.data!))
   }
 
   const handleEmailChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, email: text }))
+
     if (validationErrors.email) {
-      setValidationErrors((prev) => ({ ...prev, email: '' }))
+      dispatch(clearInputValidationError('email'))
     }
+
     if (error) {
       dispatch(clearAuthError())
     }
@@ -82,13 +87,17 @@ export default function LoginScreen() {
 
   const handlePasswordChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, password: text }))
+
     if (validationErrors.password) {
-      setValidationErrors((prev) => ({ ...prev, password: '' }))
+      dispatch(clearInputValidationError('password'))
     }
+
     if (error) {
       dispatch(clearAuthError())
     }
   }
+
+  const hasValidationErrors = Object.values(validationErrors).some(Boolean)
 
   return (
     <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
@@ -139,7 +148,7 @@ export default function LoginScreen() {
           onPress={handleSignIn}
           text={isLoading ? 'LOGGING IN...' : 'LOG IN'}
           style={styles.button}
-          disabled={isLoading || Object.values(validationErrors).some(Boolean)}
+          disabled={isLoading || hasValidationErrors}
         />
         {error && (
           <Text

@@ -10,6 +10,7 @@ export type AuthState = {
   authUser: AuthUser | null
   isLoading: boolean
   error: string | null
+  validationErrors: Record<string, string>
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -17,11 +18,22 @@ export const userAuthenticated = createAction<AuthUser>(
 )
 export const clearAuthError = createAction('auth/clearAuthError')
 
+export const setValidationErrors = createAction<Record<string, string>>(
+  'auth/setValidationErrors',
+)
+
+export const clearValidationErrors = createAction('auth/clearValidationErrors')
+
+export const clearInputValidationError = createAction<string>(
+  'auth/clearInputValidationError',
+)
+
 export const reducer = createReducer<AuthState>(
   {
     authUser: null,
     isLoading: false,
     error: null,
+    validationErrors: {},
   },
   (builder) => {
     builder
@@ -29,48 +41,58 @@ export const reducer = createReducer<AuthState>(
         state.authUser = action.payload
         state.error = null
         state.isLoading = false
+        state.validationErrors = {}
       })
       .addCase(signInWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
         state.error = null
         state.isLoading = false
+        state.validationErrors = {}
       })
       .addCase(signUpWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
         state.error = null
         state.isLoading = false
+        state.validationErrors = {}
       })
       .addCase(signInWithGoogle.fulfilled, (state, action) => {
         state.authUser = action.payload
         state.error = null
         state.isLoading = false
+        state.validationErrors = {}
       })
       .addCase(signInWithApple.fulfilled, (state, action) => {
         state.authUser = action.payload
         state.error = null
         state.isLoading = false
+        state.validationErrors = {}
       })
       .addCase(logOut.fulfilled, (state) => {
         state.authUser = null
         state.error = null
         state.isLoading = false
+        state.validationErrors = {}
       })
 
       .addCase(signInWithEmail.pending, (state) => {
         state.isLoading = true
         state.error = null
+        state.validationErrors = {}
       })
       .addCase(signUpWithEmail.pending, (state) => {
         state.isLoading = true
         state.error = null
+        state.validationErrors = {}
       })
       .addCase(signInWithGoogle.pending, (state) => {
         state.isLoading = true
         state.error = null
+        state.validationErrors = {}
       })
       .addCase(signInWithApple.pending, (state) => {
         state.isLoading = true
         state.error = null
+        state.validationErrors = {}
       })
 
       .addCase(signInWithEmail.rejected, (state, action) => {
@@ -92,6 +114,16 @@ export const reducer = createReducer<AuthState>(
 
       .addCase(clearAuthError, (state) => {
         state.error = null
+      })
+      .addCase(setValidationErrors, (state, action) => {
+        state.validationErrors = action.payload
+      })
+      .addCase(clearValidationErrors, (state) => {
+        state.validationErrors = {}
+      })
+      .addCase(clearInputValidationError, (state, action) => {
+        const { [action.payload]: removed, ...rest } = state.validationErrors
+        state.validationErrors = rest
       })
   },
 )
