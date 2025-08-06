@@ -21,6 +21,15 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { firebaseConfig } from './firebaseConfig'
 
+enum FirebaseAuthErrorCode {
+  EmailAlreadyInUse = 'auth/email-already-in-use',
+  InvalidEmail = 'auth/invalid-email',
+  WeakPassword = 'auth/weak-password',
+  InvalidCredential = 'auth/invalid-credential',
+  InvalidPassword = 'auth/invalid-password',
+  UserNotFound = 'auth/user-not-found',
+}
+
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
 
@@ -87,15 +96,22 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   private translateFirebaseError(error: unknown): string {
-    const firebaseErrorMessages: Record<string, string> = {
-      'auth/email-already-in-use': 'This email is already in use.',
-      'auth/invalid-email': 'Invalid email address.',
-      'auth/weak-password': 'Password must be at least 6 characters.',
-      'auth/invalid-credential': 'Invalid credentials.',
+    const firebaseErrorMessages: Record<FirebaseAuthErrorCode, string> = {
+      [FirebaseAuthErrorCode.EmailAlreadyInUse]:
+        'This email is already in use.',
+      [FirebaseAuthErrorCode.InvalidEmail]: 'Invalid email address.',
+      [FirebaseAuthErrorCode.WeakPassword]:
+        'Password must be at least 6 characters.',
+      [FirebaseAuthErrorCode.InvalidCredential]: 'Invalid credentials.',
+      [FirebaseAuthErrorCode.InvalidPassword]: 'Invalid password.',
+      [FirebaseAuthErrorCode.UserNotFound]: 'User not found.',
     }
 
     if (this.isFirebaseError(error)) {
-      return firebaseErrorMessages[error.code] || error.message
+      return (
+        firebaseErrorMessages[error.code as FirebaseAuthErrorCode] ||
+        error.message
+      )
     }
 
     return error instanceof Error ? error.message : 'Unknown error occurred.'

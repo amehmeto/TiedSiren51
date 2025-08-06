@@ -3,9 +3,9 @@ import {
   Keyboard,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
-  TouchableWithoutFeedback,
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
@@ -13,7 +13,6 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
-import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { useDispatch, useSelector } from 'react-redux'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
@@ -94,75 +93,74 @@ export default function SignUpScreen() {
   const hasValidationErrors = Object.values(validationErrors).some(Boolean)
 
   return (
-    <TiedSLinearBackground>
-      <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <KeyboardAvoidingView
-          style={styles.container}
-          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-        >
-          <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
-          <Text style={styles.subtitle}>{'GET STARTED FOR FREE'}</Text>
-          <TiedSSocialButton
-            iconName="logo-google"
-            text="CONTINUE WITH GOOGLE"
-            onPress={() => dispatch(signInWithGoogle())}
-          />
-          <TiedSSocialButton
-            iconName="logo-apple"
-            text="CONTINUE WITH APPLE"
-            onPress={() => dispatch(signInWithApple())}
-          />
-          <Text style={styles.orText}>{'OR'}</Text>
-          <TiedSTextInput
-            placeholder="Your Email"
-            accessibilityLabel="Email"
-            placeholderTextColor={T.color.grey}
-            value={credentials.email}
-            onChangeText={handleEmailChange}
-            keyboardType="email-address"
-            autoCapitalize="none"
-            autoFocus
-          />
-          {validationErrors.email && (
-            <Text style={styles.fieldErrorText}>{validationErrors.email}</Text>
-          )}
+    <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
+        <Text style={styles.subtitle}>{'GET STARTED FOR FREE'}</Text>
+        <TiedSSocialButton
+          iconName="logo-google"
+          text="CONTINUE WITH GOOGLE"
+          onPress={() => dispatch(signInWithGoogle())}
+        />
+        <TiedSSocialButton
+          iconName="logo-apple"
+          text="CONTINUE WITH APPLE"
+          onPress={() => dispatch(signInWithApple())}
+        />
+        <Text style={styles.orText}>{'OR'}</Text>
+        <TiedSTextInput
+          placeholder="Your Email"
+          accessibilityLabel="Email"
+          placeholderTextColor={T.color.grey}
+          value={credentials.email}
+          onChangeText={handleEmailChange}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoFocus
+        />
+        {validationErrors.email && (
+          <Text style={styles.fieldErrorText}>{validationErrors.email}</Text>
+        )}
 
-          <TiedSTextInput
-            placeholder="Create Password"
-            accessibilityLabel="Password"
-            placeholderTextColor={T.color.grey}
-            hasPasswordToggle={true}
-            value={credentials.password}
-            onChangeText={handlePasswordChange}
-            textContentType="newPassword"
-            autoComplete="new-password"
-          />
-          {validationErrors.password && (
-            <Text style={styles.fieldErrorText}>
-              {validationErrors.password}
-            </Text>
-          )}
-          <TiedSButton
-            onPress={handleSignUp}
-            text={isLoading ? 'CREATING ACCOUNT...' : 'CREATE YOUR ACCOUNT'}
-            disabled={isLoading || hasValidationErrors}
-          />
-          {error && (
-            <Text
-              style={styles.errorText}
-              accessibilityLiveRegion="polite"
-              accessibilityRole="alert"
-            >
-              {error}
-            </Text>
-          )}
-        </KeyboardAvoidingView>
-      </TouchableWithoutFeedback>
-    </TiedSLinearBackground>
+        <TiedSTextInput
+          placeholder="Create Password"
+          accessibilityLabel="Password"
+          placeholderTextColor={T.color.grey}
+          hasPasswordToggle={true}
+          value={credentials.password}
+          onChangeText={handlePasswordChange}
+          textContentType="newPassword"
+          autoComplete="new-password"
+        />
+        {validationErrors.password && (
+          <Text style={styles.fieldErrorText}>{validationErrors.password}</Text>
+        )}
+        <TiedSButton
+          onPress={handleSignUp}
+          text={isLoading ? 'CREATING ACCOUNT...' : 'CREATE YOUR ACCOUNT'}
+          disabled={isLoading || hasValidationErrors}
+        />
+        {error && (
+          <Text
+            style={styles.errorText}
+            accessibilityLiveRegion="polite"
+            accessibilityRole="alert"
+          >
+            {error}
+          </Text>
+        )}
+      </KeyboardAvoidingView>
+    </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',

@@ -4,8 +4,8 @@ import {
   Platform,
   StyleSheet,
   Text,
-  TouchableWithoutFeedback,
   Keyboard,
+  Pressable,
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
@@ -101,7 +101,7 @@ export default function LoginScreen() {
   const hasValidationErrors = Object.values(validationErrors).some(Boolean)
 
   return (
-    <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
+    <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
@@ -167,11 +167,14 @@ export default function LoginScreen() {
           {'Forgot your password?'}
         </Text>
       </KeyboardAvoidingView>
-    </TouchableWithoutFeedback>
+    </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
