@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import {
   KeyboardAvoidingView,
   Platform,
@@ -19,38 +19,44 @@ import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAut
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
-import {
-  clearAuthError,
-  clearInputValidationError,
-  setValidationErrors,
-  clearValidationErrors,
-} from '@/core/auth/reducer'
-import { validateSignInInput } from '@/ui/auth-schemas/validation-helper'
+import { prepareForAuthentication } from '@/core/auth/reducer'
+import { useForm, Controller } from 'react-hook-form'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { SignInInput, signInSchema } from '@/ui/auth-schemas/auth-schemas'
 
 export default function LoginScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const [credentials, setCredentials] = useState({ email: '', password: '' })
+  const {
+    control,
+    handleSubmit,
+    formState: { errors, isValid },
+    clearErrors,
+  } = useForm<SignInInput>({
+    resolver: zodResolver(signInSchema),
+    mode: 'onChange',
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+  })
 
   const isUserAuthenticated = useSelector((state: RootState) =>
     selectIsUserAuthenticated(state),
   )
 
-  const { isLoading, error, validationErrors } = useSelector(
-    (state: RootState) => state.auth,
-  )
+  const { isLoading, error } = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
     if (isUserAuthenticated) router.push('/')
   }, [isUserAuthenticated, router])
 
   useEffect(() => {
-    dispatch(clearValidationErrors())
-    dispatch(clearAuthError())
+    dispatch(prepareForAuthentication())
   }, [dispatch])
 
   const handleClose = () => {
-    dispatch(clearAuthError())
+    dispatch(prepareForAuthentication())
     if (router.canGoBack()) {
       router.back()
       return
@@ -61,44 +67,26 @@ export default function LoginScreen() {
     }
   }
 
-  const handleSignIn = async () => {
-    dispatch(clearAuthError())
-
-    const validation = validateSignInInput(credentials)
-
-    if (!validation.isValid) {
-      dispatch(setValidationErrors(validation.errors))
-      return
-    }
-
-    await dispatch(signInWithEmail(validation.data!))
+  const onSubmit = async (data: SignInInput) => {
+    await dispatch(signInWithEmail(data))
   }
 
-  const handleEmailChange = (text: string) => {
-    setCredentials((prev) => ({ ...prev, email: text }))
+  const handleSocialSignIn = (provider: 'google' | 'apple') => {
+    dispatch(prepareForAuthentication())
 
-    if (validationErrors.email) {
-      dispatch(clearInputValidationError('email'))
+    const providerActions = {
+      google: signInWithGoogle,
+      apple: signInWithApple,
     }
 
+    dispatch(providerActions[provider]())
+  }
+
+  const clearErrorsOnChange = () => {
     if (error) {
-      dispatch(clearAuthError())
+      dispatch(prepareForAuthentication())
     }
   }
-
-  const handlePasswordChange = (text: string) => {
-    setCredentials((prev) => ({ ...prev, password: text }))
-
-    if (validationErrors.password) {
-      dispatch(clearInputValidationError('password'))
-    }
-
-    if (error) {
-      dispatch(clearAuthError())
-    }
-  }
-
-  const hasValidationErrors = Object.values(validationErrors).some(Boolean)
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
@@ -111,45 +99,71 @@ export default function LoginScreen() {
         <TiedSSocialButton
           iconName="logo-google"
           text="CONTINUE WITH GOOGLE"
-          onPress={() => dispatch(signInWithGoogle())}
+          onPress={() => handleSocialSignIn('google')}
         />
         <TiedSSocialButton
           iconName="logo-apple"
           text="CONTINUE WITH APPLE"
-          onPress={() => dispatch(signInWithApple())}
+          onPress={() => handleSocialSignIn('apple')}
         />
         <Text style={styles.orText}>{'OR'}</Text>
-        <TiedSTextInput
-          placeholder="Your Email"
-          accessibilityLabel="Email"
-          placeholderTextColor={T.color.grey}
-          value={credentials.email}
-          onChangeText={handleEmailChange}
-          keyboardType="email-address"
-          autoCapitalize="none"
-          autoFocus
+        <Controller
+          control={control}
+          name="email"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TiedSTextInput
+              placeholder="Your Email"
+              accessibilityLabel="Email"
+              placeholderTextColor={T.color.grey}
+              value={value}
+              onChangeText={(text) => {
+                onChange(text)
+                clearErrorsOnChange()
+                if (errors.email) {
+                  clearErrors('email')
+                }
+              }}
+              onBlur={onBlur}
+              keyboardType="email-address"
+              autoCapitalize="none"
+              autoFocus
+            />
+          )}
         />
-        {validationErrors.email && (
-          <Text style={styles.fieldErrorText}>{validationErrors.email}</Text>
+        {errors.email && (
+          <Text style={styles.fieldErrorText}>{errors.email.message}</Text>
         )}
-        <TiedSTextInput
-          placeholder="Enter Your Password"
-          accessibilityLabel="Password"
-          placeholderTextColor={T.color.grey}
-          value={credentials.password}
-          hasPasswordToggle={true}
-          onChangeText={handlePasswordChange}
-          textContentType="password"
-          autoComplete="current-password"
+        <Controller
+          control={control}
+          name="password"
+          render={({ field: { onChange, onBlur, value } }) => (
+            <TiedSTextInput
+              placeholder="Enter Your Password"
+              accessibilityLabel="Password"
+              placeholderTextColor={T.color.grey}
+              value={value}
+              hasPasswordToggle={true}
+              onChangeText={(text) => {
+                onChange(text)
+                clearErrorsOnChange()
+                if (errors.password) {
+                  clearErrors('password')
+                }
+              }}
+              onBlur={onBlur}
+              textContentType="password"
+              autoComplete="current-password"
+            />
+          )}
         />
-        {validationErrors.password && (
-          <Text style={styles.fieldErrorText}>{validationErrors.password}</Text>
+        {errors.password && (
+          <Text style={styles.fieldErrorText}>{errors.password.message}</Text>
         )}
         <TiedSButton
-          onPress={handleSignIn}
+          onPress={handleSubmit(onSubmit)}
           text={isLoading ? 'LOGGING IN...' : 'LOG IN'}
           style={styles.button}
-          disabled={isLoading || hasValidationErrors}
+          disabled={isLoading || !isValid}
         />
         {error && (
           <Text

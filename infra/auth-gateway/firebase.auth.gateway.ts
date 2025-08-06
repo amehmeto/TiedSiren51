@@ -26,8 +26,6 @@ enum FirebaseAuthErrorCode {
   InvalidEmail = 'auth/invalid-email',
   WeakPassword = 'auth/weak-password',
   InvalidCredential = 'auth/invalid-credential',
-  InvalidPassword = 'auth/invalid-password',
-  UserNotFound = 'auth/user-not-found',
 }
 
 export class FirebaseAuthGateway implements AuthGateway {
@@ -102,9 +100,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       [FirebaseAuthErrorCode.InvalidEmail]: 'Invalid email address.',
       [FirebaseAuthErrorCode.WeakPassword]:
         'Password must be at least 6 characters.',
-      [FirebaseAuthErrorCode.InvalidCredential]: 'Invalid credentials.',
-      [FirebaseAuthErrorCode.InvalidPassword]: 'Invalid password.',
-      [FirebaseAuthErrorCode.UserNotFound]: 'User not found.',
+      [FirebaseAuthErrorCode.InvalidCredential]: 'Invalid email or password.',
     }
 
     if (this.isFirebaseError(error)) {

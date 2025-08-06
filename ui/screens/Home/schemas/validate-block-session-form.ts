@@ -10,8 +10,8 @@ export function validateBlockSessionForm() {
     } catch (e) {
       if (!(e instanceof z.ZodError)) return {}
       const validationErrors: ErrorMessages = {}
-      e.errors.forEach((error) => {
-        const field = error.path[0]
+      e.issues.forEach((error) => {
+        const field = String(error.path[0])
         validationErrors[field] = error.message
       })
       return validationErrors

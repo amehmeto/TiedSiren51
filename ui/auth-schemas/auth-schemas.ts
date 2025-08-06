@@ -1,4 +1,3 @@
-// ui/auth-schemas/auth-schemas.ts
 import { z } from 'zod'
 
 const CONTAINS_UPPERCASE_LOWERCASE_AND_DIGITS_REGEX_PATTERN =
@@ -28,3 +27,6 @@ export const signInSchema = z.object({
 
 export type SignUpInput = z.infer<typeof signUpSchema>
 export type SignInInput = z.infer<typeof signInSchema>
+
+// Re-export for compatibility
+export { signUpSchema as default }
