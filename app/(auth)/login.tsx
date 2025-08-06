@@ -55,6 +55,7 @@ export default function LoginScreen() {
       router.back()
       return
     }
+
     if (Platform.OS === 'ios') {
       router.replace('/(auth)/login')
     }

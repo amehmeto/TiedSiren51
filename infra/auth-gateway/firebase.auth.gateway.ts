@@ -79,6 +79,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         })
         return
       }
+
       if (!user && this.onUserLoggedOutListener) {
         this.onUserLoggedOutListener()
       }

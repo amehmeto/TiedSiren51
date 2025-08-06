@@ -74,6 +74,7 @@ export default function SignUpScreen() {
     if (validationErrors.email) {
       dispatch(clearInputValidationError('email'))
     }
+
     if (error) {
       dispatch(clearAuthError())
     }
@@ -84,6 +85,7 @@ export default function SignUpScreen() {
     if (validationErrors.password) {
       dispatch(clearInputValidationError('password'))
     }
+
     if (error) {
       dispatch(clearAuthError())
     }
