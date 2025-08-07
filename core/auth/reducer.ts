@@ -20,6 +20,10 @@ export const prepareForAuthentication = createAction(
   'auth/prepareForAuthentication',
 )
 
+export const userProvidedInvalidCredentials = createAction<string>(
+  'auth/userProvidedInvalidCredentials',
+)
+
 export const reducer = createReducer<AuthState>(
   {
     authUser: null,
@@ -31,6 +35,10 @@ export const reducer = createReducer<AuthState>(
       .addCase(userAuthenticated, (state, action) => {
         state.authUser = action.payload
         state.error = null
+        state.isLoading = false
+      })
+      .addCase(userProvidedInvalidCredentials, (state, action) => {
+        state.error = action.payload
         state.isLoading = false
       })
       .addCase(signInWithEmail.fulfilled, (state, action) => {

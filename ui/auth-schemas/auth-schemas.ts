@@ -27,6 +27,3 @@ export const signInSchema = z.object({
 
 export type SignUpInput = z.infer<typeof signUpSchema>
 export type SignInInput = z.infer<typeof signInSchema>
-
-// Re-export for compatibility
-export { signUpSchema as default }
