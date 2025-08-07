@@ -20,6 +20,7 @@ import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.useca
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import {
+  clearError,
   prepareForAuthentication,
   userProvidedInvalidCredentials,
 } from '@/core/auth/reducer'
@@ -84,7 +85,7 @@ export default function LoginScreen() {
     }
 
     if (error) {
-      dispatch(prepareForAuthentication())
+      dispatch(clearError())
     }
   }
 
@@ -96,7 +97,7 @@ export default function LoginScreen() {
     }
 
     if (error) {
-      dispatch(prepareForAuthentication())
+      dispatch(clearError())
     }
   }
 
@@ -114,7 +115,6 @@ export default function LoginScreen() {
           iconName="logo-google"
           text="CONTINUE WITH GOOGLE"
           onPress={() => {
-            dispatch(prepareForAuthentication())
             dispatch(signInWithGoogle())
           }}
         />
@@ -122,7 +122,6 @@ export default function LoginScreen() {
           iconName="logo-apple"
           text="CONTINUE WITH APPLE"
           onPress={() => {
-            dispatch(prepareForAuthentication())
             dispatch(signInWithApple())
           }}
         />

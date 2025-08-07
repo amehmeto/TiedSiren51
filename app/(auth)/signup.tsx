@@ -19,6 +19,7 @@ import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
 import {
+  clearError,
   prepareForAuthentication,
   userProvidedInvalidCredentials,
 } from '@/core/auth/reducer'
@@ -77,7 +78,7 @@ export default function SignUpScreen() {
     }
 
     if (error) {
-      dispatch(prepareForAuthentication())
+      dispatch(clearError())
     }
   }
 
@@ -88,7 +89,7 @@ export default function SignUpScreen() {
     }
 
     if (error) {
-      dispatch(prepareForAuthentication())
+      dispatch(clearError())
     }
   }
 
@@ -106,7 +107,6 @@ export default function SignUpScreen() {
           iconName="logo-google"
           text="CONTINUE WITH GOOGLE"
           onPress={() => {
-            dispatch(prepareForAuthentication())
             dispatch(signInWithGoogle())
           }}
         />
@@ -114,7 +114,6 @@ export default function SignUpScreen() {
           iconName="logo-apple"
           text="CONTINUE WITH APPLE"
           onPress={() => {
-            dispatch(prepareForAuthentication())
             dispatch(signInWithApple())
           }}
         />
