@@ -20,6 +20,8 @@ const withBlocklists = createAction<Blocklist[]>('withBlocklists')
 const withAvailableSirens = createAction<Sirens>('withAvailableSirens')
 const withAuthUser = createAction<AuthUser>('withAuthUser')
 const withoutAuthUser = createAction<{}>('withoutAuthUser')
+const withAuthError = createAction<string>('withAuthError')
+const withAuthLoading = createAction<boolean>('withAuthLoading')
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -38,6 +40,12 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withAvailableSirens, (state, action) => {
       state.siren.availableSirens = action.payload
     })
+    .addCase(withAuthError, (state, action) => {
+      state.auth.error = action.payload
+    })
+    .addCase(withAuthLoading, (state, action) => {
+      state.auth.isLoading = action.payload
+    })
 })
 
 export const stateBuilder = (baseState = initialState) => {
@@ -55,6 +63,8 @@ export const stateBuilder = (baseState = initialState) => {
     withBlockSessions: reduce(withBlockSessions),
     withBlocklists: reduce(withBlocklists),
     withAvailableSirens: reduce(withAvailableSirens),
+    withAuthError: reduce(withAuthError),
+    withAuthLoading: reduce(withAuthLoading),
   }
 }
 

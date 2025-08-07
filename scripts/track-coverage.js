@@ -27,12 +27,14 @@ function getCurrentCoverage() {
           (count) => count > 0,
         ).length
       }
+
       if (file.f) {
         totalFunctions += Object.keys(file.f).length
         coveredFunctions += Object.values(file.f).filter(
           (count) => count > 0,
         ).length
       }
+
       if (file.b) {
         Object.values(file.b).forEach((branch) => {
           totalBranches += branch.length
