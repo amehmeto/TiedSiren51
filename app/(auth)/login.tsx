@@ -19,18 +19,13 @@ import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAut
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
-import {
-  clearError,
-  prepareForAuthentication,
-  userProvidedInvalidCredentials,
-} from '@/core/auth/reducer'
+import { clearError, clearAuthState } from '@/core/auth/reducer'
 import { validateSignInInput } from '@/ui/auth-schemas/validation-helper'
 
 export default function LoginScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const [credentials, setCredentials] = useState({ email: '', password: '' })
-
   const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const isUserAuthenticated = useSelector((state: RootState) =>
@@ -44,11 +39,11 @@ export default function LoginScreen() {
   }, [isUserAuthenticated, router])
 
   useEffect(() => {
-    dispatch(prepareForAuthentication())
+    dispatch(clearAuthState())
   }, [dispatch])
 
   const handleClose = () => {
-    dispatch(prepareForAuthentication())
+    dispatch(clearAuthState())
     if (router.canGoBack()) {
       router.back()
       return
@@ -66,9 +61,6 @@ export default function LoginScreen() {
 
     if (!validation.isValid) {
       setFieldErrors(validation.errors)
-
-      const errorMessage = Object.values(validation.errors).join(', ')
-      dispatch(userProvidedInvalidCredentials(errorMessage))
       return
     }
 
@@ -100,8 +92,6 @@ export default function LoginScreen() {
       dispatch(clearError())
     }
   }
-
-  const hasValidationErrors = Object.values(fieldErrors).some(Boolean)
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
@@ -156,7 +146,7 @@ export default function LoginScreen() {
           onPress={handleSignIn}
           text={isLoading ? 'LOGGING IN...' : 'LOG IN'}
           style={styles.button}
-          disabled={isLoading || hasValidationErrors}
+          disabled={isLoading || Object.values(fieldErrors).some(Boolean)}
         />
         {error && (
           <Text

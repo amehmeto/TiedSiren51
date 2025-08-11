@@ -27,14 +27,17 @@ describe('Feature: Authenticate with Email', () => {
     })
     fixture.then.shouldNotBeLoading()
   })
+
   it('should show error when email is already in use', async () => {
     fixture.given.authGatewayWillRejectWith('This email is already in use.')
 
     await fixture.when.signUpWithEmail('existing@example.com', 'validPass123')
 
     fixture.then.authenticationErrorsShouldBe('This email is already in use.')
+
     fixture.then.shouldNotBeLoading()
   })
+
   it('should show error when password is too weak', async () => {
     fixture.given.authGatewayWillRejectWith(
       'Password must be at least 6 characters.',

@@ -94,20 +94,23 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   private translateFirebaseError(error: unknown): string {
-    const firebaseErrorMessages: Record<FirebaseAuthErrorCode, string> = {
-      [FirebaseAuthErrorCode.EmailAlreadyInUse]:
-        'This email is already in use.',
-      [FirebaseAuthErrorCode.InvalidEmail]: 'Invalid email address.',
-      [FirebaseAuthErrorCode.WeakPassword]:
-        'Password must be at least 6 characters.',
-      [FirebaseAuthErrorCode.InvalidCredential]: 'Invalid email or password.',
-    }
-
     if (this.isFirebaseError(error)) {
-      return (
-        firebaseErrorMessages[error.code as FirebaseAuthErrorCode] ||
-        error.message
-      )
+      if (error.code === FirebaseAuthErrorCode.EmailAlreadyInUse) {
+        return 'This email is already in use.'
+      }
+
+      if (error.code === FirebaseAuthErrorCode.InvalidEmail) {
+        return 'Invalid email address.'
+      }
+
+      if (error.code === FirebaseAuthErrorCode.WeakPassword) {
+        return 'Password must be at least 6 characters.'
+      }
+
+      if (error.code === FirebaseAuthErrorCode.InvalidCredential) {
+        return 'Invalid email or password.'
+      }
+      return error.message
     }
 
     return error instanceof Error ? error.message : 'Unknown error occurred.'

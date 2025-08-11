@@ -18,11 +18,7 @@ import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.useca
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
-import {
-  clearError,
-  prepareForAuthentication,
-  userProvidedInvalidCredentials,
-} from '@/core/auth/reducer'
+import { clearError, clearAuthState } from '@/core/auth/reducer'
 import { validateSignUpInput } from '@/ui/auth-schemas/validation-helper'
 
 export default function SignUpScreen() {
@@ -38,11 +34,11 @@ export default function SignUpScreen() {
   const { isLoading, error } = useSelector((state: RootState) => state.auth)
 
   useEffect(() => {
-    dispatch(prepareForAuthentication())
+    dispatch(clearAuthState())
   }, [dispatch])
 
   const handleClose = () => {
-    dispatch(prepareForAuthentication())
+    dispatch(clearAuthState())
     if (router.canGoBack()) {
       router.back()
       return
@@ -60,9 +56,6 @@ export default function SignUpScreen() {
 
     if (!validation.isValid) {
       setFieldErrors(validation.errors)
-
-      const errorMessage = Object.values(validation.errors).join(', ')
-      dispatch(userProvidedInvalidCredentials(errorMessage))
       return
     }
 

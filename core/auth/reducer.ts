@@ -16,15 +16,9 @@ export const userAuthenticated = createAction<AuthUser>(
   'auth/userAuthenticated',
 )
 
-export const prepareForAuthentication = createAction(
-  'auth/prepareForAuthentication',
-)
+export const clearAuthState = createAction('auth/clearAuthState')
 
 export const clearError = createAction('auth/clearError')
-
-export const userProvidedInvalidCredentials = createAction<string>(
-  'auth/userProvidedInvalidCredentials',
-)
 
 export const reducer = createReducer<AuthState>(
   {
@@ -41,10 +35,6 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(clearError, (state) => {
         state.error = null
-      })
-      .addCase(userProvidedInvalidCredentials, (state, action) => {
-        state.error = action.payload
-        state.isLoading = false
       })
       .addCase(signInWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
@@ -72,7 +62,7 @@ export const reducer = createReducer<AuthState>(
         state.isLoading = false
       })
 
-      .addCase(prepareForAuthentication, (state) => {
+      .addCase(clearAuthState, (state) => {
         state.isLoading = false
         state.error = null
       })
@@ -94,19 +84,19 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(signInWithEmail.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload ?? 'Authentication failed'
+        state.error = action.payload || null
       })
       .addCase(signUpWithEmail.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload ?? 'Sign up failed'
+        state.error = action.payload || null
       })
       .addCase(signInWithGoogle.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload ?? 'Google sign-in failed'
+        state.error = action.payload || null
       })
       .addCase(signInWithApple.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload ?? 'Apple sign-in failed'
+        state.error = action.payload || null
       })
   },
 )
