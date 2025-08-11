@@ -1,5 +1,12 @@
 import React, { useEffect, useState } from 'react'
-import { Platform, StyleSheet, Text, View } from 'react-native'
+import {
+  KeyboardAvoidingView,
+  Platform,
+  StyleSheet,
+  Text,
+  Keyboard,
+  Pressable,
+} from 'react-native'
 import { useRouter } from 'expo-router'
 import { T } from '@/ui/design-system/theme'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -12,115 +19,157 @@ import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAut
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
+import { clearError, clearAuthState, setError } from '@/core/auth/reducer'
+import { validateSignInInput } from '@/ui/auth-schemas/validation-helper'
 
 export default function LoginScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const [{ email, password }, setCredentials] = useState<{
-    email: string
-    password: string
-  }>({ email: '', password: '' })
-
-  const handleClose = () => {
-    if (router.canGoBack()) {
-      router.back()
-      return
-    }
-
-    if (Platform.OS === 'ios') router.replace('/(auth)/login')
-  }
+  const [credentials, setCredentials] = useState({ email: '', password: '' })
 
   const isUserAuthenticated = useSelector((state: RootState) =>
     selectIsUserAuthenticated(state),
   )
 
+  const { isLoading, error } = useSelector((state: RootState) => state.auth)
+
   useEffect(() => {
     if (isUserAuthenticated) router.push('/')
   }, [isUserAuthenticated, router])
 
+  useEffect(() => {
+    dispatch(clearAuthState())
+  }, [dispatch])
+
+  const handleClose = () => {
+    dispatch(clearAuthState())
+    if (router.canGoBack()) {
+      router.back()
+      return
+    }
+
+    if (Platform.OS === 'ios') {
+      router.replace('/(auth)/login')
+    }
+  }
+
+  const handleSignIn = async () => {
+    dispatch(clearError())
+
+    const validation = validateSignInInput(credentials)
+
+    if (!validation.isValid) {
+      const errorMessage = Object.values(validation.errors).join(', ')
+      dispatch(setError(errorMessage))
+      return
+    }
+
+    if (validation.data) {
+      await dispatch(signInWithEmail(validation.data))
+    }
+  }
+
+  const handleEmailChange = (text: string) => {
+    setCredentials((prev) => ({ ...prev, email: text }))
+
+    if (error) {
+      dispatch(clearError())
+    }
+  }
+
+  const handlePasswordChange = (text: string) => {
+    setCredentials((prev) => ({ ...prev, password: text }))
+
+    if (error) {
+      dispatch(clearError())
+    }
+  }
+
   return (
-    <View style={styles.container}>
-      <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
-      <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
-      <TiedSSocialButton
-        iconName="logo-google"
-        text="CONTINUE WITH GOOGLE"
-        onPress={() => dispatch(signInWithGoogle())}
-      />
-      <TiedSSocialButton
-        iconName="logo-apple"
-        text="CONTINUE WITH APPLE"
-        onPress={() => dispatch(signInWithApple())}
-      />
-      <Text style={styles.orText}>{'OR'}</Text>
-      <TiedSTextInput
-        placeholder={'Your Email'}
-        placeholderTextColor={T.color.grey}
-        value={email}
-        onChange={(e) =>
-          setCredentials((prev) => ({ ...prev, email: e.nativeEvent.text }))
-        }
-      />
-      <TiedSTextInput
-        placeholder="Create Password"
-        placeholderTextColor={T.color.grey}
-        value={password}
-        hasPasswordToggle={true}
-        onChange={(e) =>
-          setCredentials((prev) => ({
-            ...prev,
-            password: e.nativeEvent.text,
-          }))
-        }
-      />
-      <TiedSButton
-        onPress={() => dispatch(signInWithEmail({ email, password }))}
-        text={'LOG IN'}
-        style={styles.button}
-      />
-      <Text
-        style={styles.subtext}
-        onPress={() => router.push('/(auth)/forgot-password')}
+    <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        {'Forgot your password?'}
-      </Text>
-    </View>
+        <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
+        <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
+        <TiedSSocialButton
+          iconName="logo-google"
+          text="CONTINUE WITH GOOGLE"
+          onPress={() => {
+            dispatch(signInWithGoogle())
+          }}
+        />
+        <TiedSSocialButton
+          iconName="logo-apple"
+          text="CONTINUE WITH APPLE"
+          onPress={() => {
+            dispatch(signInWithApple())
+          }}
+        />
+        <Text style={styles.orText}>{'OR'}</Text>
+        <TiedSTextInput
+          placeholder="Your Email"
+          accessibilityLabel="Email"
+          placeholderTextColor={T.color.grey}
+          value={credentials.email}
+          onChangeText={handleEmailChange}
+          keyboardType="email-address"
+          autoCapitalize="none"
+          autoFocus
+        />
+
+        <TiedSTextInput
+          placeholder="Enter Your Password"
+          accessibilityLabel="Password"
+          placeholderTextColor={T.color.grey}
+          value={credentials.password}
+          hasPasswordToggle={true}
+          onChangeText={handlePasswordChange}
+          textContentType="password"
+          autoComplete="current-password"
+        />
+
+        <TiedSButton
+          onPress={handleSignIn}
+          text={isLoading ? 'LOGGING IN...' : 'LOG IN'}
+          style={styles.button}
+          disabled={isLoading}
+        />
+        {error && (
+          <Text
+            style={styles.errorText}
+            accessibilityLiveRegion="polite"
+            accessibilityRole="alert"
+          >
+            {error}
+          </Text>
+        )}
+        <Text
+          style={styles.subtext}
+          onPress={() => router.push('/(auth)/forgot-password')}
+        >
+          {'Forgot your password?'}
+        </Text>
+      </KeyboardAvoidingView>
+    </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: T.spacing.large,
   },
-  crossButton: {
-    position: 'absolute',
-    top: T.spacing.xx_large,
-    left: T.spacing.medium,
-    backgroundColor: 'transparent',
-  },
   subtitle: {
     color: T.color.text,
     fontSize: T.font.size.large,
     marginBottom: T.spacing.large,
-  },
-  socialButton: {
-    width: '90%',
-    alignItems: 'center',
-    justifyContent: 'center',
-    flexDirection: 'row',
-    padding: T.spacing.medium,
-    borderRadius: T.border.radius.roundedMedium,
-    marginBottom: T.spacing.medium,
-    backgroundColor: T.color.modalBackgroundColor,
-  },
-  socialButtonText: {
-    color: T.color.text,
-    fontSize: T.font.size.regular,
-    fontWeight: T.font.weight.bold,
-    marginLeft: T.spacing.medium,
   },
   orText: {
     color: T.color.text,
@@ -136,5 +185,16 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontSize: T.font.size.regular,
     marginBottom: T.spacing.large,
+  },
+  errorText: {
+    color: T.color.red,
+    fontSize: T.font.size.regular,
+    marginBottom: T.spacing.large,
+  },
+  fieldErrorText: {
+    color: T.color.red,
+    fontSize: T.font.size.small,
+    marginTop: T.spacing.extraSmall,
+    alignSelf: 'flex-start',
   },
 })

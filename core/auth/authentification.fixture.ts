@@ -47,6 +47,9 @@ export function authentificationFixture(
           stateBuilder.withAuthUser(authUser),
         )
       },
+      authGatewayWillRejectWith(errorMessage: string) {
+        authGateway.willResultWith = Promise.reject(new Error(errorMessage))
+      },
     },
     when: {
       async signInWithGoogle() {
@@ -77,6 +80,18 @@ export function authentificationFixture(
       userShouldNotBeAuthenticated() {
         const expectedState = stateBuilder().withoutAuthUser({}).build()
         expect(store.getState()).toEqual(expectedState)
+      },
+      authenticationErrorsShouldBe(expectedError: string) {
+        const state = store.getState()
+        expect(state.auth.error).toBe(expectedError)
+      },
+      shouldBeLoading(loading: boolean) {
+        const state = store.getState()
+        expect(state.auth.isLoading).toBe(loading)
+      },
+      shouldNotBeLoading() {
+        const state = store.getState()
+        expect(state.auth.isLoading).toBe(false)
       },
     },
   }
