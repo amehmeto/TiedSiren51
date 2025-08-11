@@ -19,14 +19,13 @@ import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAut
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
-import { clearError, clearAuthState } from '@/core/auth/reducer'
+import { clearError, clearAuthState, setError } from '@/core/auth/reducer'
 import { validateSignInInput } from '@/ui/auth-schemas/validation-helper'
 
 export default function LoginScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const [credentials, setCredentials] = useState({ email: '', password: '' })
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const isUserAuthenticated = useSelector((state: RootState) =>
     selectIsUserAuthenticated(state),
@@ -55,12 +54,13 @@ export default function LoginScreen() {
   }
 
   const handleSignIn = async () => {
-    setFieldErrors({})
+    dispatch(clearError())
 
     const validation = validateSignInInput(credentials)
 
     if (!validation.isValid) {
-      setFieldErrors(validation.errors)
+      const errorMessage = Object.values(validation.errors).join(', ')
+      dispatch(setError(errorMessage))
       return
     }
 
@@ -72,10 +72,6 @@ export default function LoginScreen() {
   const handleEmailChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, email: text }))
 
-    if (fieldErrors.email) {
-      setFieldErrors((prev) => ({ ...prev, email: '' }))
-    }
-
     if (error) {
       dispatch(clearError())
     }
@@ -83,10 +79,6 @@ export default function LoginScreen() {
 
   const handlePasswordChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, password: text }))
-
-    if (fieldErrors.password) {
-      setFieldErrors((prev) => ({ ...prev, password: '' }))
-    }
 
     if (error) {
       dispatch(clearError())
@@ -126,9 +118,7 @@ export default function LoginScreen() {
           autoCapitalize="none"
           autoFocus
         />
-        {fieldErrors.email && (
-          <Text style={styles.fieldErrorText}>{fieldErrors.email}</Text>
-        )}
+
         <TiedSTextInput
           placeholder="Enter Your Password"
           accessibilityLabel="Password"
@@ -139,14 +129,12 @@ export default function LoginScreen() {
           textContentType="password"
           autoComplete="current-password"
         />
-        {fieldErrors.password && (
-          <Text style={styles.fieldErrorText}>{fieldErrors.password}</Text>
-        )}
+
         <TiedSButton
           onPress={handleSignIn}
           text={isLoading ? 'LOGGING IN...' : 'LOG IN'}
           style={styles.button}
-          disabled={isLoading || Object.values(fieldErrors).some(Boolean)}
+          disabled={isLoading}
         />
         {error && (
           <Text

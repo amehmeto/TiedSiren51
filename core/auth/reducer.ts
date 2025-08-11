@@ -20,6 +20,8 @@ export const clearAuthState = createAction('auth/clearAuthState')
 
 export const clearError = createAction('auth/clearError')
 
+export const setError = createAction<string>('auth/setError')
+
 export const reducer = createReducer<AuthState>(
   {
     authUser: null,
@@ -35,6 +37,9 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(clearError, (state) => {
         state.error = null
+      })
+      .addCase(setError, (state, action) => {
+        state.error = action.payload
       })
       .addCase(signInWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload

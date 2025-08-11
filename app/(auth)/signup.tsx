@@ -18,7 +18,7 @@ import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.useca
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
-import { clearError, clearAuthState } from '@/core/auth/reducer'
+import { clearError, clearAuthState, setError } from '@/core/auth/reducer'
 import { validateSignUpInput } from '@/ui/auth-schemas/validation-helper'
 
 export default function SignUpScreen() {
@@ -28,8 +28,6 @@ export default function SignUpScreen() {
     email: '',
     password: '',
   })
-
-  const [fieldErrors, setFieldErrors] = useState<Record<string, string>>({})
 
   const { isLoading, error } = useSelector((state: RootState) => state.auth)
 
@@ -50,12 +48,13 @@ export default function SignUpScreen() {
   }
 
   const handleSignUp = async () => {
-    setFieldErrors({})
+    dispatch(clearError())
 
     const validation = validateSignUpInput(credentials)
 
     if (!validation.isValid) {
-      setFieldErrors(validation.errors)
+      const errorMessage = Object.values(validation.errors).join(', ')
+      dispatch(setError(errorMessage))
       return
     }
 
@@ -66,9 +65,6 @@ export default function SignUpScreen() {
 
   const handleEmailChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, email: text }))
-    if (fieldErrors.email) {
-      setFieldErrors((prev) => ({ ...prev, email: '' }))
-    }
 
     if (error) {
       dispatch(clearError())
@@ -77,16 +73,11 @@ export default function SignUpScreen() {
 
   const handlePasswordChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, password: text }))
-    if (fieldErrors.password) {
-      setFieldErrors((prev) => ({ ...prev, password: '' }))
-    }
 
     if (error) {
       dispatch(clearError())
     }
   }
-
-  const hasValidationErrors = Object.values(fieldErrors).some(Boolean)
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
@@ -121,10 +112,6 @@ export default function SignUpScreen() {
           autoCapitalize="none"
           autoFocus
         />
-        {fieldErrors.email && (
-          <Text style={styles.fieldErrorText}>{fieldErrors.email}</Text>
-        )}
-
         <TiedSTextInput
           placeholder="Create Password"
           accessibilityLabel="Password"
@@ -135,13 +122,11 @@ export default function SignUpScreen() {
           textContentType="newPassword"
           autoComplete="new-password"
         />
-        {fieldErrors.password && (
-          <Text style={styles.fieldErrorText}>{fieldErrors.password}</Text>
-        )}
+
         <TiedSButton
           onPress={handleSignUp}
           text={isLoading ? 'CREATING ACCOUNT...' : 'CREATE YOUR ACCOUNT'}
-          disabled={isLoading || hasValidationErrors}
+          disabled={isLoading}
         />
         {error && (
           <Text
