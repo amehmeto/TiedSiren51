@@ -1,6 +1,12 @@
 import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
-import { initializeApp, getApps, getApp, FirebaseApp } from 'firebase/app'
+import {
+  initializeApp,
+  getApps,
+  getApp,
+  FirebaseApp,
+  FirebaseError,
+} from 'firebase/app'
 import {
   signInWithEmailAndPassword,
   createUserWithEmailAndPassword,
@@ -15,6 +21,13 @@ import {
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { firebaseConfig } from './firebaseConfig'
 
+enum FirebaseAuthErrorCode {
+  EmailAlreadyInUse = 'auth/email-already-in-use',
+  InvalidEmail = 'auth/invalid-email',
+  WeakPassword = 'auth/weak-password',
+  InvalidCredential = 'auth/invalid-credential',
+}
+
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
 
@@ -25,6 +38,17 @@ export class FirebaseAuthGateway implements AuthGateway {
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
+
+  private isFirebaseError(error: unknown): error is FirebaseError {
+    return (
+      error !== null &&
+      typeof error === 'object' &&
+      'code' in error &&
+      'message' in error &&
+      typeof error['code'] === 'string' &&
+      typeof error['message'] === 'string'
+    )
+  }
 
   public constructor() {
     this.firebaseConfig = FirebaseAuthGateway.FIREBASE_CONFIG
@@ -44,8 +68,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       })
     } catch (error) {
       if (
-        error instanceof Error &&
-        'code' in error &&
+        this.isFirebaseError(error) &&
         error.code === 'auth/already-initialized'
       ) {
         return getAuth(app)
@@ -63,29 +86,65 @@ export class FirebaseAuthGateway implements AuthGateway {
         })
         return
       }
+
       if (!user && this.onUserLoggedOutListener) {
         this.onUserLoggedOutListener()
       }
     })
   }
 
+  private translateFirebaseError(error: unknown): string {
+    if (this.isFirebaseError(error)) {
+      if (error.code === FirebaseAuthErrorCode.EmailAlreadyInUse) {
+        return 'This email is already in use.'
+      }
+
+      if (error.code === FirebaseAuthErrorCode.InvalidEmail) {
+        return 'Invalid email address.'
+      }
+
+      if (error.code === FirebaseAuthErrorCode.WeakPassword) {
+        return 'Password must be at least 6 characters.'
+      }
+
+      if (error.code === FirebaseAuthErrorCode.InvalidCredential) {
+        return 'Invalid email or password.'
+      }
+      return error.message
+    }
+
+    return error instanceof Error ? error.message : 'Unknown error occurred.'
+  }
+
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
-    const result = await signInWithEmailAndPassword(this.auth, email, password)
-    return {
-      id: result.user.uid,
-      email: result.user.email ?? '',
+    try {
+      const result = await signInWithEmailAndPassword(
+        this.auth,
+        email,
+        password,
+      )
+      return {
+        id: result.user.uid,
+        email: result.user.email ?? '',
+      }
+    } catch (error) {
+      throw new Error(this.translateFirebaseError(error))
     }
   }
 
   async signUpWithEmail(email: string, password: string): Promise<AuthUser> {
-    const result = await createUserWithEmailAndPassword(
-      this.auth,
-      email,
-      password,
-    )
-    return {
-      id: result.user.uid,
-      email: result.user.email ?? '',
+    try {
+      const result = await createUserWithEmailAndPassword(
+        this.auth,
+        email,
+        password,
+      )
+      return {
+        id: result.user.uid,
+        email: result.user.email ?? '',
+      }
+    } catch (error) {
+      throw new Error(this.translateFirebaseError(error))
     }
   }
 
@@ -106,6 +165,10 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   async logOut(): Promise<void> {
-    await signOut(this.auth)
+    try {
+      await signOut(this.auth)
+    } catch (error) {
+      throw new Error(this.translateFirebaseError(error))
+    }
   }
 }
