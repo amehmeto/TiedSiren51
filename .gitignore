@@ -88,6 +88,9 @@ app.db
 
 # env
 .env
+.env.development
+.env.preview
+.env.production
 
 # IDE
 .idea/
