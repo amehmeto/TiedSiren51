@@ -95,3 +95,7 @@ app.db
 # IDE
 .idea/
 .vscode/
+
+# Google Services
+GoogleService-Info.plist
+google-services.json
