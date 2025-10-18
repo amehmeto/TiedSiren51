@@ -1,5 +1,6 @@
 import { PrismaClient } from '@prisma/client/react-native'
-import * as FileSystem from 'expo-file-system'
+import * as FileSystem from 'expo-file-system/build/legacy/FileSystem'
+import { EncodingType } from 'expo-file-system/build/legacy/FileSystem.types'
 import { Platform } from 'react-native'
 import '@prisma/react-native'
 
@@ -31,7 +32,7 @@ export abstract class PrismaRepository {
 
   public getDbPath() {
     return Platform.OS === 'android'
-      ? `${FileSystem.documentDirectory}databases/${this.dbName}`
+      ? `${FileSystem}databases/${this.dbName}`
       : `${FileSystem.documentDirectory}${this.dbName}`
   }
 
@@ -67,7 +68,7 @@ export abstract class PrismaRepository {
         await FileSystem.makeDirectoryAsync(dirPath, { intermediates: true })
 
         await FileSystem.writeAsStringAsync(this.dbPath, '', {
-          encoding: FileSystem.EncodingType.UTF8,
+          encoding: EncodingType.UTF8,
         })
       }
     } catch (error) {

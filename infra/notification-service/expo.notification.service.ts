@@ -10,6 +10,8 @@ export class ExpoNotificationService implements NotificationService {
         shouldShowAlert: true,
         shouldPlaySound: false,
         shouldSetBadge: false,
+        shouldShowBanner: true,
+        shouldShowList: true,
       }),
     })
   }
@@ -77,7 +79,7 @@ export class ExpoNotificationService implements NotificationService {
   async scheduleLocalNotification(
     title: string,
     body: string,
-    trigger: Notifications.NotificationTriggerInput,
+    trigger: { seconds: number; repeats?: boolean },
   ): Promise<string> {
     if (Platform.OS === 'web')
       return 'Local notifications are not supported on web'
@@ -90,7 +92,11 @@ export class ExpoNotificationService implements NotificationService {
         sound: 'default',
         data: { data: 'goes here' },
       },
-      trigger,
+      trigger: {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: trigger.seconds,
+        repeats: trigger.repeats ?? false,
+      },
     })
   }
 
