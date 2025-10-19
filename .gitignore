@@ -95,3 +95,7 @@ app.db
 # IDE
 .idea/
 .vscode/
+
+# Firebase
+google-services.json
+GoogleService-Info.plist
