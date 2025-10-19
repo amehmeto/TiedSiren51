@@ -22,7 +22,6 @@
         "backgroundColor": "#0C207A"
       },
       "package": "com.tiedsiren.tiedsiren",
-      "permissions": ["QUERY_ALL_PACKAGES"],
       "permissions": [
         "android.permission.READ_EXTERNAL_STORAGE",
         "android.permission.WRITE_EXTERNAL_STORAGE"
@@ -33,7 +32,12 @@
       "output": "static",
       "favicon": "./assets/images/favicon.png"
     },
-    "plugins": ["expo-router", "@prisma/react-native"],
+    "plugins": [
+      "expo-router",
+      "@prisma/react-native",
+      "expo-font",
+      "expo-web-browser"
+    ],
     "experiments": {
       "typedRoutes": true
     },
