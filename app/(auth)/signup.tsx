@@ -110,7 +110,6 @@ export default function SignUpScreen() {
           onChangeText={handleEmailChange}
           keyboardType="email-address"
           autoCapitalize="none"
-          autoFocus
         />
         <TiedSTextInput
           placeholder="Create Password"
@@ -121,6 +120,7 @@ export default function SignUpScreen() {
           onChangeText={handlePasswordChange}
           textContentType="newPassword"
           autoComplete="new-password"
+          autoCapitalize="none"
         />
 
         <TiedSButton

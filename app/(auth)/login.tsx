@@ -116,7 +116,6 @@ export default function LoginScreen() {
           onChangeText={handleEmailChange}
           keyboardType="email-address"
           autoCapitalize="none"
-          autoFocus
         />
 
         <TiedSTextInput
@@ -128,6 +127,7 @@ export default function LoginScreen() {
           onChangeText={handlePasswordChange}
           textContentType="password"
           autoComplete="current-password"
+          autoCapitalize="none"
         />
 
         <TiedSButton

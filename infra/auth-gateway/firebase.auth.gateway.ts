@@ -17,15 +17,20 @@ import {
   getReactNativePersistence,
   getAuth,
   Auth,
+  GoogleAuthProvider,
+  signInWithCredential,
 } from 'firebase/auth'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { firebaseConfig } from './firebaseConfig'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
 
 enum FirebaseAuthErrorCode {
   EmailAlreadyInUse = 'auth/email-already-in-use',
   InvalidEmail = 'auth/invalid-email',
   WeakPassword = 'auth/weak-password',
   InvalidCredential = 'auth/invalid-credential',
+  PopupClosedByUser = 'auth/popup-closed-by-user',
+  CancelledByUser = 'auth/cancelled-popup-request',
 }
 
 export class FirebaseAuthGateway implements AuthGateway {
@@ -55,6 +60,7 @@ export class FirebaseAuthGateway implements AuthGateway {
     const app = this.initializeApp()
     this.auth = this.initializeAuth(app)
     this.setupAuthStateListener()
+    this.configureGoogleSignIn()
   }
 
   private initializeApp(): FirebaseApp {
@@ -93,6 +99,12 @@ export class FirebaseAuthGateway implements AuthGateway {
     })
   }
 
+  private configureGoogleSignIn(): void {
+    GoogleSignin.configure({
+      webClientId: this.firebaseConfig.webClientId,
+    })
+  }
+
   private translateFirebaseError(error: unknown): string {
     if (this.isFirebaseError(error)) {
       if (error.code === FirebaseAuthErrorCode.EmailAlreadyInUse) {
@@ -110,10 +122,32 @@ export class FirebaseAuthGateway implements AuthGateway {
       if (error.code === FirebaseAuthErrorCode.InvalidCredential) {
         return 'Invalid email or password.'
       }
+
+      if (
+        error.code === FirebaseAuthErrorCode.PopupClosedByUser ||
+        error.code === FirebaseAuthErrorCode.CancelledByUser
+      ) {
+        return 'Sign-in cancelled.'
+      }
       return error.message
     }
 
-    return error instanceof Error ? error.message : 'Unknown error occurred.'
+    if (error instanceof Error) {
+      if (error.message.includes('SIGN_IN_CANCELLED')) {
+        return 'Google sign-in was cancelled.'
+      }
+
+      if (error.message.includes('IN_PROGRESS')) {
+        return 'Sign-in already in progress.'
+      }
+
+      if (error.message.includes('PLAY_SERVICES_NOT_AVAILABLE')) {
+        return 'Google Play Services not available.'
+      }
+      return error.message
+    }
+
+    return 'Unknown error occurred.'
   }
 
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
@@ -149,7 +183,30 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   async signInWithGoogle(): Promise<AuthUser> {
-    throw new Error('Google auth not implemented yet')
+    try {
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
+
+      const userInfo = await GoogleSignin.signIn()
+
+      const idToken = userInfo.idToken
+
+      if (!idToken) {
+        throw new Error('Failed to get Google ID token')
+      }
+
+      const googleCredential = GoogleAuthProvider.credential(idToken)
+
+      const result = await signInWithCredential(this.auth, googleCredential)
+
+      return {
+        id: result.user.uid,
+        email: result.user.email ?? '',
+        username: result.user.displayName ?? undefined,
+        profilePicture: result.user.photoURL ?? undefined,
+      }
+    } catch (error) {
+      throw new Error(this.translateFirebaseError(error))
+    }
   }
 
   async signInWithApple(): Promise<AuthUser> {
