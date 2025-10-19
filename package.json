@@ -38,10 +38,10 @@
     "*.{js,ts,jsx,tsx}": "yarn lint:fix"
   },
   "dependencies": {
-    "@amehmeto/expo-list-installed-apps": "https://github.com/amehmeto/expo-list-installed-apps.git#feature/filter-user-and-system-apps",
+    "@amehmeto/expo-list-installed-apps": "https://github.com/amehmeto/expo-list-installed-apps.git",
     "@expo/vector-icons": "^15.0.2",
     "@faker-js/faker": "^8.4.1",
-    "@prisma/client": "5.22.0",
+    "@prisma/client": "^6.17.1",
     "@prisma/react-native": "^6.0.1",
     "@react-native-async-storage/async-storage": "2.2.0",
     "@react-native-community/datetimepicker": "8.4.4",
@@ -71,7 +71,7 @@
     "firebase": "^11.9.1",
     "formik": "^2.4.5",
     "pouchdb": "^8.0.1",
-    "prisma": "^5.22.0",
+    "prisma": "^6.17.1",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-native": "0.81.4",
