@@ -7,7 +7,8 @@ export class ExpoNotificationService implements NotificationService {
   async initialize(): Promise<void> {
     Notifications.setNotificationHandler({
       handleNotification: async () => ({
-        shouldShowAlert: true,
+        shouldShowBanner: true,
+        shouldShowList: true,
         shouldPlaySound: false,
         shouldSetBadge: false,
       }),
@@ -77,12 +78,19 @@ export class ExpoNotificationService implements NotificationService {
   async scheduleLocalNotification(
     title: string,
     body: string,
-    trigger: Notifications.NotificationTriggerInput,
+    trigger: { seconds: number; repeats?: boolean },
   ): Promise<string> {
     if (Platform.OS === 'web')
       return 'Local notifications are not supported on web'
 
     await this.requestNotificationPermissions()
+
+    const notificationTrigger: Notifications.TimeIntervalTriggerInput = {
+      type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+      seconds: trigger.seconds,
+      repeats: trigger.repeats,
+    }
+
     return Notifications.scheduleNotificationAsync({
       content: {
         title,
@@ -90,7 +98,7 @@ export class ExpoNotificationService implements NotificationService {
         sound: 'default',
         data: { data: 'goes here' },
       },
-      trigger,
+      trigger: notificationTrigger,
     })
   }
 

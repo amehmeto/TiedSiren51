@@ -141,7 +141,6 @@ export default function TabLayout() {
         tabBarButton: (props) =>
           handleTabBarButton(props, { route, navigation }),
       })}
-      sceneContainerStyle={{ backgroundColor: 'transparent' }}
     >
       {tabs.map((tab) => (
         <Tabs.Screen

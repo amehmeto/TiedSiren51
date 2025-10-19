@@ -1,5 +1,5 @@
 import { PrismaClient } from '@prisma/client/react-native'
-import * as FileSystem from 'expo-file-system'
+import { Paths, Directory, File } from 'expo-file-system'
 import { Platform } from 'react-native'
 import '@prisma/react-native'
 
@@ -30,9 +30,10 @@ export abstract class PrismaRepository {
   }
 
   public getDbPath() {
+    const baseUri = Paths.document.uri
     return Platform.OS === 'android'
-      ? `${FileSystem.documentDirectory}databases/${this.dbName}`
-      : `${FileSystem.documentDirectory}${this.dbName}`
+      ? `${baseUri}databases/${this.dbName}`
+      : `${baseUri}${this.dbName}`
   }
 
   public async initialize(): Promise<void> {
@@ -60,15 +61,14 @@ export abstract class PrismaRepository {
 
   private async ensureDatabaseFile(): Promise<void> {
     try {
-      const fileInfo = await FileSystem.getInfoAsync(this.dbPath)
+      const dbFile = new File(this.dbPath)
 
-      if (!fileInfo.exists) {
+      if (!dbFile.exists) {
         const dirPath = this.dbPath.substring(0, this.dbPath.lastIndexOf('/'))
-        await FileSystem.makeDirectoryAsync(dirPath, { intermediates: true })
+        const dbDir = new Directory(dirPath)
+        dbDir.create({ intermediates: true, idempotent: true })
 
-        await FileSystem.writeAsStringAsync(this.dbPath, '', {
-          encoding: FileSystem.EncodingType.UTF8,
-        })
+        dbFile.write('', { encoding: 'utf8' })
       }
     } catch (error) {
       // eslint-disable-next-line no-console
