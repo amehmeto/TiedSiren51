@@ -21,7 +21,9 @@ jobs:
           node-version: 21.6.1
 
       - name: Clear Yarn Cache
-        run: yarn cache clean
+        run: |
+          yarn cache clean --force
+          rm -rf ~/.cache/yarn
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
@@ -60,7 +62,9 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Clear Yarn Cache
-        run: yarn cache clean
+        run: |
+          yarn cache clean --force
+          rm -rf ~/.cache/yarn
 
       - name: Install dependencies
         run: yarn install --frozen-lockfile
