@@ -21,7 +21,9 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --no-cache
+        run: |
+          rm -rf ~/.cache/yarn
+          yarn install --frozen-lockfile
 
       - name: Run tests with coverage (PR)
         run: yarn test:cov
