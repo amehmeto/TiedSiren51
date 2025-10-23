@@ -21,6 +21,7 @@
     "prebuild": "npx expo prebuild",
     "prebuild:android": "npx expo prebuild --platform android",
     "prebuild:ios": "npx expo prebuild --platform ios",
+    "preinstall": "npx only-allow yarn",
     "build": "eas build --platform all",
     "build:local": "eas build --platform all --local",
     "build:android": "eas build --platform android",
@@ -38,7 +39,7 @@
     "*.{js,ts,jsx,tsx}": "yarn lint:fix"
   },
   "dependencies": {
-    "@amehmeto/expo-list-installed-apps": "https://github.com/amehmeto/expo-list-installed-apps.git#feature/filter-user-and-system-apps",
+    "@amehmeto/expo-list-installed-apps": "https://github.com/amehmeto/expo-list-installed-apps.git",
     "@expo/vector-icons": "14.0.3",
     "@faker-js/faker": "^8.4.1",
     "@prisma/client": "5.22.0",
@@ -104,6 +105,7 @@
     "eslint-plugin-vitest": "^0.5.4",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.5",
+    "only-allow": "^1.2.1",
     "prettier": "^3.3.0",
     "react-test-renderer": "18.2.0",
     "typescript": "~5.3.3",
