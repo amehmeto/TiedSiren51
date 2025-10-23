@@ -21,9 +21,10 @@ jobs:
           node-version: 21.6.1
 
       - name: Install dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
+        run: npm ci
+
+      - name: Install rollup platform binary
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -59,9 +60,10 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
+        run: npm ci
+
+      - name: Install rollup platform binary
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
       - name: Prebuild
         run: npm run prebuild:android

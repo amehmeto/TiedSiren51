@@ -21,9 +21,10 @@ jobs:
           node-version: '20'
 
       - name: Install dependencies
-        run: |
-          rm -rf node_modules package-lock.json
-          npm install
+        run: npm ci
+
+      - name: Install rollup platform binary
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
       - name: Run tests with coverage (PR)
         run: npm run test:cov
