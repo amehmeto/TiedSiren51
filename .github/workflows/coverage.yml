@@ -44,7 +44,10 @@ jobs:
           git checkout origin/${{ github.event.pull_request.base.ref }}
 
       - name: Install dependencies (base)
-        run: npm ci
+        run: npm install
+
+      - name: Install rollup platform binary (base)
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
       - name: Run tests with coverage (base)
         run: npm run test:cov
