@@ -21,7 +21,7 @@ jobs:
           node-version: 21.6.1
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --check-files
+        run: yarn install --frozen-lockfile --no-cache
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -57,7 +57,7 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile --check-files
+        run: yarn install --frozen-lockfile --no-cache
 
       - name: Prebuild
         run: yarn prebuild:android
