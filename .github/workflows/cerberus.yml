@@ -20,13 +20,8 @@ jobs:
         with:
           node-version: 21.6.1
 
-      - name: Clear Yarn Cache
-        run: |
-          yarn cache clean --force
-          rm -rf ~/.cache/yarn
-
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --check-files
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -61,13 +56,8 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Clear Yarn Cache
-        run: |
-          yarn cache clean --force
-          rm -rf ~/.cache/yarn
-
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --check-files
 
       - name: Prebuild
         run: yarn prebuild:android

@@ -35,13 +35,8 @@ jobs:
           eas-version: latest
           token: ${{ secrets.EXPO_TOKEN }}
 
-      - name: Clear Yarn Cache
-        run: |
-          yarn cache clean --force
-          rm -rf ~/.cache/yarn
-
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: yarn install --frozen-lockfile --check-files
 
       - name: Trigger Preview Build
         run: eas build -p android --profile preview --non-interactive
