@@ -9,31 +9,31 @@ TiedSiren51 is a React Native mobile application built with Expo, featuring bloc
 ## Development Commands
 
 ### Core Development
-- `yarn start` - Start Expo development server
-- `yarn android` - Run on Android device/emulator  
-- `yarn ios` - Run on iOS device/simulator
-- `yarn web` - Run web version
-- `yarn electron:dev` - Run Electron desktop version
+- `npm start` - Start Expo development server
+- `npm run android` - Run on Android device/emulator
+- `npm run ios` - Run on iOS device/simulator
+- `npm run web` - Run web version
+- `npm run electron:dev` - Run Electron desktop version
 
 ### Code Quality & Testing
-- `yarn lint` - Run TypeScript, ESLint, and Prettier checks
-- `yarn lint:fix` - Fix linting and formatting issues
-- `yarn test` - Run Vitest tests in watch mode
-- `yarn test:prepush` - Run tests once (used in git hooks)
-- `yarn test:cov` - Run tests with coverage report
-- `yarn test:e2e` - Run Maestro end-to-end tests
+- `npm run lint` - Run TypeScript, ESLint, and Prettier checks
+- `npm run lint:fix` - Fix linting and formatting issues
+- `npm test` - Run Vitest tests in watch mode
+- `npm run test:prepush` - Run tests once (used in git hooks)
+- `npm run test:cov` - Run tests with coverage report
+- `npm run test:e2e` - Run Maestro end-to-end tests
 
 ### Building & Deployment
-- `yarn prebuild` - Generate native code for both platforms
-- `yarn prebuild:android` / `yarn prebuild:ios` - Platform-specific prebuild
-- `yarn build` - Build for production (both platforms via EAS)
-- `yarn build:android:apk` - Build Android APK for testing
-- `yarn build:local` - Build locally (requires native toolchains)
+- `npm run prebuild` - Generate native code for both platforms
+- `npm run prebuild:android` / `npm run prebuild:ios` - Platform-specific prebuild
+- `npm run build` - Build for production (both platforms via EAS)
+- `npm run build:android:apk` - Build Android APK for testing
+- `npm run build:local` - Build locally (requires native toolchains)
 
 ### Database
 - `npx prisma generate` - Generate Prisma client after schema changes
 - `npx prisma migrate dev` - Run database migrations
-- `yarn generate:schema` - Shorthand for prisma generate
+- `npm run generate:schema` - Shorthand for prisma generate
 
 ## Architecture
 
