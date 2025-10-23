@@ -36,9 +36,7 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: |
-          rm -rf ~/.cache/yarn
-          yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Trigger Preview Build
         run: eas build -p android --profile preview --non-interactive

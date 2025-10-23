@@ -4,12 +4,12 @@
   "main": "expo-router/entry",
   "version": "1.0.0",
   "scripts": {
-    "install:clean": "rm -rf node_modules && yarn install --frozen-lockfile",
+    "install:clean": "rm -rf node_modules && npm ci",
     "start": "expo start",
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "electron:dev": "concurrently \"BROWSER=none yarn web --port 19006\" \"wait-on http://localhost:19006 && yarn electron:start\"",
+    "electron:dev": "concurrently \"BROWSER=none npm run web -- --port 19006\" \"wait-on http://localhost:19006 && npm run electron:start\"",
     "lint": "tsc --noEmit && eslint \"**/*.{js,ts,tsx}\" && prettier \"**/*.{js,ts,tsx}\"",
     "lint:fix": "tsc --noEmit && eslint --fix \"**/*.{js,ts,tsx}\" && prettier --write \"**/*.{js,ts,tsx}\"",
     "test": "vitest",
@@ -21,7 +21,6 @@
     "prebuild": "npx expo prebuild",
     "prebuild:android": "npx expo prebuild --platform android",
     "prebuild:ios": "npx expo prebuild --platform ios",
-    "preinstall": "npx only-allow yarn",
     "build": "eas build --platform all",
     "build:local": "eas build --platform all --local",
     "build:android": "eas build --platform android",
@@ -36,7 +35,7 @@
     "generate:schema": "npx prisma generate"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": "yarn lint:fix"
+    "*.{js,ts,jsx,tsx}": "npm run lint:fix"
   },
   "dependencies": {
     "@amehmeto/expo-list-installed-apps": "https://github.com/amehmeto/expo-list-installed-apps.git",
@@ -105,7 +104,6 @@
     "eslint-plugin-vitest": "^0.5.4",
     "husky": "^9.1.7",
     "lint-staged": "^15.2.5",
-    "only-allow": "^1.2.1",
     "prettier": "^3.3.0",
     "react-test-renderer": "18.2.0",
     "typescript": "~5.3.3",
