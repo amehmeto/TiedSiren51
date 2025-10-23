@@ -8,7 +8,7 @@ const HISTORY_FILE = 'coverage-history.json'
 function viewHistory() {
   if (!fs.existsSync(HISTORY_FILE)) {
     console.log(
-      '📊 No coverage history found. Run `yarn test:cov:track` first.',
+      '📊 No coverage history found. Run `npm run test:cov:track` first.',
     )
     return
   }

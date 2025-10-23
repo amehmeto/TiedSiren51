@@ -24,7 +24,7 @@ jobs:
         run: npm ci
 
       - name: Run tests with coverage (PR)
-        run: yarn test:cov
+        run: npm run test:cov
         continue-on-error: true
 
       - name: Store PR coverage
@@ -41,10 +41,10 @@ jobs:
           git checkout origin/${{ github.event.pull_request.base.ref }}
 
       - name: Install dependencies (base)
-        run: yarn install --frozen-lockfile
+        run: npm ci
 
       - name: Run tests with coverage (base)
-        run: yarn test:cov
+        run: npm run test:cov
         continue-on-error: true
 
       - name: Store base coverage
