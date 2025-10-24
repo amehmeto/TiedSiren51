@@ -19,13 +19,15 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache: 'yarn'
 
       - name: Install dependencies
-        run: yarn install --frozen-lockfile
+        run: npm ci
+
+      - name: Install rollup platform binary
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
       - name: Run tests with coverage (PR)
-        run: yarn test:cov
+        run: npm run test:cov
         continue-on-error: true
 
       - name: Store PR coverage
@@ -42,10 +44,18 @@ jobs:
           git checkout origin/${{ github.event.pull_request.base.ref }}
 
       - name: Install dependencies (base)
-        run: yarn install --frozen-lockfile
+        run: |
+          if [ -f package-lock.json ]; then
+            npm ci
+          else
+            npm install
+          fi
+
+      - name: Install rollup platform binary (base)
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
       - name: Run tests with coverage (base)
-        run: yarn test:cov
+        run: npm run test:cov
         continue-on-error: true
 
       - name: Store base coverage
