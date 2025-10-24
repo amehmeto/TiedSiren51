@@ -2,9 +2,12 @@
   "permissions": {
     "allow": [
       "Bash(npm install:*)",
-      "Bash(gh pr:*)"
+      "Bash(gh pr:*)",
+      "Bash(gh run view:*)"
     ],
     "deny": [],
-    "ask": []
+    "ask": [
+      "Bash(gh api:*)"
+    ]
   }
 }
