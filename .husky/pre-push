@@ -2,7 +2,7 @@ sh .husky/scripts/no-direct-push-main-demo.sh
 sh .husky/scripts/branch-name-check.sh
 sh .husky/scripts/uncommitted-files-check.sh
 
-yarn test:cov
+npm run test:cov
 echo ""
 
 npx expo-doctor
@@ -12,13 +12,13 @@ exec < /dev/tty  # Redirect input to terminal
 echo ""
 echo "⚠️  Warning: E2E tests are not part of CI pipeline yet."
 echo "👉 It's your responsibility to ensure e2e tests pass before final merge."
-echo "🛑 Please run 'yarn test:e2e' to verify your changes."
+echo "🛑 Please run 'npm run test:e2e' to verify your changes."
 read -p "❓ Have you manually verified that e2e tests pass? (y/n): " answer
 echo ""
 
 if [ "$answer" != "y" ]; then
-    echo "🛑 Please run 'yarn test:e2e' to verify your changes."
-    echo "   You can run the tests with: yarn test:e2e"
+    echo "🛑 Please run 'npm run test:e2e' to verify your changes."
+    echo "   You can run the tests with: npm run test:e2e"
     exit 1
 fi
 
