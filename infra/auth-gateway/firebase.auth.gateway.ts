@@ -1,24 +1,24 @@
 import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
 import {
-  initializeApp,
-  getApps,
-  getApp,
   FirebaseApp,
   FirebaseError,
+  getApp,
+  getApps,
+  initializeApp,
 } from 'firebase/app'
 import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  User,
-  initializeAuth,
-  getReactNativePersistence,
-  getAuth,
   Auth,
+  createUserWithEmailAndPassword,
+  getAuth,
+  getReactNativePersistence,
   GoogleAuthProvider,
+  initializeAuth,
+  onAuthStateChanged,
   signInWithCredential,
+  signInWithEmailAndPassword,
+  signOut,
+  User,
 } from 'firebase/auth'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { firebaseConfig } from './firebaseConfig'
@@ -33,8 +33,37 @@ enum FirebaseAuthErrorCode {
   CancelledByUser = 'auth/cancelled-popup-request',
 }
 
+enum GoogleSignInError {
+  SignInCancelled = 'SIGN_IN_CANCELLED',
+  InProgress = 'IN_PROGRESS',
+  PlayServicesNotAvailable = 'PLAY_SERVICES_NOT_AVAILABLE',
+}
+
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
+
+  private static readonly FIREBASE_ERROR_MESSAGES: Record<
+    FirebaseAuthErrorCode,
+    string
+  > = {
+    [FirebaseAuthErrorCode.EmailAlreadyInUse]: 'This email is already in use.',
+    [FirebaseAuthErrorCode.InvalidEmail]: 'Invalid email address.',
+    [FirebaseAuthErrorCode.WeakPassword]:
+      'Password must be at least 6 characters.',
+    [FirebaseAuthErrorCode.InvalidCredential]: 'Invalid email or password.',
+    [FirebaseAuthErrorCode.PopupClosedByUser]: 'Sign-in cancelled.',
+    [FirebaseAuthErrorCode.CancelledByUser]: 'Sign-in cancelled.',
+  }
+
+  private static readonly GOOGLE_SIGN_IN_ERROR_MESSAGES: Record<
+    GoogleSignInError,
+    string
+  > = {
+    [GoogleSignInError.SignInCancelled]: 'Google sign-in was cancelled.',
+    [GoogleSignInError.InProgress]: 'Sign-in already in progress.',
+    [GoogleSignInError.PlayServicesNotAvailable]:
+      'Google Play Services not available.',
+  }
 
   private readonly firebaseConfig: typeof firebaseConfig
 
@@ -52,6 +81,17 @@ export class FirebaseAuthGateway implements AuthGateway {
       'message' in error &&
       typeof error['code'] === 'string' &&
       typeof error['message'] === 'string'
+    )
+  }
+
+  private isFirebaseAuthError(
+    error: unknown,
+  ): error is FirebaseError & { code: FirebaseAuthErrorCode } {
+    return (
+      this.isFirebaseError(error) &&
+      Object.values(FirebaseAuthErrorCode).includes(
+        error.code as FirebaseAuthErrorCode,
+      )
     )
   }
 
@@ -106,43 +146,15 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   private translateFirebaseError(error: unknown): string {
-    if (this.isFirebaseError(error)) {
-      if (error.code === FirebaseAuthErrorCode.EmailAlreadyInUse) {
-        return 'This email is already in use.'
-      }
+    if (this.isFirebaseAuthError(error))
+      return FirebaseAuthGateway.FIREBASE_ERROR_MESSAGES[error.code]
 
-      if (error.code === FirebaseAuthErrorCode.InvalidEmail) {
-        return 'Invalid email address.'
-      }
-
-      if (error.code === FirebaseAuthErrorCode.WeakPassword) {
-        return 'Password must be at least 6 characters.'
-      }
-
-      if (error.code === FirebaseAuthErrorCode.InvalidCredential) {
-        return 'Invalid email or password.'
-      }
-
-      if (
-        error.code === FirebaseAuthErrorCode.PopupClosedByUser ||
-        error.code === FirebaseAuthErrorCode.CancelledByUser
-      ) {
-        return 'Sign-in cancelled.'
-      }
-      return error.message
-    }
+    if (this.isFirebaseError(error)) return error.message
 
     if (error instanceof Error) {
-      if (error.message.includes('SIGN_IN_CANCELLED')) {
-        return 'Google sign-in was cancelled.'
-      }
-
-      if (error.message.includes('IN_PROGRESS')) {
-        return 'Sign-in already in progress.'
-      }
-
-      if (error.message.includes('PLAY_SERVICES_NOT_AVAILABLE')) {
-        return 'Google Play Services not available.'
+      for (const pattern of Object.values(GoogleSignInError)) {
+        if (error.message.includes(pattern))
+          return FirebaseAuthGateway.GOOGLE_SIGN_IN_ERROR_MESSAGES[pattern]
       }
       return error.message
     }

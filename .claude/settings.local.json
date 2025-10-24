@@ -3,7 +3,10 @@
     "allow": [
       "Bash(npm install:*)",
       "Bash(gh pr:*)",
-      "Bash(gh run view:*)"
+      "Bash(gh run view:*)",
+      "Bash(npm test:*)",
+      "Bash(npm run lint:fix:*)",
+      "Bash(npm run test:prepush:*)"
     ],
     "deny": [],
     "ask": [
