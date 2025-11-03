@@ -69,8 +69,9 @@ jobs:
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          echo "$GOOGLE_SERVICES_JSON" | base64 --decode > ./google-services.json
-          ls -la ./google-services.json
+          echo "$GOOGLE_SERVICES_JSON" | -base64 -decode > ./google-services.json
+          ls -la ./
+          cat ./google-services.json
 
       - name: Prebuild
         run: npm run prebuild:android
