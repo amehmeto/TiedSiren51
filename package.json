@@ -34,7 +34,7 @@
     "build:android:apk:local": "eas build -p android --profile preview --local",
     "build:ios": "eas build --platform ios",
     "build:ios:simulator": "eas build --profile development-simulator --platform ios",
-    "prepare": "husky",
+    "prepare": "husky || true",
     "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
     "expo:lint": "expo lint",
     "generate:schema": "npx prisma generate"
