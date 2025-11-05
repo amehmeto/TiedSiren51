@@ -1,0 +1,62 @@
+{
+  "project_info": {
+    "project_number": "1095676718619",
+    "project_id": "com-tiedsiren",
+    "storage_bucket": "com-tiedsiren.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1095676718619:android:9f78e5cb273253740d12be",
+        "android_client_info": {
+          "package_name": "com.tiedsiren.tiedsiren"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "1095676718619-659a5ljme5bbedr4evrk3okefd2mqhim.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tiedsiren.tiedsiren",
+            "certificate_hash": "25da568c7547fc897705f1df07cf8f032eacaa0b"
+          }
+        },
+        {
+          "client_id": "1095676718619-9br92pmrqj0og0lem1hhqq1rsrtc2pv8.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.tiedsiren.tiedsiren",
+            "certificate_hash": "5e8f16062ea3cd2c4a0d547876baa6f38cabf625"
+          }
+        },
+        {
+          "client_id": "1095676718619-7l0jfdilan1pc85bhjfqmr2ruplgvt48.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBnYIUt_3fYSuwYLlRjSEOw2WJJWLHFuZU"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "1095676718619-7l0jfdilan1pc85bhjfqmr2ruplgvt48.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "1095676718619-bcsof7rpblj5r933bbnqdfrldrmoaeqv.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.tiedsiren.tiedsiren"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
