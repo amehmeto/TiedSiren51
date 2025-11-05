@@ -2,12 +2,27 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FirebaseAuthGateway } from './firebase.auth.gateway'
 import * as firebaseAuth from 'firebase/auth'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import { FirebaseError } from 'firebase/app'
 
-vi.mock('firebase/app', () => ({
-  initializeApp: vi.fn(() => ({})),
-  getApps: vi.fn(() => []),
-  getApp: vi.fn(() => ({})),
-}))
+vi.mock('firebase/app', () => {
+  // Mock FirebaseError class for instanceof checks
+  class MockFirebaseError extends Error {
+    code: string
+
+    constructor(code: string, message: string) {
+      super(message)
+      this.code = code
+      this.name = 'FirebaseError'
+    }
+  }
+
+  return {
+    initializeApp: vi.fn(() => ({})),
+    getApps: vi.fn(() => []),
+    getApp: vi.fn(() => ({})),
+    FirebaseError: MockFirebaseError,
+  }
+})
 
 vi.mock('firebase/auth', () => ({
   initializeAuth: vi.fn(() => ({})),
@@ -90,10 +105,7 @@ describe('FirebaseAuthGateway - Error Translation', () => {
     ])(
       'should translate $code to "$expected"',
       async ({ code, expected, method }) => {
-        const mockError = {
-          code,
-          message: `Firebase: Error (${code}).`,
-        }
+        const mockError = new FirebaseError(code, `Firebase: Error (${code}).`)
 
         const authMethod =
           method === 'signUpWithEmail'
@@ -112,10 +124,10 @@ describe('FirebaseAuthGateway - Error Translation', () => {
     )
 
     it('should return original Firebase error message for unknown error codes', async () => {
-      const mockError = {
-        code: 'auth/unknown-error',
-        message: 'Some unknown Firebase error',
-      }
+      const mockError = new FirebaseError(
+        'auth/unknown-error',
+        'Some unknown Firebase error',
+      )
 
       vi.mocked(firebaseAuth.signInWithEmailAndPassword).mockRejectedValue(
         mockError,

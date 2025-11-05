@@ -37,12 +37,13 @@ enum GoogleSignInError {
   SignInCancelled = 'SIGN_IN_CANCELLED',
   InProgress = 'IN_PROGRESS',
   PlayServicesNotAvailable = 'PLAY_SERVICES_NOT_AVAILABLE',
+  MissingIdToken = 'MISSING_ID_TOKEN',
 }
 
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
 
-  private static readonly FIREBASE_ERROR_MESSAGES: Record<
+  private static readonly FIREBASE_ERRORS: Record<
     FirebaseAuthErrorCode,
     string
   > = {
@@ -55,7 +56,7 @@ export class FirebaseAuthGateway implements AuthGateway {
     [FirebaseAuthErrorCode.CancelledByUser]: 'Sign-in cancelled.',
   }
 
-  private static readonly GOOGLE_SIGN_IN_ERROR_MESSAGES: Record<
+  private static readonly GOOGLE_SIGN_IN_ERRORS: Record<
     GoogleSignInError,
     string
   > = {
@@ -63,6 +64,7 @@ export class FirebaseAuthGateway implements AuthGateway {
     [GoogleSignInError.InProgress]: 'Sign-in already in progress.',
     [GoogleSignInError.PlayServicesNotAvailable]:
       'Google Play Services not available.',
+    [GoogleSignInError.MissingIdToken]: 'Failed to get Google ID token',
   }
 
   private readonly firebaseConfig: typeof firebaseConfig
@@ -74,14 +76,7 @@ export class FirebaseAuthGateway implements AuthGateway {
   private onUserLoggedOutListener: (() => void) | null = null
 
   private isFirebaseError(error: unknown): error is FirebaseError {
-    return (
-      error !== null &&
-      typeof error === 'object' &&
-      'code' in error &&
-      'message' in error &&
-      typeof error['code'] === 'string' &&
-      typeof error['message'] === 'string'
-    )
+    return error instanceof FirebaseError
   }
 
   private isFirebaseAuthError(
@@ -93,6 +88,20 @@ export class FirebaseAuthGateway implements AuthGateway {
         error.code as FirebaseAuthErrorCode,
       )
     )
+  }
+
+  private getGoogleSignInErrorPattern(error: Error): GoogleSignInError | null {
+    for (const pattern of Object.values(GoogleSignInError)) {
+      if (error.message.includes(pattern)) return pattern
+    }
+    return null
+  }
+
+  private isGoogleSignInError(error: unknown): error is Error {
+    if (!(error instanceof Error)) return false
+
+    const pattern = this.getGoogleSignInErrorPattern(error)
+    return !!pattern
   }
 
   public constructor() {
@@ -147,19 +156,16 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   private translateFirebaseError(error: unknown): string {
     if (this.isFirebaseAuthError(error))
-      return FirebaseAuthGateway.FIREBASE_ERROR_MESSAGES[error.code]
+      return FirebaseAuthGateway.FIREBASE_ERRORS[error.code]
 
-    if (this.isFirebaseError(error)) return error.message
-
-    if (error instanceof Error) {
-      for (const pattern of Object.values(GoogleSignInError)) {
-        if (error.message.includes(pattern))
-          return FirebaseAuthGateway.GOOGLE_SIGN_IN_ERROR_MESSAGES[pattern]
-      }
-      return error.message
+    if (this.isGoogleSignInError(error)) {
+      const pattern = this.getGoogleSignInErrorPattern(error)
+      if (pattern) return FirebaseAuthGateway.GOOGLE_SIGN_IN_ERRORS[pattern]
     }
 
-    return 'Unknown error occurred.'
+    return error && error instanceof Error
+      ? error.message
+      : 'Unknown error occurred.'
   }
 
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
@@ -202,19 +208,17 @@ export class FirebaseAuthGateway implements AuthGateway {
 
       const idToken = userInfo.idToken
 
-      if (!idToken) {
-        throw new Error('Failed to get Google ID token')
-      }
+      if (!idToken) throw new Error(GoogleSignInError.MissingIdToken)
 
       const googleCredential = GoogleAuthProvider.credential(idToken)
 
-      const result = await signInWithCredential(this.auth, googleCredential)
+      const credential = await signInWithCredential(this.auth, googleCredential)
 
       return {
-        id: result.user.uid,
-        email: result.user.email ?? '',
-        username: result.user.displayName ?? undefined,
-        profilePicture: result.user.photoURL ?? undefined,
+        id: credential.user.uid,
+        email: credential.user.email ?? '',
+        username: credential.user.displayName ?? undefined,
+        profilePicture: credential.user.photoURL ?? undefined,
       }
     } catch (error) {
       throw new Error(this.translateFirebaseError(error))

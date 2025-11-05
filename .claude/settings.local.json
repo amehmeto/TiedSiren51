@@ -1,16 +1,21 @@
 {
   "permissions": {
     "allow": [
-      "Bash(npm install:*)",
+      "Bash(base64:*)",
+      "Bash(cat:*)",
       "Bash(gh pr:*)",
       "Bash(gh run view:*)",
-      "Bash(npm test:*)",
+      "Bash(git log:*)",
+      "Bash(grep:*)",
+      "Bash(npm install:*)",
       "Bash(npm run lint:fix:*)",
-      "Bash(npm run test:prepush:*)"
+      "Bash(npm run test:prepush:*)",
+      "Bash(npm test:*)",
+      "WebFetch(domain:docs.expo.dev)",
+      "WebFetch(domain:github.com)",
+      "WebSearch"
     ],
-    "deny": [],
-    "ask": [
-      "Bash(gh api:*)"
-    ]
+    "deny": ["Bash(git *)"],
+    "ask": ["Bash(gh api:*)", "Bash(chmod:*)"]
   }
 }

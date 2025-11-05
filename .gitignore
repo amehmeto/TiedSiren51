@@ -51,10 +51,7 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-coverage/
-
-# Coverage tracking
-coverage-history.json
+coverage/tmp/
 
 # Android
 #

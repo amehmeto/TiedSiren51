@@ -16,6 +16,12 @@ module.exports = {
   },
   overrides: [
     {
+      files: ['scripts/**/*.{js,cjs}'],
+      env: {
+        node: true,
+      },
+    },
+    {
       files: ['**/*.spec.ts', '**/*.test.ts'],
       plugins: ['vitest'],
       rules: {
