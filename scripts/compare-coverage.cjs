@@ -3,25 +3,102 @@
 /* eslint-disable no-console */
 
 /**
- * Compares PR coverage with base branch coverage and posts/updates a GitHub PR comment
- * Usage: Called from GitHub Actions with github and context objects
+ * Compares coverage with base branch
+ * Usage:
+ *   - CLI: node scripts/compare-coverage.cjs
+ *   - GitHub Actions: Called with github and context objects
  */
 
-module.exports = async ({ github, context }) => {
-  const fs = require('fs')
+const fs = require('fs')
 
+// Shared calculation functions
+const calculateFolderCoverage = (coverage, folderPath) => {
+  const files = Object.keys(coverage).filter(
+    (path) =>
+      path.includes(`/${folderPath}/`) && !path.includes('node_modules'),
+  )
+
+  if (files.length === 0) {
+    return {
+      statements: { pct: 0 },
+      functions: { pct: 0 },
+      branches: { pct: 0 },
+      lines: { pct: 0 },
+    }
+  }
+
+  const totals = files.reduce(
+    (acc, file) => {
+      const fileCov = coverage[file]
+      acc.statements.covered += fileCov.statements?.covered || 0
+      acc.statements.total += fileCov.statements?.total || 0
+      acc.functions.covered += fileCov.functions?.covered || 0
+      acc.functions.total += fileCov.functions?.total || 0
+      acc.branches.covered += fileCov.branches?.covered || 0
+      acc.branches.total += fileCov.branches?.total || 0
+      acc.lines.covered += fileCov.lines?.covered || 0
+      acc.lines.total += fileCov.lines?.total || 0
+      return acc
+    },
+    {
+      statements: { covered: 0, total: 0 },
+      functions: { covered: 0, total: 0 },
+      branches: { covered: 0, total: 0 },
+      lines: { covered: 0, total: 0 },
+    },
+  )
+
+  return {
+    statements: {
+      pct: totals.statements.total
+        ? (totals.statements.covered / totals.statements.total) * 100
+        : 0,
+    },
+    functions: {
+      pct: totals.functions.total
+        ? (totals.functions.covered / totals.functions.total) * 100
+        : 0,
+    },
+    branches: {
+      pct: totals.branches.total
+        ? (totals.branches.covered / totals.branches.total) * 100
+        : 0,
+    },
+    lines: {
+      pct: totals.lines.total
+        ? (totals.lines.covered / totals.lines.total) * 100
+        : 0,
+    },
+  }
+}
+
+const formatChange = (current, previous) => {
+  const diff = (current - previous).toFixed(2)
+  const arrow = diff > 0 ? '🟢⬆️' : diff < 0 ? '🔴⬇️' : '➡️'
+  const sign = diff > 0 ? '+' : ''
+  return `${arrow} ${sign}${diff}%`
+}
+
+const getCoverageData = () => {
   let prCoverage, baseCoverage
 
   try {
     prCoverage = JSON.parse(fs.readFileSync('pr-coverage.json', 'utf8'))
   } catch {
-    prCoverage = {
-      total: {
-        statements: { pct: 0 },
-        functions: { pct: 0 },
-        branches: { pct: 0 },
-        lines: { pct: 0 },
-      },
+    // Try coverage-summary.json for CLI mode
+    try {
+      prCoverage = JSON.parse(
+        fs.readFileSync('coverage/coverage-summary.json', 'utf8'),
+      )
+    } catch {
+      prCoverage = {
+        total: {
+          statements: { pct: 0 },
+          functions: { pct: 0 },
+          branches: { pct: 0 },
+          lines: { pct: 0 },
+        },
+      }
     }
   }
 
@@ -41,19 +118,104 @@ module.exports = async ({ github, context }) => {
   const prStats = prCoverage.total
   const baseStats = baseCoverage.total
 
-  const formatChange = (current, previous) => {
-    const diff = (current - previous).toFixed(2)
-    const arrow = diff > 0 ? '📈' : diff < 0 ? '📉' : '➡️'
-    const sign = diff > 0 ? '+' : ''
-    return `${arrow} ${sign}${diff}%`
+  const prUi = calculateFolderCoverage(prCoverage, 'ui')
+  const baseUi = calculateFolderCoverage(baseCoverage, 'ui')
+  const prCore = calculateFolderCoverage(prCoverage, 'core')
+  const baseCore = calculateFolderCoverage(baseCoverage, 'core')
+  const prInfra = calculateFolderCoverage(prCoverage, 'infra')
+  const baseInfra = calculateFolderCoverage(baseCoverage, 'infra')
+
+  return {
+    prStats,
+    baseStats,
+    prUi,
+    baseUi,
+    prCore,
+    baseCore,
+    prInfra,
+    baseInfra,
+  }
+}
+
+const formatCLI = (data) => {
+  const {
+    prStats,
+    baseStats,
+    prUi,
+    baseUi,
+    prCore,
+    baseCore,
+    prInfra,
+    baseInfra,
+  } = data
+
+  const formatRow = (label, current, base) => {
+    const currentStr = current.toFixed(2).padStart(6) + '%'
+    const baseStr = base.toFixed(2).padStart(6) + '%'
+    const change = formatChange(current, base)
+    return `${label.padEnd(15)} ${baseStr}  ${currentStr}  ${change}`
   }
 
-  const stmtChange = formatChange(prStats.statements.pct, baseStats.statements.pct)
-  const funcChange = formatChange(prStats.functions.pct, baseStats.functions.pct)
-  const branchChange = formatChange(prStats.branches.pct, baseStats.branches.pct)
+  console.log('\n📊 Coverage Report\n')
+  console.log('Metric          Base      Current  Change')
+  console.log('─'.repeat(60))
+  console.log(
+    formatRow('Statements', prStats.statements.pct, baseStats.statements.pct),
+  )
+  console.log(
+    formatRow('Functions', prStats.functions.pct, baseStats.functions.pct),
+  )
+  console.log(
+    formatRow('Branches', prStats.branches.pct, baseStats.branches.pct),
+  )
+  console.log(formatRow('Lines', prStats.lines.pct, baseStats.lines.pct))
+  console.log('')
+  console.log(formatRow('UI (Lines)', prUi.lines.pct, baseUi.lines.pct))
+  console.log(formatRow('Core (Lines)', prCore.lines.pct, baseCore.lines.pct))
+  console.log(
+    formatRow('Infra (Lines)', prInfra.lines.pct, baseInfra.lines.pct),
+  )
+  console.log('')
+
+  if (prStats.statements.pct >= baseStats.statements.pct) {
+    console.log('✅ Coverage maintained or improved!')
+  } else {
+    console.log('⚠️  Coverage decreased')
+  }
+  console.log('')
+}
+
+const formatGitHub = (data) => {
+  const {
+    prStats,
+    baseStats,
+    prUi,
+    baseUi,
+    prCore,
+    baseCore,
+    prInfra,
+    baseInfra,
+  } = data
+
+  const stmtChange = formatChange(
+    prStats.statements.pct,
+    baseStats.statements.pct,
+  )
+  const funcChange = formatChange(
+    prStats.functions.pct,
+    baseStats.functions.pct,
+  )
+  const branchChange = formatChange(
+    prStats.branches.pct,
+    baseStats.branches.pct,
+  )
   const lineChange = formatChange(prStats.lines.pct, baseStats.lines.pct)
 
-  const comment = `## 📊 Coverage Report
+  const uiChange = formatChange(prUi.lines.pct, baseUi.lines.pct)
+  const coreChange = formatChange(prCore.lines.pct, baseCore.lines.pct)
+  const infraChange = formatChange(prInfra.lines.pct, baseInfra.lines.pct)
+
+  return `## 📊 Coverage Report
 
 | Metric | Base Branch | This PR | Change |
 |--------|-------------|---------|--------|
@@ -61,8 +223,18 @@ module.exports = async ({ github, context }) => {
 | **Functions** | ${baseStats.functions.pct.toFixed(2)}% | ${prStats.functions.pct.toFixed(2)}% | ${funcChange} |
 | **Branches** | ${baseStats.branches.pct.toFixed(2)}% | ${prStats.branches.pct.toFixed(2)}% | ${branchChange} |
 | **Lines** | ${baseStats.lines.pct.toFixed(2)}% | ${prStats.lines.pct.toFixed(2)}% | ${lineChange} |
+| | | | |
+| **UI** (Lines) | ${baseUi.lines.pct.toFixed(2)}% | ${prUi.lines.pct.toFixed(2)}% | ${uiChange} |
+| **Core** (Lines) | ${baseCore.lines.pct.toFixed(2)}% | ${prCore.lines.pct.toFixed(2)}% | ${coreChange} |
+| **Infra** (Lines) | ${baseInfra.lines.pct.toFixed(2)}% | ${prInfra.lines.pct.toFixed(2)}% | ${infraChange} |
 
 ${prStats.statements.pct >= baseStats.statements.pct ? '✅ Coverage maintained or improved!' : '⚠️ Coverage decreased'}`
+}
+
+// GitHub Actions mode
+module.exports = async ({ github, context }) => {
+  const data = getCoverageData()
+  const comment = formatGitHub(data)
 
   // Find existing coverage comment
   const { data: comments } = await github.rest.issues.listComments({
@@ -92,4 +264,10 @@ ${prStats.statements.pct >= baseStats.statements.pct ? '✅ Coverage maintained 
       body: comment,
     })
   }
+}
+
+// CLI mode
+if (require.main === module) {
+  const data = getCoverageData()
+  formatCLI(data)
 }

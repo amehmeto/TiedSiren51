@@ -3,8 +3,11 @@
     "allow": [
       "Bash(base64:*)",
       "Bash(cat:*)",
+      "Bash(eas:*)",
+      "Bash(find:*)",
       "Bash(gh pr:*)",
       "Bash(gh run view:*)",
+      "Bash(git diff:*)",
       "Bash(git log:*)",
       "Bash(grep:*)",
       "Bash(npm install:*)",
@@ -13,15 +16,14 @@
       "Bash(npm test:*)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
-      "WebSearch",
-      "Bash(eas:*)"
+      "WebSearch"
     ],
-    "deny": [
-      "Bash(git push:*)"
-    ],
+    "deny": ["Bash(git push:*)"],
     "ask": [
+      "Bash(chmod:*)",
       "Bash(gh api:*)",
-      "Bash(chmod:*)"
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
     ]
   }
 }
