@@ -44,11 +44,17 @@ module.exports = async ({ github, context }) => {
   // Calculate coverage by folder
   const calculateFolderCoverage = (coverage, folderPath) => {
     const files = Object.keys(coverage).filter(
-      (path) => path.includes(`/${folderPath}/`) && !path.includes('node_modules'),
+      (path) =>
+        path.includes(`/${folderPath}/`) && !path.includes('node_modules'),
     )
 
     if (files.length === 0) {
-      return { statements: { pct: 0 }, functions: { pct: 0 }, branches: { pct: 0 }, lines: { pct: 0 } }
+      return {
+        statements: { pct: 0 },
+        functions: { pct: 0 },
+        branches: { pct: 0 },
+        lines: { pct: 0 },
+      }
     }
 
     const totals = files.reduce(
@@ -73,10 +79,26 @@ module.exports = async ({ github, context }) => {
     )
 
     return {
-      statements: { pct: totals.statements.total ? (totals.statements.covered / totals.statements.total) * 100 : 0 },
-      functions: { pct: totals.functions.total ? (totals.functions.covered / totals.functions.total) * 100 : 0 },
-      branches: { pct: totals.branches.total ? (totals.branches.covered / totals.branches.total) * 100 : 0 },
-      lines: { pct: totals.lines.total ? (totals.lines.covered / totals.lines.total) * 100 : 0 },
+      statements: {
+        pct: totals.statements.total
+          ? (totals.statements.covered / totals.statements.total) * 100
+          : 0,
+      },
+      functions: {
+        pct: totals.functions.total
+          ? (totals.functions.covered / totals.functions.total) * 100
+          : 0,
+      },
+      branches: {
+        pct: totals.branches.total
+          ? (totals.branches.covered / totals.branches.total) * 100
+          : 0,
+      },
+      lines: {
+        pct: totals.lines.total
+          ? (totals.lines.covered / totals.lines.total) * 100
+          : 0,
+      },
     }
   }
 
@@ -94,9 +116,18 @@ module.exports = async ({ github, context }) => {
     return `${arrow} ${sign}${diff}%`
   }
 
-  const stmtChange = formatChange(prStats.statements.pct, baseStats.statements.pct)
-  const funcChange = formatChange(prStats.functions.pct, baseStats.functions.pct)
-  const branchChange = formatChange(prStats.branches.pct, baseStats.branches.pct)
+  const stmtChange = formatChange(
+    prStats.statements.pct,
+    baseStats.statements.pct,
+  )
+  const funcChange = formatChange(
+    prStats.functions.pct,
+    baseStats.functions.pct,
+  )
+  const branchChange = formatChange(
+    prStats.branches.pct,
+    baseStats.branches.pct,
+  )
   const lineChange = formatChange(prStats.lines.pct, baseStats.lines.pct)
 
   const uiChange = formatChange(prUi.lines.pct, baseUi.lines.pct)
