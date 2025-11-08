@@ -72,7 +72,7 @@ jobs:
       - name: 🏗 Setup EAS
         uses: expo/expo-github-action@v8
         with:
-          eas-version: latest
+          eas-version: 16.24.1
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
@@ -81,14 +81,16 @@ jobs:
       - name: Install rollup platform binary
         run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
-#      Needs to resolve the issue with local build inside GitHub Actions and env var (Google Services in particular)
-#      - name: Local Build
-#        env:
-#          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-#          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
-#        run: npm run build:android:local -- --non-interactive
-
-      - name: EAS Cloud Preview Build
-        run: eas build -p android --profile preview --non-interactive
+#      Needs to resolve the issue with a local build inside GitHub Actions and env var (Google Services in particular)
+      - name: Local Build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+        run: |
+          set-env GOOGLE_SERVICES_JSON ${{ secrets.GOOGLE_SERVICES_JSON }}
+          npm run build:android:local -- --non-interactive
+
+#      - name: EAS Cloud Preview Build
+#        run: eas build -p android --profile preview --non-interactive
+#        env:
+#          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}

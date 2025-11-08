@@ -15,7 +15,7 @@
       "WebFetch(domain:github.com)",
       "WebSearch"
     ],
-    "deny": ["Bash(git *)"],
+    "deny": ["Bash(git push:*)"],
     "ask": ["Bash(gh api:*)", "Bash(chmod:*)"]
   }
 }
