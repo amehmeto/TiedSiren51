@@ -24,7 +24,8 @@ export default {
         backgroundColor: '#0C207A',
       },
       package: 'com.tiedsiren.tiedsiren',
-      googleServicesFile: './google-services.json',
+      googleServicesFile:
+        process.env.GOOGLE_SERVICES_JSON ?? './google-services.json',
       permissions: [
         'QUERY_ALL_PACKAGES',
         'android.permission.READ_EXTERNAL_STORAGE',
