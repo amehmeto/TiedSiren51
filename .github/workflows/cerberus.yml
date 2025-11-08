@@ -87,7 +87,6 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
-          set-env GOOGLE_SERVICES_JSON ${{ secrets.GOOGLE_SERVICES_JSON }}
           npm run build:android:local -- --non-interactive
 
 #      - name: EAS Cloud Preview Build
