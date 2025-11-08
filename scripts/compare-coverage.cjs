@@ -43,7 +43,7 @@ module.exports = async ({ github, context }) => {
 
   const formatChange = (current, previous) => {
     const diff = (current - previous).toFixed(2)
-    const arrow = diff > 0 ? '📈' : diff < 0 ? '📉' : '➡️'
+    const arrow = diff > 0 ? '🟢⬆️' : diff < 0 ? '🔴⬇️' : '➡️'
     const sign = diff > 0 ? '+' : ''
     return `${arrow} ${sign}${diff}%`
   }
