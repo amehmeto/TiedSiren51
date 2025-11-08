@@ -51,10 +51,7 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-coverage/
-
-# Coverage tracking
-coverage-history.json
+coverage/tmp/
 
 # Android
 #
@@ -97,5 +94,5 @@ app.db
 .vscode/
 
 # Firebase
-GoogleService-Info.plist
 google-services.json
+GoogleService-Info.plist
