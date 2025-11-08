@@ -34,10 +34,12 @@
     "build:android:apk:local": "eas build -p android --profile preview --local",
     "build:ios": "eas build --platform ios",
     "build:ios:simulator": "eas build --profile development-simulator --platform ios",
-    "prepare": "husky || true",
+    "prepare": "husky",
     "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
     "expo:lint": "expo lint",
-    "generate:schema": "npx prisma generate"
+    "generate:schema": "npx prisma generate",
+    "eas-build-pre-install": "node scripts/setup-google-services.cjs",
+    "eas-build-post-install": "cat google-services.json"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "npm run lint:fix"

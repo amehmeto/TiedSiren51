@@ -13,9 +13,15 @@
       "Bash(npm test:*)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
-      "WebSearch"
+      "WebSearch",
+      "Bash(eas:*)"
     ],
-    "deny": ["Bash(git push:*)"],
-    "ask": ["Bash(gh api:*)", "Bash(chmod:*)"]
+    "deny": [
+      "Bash(git push:*)"
+    ],
+    "ask": [
+      "Bash(gh api:*)",
+      "Bash(chmod:*)"
+    ]
   }
 }
