@@ -5,6 +5,9 @@ sh .husky/scripts/uncommitted-files-check.sh
 npm run test:cov
 echo ""
 
+# Display coverage report
+node scripts/compare-coverage.cjs
+
 npx expo-doctor
 
 exec < /dev/tty  # Redirect input to terminal
