@@ -11,10 +11,16 @@ module.exports = {
     'no-else-return': 'warn',
     'padding-line-between-statements': [
       'error',
-      { blankLine: 'always', prev: 'block-like', next: 'block-like' }
+      { blankLine: 'always', prev: 'block-like', next: 'block-like' },
     ],
   },
   overrides: [
+    {
+      files: ['scripts/**/*.{js,cjs}'],
+      env: {
+        node: true,
+      },
+    },
     {
       files: ['**/*.spec.ts', '**/*.test.ts'],
       plugins: ['vitest'],
