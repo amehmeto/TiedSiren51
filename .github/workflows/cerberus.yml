@@ -25,9 +25,42 @@ jobs:
 
       - name: Install dependencies
         run: npm ci
+        env:
+          NODE_ENV: development
+          npm_config_production: "false"
 
       - name: Install rollup platform binary
         run: npm install --no-save @rollup/rollup-linux-x64-gnu
+
+      - name: Write google-services.json
+        run: |
+          if [ -z "$GOOGLE_SERVICES_JSON" ]; then
+            echo "GOOGLE_SERVICES_JSON secret is not configured." >&2
+            exit 1
+          fi
+          python - <<'PY'
+import base64
+import json
+import os
+import sys
+
+value = os.environ["GOOGLE_SERVICES_JSON"]
+path = "google-services.json"
+
+decoded = value
+try:
+    decoded_bytes = base64.b64decode(value, validate=True)
+    decoded_str = decoded_bytes.decode("utf-8")
+    json.loads(decoded_str)
+    decoded = decoded_str
+except Exception:
+    pass
+
+with open(path, "w", encoding="utf-8") as f:
+    f.write(decoded)
+
+print(f"Wrote {path}")
+PY
 
       - name: Generate Prisma Client
         run: npx prisma generate
