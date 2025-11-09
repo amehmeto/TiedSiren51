@@ -60,7 +60,6 @@ jobs:
 
       - name: Create google-services.json from secret
         run: |
-          # Write to project root (where app.config.ts expects it)
           printf '%s\n' "$GOOGLE_SERVICES_JSON" > google-services.json
         env:
           GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
@@ -83,24 +82,15 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --include=dev
 
       - name: Install rollup platform binary
         run: npm install --no-save @rollup/rollup-linux-x64-gnu
-
-      - name: Create google-services.json from environment
-        run: |
-          if [ -n "$GOOGLE_SERVICES_JSON" ]; then
-            echo "$GOOGLE_SERVICES_JSON" > google-services.json
-          fi
-        env:
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
 
 #      Needs to resolve the issue with a local build inside GitHub Actions and env var (Google Services in particular)
       - name: Local Build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
-          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
         run: |
           npm run build:android:local -- --non-interactive
 
