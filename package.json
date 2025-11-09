@@ -37,9 +37,7 @@
     "prepare": "is-ci || husky",
     "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
     "expo:lint": "expo lint",
-    "generate:schema": "npx prisma generate",
-    "eas-build-pre-install": "node scripts/setup-google-services.cjs",
-    "eas-build-post-install": "cat google-services.json"
+    "generate:schema": "npx prisma generate"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "npm run lint:fix"
