@@ -120,10 +120,11 @@ export function BlocklistForm({
 
   const isSirenSelected = useCallback(
     (sirenType: SirenType, sirenId: string) => {
-      if (sirenType === SirenType.ANDROID)
+      if (sirenType === SirenType.ANDROID) {
         return blocklist.sirens.android
           .map((app) => app.packageName)
           .includes(sirenId)
+      }
       return blocklist.sirens[sirenType].includes(sirenId)
     },
     [blocklist],
@@ -207,9 +208,8 @@ export function BlocklistForm({
   const saveBlocklist = useCallback(async () => {
     if (!validateForm(blocklist)) return
 
-    if (mode === 'edit') {
-      await dispatch(updateBlocklist(blocklist as Blocklist))
-    } else {
+    if (mode === 'edit') await dispatch(updateBlocklist(blocklist as Blocklist))
+    else {
       await dispatch(
         createBlocklist(blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>),
       )

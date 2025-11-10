@@ -30,9 +30,7 @@ function validateWithSchema<T extends SignInInput | SignUpInput>(
     const fieldErrors: Record<string, string> = {}
     validation.error.errors.forEach((error) => {
       const key = error.path[0]
-      if (typeof key === 'string') {
-        fieldErrors[key] = error.message
-      }
+      if (typeof key === 'string') fieldErrors[key] = error.message
     })
 
     return {

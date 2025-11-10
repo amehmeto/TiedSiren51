@@ -16,9 +16,7 @@ export default function ForgotPasswordScreen() {
       return
     }
 
-    if (Platform.OS === 'ios') {
-      router.replace('/(auth)/login')
-    }
+    if (Platform.OS === 'ios') router.replace('/(auth)/login')
   }
 
   return (

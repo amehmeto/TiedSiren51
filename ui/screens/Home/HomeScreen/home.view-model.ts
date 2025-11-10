@@ -34,9 +34,8 @@ function generateEndTime(
 
   const todayEnd = dateProvider.recoverDate(session.endedAt)
 
-  if (!isOvernight || (isOvernight && isAfterMidnightBeforeEnd)) {
+  if (!isOvernight || (isOvernight && isAfterMidnightBeforeEnd))
     return 'Ends ' + formatDistance(todayEnd, now, { addSuffix: true })
-  }
 
   const tomorrowEnd = new Date(now.getTime() + 24 * 60 * 60 * 1000)
   const [hourStr, minuteStr] = session.endedAt.split(':')
@@ -107,13 +106,14 @@ export const selectHomeViewModel = createSelector(
       message: SessionBoardMessage.NO_SCHEDULED_SESSIONS as const,
     }
 
-    if (!blockSessions.length)
+    if (!blockSessions.length) {
       return {
         type: HomeViewModel.WithoutActiveNorScheduledSessions,
         greetings,
         activeSessions: NO_ACTIVE_SESSION,
         scheduledSessions: NO_SCHEDULED_SESSION,
       }
+    }
 
     const activeSessions = selectActiveSessions(dateProvider, blockSession)
     const formattedActiveSessions = formatToViewModel(
@@ -130,7 +130,7 @@ export const selectHomeViewModel = createSelector(
       dateProvider,
     )
 
-    if (!activeSessions.length)
+    if (!activeSessions.length) {
       return {
         type: HomeViewModel.WithoutActiveWithScheduledSessions,
         greetings,
@@ -140,8 +140,9 @@ export const selectHomeViewModel = createSelector(
           blockSessions: formattedScheduledSessions,
         },
       }
+    }
 
-    if (!scheduledSessions.length)
+    if (!scheduledSessions.length) {
       return {
         type: HomeViewModel.WithActiveWithoutScheduledSessions,
         greetings,
@@ -151,6 +152,7 @@ export const selectHomeViewModel = createSelector(
         },
         scheduledSessions: NO_SCHEDULED_SESSION,
       }
+    }
 
     return {
       type: HomeViewModel.WithActiveAndScheduledSessions,

@@ -55,9 +55,7 @@ export class PrismaBlocklistRepository
       where: { id },
     })
 
-    if (!blocklist) {
-      throw new Error(`Blocklist ${id} not found`)
-    }
+    if (!blocklist) throw new Error(`Blocklist ${id} not found`)
 
     return this.mapToBlocklist(blocklist)
   }

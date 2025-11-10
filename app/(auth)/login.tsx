@@ -48,9 +48,7 @@ export default function LoginScreen() {
       return
     }
 
-    if (Platform.OS === 'ios') {
-      router.replace('/(auth)/login')
-    }
+    if (Platform.OS === 'ios') router.replace('/(auth)/login')
   }
 
   const handleSignIn = async () => {
@@ -64,25 +62,19 @@ export default function LoginScreen() {
       return
     }
 
-    if (validation.data) {
-      await dispatch(signInWithEmail(validation.data))
-    }
+    if (validation.data) await dispatch(signInWithEmail(validation.data))
   }
 
   const handleEmailChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, email: text }))
 
-    if (error) {
-      dispatch(clearError())
-    }
+    if (error) dispatch(clearError())
   }
 
   const handlePasswordChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, password: text }))
 
-    if (error) {
-      dispatch(clearError())
-    }
+    if (error) dispatch(clearError())
   }
 
   return (

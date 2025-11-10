@@ -36,9 +36,8 @@ export class FakeAuthGateway implements AuthGateway {
   }
 
   async logOut(): Promise<void> {
-    if (this.onUserLoggedOutListener) {
-      this.onUserLoggedOutListener()
-    }
+    if (this.onUserLoggedOutListener) this.onUserLoggedOutListener()
+
     return Promise.resolve()
   }
 

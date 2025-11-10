@@ -114,9 +114,7 @@ export class PrismaBlockSessionRepository
       },
     })
 
-    if (!session) {
-      throw new Error(`Session with id ${id} not found`)
-    }
+    if (!session) throw new Error(`Session with id ${id} not found`)
 
     return this.mapToBlockSession(session)
   }

@@ -11,8 +11,6 @@ function getCurrentCoverage() {
     const coverageData = JSON.parse(fs.readFileSync(COVERAGE_FILE, 'utf8'))
 
     // Calculate overall coverage
-    let totalLines = 0
-    let coveredLines = 0
     let totalFunctions = 0
     let coveredFunctions = 0
     let totalBranches = 0
@@ -83,9 +81,7 @@ function updateHistory(newCoverage) {
   history.push(newCoverage)
 
   // Keep only last 100 entries
-  if (history.length > 100) {
-    history = history.slice(-100)
-  }
+  if (history.length > 100) history = history.slice(-100)
 
   fs.writeFileSync(HISTORY_FILE, JSON.stringify(history, null, 2))
 

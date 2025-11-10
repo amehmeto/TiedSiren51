@@ -24,10 +24,11 @@ export class InMemoryRepository<T extends { id: string }> {
     const toBeCreatedEntity: T = { id: uuid.v4().toString(), ...payload } as T
     this.entities.set(toBeCreatedEntity.id, toBeCreatedEntity)
     const createdEntity = this.entities.get(toBeCreatedEntity.id)
-    if (!createdEntity)
+    if (!createdEntity) {
       throw new Error(
         `Entity not created inside InMemory  ${toBeCreatedEntity.id}`,
       )
+    }
     return Promise.resolve(createdEntity)
   }
 
