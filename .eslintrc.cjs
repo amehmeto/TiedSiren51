@@ -4,17 +4,32 @@ module.exports = {
   extends: ['expo', 'prettier', 'plugin:no-switch-statements/recommended'],
   plugins: ['prettier', 'no-switch-statements'],
   rules: {
-    'prettier/prettier': 'error',
-    'no-console': 'error',
-    'no-switch-statements/no-switch': 'error',
     'lines-between-class-members': ['error', 'always'],
+    'max-statements-per-line': ['error', { max: 1 }],
+    'no-console': 'error',
     'no-else-return': 'warn',
+    'no-nested-ternary': 'error',
+    'no-switch-statements/no-switch': 'error',
+    'prefer-const': 'error',
+    'prettier/prettier': 'error',
+    complexity: ['warn', { max: 10 }],
+    curly: ['error', 'multi-or-nest'],
+    eqeqeq: ['error', 'always'],
     'padding-line-between-statements': [
       'error',
       { blankLine: 'always', prev: 'block-like', next: 'block-like' },
     ],
   },
   overrides: [
+    {
+      files: ['**/*.{ts,tsx}'],
+      parserOptions: {
+        project: './tsconfig.json',
+      },
+      rules: {
+        '@typescript-eslint/prefer-optional-chain': 'error',
+      },
+    },
     {
       files: ['scripts/**/*.{js,cjs}'],
       env: {

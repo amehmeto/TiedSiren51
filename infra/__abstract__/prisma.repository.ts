@@ -52,9 +52,8 @@ export abstract class PrismaRepository {
   }
 
   public getClient(): PrismaClient {
-    if (!this._isInitialized) {
-      throw new Error('Database not initialized')
-    }
+    if (!this._isInitialized) throw new Error('Database not initialized')
+
     return this.baseClient
   }
 

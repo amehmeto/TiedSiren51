@@ -4,9 +4,7 @@ import { useLocalSearchParams } from 'expo-router'
 
 export default function EditBlocklistScreen() {
   const { blocklistId } = useLocalSearchParams<{ blocklistId: string }>()
-  if (!blocklistId) {
-    return null
-  }
+  if (!blocklistId) return null
 
   return <BlocklistForm mode="edit" blocklistId={blocklistId as string} />
 }

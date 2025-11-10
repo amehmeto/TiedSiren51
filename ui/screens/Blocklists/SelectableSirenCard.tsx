@@ -19,6 +19,7 @@ export function SelectableSirenCard({
   isSelected: boolean
 }>) {
   const iconElement =
+    // eslint-disable-next-line no-nested-ternary
     sirenType === SirenType.ANDROID ? (
       <Image
         source={{ uri: (siren as InstalledApp).icon }}

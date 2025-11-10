@@ -1,22 +1,22 @@
 import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
 import {
-  initializeApp,
-  getApps,
-  getApp,
   FirebaseApp,
   FirebaseError,
+  getApp,
+  getApps,
+  initializeApp,
 } from 'firebase/app'
 import {
-  signInWithEmailAndPassword,
-  createUserWithEmailAndPassword,
-  signOut,
-  onAuthStateChanged,
-  User,
-  initializeAuth,
-  getReactNativePersistence,
-  getAuth,
   Auth,
+  createUserWithEmailAndPassword,
+  getAuth,
+  getReactNativePersistence,
+  initializeAuth,
+  onAuthStateChanged,
+  signInWithEmailAndPassword,
+  signOut,
+  User,
 } from 'firebase/auth'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { firebaseConfig } from './firebaseConfig'
@@ -30,6 +30,14 @@ enum FirebaseAuthErrorCode {
 
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
+
+  private static readonly ERROR_MESSAGES: Record<string, string> = {
+    [FirebaseAuthErrorCode.EmailAlreadyInUse]: 'This email is already in use.',
+    [FirebaseAuthErrorCode.InvalidEmail]: 'Invalid email address.',
+    [FirebaseAuthErrorCode.WeakPassword]:
+      'Password must be at least 6 characters.',
+    [FirebaseAuthErrorCode.InvalidCredential]: 'Invalid email or password.',
+  }
 
   private readonly firebaseConfig: typeof firebaseConfig
 
@@ -70,9 +78,9 @@ export class FirebaseAuthGateway implements AuthGateway {
       if (
         this.isFirebaseError(error) &&
         error.code === 'auth/already-initialized'
-      ) {
+      )
         return getAuth(app)
-      }
+
       throw error
     }
   }
@@ -87,31 +95,13 @@ export class FirebaseAuthGateway implements AuthGateway {
         return
       }
 
-      if (!user && this.onUserLoggedOutListener) {
-        this.onUserLoggedOutListener()
-      }
+      if (!user && this.onUserLoggedOutListener) this.onUserLoggedOutListener()
     })
   }
 
   private translateFirebaseError(error: unknown): string {
-    if (this.isFirebaseError(error)) {
-      if (error.code === FirebaseAuthErrorCode.EmailAlreadyInUse) {
-        return 'This email is already in use.'
-      }
-
-      if (error.code === FirebaseAuthErrorCode.InvalidEmail) {
-        return 'Invalid email address.'
-      }
-
-      if (error.code === FirebaseAuthErrorCode.WeakPassword) {
-        return 'Password must be at least 6 characters.'
-      }
-
-      if (error.code === FirebaseAuthErrorCode.InvalidCredential) {
-        return 'Invalid email or password.'
-      }
-      return error.message
-    }
+    if (this.isFirebaseError(error))
+      return FirebaseAuthGateway.ERROR_MESSAGES[error.code] ?? error.message
 
     return error instanceof Error ? error.message : 'Unknown error occurred.'
   }

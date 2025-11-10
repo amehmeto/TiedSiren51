@@ -42,6 +42,7 @@ function AppWithInitialization() {
         }}
       >
         <Text style={{ color: 'white', fontSize: 18 }}>
+          {/* eslint-disable-next-line no-nested-ternary */}
           {isInitializing
             ? 'Loading...'
             : error

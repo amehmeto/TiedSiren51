@@ -30,9 +30,8 @@ describe('PrismaRemoteDeviceRepository', () => {
       { id: 'device-3', name: 'Device 3', type: 'laptop' },
     ]
 
-    for (const device of testDevices) {
+    for (const device of testDevices)
       await repository.createDeviceForTesting(device)
-    }
 
     const devices = await repository.findAll()
 

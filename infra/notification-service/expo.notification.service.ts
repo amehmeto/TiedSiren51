@@ -69,9 +69,7 @@ export class ExpoNotificationService implements NotificationService {
       }),
     })
 
-    if (!response.ok) {
-      throw new Error('Failed to send push notification')
-    }
+    if (!response.ok) throw new Error('Failed to send push notification')
   }
 
   async scheduleLocalNotification(

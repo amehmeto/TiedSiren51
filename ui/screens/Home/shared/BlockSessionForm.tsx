@@ -52,11 +52,9 @@ export function BlockSessionForm({
     return (values: Session) => {
       assertIsBlockSession(values)
 
-      if (mode === 'edit') {
+      if (mode === 'edit')
         dispatch(updateBlockSession(values as UpdateBlockSessionPayload))
-      } else {
-        dispatch(createBlockSession(values as CreateBlockSessionPayload))
-      }
+      else dispatch(createBlockSession(values as CreateBlockSessionPayload))
 
       router.push('/(tabs)')
     }
