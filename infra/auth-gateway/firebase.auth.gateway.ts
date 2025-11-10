@@ -237,6 +237,7 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   async logOut(): Promise<void> {
     try {
+      if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut()
       await signOut(this.auth)
     } catch (error) {
       throw new Error(this.translateFirebaseError(error))
