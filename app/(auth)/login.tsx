@@ -13,29 +13,26 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/core/_redux_/createStore'
-import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '@/core/_redux_/createStore'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import { clearError, clearAuthState, setError } from '@/core/auth/reducer'
 import { validateSignInInput } from '@/ui/auth-schemas/validation-helper'
+import { useAuthStore } from '@/core/_zustand_/store-context'
 
 export default function LoginScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const [credentials, setCredentials] = useState({ email: '', password: '' })
-
-  const isUserAuthenticated = useSelector((state: RootState) =>
-    selectIsUserAuthenticated(state),
-  )
-
-  const { isLoading, error } = useSelector((state: RootState) => state.auth)
+  const authUser = useAuthStore((state) => state.authUser)
+  const isLoading = useAuthStore((state) => state.isLoading)
+  const error = useAuthStore((state) => state.error)
 
   useEffect(() => {
-    if (isUserAuthenticated) router.push('/')
-  }, [isUserAuthenticated, router])
+    if (authUser) router.push('/')
+  }, [authUser, router])
 
   useEffect(() => {
     dispatch(clearAuthState())
