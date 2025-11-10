@@ -12,6 +12,8 @@ const env = from({
   EXPO_PUBLIC_FIREBASE_APP_ID: process.env.EXPO_PUBLIC_FIREBASE_APP_ID,
   EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID:
     process.env.EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID,
+  EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID:
+    process.env.EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID,
 })
 
 export const firebaseConfig = {
@@ -29,6 +31,10 @@ export const firebaseConfig = {
   appId: env.get('EXPO_PUBLIC_FIREBASE_APP_ID').required().asString(),
   measurementId: env
     .get('EXPO_PUBLIC_FIREBASE_MEASUREMENT_ID')
+    .required()
+    .asString(),
+  webClientId: env
+    .get('EXPO_PUBLIC_GOOGLE_WEB_CLIENT_ID')
     .required()
     .asString(),
 }

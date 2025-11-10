@@ -58,6 +58,12 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
+      - name: Create google-services.json from secret
+        run: |
+          printf '%s\n' "$GOOGLE_SERVICES_JSON" > google-services.json
+        env:
+          GOOGLE_SERVICES_JSON: ${{ secrets.GOOGLE_SERVICES_JSON }}
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
@@ -76,12 +82,19 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies
-        run: npm ci
+        run: npm ci --include=dev
 
       - name: Install rollup platform binary
         run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
-      - name: Build
-        run: npm run build:android:local -- --non-interactive
+#      Needs to resolve the issue with a local build inside GitHub Actions and env var (Google Services in particular)
+      - name: Local Build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+        run: |
+          npm run build:android:local -- --non-interactive
+
+#      - name: EAS Cloud Preview Build
+#        run: eas build -p android --profile preview --non-interactive
+#        env:
+#          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
