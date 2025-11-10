@@ -19,11 +19,11 @@ export class FakeAuthGateway implements AuthGateway {
     return this.willResultWith
   }
 
-  signUpWithEmail(email: string, password: string): Promise<AuthUser> {
+  signUpWithEmail(_email: string, _password: string): Promise<AuthUser> {
     return this.willResultWith
   }
 
-  signInWithEmail(email: string, password: string): Promise<AuthUser> {
+  signInWithEmail(_email: string, _password: string): Promise<AuthUser> {
     return this.willResultWith
   }
 

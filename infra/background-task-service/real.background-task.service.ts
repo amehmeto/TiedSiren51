@@ -32,7 +32,7 @@ export class RealBackgroundTaskService implements BackgroundTaskService {
     })
   }
 
-  async scheduleTask(taskName: string, options?: TaskOptions): Promise<void> {
+  async scheduleTask(taskName: string, _options?: TaskOptions): Promise<void> {
     if (Platform.OS === 'web') return
 
     return BackgroundFetch.registerTaskAsync(taskName, {

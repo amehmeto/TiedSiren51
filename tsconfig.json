@@ -2,8 +2,27 @@
   "extends": "expo/tsconfig.base",
   "compilerOptions": {
     "strict": true,
+    "noImplicitAny": true,
+    "strictNullChecks": true,
+    "strictFunctionTypes": true,
+    "strictBindCallApply": true,
+    "strictPropertyInitialization": true,
+    "noImplicitThis": true,
+    "alwaysStrict": true,
+    "noUnusedLocals": true,
+    "noUnusedParameters": true,
+    "noImplicitReturns": true,
+    "noFallthroughCasesInSwitch": true,
+
+    // Path Aliases
+    "baseUrl": ".",
     "paths": {
       "@/*": ["./*"],
+      "@core/*": ["core/*"],
+      "@infra/*": ["infra/*"],
+      "@ui/*": ["ui/*"],
+      "@app/*": ["app/*"],
+      "@assets/*": ["assets/*"],
       "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
     },
     "typeRoots": ["./node_modules/@types", "./prisma.d.ts"]

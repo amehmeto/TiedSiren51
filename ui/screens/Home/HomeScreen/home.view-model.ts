@@ -78,7 +78,6 @@ function formatToViewModel(
   })
 }
 
-const selectNow = (_state: RootState, now: Date) => now
 const selectDateProvider = (
   _state: RootState,
   _now: Date,
@@ -86,12 +85,8 @@ const selectDateProvider = (
 ) => dateProvider
 
 export const selectHomeViewModel = createSelector(
-  [
-    (rootState: RootState) => rootState.blockSession,
-    selectNow,
-    selectDateProvider,
-  ],
-  (blockSession, now, dateProvider): HomeViewModelType => {
+  [(rootState: RootState) => rootState.blockSession, selectDateProvider],
+  (blockSession, dateProvider): HomeViewModelType => {
     const blockSessions = selectAllBlockSessions(blockSession)
 
     const greetings = greetUser(dateProvider.getNow())
