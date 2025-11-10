@@ -1,4 +1,5 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import {
   FirebaseApp,
   FirebaseError,
@@ -11,8 +12,10 @@ import {
   createUserWithEmailAndPassword,
   getAuth,
   getReactNativePersistence,
+  GoogleAuthProvider,
   initializeAuth,
   onAuthStateChanged,
+  signInWithCredential,
   signInWithEmailAndPassword,
   signOut,
   User,
@@ -20,7 +23,6 @@ import {
 import { AuthUser } from '@/core/auth/authUser'
 import { AuthGateway } from '@/core/ports/auth.gateway'
 import { firebaseConfig } from './firebaseConfig'
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
 
 enum FirebaseAuthErrorCode {
   EmailAlreadyInUse = 'auth/email-already-in-use',
@@ -89,9 +91,9 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   private getGoogleSignInErrorPattern(error: Error): GoogleSignInError | null {
-    for (const pattern of Object.values(GoogleSignInError)) {
+    for (const pattern of Object.values(GoogleSignInError))
       if (error.message.includes(pattern)) return pattern
-    }
+
     return null
   }
 
