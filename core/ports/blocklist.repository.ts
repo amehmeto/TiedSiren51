@@ -1,6 +1,6 @@
 import { Blocklist } from '../blocklist/blocklist'
-import { UpdatePayload } from './update.payload'
 import { CreatePayload } from './create.payload'
+import { UpdatePayload } from './update.payload'
 
 export interface BlocklistRepository {
   findAll(): Promise<Blocklist[]>

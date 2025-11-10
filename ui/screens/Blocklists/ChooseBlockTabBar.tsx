@@ -1,13 +1,9 @@
-import { T } from '@/ui/design-system/theme'
 import * as React from 'react'
 import { Pressable, StyleSheet, Text } from 'react-native'
 import { SceneRendererProps, TabBar } from 'react-native-tab-view'
+import { T } from '@/ui/design-system/theme'
 
-export function ChooseBlockTabBar(
-  props: SceneRendererProps /* & {
-    navigationState: NavigationState<Route>
-  }*/,
-) {
+export function ChooseBlockTabBar(props: SceneRendererProps) {
   return (
     <TabBar
       navigationState={{
@@ -43,8 +39,8 @@ const styles = StyleSheet.create({
     minWidth: T.width.chipMinWidth,
     margin: T.spacing.none,
   },
-  labelText: { color: 'white', textAlign: 'center' },
-  tabBar: { backgroundColor: 'transparent' },
+  labelText: { color: T.color.white, textAlign: 'center' },
+  tabBar: { backgroundColor: T.color.transparent },
   tabBarStyle: { marginLeft: 0, paddingLeft: 0 },
   indicator: { height: 0, display: 'none', width: 0 },
 })

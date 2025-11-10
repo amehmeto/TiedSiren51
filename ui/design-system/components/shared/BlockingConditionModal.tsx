@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons'
 import React, { useEffect } from 'react'
 import {
   Modal,
@@ -7,14 +8,13 @@ import {
   StyleSheet,
   ScrollView,
 } from 'react-native'
-import { T } from '@/ui/design-system/theme'
-import { Ionicons } from '@expo/vector-icons'
 import Animated, {
   useAnimatedStyle,
   useSharedValue,
   withSpring,
   withTiming,
 } from 'react-native-reanimated'
+import { T } from '@/ui/design-system/theme'
 import { TiedSCloseButton } from './TiedSCloseButton'
 
 type IconName =

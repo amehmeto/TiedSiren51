@@ -1,8 +1,8 @@
-import { StyleSheet, Text } from 'react-native'
-import { T } from '@/ui/design-system/theme'
 import { FormikErrors } from 'formik'
+import { StyleSheet, Text } from 'react-native'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
+import { T } from '@/ui/design-system/theme'
 
 export function FormError({
   error,

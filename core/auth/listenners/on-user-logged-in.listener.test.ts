@@ -1,7 +1,7 @@
 import { describe, expect, it } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
-import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { userAuthenticated } from '@/core/auth/reducer'
+import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 
 describe('onUserLoggedIn listener', () => {
   it('should dispatch a user status changed action when the auth gateway notifies the user is authenticated', async () => {

@@ -1,10 +1,10 @@
+import { z } from 'zod'
 import {
   signInSchema,
   signUpSchema,
   SignInInput,
   SignUpInput,
 } from './auth-schemas'
-import { z } from 'zod'
 
 export interface ValidationResult {
   isValid: boolean

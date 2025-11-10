@@ -1,7 +1,7 @@
 import { expect } from 'vitest'
 import { z } from 'zod'
-import { blocklistSchema } from './blocklist-form.schema'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
+import { blocklistSchema } from './blocklist-form.schema'
 
 export type BlockFormData = z.infer<typeof blocklistSchema>
 

@@ -1,6 +1,6 @@
+import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
 import { Text, StyleSheet, Pressable, StyleProp, ViewStyle } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
 import { T } from '@/ui/design-system/theme'
 
 type IconName = 'logo-google' | 'logo-apple'

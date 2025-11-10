@@ -1,19 +1,18 @@
-/* eslint-disable no-switch-statements/no-switch */
+import { useRouter } from 'expo-router'
 import React, { ReactNode, useEffect, useState } from 'react'
 import { Image, StyleSheet, Text } from 'react-native'
 import 'react-native-gesture-handler'
-import { dependencies } from '@/ui/dependencies'
-import { HomeViewModel } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
+import { dependencies } from '@/ui/dependencies'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { T } from '@/ui/design-system/theme'
+import { exhaustiveGuard } from '@/ui/exhaustive-guard'
+import { HomeViewModel } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 import { NoSessionBoard } from '@/ui/screens/Home/HomeScreen/NoSessionBoard'
 import { SessionsBoard } from '@/ui/screens/Home/HomeScreen/SessionsBoard'
 import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
-import { exhaustiveGuard } from '@/ui/exhaustive-guard'
-import { T } from '@/ui/design-system/theme'
-import { useRouter } from 'expo-router'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -32,6 +31,7 @@ export default function HomeScreen() {
   }, [dateProvider, now])
 
   const [activeSessionsNode, scheduledSessionsNode]: ReactNode[] = (() => {
+    // eslint-disable-next-line no-switch-statements/no-switch
     switch (viewModel.type) {
       case HomeViewModel.WithoutActiveNorScheduledSessions:
         return [
@@ -95,19 +95,15 @@ export default function HomeScreen() {
 }
 
 const styles = StyleSheet.create({
-  title: {
-    fontWeight: T.font.weight.bold,
-    color: T.color.text,
-    fontSize: T.size.small,
-    marginTop: T.spacing.small,
-    marginBottom: T.spacing.small,
-  },
   greetings: {
     color: T.color.text,
     fontWeight: T.font.weight.bold,
     fontSize: T.size.medium,
   },
-  text: { color: T.color.text, marginBottom: T.spacing.large },
+  text: {
+    color: T.color.text,
+    marginBottom: T.spacing.large,
+  },
   image: {
     width: T.width.tiedSirenLogo,
     height: T.width.tiedSirenLogo,

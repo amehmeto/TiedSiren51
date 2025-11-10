@@ -1,16 +1,10 @@
+import React from 'react'
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
-import { T } from '@/ui/design-system/theme'
-import React from 'react'
 import { dependencies } from '@/ui/dependencies'
+import { T } from '@/ui/design-system/theme'
 import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
-
-/*export function toHHmm(date: Date) {
-  const hours = String(date.getHours()).padStart(2, '0')
-  const minutes = String(date.getMinutes()).padStart(2, '0')
-  return `${hours}:${minutes}`
-}*/
 
 function formatTimeString(time: string): string {
   const [hours, minutes] = time.split(':').map(Number)
@@ -88,10 +82,6 @@ export function SelectTime({
 }
 
 const styles = StyleSheet.create({
-  blockSession: {
-    flexDirection: 'column',
-    alignItems: 'stretch',
-  },
   param: {
     flexDirection: 'row',
     justifyContent: 'space-between',

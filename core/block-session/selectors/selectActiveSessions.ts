@@ -1,6 +1,6 @@
-import { BlockSession, blockSessionAdapter } from '../block.session'
 import { EntityState } from '@reduxjs/toolkit'
 import { DateProvider } from '../../ports/port.date-provider'
+import { BlockSession, blockSessionAdapter } from '../block.session'
 import { isActive } from './isActive'
 
 export const selectActiveSessions = (

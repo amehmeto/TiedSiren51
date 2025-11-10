@@ -1,9 +1,9 @@
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { useState } from 'react'
 import { FormikErrors } from 'formik'
-import { T } from '@/ui/design-system/theme'
+import { useState } from 'react'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
+import { T } from '@/ui/design-system/theme'
 import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { SelectListModal } from '@/ui/screens/Home/shared/SelectListModal'
 

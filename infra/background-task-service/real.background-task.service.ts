@@ -1,12 +1,12 @@
+import * as BackgroundFetch from 'expo-background-fetch'
+import * as TaskManager from 'expo-task-manager'
+import { Platform } from 'react-native'
+import { AppStore } from '@/core/_redux_/createStore'
 import {
   BackgroundTaskService,
   TaskOptions,
 } from '@/core/ports/background-task.service'
-import * as TaskManager from 'expo-task-manager'
 import { tieSirens } from '@/core/siren/usecases/tie-sirens.usecase'
-import * as BackgroundFetch from 'expo-background-fetch'
-import { Platform } from 'react-native'
-import { AppStore } from '@/core/_redux_/createStore'
 
 export class RealBackgroundTaskService implements BackgroundTaskService {
   defineTask(

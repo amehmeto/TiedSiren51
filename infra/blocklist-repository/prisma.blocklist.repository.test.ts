@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { PrismaBlocklistRepository } from './prisma.blocklist.repository'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
+import { PrismaBlocklistRepository } from './prisma.blocklist.repository'
 
 class TestPrismaBlocklistRepository extends PrismaBlocklistRepository {
   async reset(): Promise<void> {

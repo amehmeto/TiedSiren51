@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { createBlockSession } from './usecases/create-block-session.usecase'
+import { loadUser } from '../auth/usecases/load-user.usecase'
 import { blockSessionAdapter } from './block.session'
+import { createBlockSession } from './usecases/create-block-session.usecase'
+import { deleteBlockSession } from './usecases/delete-block-session.usecase'
 import { duplicateBlockSession } from './usecases/duplicate-block-session.usecase'
 import { renameBlockSession } from './usecases/rename-block-session.usecase'
-import { deleteBlockSession } from './usecases/delete-block-session.usecase'
 import { updateBlockSession } from './usecases/update-block-session.usecase'
-import { loadUser } from '../auth/usecases/load-user.usecase'
 
 export const blockSessionSlice = createSlice({
   name: 'blockSession',

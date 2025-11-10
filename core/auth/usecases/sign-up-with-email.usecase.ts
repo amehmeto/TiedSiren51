@@ -1,6 +1,6 @@
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
-import { AuthUser } from '../authUser'
 import { SignUpCredentials } from '../authTypes'
+import { AuthUser } from '../authUser'
 
 export const signUpWithEmail = createAppAsyncThunk<
   AuthUser,

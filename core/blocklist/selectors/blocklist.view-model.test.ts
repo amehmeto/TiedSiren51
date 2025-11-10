@@ -1,11 +1,11 @@
 import { describe, expect, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
-import { stateBuilder } from '@/core/_tests_/state-builder'
-import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import {
   amazonPrimeAndroidSiren,
   youtubeAndroidSiren,
 } from '@/core/_tests_/data-builders/android-siren.builder'
+import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
+import { stateBuilder } from '@/core/_tests_/state-builder'
 import { BlocklistViewModel } from '@/core/blocklist/selectors/blocklist-view-model.type'
 import { selectBlocklistViewModel } from '@/core/blocklist/selectors/blocklist.view-model'
 

@@ -1,3 +1,5 @@
+import { Ionicons } from '@expo/vector-icons'
+import { useState } from 'react'
 import {
   StyleSheet,
   TextInput,
@@ -7,8 +9,6 @@ import {
   Pressable,
 } from 'react-native'
 import { T } from '@/ui/design-system/theme'
-import { useState } from 'react'
-import { Ionicons } from '@expo/vector-icons'
 
 interface TiedSTextInputProps extends TextInputProps {
   label?: string

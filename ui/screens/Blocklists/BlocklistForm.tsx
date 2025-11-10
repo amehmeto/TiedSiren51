@@ -1,33 +1,33 @@
-import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/core/_redux_/createStore'
-import { AndroidSiren, Sirens, SirenType } from '@/core/siren/sirens'
-import { selectBlocklistById } from '@/core/blocklist/selectors/selectBlocklistById'
+import { useRouter } from 'expo-router'
 import * as React from 'react'
-import { useEffect, useState, useMemo, useCallback } from 'react'
-import { Blocklist } from '@/core/blocklist/blocklist'
-import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
+import { useCallback, useEffect, useMemo, useState } from 'react'
+import { Dimensions, StyleSheet, Text } from 'react-native'
 import {
   Route,
   SceneRendererProps,
   TabBarProps,
   TabView,
 } from 'react-native-tab-view'
-import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
-import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
-import { Dimensions, StyleSheet, Text } from 'react-native'
-import { updateBlocklist } from '@/core/blocklist/usecases/update-blocklist.usecase'
-import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
-import { T } from '@/ui/design-system/theme'
-import { AppsSelectionScene } from '@/ui/screens/Blocklists/AppsSelectionScene'
-import { TextInputSelectionScene } from '@/ui/screens/Blocklists/TextInputSelectionScene'
-import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/ChooseBlockTabBar'
-import { useRouter } from 'expo-router'
-import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
-import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { useDispatch, useSelector } from 'react-redux'
 import { z } from 'zod'
-import { blocklistSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { Blocklist } from '@/core/blocklist/blocklist'
+import { selectBlocklistById } from '@/core/blocklist/selectors/selectBlocklistById'
+import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
+import { updateBlocklist } from '@/core/blocklist/usecases/update-blocklist.usecase'
+import { AndroidSiren, Sirens, SirenType } from '@/core/siren/sirens'
+import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
+import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
+import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
+import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
+import { T } from '@/ui/design-system/theme'
 import { ErrorMessages } from '@/ui/error-messages.type'
+import { AppsSelectionScene } from '@/ui/screens/Blocklists/AppsSelectionScene'
+import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/ChooseBlockTabBar'
+import { blocklistSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
+import { TextInputSelectionScene } from '@/ui/screens/Blocklists/TextInputSelectionScene'
 
 export type BlocklistScreenProps = {
   mode: 'create' | 'edit'
@@ -75,6 +75,7 @@ export function BlocklistForm({
 
   useEffect(() => {
     dispatch(fetchAvailableSirens())
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     if (mode === 'edit' && blocklistFromState) setBlocklist(blocklistFromState)
   }, [mode, blocklistFromState, dispatch])
 

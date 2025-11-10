@@ -1,26 +1,26 @@
+import { useRouter } from 'expo-router'
 import React, { useEffect, useState } from 'react'
 import {
+  Keyboard,
   KeyboardAvoidingView,
   Platform,
+  Pressable,
   StyleSheet,
   Text,
-  Keyboard,
-  Pressable,
 } from 'react-native'
-import { useRouter } from 'expo-router'
-import { T } from '@/ui/design-system/theme'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
-import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
-import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
-import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
-import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
-import { clearError, clearAuthState, setError } from '@/core/auth/reducer'
+import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { validateSignInInput } from '@/ui/auth-schemas/validation-helper'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
+import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
+import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
+import { T } from '@/ui/design-system/theme'
 
 export default function LoginScreen() {
   const router = useRouter()
@@ -182,11 +182,5 @@ const styles = StyleSheet.create({
     color: T.color.red,
     fontSize: T.font.size.regular,
     marginBottom: T.spacing.large,
-  },
-  fieldErrorText: {
-    color: T.color.red,
-    fontSize: T.font.size.small,
-    marginTop: T.spacing.extraSmall,
-    alignSelf: 'flex-start',
   },
 })

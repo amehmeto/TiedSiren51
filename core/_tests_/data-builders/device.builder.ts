@@ -1,5 +1,5 @@
-import { Device } from '../../device/device'
 import { faker } from '@faker-js/faker'
+import { Device } from '../../device/device'
 
 export function buildDevice(device: Partial<Device> = {}): Device {
   const deviceTypes = ['android', 'ios', 'web', 'masOS', 'windows']

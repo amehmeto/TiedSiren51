@@ -1,8 +1,8 @@
 import { beforeEach, describe, expect, it, test } from 'vitest'
-import { createTestStore } from '@/core/_tests_/createTestStore'
 import { PreloadedState } from '@/core/_redux_/createStore'
-import { stateBuilder } from '@/core/_tests_/state-builder'
+import { createTestStore } from '@/core/_tests_/createTestStore'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
+import { stateBuilder } from '@/core/_tests_/state-builder'
 
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import {

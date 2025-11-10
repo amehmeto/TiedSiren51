@@ -4,10 +4,10 @@ import {
   ThunkDispatch,
   Middleware,
 } from '@reduxjs/toolkit'
-import { rootReducer } from './rootReducer'
-import { Dependencies } from './dependencies'
 import { onUserLoggedInListener } from '@/core/auth/listenners/on-user-logged-in.listener'
 import { onUserLoggedOutListener } from '@/core/auth/listenners/on-user-logged-out.listener'
+import { Dependencies } from './dependencies'
+import { rootReducer } from './rootReducer'
 
 export type PreloadedState = Partial<RootState>
 

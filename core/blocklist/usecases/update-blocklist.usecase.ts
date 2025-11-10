@@ -1,7 +1,6 @@
 import { createAppAsyncThunk } from '../../_redux_/create-app-thunk'
-import { Blocklist } from '../blocklist'
-
 import { UpdatePayload } from '../../ports/update.payload'
+import { Blocklist } from '../blocklist'
 
 export const updateBlocklist = createAppAsyncThunk(
   'blocklist/updateBlocklist',

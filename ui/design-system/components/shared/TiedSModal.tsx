@@ -1,7 +1,7 @@
+import React from 'react'
 import { Dimensions, Modal, StyleSheet, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { TiedSBlurView } from './TiedSBlurView'
-import React from 'react'
 
 export function TiedSModal(
   props: Readonly<{

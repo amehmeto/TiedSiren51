@@ -1,10 +1,10 @@
-import { InstalledAppRepository } from '@/core/ports/installed-app.repository'
-import { InstalledApp as AppModel } from '@/core/installed-app/InstalledApp'
 import { listInstalledApps } from '@amehmeto/expo-list-installed-apps'
 import {
   InstalledApp,
   AppType,
 } from '@amehmeto/expo-list-installed-apps/build/ExpoListInstalledApps.types'
+import { InstalledApp as AppModel } from '@/core/installed-app/InstalledApp'
+import { InstalledAppRepository } from '@/core/ports/installed-app.repository'
 
 export class ExpoListInstalledAppsRepository implements InstalledAppRepository {
   async getInstalledApps(): Promise<AppModel[]> {

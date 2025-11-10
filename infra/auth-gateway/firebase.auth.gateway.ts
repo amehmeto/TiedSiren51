@@ -1,5 +1,4 @@
-import { AuthGateway } from '@/core/ports/auth.gateway'
-import { AuthUser } from '@/core/auth/authUser'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 import {
   FirebaseApp,
   FirebaseError,
@@ -18,7 +17,8 @@ import {
   signOut,
   User,
 } from 'firebase/auth'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { AuthUser } from '@/core/auth/authUser'
+import { AuthGateway } from '@/core/ports/auth.gateway'
 import { firebaseConfig } from './firebaseConfig'
 
 enum FirebaseAuthErrorCode {

@@ -1,15 +1,15 @@
+import { Entypo, Ionicons } from '@expo/vector-icons'
 import { Tabs } from 'expo-router'
 import React, { useEffect } from 'react'
-import { StyleSheet, Pressable, PressableProps } from 'react-native'
-import { Entypo, Ionicons } from '@expo/vector-icons'
-import { TabScreens } from '@/ui/navigation/TabScreens'
-import { T } from '@/ui/design-system/theme'
+import { Pressable, PressableProps, StyleSheet } from 'react-native'
 import Animated, {
-  useAnimatedStyle,
-  withTiming,
-  useSharedValue,
   Easing,
+  useAnimatedStyle,
+  useSharedValue,
+  withTiming,
 } from 'react-native-reanimated'
+import { T } from '@/ui/design-system/theme'
+import { TabScreens } from '@/ui/navigation/TabScreens'
 
 type Tab = {
   name: string
@@ -141,7 +141,7 @@ export default function TabLayout() {
         tabBarButton: (props) =>
           handleTabBarButton(props, { route, navigation }),
       })}
-      sceneContainerStyle={{ backgroundColor: 'transparent' }}
+      sceneContainerStyle={{ backgroundColor: T.color.transparent }}
     >
       {tabs.map((tab) => (
         <Tabs.Screen

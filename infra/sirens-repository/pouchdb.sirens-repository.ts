@@ -1,6 +1,6 @@
-import { AndroidSiren, Sirens } from '@/core/siren/sirens'
-import { SirensRepository } from '@/core/ports/sirens.repository'
 import PouchDB from 'pouchdb'
+import { SirensRepository } from '@/core/ports/sirens.repository'
+import { AndroidSiren, Sirens } from '@/core/siren/sirens'
 
 export class PouchdbSirensRepository implements SirensRepository {
   private db: PouchDB.Database<Sirens>

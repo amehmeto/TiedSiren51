@@ -1,12 +1,12 @@
-import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
-import { T } from '@/ui/design-system/theme'
+import * as ExpoDevice from 'expo-device'
+import { useRouter } from 'expo-router'
 import { useEffect, useState } from 'react'
+import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
-import * as ExpoDevice from 'expo-device'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
-import { useRouter } from 'expo-router'
+import { T } from '@/ui/design-system/theme'
 
 const currentDevice: Device = {
   id: ExpoDevice.modelId ?? 'unknown-current',
@@ -47,6 +47,7 @@ export function SelectListModal(
   const [selectedItems, setSelectedItems] = useState<(Blocklist | Device)[]>([])
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedItems((currentItems) => {
       if (props.listType === 'devices') {
         const uniqueSelections = new Map(

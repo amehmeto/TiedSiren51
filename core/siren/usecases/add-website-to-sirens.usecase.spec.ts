@@ -1,6 +1,6 @@
 import { describe, it, beforeEach } from 'vitest'
-import { sirensFixture } from './sirens.fixture'
 import { buildSirens } from '../../_tests_/data-builders/sirens.builder'
+import { sirensFixture } from './sirens.fixture'
 
 describe('Feature: Adding websites to sirens', () => {
   let fixture: ReturnType<typeof sirensFixture>

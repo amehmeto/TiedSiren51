@@ -1,12 +1,12 @@
-import { AmazonPrimeIcon } from '@/assets/base64AppIcon/amazonPrimeAppIcon'
-import { InstalledAppRepository } from '@/core/ports/installed-app.repository'
-import { InstalledApp } from '@/core/installed-app/InstalledApp'
 import { faker } from '@faker-js/faker'
-import { TikTokAppIcon } from '@/assets/base64AppIcon/tikTokAppIcon'
-import { YouTubeAppIcon } from '@/assets/base64AppIcon/youTubeAppIcon'
+import { AmazonPrimeIcon } from '@/assets/base64AppIcon/amazonPrimeAppIcon'
 import { FacebookAppIcon } from '@/assets/base64AppIcon/facebookAppIcon'
 import { InstagramAppIcon } from '@/assets/base64AppIcon/instagramAppIcon'
+import { TikTokAppIcon } from '@/assets/base64AppIcon/tikTokAppIcon'
 import { WhatsAppAppIcon } from '@/assets/base64AppIcon/whatsAppAppIcon'
+import { YouTubeAppIcon } from '@/assets/base64AppIcon/youTubeAppIcon'
+import { InstalledApp } from '@/core/installed-app/InstalledApp'
+import { InstalledAppRepository } from '@/core/ports/installed-app.repository'
 
 export function buildInstalledApp(
   wantedInstalledApp: Partial<InstalledApp>,

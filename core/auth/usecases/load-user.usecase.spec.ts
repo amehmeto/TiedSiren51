@@ -1,14 +1,14 @@
+import { describe, expect, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
+import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
+import { buildSirens } from '@/core/_tests_/data-builders/sirens.builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { Sirens } from '@/core/siren/sirens'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
 import { FakeDataSirensRepository } from '@/infra/sirens-repository/fake-data.sirens-repository'
-import { describe, expect, test } from 'vitest'
 import { loadUser } from './load-user.usecase'
-import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
-import { buildSirens } from '@/core/_tests_/data-builders/sirens.builder'
 
 describe('loadUser usecase', () => {
   test('should load user data from repositories', async () => {

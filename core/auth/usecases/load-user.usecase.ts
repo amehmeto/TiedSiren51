@@ -1,6 +1,6 @@
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
-import { Blocklist } from '@/core/blocklist/blocklist'
 import { BlockSession } from '@/core/block-session/block.session'
+import { Blocklist } from '@/core/blocklist/blocklist'
 import { Sirens } from '@/core/siren/sirens'
 
 type UserData = {

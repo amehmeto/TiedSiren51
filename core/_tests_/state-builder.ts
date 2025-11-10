@@ -1,17 +1,17 @@
 import {
-  BlockSession,
-  blockSessionAdapter,
-} from '../block-session/block.session'
-import { RootState } from '../_redux_/createStore'
-import {
   ActionCreatorWithPayload,
   createAction,
   createReducer,
 } from '@reduxjs/toolkit'
+import { AuthUser } from '@/core/auth/authUser'
+import { RootState } from '../_redux_/createStore'
 import { rootReducer } from '../_redux_/rootReducer'
+import {
+  BlockSession,
+  blockSessionAdapter,
+} from '../block-session/block.session'
 import { Blocklist, blocklistAdapter } from '../blocklist/blocklist'
 import { Sirens } from '../siren/sirens'
-import { AuthUser } from '@/core/auth/authUser'
 
 const initialState = rootReducer(undefined, { type: 'unknown' })
 

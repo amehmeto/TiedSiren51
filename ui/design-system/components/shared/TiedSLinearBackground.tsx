@@ -1,8 +1,8 @@
-import React from 'react'
 import { LinearGradient } from 'expo-linear-gradient'
-import { T } from '@/ui/design-system/theme'
+import React from 'react'
 import { Platform, StatusBar, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { T } from '@/ui/design-system/theme'
 
 export function TiedSLinearBackground(
   props: Readonly<{ children: React.ReactNode }>,

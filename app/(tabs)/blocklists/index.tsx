@@ -1,5 +1,6 @@
 /* eslint-disable no-switch-statements/no-switch */
-import { useSelector } from 'react-redux'
+import { Ionicons } from '@expo/vector-icons'
+import { useRouter } from 'expo-router'
 import React, { ReactNode } from 'react'
 import {
   FlatList,
@@ -9,14 +10,13 @@ import {
   Text,
   View,
 } from 'react-native'
+import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
-import { selectBlocklistViewModel } from '@/core/blocklist/selectors/blocklist.view-model'
 import { BlocklistViewModel } from '@/core/blocklist/selectors/blocklist-view-model.type'
-import { BlocklistCard } from '@/ui/screens/Blocklists/BlocklistCard'
-import { exhaustiveGuard } from '@/ui/exhaustive-guard'
-import { Ionicons } from '@expo/vector-icons'
+import { selectBlocklistViewModel } from '@/core/blocklist/selectors/blocklist.view-model'
 import { T } from '@/ui/design-system/theme'
-import { useRouter } from 'expo-router'
+import { exhaustiveGuard } from '@/ui/exhaustive-guard'
+import { BlocklistCard } from '@/ui/screens/Blocklists/BlocklistCard'
 
 export default function BlocklistScreen() {
   const viewModel = useSelector<
@@ -100,5 +100,5 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  text: { color: 'white' },
+  text: { color: T.color.white },
 })

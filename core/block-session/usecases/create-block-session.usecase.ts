@@ -1,6 +1,6 @@
+import { differenceInSeconds } from 'date-fns'
 import { createAppAsyncThunk } from '../../_redux_/create-app-thunk'
 import { BlockSession } from '../block.session'
-import { differenceInSeconds } from 'date-fns'
 
 export type CreateBlockSessionPayload = Omit<
   BlockSession,

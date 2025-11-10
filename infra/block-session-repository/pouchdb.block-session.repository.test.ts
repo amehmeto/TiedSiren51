@@ -1,10 +1,10 @@
+import PouchDB from 'pouchdb'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { PouchdbBlockSessionRepository } from './pouchdb.block-session.repository'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
-import PouchDB from 'pouchdb'
-import { UpdatePayload } from '@/core/ports/update.payload'
 import { CreatePayload } from '@/core/ports/create.payload'
+import { UpdatePayload } from '@/core/ports/update.payload'
+import { PouchdbBlockSessionRepository } from './pouchdb.block-session.repository'
 
 describe('PouchDBBlockSessionRepository', () => {
   let blockSessionRepository: PouchdbBlockSessionRepository

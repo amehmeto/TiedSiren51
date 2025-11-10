@@ -1,7 +1,7 @@
 import { Siren as PrismaSiren } from '@prisma/client'
-import { AndroidSiren, Sirens } from '@/core/siren/sirens'
-import { SirensRepository } from '@/core/ports/sirens.repository'
 import uuid from 'react-native-uuid'
+import { SirensRepository } from '@/core/ports/sirens.repository'
+import { AndroidSiren, Sirens } from '@/core/siren/sirens'
 import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
 
 export class PrismaSirensRepository

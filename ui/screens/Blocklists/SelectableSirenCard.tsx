@@ -1,11 +1,11 @@
-import { Image, Pressable, StyleSheet, Text } from 'react-native'
-import { T } from '@/ui/design-system/theme'
-import { InstalledApp } from '@/core/installed-app/InstalledApp'
 import { FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
+import { Image, Pressable, StyleSheet, Text } from 'react-native'
 import { CheckBox } from 'react-native-elements'
+import { InstalledApp } from '@/core/installed-app/InstalledApp'
 
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
+import { T } from '@/ui/design-system/theme'
 
 export function SelectableSirenCard({
   sirenType,
@@ -96,7 +96,7 @@ const styles = StyleSheet.create({
   checkboxContainer: {
     padding: T.spacing.none,
     margin: T.spacing.none,
-    backgroundColor: 'transparent',
+    backgroundColor: T.color.transparent,
   },
   appName: {
     color: T.color.text,

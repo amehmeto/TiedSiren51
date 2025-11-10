@@ -1,11 +1,11 @@
 import { createSlice } from '@reduxjs/toolkit'
+import { loadUser } from '../auth/usecases/load-user.usecase'
 import { blocklistAdapter } from './blocklist'
 import { createBlocklist } from './usecases/create-blocklist.usecase'
-import { updateBlocklist } from './usecases/update-blocklist.usecase'
-import { renameBlocklist } from './usecases/rename-blocklist.usecase'
-import { duplicateBlocklist } from './usecases/duplicate-blocklist.usecase'
 import { deleteBlocklist } from './usecases/delete-blocklist.usecase'
-import { loadUser } from '../auth/usecases/load-user.usecase'
+import { duplicateBlocklist } from './usecases/duplicate-blocklist.usecase'
+import { renameBlocklist } from './usecases/rename-blocklist.usecase'
+import { updateBlocklist } from './usecases/update-blocklist.usecase'
 
 export const blocklistSlice = createSlice({
   name: 'blocklist',

@@ -1,6 +1,6 @@
+import PouchDB from 'pouchdb'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { PouchdbSirensRepository } from './pouchdb.sirens-repository'
-import PouchDB from 'pouchdb'
 
 describe('PouchDBSirenRepository', () => {
   let sirenRepository: PouchdbSirensRepository

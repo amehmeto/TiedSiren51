@@ -1,10 +1,10 @@
 import { faker } from '@faker-js/faker'
-import { buildBlocklist } from './blocklist.builder'
-import { buildDevice } from './device.builder'
 import {
   BlockingConditions,
   BlockSession,
 } from '@/core/block-session/block.session'
+import { buildBlocklist } from './blocklist.builder'
+import { buildDevice } from './device.builder'
 
 export const buildBlockSession = (
   wantedBlockSession: Partial<BlockSession> = {},

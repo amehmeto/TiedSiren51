@@ -1,11 +1,5 @@
-import {
-  Menu,
-  MenuOption,
-  MenuOptions,
-  MenuTrigger,
-} from 'react-native-popup-menu'
 import { Ionicons } from '@expo/vector-icons'
-import { TiedSBlurView } from './TiedSBlurView'
+import { useMemo } from 'react'
 import {
   StyleProp,
   StyleSheet,
@@ -13,8 +7,14 @@ import {
   ViewStyle,
   useWindowDimensions,
 } from 'react-native'
+import {
+  Menu,
+  MenuOption,
+  MenuOptions,
+  MenuTrigger,
+} from 'react-native-popup-menu'
 import { T } from '@/ui/design-system/theme'
-import { useMemo } from 'react'
+import { TiedSBlurView } from './TiedSBlurView'
 
 type IconName =
   | 'text-outline'

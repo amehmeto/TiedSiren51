@@ -1,14 +1,14 @@
-import { useEffect, useState } from 'react'
-import { AppStore } from '@/core/_redux_/createStore'
-import { dependencies } from '@/ui/dependencies'
-import { handleUIError } from '@/ui/utils/handleUIError'
-import { tieSirens } from '@/core/siren/usecases/tie-sirens.usecase'
 import * as NavigationBar from 'expo-navigation-bar'
+import { useEffect, useState } from 'react'
 import { Platform } from 'react-native'
-import { T } from '@/ui/design-system/theme'
-import { loadUser } from '@/core/auth/usecases/load-user.usecase'
-import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { useSelector } from 'react-redux'
+import { AppStore } from '@/core/_redux_/createStore'
+import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
+import { loadUser } from '@/core/auth/usecases/load-user.usecase'
+import { tieSirens } from '@/core/siren/usecases/tie-sirens.usecase'
+import { dependencies } from '@/ui/dependencies'
+import { T } from '@/ui/design-system/theme'
+import { handleUIError } from '@/ui/utils/handleUIError'
 
 export function useAppInitialization(store: AppStore) {
   const [error, setError] = useState<string | null>(null)

@@ -1,9 +1,9 @@
 import * as React from 'react'
 import { useState } from 'react'
 import { FlatList, StyleSheet, TextInput } from 'react-native'
+import { SirenType } from '@/core/siren/sirens'
 import { T } from '@/ui/design-system/theme'
 
-import { SirenType } from '@/core/siren/sirens'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
 
 export function TextInputSelectionScene(

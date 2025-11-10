@@ -1,9 +1,9 @@
+import PouchDB from 'pouchdb'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { Blocklist } from '@/core/blocklist/blocklist'
-import { PouchdbBlocklistRepository } from './pouchdb.blocklist.repository'
-import PouchDB from 'pouchdb'
 import { CreatePayload } from '@/core/ports/create.payload'
+import { PouchdbBlocklistRepository } from './pouchdb.blocklist.repository'
 
 describe('PouchDBBlocklistRepository', () => {
   let blocklistRepository: PouchdbBlocklistRepository

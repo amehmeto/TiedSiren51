@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { PrismaRemoteDeviceRepository } from './prisma.remote-device.repository'
 import { Device } from '@/core/device/device'
+import { PrismaRemoteDeviceRepository } from './prisma.remote-device.repository'
 
 class TestPrismaRemoteDeviceRepository extends PrismaRemoteDeviceRepository {
   async reset(): Promise<void> {
