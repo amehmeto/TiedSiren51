@@ -6,7 +6,7 @@ import {
 export class FakeBackgroundTaskService implements BackgroundTaskService {
   lastScheduledTasks: string[] = []
 
-  async scheduleTask(taskName: string, options: TaskOptions): Promise<void> {
+  async scheduleTask(taskName: string, _options: TaskOptions): Promise<void> {
     this.lastScheduledTasks.push(taskName)
   }
 
@@ -16,8 +16,8 @@ export class FakeBackgroundTaskService implements BackgroundTaskService {
   }
 
   defineTask(
-    taskName: string,
-    taskFunction: () => Promise<void>,
+    _taskName: string,
+    _taskFunction: () => Promise<void>,
   ): Promise<void> {
     return Promise.resolve(undefined)
   }

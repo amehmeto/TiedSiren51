@@ -1,10 +1,10 @@
 import { createSlice } from '@reduxjs/toolkit'
-import { fetchAvailableSirens } from './usecases/fetch-available-sirens.usecase'
+import { loadUser } from '../auth/usecases/load-user.usecase'
 import { Sirens } from './sirens'
 import { addKeywordToSirens } from './usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from './usecases/add-website-to-sirens.usecase'
+import { fetchAvailableSirens } from './usecases/fetch-available-sirens.usecase'
 import { tieSirens } from './usecases/tie-sirens.usecase'
-import { loadUser } from '../auth/usecases/load-user.usecase'
 
 export const sirenSlice = createSlice({
   name: 'siren',

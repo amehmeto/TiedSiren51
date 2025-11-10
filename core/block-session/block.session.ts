@@ -1,6 +1,6 @@
+import { createEntityAdapter } from '@reduxjs/toolkit'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '../device/device'
-import { createEntityAdapter } from '@reduxjs/toolkit'
 
 export enum BlockingConditions {
   TIME = 'time',

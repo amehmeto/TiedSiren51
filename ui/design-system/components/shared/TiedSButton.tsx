@@ -1,6 +1,6 @@
+import { ReactNode } from 'react'
 import { Pressable, StyleProp, StyleSheet, Text, ViewStyle } from 'react-native'
 import { T } from '@/ui/design-system/theme'
-import { ReactNode } from 'react'
 
 export function TiedSButton(
   props: Readonly<{

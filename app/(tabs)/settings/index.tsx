@@ -1,8 +1,8 @@
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { T } from '@/ui/design-system/theme'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
+import { T } from '@/ui/design-system/theme'
 
 export default function SettingsScreen() {
   const dispatch = useDispatch<AppDispatch>()
@@ -30,13 +30,13 @@ const styles = StyleSheet.create({
   },
   text: {
     color: T.color.white,
-    marginBottom: 20,
+    marginBottom: T.spacing.large,
   },
   logoutButton: {
     padding: 12,
   },
   logoutText: {
-    color: '#FF3B30',
+    color: T.color.red,
     fontSize: 16,
   },
 })

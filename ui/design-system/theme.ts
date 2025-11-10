@@ -18,6 +18,7 @@ export const T = {
     modalBackgroundColor: 'rgba(0, 0, 0, 0.3)',
     modalContentColor: 'rgba(240, 244, 255,1)',
     modalTitleColor: 'rgba(125, 138, 153,1)',
+    darkBlueGray: '#1e293b',
   },
   font: {
     size: {

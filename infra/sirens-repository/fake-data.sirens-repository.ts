@@ -1,7 +1,7 @@
-import { SirensRepository } from '@/core/ports/sirens.repository'
-import { AndroidSiren, Sirens } from '@/core/siren/sirens'
 import { faker } from '@faker-js/faker'
 import { buildAndroidSiren } from '@/core/_tests_/data-builders/android-siren.builder'
+import { SirensRepository } from '@/core/ports/sirens.repository'
+import { AndroidSiren, Sirens } from '@/core/siren/sirens'
 
 export class FakeDataSirensRepository implements SirensRepository {
   selectableSirens: Sirens = {

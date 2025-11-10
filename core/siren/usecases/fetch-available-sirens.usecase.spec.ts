@@ -1,8 +1,7 @@
 import { describe, it, beforeEach } from 'vitest'
-import { sirensFixture } from './sirens.fixture'
-import { buildInstalledApp } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
-
 import { YouTubeAppIcon } from '@/assets/base64AppIcon/youTubeAppIcon'
+import { buildInstalledApp } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
+import { sirensFixture } from './sirens.fixture'
 
 describe('Feature: Fetching available sirens', () => {
   let fixture: ReturnType<typeof sirensFixture>

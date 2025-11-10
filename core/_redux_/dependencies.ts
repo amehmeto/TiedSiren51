@@ -1,14 +1,14 @@
+import { AuthGateway } from '@/core/ports/auth.gateway'
+import { DatabaseService } from '@/core/ports/database.service'
+import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
+import { BackgroundTaskService } from '../ports/background-task.service'
 import { BlockSessionRepository } from '../ports/block-session.repository'
 import { BlocklistRepository } from '../ports/blocklist.repository'
-import { SirenTier } from '../ports/siren.tier'
-import { DateProvider } from '../ports/port.date-provider'
 import { InstalledAppRepository } from '../ports/installed-app.repository'
-import { SirensRepository } from '../ports/sirens.repository'
 import { NotificationService } from '../ports/notification.service'
-import { BackgroundTaskService } from '../ports/background-task.service'
-import { AuthGateway } from '@/core/ports/auth.gateway'
-import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
-import { DatabaseService } from '@/core/ports/database.service'
+import { DateProvider } from '../ports/port.date-provider'
+import { SirenTier } from '../ports/siren.tier'
+import { SirensRepository } from '../ports/sirens.repository'
 
 export type Dependencies = {
   databaseService: DatabaseService

@@ -1,8 +1,8 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { FirebaseAuthGateway } from './firebase.auth.gateway'
-import * as firebaseAuth from 'firebase/auth'
 import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import { FirebaseError } from 'firebase/app'
+import * as firebaseAuth from 'firebase/auth'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { FirebaseAuthGateway } from './firebase.auth.gateway'
 
 vi.mock('firebase/app', () => {
   // Mock FirebaseError class for instanceof checks

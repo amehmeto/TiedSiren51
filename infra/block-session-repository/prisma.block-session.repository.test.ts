@@ -1,9 +1,9 @@
+import { PrismaClient } from '@prisma/client/react-native'
 import { beforeEach, describe, expect, it } from 'vitest'
-import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { UpdatePayload } from '@/core/ports/update.payload'
-import { PrismaClient } from '@prisma/client/react-native'
+import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 
 describe('PrismaBlockSessionRepository', () => {
   let repository: PrismaBlockSessionRepository

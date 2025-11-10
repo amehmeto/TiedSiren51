@@ -1,21 +1,20 @@
-import { useEffect, useState } from 'react'
 import { FormikProps } from 'formik'
+import { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { T } from '@/ui/design-system/theme'
-import { Device } from '@/core/device/device'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
-import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
-import { ChooseName } from '@/ui/screens/Home/shared/ChooseName'
-import { SelectFromList } from '@/ui/screens/Home/shared/SelectFromList'
-import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
+import { Device } from '@/core/device/device'
+import { dependencies } from '@/ui/dependencies'
 import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
-import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlockingCondition'
-import { FormError } from '@/ui/screens/Home/shared/FormError'
+import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { ChooseName } from '@/ui/screens/Home/shared/ChooseName'
 import { FieldErrors } from '@/ui/screens/Home/shared/FieldErrors'
-import { dependencies } from '@/ui/dependencies'
+import { FormError } from '@/ui/screens/Home/shared/FormError'
+import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlockingCondition'
+import { SelectFromList } from '@/ui/screens/Home/shared/SelectFromList'
+import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
 
 export function SelectBlockSessionParams({
   form,
@@ -105,18 +104,5 @@ const styles = StyleSheet.create({
   blockSession: {
     flexDirection: 'column',
     alignItems: 'stretch',
-  },
-  label: {
-    color: T.color.text,
-  },
-  option: {
-    color: T.color.lightBlue,
-    textAlign: 'right',
-  },
-  errorText: {
-    color: T.color.red,
-    fontSize: T.font.size.small,
-    marginTop: T.spacing.extraSmall,
-    fontWeight: T.font.weight.bold,
   },
 })

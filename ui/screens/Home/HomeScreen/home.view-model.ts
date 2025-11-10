@@ -1,12 +1,12 @@
+import { createSelector } from '@reduxjs/toolkit'
+import { formatDistance } from 'date-fns'
 import { RootState } from '@/core/_redux_/createStore'
 import { BlockSession } from '@/core/block-session/block.session'
-import { formatDistance } from 'date-fns'
-import { createSelector } from '@reduxjs/toolkit'
+import { isActive } from '@/core/block-session/selectors/isActive'
 import { selectActiveSessions } from '@/core/block-session/selectors/selectActiveSessions'
 import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAllBlockSessions'
-import { DateProvider } from '@/core/ports/port.date-provider'
-import { isActive } from '@/core/block-session/selectors/isActive'
 import { selectScheduledSessions } from '@/core/block-session/selectors/selectScheduledSessions'
+import { DateProvider } from '@/core/ports/port.date-provider'
 import {
   Greetings,
   HomeViewModel,
@@ -34,9 +34,8 @@ function generateEndTime(
 
   const todayEnd = dateProvider.recoverDate(session.endedAt)
 
-  if (!isOvernight || (isOvernight && isAfterMidnightBeforeEnd)) {
+  if (!isOvernight || (isOvernight && isAfterMidnightBeforeEnd))
     return 'Ends ' + formatDistance(todayEnd, now, { addSuffix: true })
-  }
 
   const tomorrowEnd = new Date(now.getTime() + 24 * 60 * 60 * 1000)
   const [hourStr, minuteStr] = session.endedAt.split(':')
@@ -79,7 +78,6 @@ function formatToViewModel(
   })
 }
 
-const selectNow = (_state: RootState, now: Date) => now
 const selectDateProvider = (
   _state: RootState,
   _now: Date,
@@ -87,12 +85,8 @@ const selectDateProvider = (
 ) => dateProvider
 
 export const selectHomeViewModel = createSelector(
-  [
-    (rootState: RootState) => rootState.blockSession,
-    selectNow,
-    selectDateProvider,
-  ],
-  (blockSession, now, dateProvider): HomeViewModelType => {
+  [(rootState: RootState) => rootState.blockSession, selectDateProvider],
+  (blockSession, dateProvider): HomeViewModelType => {
     const blockSessions = selectAllBlockSessions(blockSession)
 
     const greetings = greetUser(dateProvider.getNow())
@@ -107,13 +101,14 @@ export const selectHomeViewModel = createSelector(
       message: SessionBoardMessage.NO_SCHEDULED_SESSIONS as const,
     }
 
-    if (!blockSessions.length)
+    if (!blockSessions.length) {
       return {
         type: HomeViewModel.WithoutActiveNorScheduledSessions,
         greetings,
         activeSessions: NO_ACTIVE_SESSION,
         scheduledSessions: NO_SCHEDULED_SESSION,
       }
+    }
 
     const activeSessions = selectActiveSessions(dateProvider, blockSession)
     const formattedActiveSessions = formatToViewModel(
@@ -130,7 +125,7 @@ export const selectHomeViewModel = createSelector(
       dateProvider,
     )
 
-    if (!activeSessions.length)
+    if (!activeSessions.length) {
       return {
         type: HomeViewModel.WithoutActiveWithScheduledSessions,
         greetings,
@@ -140,8 +135,9 @@ export const selectHomeViewModel = createSelector(
           blockSessions: formattedScheduledSessions,
         },
       }
+    }
 
-    if (!scheduledSessions.length)
+    if (!scheduledSessions.length) {
       return {
         type: HomeViewModel.WithActiveWithoutScheduledSessions,
         greetings,
@@ -151,6 +147,7 @@ export const selectHomeViewModel = createSelector(
         },
         scheduledSessions: NO_SCHEDULED_SESSION,
       }
+    }
 
     return {
       type: HomeViewModel.WithActiveAndScheduledSessions,

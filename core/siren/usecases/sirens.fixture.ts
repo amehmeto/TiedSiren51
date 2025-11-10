@@ -1,15 +1,15 @@
-import { selectAvailableSirens } from '../selectors/selectAvailableSirens'
-import { createTestStore } from '../../_tests_/createTestStore'
-import { Sirens } from '../sirens'
-import { fetchAvailableSirens } from './fetch-available-sirens.usecase'
 import { expect } from 'vitest'
 import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
-import { AppStore } from '../../_redux_/createStore'
-import { InstalledApp } from '../../installed-app/InstalledApp'
 import { FakeDataSirensRepository } from '@/infra/sirens-repository/fake-data.sirens-repository'
-import { addKeywordToSirens } from './add-keyword-to-sirens.usecase'
+import { AppStore } from '../../_redux_/createStore'
+import { createTestStore } from '../../_tests_/createTestStore'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
+import { InstalledApp } from '../../installed-app/InstalledApp'
+import { selectAvailableSirens } from '../selectors/selectAvailableSirens'
+import { Sirens } from '../sirens'
+import { addKeywordToSirens } from './add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from './add-website-to-sirens.usecase'
+import { fetchAvailableSirens } from './fetch-available-sirens.usecase'
 export function sirensFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ) {

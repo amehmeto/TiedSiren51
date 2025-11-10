@@ -1,7 +1,7 @@
 import { beforeEach, describe, it } from 'vitest'
-import { blocklistFixture } from './blocklist.fixture'
 import { buildBlocklist } from '../../_tests_/data-builders/blocklist.builder'
 import { Blocklist } from '../blocklist'
+import { blocklistFixture } from './blocklist.fixture'
 
 describe('Feature: Updating blocklist', () => {
   let fixture: ReturnType<typeof blocklistFixture>

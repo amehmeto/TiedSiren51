@@ -1,7 +1,7 @@
 import { beforeEach, describe, it, expect } from 'vitest'
+import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { blockSessionFixture } from './block-session.fixture'
 import { UpdateBlockSessionPayload } from './update-block-session.usecase'
-import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 
 describe('Feature: Updating block session', () => {
   let fixture: ReturnType<typeof blockSessionFixture>

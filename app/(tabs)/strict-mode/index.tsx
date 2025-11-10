@@ -12,7 +12,7 @@ export default function StrictModeScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: 'transparent',
+    backgroundColor: T.color.transparent,
     justifyContent: 'center',
     alignItems: 'center',
   },

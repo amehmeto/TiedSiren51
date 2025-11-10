@@ -1,6 +1,6 @@
 import { beforeEach, describe, it } from 'vitest'
-import { blockSessionFixture } from './block-session.fixture'
 import { buildBlockSession } from '../../_tests_/data-builders/block-session.builder'
+import { blockSessionFixture } from './block-session.fixture'
 
 describe('Feature: Renaming a block session', () => {
   let fixture: ReturnType<typeof blockSessionFixture>

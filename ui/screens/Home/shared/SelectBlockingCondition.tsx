@@ -1,9 +1,9 @@
-import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { FormikProps } from 'formik'
-import { StyleSheet, Text, Pressable } from 'react-native'
+import { useState } from 'react'
+import { Pressable, StyleSheet, Text } from 'react-native'
 import BlockingConditionModal from '@/ui/design-system/components/shared/BlockingConditionModal'
 import { T } from '@/ui/design-system/theme'
-import { useState } from 'react'
+import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 
 export function SelectBlockingCondition(props: { form: FormikProps<Session> }) {
   const selectBlockingCondition = (selectedCondition: string) => {
@@ -56,11 +56,5 @@ const styles = StyleSheet.create({
     paddingBottom: T.spacing.medium,
     paddingLeft: T.spacing.small,
     paddingRight: T.spacing.small,
-  },
-  errorText: {
-    color: T.color.red,
-    fontSize: T.font.size.small,
-    marginTop: T.spacing.extraSmall,
-    fontWeight: T.font.weight.bold,
   },
 })

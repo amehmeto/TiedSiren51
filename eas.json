@@ -12,7 +12,6 @@
         "buildType": "apk"
       },
       "env": {
-        "NODE_ENV": "development",
         "EXPO_ROUTER_APP_ROOT": ".app/",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCLDrarLuQfE9oTVrN6JNOdSKiiVs6oiik",
         "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "com-tiedsiren.firebaseapp.com",
@@ -37,7 +36,6 @@
     "preview": {
       "node": "18.18.2",
       "env": {
-        "NODE_ENV": "production",
         "EXPO_ROUTER_APP_ROOT": ".app/",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCLDrarLuQfE9oTVrN6JNOdSKiiVs6oiik",
         "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "com-tiedsiren.firebaseapp.com",
@@ -56,7 +54,6 @@
     "production": {
       "node": "18.18.2",
       "env": {
-        "NODE_ENV": "production",
         "EXPO_ROUTER_APP_ROOT": ".app/",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCLDrarLuQfE9oTVrN6JNOdSKiiVs6oiik",
         "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "com-tiedsiren.firebaseapp.com",

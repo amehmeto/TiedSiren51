@@ -1,14 +1,15 @@
-import { useEffect } from 'react'
-import { Provider } from 'react-redux'
-import { MenuProvider } from 'react-native-popup-menu'
-import { StatusBar } from 'expo-status-bar'
-import { Text, View } from 'react-native'
 import { Stack, useRouter } from 'expo-router'
-import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
+import { StatusBar } from 'expo-status-bar'
+import { useEffect } from 'react'
+import { StyleSheet, Text, View } from 'react-native'
+import { MenuProvider } from 'react-native-popup-menu'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
-import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
+import { Provider } from 'react-redux'
 import { createStore } from '@/core/_redux_/createStore'
 import { dependencies } from '@/ui/dependencies'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
+import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
+import { T } from '@ui/design-system/theme'
 
 const store = createStore(dependencies)
 
@@ -33,15 +34,9 @@ function AppWithInitialization() {
 
   if (isInitializing) {
     return (
-      <View
-        style={{
-          flex: 1,
-          justifyContent: 'center',
-          alignItems: 'center',
-          backgroundColor: '#1e293b',
-        }}
-      >
-        <Text style={{ color: 'white', fontSize: 18 }}>
+      <View style={styles.view}>
+        <Text style={styles.text}>
+          {/* eslint-disable-next-line no-nested-ternary */}
           {isInitializing
             ? 'Loading...'
             : error
@@ -85,3 +80,16 @@ function AppWithInitialization() {
     </MenuProvider>
   )
 }
+
+const styles = StyleSheet.create({
+  text: {
+    color: T.color.white,
+    fontSize: 18,
+  },
+  view: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: T.color.darkBlueGray,
+  },
+})

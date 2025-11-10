@@ -1,23 +1,23 @@
+import { expect } from 'vitest'
+import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
+import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
+import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
 import { AppStore } from '../../_redux_/createStore'
+import { createTestStore } from '../../_tests_/createTestStore'
+import { stateBuilderProvider } from '../../_tests_/state-builder'
+import { NotificationTrigger } from '../../ports/notification.service'
+import { BlockSession, blockSessionAdapter } from '../block.session'
+import { selectAllBlockSessionIds } from '../selectors/selectAllBlockSessionIds'
+import { selectBlockSessionById } from '../selectors/selectBlockSessionById'
 import {
   createBlockSession,
   CreateBlockSessionPayload,
 } from './create-block-session.usecase'
-import { expect } from 'vitest'
-import { BlockSession, blockSessionAdapter } from '../block.session'
-import { createTestStore } from '../../_tests_/createTestStore'
-import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
-import { stateBuilderProvider } from '../../_tests_/state-builder'
-import { duplicateBlockSession } from './duplicate-block-session.usecase'
-import { selectBlockSessionById } from '../selectors/selectBlockSessionById'
-import { selectAllBlockSessionIds } from '../selectors/selectAllBlockSessionIds'
-import { renameBlockSession } from './rename-block-session.usecase'
 import { deleteBlockSession } from './delete-block-session.usecase'
+import { duplicateBlockSession } from './duplicate-block-session.usecase'
+import { renameBlockSession } from './rename-block-session.usecase'
 import { updateBlockSession } from './update-block-session.usecase'
-import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
-import { NotificationTrigger } from '../../ports/notification.service'
-import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
-import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 
 export function blockSessionFixture(
   testStateBuilderProvider = stateBuilderProvider(),

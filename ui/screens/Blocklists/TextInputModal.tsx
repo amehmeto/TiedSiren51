@@ -1,9 +1,9 @@
-import { StyleSheet, View } from 'react-native'
-import { T } from '@/ui/design-system/theme'
 import { useState } from 'react'
+import { StyleSheet, View } from 'react-native'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { T } from '@/ui/design-system/theme'
 
 export function TextInputModal(props: {
   visible: boolean

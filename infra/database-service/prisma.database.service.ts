@@ -1,5 +1,5 @@
-import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
 import { DatabaseService } from '@/core/ports/database.service'
+import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
 
 export class PrismaDatabaseService
   extends PrismaRepository

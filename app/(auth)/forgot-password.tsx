@@ -1,11 +1,11 @@
+import { useRouter } from 'expo-router'
 import React from 'react'
 import { View, Text, StyleSheet, Platform } from 'react-native'
-import { useRouter } from 'expo-router'
-import { T } from '@/ui/design-system/theme'
-import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
+import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
+import { T } from '@/ui/design-system/theme'
 
 export default function ForgotPasswordScreen() {
   const router = useRouter()
@@ -16,9 +16,7 @@ export default function ForgotPasswordScreen() {
       return
     }
 
-    if (Platform.OS === 'ios') {
-      router.replace('/(auth)/login')
-    }
+    if (Platform.OS === 'ios') router.replace('/(auth)/login')
   }
 
   return (

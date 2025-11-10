@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { PrismaRemoteDeviceRepository } from './prisma.remote-device.repository'
 import { Device } from '@/core/device/device'
+import { PrismaRemoteDeviceRepository } from './prisma.remote-device.repository'
 
 class TestPrismaRemoteDeviceRepository extends PrismaRemoteDeviceRepository {
   async reset(): Promise<void> {
@@ -30,9 +30,8 @@ describe('PrismaRemoteDeviceRepository', () => {
       { id: 'device-3', name: 'Device 3', type: 'laptop' },
     ]
 
-    for (const device of testDevices) {
+    for (const device of testDevices)
       await repository.createDeviceForTesting(device)
-    }
 
     const devices = await repository.findAll()
 

@@ -1,6 +1,6 @@
-import { blockSessionSchema } from '@/ui/screens/Home/schemas/block-session.schema'
 import { z } from 'zod'
 import { ErrorMessages } from '@/ui/error-messages.type'
+import { blockSessionSchema } from '@/ui/screens/Home/schemas/block-session.schema'
 
 export function validateBlockSessionForm() {
   return (values: unknown) => {

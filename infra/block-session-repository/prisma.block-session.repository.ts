@@ -1,8 +1,8 @@
+import uuid from 'react-native-uuid'
 import { BlockSession } from '@/core/block-session/block.session'
 import { BlockSessionRepository } from '@/core/ports/block-session.repository'
-import { UpdatePayload } from '@/core/ports/update.payload'
 import { CreatePayload } from '@/core/ports/create.payload'
-import uuid from 'react-native-uuid'
+import { UpdatePayload } from '@/core/ports/update.payload'
 import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
 
 type DbBlockSession = {
@@ -114,9 +114,7 @@ export class PrismaBlockSessionRepository
       },
     })
 
-    if (!session) {
-      throw new Error(`Session with id ${id} not found`)
-    }
+    if (!session) throw new Error(`Session with id ${id} not found`)
 
     return this.mapToBlockSession(session)
   }

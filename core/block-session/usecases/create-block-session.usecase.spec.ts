@@ -1,12 +1,12 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import { blockSessionFixture } from './block-session.fixture'
-import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import {
   facebookAndroidSiren,
   instagramAndroidSiren,
 } from '@/core/_tests_/data-builders/android-siren.builder'
-import { CreateBlockSessionPayload } from './create-block-session.usecase'
+import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { BlockingConditions } from '@/core/block-session/block.session'
+import { blockSessionFixture } from './block-session.fixture'
+import { CreateBlockSessionPayload } from './create-block-session.usecase'
 
 describe('Feature: Creating a block session', () => {
   let fixture: ReturnType<typeof blockSessionFixture>

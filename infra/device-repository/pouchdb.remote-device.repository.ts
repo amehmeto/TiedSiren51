@@ -1,6 +1,6 @@
+import PouchDB from 'pouchdb'
 import { Device } from '@/core/device/device'
 import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
-import PouchDB from 'pouchdb'
 
 export class PouchdbRemoteDeviceRepository implements RemoteDeviceRepository {
   private db: PouchDB.Database<Device> = new PouchDB('pdb-remote-devices')

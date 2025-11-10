@@ -1,8 +1,8 @@
 import { FlatList, StyleSheet, Text } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { ViewModelBlockSession } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
-import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 import { SessionCard } from '@/ui/screens/Home/HomeScreen/SessionCard'
+import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 
 export function SessionsBoard(
   props: Readonly<{
@@ -35,7 +35,6 @@ const styles = StyleSheet.create({
     marginTop: T.spacing.small,
     marginBottom: T.spacing.small,
   },
-  text: { color: T.color.text },
   cardList: {
     marginBottom: T.spacing.small,
     flexGrow: 0,

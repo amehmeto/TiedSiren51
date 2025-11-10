@@ -1,12 +1,12 @@
+import { useRouter } from 'expo-router'
 import React, { useEffect } from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
-import { useRouter } from 'expo-router'
-import { T } from '@/ui/design-system/theme'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
-import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
+import { T } from '@/ui/design-system/theme'
 
 export default function RegisterScreen() {
   const isUserAuthenticated = useSelector((state: RootState) =>

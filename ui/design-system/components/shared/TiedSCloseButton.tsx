@@ -1,6 +1,6 @@
+import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
 import { Pressable, StyleSheet } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
 import { T } from '@/ui/design-system/theme'
 
 type CloseButtonProps = {

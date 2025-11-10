@@ -1,5 +1,5 @@
-import { AuthGateway } from '@/core/ports/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
+import { AuthGateway } from '@/core/ports/auth.gateway'
 
 export class FakeAuthGateway implements AuthGateway {
   willResultWith: Promise<AuthUser> = Promise.resolve({
@@ -19,11 +19,11 @@ export class FakeAuthGateway implements AuthGateway {
     return this.willResultWith
   }
 
-  signUpWithEmail(email: string, password: string): Promise<AuthUser> {
+  signUpWithEmail(_email: string, _password: string): Promise<AuthUser> {
     return this.willResultWith
   }
 
-  signInWithEmail(email: string, password: string): Promise<AuthUser> {
+  signInWithEmail(_email: string, _password: string): Promise<AuthUser> {
     return this.willResultWith
   }
 
@@ -36,9 +36,8 @@ export class FakeAuthGateway implements AuthGateway {
   }
 
   async logOut(): Promise<void> {
-    if (this.onUserLoggedOutListener) {
-      this.onUserLoggedOutListener()
-    }
+    if (this.onUserLoggedOutListener) this.onUserLoggedOutListener()
+
     return Promise.resolve()
   }
 

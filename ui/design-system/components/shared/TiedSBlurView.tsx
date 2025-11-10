@@ -1,7 +1,7 @@
-import React from 'react'
 import { BlurView } from 'expo-blur'
-import { T } from '@/ui/design-system/theme'
+import React from 'react'
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
+import { T } from '@/ui/design-system/theme'
 
 export function TiedSBlurView(
   props: Readonly<{

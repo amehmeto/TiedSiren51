@@ -1,7 +1,7 @@
-import { T } from '@/ui/design-system/theme'
 import { Stack } from 'expo-router'
 import React from 'react'
 import { StyleSheet } from 'react-native'
+import { T } from '@/ui/design-system/theme'
 
 export default function HomeStackLayout() {
   return (
@@ -18,7 +18,7 @@ export default function HomeStackLayout() {
 
 const styles = StyleSheet.create({
   contentStyle: {
-    backgroundColor: 'transparent',
+    backgroundColor: T.color.transparent,
     paddingHorizontal: T.spacing.large,
   },
 })

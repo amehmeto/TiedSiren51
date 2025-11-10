@@ -1,10 +1,10 @@
 import { beforeEach, describe, it } from 'vitest'
-import { blocklistFixture } from './blocklist.fixture'
-import { buildBlocklist } from '../../_tests_/data-builders/blocklist.builder'
 import {
   facebookAndroidSiren,
   instagramAndroidSiren,
 } from '../../_tests_/data-builders/android-siren.builder'
+import { buildBlocklist } from '../../_tests_/data-builders/blocklist.builder'
+import { blocklistFixture } from './blocklist.fixture'
 
 describe('Feature: Creating a blocklist', () => {
   let fixture: ReturnType<typeof blocklistFixture>

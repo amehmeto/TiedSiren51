@@ -1,7 +1,7 @@
-import * as Notifications from 'expo-notifications'
-import { NotificationService } from '@/core/ports/notification.service'
 import Constants from 'expo-constants'
+import * as Notifications from 'expo-notifications'
 import { Platform } from 'react-native'
+import { NotificationService } from '@/core/ports/notification.service'
 
 export class ExpoNotificationService implements NotificationService {
   async initialize(): Promise<void> {
@@ -69,9 +69,7 @@ export class ExpoNotificationService implements NotificationService {
       }),
     })
 
-    if (!response.ok) {
-      throw new Error('Failed to send push notification')
-    }
+    if (!response.ok) throw new Error('Failed to send push notification')
   }
 
   async scheduleLocalNotification(

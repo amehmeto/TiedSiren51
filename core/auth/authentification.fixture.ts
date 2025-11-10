@@ -1,17 +1,17 @@
+import { expect } from 'vitest'
+import { AppStore } from '@/core/_redux_/createStore'
+import { createTestStore } from '@/core/_tests_/createTestStore'
 import {
   stateBuilder,
   stateBuilderProvider,
 } from '@/core/_tests_/state-builder'
-import { AppStore } from '@/core/_redux_/createStore'
-import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
-import { createTestStore } from '@/core/_tests_/createTestStore'
 import { AuthUser } from '@/core/auth/authUser'
-import { expect } from 'vitest'
+import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
+import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
-import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
-import { logOut } from '@/core/auth/usecases/log-out.usecase'
+import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 
 export function authentificationFixture(
   testStateBuilderProvider = stateBuilderProvider(),
