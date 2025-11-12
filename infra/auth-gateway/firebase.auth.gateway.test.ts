@@ -5,7 +5,6 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { FirebaseAuthGateway } from './firebase.auth.gateway'
 
 vi.mock('firebase/app', () => {
-  // Mock FirebaseError class for instanceof checks
   class MockFirebaseError extends Error {
     code: string
 
@@ -42,6 +41,8 @@ vi.mock('@react-native-google-signin/google-signin', () => ({
     configure: vi.fn(),
     hasPlayServices: vi.fn(),
     signIn: vi.fn(),
+    isSignedIn: vi.fn().mockResolvedValue(false),
+    signOut: vi.fn().mockResolvedValue(undefined),
   },
 }))
 
@@ -63,6 +64,9 @@ describe('FirebaseAuthGateway - Error Translation', () => {
 
   beforeEach(() => {
     vi.clearAllMocks()
+    vi.mocked(firebaseAuth.signOut).mockResolvedValue(undefined)
+    vi.mocked(GoogleSignin.isSignedIn).mockResolvedValue(false)
+    vi.mocked(GoogleSignin.signOut).mockResolvedValue(null)
     gateway = new FirebaseAuthGateway()
   })
 
@@ -204,6 +208,27 @@ describe('FirebaseAuthGateway - Error Translation', () => {
       await expect(
         gateway.signInWithEmail('test@example.com', 'password123'),
       ).rejects.toThrow('Unknown error occurred.')
+    })
+  })
+
+  describe('logOut', () => {
+    it('signs out of Google before Firebase when Google session exists', async () => {
+      vi.mocked(GoogleSignin.isSignedIn).mockResolvedValue(true)
+
+      await gateway.logOut()
+
+      expect(GoogleSignin.isSignedIn).toHaveBeenCalledTimes(1)
+      expect(GoogleSignin.signOut).toHaveBeenCalledTimes(1)
+      expect(firebaseAuth.signOut).toHaveBeenCalledTimes(1)
+    })
+
+    it('skips Google sign out when no Google session exists', async () => {
+      vi.mocked(GoogleSignin.isSignedIn).mockResolvedValue(false)
+
+      await gateway.logOut()
+
+      expect(GoogleSignin.signOut).not.toHaveBeenCalled()
+      expect(firebaseAuth.signOut).toHaveBeenCalledTimes(1)
     })
   })
 })
