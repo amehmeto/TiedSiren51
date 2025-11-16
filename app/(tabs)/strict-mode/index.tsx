@@ -18,14 +18,8 @@ export default function StrictModeScreen() {
   const [showTimerPicker, setShowTimerPicker] = useState(false)
   const [showExtendPicker, setShowExtendPicker] = useState(false)
 
-  const {
-    timeRemaining,
-    isActive,
-    isLoading,
-    startTimer,
-    stopTimer,
-    extendTimer,
-  } = useStrictModeTimer()
+  const { timeRemaining, isActive, isLoading, startTimer, extendTimer } =
+    useStrictModeTimer()
 
   const handleStartTimer = async (
     days: number,
@@ -41,10 +35,6 @@ export default function StrictModeScreen() {
     minutes: number,
   ) => {
     await extendTimer(days, hours, minutes)
-  }
-
-  const handleStopTimer = async () => {
-    await stopTimer()
   }
 
   if (isLoading) {
@@ -78,7 +68,6 @@ export default function StrictModeScreen() {
           isActive={isActive}
           onStartTimer={() => setShowTimerPicker(true)}
           onExtendTimer={() => setShowExtendPicker(true)}
-          onStopTimer={handleStopTimer}
         />
 
         {isActive && <UnlockMethodCard timeRemaining={timeRemaining} />}

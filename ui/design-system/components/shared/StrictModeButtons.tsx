@@ -7,7 +7,7 @@ type StrictModeButtonsProps = {
   isActive: boolean
   onStartTimer: () => void
   onExtendTimer: () => void
-  onStopTimer: () => void
+  onStopTimer?: () => void
 }
 
 export const StrictModeButtons = ({
@@ -44,13 +44,15 @@ export const StrictModeButtons = ({
           </View>
         )}
       </Pressable>
-      <Pressable style={styles.dangerButton} onPress={onStopTimer}>
-        {({ pressed }) => (
-          <View style={pressed && styles.pressed}>
-            <Text style={styles.dangerButtonText}>{'Stop Timer'}</Text>
-          </View>
-        )}
-      </Pressable>
+      {onStopTimer && (
+        <Pressable style={styles.dangerButton} onPress={onStopTimer}>
+          {({ pressed }) => (
+            <View style={pressed && styles.pressed}>
+              <Text style={styles.dangerButtonText}>{'Stop Timer'}</Text>
+            </View>
+          )}
+        </Pressable>
+      )}
     </View>
   )
 }
@@ -83,7 +85,7 @@ const styles = StyleSheet.create({
     fontFamily: T.font.family.primary,
   },
   secondaryButton: {
-    backgroundColor: T.color.buttonSecondaryBg,
+    backgroundColor: T.color.lightBlue,
     borderRadius: T.border.radius.extraRounded,
     paddingVertical: T.spacing.medium,
     alignItems: 'center',
