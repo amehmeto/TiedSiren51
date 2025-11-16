@@ -51,7 +51,7 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-coverage/tmp/
+coverage/
 
 # Android
 #
