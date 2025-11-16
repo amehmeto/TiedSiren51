@@ -7,6 +7,7 @@
       "Bash(echo:*)",
       "Bash(find:*)",
       "Bash(gh pr:*)",
+      "Bash(gh run list:*)",
       "Bash(gh run view:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
