@@ -1,3 +1,4 @@
+import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import { useRouter } from 'expo-router'
 import React, { ReactNode, useEffect, useState } from 'react'
 import { Image, StyleSheet, Text } from 'react-native'
@@ -19,6 +20,8 @@ export default function HomeScreen() {
   const router = useRouter()
   const { dateProvider } = dependencies
   const [now, setNow] = useState<Date>(dateProvider.getNow())
+  const [hasAccessibilityPermission, setHasAccessibilityPermission] =
+    useState(true)
   const viewModel = useSelector<
     RootState,
     ReturnType<typeof selectHomeViewModel>
@@ -30,6 +33,20 @@ export default function HomeScreen() {
     }, 1_000)
     return () => clearInterval(intervalId)
   }, [dateProvider, now])
+
+  useEffect(() => {
+    const checkPermission = async () => {
+      try {
+        const isEnabled = await AccessibilityService.isEnabled()
+        setHasAccessibilityPermission(isEnabled)
+      } catch {
+        // If there's an error checking, assume permission is not granted
+        setHasAccessibilityPermission(false)
+      }
+    }
+
+    void checkPermission()
+  }, [])
 
   const [activeSessionsNode, scheduledSessionsNode]: ReactNode[] = (() => {
     // eslint-disable-next-line no-switch-statements/no-switch
@@ -84,7 +101,7 @@ export default function HomeScreen() {
       <Text style={styles.greetings}>{viewModel.greetings}</Text>
       <Text style={styles.text}>{"Let's make it productive"}</Text>
 
-      <AccessibilityPermissionCard />
+      {!hasAccessibilityPermission && <AccessibilityPermissionCard />}
 
       {activeSessionsNode}
       {scheduledSessionsNode}

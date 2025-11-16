@@ -1,47 +1,20 @@
 import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { useEffect, useState } from 'react'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 
 export const AccessibilityPermissionCard = () => {
-  const [hasAccessibilityPermission, setHasAccessibilityPermission] =
-    useState(true) // Default to true to avoid flashing the card on load
-
-  useEffect(() => {
-    const checkPermission = async () => {
-      try {
-        const isEnabled = await AccessibilityService.isEnabled()
-        setHasAccessibilityPermission(isEnabled)
-      } catch {
-        // If there's an error checking, assume permission is not granted
-        setHasAccessibilityPermission(false)
-      }
-    }
-
-    void checkPermission()
-  }, [])
-
   const handleOpenSettings = async () => {
     try {
       await AccessibilityService.askPermission()
-      // Recheck permission after a short delay when user returns
-      setTimeout(async () => {
-        try {
-          const isEnabled = await AccessibilityService.isEnabled()
-          setHasAccessibilityPermission(isEnabled)
-        } catch {
-          setHasAccessibilityPermission(false)
-        }
-      }, 1000)
     } catch {
       // Handle error silently - user can try again
     }
   }
 
-  if (Platform.OS !== 'android' || hasAccessibilityPermission) return null
+  if (Platform.OS !== 'android') return null
 
   return (
     <TiedSCard style={styles.container}>
