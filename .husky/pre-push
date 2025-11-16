@@ -5,9 +5,6 @@ sh .husky/scripts/uncommitted-files-check.sh
 npm run test:cov
 echo ""
 
-git add coverage/coverage-summary.json
-git commit --amend --no-edit --no-verify
-
 node scripts/compare-coverage.cjs
 
 npx expo-doctor
