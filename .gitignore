@@ -51,7 +51,9 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-coverage/
+# Coverage - ignore all except summary (tracked by CI)
+coverage/*
+!coverage/coverage-summary.json
 
 # Android
 #
