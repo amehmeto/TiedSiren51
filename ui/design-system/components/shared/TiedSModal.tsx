@@ -1,7 +1,7 @@
 import React from 'react'
 import { Dimensions, Modal, StyleSheet, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
-import { TiedSBlurView } from './TiedSBlurView'
+import { TiedSCard } from './TiedSCard'
 
 export function TiedSModal(
   props: Readonly<{
@@ -20,7 +20,7 @@ export function TiedSModal(
       onRequestClose={props.onRequestClose}
     >
       <View style={[styles.centeredView]}>
-        <TiedSBlurView style={props.style}>{props.children}</TiedSBlurView>
+        <TiedSCard style={props.style}>{props.children}</TiedSCard>
       </View>
     </Modal>
   )

@@ -8,7 +8,7 @@ import { deleteBlockSession } from '@/core/block-session/usecases/delete-block-s
 import { duplicateBlockSession } from '@/core/block-session/usecases/duplicate-block-session.usecase'
 import { renameBlockSession } from '@/core/block-session/usecases/rename-block-session.usecase'
 import { ThreeDotMenu } from '@/ui/design-system/components/shared/ThreeDotMenu'
-import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
+import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 import { RoundBlueDot } from '@/ui/screens/Home/HomeScreen/RoundBlueDot'
@@ -77,7 +77,7 @@ export function SessionCard(
           })
         }}
       >
-        <TiedSBlurView>
+        <TiedSCard>
           {props.type === SessionType.ACTIVE ? (
             <RoundBlueDot />
           ) : (
@@ -100,7 +100,7 @@ export function SessionCard(
             </Text>
           </View>
           <ThreeDotMenu menuOptions={sessionCardMenu} style={styles.menu} />
-        </TiedSBlurView>
+        </TiedSCard>
       </Pressable>
 
       <TextInputModal

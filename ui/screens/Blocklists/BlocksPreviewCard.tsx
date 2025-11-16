@@ -1,7 +1,7 @@
 import { IconProps } from '@expo/vector-icons/build/createIconSet'
 import React from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
+import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 
 export function BlocksPreviewCard(
@@ -17,7 +17,7 @@ export function BlocksPreviewCard(
 ) {
   return (
     <Pressable onPress={props.onPress}>
-      <TiedSBlurView>
+      <TiedSCard>
         <props.IconTag
           name={props.iconName}
           color={T.color.text}
@@ -28,7 +28,7 @@ export function BlocksPreviewCard(
           <Text style={styles.blocksNumber}>{props.blocksNumber} blocks</Text>
           <Text style={styles.platform}>{props.platform}</Text>
         </View>
-      </TiedSBlurView>
+      </TiedSCard>
     </Pressable>
   )
 }

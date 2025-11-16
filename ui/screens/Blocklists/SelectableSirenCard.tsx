@@ -4,7 +4,7 @@ import { CheckBox } from 'react-native-elements'
 import { InstalledApp } from '@/core/installed-app/InstalledApp'
 
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
-import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
+import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 
 export function SelectableSirenCard({
@@ -54,7 +54,7 @@ export function SelectableSirenCard({
 
   return (
     <Pressable onPress={onPress} testID={baseTestId}>
-      <TiedSBlurView
+      <TiedSCard
         style={[
           styles.container,
           { marginVertical: T.spacing.extraExtraSmall },
@@ -79,7 +79,7 @@ export function SelectableSirenCard({
           onPress={onPress}
           testID={`${baseTestId}-checkbox`}
         />
-      </TiedSBlurView>
+      </TiedSCard>
     </Pressable>
   )
 }

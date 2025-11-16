@@ -19,8 +19,8 @@ import { AndroidSiren, Sirens, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
-import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 import { ErrorMessages } from '@/ui/error-messages.type'
@@ -232,13 +232,13 @@ export function BlocklistForm({
   return (
     <>
       <Text style={styles.title}>Name</Text>
-      <TiedSBlurView>
+      <TiedSCard>
         <TiedSTextInput
           placeholder={blocklistFromState?.name ?? 'Blocklist name'}
           onChangeText={(text) => setBlocklist({ ...blocklist, name: text })}
           testID="addBlocklistName"
         />
-      </TiedSBlurView>
+      </TiedSCard>
       {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}
       <TabView
         navigationState={navigationState}

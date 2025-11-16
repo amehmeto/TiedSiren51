@@ -8,6 +8,7 @@ import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
 import { exhaustiveGuard } from '@/ui/exhaustive-guard'
+import { AccessibilityPermissionCard } from '@/ui/screens/Home/HomeScreen/AccessibilityPermissionCard'
 import { HomeViewModel } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 import { NoSessionBoard } from '@/ui/screens/Home/HomeScreen/NoSessionBoard'
@@ -82,6 +83,8 @@ export default function HomeScreen() {
       />
       <Text style={styles.greetings}>{viewModel.greetings}</Text>
       <Text style={styles.text}>{"Let's make it productive"}</Text>
+
+      <AccessibilityPermissionCard />
 
       {activeSessionsNode}
       {scheduledSessionsNode}
