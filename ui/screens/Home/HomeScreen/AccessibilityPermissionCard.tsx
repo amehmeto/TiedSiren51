@@ -1,29 +1,56 @@
+import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import React from 'react'
+import { useEffect, useState } from 'react'
 import { Platform, StyleSheet, Text, View } from 'react-native'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 
 export const AccessibilityPermissionCard = () => {
-  // Only show on Android
-  if (Platform.OS !== 'android') return null
+  const [hasAccessibilityPermission, setHasAccessibilityPermission] =
+    useState(true) // Default to true to avoid flashing the card on load
 
-  const handleOpenSettings = () => {
-    // TODO: Implement navigation to accessibility settings
+  useEffect(() => {
+    const checkPermission = async () => {
+      try {
+        const isEnabled = await AccessibilityService.isEnabled()
+        setHasAccessibilityPermission(isEnabled)
+      } catch {
+        // If there's an error checking, assume permission is not granted
+        setHasAccessibilityPermission(false)
+      }
+    }
+
+    void checkPermission()
+  }, [])
+
+  const handleOpenSettings = async () => {
+    try {
+      await AccessibilityService.askPermission()
+      // Recheck permission after a short delay when user returns
+      setTimeout(async () => {
+        try {
+          const isEnabled = await AccessibilityService.isEnabled()
+          setHasAccessibilityPermission(isEnabled)
+        } catch {
+          setHasAccessibilityPermission(false)
+        }
+      }, 1000)
+    } catch {
+      // Handle error silently - user can try again
+    }
   }
+
+  if (Platform.OS !== 'android' || hasAccessibilityPermission) return null
 
   return (
     <TiedSCard style={styles.container}>
-      <View style={styles.iconContainer}>
+      <View style={styles.content}>
         <MaterialCommunityIcons
-          name="link-variant"
+          name="alert-circle"
           size={32}
           color={T.color.lightBlue}
         />
-      </View>
-
-      <View style={styles.content}>
         <Text style={styles.title}>Enable App Blocking</Text>
         <Text style={styles.description}>
           TiedSiren needs accessibility permission to block apps on this device.
@@ -44,10 +71,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     alignItems: 'stretch',
     paddingVertical: T.spacing.large,
-  },
-  iconContainer: {
-    alignSelf: 'center',
-    marginBottom: T.spacing.small,
   },
   content: {
     marginBottom: T.spacing.medium,
