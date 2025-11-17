@@ -14,14 +14,15 @@ export const T = {
     grey: 'rgba(211, 211, 211, 1)',
     red: 'rgba(255, 0, 0, 1)',
     yellow: 'rgba(255, 255, 0, 1)',
-    blueIconColor: 'rgba(0, 102, 255,1)',
+    blueIconColor: 'rgba(0, 102, 255, 1)',
     modalBackgroundColor: 'rgba(0, 0, 0, 0.3)',
-    modalContentColor: 'rgba(240, 244, 255,1)',
-    modalTitleColor: 'rgba(125, 138, 153,1)',
-    darkBlueGray: '#1e293b',
+    modalContentColor: 'rgba(240, 244, 255, 1)',
+    modalTitleColor: 'rgba(125, 138, 153, 1)',
+    darkBlueGray: 'rgba(30, 41, 59, 1)',
   },
   font: {
     size: {
+      xSmall: 11,
       small: 14,
       regular: 18,
       medium: 20,
@@ -29,7 +30,17 @@ export const T = {
       xLarge: 32,
     },
     weight: {
+      light: '300' as const,
+      normal: '400' as const,
+      medium: '500' as const,
+      semibold: '600' as const,
       bold: 'bold' as const,
+    },
+    lineHeight: {
+      tight: 1.2,
+      normal: 1.5,
+      relaxed: 1.75,
+      loose: 2,
     },
     family: {
       primary: Platform.select({
@@ -39,12 +50,16 @@ export const T = {
       }),
     },
   },
-  size: {
-    tiny: 10,
-    xSmall: 11,
-    small: 14,
-    medium: 20,
-    large: 24,
+  component: {
+    size: {
+      tiny: 10,
+      xSmall: 11,
+      small: 14,
+      medium: 20,
+      large: 24,
+    },
+    roundDot: 15,
+    menuIcon: 25,
   },
   spacing: {
     none: 0,
@@ -61,7 +76,8 @@ export const T = {
     width: {
       none: 0,
       thin: 1,
-      thick: 2,
+      medium: 2,
+      thick: 3,
     },
     radius: {
       roundedSmall: 5,
@@ -87,6 +103,47 @@ export const T = {
     modalButton: 120,
     tiedSirenLogo: 100,
   },
+  icon: {
+    size: {
+      small: 16,
+      medium: 20,
+      large: 24,
+      xLarge: 32,
+    },
+  },
+  opacity: {
+    invisible: 0,
+    pressed: 0.5,
+    disabled: 0.6,
+    semiTransparent: 0.9,
+    full: 1,
+  },
+  elevation: {
+    none: 0,
+    low: 1,
+    medium: 3,
+    high: 5,
+    highest: 8,
+  },
+  layout: {
+    width: {
+      full: '100%' as const,
+      nineTenths: '90%' as const,
+      fourFifths: '80%' as const,
+      threeQuarters: '75%' as const,
+      half: '50%' as const,
+    },
+  },
+  effects: {
+    blur: {
+      intensity: {
+        light: 30,
+        medium: 60,
+        strong: 90,
+      },
+    },
+  },
+  // Legacy icon size constants (kept for backward compatibility)
   sirenIconSize: 20,
   largeIconSize: 32,
   iconProportion: 0.45,

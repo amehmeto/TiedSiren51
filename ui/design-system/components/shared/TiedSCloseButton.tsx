@@ -12,7 +12,7 @@ type CloseButtonProps = {
 export function TiedSCloseButton({
   onClose,
   iconColor = T.color.blueIconColor,
-  iconSize = T.size.large,
+  iconSize = T.icon.size.large,
 }: CloseButtonProps) {
   return (
     <Pressable style={styles.closeIconContainer} onPress={onClose}>
@@ -24,10 +24,10 @@ export function TiedSCloseButton({
 const styles = StyleSheet.create({
   closeIconContainer: {
     position: 'absolute',
-    top: T.size.tiny,
-    right: T.size.tiny,
+    top: T.component.size.tiny,
+    right: T.component.size.tiny,
     zIndex: 1,
     backgroundColor: T.color.transparent,
-    padding: T.size.tiny,
+    padding: T.component.size.tiny,
   },
 })

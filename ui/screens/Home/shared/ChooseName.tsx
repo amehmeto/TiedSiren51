@@ -73,6 +73,6 @@ const styles = StyleSheet.create({
   },
   modal: {
     flexDirection: 'column',
-    width: '80%',
+    width: T.layout.width.fourFifths,
   },
 })

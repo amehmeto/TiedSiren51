@@ -23,7 +23,7 @@ const styles = StyleSheet.create({
   title: {
     fontWeight: T.font.weight.bold,
     color: T.color.text,
-    fontSize: T.size.small,
+    fontSize: T.font.size.small,
     marginTop: T.spacing.small,
     marginBottom: T.spacing.small,
   },

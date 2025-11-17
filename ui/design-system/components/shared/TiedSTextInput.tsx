@@ -49,7 +49,7 @@ export function TiedSTextInput({
           >
             <Ionicons
               name={isPasswordShown ? 'eye-outline' : 'eye-off-outline'}
-              size={T.size.large}
+              size={T.icon.size.large}
               color={T.color.grey}
             />
           </Pressable>
@@ -61,7 +61,7 @@ export function TiedSTextInput({
 
 const styles = StyleSheet.create({
   container: {
-    width: '100%',
+    width: T.layout.width.full,
     marginVertical: T.spacing.medium,
   },
   inputContainer: {
@@ -76,7 +76,7 @@ const styles = StyleSheet.create({
     borderColor: T.color.lightBlue,
     borderRadius: T.border.radius.roundedSmall,
     color: T.color.white,
-    width: '100%',
+    width: T.layout.width.full,
   },
   text: {
     color: T.color.white,

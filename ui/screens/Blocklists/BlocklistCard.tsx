@@ -130,7 +130,7 @@ const styles = StyleSheet.create({
   },
   totalBlocks: {
     color: T.color.text,
-    fontSize: T.size.xSmall,
+    fontSize: T.font.size.xSmall,
   },
   infoContainer: {
     flex: 1,
@@ -138,7 +138,7 @@ const styles = StyleSheet.create({
   },
   menu: {
     color: T.color.text,
-    fontSize: T.size.small,
+    fontSize: T.font.size.small,
     marginRight: T.spacing.small,
   },
 })

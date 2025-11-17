@@ -30,7 +30,7 @@ export function SelectableSirenCard({
       <MaterialCommunityIcons
         name={'web'}
         color={T.color.white}
-        size={20}
+        size={T.sirenIconSize}
         style={[{ marginRight: T.spacing.small }]}
       />
     ) : (
@@ -112,6 +112,6 @@ const styles = StyleSheet.create({
   },
   selected: {
     borderColor: T.color.lightBlue,
-    borderWidth: 2,
+    borderWidth: T.border.width.medium,
   },
 })

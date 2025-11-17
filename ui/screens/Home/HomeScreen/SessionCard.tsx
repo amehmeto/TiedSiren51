@@ -83,7 +83,7 @@ export function SessionCard(
           ) : (
             <MaterialCommunityIcons
               name={'clock-outline'}
-              size={16}
+              size={T.icon.size.small}
               color={T.color.lightBlue}
               style={{
                 margin: T.spacing.small,

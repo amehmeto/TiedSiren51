@@ -117,7 +117,7 @@ const styles = StyleSheet.create({
   greetings: {
     color: T.color.text,
     fontWeight: T.font.weight.bold,
-    fontSize: T.size.medium,
+    fontSize: T.font.size.medium,
   },
   text: {
     color: T.color.text,
