@@ -88,6 +88,7 @@ export const T = {
     tiedSirenLogo: 100,
   },
   sirenIconSize: 20,
+  largeIconSize: 32,
   iconProportion: 0.45,
   get addButtonIconSize() {
     return this.width.roundButton * this.iconProportion

@@ -6,14 +6,6 @@ import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 
 export const AccessibilityPermissionCard = () => {
-  const handleOpenSettings = async () => {
-    try {
-      await AccessibilityService.askPermission()
-    } catch {
-      // Handle error silently - user can try again
-    }
-  }
-
   if (Platform.OS !== 'android') return null
 
   return (
@@ -21,7 +13,7 @@ export const AccessibilityPermissionCard = () => {
       <View style={styles.content}>
         <MaterialCommunityIcons
           name="alert-circle"
-          size={32}
+          size={T.largeIconSize}
           color={T.color.lightBlue}
         />
         <Text style={styles.title}>Enable App Blocking</Text>
@@ -33,7 +25,10 @@ export const AccessibilityPermissionCard = () => {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TiedSButton onPress={handleOpenSettings} text="Open Settings" />
+        <TiedSButton
+          onPress={async () => await AccessibilityService.askPermission()}
+          text="Open Settings"
+        />
       </View>
     </TiedSCard>
   )
@@ -49,17 +44,17 @@ const styles = StyleSheet.create({
     marginBottom: T.spacing.medium,
   },
   title: {
-    fontSize: T.size.medium,
+    fontSize: T.font.size.medium,
     fontWeight: T.font.weight.bold,
     color: T.color.text,
     textAlign: 'center',
     marginBottom: T.spacing.small,
   },
   description: {
-    fontSize: T.size.small,
+    fontSize: T.font.size.small,
     color: T.color.text,
     textAlign: 'center',
-    lineHeight: 20,
+    lineHeight: T.font.size.medium,
     opacity: 0.9,
   },
   buttonContainer: {
