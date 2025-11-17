@@ -1,4 +1,4 @@
-import { Picker } from '@react-native-picker/picker'
+import { Ionicons } from '@expo/vector-icons'
 import { BlurView } from 'expo-blur'
 import React, { useState, useMemo } from 'react'
 import {
@@ -6,59 +6,48 @@ import {
   View,
   Text,
   StyleSheet,
-  TouchableOpacity,
+  Pressable,
   Platform,
 } from 'react-native'
 import { T } from '@/ui/design-system/theme'
+import { formatEndFromOffsets } from '@/ui/utils/timeFormat'
+import { TimePicker } from './TimePicker'
 
-interface TimerPickerModalProps {
+type TimerPickerModalProps = {
   visible: boolean
   onClose: () => void
   onSave: (days: number, hours: number, minutes: number) => void
   title?: string
 }
 
-export const TimerPickerModal: React.FC<TimerPickerModalProps> = ({
+export const TimerPickerModal = ({
   visible,
   onClose,
   onSave,
   title = 'Set the timer',
-}) => {
+}: Readonly<TimerPickerModalProps>) => {
   const [selectedDays, setSelectedDays] = useState(1)
   const [selectedHours, setSelectedHours] = useState(0)
   const [selectedMinutes, setSelectedMinutes] = useState(0)
 
-  const dayItems = useMemo(() => Array.from({ length: 31 }, (_, i) => i), [])
-  const hourItems = useMemo(() => Array.from({ length: 24 }, (_, i) => i), [])
-  const minuteItems = useMemo(() => Array.from({ length: 60 }, (_, i) => i), [])
+  const isZeroDuration = useMemo(
+    () => selectedDays === 0 && selectedHours === 0 && selectedMinutes === 0,
+    [selectedDays, selectedHours, selectedMinutes],
+  )
 
-  const endDateTime = useMemo(() => {
-    const now = new Date()
-    const endTime = new Date(
-      now.getTime() +
-        selectedDays * 24 * 60 * 60 * 1000 +
-        selectedHours * 60 * 60 * 1000 +
-        selectedMinutes * 60 * 1000,
-    )
-
-    const day = endTime.getDate()
-    const month = endTime.getMonth() + 1
-    const hours = endTime.getHours()
-    const minutes = endTime.getMinutes()
-    const ampm = hours >= 12 ? 'p.m.' : 'a.m.'
-    const displayHours = hours % 12 || 12
-
-    return `Ends ${day}/${month}, ${displayHours}:${minutes
-      .toString()
-      .padStart(2, '0')} ${ampm}`
-  }, [selectedDays, selectedHours, selectedMinutes])
+  const endDateTime = useMemo(
+    () =>
+      formatEndFromOffsets({
+        days: selectedDays,
+        hours: selectedHours,
+        minutes: selectedMinutes,
+      }),
+    [selectedDays, selectedHours, selectedMinutes],
+  )
 
   const handleSave = () => {
+    if (isZeroDuration) return
     onSave(selectedDays, selectedHours, selectedMinutes)
-    onClose()
-  }
-
-  const handleClose = () => {
     onClose()
   }
 
@@ -67,92 +56,70 @@ export const TimerPickerModal: React.FC<TimerPickerModalProps> = ({
       visible={visible}
       transparent
       animationType="slide"
-      onRequestClose={handleClose}
+      onRequestClose={onClose}
     >
       <View style={styles.overlay}>
         <BlurView intensity={20} style={StyleSheet.absoluteFill} tint="dark" />
 
-        <TouchableOpacity
-          style={StyleSheet.absoluteFill}
-          activeOpacity={1}
-          onPress={handleClose}
-        />
+        <Pressable style={StyleSheet.absoluteFill} onPress={onClose} />
 
         <View style={styles.modalContainer}>
           <View style={styles.header}>
-            <TouchableOpacity onPress={handleClose} style={styles.closeButton}>
-              <Text style={styles.closeButtonText}>✕</Text>
-            </TouchableOpacity>
+            <Pressable onPress={onClose} style={styles.closeButton}>
+              <Ionicons
+                name="close"
+                size={T.font.size.large}
+                color={T.color.lightBlue}
+              />
+            </Pressable>
             <Text style={styles.title}>{title}</Text>
           </View>
 
           <View style={styles.pickerContainer}>
-            <View style={styles.pickerWrapper}>
-              <Picker
-                selectedValue={selectedDays}
-                onValueChange={(value) => setSelectedDays(value)}
-                style={styles.picker}
-                itemStyle={styles.pickerItem}
-                mode={Platform.OS === 'android' ? 'dropdown' : 'dialog'}
-                dropdownIconColor={T.color.white}
-              >
-                {dayItems.map((day) => (
-                  <Picker.Item
-                    key={`day-${day}`}
-                    label={`${day} day${day !== 1 ? 's' : ''}`}
-                    value={day}
-                    color={T.color.modalBackgroundColor}
-                  />
-                ))}
-              </Picker>
-            </View>
-
-            <View style={styles.pickerWrapper}>
-              <Picker
-                selectedValue={selectedHours}
-                onValueChange={(value) => setSelectedHours(value)}
-                style={styles.picker}
-                itemStyle={styles.pickerItem}
-                mode={Platform.OS === 'android' ? 'dropdown' : 'dialog'}
-                dropdownIconColor={T.color.white}
-              >
-                {hourItems.map((hour) => (
-                  <Picker.Item
-                    key={`hour-${hour}`}
-                    label={`${hour} hour${hour !== 1 ? 's' : ''}`}
-                    value={hour}
-                    color={T.color.modalBackgroundColor}
-                  />
-                ))}
-              </Picker>
-            </View>
-
-            <View style={styles.pickerWrapper}>
-              <Picker
-                selectedValue={selectedMinutes}
-                onValueChange={(value) => setSelectedMinutes(value)}
-                style={styles.picker}
-                itemStyle={styles.pickerItem}
-                mode={Platform.OS === 'android' ? 'dropdown' : 'dialog'}
-                dropdownIconColor={T.color.white}
-              >
-                {minuteItems.map((minute) => (
-                  <Picker.Item
-                    key={`minute-${minute}`}
-                    label={`${minute} min`}
-                    value={minute}
-                    color={T.color.modalBackgroundColor}
-                  />
-                ))}
-              </Picker>
-            </View>
+            <TimePicker
+              selectedValue={selectedDays}
+              onValueChange={setSelectedDays}
+              max={30}
+              labelSingular="day"
+              labelPlural="days"
+            />
+            <TimePicker
+              selectedValue={selectedHours}
+              onValueChange={setSelectedHours}
+              max={23}
+              labelSingular="hour"
+              labelPlural="hours"
+            />
+            <TimePicker
+              selectedValue={selectedMinutes}
+              onValueChange={setSelectedMinutes}
+              max={59}
+              labelSingular="min"
+              labelPlural="min"
+            />
           </View>
 
           <Text style={styles.endTimeText}>{endDateTime}</Text>
 
-          <TouchableOpacity style={styles.saveButton} onPress={handleSave}>
-            <Text style={styles.saveButtonText}>Save</Text>
-          </TouchableOpacity>
+          <Pressable
+            style={[
+              styles.saveButton,
+              isZeroDuration && styles.saveButtonDisabled,
+            ]}
+            onPress={handleSave}
+            disabled={isZeroDuration}
+          >
+            {({ pressed }) => (
+              <Text
+                style={[
+                  styles.saveButtonText,
+                  pressed && !isZeroDuration && styles.pressed,
+                ]}
+              >
+                {'Save'}
+              </Text>
+            )}
+          </Pressable>
         </View>
       </View>
     </Modal>
@@ -184,11 +151,6 @@ const styles = StyleSheet.create({
     padding: T.spacing.small,
     zIndex: 1,
   },
-  closeButtonText: {
-    color: T.color.lightBlue,
-    fontSize: T.font.size.large,
-    fontWeight: T.font.weight.bold,
-  },
   title: {
     color: T.color.white,
     fontSize: T.font.size.large,
@@ -200,23 +162,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
     marginVertical: T.spacing.large,
-    backgroundColor: T.color.modalBackgroundColor,
+    backgroundColor: T.color.cardBg,
     borderRadius: T.border.radius.roundedMedium,
     paddingVertical: Platform.OS === 'ios' ? 0 : T.spacing.small,
-  },
-  pickerWrapper: {
-    flex: 1,
-    alignItems: 'center',
-  },
-  picker: {
-    width: '100%',
-    height: Platform.OS === 'ios' ? 180 : 50,
-    color: T.color.white,
-  },
-  pickerItem: {
-    color: T.color.red,
-    fontSize: T.font.size.regular,
-    height: Platform.OS === 'ios' ? 180 : undefined,
   },
   endTimeText: {
     color: T.color.grey,
@@ -240,10 +188,16 @@ const styles = StyleSheet.create({
     shadowRadius: 8,
     elevation: 8,
   },
+  saveButtonDisabled: {
+    opacity: 0.5,
+  },
   saveButtonText: {
     color: T.color.white,
     fontSize: T.font.size.medium,
     fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.primary,
+  },
+  pressed: {
+    opacity: 0.7,
   },
 })

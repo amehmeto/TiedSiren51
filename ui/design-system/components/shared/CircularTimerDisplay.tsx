@@ -1,36 +1,34 @@
+import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { TimeRemaining } from '@/ui/hooks/useStrictModeTimer'
+import { formatCountdown, formatInlineRemaining } from '@/ui/utils/timeFormat'
 
-interface CircularTimerDisplayProps {
+type CircularTimerDisplayProps = {
   timeRemaining: TimeRemaining
   isActive: boolean
 }
 
-export const CircularTimerDisplay: React.FC<CircularTimerDisplayProps> = ({
+export const CircularTimerDisplay = ({
   timeRemaining,
   isActive,
-}) => {
-  const formatTime = () => {
-    const { days, hours, minutes, seconds } = timeRemaining
-    const parts = []
-
-    if (days > 0) parts.push(`${days}d`)
-    if (hours > 0 || days > 0) parts.push(`${hours}h`)
-    if (minutes > 0 || hours > 0 || days > 0) parts.push(`${minutes}m`)
-    parts.push(`${seconds}s`)
-
-    return parts.join(' ')
-  }
+}: Readonly<CircularTimerDisplayProps>) => {
+  const shouldShowInline = isActive && timeRemaining.total > 0
 
   return (
     <View style={styles.container}>
-      <Text style={styles.timerText}>{formatTime()}</Text>
-      <Text style={styles.title}>
-        until the timer ends: {timeRemaining.days}d {timeRemaining.hours}h{' '}
-        {timeRemaining.minutes}m{timeRemaining.seconds}s
-      </Text>
+      {isActive && (
+        <Ionicons
+          name="lock-closed-outline"
+          size={28}
+          color={T.color.lightBlue}
+        />
+      )}
+      <Text style={styles.timerText}>{formatCountdown(timeRemaining)}</Text>
+      {shouldShowInline && (
+        <Text style={styles.title}>{formatInlineRemaining(timeRemaining)}</Text>
+      )}
 
       <Text style={styles.statusMessage}>
         {isActive

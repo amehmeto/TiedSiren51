@@ -2,7 +2,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const TIMER_STORAGE_KEY = '@strict_mode_timer'
 
-export interface TimerData {
+export type TimerData = {
   endTime: number
   duration: number
   isActive: boolean
