@@ -3,7 +3,7 @@ import React from 'react'
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
-export function TiedSBlurView(
+export function TiedSCard(
   props: Readonly<{
     children: React.ReactNode
     style?: StyleProp<ViewStyle>

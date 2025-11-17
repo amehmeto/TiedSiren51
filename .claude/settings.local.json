@@ -4,8 +4,10 @@
       "Bash(base64:*)",
       "Bash(cat:*)",
       "Bash(eas:*)",
+      "Bash(echo:*)",
       "Bash(find:*)",
       "Bash(gh pr:*)",
+      "Bash(gh run list:*)",
       "Bash(gh run view:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
@@ -16,6 +18,7 @@
       "Bash(npm test:*)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
+      "WebFetch(domain:stackoverflow.com)",
       "WebSearch"
     ],
     "deny": ["Bash(git push:*)"],

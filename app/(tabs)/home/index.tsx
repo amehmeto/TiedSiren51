@@ -1,3 +1,4 @@
+import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import { useRouter } from 'expo-router'
 import React, { ReactNode, useEffect, useState } from 'react'
 import { Image, StyleSheet, Text } from 'react-native'
@@ -8,6 +9,7 @@ import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
 import { exhaustiveGuard } from '@/ui/exhaustive-guard'
+import { AccessibilityPermissionCard } from '@/ui/screens/Home/HomeScreen/AccessibilityPermissionCard'
 import { HomeViewModel } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 import { NoSessionBoard } from '@/ui/screens/Home/HomeScreen/NoSessionBoard'
@@ -18,6 +20,8 @@ export default function HomeScreen() {
   const router = useRouter()
   const { dateProvider } = dependencies
   const [now, setNow] = useState<Date>(dateProvider.getNow())
+  const [hasAccessibilityPermission, setHasAccessibilityPermission] =
+    useState(true)
   const viewModel = useSelector<
     RootState,
     ReturnType<typeof selectHomeViewModel>
@@ -29,6 +33,19 @@ export default function HomeScreen() {
     }, 1_000)
     return () => clearInterval(intervalId)
   }, [dateProvider, now])
+
+  useEffect(() => {
+    const checkPermission = async () => {
+      try {
+        const isEnabled = await AccessibilityService.isEnabled()
+        setHasAccessibilityPermission(isEnabled)
+      } catch {
+        setHasAccessibilityPermission(false)
+      }
+    }
+
+    void checkPermission()
+  }, [])
 
   const [activeSessionsNode, scheduledSessionsNode]: ReactNode[] = (() => {
     // eslint-disable-next-line no-switch-statements/no-switch
@@ -82,6 +99,8 @@ export default function HomeScreen() {
       />
       <Text style={styles.greetings}>{viewModel.greetings}</Text>
       <Text style={styles.text}>{"Let's make it productive"}</Text>
+
+      {!hasAccessibilityPermission && <AccessibilityPermissionCard />}
 
       {activeSessionsNode}
       {scheduledSessionsNode}

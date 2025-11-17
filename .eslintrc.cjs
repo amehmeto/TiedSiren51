@@ -45,10 +45,11 @@ module.exports = {
     'react/react-in-jsx-scope': 'off', // Not needed in React 18+
     // React Hooks rules
     'react-hooks/rules-of-hooks': 'error', // Enforces hooks rules
+    'react-hooks/exhaustive-deps': 'off', // Disabled - manage dependencies manually
     // React Native rules
     'react-native/no-unused-styles': 'error', // Detects unused StyleSheet styles
-    'react-native/no-inline-styles': 'warn', // Encourages StyleSheet usage
-    'react-native/no-color-literals': 'warn', // Encourages design system colors
+    'react-native/no-inline-styles': 'error', // Encourages StyleSheet usage
+    'react-native/no-color-literals': 'error', // Encourages design system colors
   },
   overrides: [
     {

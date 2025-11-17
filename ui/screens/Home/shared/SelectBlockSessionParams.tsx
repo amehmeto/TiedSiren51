@@ -6,8 +6,8 @@ import { RootState } from '@/core/_redux_/createStore'
 import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
 import { Device } from '@/core/device/device'
 import { dependencies } from '@/ui/dependencies'
-import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { ChooseName } from '@/ui/screens/Home/shared/ChooseName'
 import { FieldErrors } from '@/ui/screens/Home/shared/FieldErrors'
@@ -43,7 +43,7 @@ export function SelectBlockSessionParams({
 
   return (
     <View>
-      <TiedSBlurView style={styles.blockSession}>
+      <TiedSCard style={styles.blockSession}>
         <ChooseName
           values={form.values}
           onChange={form.handleChange('name')}
@@ -93,7 +93,7 @@ export function SelectBlockSessionParams({
         {hasFieldError('blockingConditions') && (
           <FieldErrors errors={form.errors} fieldName={'blockingConditions'} />
         )}
-      </TiedSBlurView>
+      </TiedSCard>
 
       <TiedSButton text={'START'} onPress={() => form.handleSubmit()} />
     </View>

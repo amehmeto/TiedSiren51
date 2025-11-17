@@ -7,7 +7,7 @@ import { deleteBlocklist } from '@/core/blocklist/usecases/delete-blocklist.usec
 import { duplicateBlocklist } from '@/core/blocklist/usecases/duplicate-blocklist.usecase'
 import { renameBlocklist } from '@/core/blocklist/usecases/rename-blocklist.usecase'
 import { ThreeDotMenu } from '@/ui/design-system/components/shared/ThreeDotMenu'
-import { TiedSBlurView } from '@/ui/design-system/components/shared/TiedSBlurView'
+import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 
@@ -70,7 +70,7 @@ export function BlocklistCard(
           })
         }
       >
-        <TiedSBlurView style={styles.container}>
+        <TiedSCard style={styles.container}>
           <View style={styles.infoContainer}>
             <Text style={styles.name}>{props.blocklist.name}</Text>
             <Text style={styles.totalBlocks}>
@@ -78,7 +78,7 @@ export function BlocklistCard(
             </Text>
           </View>
           <ThreeDotMenu menuOptions={blocklistCardMenu} style={styles.menu} />
-        </TiedSBlurView>
+        </TiedSCard>
       </Pressable>
 
       <TextInputModal

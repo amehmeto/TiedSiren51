@@ -1,33 +1,11 @@
+sh .husky/scripts/e2e-test-check.sh
 sh .husky/scripts/no-direct-push-main-demo.sh
 sh .husky/scripts/branch-name-check.sh
 sh .husky/scripts/uncommitted-files-check.sh
 
+npx expo-doctor
 npm run test:cov
 echo ""
-
-git add coverage/coverage-summary.json
-git commit --amend --no-edit --no-verify
-
 node scripts/compare-coverage.cjs
 
-npx expo-doctor
-
-exec < /dev/tty  # Redirect input to terminal
-
-echo ""
-echo "⚠️  Warning: E2E tests are not part of CI pipeline yet."
-echo "👉 It's your responsibility to ensure e2e tests pass before final merge."
-echo "🛑 Please run 'npm run test:e2e' to verify your changes."
-read -p "❓ Have you manually verified that e2e tests pass? (y/n): " answer
-echo ""
-
-if [ "$answer" != "y" ]; then
-    echo "🛑 Please run 'npm run test:e2e' to verify your changes."
-    echo "   You can run the tests with: npm run test:e2e"
-    exit 1
-fi
-
-exec <&- # Close terminal input
-
-echo "✅ Proceeding with push. Remember to run e2e tests before final merge!"
-echo ""
+printf "✅ Proceeding with push. Remember to run e2e tests before final merge!\n"

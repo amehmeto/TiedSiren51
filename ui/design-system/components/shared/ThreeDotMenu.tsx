@@ -14,7 +14,7 @@ import {
   MenuTrigger,
 } from 'react-native-popup-menu'
 import { T } from '@/ui/design-system/theme'
-import { TiedSBlurView } from './TiedSBlurView'
+import { TiedSCard } from './TiedSCard'
 
 type IconName =
   | 'text-outline'
@@ -106,7 +106,7 @@ export function ThreeDotMenu(props: {
           optionsContainer: dynamicStyles.optionsContainer,
         }}
       >
-        <TiedSBlurView style={styles.menuOptions}>
+        <TiedSCard style={styles.menuOptions}>
           {props.menuOptions.map((option) => (
             <TiedSMenuOption
               key={option.name}
@@ -114,7 +114,7 @@ export function ThreeDotMenu(props: {
               iconName={option.iconName}
             />
           ))}
-        </TiedSBlurView>
+        </TiedSCard>
       </MenuOptions>
     </Menu>
   )

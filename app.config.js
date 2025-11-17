@@ -38,10 +38,10 @@ export default {
       favicon: './assets/images/favicon.png',
     },
     plugins: [
-      'expo-router',
       '@prisma/react-native',
       '@react-native-google-signin/google-signin',
       'expo-apple-authentication',
+      'expo-router',
     ],
     experiments: {
       typedRoutes: true,
