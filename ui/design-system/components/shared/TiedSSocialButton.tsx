@@ -23,11 +23,15 @@ export function TiedSSocialButton({
       style={({ pressed }) => [
         styles.button,
         style,
-        { opacity: pressed ? 0.5 : 1 },
+        { opacity: pressed ? T.opacity.pressed : T.opacity.full },
       ]}
       onPress={onPress}
     >
-      <Ionicons name={iconName} size={T.size.large} color={T.color.white} />
+      <Ionicons
+        name={iconName}
+        size={T.icon.size.large}
+        color={T.color.white}
+      />
       <Text style={styles.buttonText}>{text}</Text>
     </Pressable>
   )
@@ -38,7 +42,7 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
-    width: '90%',
+    width: T.layout.width.nineTenths,
     padding: T.spacing.medium,
     marginBottom: T.spacing.medium,
     borderRadius: T.border.radius.roundedMedium,

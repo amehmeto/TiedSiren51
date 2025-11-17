@@ -21,7 +21,7 @@ export function BlocksPreviewCard(
         <props.IconTag
           name={props.iconName}
           color={T.color.text}
-          size={25}
+          size={T.component.menuIcon}
           style={styles.icon}
         />
         <View style={styles.container}>
@@ -46,6 +46,6 @@ const styles = StyleSheet.create({
   },
   platform: {
     color: T.color.text,
-    fontSize: T.size.xSmall,
+    fontSize: T.font.size.xSmall,
   },
 })

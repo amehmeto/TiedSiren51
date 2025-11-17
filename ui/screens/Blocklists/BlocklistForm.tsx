@@ -262,7 +262,7 @@ const styles = StyleSheet.create({
     fontWeight: T.font.weight.bold,
     color: T.color.text,
     fontFamily: T.font.family.primary,
-    fontSize: T.size.small,
+    fontSize: T.font.size.small,
     marginTop: T.spacing.small,
     marginBottom: T.spacing.small,
   },

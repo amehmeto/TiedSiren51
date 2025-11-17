@@ -49,7 +49,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',
-    width: '100%',
+    width: T.layout.width.full,
   },
   modalButton: { marginLeft: T.spacing.large },
   renameModal: { flexDirection: 'column' },

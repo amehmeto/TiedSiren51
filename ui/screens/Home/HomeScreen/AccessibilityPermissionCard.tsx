@@ -55,9 +55,9 @@ const styles = StyleSheet.create({
     color: T.color.text,
     textAlign: 'center',
     lineHeight: T.font.size.medium,
-    opacity: 0.9,
+    opacity: T.opacity.semiTransparent,
   },
   buttonContainer: {
-    width: '100%',
+    width: T.layout.width.full,
   },
 })

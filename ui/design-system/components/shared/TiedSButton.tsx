@@ -16,7 +16,7 @@ export function TiedSButton(
         styles.container,
         props.style,
         props.disabled && styles.disabled,
-        { opacity: pressed ? 0.5 : 1 },
+        { opacity: pressed ? T.opacity.pressed : T.opacity.full },
       ]}
       onPress={props.onPress}
       disabled={props.disabled}
@@ -47,6 +47,6 @@ const styles = StyleSheet.create({
   },
   disabled: {
     backgroundColor: T.color.grey,
-    opacity: 0.6,
+    opacity: T.opacity.disabled,
   },
 })

@@ -130,7 +130,7 @@ function BlockingConditionComponent({
     <TouchableOpacity style={styles.conditionContainer} onPress={onSelect}>
       <Ionicons
         name={iconName}
-        size={T.size.large}
+        size={T.icon.size.large}
         color={T.color.blueIconColor}
         style={styles.conditionIcon}
       />
@@ -150,7 +150,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalContent: {
-    width: '90%',
+    width: T.layout.width.nineTenths,
     backgroundColor: T.color.modalContentColor,
     borderRadius: T.border.radius.roundedLarge,
     padding: T.spacing.medium,
@@ -159,28 +159,28 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.large,
     fontWeight: T.font.weight.bold,
     color: T.color.blueIconColor,
-    marginBottom: T.size.tiny,
+    marginBottom: T.component.size.tiny,
     textAlign: 'left',
   },
   modalSubtitle: {
-    fontSize: T.size.small,
+    fontSize: T.font.size.small,
     color: T.color.modalTitleColor,
-    marginBottom: T.size.medium,
+    marginBottom: T.component.size.medium,
   },
   scrollViewContent: {
-    paddingBottom: T.size.medium,
+    paddingBottom: T.component.size.medium,
   },
   conditionContainer: {
     backgroundColor: T.color.white,
     borderRadius: T.border.radius.roundedMedium,
-    padding: T.size.small,
-    marginBottom: T.size.small,
+    padding: T.component.size.small,
+    marginBottom: T.component.size.small,
     flexDirection: 'row',
     alignItems: 'center',
-    elevation: 1,
+    elevation: T.elevation.low,
   },
   conditionIcon: {
-    marginRight: T.size.medium,
+    marginRight: T.component.size.medium,
   },
   conditionTitle: {
     fontSize: T.font.size.regular,

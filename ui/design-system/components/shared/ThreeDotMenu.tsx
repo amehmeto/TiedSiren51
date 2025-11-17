@@ -37,7 +37,7 @@ function TiedSMenuOption(props: {
       <Text style={[styles.menuOptionText]}>{props.optionName}</Text>
       <Ionicons
         name={props.iconName}
-        size={T.size.large}
+        size={T.icon.size.large}
         color={T.color.white}
       />
     </MenuOption>
@@ -97,7 +97,7 @@ export function ThreeDotMenu(props: {
       <MenuTrigger>
         <Ionicons
           name={'ellipsis-horizontal'}
-          size={T.size.large}
+          size={T.icon.size.large}
           color={T.color.text}
         />
       </MenuTrigger>
@@ -123,7 +123,7 @@ export function ThreeDotMenu(props: {
 const styles = StyleSheet.create({
   menuOptionText: {
     color: T.color.white,
-    fontSize: T.size.small,
+    fontSize: T.font.size.small,
     flex: 1,
   },
   menuOptions: {

@@ -46,6 +46,6 @@ const styles = StyleSheet.create({
     width: Dimensions.get('window').width * 0.9,
     shadowOpacity: T.shadow.opacity,
     shadowRadius: T.shadow.radius,
-    elevation: 5,
+    elevation: T.elevation.high,
   },
 })
