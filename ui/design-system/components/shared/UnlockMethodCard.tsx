@@ -44,11 +44,11 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
   },
   unlockMethodCard: {
-    backgroundColor: T.color.cardBg,
+    backgroundColor: T.color.darkBlueGray,
     borderRadius: T.border.radius.roundedMedium,
     padding: T.spacing.medium,
-    borderWidth: 1,
-    borderColor: T.color.cardBorder,
+    borderWidth: T.border.width.thin,
+    borderColor: T.color.lightBlueShade,
   },
   unlockMethodRow: {
     flexDirection: 'row',

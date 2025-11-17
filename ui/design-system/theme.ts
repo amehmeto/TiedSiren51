@@ -20,15 +20,6 @@ export const T = {
     modalContentColor: 'rgba(240, 244, 255, 1)',
     modalTitleColor: 'rgba(125, 138, 153, 1)',
     darkBlueGray: 'rgba(30, 41, 59, 1)',
-    buttonPrimary: 'rgba(59, 130, 246, 1)',
-    buttonPrimaryDark: 'rgba(37, 99, 235, 1)',
-    buttonSecondaryBg: 'rgba(255, 255, 255, 0.1)',
-    buttonSecondaryBorder: 'rgba(255, 255, 255, 0.2)',
-    buttonDangerBg: 'rgba(239, 68, 68, 0.2)',
-    buttonDangerBorder: 'rgba(239, 68, 68, 0.4)',
-    buttonDangerText: 'rgba(239, 68, 68, 1)',
-    cardBg: 'rgba(255, 255, 255, 0.05)',
-    cardBorder: 'rgba(255, 255, 255, 0.1)',
   },
   font: {
     size: {

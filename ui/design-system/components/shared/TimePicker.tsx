@@ -52,13 +52,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   picker: {
-    width: '100%',
+    width: '110%',
     height: Platform.OS === 'ios' ? 180 : 50,
     color: T.color.white,
   },
   pickerItem: {
     color: T.color.white,
-    fontSize: T.font.size.regular,
+    fontSize: T.font.size.small,
     height: Platform.OS === 'ios' ? 180 : undefined,
+    fontFamily: T.font.family.primary,
   },
 })

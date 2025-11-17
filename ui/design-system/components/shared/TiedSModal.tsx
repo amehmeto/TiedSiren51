@@ -13,7 +13,7 @@ export function TiedSModal(
 ) {
   return (
     <Modal
-      style={styles.modalView}
+      style={[styles.modalView, props.style]}
       animationType="slide"
       transparent={true}
       visible={props.isVisible}
