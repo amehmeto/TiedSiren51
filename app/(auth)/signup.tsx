@@ -77,7 +77,11 @@ export default function SignUpScreen() {
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
+        <TiedSCloseButton
+          onClose={handleClose}
+          iconColor={T.color.white}
+          style={styles.closeButton}
+        />
         <Text style={styles.subtitle}>{'GET STARTED FOR FREE'}</Text>
         <TiedSSocialButton
           iconName="logo-google"
@@ -158,5 +162,10 @@ const styles = StyleSheet.create({
     color: T.color.red,
     fontSize: T.font.size.regular,
     marginVertical: T.spacing.medium,
+  },
+  closeButton: {
+    position: 'absolute',
+    right: T.spacing.medium,
+    top: T.spacing.medium,
   },
 })

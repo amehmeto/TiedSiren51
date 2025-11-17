@@ -22,7 +22,11 @@ export default function ForgotPasswordScreen() {
   return (
     <TiedSLinearBackground>
       <View style={styles.container}>
-        <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
+        <TiedSCloseButton
+          onClose={handleClose}
+          iconColor={T.color.white}
+          style={styles.closeButton}
+        />
         <Text style={styles.title}>{'RESET YOUR PASSWORD'}</Text>
         <TiedSTextInput
           placeholder={'Your Email'}
@@ -48,5 +52,10 @@ const styles = StyleSheet.create({
     fontWeight: T.font.weight.bold,
     color: T.color.text,
     marginBottom: T.spacing.large,
+  },
+  closeButton: {
+    position: 'absolute',
+    right: T.spacing.medium,
+    top: T.spacing.medium,
   },
 })

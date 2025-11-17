@@ -83,7 +83,11 @@ export default function LoginScreen() {
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
+        <TiedSCloseButton
+          onClose={handleClose}
+          iconColor={T.color.white}
+          style={styles.closeButton}
+        />
         <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
         <TiedSSocialButton
           iconName="logo-google"
@@ -182,5 +186,10 @@ const styles = StyleSheet.create({
     color: T.color.red,
     fontSize: T.font.size.regular,
     marginBottom: T.spacing.large,
+  },
+  closeButton: {
+    position: 'absolute',
+    right: T.spacing.medium,
+    top: T.spacing.medium,
   },
 })
