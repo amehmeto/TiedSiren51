@@ -22,7 +22,7 @@ fi
 # Check if coverage changed
 if ! git diff --quiet coverage/coverage-summary.json; then
   git add coverage/coverage-summary.json
-  git commit -m "chore: update test coverage summary [skip ci]"
+  git commit -m "chore: update test coverage summary"
   if [ -n "$GITHUB_HEAD_REF" ]; then
     git push origin "$GITHUB_HEAD_REF"
   else

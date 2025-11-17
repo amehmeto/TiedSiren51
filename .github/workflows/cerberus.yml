@@ -40,8 +40,8 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test:cov
 
-      - name: Commit coverage if changed
-        run: bash scripts/commit-coverage.sh
+#      - name: Commit coverage if changed
+#        run: bash scripts/commit-coverage.sh
 
       - name: Store PR coverage
         run: bash scripts/store-coverage.sh pr-coverage.json

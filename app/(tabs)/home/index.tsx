@@ -40,7 +40,6 @@ export default function HomeScreen() {
         const isEnabled = await AccessibilityService.isEnabled()
         setHasAccessibilityPermission(isEnabled)
       } catch {
-        // If there's an error checking, assume permission is not granted
         setHasAccessibilityPermission(false)
       }
     }
