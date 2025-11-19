@@ -8,7 +8,7 @@ import { FakeDataDeviceRepository } from '@/infra/device-repository/fake-data.de
 import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
 import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
 import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
-import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
+import { FakeSirenLookout } from '@infra/siren-tier/fake.siren-lookout'
 import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 import { createStore } from '../_redux_/createStore'
 import { Dependencies } from '../_redux_/dependencies'
@@ -25,7 +25,7 @@ export const createTestStore = (
     deviceRepository = new FakeDataDeviceRepository(),
     installedAppRepository = new FakeDataInstalledAppsRepository(),
     notificationService = new FakeNotificationService(),
-    sirenLookout = new InMemorySirenLookout(),
+    sirenLookout = new FakeSirenLookout(),
     sirenTier = new InMemorySirenTier(),
     sirensRepository = new FakeDataSirensRepository(),
   }: Partial<Dependencies> = {},
