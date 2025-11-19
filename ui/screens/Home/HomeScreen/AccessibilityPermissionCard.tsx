@@ -1,11 +1,17 @@
-import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { Platform, StyleSheet, Text, View } from 'react-native'
+import { AndroidSirenLookout } from '@/core/_ports_/siren.lookout'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 
-export const AccessibilityPermissionCard = () => {
+interface AccessibilityPermissionCardProps {
+  sirenLookout: AndroidSirenLookout
+}
+
+export const AccessibilityPermissionCard = ({
+  sirenLookout,
+}: AccessibilityPermissionCardProps) => {
   if (Platform.OS !== 'android') return null
 
   return (
@@ -26,7 +32,7 @@ export const AccessibilityPermissionCard = () => {
 
       <View style={styles.buttonContainer}>
         <TiedSButton
-          onPress={async () => await AccessibilityService.askPermission()}
+          onPress={async () => await sirenLookout.askPermission()}
           text="Open Settings"
         />
       </View>

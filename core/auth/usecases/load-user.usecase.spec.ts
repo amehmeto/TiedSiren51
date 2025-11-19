@@ -7,7 +7,7 @@ import { BlockSession } from '@/core/block-session/block.session'
 import { Sirens } from '@/core/siren/sirens'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
-import { FakeDataSirensRepository } from '@/infra/sirens-repository/fake-data.sirens-repository'
+import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
 import { loadUser } from './load-user.usecase'
 
 describe('loadUser usecase', () => {

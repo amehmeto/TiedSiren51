@@ -1,3 +1,4 @@
+import { BlocklistRepository } from '@/core/_ports_/blocklist.repository'
 import {
   amazonPrimeAndroidSiren,
   facebookAndroidSiren,
@@ -7,7 +8,6 @@ import {
 } from '@/core/_tests_/data-builders/android-siren.builder'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { Blocklist } from '@/core/blocklist/blocklist'
-import { BlocklistRepository } from '@/core/ports/blocklist.repository'
 
 export class FakeDataBlocklistRepository implements BlocklistRepository {
   blocklists: Map<string, Blocklist> = new Map(

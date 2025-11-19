@@ -1,5 +1,5 @@
+import { RemoteDeviceRepository } from '@/core/_ports_/remote-device.repository'
 import { Device } from '@/core/device/device'
-import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
 
 export class FakeDataDeviceRepository implements RemoteDeviceRepository {
   async findAll(): Promise<Device[]> {
