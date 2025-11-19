@@ -1,7 +1,7 @@
+import { BlocklistRepository } from '@/core/_ports_/blocklist.repository'
+import { CreatePayload } from '@/core/_ports_/create.payload'
+import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { Blocklist } from '@/core/blocklist/blocklist'
-import { BlocklistRepository } from '@/core/ports/blocklist.repository'
-import { CreatePayload } from '@/core/ports/create.payload'
-import { UpdatePayload } from '@/core/ports/update.payload'
 import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
 
 type DbBlocklist = {
