@@ -1,8 +1,8 @@
 import {
   Action,
   configureStore,
-  ThunkDispatch,
   Middleware,
+  ThunkDispatch,
 } from '@reduxjs/toolkit'
 import { onUserLoggedInListener } from '@/core/auth/listenners/on-user-logged-in.listener'
 import { onUserLoggedOutListener } from '@/core/auth/listenners/on-user-logged-out.listener'
@@ -11,13 +11,22 @@ import { rootReducer } from './rootReducer'
 
 export type PreloadedState = Partial<RootState>
 
+function isAction(action: unknown): action is Action {
+  return (
+    typeof action === 'object' &&
+    action !== null &&
+    'type' in action &&
+    typeof action.type === 'string'
+  )
+}
+
 export const createStore = (
   dependencies: Dependencies,
   preloadedState?: PreloadedState,
 ) => {
   const actions: Action[] = []
   const logActionMiddleware: Middleware = () => (next) => (action: unknown) => {
-    actions.push(action as Action)
+    if (isAction(action)) actions.push(action)
     return next(action)
   }
 

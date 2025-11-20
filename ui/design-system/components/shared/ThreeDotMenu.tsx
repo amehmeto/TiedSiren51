@@ -4,8 +4,8 @@ import {
   StyleProp,
   StyleSheet,
   Text,
-  ViewStyle,
   useWindowDimensions,
+  ViewStyle,
 } from 'react-native'
 import {
   Menu,
@@ -34,7 +34,7 @@ function TiedSMenuOption(props: {
 }) {
   return (
     <MenuOption value={props.optionName} style={styles.menuOption}>
-      <Text style={[styles.menuOptionText]}>{props.optionName}</Text>
+      <Text style={styles.menuOptionText}>{props.optionName}</Text>
       <Ionicons
         name={props.iconName}
         size={T.icon.size.large}
@@ -56,9 +56,7 @@ export function ThreeDotMenu(props: {
     const minWidth = 160
 
     const lowerBound = Math.max(fortyPercent, minWidth)
-    const clampedWidth = Math.min(lowerBound, seventyPercent)
-
-    return clampedWidth
+    return Math.min(lowerBound, seventyPercent)
   }, [windowWidth])
 
   const selectMenuOption = (optionName: TiedSMenu['name']) => {
@@ -93,7 +91,7 @@ export function ThreeDotMenu(props: {
   )
 
   return (
-    <Menu onSelect={selectMenuOption} style={[props.style]}>
+    <Menu onSelect={selectMenuOption} style={props.style}>
       <MenuTrigger>
         <Ionicons
           name={'ellipsis-horizontal'}

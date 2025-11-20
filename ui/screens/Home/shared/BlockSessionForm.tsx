@@ -4,14 +4,8 @@ import uuid from 'react-native-uuid'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { BlockingConditions } from '@/core/block-session/block.session'
-import {
-  createBlockSession,
-  CreateBlockSessionPayload,
-} from '@/core/block-session/usecases/create-block-session.usecase'
-import {
-  updateBlockSession,
-  UpdateBlockSessionPayload,
-} from '@/core/block-session/usecases/update-block-session.usecase'
+import { createBlockSession } from '@/core/block-session/usecases/create-block-session.usecase'
+import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
 import { assertIsBlockSession } from '@/ui/screens/Home/HomeScreen/assertIsBlockSession'
@@ -31,11 +25,11 @@ export type Session = {
 const defaultSession: Session = {
   id: uuid.v4().toString(),
   name: null,
-  blocklists: [] as Blocklist[],
-  devices: [] as Device[],
+  blocklists: [],
+  devices: [],
   startedAt: null,
   endedAt: null,
-  blockingConditions: [] as BlockingConditions[],
+  blockingConditions: [],
 }
 
 export function BlockSessionForm({
@@ -49,12 +43,12 @@ export function BlockSessionForm({
   const router = useRouter()
 
   function saveBlockSession() {
-    return (values: Session) => {
-      assertIsBlockSession(values)
+    return (session: Session) => {
+      assertIsBlockSession(session)
 
-      if (mode === 'edit')
-        dispatch(updateBlockSession(values as UpdateBlockSessionPayload))
-      else dispatch(createBlockSession(values as CreateBlockSessionPayload))
+      if (mode === 'edit' && 'id' in session)
+        dispatch(updateBlockSession(session))
+      else dispatch(createBlockSession(session))
 
       router.push('/(tabs)')
     }

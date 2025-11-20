@@ -4,6 +4,7 @@ export const T = {
   color: {
     transparent: 'transparent',
     text: 'rgba(255, 255, 255, 1)',
+    textSecondary: 'rgba(50, 50, 50, 1)',
     darkBlue: 'rgba(12, 32, 122, 1)',
     lightBlue: 'rgba(0, 212, 255, 1)',
     lightBlueShade: 'rgba(105, 178, 225, 1)',
@@ -24,10 +25,12 @@ export const T = {
     size: {
       xSmall: 11,
       small: 14,
+      base: 16,
       regular: 18,
       medium: 20,
       large: 24,
       xLarge: 32,
+      xxLarge: 40,
     },
     weight: {
       light: '300' as const,
@@ -62,10 +65,12 @@ export const T = {
     menuIcon: 25,
   },
   spacing: {
+    negativeExtraSmall: -3,
     none: 0,
     extraExtraSmall: 2,
     extraSmall: 4,
     small: 8,
+    smallMedium: 12,
     medium: 16,
     large: 20,
     x_large: 25,
@@ -94,7 +99,18 @@ export const T = {
       height: 5,
     },
     opacity: 0.1,
-    radius: 10,
+    radius: {
+      small: 4,
+      medium: 8,
+      large: 10,
+    },
+    // Common shadow offset patterns
+    offsets: {
+      none: { width: 0, height: 0 },
+      small: { width: 0, height: 2 },
+      medium: { width: 0, height: 4 },
+      large: { width: 0, height: 5 },
+    },
   },
   width: {
     roundButton: 60,

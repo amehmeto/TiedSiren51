@@ -8,6 +8,8 @@ module.exports = {
     'react',
     'react-hooks',
     'react-native',
+    'sonarjs',
+    'local-rules',
   ],
   rules: {
     'import/order': [
@@ -32,6 +34,19 @@ module.exports = {
     'no-nested-ternary': 'error',
     'no-switch-statements/no-switch': 'error',
     'prefer-const': 'error',
+    'sonarjs/no-collapsible-if': 'error',
+    'sonarjs/no-collection-size-mischeck': 'error',
+    'sonarjs/no-duplicated-branches': 'error',
+    'sonarjs/no-gratuitous-expressions': 'error',
+    'sonarjs/no-identical-functions': 'error',
+    'sonarjs/no-redundant-boolean': 'error',
+    'sonarjs/no-redundant-jump': 'error',
+    'sonarjs/no-same-line-conditional': 'error',
+    'sonarjs/no-unused-collection': 'error',
+    'sonarjs/no-useless-catch': 'error',
+    'sonarjs/prefer-immediate-return': 'error',
+    'sonarjs/prefer-object-literal': 'error',
+    'sonarjs/prefer-single-boolean-return': 'error',
     'prettier/prettier': 'error',
     complexity: ['warn', { max: 10 }],
     curly: ['error', 'multi-or-nest'],
@@ -41,15 +56,26 @@ module.exports = {
       { blankLine: 'always', prev: 'block-like', next: 'block-like' },
     ],
     // React rules
-    'react/prop-types': 'off', // Not needed with TypeScript
-    'react/react-in-jsx-scope': 'off', // Not needed in React 18+
+    'react/prop-types': 'off',
+    'react/react-in-jsx-scope': 'off',
     // React Hooks rules
-    'react-hooks/rules-of-hooks': 'error', // Enforces hooks rules
-    'react-hooks/exhaustive-deps': 'off', // Disabled - manage dependencies manually
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'off',
     // React Native rules
-    'react-native/no-unused-styles': 'error', // Detects unused StyleSheet styles
-    'react-native/no-inline-styles': 'error', // Encourages StyleSheet usage
-    'react-native/no-color-literals': 'error', // Encourages design system colors
+    'react-native/no-color-literals': 'error',
+    'react-native/no-inline-styles': 'error',
+    'react-native/no-raw-text': 'error',
+    'react-native/no-single-element-style-arrays': 'error',
+    'react-native/no-unused-styles': 'error',
+    // Custom local rules
+    'local-rules/no-stylesheet-magic-numbers': 'error',
+    'local-rules/no-complex-jsx-in-conditionals': [
+      'error',
+      {
+        maxProps: 2,
+        allowSimpleElements: true,
+      },
+    ],
   },
   overrides: [
     {
@@ -59,10 +85,16 @@ module.exports = {
       },
       rules: {
         '@typescript-eslint/prefer-optional-chain': 'error',
+        '@typescript-eslint/consistent-type-assertions': [
+          'error',
+          {
+            assertionStyle: 'never',
+          },
+        ],
       },
     },
     {
-      files: ['scripts/**/*.{js,cjs}'],
+      files: ['scripts/**/*.{js,cjs}', 'electron.js'],
       env: {
         node: true,
       },
