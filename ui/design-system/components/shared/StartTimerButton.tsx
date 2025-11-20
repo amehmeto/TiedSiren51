@@ -1,38 +1,21 @@
-import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
-import { StartTimerButton } from './StartTimerButton'
 import { TiedSButton } from './TiedSButton'
 
-type StrictModeButtonsProps = {
-  isActive: boolean
+type StartTimerButtonProps = {
   onStartTimer: () => void
-  onExtendTimer: () => void
-  onStopTimer?: () => void
 }
 
-export const StrictModeButtons = ({
-  isActive,
+export const StartTimerButton = ({
   onStartTimer,
-  onExtendTimer,
-  onStopTimer,
-}: Readonly<StrictModeButtonsProps>) => {
-  if (!isActive) return <StartTimerButton onStartTimer={onStartTimer} />
-
+}: Readonly<StartTimerButtonProps>) => {
   return (
     <View style={styles.actionButtons}>
       <TiedSButton
-        onPress={onExtendTimer}
-        text="Extend Timer"
+        onPress={onStartTimer}
+        text="Start Timer"
         style={styles.primaryButton}
       />
-      {onStopTimer && (
-        <TiedSButton
-          onPress={onStopTimer}
-          text="Stop Timer"
-          style={styles.dangerButton}
-        />
-      )}
     </View>
   )
 }
@@ -53,8 +36,5 @@ const styles = StyleSheet.create({
   actionButtons: {
     paddingHorizontal: T.spacing.large,
     gap: T.spacing.medium,
-  },
-  dangerButton: {
-    backgroundColor: T.color.red,
   },
 })

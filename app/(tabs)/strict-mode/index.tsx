@@ -1,13 +1,7 @@
-import { LinearGradient } from 'expo-linear-gradient'
 import React, { useState } from 'react'
-import {
-  ActivityIndicator,
-  ScrollView,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { CircularTimerDisplay } from '@/ui/design-system/components/shared/CircularTimerDisplay'
+import { LoadingScreen } from '@/ui/design-system/components/shared/LoadingScreen'
 import { StrictModeButtons } from '@/ui/design-system/components/shared/StrictModeButtons'
 import { TimerPickerModal } from '@/ui/design-system/components/shared/TimerPickerModal'
 import { UnlockMethodCard } from '@/ui/design-system/components/shared/UnlockMethodCard'
@@ -21,16 +15,7 @@ export default function StrictModeScreen() {
   const { timeRemaining, isActive, isLoading, startTimer, extendTimer } =
     useStrictModeTimer()
 
-  if (isLoading) {
-    return (
-      <LinearGradient
-        colors={[T.color.darkBlue, T.color.darkBlueGray, T.color.darkBlue]}
-        style={styles.container}
-      >
-        <ActivityIndicator size="large" color={T.color.lightBlue} />
-      </LinearGradient>
-    )
-  }
+  if (isLoading) return <LoadingScreen />
 
   return (
     <View style={styles.container}>
