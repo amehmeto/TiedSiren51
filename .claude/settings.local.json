@@ -30,20 +30,17 @@
       "Bash(npm run lint:*)",
       "Bash(npm run test:*)",
       "Bash(npm test:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx tsc:*)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:stackoverflow.com)",
+      "WebFetch(domain:www.npmjs.com)",
       "WebSearch",
-      "Bash(npx eslint:*)",
-      "WebFetch(domain:www.npmjs.com)"
+      "mcp__ide__getDiagnostics"
     ],
-    "deny": [
-      "Bash(git push:*)"
-    ],
-    "ask": [
-      "Bash(chmod:*)",
-      "Bash(git add:*)",
-      "Bash(git commit:*)"
-    ]
+    "deny": ["Bash(git push:*)"],
+    "ask": ["Bash(chmod:*)", "Bash(git add:*)", "Bash(git commit:*)"]
   }
 }

@@ -1,5 +1,5 @@
 import PouchDB from 'pouchdb'
-import { SirensRepository } from '@/core/ports/sirens.repository'
+import { SirensRepository } from '@/core/_ports_/sirens.repository'
 import { AndroidSiren, Sirens } from '@/core/siren/sirens'
 
 export class PouchdbSirensRepository implements SirensRepository {

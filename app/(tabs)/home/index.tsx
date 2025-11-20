@@ -1,9 +1,9 @@
-import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import { useRouter } from 'expo-router'
 import React, { ReactNode, useEffect, useState } from 'react'
 import { Image, StyleSheet, Text } from 'react-native'
 import 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
+import { isAndroidSirenLookout } from '@/core/_ports_/siren.lookout'
 import { RootState } from '@/core/_redux_/createStore'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -18,7 +18,7 @@ import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 
 export default function HomeScreen() {
   const router = useRouter()
-  const { dateProvider } = dependencies
+  const { dateProvider, sirenLookout } = dependencies
   const [now, setNow] = useState<Date>(dateProvider.getNow())
   const [hasAccessibilityPermission, setHasAccessibilityPermission] =
     useState(true)
@@ -36,16 +36,14 @@ export default function HomeScreen() {
 
   useEffect(() => {
     const checkPermission = async () => {
-      try {
-        const isEnabled = await AccessibilityService.isEnabled()
+      if (isAndroidSirenLookout(sirenLookout)) {
+        const isEnabled = await sirenLookout.isEnabled()
         setHasAccessibilityPermission(isEnabled)
-      } catch {
-        setHasAccessibilityPermission(false)
-      }
+      } else setHasAccessibilityPermission(true)
     }
 
     void checkPermission()
-  }, [])
+  }, [sirenLookout])
 
   const [activeSessionsNode, scheduledSessionsNode]: ReactNode[] = (() => {
     // eslint-disable-next-line no-switch-statements/no-switch
@@ -100,7 +98,9 @@ export default function HomeScreen() {
       <Text style={styles.greetings}>{viewModel.greetings}</Text>
       <Text style={styles.text}>{"Let's make it productive"}</Text>
 
-      {!hasAccessibilityPermission && <AccessibilityPermissionCard />}
+      {!hasAccessibilityPermission && isAndroidSirenLookout(sirenLookout) && (
+        <AccessibilityPermissionCard sirenLookout={sirenLookout} />
+      )}
 
       {activeSessionsNode}
       {scheduledSessionsNode}

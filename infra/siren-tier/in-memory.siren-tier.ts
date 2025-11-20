@@ -1,5 +1,5 @@
-import { SirenTier } from '@/core/ports/siren.tier'
-import { Sirens } from '@/core/siren/sirens'
+import { SirenTier } from '@core/_ports_/siren.tier'
+import { Sirens } from '@core/siren/sirens'
 
 export class InMemorySirenTier implements SirenTier {
   sirens?: Sirens = undefined

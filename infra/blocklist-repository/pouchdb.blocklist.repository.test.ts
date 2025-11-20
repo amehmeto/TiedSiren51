@@ -1,8 +1,8 @@
 import PouchDB from 'pouchdb'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { CreatePayload } from '@/core/_ports_/create.payload'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { Blocklist } from '@/core/blocklist/blocklist'
-import { CreatePayload } from '@/core/ports/create.payload'
 import { PouchdbBlocklistRepository } from './pouchdb.blocklist.repository'
 
 describe('PouchDBBlocklistRepository', () => {

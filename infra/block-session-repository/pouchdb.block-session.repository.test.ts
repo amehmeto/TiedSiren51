@@ -1,9 +1,9 @@
 import PouchDB from 'pouchdb'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { CreatePayload } from '@/core/_ports_/create.payload'
+import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
-import { CreatePayload } from '@/core/ports/create.payload'
-import { UpdatePayload } from '@/core/ports/update.payload'
 import { PouchdbBlockSessionRepository } from './pouchdb.block-session.repository'
 
 describe('PouchDBBlockSessionRepository', () => {

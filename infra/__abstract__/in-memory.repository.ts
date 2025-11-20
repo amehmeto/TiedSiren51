@@ -1,6 +1,6 @@
 import uuid from 'react-native-uuid'
-import { CreatePayload } from '@/core/ports/create.payload'
-import { UpdatePayload } from '@/core/ports/update.payload'
+import { CreatePayload } from '@/core/_ports_/create.payload'
+import { UpdatePayload } from '@/core/_ports_/update.payload'
 
 export class InMemoryRepository<T extends { id: string }> {
   entities: Map<string, T> = new Map()

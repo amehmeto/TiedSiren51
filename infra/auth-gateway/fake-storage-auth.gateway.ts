@@ -1,6 +1,6 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
+import { AuthGateway } from '@/core/_ports_/auth.gateway'
 import { AuthUser } from '@/core/auth/authUser'
-import { AuthGateway } from '@/core/ports/auth.gateway'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 
 export class FakeStorageAuthGateway implements AuthGateway {

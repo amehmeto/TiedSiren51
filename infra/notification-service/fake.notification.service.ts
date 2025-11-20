@@ -2,7 +2,7 @@ import uuid from 'react-native-uuid'
 import {
   NotificationService,
   NotificationTrigger,
-} from '@/core/ports/notification.service'
+} from '@/core/_ports_/notification.service'
 
 export class FakeNotificationService implements NotificationService {
   lastScheduledNotification: {
