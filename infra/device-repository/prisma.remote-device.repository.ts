@@ -1,6 +1,6 @@
 import { Device as PrismaDevice } from '@prisma/client'
+import { RemoteDeviceRepository } from '@/core/_ports_/remote-device.repository'
 import { Device } from '@/core/device/device'
-import { RemoteDeviceRepository } from '@/core/ports/remote-device.repository'
 import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
 
 export class PrismaRemoteDeviceRepository

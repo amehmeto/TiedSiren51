@@ -1,4 +1,4 @@
-import { DateProvider } from '@/core/ports/port.date-provider'
+import { DateProvider } from '@/core/_ports_/port.date-provider'
 
 export class StubDateProvider implements DateProvider {
   private MILLISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000

@@ -9,23 +9,25 @@ import { RealDateProvider } from '@/infra/date-provider/real.date-provider'
 import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
 import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-repository/expo-list-installed-apps.repository'
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
-import { InMemorySirenTier } from '@/infra/siren-tier/in-memory-siren.tier'
-import { PrismaSirensRepository } from '@/infra/sirens-repository/prisma.sirens-repository'
+import { PrismaSirensRepository } from '@/infra/siren-repository/prisma.sirens-repository'
+import { InMemorySirenLookout } from '@/infra/siren-tier/in-memory.siren-lookout'
+import { InMemorySirenTier } from '@/infra/siren-tier/in-memory.siren-tier'
 
 const mobileDependencies = {
-  databaseService: new PrismaDatabaseService(),
   authGateway: process.env.EXPO_PUBLIC_E2E
     ? new FakeAuthGateway()
     : new FirebaseAuthGateway(),
+  backgroundTaskService: new RealBackgroundTaskService(),
   blockSessionRepository: new PrismaBlockSessionRepository(),
   blocklistRepository: new PrismaBlocklistRepository(),
-  sirenTier: new InMemorySirenTier(),
+  databaseService: new PrismaDatabaseService(),
   dateProvider: new RealDateProvider(),
   deviceRepository: new PrismaRemoteDeviceRepository(),
   installedAppRepository: new ExpoListInstalledAppsRepository(),
-  sirensRepository: new PrismaSirensRepository(),
   notificationService: new ExpoNotificationService(),
-  backgroundTaskService: new RealBackgroundTaskService(),
+  sirenLookout: new InMemorySirenLookout(),
+  sirenTier: new InMemorySirenTier(),
+  sirensRepository: new PrismaSirensRepository(),
 }
 
 export const dependencies: Dependencies = mobileDependencies

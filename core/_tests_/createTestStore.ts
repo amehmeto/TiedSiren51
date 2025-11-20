@@ -7,8 +7,9 @@ import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataDeviceRepository } from '@/infra/device-repository/fake-data.device.repository'
 import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
 import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
-import { InMemorySirenTier } from '@/infra/siren-tier/in-memory-siren.tier'
-import { FakeDataSirensRepository } from '@/infra/sirens-repository/fake-data.sirens-repository'
+import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
+import { FakeSirenLookout } from '@infra/siren-tier/fake.siren-lookout'
+import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 import { createStore } from '../_redux_/createStore'
 import { Dependencies } from '../_redux_/dependencies'
 import { rootReducer } from '../_redux_/rootReducer'
@@ -24,6 +25,7 @@ export const createTestStore = (
     deviceRepository = new FakeDataDeviceRepository(),
     installedAppRepository = new FakeDataInstalledAppsRepository(),
     notificationService = new FakeNotificationService(),
+    sirenLookout = new FakeSirenLookout(),
     sirenTier = new InMemorySirenTier(),
     sirensRepository = new FakeDataSirensRepository(),
   }: Partial<Dependencies> = {},
@@ -40,6 +42,7 @@ export const createTestStore = (
       deviceRepository,
       installedAppRepository,
       notificationService,
+      sirenLookout,
       sirenTier,
       sirensRepository,
     },

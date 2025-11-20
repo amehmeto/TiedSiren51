@@ -1,6 +1,6 @@
 import { expect } from 'vitest'
 import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
-import { FakeDataSirensRepository } from '@/infra/sirens-repository/fake-data.sirens-repository'
+import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
 import { AppStore } from '../../_redux_/createStore'
 import { createTestStore } from '../../_tests_/createTestStore'
 import { stateBuilderProvider } from '../../_tests_/state-builder'

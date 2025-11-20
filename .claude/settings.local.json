@@ -30,11 +30,13 @@
       "Bash(npm run lint:*)",
       "Bash(npm run test:*)",
       "Bash(npm test:*)",
+      "Bash(npx tsc:*)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:stackoverflow.com)",
       "WebSearch",
       "Bash(npx eslint:*)"
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [
       "Bash(git push:*)"

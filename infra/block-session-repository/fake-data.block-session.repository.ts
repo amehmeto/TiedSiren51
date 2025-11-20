@@ -1,5 +1,6 @@
 import uuid from 'react-native-uuid'
 
+import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
 import {
   facebookAndroidSiren,
   instagramAndroidSiren,
@@ -9,7 +10,6 @@ import {
   BlockingConditions,
   BlockSession,
 } from '@/core/block-session/block.session'
-import { BlockSessionRepository } from '@/core/ports/block-session.repository'
 import { InMemoryRepository } from '../__abstract__/in-memory.repository'
 
 export class FakeDataBlockSessionRepository

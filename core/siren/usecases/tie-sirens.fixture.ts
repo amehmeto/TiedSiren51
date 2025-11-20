@@ -4,7 +4,7 @@ import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
-import { InMemorySirenTier } from '@/infra/siren-tier/in-memory-siren.tier'
+import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 import { Sirens } from '../sirens'
 import { tieSirens } from './tie-sirens.usecase'
 

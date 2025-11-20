@@ -1,5 +1,5 @@
+import { CreatePayload } from '../../_ports_/create.payload'
 import { createAppAsyncThunk } from '../../_redux_/create-app-thunk'
-import { CreatePayload } from '../../ports/create.payload'
 import { Blocklist } from '../blocklist'
 
 export const createBlocklist = createAppAsyncThunk(
