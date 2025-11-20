@@ -21,22 +21,6 @@ export default function StrictModeScreen() {
   const { timeRemaining, isActive, isLoading, startTimer, extendTimer } =
     useStrictModeTimer()
 
-  const handleStartTimer = async (
-    days: number,
-    hours: number,
-    minutes: number,
-  ) => {
-    await startTimer(days, hours, minutes)
-  }
-
-  const handleExtendTimer = async (
-    days: number,
-    hours: number,
-    minutes: number,
-  ) => {
-    await extendTimer(days, hours, minutes)
-  }
-
   if (isLoading) {
     return (
       <LinearGradient
@@ -76,14 +60,14 @@ export default function StrictModeScreen() {
       <TimerPickerModal
         visible={showTimerPicker}
         onClose={() => setShowTimerPicker(false)}
-        onSave={handleStartTimer}
+        onSave={startTimer}
         title={'Set the timer'}
       />
 
       <TimerPickerModal
         visible={showExtendPicker}
         onClose={() => setShowExtendPicker(false)}
-        onSave={handleExtendTimer}
+        onSave={extendTimer}
         title={'Extend timer by'}
       />
     </View>

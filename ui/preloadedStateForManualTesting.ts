@@ -34,13 +34,16 @@ export async function preloadedStateForManualTesting() {
       .withBlockSessions(preloadedBlockSessions)
       .withBlocklists(blocklists),
   )
-  ;(blockSessionRepository as FakeDataBlockSessionRepository).entities =
-    new Map(
+
+  if (blockSessionRepository instanceof FakeDataBlockSessionRepository) {
+    blockSessionRepository.entities = new Map(
       preloadedBlockSessions.map((blockSession) => [
         blockSession.id,
         blockSession,
       ]),
     )
+  }
+
   return preloadedState
 }
 

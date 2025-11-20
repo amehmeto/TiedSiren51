@@ -6,18 +6,20 @@ import { addWebsiteToSirens } from './usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from './usecases/fetch-available-sirens.usecase'
 import { tieSirens } from './usecases/tie-sirens.usecase'
 
+const initialSirens: Sirens = {
+  android: [],
+  windows: [],
+  macos: [],
+  ios: [],
+  linux: [],
+  websites: [],
+  keywords: [],
+}
+
 export const sirenSlice = createSlice({
   name: 'siren',
   initialState: {
-    availableSirens: {
-      android: [],
-      windows: [],
-      macos: [],
-      ios: [],
-      linux: [],
-      websites: [],
-      keywords: [],
-    } as Sirens,
+    availableSirens: initialSirens,
   },
   reducers: {
     setSirens: (state, action) => {

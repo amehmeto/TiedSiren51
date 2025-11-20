@@ -8,6 +8,7 @@ module.exports = {
     'react',
     'react-hooks',
     'react-native',
+    'sonarjs',
   ],
   rules: {
     'import/order': [
@@ -32,6 +33,7 @@ module.exports = {
     'no-nested-ternary': 'error',
     'no-switch-statements/no-switch': 'error',
     'prefer-const': 'error',
+    'sonarjs/no-collapsible-if': 'error',
     'prettier/prettier': 'error',
     complexity: ['warn', { max: 10 }],
     curly: ['error', 'multi-or-nest'],
@@ -59,6 +61,12 @@ module.exports = {
       },
       rules: {
         '@typescript-eslint/prefer-optional-chain': 'error',
+        '@typescript-eslint/consistent-type-assertions': [
+          'error',
+          {
+            assertionStyle: 'never',
+          },
+        ],
       },
     },
     {

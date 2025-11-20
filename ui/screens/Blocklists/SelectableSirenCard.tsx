@@ -1,11 +1,20 @@
 import { FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Image, Pressable, StyleSheet, Text } from 'react-native'
 import { CheckBox } from 'react-native-elements'
-import { InstalledApp } from '@/core/installed-app/InstalledApp'
-
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
+
+function isAndroidSiren(
+  sirenType: SirenType,
+  siren: AndroidSiren | string,
+): siren is AndroidSiren {
+  return (
+    sirenType === SirenType.ANDROID &&
+    typeof siren === 'object' &&
+    siren !== null
+  )
+}
 
 export function SelectableSirenCard({
   sirenType,
@@ -20,9 +29,9 @@ export function SelectableSirenCard({
 }>) {
   const iconElement =
     // eslint-disable-next-line no-nested-ternary
-    sirenType === SirenType.ANDROID ? (
+    isAndroidSiren(sirenType, siren) ? (
       <Image
-        source={{ uri: (siren as InstalledApp).icon }}
+        source={{ uri: siren.icon }}
         style={styles.appIcon}
         resizeMode="contain"
       />
@@ -42,15 +51,11 @@ export function SelectableSirenCard({
       />
     )
 
-  const sirenName =
-    sirenType === SirenType.ANDROID
-      ? (siren as InstalledApp).appName
-      : (siren as string)
+  const sirenName = isAndroidSiren(sirenType, siren) ? siren.appName : siren
 
-  const baseTestId =
-    sirenType === SirenType.ANDROID
-      ? `siren-${sirenType}-${(siren as InstalledApp).packageName}`
-      : `siren-${sirenType}-${siren}`
+  const baseTestId = isAndroidSiren(sirenType, siren)
+    ? `siren-${sirenType}-${siren.packageName}`
+    : `siren-${sirenType}-${siren}`
 
   return (
     <Pressable onPress={onPress} testID={baseTestId}>

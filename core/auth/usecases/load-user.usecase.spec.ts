@@ -12,7 +12,7 @@ import { loadUser } from './load-user.usecase'
 
 describe('loadUser usecase', () => {
   test('should load user data from repositories', async () => {
-    const mockBlocklists = [
+    const mockBlocklists: ReturnType<typeof buildBlocklist>[] = [
       buildBlocklist({ id: 'blocklist-1', name: 'Test Blocklist' }),
     ]
 
@@ -27,8 +27,7 @@ describe('loadUser usecase', () => {
     const blockSessionRepository = new FakeDataBlockSessionRepository()
     const sirensRepository = new FakeDataSirensRepository()
 
-    blocklistRepository.findAll = async () =>
-      mockBlocklists as ReturnType<typeof buildBlocklist>[]
+    blocklistRepository.findAll = async () => mockBlocklists
     blockSessionRepository.findAll = async () => mockBlockSessions
     sirensRepository.getSelectableSirens = async () => mockSirens
 
