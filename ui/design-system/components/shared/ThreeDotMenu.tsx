@@ -4,8 +4,8 @@ import {
   StyleProp,
   StyleSheet,
   Text,
-  ViewStyle,
   useWindowDimensions,
+  ViewStyle,
 } from 'react-native'
 import {
   Menu,
@@ -56,9 +56,7 @@ export function ThreeDotMenu(props: {
     const minWidth = 160
 
     const lowerBound = Math.max(fortyPercent, minWidth)
-    const clampedWidth = Math.min(lowerBound, seventyPercent)
-
-    return clampedWidth
+    return Math.min(lowerBound, seventyPercent)
   }, [windowWidth])
 
   const selectMenuOption = (optionName: TiedSMenu['name']) => {

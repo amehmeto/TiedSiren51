@@ -13,31 +13,19 @@ export type TimerData = z.infer<typeof timerDataSchema>
 
 export const TimerStorage = {
   async saveTimer(data: TimerData): Promise<void> {
-    try {
-      const jsonValue = JSON.stringify(data)
-      await AsyncStorage.setItem(TIMER_STORAGE_KEY, jsonValue)
-    } catch (error) {
-      throw error
-    }
+    const jsonValue = JSON.stringify(data)
+    await AsyncStorage.setItem(TIMER_STORAGE_KEY, jsonValue)
   },
 
   async loadTimer(): Promise<TimerData | null> {
-    try {
-      const jsonValue = await AsyncStorage.getItem(TIMER_STORAGE_KEY)
-      if (jsonValue === null) return null
+    const jsonValue = await AsyncStorage.getItem(TIMER_STORAGE_KEY)
+    if (jsonValue === null) return null
 
-      const parsed = JSON.parse(jsonValue)
-      return timerDataSchema.parse(parsed)
-    } catch {
-      return null
-    }
+    const parsed = JSON.parse(jsonValue)
+    return timerDataSchema.parse(parsed)
   },
 
   async clearTimer(): Promise<void> {
-    try {
-      await AsyncStorage.removeItem(TIMER_STORAGE_KEY)
-    } catch (error) {
-      throw error
-    }
+    await AsyncStorage.removeItem(TIMER_STORAGE_KEY)
   },
 }

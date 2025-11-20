@@ -34,7 +34,8 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:stackoverflow.com)",
       "WebSearch",
-      "Bash(npx eslint:*)"
+      "Bash(npx eslint:*)",
+      "WebFetch(domain:www.npmjs.com)"
     ],
     "deny": [
       "Bash(git push:*)"
