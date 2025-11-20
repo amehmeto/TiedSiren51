@@ -84,7 +84,7 @@ function AppWithInitialization() {
 const styles = StyleSheet.create({
   text: {
     color: T.color.white,
-    fontSize: 18,
+    fontSize: T.font.size.regular,
   },
   view: {
     flex: 1,

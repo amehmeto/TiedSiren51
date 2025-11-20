@@ -49,7 +49,7 @@ export function TextInputSelectionScene(
 
 const styles = StyleSheet.create({
   addWebsiteInput: {
-    borderBottomWidth: 2,
+    borderBottomWidth: T.border.width.medium,
     padding: T.spacing.small,
     color: T.color.white,
   },

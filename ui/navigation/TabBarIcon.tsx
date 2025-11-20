@@ -4,6 +4,7 @@ import { type IconProps } from '@expo/vector-icons/build/createIconSet'
 import Ionicons from '@expo/vector-icons/Ionicons'
 import { type ComponentProps } from 'react'
 import { StyleSheet } from 'react-native'
+import { T } from '@/ui/design-system/theme'
 
 export function TabBarIcon({
   style,
@@ -13,5 +14,5 @@ export function TabBarIcon({
 }
 
 const styles = StyleSheet.create({
-  tabIcon: { marginBottom: -3 },
+  tabIcon: { marginBottom: T.spacing.negativeExtraSmall },
 })

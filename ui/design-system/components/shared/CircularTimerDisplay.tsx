@@ -53,7 +53,7 @@ const styles = StyleSheet.create({
   },
   timerText: {
     color: T.color.white,
-    fontSize: 40,
+    fontSize: T.font.size.xxLarge,
     fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.primary,
     letterSpacing: 1,
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.regular,
     textAlign: 'center',
     marginTop: T.spacing.large,
-    lineHeight: 24,
+    lineHeight: T.font.size.large,
     fontFamily: T.font.family.primary,
     paddingHorizontal: T.spacing.xx_large,
   },

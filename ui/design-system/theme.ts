@@ -25,10 +25,12 @@ export const T = {
     size: {
       xSmall: 11,
       small: 14,
+      base: 16,
       regular: 18,
       medium: 20,
       large: 24,
       xLarge: 32,
+      xxLarge: 40,
     },
     weight: {
       light: '300' as const,
@@ -63,10 +65,12 @@ export const T = {
     menuIcon: 25,
   },
   spacing: {
+    negativeExtraSmall: -3,
     none: 0,
     extraExtraSmall: 2,
     extraSmall: 4,
     small: 8,
+    smallMedium: 12,
     medium: 16,
     large: 20,
     x_large: 25,

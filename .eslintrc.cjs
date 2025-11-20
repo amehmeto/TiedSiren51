@@ -9,6 +9,7 @@ module.exports = {
     'react-hooks',
     'react-native',
     'sonarjs',
+    'local-rules',
   ],
   rules: {
     'import/order': [
@@ -55,15 +56,16 @@ module.exports = {
       { blankLine: 'always', prev: 'block-like', next: 'block-like' },
     ],
     // React rules
-    'react/prop-types': 'off', // Not needed with TypeScript
-    'react/react-in-jsx-scope': 'off', // Not needed in React 18+
+    'react/prop-types': 'off',
+    'react/react-in-jsx-scope': 'off',
     // React Hooks rules
-    'react-hooks/rules-of-hooks': 'error', // Enforces hooks rules
-    'react-hooks/exhaustive-deps': 'off', // Disabled - manage dependencies manually
+    'react-hooks/rules-of-hooks': 'error',
+    'react-hooks/exhaustive-deps': 'off',
     // React Native rules
-    'react-native/no-unused-styles': 'error', // Detects unused StyleSheet styles
-    'react-native/no-inline-styles': 'error', // Encourages StyleSheet usage
-    'react-native/no-color-literals': 'error', // Encourages design system colors
+    'react-native/no-unused-styles': 'error',
+    'react-native/no-inline-styles': 'error',
+    'react-native/no-color-literals': 'error',
+    'local-rules/no-stylesheet-magic-numbers': 'error',
   },
   overrides: [
     {
@@ -82,7 +84,7 @@ module.exports = {
       },
     },
     {
-      files: ['scripts/**/*.{js,cjs}'],
+      files: ['scripts/**/*.{js,cjs}', 'electron.js'],
       env: {
         node: true,
       },
