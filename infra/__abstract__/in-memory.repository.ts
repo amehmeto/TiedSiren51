@@ -21,6 +21,7 @@ export class InMemoryRepository<T extends { id: string }> {
   }
 
   async create(payload: CreatePayload<T>): Promise<T> {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const toBeCreatedEntity: T = { id: uuid.v4().toString(), ...payload } as T
     this.entities.set(toBeCreatedEntity.id, toBeCreatedEntity)
     const createdEntity = this.entities.get(toBeCreatedEntity.id)

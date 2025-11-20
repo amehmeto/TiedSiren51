@@ -119,10 +119,7 @@ describe('FirebaseAuthGateway - Error Translation', () => {
         vi.mocked(authMethod).mockRejectedValue(mockError)
 
         await expect(
-          gateway[method as 'signInWithEmail' | 'signUpWithEmail'](
-            'test@example.com',
-            'password123',
-          ),
+          gateway[method]('test@example.com', 'password123'),
         ).rejects.toThrow(expected)
       },
     )

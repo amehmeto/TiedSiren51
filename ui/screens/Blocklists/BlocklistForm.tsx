@@ -34,6 +34,8 @@ export type BlocklistScreenProps = {
   blocklistId?: string
 }
 
+type BlocklistTabKey = 'apps' | 'websites' | 'keywords'
+
 export function BlocklistForm({
   mode,
   blocklistId,
@@ -67,7 +69,7 @@ export function BlocklistForm({
   const [errors, setErrors] = useState<ErrorMessages>({})
   const [index, setIndex] = useState(0)
 
-  const routes = [
+  const routes: { key: BlocklistTabKey; title: string }[] = [
     { key: 'apps', title: 'Apps' },
     { key: 'websites', title: 'Websites' },
     { key: 'keywords', title: 'Keywords' },
@@ -136,11 +138,11 @@ export function BlocklistForm({
       route,
     }: SceneRendererProps & {
       route: {
-        key: string
+        key: BlocklistTabKey
         title: string
       }
     }) => {
-      const scenes = {
+      const scenes: Record<BlocklistTabKey, () => React.JSX.Element> = {
         apps: () => (
           <AppsSelectionScene
             data={selectableSirens.android}
@@ -174,7 +176,7 @@ export function BlocklistForm({
         ),
       }
 
-      return scenes[route.key as keyof typeof scenes]()
+      return scenes[route.key]()
     },
     [
       dispatch,
@@ -209,12 +211,9 @@ export function BlocklistForm({
   const saveBlocklist = useCallback(async () => {
     if (!validateForm(blocklist)) return
 
-    if (mode === 'edit') await dispatch(updateBlocklist(blocklist as Blocklist))
-    else {
-      await dispatch(
-        createBlocklist(blocklist as Omit<Blocklist, 'id' | 'totalBlocks'>),
-      )
-    }
+    if (mode === 'edit' && 'id' in blocklist)
+      await dispatch(updateBlocklist(blocklist))
+    else await dispatch(createBlocklist(blocklist))
 
     router.push('/(tabs)/blocklists')
   }, [blocklist, mode, dispatch, router, validateForm])

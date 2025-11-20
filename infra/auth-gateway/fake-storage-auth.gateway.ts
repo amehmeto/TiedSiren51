@@ -12,53 +12,31 @@ export class FakeStorageAuthGateway implements AuthGateway {
   }
 
   async signUpWithEmail(email: string, password: string): Promise<AuthUser> {
-    try {
-      const authUser = await this.fakeAuthGateway.signUpWithEmail(
-        email,
-        password,
-      )
-      await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
-      this.fakeAuthGateway.simulateUserLoggedIn(authUser)
-      return authUser
-    } catch (error) {
-      throw error
-    }
+    const authUser = await this.fakeAuthGateway.signUpWithEmail(email, password)
+    await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
+    this.fakeAuthGateway.simulateUserLoggedIn(authUser)
+    return authUser
   }
 
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
-    try {
-      const authUser = await this.fakeAuthGateway.signInWithEmail(
-        email,
-        password,
-      )
-      await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
-      this.fakeAuthGateway.simulateUserLoggedIn(authUser)
-      return authUser
-    } catch (error) {
-      throw error
-    }
+    const authUser = await this.fakeAuthGateway.signInWithEmail(email, password)
+    await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
+    this.fakeAuthGateway.simulateUserLoggedIn(authUser)
+    return authUser
   }
 
   async signInWithApple(): Promise<AuthUser> {
-    try {
-      const authUser = await this.fakeAuthGateway.signInWithApple()
-      await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
-      this.fakeAuthGateway.simulateUserLoggedIn(authUser)
-      return authUser
-    } catch (error) {
-      throw error
-    }
+    const authUser = await this.fakeAuthGateway.signInWithApple()
+    await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
+    this.fakeAuthGateway.simulateUserLoggedIn(authUser)
+    return authUser
   }
 
   async signInWithGoogle(): Promise<AuthUser> {
-    try {
-      const authUser = await this.fakeAuthGateway.signInWithGoogle()
-      await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
-      this.fakeAuthGateway.simulateUserLoggedIn(authUser)
-      return authUser
-    } catch (error) {
-      throw error
-    }
+    const authUser = await this.fakeAuthGateway.signInWithGoogle()
+    await AsyncStorage.setItem('fake-auth-user', JSON.stringify(authUser))
+    this.fakeAuthGateway.simulateUserLoggedIn(authUser)
+    return authUser
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {

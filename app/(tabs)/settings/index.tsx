@@ -33,10 +33,10 @@ const styles = StyleSheet.create({
     marginBottom: T.spacing.large,
   },
   logoutButton: {
-    padding: 12,
+    padding: T.spacing.smallMedium,
   },
   logoutText: {
     color: T.color.red,
-    fontSize: 16,
+    fontSize: T.font.size.base,
   },
 })
