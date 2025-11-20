@@ -32,7 +32,8 @@ export function WebTimePicker(
           props.setIsTimePickerVisible(false)
         }}
       >
-        Confirm
+        {/* eslint-disable-next-line react-native/no-raw-text -- Web-only component using HTML button */}
+        {'Confirm'}
       </button>
     </View>
   )

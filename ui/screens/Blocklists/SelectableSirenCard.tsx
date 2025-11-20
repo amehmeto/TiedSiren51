@@ -40,14 +40,14 @@ export function SelectableSirenCard({
         name={'web'}
         color={T.color.white}
         size={T.sirenIconSize}
-        style={[{ marginRight: T.spacing.small }]}
+        style={{ marginRight: T.spacing.small }}
       />
     ) : (
       <FontAwesome6
         name={'hashtag'}
         color={T.color.white}
         size={T.sirenIconSize}
-        style={[{ marginRight: T.spacing.small }]}
+        style={{ marginRight: T.spacing.small }}
       />
     )
 

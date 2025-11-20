@@ -19,7 +19,7 @@ export function TiedSModal(
       visible={props.isVisible}
       onRequestClose={props.onRequestClose}
     >
-      <View style={[styles.centeredView]}>
+      <View style={styles.centeredView}>
         <TiedSCard style={props.style}>{props.children}</TiedSCard>
       </View>
     </Modal>

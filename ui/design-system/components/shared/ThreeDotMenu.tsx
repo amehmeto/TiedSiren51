@@ -34,7 +34,7 @@ function TiedSMenuOption(props: {
 }) {
   return (
     <MenuOption value={props.optionName} style={styles.menuOption}>
-      <Text style={[styles.menuOptionText]}>{props.optionName}</Text>
+      <Text style={styles.menuOptionText}>{props.optionName}</Text>
       <Ionicons
         name={props.iconName}
         size={T.icon.size.large}
@@ -91,7 +91,7 @@ export function ThreeDotMenu(props: {
   )
 
   return (
-    <Menu onSelect={selectMenuOption} style={[props.style]}>
+    <Menu onSelect={selectMenuOption} style={props.style}>
       <MenuTrigger>
         <Ionicons
           name={'ellipsis-horizontal'}
