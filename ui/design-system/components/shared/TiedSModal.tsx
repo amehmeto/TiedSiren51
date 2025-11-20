@@ -39,13 +39,10 @@ const styles = StyleSheet.create({
     padding: T.spacing.xx_large,
     alignItems: 'center',
     shadowColor: T.shadow.color,
-    shadowOffset: {
-      width: T.shadow.offset.width,
-      height: T.shadow.offset.height,
-    },
+    shadowOffset: T.shadow.offset,
     width: Dimensions.get('window').width * 0.9,
     shadowOpacity: T.shadow.opacity,
-    shadowRadius: T.shadow.radius,
+    shadowRadius: T.shadow.radius.large,
     elevation: T.elevation.high,
   },
 })

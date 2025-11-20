@@ -99,7 +99,18 @@ export const T = {
       height: 5,
     },
     opacity: 0.1,
-    radius: 10,
+    radius: {
+      small: 4,
+      medium: 8,
+      large: 10,
+    },
+    // Common shadow offset patterns
+    offsets: {
+      none: { width: 0, height: 0 },
+      small: { width: 0, height: 2 },
+      medium: { width: 0, height: 4 },
+      large: { width: 0, height: 5 },
+    },
   },
   width: {
     roundButton: 60,

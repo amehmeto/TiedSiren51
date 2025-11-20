@@ -25,13 +25,10 @@ const styles = StyleSheet.create({
     borderRadius: T.border.radius.extraRounded,
     overflow: 'hidden',
     shadowColor: T.color.lightBlue,
-    shadowOffset: {
-      width: 0,
-      height: 4,
-    },
+    shadowOffset: T.shadow.offsets.medium,
     shadowOpacity: 0.3,
-    shadowRadius: 8,
-    elevation: 8,
+    shadowRadius: T.shadow.radius.medium,
+    elevation: T.elevation.highest,
   },
   actionButtons: {
     paddingHorizontal: T.spacing.large,

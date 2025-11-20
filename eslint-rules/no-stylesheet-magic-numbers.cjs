@@ -76,6 +76,10 @@ module.exports = {
       'left',
       'start',
       'end',
+      // Shadow and elevation
+      'shadowRadius',
+      'elevation',
+      // Note: shadowOpacity is intentionally excluded - it's contextual to the specific shadow effect
     ])
 
     // Numbers that are always acceptable (even in restricted properties)
@@ -96,6 +100,12 @@ module.exports = {
 
         const propertyName = prop.key.name || prop.key.value
         const value = prop.value
+
+        // If value is a nested object (like shadowOffset), recursively check it
+        if (value.type === 'ObjectExpression') {
+          checkStyleObject(value.properties)
+          return
+        }
 
         // Check if this property should use theme values
         if (RESTRICTED_PROPERTIES.has(propertyName)) {
