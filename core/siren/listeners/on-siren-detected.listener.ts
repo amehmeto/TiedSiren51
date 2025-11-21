@@ -10,8 +10,6 @@ export const onSirenDetectedListener = ({
   sirenLookout: SirenLookout
 }) => {
   sirenLookout.onSirenDetected((packageName: string) => {
-    // Dispatch event for logging/testing purposes (doesn't update state)
-    // store.dispatch(sirenDetected({ packageName }))
     store.dispatch(blockLaunchedApp({ packageName }))
   })
 }

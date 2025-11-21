@@ -4,10 +4,8 @@ import {
   Middleware,
   ThunkDispatch,
 } from '@reduxjs/toolkit'
-import { onUserLoggedInListener } from '@/core/auth/listenners/on-user-logged-in.listener'
-import { onUserLoggedOutListener } from '@/core/auth/listenners/on-user-logged-out.listener'
-import { onSirenDetectedListener } from '@/core/siren/listeners/on-siren-detected.listener'
 import { Dependencies } from './dependencies'
+import { registerListeners } from './registerListeners'
 import { rootReducer } from './rootReducer'
 
 export type PreloadedState = Partial<RootState>
@@ -42,25 +40,14 @@ export const createStore = (
     preloadedState,
   })
 
-  onUserLoggedInListener({
-    store,
-    authGateway: dependencies.authGateway,
-  })
-
-  onUserLoggedOutListener({
-    store,
-    authGateway: dependencies.authGateway,
-  })
-
-  onSirenDetectedListener({
-    store,
-    sirenLookout: dependencies.sirenLookout,
-  })
-
-  return {
+  const appStore = {
     ...store,
     getActions: () => actions,
   }
+
+  registerListeners(appStore, dependencies)
+
+  return appStore
 }
 
 export type AppStore = Omit<ReturnType<typeof createStore>, 'getActions'>
