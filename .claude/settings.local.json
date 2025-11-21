@@ -31,7 +31,6 @@
       "Bash(npm run test:*)",
       "Bash(npm test:*)",
       "Bash(npx eslint:*)",
-      "Bash(npx eslint:*)",
       "Bash(npx tsc:*)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
