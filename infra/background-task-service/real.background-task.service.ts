@@ -18,7 +18,7 @@ export class RealBackgroundTaskService implements BackgroundTaskService {
   }
 
   async initialize(store: AppStore): Promise<void> {
-    TaskManager.defineTask('tie-sirens', async () => {
+    TaskManager.defineTask('target-sirens', async () => {
       const now = Date.now()
 
       store.dispatch(targetSirens())
