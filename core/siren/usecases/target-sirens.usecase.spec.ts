@@ -5,16 +5,16 @@ import {
 } from '@/core/_tests_/data-builders/android-siren.builder'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
-import { tieSirensFixture } from './tie-sirens.fixture'
+import { targetSirensFixture } from './target-sirens.fixture'
 
-describe('Feature: Tie sirens', () => {
-  let fixture: ReturnType<typeof tieSirensFixture>
+describe('Feature: Target sirens', () => {
+  let fixture: ReturnType<typeof targetSirensFixture>
 
   beforeEach(() => {
-    fixture = tieSirensFixture()
+    fixture = targetSirensFixture()
   })
 
-  it('should tie the sirens', async () => {
+  it('should target the sirens', async () => {
     fixture.given.nowIs({
       hours: 14,
       minutes: 30,
@@ -56,8 +56,8 @@ describe('Feature: Tie sirens', () => {
       }),
     ])
 
-    const sirensBeingTied = fixture.when.tieSirens()
-    await sirensBeingTied
+    const sirensBeingTargeted = fixture.when.targetSirens()
+    await sirensBeingTargeted
 
     fixture.then.sirensShouldTied({
       android: [instagramAndroidSiren, facebookAndroidSiren],

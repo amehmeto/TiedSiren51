@@ -6,9 +6,9 @@ import { BlockSession } from '@/core/block-session/block.session'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 import { Sirens } from '../sirens'
-import { tieSirens } from './tie-sirens.usecase'
+import { targetSirens } from './target-sirens.usecase'
 
-export function tieSirensFixture(
+export function targetSirensFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ) {
   const sirenTier = new InMemorySirenTier()
@@ -28,12 +28,12 @@ export function tieSirensFixture(
       },
     },
     when: {
-      tieSirens() {
+      targetSirens() {
         const store: AppStore = createTestStore(
           { sirenTier, dateProvider },
           testStateBuilderProvider.getState(),
         )
-        return store.dispatch(tieSirens())
+        return store.dispatch(targetSirens())
       },
     },
     then: {

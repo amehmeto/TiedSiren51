@@ -2,6 +2,7 @@ import { Sirens } from '../siren/sirens'
 
 export interface SirenLookout {
   watchSirens(sirens: Sirens): void
+  onSirenDetected(callback: (packageName: string) => void): void
 }
 
 export interface AndroidSirenLookout extends SirenLookout {

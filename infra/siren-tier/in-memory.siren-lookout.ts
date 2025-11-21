@@ -5,13 +5,24 @@ import { AndroidSirenLookout } from '@core/_ports_/siren.lookout'
 export class InMemorySirenLookout implements AndroidSirenLookout {
   sirens?: Sirens = undefined
 
+  private callback?: (packageName: string) => void
+
   watchSirens(sirens: Sirens): void {
     // eslint-disable-next-line no-console
     console.log(
-      'Looking out fo sirens:',
+      'Looking out for sirens:',
       sirens.android.map((app) => app.appName),
     )
     this.sirens = sirens
+  }
+
+  onSirenDetected(callback: (packageName: string) => void): void {
+    this.callback = callback
+  }
+
+  // Test helper method to simulate detection
+  simulateDetection(packageName: string): void {
+    if (this.callback) this.callback(packageName)
   }
 
   async isEnabled(): Promise<boolean> {
