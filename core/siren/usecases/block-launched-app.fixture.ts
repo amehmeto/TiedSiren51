@@ -1,6 +1,8 @@
 import { expect } from 'vitest'
 import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
+import { dateFixture } from '@/core/_tests_/date.fixture'
+import { Fixture } from '@/core/_tests_/fixture.types'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
@@ -9,9 +11,10 @@ import { blockLaunchedApp } from './block-launched-app.usecase'
 
 export function blockLaunchedAppFixture(
   testStateBuilderProvider = stateBuilderProvider(),
-) {
+): Fixture {
   const sirenTier = new InMemorySirenTier()
   const dateProvider = new StubDateProvider()
+  const dateTest = dateFixture(dateProvider)
 
   return {
     given: {
@@ -20,11 +23,7 @@ export function blockLaunchedAppFixture(
           builder.withBlockSessions([blockSession]),
         )
       },
-      nowIs({ hours, minutes }: { hours: number; minutes: number }) {
-        const date = new Date()
-        date.setHours(hours, minutes, 0, 0)
-        dateProvider.now = date
-      },
+      ...dateTest.given,
     },
     when: {
       appLaunched(packageName: string) {

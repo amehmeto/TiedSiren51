@@ -27,10 +27,6 @@ describe('Feature: Target sirens', () => {
           buildBlocklist({
             sirens: {
               android: [instagramAndroidSiren, facebookAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
               websites: [],
               keywords: [],
             },
@@ -44,10 +40,6 @@ describe('Feature: Target sirens', () => {
           buildBlocklist({
             sirens: {
               android: [],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
               websites: ['facebook.com', 'instagram.com'],
               keywords: [],
             },

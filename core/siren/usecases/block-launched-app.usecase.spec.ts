@@ -27,12 +27,6 @@ describe('Feature: Block launched app', () => {
           buildBlocklist({
             sirens: {
               android: [facebookAndroidSiren, instagramAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: [],
-              keywords: [],
             },
           }),
         ],
@@ -57,12 +51,6 @@ describe('Feature: Block launched app', () => {
           buildBlocklist({
             sirens: {
               android: [instagramAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: [],
-              keywords: [],
             },
           }),
         ],
@@ -87,12 +75,6 @@ describe('Feature: Block launched app', () => {
           buildBlocklist({
             sirens: {
               android: [facebookAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: [],
-              keywords: [],
             },
           }),
         ],

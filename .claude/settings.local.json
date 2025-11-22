@@ -38,6 +38,11 @@
       "mcp__ide__getDiagnostics"
     ],
     "deny": ["Bash(git push:*)"],
-    "ask": ["Bash(chmod:*)", "Bash(git add:*)", "Bash(git commit:*)"]
+    "ask": [
+      "Bash(chmod:*)",
+      "Bash(git add:*)",
+      "Bash(git checkout:*)",
+      "Bash(git commit:*)"
+    ]
   }
 }

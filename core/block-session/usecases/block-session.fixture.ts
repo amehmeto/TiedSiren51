@@ -6,6 +6,8 @@ import { FakeNotificationService } from '@/infra/notification-service/fake.notif
 import { NotificationTrigger } from '../../_ports_/notification.service'
 import { AppStore } from '../../_redux_/createStore'
 import { createTestStore } from '../../_tests_/createTestStore'
+import { dateFixture } from '../../_tests_/date.fixture'
+import { Fixture } from '../../_tests_/fixture.types'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
 import { BlockSession, blockSessionAdapter } from '../block.session'
 import { selectAllBlockSessionIds } from '../selectors/selectAllBlockSessionIds'
@@ -21,12 +23,13 @@ import { updateBlockSession } from './update-block-session.usecase'
 
 export function blockSessionFixture(
   testStateBuilderProvider = stateBuilderProvider(),
-) {
+): Fixture {
   let store: AppStore
   const blockSessionRepository = new FakeDataBlockSessionRepository()
   const notificationService = new FakeNotificationService()
   const dateProvider = new StubDateProvider()
   const backgroundTaskService = new FakeBackgroundTaskService()
+  const dateTest = dateFixture(dateProvider)
 
   return {
     given: {
@@ -39,11 +42,7 @@ export function blockSessionFixture(
           builder.withBlockSessions([givenBlockSession]),
         )
       },
-      nowIs(now: { hours: number; minutes: number }) {
-        const nowDate = new Date()
-        nowDate.setHours(now.hours, now.minutes, 0, 0)
-        dateProvider.now = nowDate
-      },
+      ...dateTest.given,
     },
     when: {
       creatingBlockSession: async (payload: CreateBlockSessionPayload) => {

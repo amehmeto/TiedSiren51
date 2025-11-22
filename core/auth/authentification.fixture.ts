@@ -1,6 +1,7 @@
 import { expect } from 'vitest'
 import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
+import { Fixture } from '@/core/_tests_/fixture.types'
 import {
   stateBuilder,
   stateBuilderProvider,
@@ -15,7 +16,7 @@ import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 
 export function authentificationFixture(
   testStateBuilderProvider = stateBuilderProvider(),
-) {
+): Fixture {
   let store: AppStore
   const authGateway = new FakeAuthGateway()
   store = createTestStore({ authGateway })

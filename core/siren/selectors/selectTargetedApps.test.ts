@@ -27,12 +27,6 @@ describe('selectTargetedApps', () => {
               buildBlocklist({
                 sirens: {
                   android: [facebookAndroidSiren],
-                  ios: [],
-                  linux: [],
-                  macos: [],
-                  windows: [],
-                  websites: [],
-                  keywords: [],
                 },
               }),
             ],
@@ -61,12 +55,6 @@ describe('selectTargetedApps', () => {
               buildBlocklist({
                 sirens: {
                   android: [facebookAndroidSiren, instagramAndroidSiren],
-                  ios: [],
-                  linux: [],
-                  macos: [],
-                  windows: [],
-                  websites: [],
-                  keywords: [],
                 },
               }),
             ],
@@ -95,12 +83,6 @@ describe('selectTargetedApps', () => {
               buildBlocklist({
                 sirens: {
                   android: [facebookAndroidSiren],
-                  ios: [],
-                  linux: [],
-                  macos: [],
-                  windows: [],
-                  websites: [],
-                  keywords: [],
                 },
               }),
             ],
@@ -112,12 +94,6 @@ describe('selectTargetedApps', () => {
               buildBlocklist({
                 sirens: {
                   android: [instagramAndroidSiren, youtubeAndroidSiren],
-                  ios: [],
-                  linux: [],
-                  macos: [],
-                  windows: [],
-                  websites: [],
-                  keywords: [],
                 },
               }),
             ],
@@ -150,23 +126,11 @@ describe('selectTargetedApps', () => {
               buildBlocklist({
                 sirens: {
                   android: [facebookAndroidSiren],
-                  ios: [],
-                  linux: [],
-                  macos: [],
-                  windows: [],
-                  websites: [],
-                  keywords: [],
                 },
               }),
               buildBlocklist({
                 sirens: {
                   android: [instagramAndroidSiren],
-                  ios: [],
-                  linux: [],
-                  macos: [],
-                  windows: [],
-                  websites: [],
-                  keywords: [],
                 },
               }),
             ],

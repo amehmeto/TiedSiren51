@@ -1,6 +1,8 @@
 import { expect } from 'vitest'
 import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
+import { dateFixture } from '@/core/_tests_/date.fixture'
+import { Fixture } from '@/core/_tests_/fixture.types'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
@@ -10,9 +12,10 @@ import { targetSirens } from './target-sirens.usecase'
 
 export function targetSirensFixture(
   testStateBuilderProvider = stateBuilderProvider(),
-) {
+): Fixture {
   const sirenTier = new InMemorySirenTier()
   const dateProvider = new StubDateProvider()
+  const dateTest = dateFixture(dateProvider)
 
   return {
     given: {
@@ -21,11 +24,7 @@ export function targetSirensFixture(
           builder.withBlockSessions(blockSessions),
         )
       },
-      nowIs({ hours, minutes }: { hours: number; minutes: number }) {
-        const date = new Date()
-        date.setHours(hours, minutes, 0, 0)
-        dateProvider.now = date
-      },
+      ...dateTest.given,
     },
     when: {
       targetSirens() {
