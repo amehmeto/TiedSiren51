@@ -9,11 +9,7 @@ function isAndroidSiren(
   sirenType: SirenType,
   siren: AndroidSiren | string,
 ): siren is AndroidSiren {
-  return (
-    sirenType === SirenType.ANDROID &&
-    typeof siren === 'object' &&
-    siren !== null
-  )
+  return sirenType === SirenType.ANDROID && typeof siren === 'object'
 }
 
 export function SelectableSirenCard({

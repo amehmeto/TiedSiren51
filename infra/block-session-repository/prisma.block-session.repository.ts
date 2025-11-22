@@ -37,7 +37,7 @@ export class PrismaBlockSessionRepository
       create: {
         id: b.id,
         name: b.name,
-        sirens: JSON.stringify(b.sirens || {}),
+        sirens: JSON.stringify(b.sirens),
       },
     }))
 
@@ -58,15 +58,9 @@ export class PrismaBlockSessionRepository
         endedAt: sessionPayload.endedAt,
         startNotificationId: sessionPayload.startNotificationId,
         endNotificationId: sessionPayload.endNotificationId,
-        blockingConditions: JSON.stringify(
-          sessionPayload.blockingConditions || [],
-        ),
-        blocklists: {
-          connectOrCreate: blocklistIds,
-        },
-        devices: {
-          connectOrCreate: deviceIds,
-        },
+        blockingConditions: JSON.stringify(sessionPayload.blockingConditions),
+        blocklists: { connectOrCreate: blocklistIds },
+        devices: { connectOrCreate: deviceIds },
       },
       include: {
         blocklists: true,
