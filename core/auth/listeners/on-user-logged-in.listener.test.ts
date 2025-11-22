@@ -33,7 +33,7 @@ describe('onUserLoggedIn listener', () => {
 
     expect(
       dispatchedActions.some(
-        (action) => action.type === 'siren/tieSirens /pending',
+        (action) => action.type === 'siren/targetSirens/pending',
       ),
     ).toBe(true)
   })

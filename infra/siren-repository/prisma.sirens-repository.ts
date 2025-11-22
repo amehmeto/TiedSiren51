@@ -15,8 +15,8 @@ export class PrismaSirensRepository
         .filter((s: PrismaSiren) => s.type === 'android')
         .map((s: PrismaSiren) => ({
           packageName: s.value,
-          appName: s.name || '',
-          icon: s.icon || '',
+          appName: s.name ?? '',
+          icon: s.icon ?? '',
         })),
       ios: [],
       windows: [],

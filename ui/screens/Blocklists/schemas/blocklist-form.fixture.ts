@@ -1,6 +1,7 @@
 import { expect } from 'vitest'
 import { z } from 'zod'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
+import { Fixture } from '@/core/_tests_/fixture.types'
 import { blocklistSchema } from './blocklist-form.schema'
 
 export type BlockFormData = z.infer<typeof blocklistSchema>
@@ -20,7 +21,7 @@ function buildValidBlocklistFormData(
   }
 }
 
-export function blocklistFormFixture() {
+export function blocklistFormFixture(): Fixture {
   let blocklistData: BlockFormData
   let validationResult: ReturnType<typeof blocklistSchema.safeParse> | undefined
 

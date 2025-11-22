@@ -7,7 +7,7 @@ import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 
 export function SelectBlockingCondition(props: { form: FormikProps<Session> }) {
   const selectBlockingCondition = (selectedCondition: string) => {
-    const currentConditions = props.form.values.blockingConditions || []
+    const currentConditions = props.form.values.blockingConditions
     props.form.setFieldValue('blockingConditions', [
       ...currentConditions,
       selectedCondition,

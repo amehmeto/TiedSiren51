@@ -20,12 +20,8 @@ export class PouchdbBlocklistRepository implements BlocklistRepository {
       id: createdId,
     }
 
-    await this.db.put(createdBlocklist).catch((err) => {
-      // eslint-disable-next-line no-console
-      console.error(err)
-    })
+    await this.db.put(createdBlocklist)
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { _id, ...blocklistWithoutInternalId } = createdBlocklist
     return Promise.resolve(blocklistWithoutInternalId)
   }

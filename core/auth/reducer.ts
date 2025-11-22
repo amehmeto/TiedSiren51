@@ -89,19 +89,19 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(signInWithEmail.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload || null
+        state.error = action.payload ?? null
       })
       .addCase(signUpWithEmail.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload || null
+        state.error = action.payload ?? null
       })
       .addCase(signInWithGoogle.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload || null
+        state.error = action.payload ?? null
       })
       .addCase(signInWithApple.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload || null
+        state.error = action.payload ?? null
       })
   },
 )

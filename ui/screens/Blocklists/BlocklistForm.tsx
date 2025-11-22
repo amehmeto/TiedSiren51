@@ -107,7 +107,6 @@ export function BlocklistForm({
     (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
-        if (sirenType !== SirenType.ANDROID) return prevBlocklist
 
         updatedSirens[sirenType] = updatedSirens[sirenType].includes(app)
           ? updatedSirens[sirenType].filter(

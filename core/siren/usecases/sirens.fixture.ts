@@ -3,6 +3,7 @@ import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-reposito
 import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
 import { AppStore } from '../../_redux_/createStore'
 import { createTestStore } from '../../_tests_/createTestStore'
+import { Fixture } from '../../_tests_/fixture.types'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
 import { InstalledApp } from '../../installed-app/InstalledApp'
 import { selectAvailableSirens } from '../selectors/selectAvailableSirens'
@@ -12,7 +13,7 @@ import { addWebsiteToSirens } from './add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from './fetch-available-sirens.usecase'
 export function sirensFixture(
   testStateBuilderProvider = stateBuilderProvider(),
-) {
+): Fixture {
   let store: AppStore
   const installedAppRepository = new FakeDataInstalledAppsRepository()
   const sirensRepository = new FakeDataSirensRepository()

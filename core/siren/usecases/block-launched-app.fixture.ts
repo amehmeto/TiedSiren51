@@ -1,44 +1,48 @@
 import { expect } from 'vitest'
 import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
+import { dateFixture } from '@/core/_tests_/date.fixture'
+import { Fixture } from '@/core/_tests_/fixture.types'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { BlockSession } from '@/core/block-session/block.session'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
-import { Sirens } from '../sirens'
-import { tieSirens } from './tie-sirens.usecase'
+import { blockLaunchedApp } from './block-launched-app.usecase'
 
-export function tieSirensFixture(
+export function blockLaunchedAppFixture(
   testStateBuilderProvider = stateBuilderProvider(),
-) {
+): Fixture {
   const sirenTier = new InMemorySirenTier()
   const dateProvider = new StubDateProvider()
+  const dateTest = dateFixture(dateProvider)
 
   return {
     given: {
-      activeBlockSessions(blockSessions: BlockSession[]) {
+      activeBlockSession(blockSession: BlockSession) {
         testStateBuilderProvider.setState((builder) =>
-          builder.withBlockSessions(blockSessions),
+          builder.withBlockSessions([blockSession]),
         )
       },
-      nowIs({ hours, minutes }: { hours: number; minutes: number }) {
-        const date = new Date()
-        date.setHours(hours, minutes, 0, 0)
-        dateProvider.now = date
-      },
+      ...dateTest.given,
     },
     when: {
-      tieSirens() {
+      appLaunched(packageName: string) {
         const store: AppStore = createTestStore(
           { sirenTier, dateProvider },
           testStateBuilderProvider.getState(),
         )
-        return store.dispatch(tieSirens())
+        return store.dispatch(blockLaunchedApp({ packageName }))
       },
     },
     then: {
-      sirensShouldTied(expectedSirens: Sirens) {
-        expect(sirenTier.sirens).toStrictEqual(expectedSirens)
+      appShouldBeBlocked(packageName: string) {
+        expect(sirenTier.blockedApps).toContain(packageName)
+      },
+      appShouldNotBeBlocked(packageName: string) {
+        expect(sirenTier.blockedApps).not.toContain(packageName)
+      },
+      noAppShouldBeBlocked() {
+        expect(sirenTier.blockedApps).toHaveLength(0)
       },
     },
   }
