@@ -114,6 +114,34 @@ jobs:
           echo "apk_name=$(basename $APK_PATH)" >> $GITHUB_OUTPUT
           echo "Found APK: $APK_PATH"
 
+      - name: Create GitHub Release with APK
+        id: create_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG_NAME="pr-${{ github.event.pull_request.number }}-build-${{ github.run_number }}"
+          RELEASE_TITLE="PR #${{ github.event.pull_request.number }} - Build #${{ github.run_number }}"
+
+          # Create release and upload APK
+          gh release create "$TAG_NAME" \
+            "${{ steps.find_apk.outputs.apk_path }}" \
+            --title "$RELEASE_TITLE" \
+            --notes "Android APK build for PR #${{ github.event.pull_request.number }}
+
+          **Branch:** \`${{ github.head_ref }}\`
+          **Author:** @${{ github.event.pull_request.user.login }}
+          **Commit:** ${{ github.event.pull_request.head.sha }}
+
+          [View Pull Request](${{ github.event.pull_request.html_url }})" \
+            --prerelease \
+            --repo ${{ github.repository }}
+
+          # Generate download URL
+          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/$TAG_NAME/${{ steps.find_apk.outputs.apk_name }}"
+          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
+          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
+          echo "APK available at: $DOWNLOAD_URL"
+
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
         with:
@@ -183,7 +211,7 @@ jobs:
                         "text": "⬇️ Download APK",
                         "emoji": true
                       },
-                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
+                      "url": "${{ steps.create_release.outputs.download_url }}",
                       "style": "primary"
                     },
                     {
@@ -194,6 +222,15 @@ jobs:
                         "emoji": true
                       },
                       "url": "${{ github.event.pull_request.html_url }}"
+                    },
+                    {
+                      "type": "button",
+                      "text": {
+                        "type": "plain_text",
+                        "text": "🏷️ View Release",
+                        "emoji": true
+                      },
+                      "url": "${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ steps.create_release.outputs.tag_name }}"
                     }
                   ]
                 }
