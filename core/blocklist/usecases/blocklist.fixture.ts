@@ -2,6 +2,7 @@ import { expect } from 'vitest'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
 import { AppStore } from '../../_redux_/createStore'
 import { createTestStore } from '../../_tests_/createTestStore'
+import { Fixture } from '../../_tests_/fixture.types'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
 import { Blocklist, blocklistAdapter } from '../blocklist'
 import { selectBlocklistById } from '../selectors/selectBlocklistById'
@@ -13,7 +14,7 @@ import { updateBlocklist } from './update-blocklist.usecase'
 
 export function blocklistFixture(
   testStateBuilderProvider = stateBuilderProvider(),
-) {
+): Fixture {
   let store: AppStore
   const blocklistRepository = new FakeDataBlocklistRepository()
 

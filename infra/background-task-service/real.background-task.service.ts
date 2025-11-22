@@ -6,7 +6,7 @@ import {
   TaskOptions,
 } from '@/core/_ports_/background-task.service'
 import { AppStore } from '@/core/_redux_/createStore'
-import { tieSirens } from '@/core/siren/usecases/tie-sirens.usecase'
+import { targetSirens } from '@/core/siren/usecases/target-sirens.usecase'
 
 export class RealBackgroundTaskService implements BackgroundTaskService {
   defineTask(
@@ -18,10 +18,10 @@ export class RealBackgroundTaskService implements BackgroundTaskService {
   }
 
   async initialize(store: AppStore): Promise<void> {
-    TaskManager.defineTask('tie-sirens', async () => {
+    TaskManager.defineTask('target-sirens', async () => {
       const now = Date.now()
 
-      store.dispatch(tieSirens())
+      store.dispatch(targetSirens())
       // eslint-disable-next-line no-console
       console.log(
         `Got background fetch call at date: ${new Date(now).toISOString()}`,

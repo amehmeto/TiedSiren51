@@ -4,7 +4,7 @@ import { Sirens } from './sirens'
 import { addKeywordToSirens } from './usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from './usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from './usecases/fetch-available-sirens.usecase'
-import { tieSirens } from './usecases/tie-sirens.usecase'
+import { targetSirens } from './usecases/target-sirens.usecase'
 
 const initialSirens: Sirens = {
   android: [],
@@ -40,9 +40,9 @@ export const sirenSlice = createSlice({
       .addCase(addWebsiteToSirens.fulfilled, (state, action) => {
         state.availableSirens.websites.push(action.payload)
       })
-      .addCase(tieSirens.fulfilled, () => {
+      .addCase(targetSirens.fulfilled, () => {
         // eslint-disable-next-line no-console
-        console.log('sirens tied!')
+        console.log('sirens targeted!')
       })
   },
 })

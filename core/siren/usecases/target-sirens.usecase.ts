@@ -4,8 +4,8 @@ import { selectActiveSessions } from '../../block-session/selectors/selectActive
 
 import { Sirens } from '../sirens'
 
-export const tieSirens = createAppAsyncThunk(
-  'siren/tieSirens ',
+export const targetSirens = createAppAsyncThunk(
+  'siren/targetSirens',
   async (_, { extra: { sirenTier, dateProvider }, getState }) => {
     const activeBlockSessions: BlockSession[] = selectActiveSessions(
       dateProvider,
@@ -36,6 +36,6 @@ export const tieSirens = createAppAsyncThunk(
         keywords: [],
       },
     )
-    await sirenTier.tie(sirens)
+    await sirenTier.target(sirens)
   },
 )
