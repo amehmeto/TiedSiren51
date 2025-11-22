@@ -84,6 +84,8 @@ module.exports = {
         project: './tsconfig.json',
       },
       rules: {
+        '@typescript-eslint/no-explicit-any': 'error',
+        '@typescript-eslint/no-unnecessary-condition': 'error',
         '@typescript-eslint/prefer-optional-chain': 'error',
         '@typescript-eslint/prefer-nullish-coalescing': 'error',
         '@typescript-eslint/consistent-type-assertions': [

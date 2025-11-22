@@ -56,9 +56,7 @@ export function SelectListModal(
         return Array.from(uniqueSelections.values())
       }
 
-      if (props.listType === 'blocklists') return []
-
-      return currentItems
+      return []
     })
   }, [props.listType])
 

@@ -1,5 +1,5 @@
-import { onUserLoggedInListener } from '@/core/auth/listenners/on-user-logged-in.listener'
-import { onUserLoggedOutListener } from '@/core/auth/listenners/on-user-logged-out.listener'
+import { onUserLoggedInListener } from '@/core/auth/listeners/on-user-logged-in.listener'
+import { onUserLoggedOutListener } from '@/core/auth/listeners/on-user-logged-out.listener'
 import { onSirenDetectedListener } from '@/core/siren/listeners/on-siren-detected.listener'
 import { AppStore } from './createStore'
 import { Dependencies } from './dependencies'

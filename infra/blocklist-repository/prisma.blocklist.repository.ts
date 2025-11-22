@@ -18,17 +18,7 @@ export class PrismaBlocklistRepository
     const created = await this.baseClient.blocklist.create({
       data: {
         name: blocklistPayload.name,
-        sirens: JSON.stringify(
-          blocklistPayload.sirens || {
-            android: [],
-            ios: [],
-            windows: [],
-            macos: [],
-            linux: [],
-            websites: [],
-            keywords: [],
-          },
-        ),
+        sirens: JSON.stringify(blocklistPayload.sirens),
       },
     })
 

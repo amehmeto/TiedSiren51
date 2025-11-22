@@ -13,9 +13,6 @@ export const onUserLoggedInListener = ({
 }) => {
   authGateway.onUserLoggedIn((user) => {
     store.dispatch(userAuthenticated(user))
-
-    if (!user) return
-
     store.dispatch(loadUser())
     store.dispatch(targetSirens())
   })
