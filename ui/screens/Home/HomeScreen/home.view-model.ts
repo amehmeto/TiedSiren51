@@ -34,7 +34,7 @@ function generateEndTime(
 
   const todayEnd = dateProvider.recoverDate(session.endedAt)
 
-  if (!isOvernight || (isOvernight && isAfterMidnightBeforeEnd))
+  if (!isOvernight || isAfterMidnightBeforeEnd)
     return 'Ends ' + formatDistance(todayEnd, now, { addSuffix: true })
 
   const tomorrowEnd = new Date(now.getTime() + 24 * 60 * 60 * 1000)

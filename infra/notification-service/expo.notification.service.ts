@@ -34,7 +34,7 @@ export class ExpoNotificationService implements NotificationService {
   async getNotificationToken(): Promise<string> {
     try {
       await this.requestNotificationPermissions()
-      const projectId = Constants?.expoConfig?.extra?.eas?.projectId
+      const projectId = Constants.expoConfig?.extra?.eas?.projectId
 
       if (!projectId) throw new Error('Project ID not found')
 

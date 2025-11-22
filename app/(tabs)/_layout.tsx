@@ -11,19 +11,24 @@ import Animated, {
 import { T } from '@/ui/design-system/theme'
 import { TabScreens } from '@/ui/navigation/TabScreens'
 
-type Tab = {
+type EntypoTab = {
   name: string
   title: string
-  icon: string
-  IconType: typeof Entypo | typeof Ionicons
+  icon: React.ComponentProps<typeof Entypo>['name']
+  IconType: typeof Entypo
 }
 
-type TabBarIconProps = {
-  IconType: typeof Entypo | typeof Ionicons
-  iconName: any
-  color: string
-  size: number
-  isFocused: boolean
+type IoniconsTab = {
+  name: string
+  title: string
+  icon: React.ComponentProps<typeof Ionicons>['name']
+  IconType: typeof Ionicons
+}
+
+type Tab = EntypoTab | IoniconsTab
+
+function isEntypoTab(tab: Tab): tab is EntypoTab {
+  return tab.IconType === Entypo
 }
 
 type TabBarButtonProps = {
@@ -60,12 +65,16 @@ export default function TabLayout() {
   ]
 
   const TabBarIcon = ({
-    IconType,
-    iconName,
+    tab,
     color,
     size,
     isFocused,
-  }: TabBarIconProps) => {
+  }: {
+    tab: Tab
+    color: string
+    size: number
+    isFocused: boolean
+  }) => {
     const scale = useSharedValue(1)
     const opacity = useSharedValue(1)
 
@@ -87,7 +96,11 @@ export default function TabLayout() {
 
     return (
       <Animated.View style={animatedStyle}>
-        <IconType name={iconName} size={size} color={color} />
+        {isEntypoTab(tab) ? (
+          <Entypo name={tab.icon} size={size} color={color} />
+        ) : (
+          <Ionicons name={tab.icon} size={size} color={color} />
+        )}
       </Animated.View>
     )
   }
@@ -107,13 +120,7 @@ export default function TabLayout() {
     if (!tab) return null
 
     return (
-      <TabBarIcon
-        IconType={tab.IconType}
-        iconName={tab.icon}
-        color={color}
-        size={size}
-        isFocused={focused}
-      />
+      <TabBarIcon tab={tab} color={color} size={size} isFocused={focused} />
     )
   }
 
