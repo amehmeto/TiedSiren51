@@ -75,9 +75,7 @@ export const TimeStepper = ({
       />
 
       <View style={styles.valueContainer}>
-        <Text style={styles.valueText} numberOfLines={1}>
-          {displayText}
-        </Text>
+        <Text style={styles.valueText}>{displayText}</Text>
       </View>
 
       <TiedSButton
@@ -105,7 +103,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     padding: 0,
-    marginTop: T.spacing.extraSmall,
     marginBottom: T.spacing.extraSmall,
     minWidth: T.spacing.x_large,
     maxWidth: T.spacing.x_large,
@@ -115,10 +112,9 @@ const styles = StyleSheet.create({
     opacity: T.opacity.disabled,
   },
   valueContainer: {
-    minHeight: T.spacing.x_large,
+    minHeight: T.spacing.xxx_large,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingHorizontal: T.spacing.small,
     paddingVertical: T.spacing.extraSmall,
   },
   valueText: {
@@ -126,5 +122,6 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.regular,
     fontFamily: T.font.family.primary,
     textAlign: 'center',
+    lineHeight: T.font.size.regular * T.font.lineHeight.normal,
   },
 })
