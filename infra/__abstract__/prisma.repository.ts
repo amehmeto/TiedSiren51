@@ -45,8 +45,6 @@ export abstract class PrismaRepository {
       await this.loadInitialData()
       this._isInitialized = true
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Database initialization error:', error)
       throw new Error(`Failed to initialize database: ${error}`)
     }
   }

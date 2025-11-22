@@ -85,6 +85,7 @@ module.exports = {
       },
       rules: {
         '@typescript-eslint/prefer-optional-chain': 'error',
+        '@typescript-eslint/prefer-nullish-coalescing': 'error',
         '@typescript-eslint/consistent-type-assertions': [
           'error',
           {
