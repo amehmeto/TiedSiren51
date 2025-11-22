@@ -123,8 +123,10 @@ jobs:
 
       - name: Send APK notification to Slack
         if: success()
-        uses: slackapi/slack-github-action@v1.26.0
+        uses: slackapi/slack-github-action@v2.0.0
         with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
           payload: |
             {
               "text": "📱 New Android APK ready for QA testing!",
@@ -165,6 +167,13 @@ jobs:
                   }
                 },
                 {
+                  "type": "section",
+                  "text": {
+                    "type": "mrkdwn",
+                    "text": "*Commit:*\n<${{ github.event.pull_request.head.repo.html_url }}/commit/${{ github.event.pull_request.head.sha }}|${{ github.event.pull_request.head.sha }}>"
+                  }
+                },
+                {
                   "type": "actions",
                   "elements": [
                     {
@@ -190,8 +199,6 @@ jobs:
                 }
               ]
             }
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 #
 #      - name: EAS Cloud Preview Build
 #        run: eas build -p android --profile preview --non-interactive
