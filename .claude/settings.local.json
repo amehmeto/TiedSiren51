@@ -36,6 +36,7 @@
       "WebFetch(domain:stackoverflow.com)",
       "WebSearch",
       "mcp__ide__getDiagnostics",
+      "mcp__github__pull_request_read"
     ],
     "deny": [
       "Bash(git push:*)"
