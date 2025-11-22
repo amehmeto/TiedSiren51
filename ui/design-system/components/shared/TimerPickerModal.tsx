@@ -1,11 +1,11 @@
 import React, { useState, useMemo } from 'react'
-import { View, Text, StyleSheet, Dimensions } from 'react-native'
+import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { formatEndFromOffsets } from '@/ui/utils/timeFormat'
 import { TiedSButton } from './TiedSButton'
 import { TiedSCloseButton } from './TiedSCloseButton'
 import { TiedSModal } from './TiedSModal'
-import { TimePicker } from './TimePicker'
+import { TimeStepper } from './TimeStepper'
 
 type TimerPickerModalProps = {
   visible: boolean
@@ -46,32 +46,28 @@ export const TimerPickerModal = ({
   }
 
   return (
-    <TiedSModal
-      isVisible={visible}
-      onRequestClose={onClose}
-      style={styles.modalContent}
-    >
-      <View style={styles.container}>
+    <TiedSModal isVisible={visible} onRequestClose={onClose}>
+      <ScrollView contentContainerStyle={styles.container}>
         <TiedSCloseButton onClose={onClose} />
 
         <Text style={styles.title}>{title}</Text>
 
         <View style={styles.pickerContainer}>
-          <TimePicker
+          <TimeStepper
             selectedValue={selectedDays}
             onValueChange={setSelectedDays}
             max={30}
             labelSingular="day"
             labelPlural="days"
           />
-          <TimePicker
+          <TimeStepper
             selectedValue={selectedHours}
             onValueChange={setSelectedHours}
             max={23}
             labelSingular="hour"
             labelPlural="hours"
           />
-          <TimePicker
+          <TimeStepper
             selectedValue={selectedMinutes}
             onValueChange={setSelectedMinutes}
             max={59}
@@ -88,20 +84,15 @@ export const TimerPickerModal = ({
           disabled={isZeroDuration}
           style={styles.saveButton}
         />
-      </View>
+      </ScrollView>
     </TiedSModal>
   )
 }
 
 const styles = StyleSheet.create({
-  modalContent: {
-    flex: 0.3,
-    backgroundColor: T.color.darkBlueGray,
-    width: Dimensions.get('window').width * 0.9,
-  },
   container: {
-    flex: 1,
-    alignItems: 'stretch',
+    paddingHorizontal: T.spacing.large,
+    paddingBottom: T.spacing.x_large,
   },
   title: {
     color: T.color.white,
@@ -113,11 +104,14 @@ const styles = StyleSheet.create({
   },
   pickerContainer: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    justifyContent: 'space-evenly',
+    alignItems: 'stretch',
     marginVertical: T.spacing.medium,
     backgroundColor: T.color.darkBlueGray,
     borderRadius: T.border.radius.roundedMedium,
+    paddingHorizontal: T.spacing.small,
+    paddingVertical: T.spacing.medium,
+    gap: T.spacing.small,
   },
   endTimeText: {
     color: T.color.grey,

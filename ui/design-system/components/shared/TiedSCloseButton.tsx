@@ -1,23 +1,21 @@
 import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
-import { Pressable, StyleProp, StyleSheet, ViewStyle } from 'react-native'
+import { Pressable, StyleSheet } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
 type CloseButtonProps = {
   onClose: () => void
   iconColor?: string
   iconSize?: number
-  style?: StyleProp<ViewStyle>
 }
 
 export function TiedSCloseButton({
   onClose,
   iconColor = T.color.lightBlue,
   iconSize = T.icon.size.large,
-  style,
 }: CloseButtonProps) {
   return (
-    <Pressable style={[styles.closeIconContainer, style]} onPress={onClose}>
+    <Pressable style={styles.closeIconContainer} onPress={onClose}>
       <Ionicons name="close" size={iconSize} color={iconColor} />
     </Pressable>
   )

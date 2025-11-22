@@ -49,17 +49,17 @@ export const TimePicker = ({
 const styles = StyleSheet.create({
   pickerWrapper: {
     flex: 1,
-    alignItems: 'center',
+    justifyContent: 'center',
+    alignItems: 'stretch',
+    paddingHorizontal: T.spacing.extraExtraSmall,
   },
   picker: {
-    width: '110%',
-    height: Platform.OS === 'ios' ? 180 : 50,
+    width: T.layout.width.full,
     color: T.color.white,
   },
   pickerItem: {
     color: T.color.white,
     fontSize: T.font.size.small,
-    height: Platform.OS === 'ios' ? 180 : undefined,
     fontFamily: T.font.family.primary,
   },
 })
