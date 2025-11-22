@@ -95,7 +95,6 @@ jobs:
       - name: Install rollup platform binary
         run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
-#      Needs to resolve the issue with a local build inside GitHub Actions and env var (Google Services in particular)
       - name: Local Build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
@@ -104,43 +103,16 @@ jobs:
 
       - name: Find APK file
         id: find_apk
-        run: |
-          APK_PATH=$(find . -maxdepth 1 -name "build-*.apk" -type f | head -n 1)
-          if [ -z "$APK_PATH" ]; then
-            echo "APK not found!"
-            exit 1
-          fi
-          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
-          echo "apk_name=$(basename $APK_PATH)" >> $GITHUB_OUTPUT
-          echo "Found APK: $APK_PATH"
+        run: bash scripts/find-apk.sh
 
       - name: Create GitHub Release with APK
         id: create_release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          TAG_NAME="pr-${{ github.event.pull_request.number }}-build-${{ github.run_number }}"
-          RELEASE_TITLE="PR #${{ github.event.pull_request.number }} - Build #${{ github.run_number }}"
-
-          # Create release and upload APK
-          gh release create "$TAG_NAME" \
-            "${{ steps.find_apk.outputs.apk_path }}" \
-            --title "$RELEASE_TITLE" \
-            --notes "Android APK build for PR #${{ github.event.pull_request.number }}
-
-          **Branch:** \`${{ github.head_ref }}\`
-          **Author:** @${{ github.event.pull_request.user.login }}
-          **Commit:** ${{ github.event.pull_request.head.sha }}
-
-          [View Pull Request](${{ github.event.pull_request.html_url }})" \
-            --prerelease \
-            --repo ${{ github.repository }}
-
-          # Generate download URL
-          DOWNLOAD_URL="https://github.com/${{ github.repository }}/releases/download/$TAG_NAME/${{ steps.find_apk.outputs.apk_name }}"
-          echo "download_url=$DOWNLOAD_URL" >> $GITHUB_OUTPUT
-          echo "tag_name=$TAG_NAME" >> $GITHUB_OUTPUT
-          echo "APK available at: $DOWNLOAD_URL"
+          bash scripts/create-release-with-apk.sh \
+            '${{ toJSON(github) }}' \
+            '${{ steps.find_apk.outputs.apk_path }}'
 
       - name: Upload APK artifact
         uses: actions/upload-artifact@v4
@@ -151,92 +123,13 @@ jobs:
 
       - name: Send APK notification to Slack
         if: success()
-        uses: slackapi/slack-github-action@v2.0.0
-        with:
-          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
-          webhook-type: incoming-webhook
-          payload: |
-            {
-              "text": "📱 New Android APK ready for QA testing!",
-              "blocks": [
-                {
-                  "type": "header",
-                  "text": {
-                    "type": "plain_text",
-                    "text": "🎉 Android Build Ready for QA"
-                  }
-                },
-                {
-                  "type": "section",
-                  "fields": [
-                    {
-                      "type": "mrkdwn",
-                      "text": "*PR:*\n<${{ github.event.pull_request.html_url }}|#${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}>"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Branch:*\n`${{ github.head_ref }}`"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Build:*\n#${{ github.run_number }}"
-                    },
-                    {
-                      "type": "mrkdwn",
-                      "text": "*Author:*\n${{ github.event.pull_request.user.login }}"
-                    }
-                  ]
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*APK File:* `${{ steps.find_apk.outputs.apk_name }}`"
-                  }
-                },
-                {
-                  "type": "section",
-                  "text": {
-                    "type": "mrkdwn",
-                    "text": "*Commit:*\n<${{ github.event.pull_request.head.repo.html_url }}/commit/${{ github.event.pull_request.head.sha }}|${{ github.event.pull_request.head.sha }}>"
-                  }
-                },
-                {
-                  "type": "actions",
-                  "elements": [
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "⬇️ Download APK",
-                        "emoji": true
-                      },
-                      "url": "${{ steps.create_release.outputs.download_url }}",
-                      "style": "primary"
-                    },
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "📋 View PR",
-                        "emoji": true
-                      },
-                      "url": "${{ github.event.pull_request.html_url }}"
-                    },
-                    {
-                      "type": "button",
-                      "text": {
-                        "type": "plain_text",
-                        "text": "🏷️ View Release",
-                        "emoji": true
-                      },
-                      "url": "${{ github.server_url }}/${{ github.repository }}/releases/tag/${{ steps.create_release.outputs.tag_name }}"
-                    }
-                  ]
-                }
-              ]
-            }
-#
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          bash scripts/send-slack-notification.sh \
+            '${{ toJSON(github) }}' \
+            '${{ toJSON(steps) }}'
+
 #      - name: EAS Cloud Preview Build
 #        run: eas build -p android --profile preview --non-interactive
 #        env:

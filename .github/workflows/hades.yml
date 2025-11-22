@@ -10,9 +10,12 @@ on:
   push:
     branches:
       - main
+  pull_request:
+    types: [closed]
 
 jobs:
   build-preview:
+    if: github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -45,3 +48,17 @@ jobs:
         run: eas build -p android --profile preview --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+  cleanup-pr-releases:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Cleanup PR build releases
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/cleanup-pr-releases.sh '${{ toJSON(github) }}'
