@@ -41,10 +41,22 @@ Business logic: domain patterns, state management, use cases.
 #### Infrastructure Layer (`infrastructure/`)
 External services, databases, adapters, platform-specific implementations.
 
+**Data Persistence:**
 - [Prisma ORM with SQLite](infrastructure/prisma-orm-sqlite.md)
 - [Abandon PouchDB](infrastructure/abandon-pouchdb.md)
 - [Platform-Specific Database Paths](infrastructure/platform-specific-db-paths.md)
 - [Local-First Architecture](infrastructure/local-first-architecture.md)
+
+**Authentication:**
+- [Firebase Authentication](infrastructure/firebase-authentication.md)
+
+**Notifications & Background Tasks:**
+- [Expo Notifications](infrastructure/expo-notifications.md)
+- [Expo Background Fetch](infrastructure/expo-background-fetch.md)
+
+**Platform Adapters:**
+- [Expo List Installed Apps](infrastructure/expo-list-installed-apps.md)
+- [Date Provider Pattern](infrastructure/date-provider-pattern.md)
 
 ### Cross-Cutting Concerns
 
