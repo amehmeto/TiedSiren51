@@ -60,7 +60,7 @@ jobs:
     needs: test
     runs-on: ubuntu-latest
     permissions:
-      contents: read
+      contents: write
       pull-requests: write
     steps:
       - name: Checkout code
@@ -95,104 +95,41 @@ jobs:
       - name: Install rollup platform binary
         run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
-#      Needs to resolve the issue with a local build inside GitHub Actions and env var (Google Services in particular)
       - name: Local Build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
         run: |
-          npm run build:android:local -- --non-interactive
+          npm run build:android:apk:local -- --non-interactive
 
-#      - name: Find APK file
-#        id: find_apk
-#        run: |
-#          APK_PATH=$(find android/app/build/outputs/apk -name "*.apk" -type f | head -n 1)
-#          if [ -z "$APK_PATH" ]; then
-#            echo "APK not found!"
-#            exit 1
-#          fi
-#          echo "apk_path=$APK_PATH" >> $GITHUB_OUTPUT
-#          echo "apk_name=$(basename $APK_PATH)" >> $GITHUB_OUTPUT
-#          echo "Found APK: $APK_PATH"
-#
-#      - name: Upload APK artifact
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: app-debug-${{ github.run_number }}
-#          path: ${{ steps.find_apk.outputs.apk_path }}
-#          retention-days: 7
-#
-#      - name: Send APK notification to Slack
-#        if: success()
-#        uses: slackapi/slack-github-action@v1.26.0
-#        with:
-#          payload: |
-#            {
-#              "text": "📱 New Android APK ready for QA testing!",
-#              "blocks": [
-#                {
-#                  "type": "header",
-#                  "text": {
-#                    "type": "plain_text",
-#                    "text": "🎉 Android Build Ready for QA"
-#                  }
-#                },
-#                {
-#                  "type": "section",
-#                  "fields": [
-#                    {
-#                      "type": "mrkdwn",
-#                      "text": "*PR:*\n<${{ github.event.pull_request.html_url }}|#${{ github.event.pull_request.number }} - ${{ github.event.pull_request.title }}>"
-#                    },
-#                    {
-#                      "type": "mrkdwn",
-#                      "text": "*Branch:*\n`${{ github.head_ref }}`"
-#                    },
-#                    {
-#                      "type": "mrkdwn",
-#                      "text": "*Build:*\n#${{ github.run_number }}"
-#                    },
-#                    {
-#                      "type": "mrkdwn",
-#                      "text": "*Author:*\n${{ github.event.pull_request.user.login }}"
-#                    }
-#                  ]
-#                },
-#                {
-#                  "type": "section",
-#                  "text": {
-#                    "type": "mrkdwn",
-#                    "text": "*APK File:* `${{ steps.find_apk.outputs.apk_name }}`"
-#                  }
-#                },
-#                {
-#                  "type": "actions",
-#                  "elements": [
-#                    {
-#                      "type": "button",
-#                      "text": {
-#                        "type": "plain_text",
-#                        "text": "⬇️ Download APK",
-#                        "emoji": true
-#                      },
-#                      "url": "${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}",
-#                      "style": "primary"
-#                    },
-#                    {
-#                      "type": "button",
-#                      "text": {
-#                        "type": "plain_text",
-#                        "text": "📋 View PR",
-#                        "emoji": true
-#                      },
-#                      "url": "${{ github.event.pull_request.html_url }}"
-#                    }
-#                  ]
-#                }
-#              ]
-#            }
-#        env:
-#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-#
+      - name: Find APK file
+        id: find_apk
+        run: bash scripts/find-apk.sh
+
+      - name: Create GitHub Release with APK
+        id: create_release
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/create-release-with-apk.sh \
+            '${{ toJSON(github) }}' \
+            '${{ steps.find_apk.outputs.apk_path }}'
+
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-${{ github.run_number }}
+          path: ${{ steps.find_apk.outputs.apk_path }}
+          retention-days: 7
+
+      - name: Send APK notification to Slack
+        if: success()
+        env:
+          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        run: |
+          bash scripts/send-slack-notification.sh \
+            '${{ toJSON(github) }}' \
+            '${{ toJSON(steps) }}'
+
 #      - name: EAS Cloud Preview Build
 #        run: eas build -p android --profile preview --non-interactive
 #        env:
