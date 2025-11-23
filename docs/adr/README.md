@@ -12,37 +12,47 @@ An Architecture Decision Record captures a significant architectural decision al
 
 ## Navigation
 
-### By Category
+### By Architectural Layer
 
-#### Architecture
-Core architectural patterns and design principles.
+Directory structure mirrors the three-layer architecture (UI-Core-Infrastructure separation).
 
-- [Hexagonal Architecture](architecture/hexagonal-architecture.md)
-- [Dependency Injection Pattern](architecture/dependency-injection-pattern.md)
-- [Repository Pattern](architecture/repository-pattern.md)
-- [View Model Pattern](architecture/view-model-pattern.md)
-- [Listener Pattern for Side Effects](architecture/listener-pattern.md)
+#### UI Layer (`ui/`)
+Presentation layer: components, screens, design system, routing.
 
-#### State Management
-How application state is managed and synchronized.
+- [Design System Principles](ui/design-system-principles.md)
+- [View Model Pattern](ui/view-model-pattern.md)
+- [Expo Router File-Based Routing](ui/expo-router-file-based.md)
 
-- [Redux Toolkit for Business Logic](state-management/redux-toolkit-for-business-logic.md)
-- [Entity Adapter Normalization](state-management/entity-adapter-normalization.md)
-- [Typed Async Thunk Factory](state-management/typed-async-thunk-factory.md)
-- [Domain-Based Slices](state-management/domain-based-slices.md)
+#### Core Layer (`core/`)
+Business logic: domain patterns, state management, use cases.
 
-#### Data Persistence
-Database and storage decisions.
+**Architectural Patterns:**
+- [Hexagonal Architecture](hexagonal-architecture.md)
+- [Dependency Injection Pattern](core/dependency-injection-pattern.md)
+- [Repository Pattern](core/repository-pattern.md)
+- [Listener Pattern for Side Effects](core/listener-pattern.md)
 
-- [Prisma ORM with SQLite](data-persistence/prisma-orm-sqlite.md)
-- [Abandon PouchDB](data-persistence/abandon-pouchdb.md)
-- [Platform-Specific Database Paths](data-persistence/platform-specific-db-paths.md)
-- [Local-First Architecture](data-persistence/local-first-architecture.md)
+**State Management:**
+- [Redux Toolkit for Business Logic](core/redux-toolkit-for-business-logic.md)
+- [Entity Adapter Normalization](core/entity-adapter-normalization.md)
+- [Typed Async Thunk Factory](core/typed-async-thunk-factory.md)
+- [Domain-Based Slices](core/domain-based-slices.md)
 
-#### Testing
-Testing strategies, tools, and patterns.
+#### Infrastructure Layer (`infrastructure/`)
+External services, databases, adapters, platform-specific implementations.
+
+- [Prisma ORM with SQLite](infrastructure/prisma-orm-sqlite.md)
+- [Abandon PouchDB](infrastructure/abandon-pouchdb.md)
+- [Platform-Specific Database Paths](infrastructure/platform-specific-db-paths.md)
+- [Local-First Architecture](infrastructure/local-first-architecture.md)
+
+### Cross-Cutting Concerns
+
+#### Testing (`testing/`)
+Testing strategies, tools, and patterns across all layers.
 
 - [Vitest Over Jest](testing/vitest-over-jest.md)
+- [Data Builder Pattern](testing/data-builder-pattern.md)
 - [Fixture Pattern for Test Data](testing/fixture-pattern.md)
 - [Stub vs Fake Implementations](testing/stub-vs-fake-implementations.md)
 - [Test Store Factory](testing/test-store-factory.md)
@@ -50,46 +60,18 @@ Testing strategies, tools, and patterns.
 - [Maestro for E2E Testing](testing/maestro-for-e2e.md)
 - [Coverage Tracking and History](testing/coverage-tracking.md)
 
-#### Code Quality
-Linting, formatting, and code standards.
-
-- [TypeScript Strict Mode](code-quality/typescript-strict-mode.md)
-- [No Switch Statements Rule](code-quality/no-switch-statements.md)
-- [Complexity Limits](code-quality/complexity-limits.md)
-- [Custom ESLint Rules](code-quality/custom-eslint-rules.md)
-- [Path Aliases](code-quality/path-aliases.md)
-- [No Console Log in Production](code-quality/no-console-log.md)
-
-#### Infrastructure
-External services and infrastructure decisions.
-
-- [Expo Router File-Based Routing](infrastructure/expo-router-file-based.md)
-- [EAS Build Profiles](infrastructure/eas-build-profiles.md)
-- [Firebase Authentication](infrastructure/firebase-authentication.md)
-- [Expo Notifications](infrastructure/expo-notifications.md)
-- [Node Version Standardization](infrastructure/node-version-standardization.md)
-
-#### Development Workflow
-Tools and processes for development.
-
-- [Husky Git Hooks](development-workflow/husky-git-hooks.md)
-- [Branch Protection Rules](development-workflow/branch-protection.md)
-- [Prettier Integration](development-workflow/prettier-integration.md)
-
-#### Code Organization
-How code is structured and organized.
-
-- [Feature-Based Domains](code-organization/feature-based-domains.md)
-- [Domain Structure Convention](code-organization/domain-structure-convention.md)
-- [UI-Core-Infra Separation](code-organization/ui-core-infra-separation.md)
-
 ## Creating a New ADR
 
-1. Copy `template.md` to the appropriate category directory
-2. Name it descriptively (e.g., `use-graphql-for-api.md`)
-3. Fill in all sections
-4. Link it in this README under the relevant category
-5. Commit and create a PR
+1. Determine which layer the decision belongs to:
+   - `ui/` - Presentation, components, screens, design system, routing
+   - `core/` - Business logic, domain patterns, state management
+   - `infrastructure/` - External services, databases, platform-specific code
+   - `testing/` - Cross-cutting testing concerns
+2. Copy `template.md` to the appropriate directory
+3. Name it descriptively (e.g., `graphql-api.md`)
+4. Fill in all sections
+5. Link it in this README under the relevant section
+6. Commit and create a PR
 
 ## ADR Lifecycle
 

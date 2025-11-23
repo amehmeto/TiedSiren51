@@ -135,8 +135,8 @@ Dependencies are injected via factory pattern:
 
 ### Related ADRs
 - [Redux Toolkit for Business Logic](../state-management/redux-toolkit-for-business-logic.md)
-- [Repository Pattern](repository-pattern.md)
-- [Dependency Injection Pattern](dependency-injection-pattern.md)
+- [Repository Pattern](core/repository-pattern.md)
+- [Dependency Injection Pattern](core/dependency-injection-pattern.md)
 
 ## References
 

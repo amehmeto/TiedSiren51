@@ -238,7 +238,7 @@ export interface IBlockSessionRepository {
 ```
 
 ### Related ADRs
-- [Hexagonal Architecture](hexagonal-architecture.md)
+- [Hexagonal Architecture](../hexagonal-architecture.md)
 - [Dependency Injection Pattern](dependency-injection-pattern.md)
 - [Prisma ORM with SQLite](../data-persistence/prisma-orm-sqlite.md)
 

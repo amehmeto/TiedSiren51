@@ -226,7 +226,7 @@ it('loads user data when user logs in', async () => {
 
 ### Related ADRs
 - [Redux Toolkit for Business Logic](../state-management/redux-toolkit-for-business-logic.md)
-- [Hexagonal Architecture](hexagonal-architecture.md)
+- [Hexagonal Architecture](../hexagonal-architecture.md)
 - [Dependency Injection Pattern](dependency-injection-pattern.md)
 
 ## References

@@ -230,7 +230,7 @@ const authGateway = process.env.EXPO_PUBLIC_E2E
 6. Use via `extra` argument in thunks
 
 ### Related ADRs
-- [Hexagonal Architecture](hexagonal-architecture.md)
+- [Hexagonal Architecture](../hexagonal-architecture.md)
 - [Redux Toolkit for Business Logic](../state-management/redux-toolkit-for-business-logic.md)
 - [Repository Pattern](repository-pattern.md)
 - [Stub vs Fake Implementations](../testing/stub-vs-fake-implementations.md)
