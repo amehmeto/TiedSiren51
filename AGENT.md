@@ -1,6 +1,6 @@
-# WARP.md
+# AGENT.md
 
-This file provides guidance to WARP (warp.dev) when working with code in this repository.
+This file provides guidance to AI coding agents when working with code in this repository.
 
 ## Project Overview
 
@@ -52,9 +52,9 @@ The project follows **Hexagonal Architecture** with clear separation of concerns
 ├── core/                   # Business Logic (Domain Layer)
 │   ├── auth/               # Authentication domain
 │   ├── block-session/      # Block session management
-│   ├── blocklist/          # Blocklist management  
+│   ├── blocklist/          # Blocklist management
 │   ├── siren/              # Siren (apps/websites/keywords) domain
-│   ├── ports/              # Interface definitions for external dependencies
+│   ├── _ports_/            # Interface definitions for external dependencies
 │   └── _redux_/            # Redux Toolkit state management
 ├── infra/                  # Infrastructure (Adapters)
 │   ├── auth-gateway/       # Firebase authentication
@@ -73,7 +73,7 @@ The project follows **Hexagonal Architecture** with clear separation of concerns
 - Use cases for complex operations
 - Selectors for state queries
 
-**Repository Pattern**: Data access is abstracted through repository interfaces in `core/ports/` and implemented in `infra/` using Prisma.
+**Repository Pattern**: Data access is abstracted through repository interfaces in `core/_ports_/` and implemented in `infra/` using Prisma.
 
 ## Database Schema
 
