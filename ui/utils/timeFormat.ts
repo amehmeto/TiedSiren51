@@ -1,5 +1,5 @@
-import { TimeRemaining } from '@/ui/hooks/useStrictModeTimer'
-import { calculateMilliseconds } from './timeConstants'
+import { TimeRemaining } from '@/core/timer/timer'
+import { calculateMilliseconds } from '@/core/timer/timer.utils'
 
 export const formatCountdown = (timeRemaining: TimeRemaining): string => {
   const parts: string[] = []

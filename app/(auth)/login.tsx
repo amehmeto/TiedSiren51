@@ -79,7 +79,7 @@ export default function LoginScreen() {
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
-      <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
+      <TiedSCloseButton onClose={handleClose} />
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

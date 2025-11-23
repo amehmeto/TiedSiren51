@@ -11,7 +11,7 @@ type CloseButtonProps = {
 
 export function TiedSCloseButton({
   onClose,
-  iconColor = T.color.lightBlue,
+  iconColor = T.color.white,
   iconSize = T.icon.size.large,
 }: CloseButtonProps) {
   return (

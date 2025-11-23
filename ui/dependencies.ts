@@ -12,6 +12,7 @@ import { ExpoNotificationService } from '@/infra/notification-service/expo.notif
 import { PrismaSirensRepository } from '@/infra/siren-repository/prisma.sirens-repository'
 import { InMemorySirenLookout } from '@/infra/siren-tier/in-memory.siren-lookout'
 import { InMemorySirenTier } from '@/infra/siren-tier/in-memory.siren-tier'
+import { PrismaTimerRepository } from '@/infra/timer-repository/prisma.timer.repository'
 
 const mobileDependencies = {
   authGateway: process.env.EXPO_PUBLIC_E2E
@@ -28,6 +29,7 @@ const mobileDependencies = {
   sirenLookout: new InMemorySirenLookout(),
   sirenTier: new InMemorySirenTier(),
   sirensRepository: new PrismaSirensRepository(),
+  timerRepository: new PrismaTimerRepository(),
 }
 
 export const dependencies: Dependencies = mobileDependencies

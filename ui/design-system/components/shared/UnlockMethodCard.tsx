@@ -1,8 +1,8 @@
 import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
+import { TimeRemaining } from '@/core/timer/timer'
 import { T } from '@/ui/design-system/theme'
-import { TimeRemaining } from '@/ui/hooks/useStrictModeTimer'
 import { formatInlineRemaining } from '@/ui/utils/timeFormat'
 
 type UnlockMethodCardProps = {

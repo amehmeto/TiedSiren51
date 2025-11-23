@@ -21,7 +21,7 @@ export default function ForgotPasswordScreen() {
 
   return (
     <TiedSLinearBackground>
-      <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
+      <TiedSCloseButton onClose={handleClose} />
       <View style={styles.container}>
         <Text style={styles.title}>{'RESET YOUR PASSWORD'}</Text>
         <TiedSTextInput

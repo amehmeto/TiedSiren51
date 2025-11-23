@@ -1,5 +1,5 @@
 generator client {
-  provider = "prisma-client-js"
+  provider        = "prisma-client-js"
   previewFeatures = ["reactNative"]
 }
 
@@ -11,8 +11,8 @@ datasource db {
 // Your data model
 
 model User {
-  id           Int     @id @default(autoincrement())
-  name         String
+  id   Int    @id @default(autoincrement())
+  name String
 }
 
 model BlockSession {
@@ -22,30 +22,39 @@ model BlockSession {
   endedAt             String
   startNotificationId String
   endNotificationId   String
-  blockingConditions  String      // JSON string of BlockingConditions[]
-  blocklists         Blocklist[]  
-  devices            Device[]     
-  createdAt          DateTime     @default(now())
+  blockingConditions  String // JSON string of BlockingConditions[]
+  blocklists          Blocklist[]
+  devices             Device[]
+  createdAt           DateTime    @default(now())
 }
 
 model Blocklist {
-  id        String         @id @default(uuid())
-  name      String
-  sirens    String         // JSON string
-  sessions  BlockSession[]
+  id       String         @id @default(uuid())
+  name     String
+  sirens   String // JSON string
+  sessions BlockSession[]
 }
 
 model Device {
-  id        String         @id @default(uuid())
-  type      String
-  name      String
-  sessions  BlockSession[]
+  id       String         @id @default(uuid())
+  type     String
+  name     String
+  sessions BlockSession[]
 }
 
 model Siren {
-  id          String  @id @default(uuid())
-  type        String  // 'android', 'ios', 'website', 'keyword'
-  value       String  // package name for apps, URL for websites, or keyword
-  name        String?
-  icon        String?
+  id    String  @id @default(uuid())
+  type  String // 'android', 'ios', 'website', 'keyword'
+  value String // package name for apps, URL for websites, or keyword
+  name  String?
+  icon  String?
+}
+
+model Timer {
+  id        String   @id
+  userId    String
+  endTime   Float
+  duration  Float
+  isActive  Int      @default(0) // 0 = false, 1 = true (SQLite doesn't have boolean)
+  updatedAt DateTime @default(now()) @updatedAt
 }

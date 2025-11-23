@@ -89,6 +89,7 @@ export abstract class PrismaRepository {
     try {
       await this.createMainTables()
       await this.createJunctionTables()
+      await this.migrateTimerTable()
     } catch (error) {
       // eslint-disable-next-line no-console
       console.error('Error creating tables:', error)
@@ -136,6 +137,42 @@ export abstract class PrismaRepository {
         "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     `
+
+    await this.baseClient.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "Timer" (
+        "id" TEXT PRIMARY KEY NOT NULL,
+        "userId" TEXT NOT NULL,
+        "endTime" REAL NOT NULL,
+        "duration" REAL NOT NULL,
+        "isActive" INTEGER NOT NULL DEFAULT 0,
+        "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `
+  }
+
+  private async migrateTimerTable(): Promise<void> {
+    try {
+      const tableInfo = await this.baseClient.$queryRaw<
+        { name: string; type: string }[]
+      >`
+        PRAGMA table_info("Timer");
+      `
+
+      const hasUserIdColumn = tableInfo.some((col) => col.name === 'userId')
+
+      if (!hasUserIdColumn) {
+        await this.baseClient.$executeRaw`
+          ALTER TABLE "Timer" ADD COLUMN "userId" TEXT;
+        `
+
+        await this.baseClient.$executeRaw`
+          UPDATE "Timer" SET "userId" = "id" WHERE "userId" IS NULL;
+        `
+      }
+    } catch (error) {
+      // eslint-disable-next-line no-console
+      console.error('Error migrating Timer table:', error)
+    }
   }
 
   private async createJunctionTables(): Promise<void> {

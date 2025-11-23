@@ -1,21 +1,10 @@
 export enum TimeUnit {
   MILLISECOND = 1,
-  SECOND = 1000, // 1 second = 1000 milliseconds
-  MINUTE = 60 * 1000, // 1 minute = 60 seconds
-  HOUR = 60 * 60 * 1000, // 1 hour = 60 minutes
-  DAY = 24 * 60 * 60 * 1000, // 1 day = 24 hours
+  SECOND = 1000,
+  MINUTE = 60 * 1000,
+  HOUR = 60 * 60 * 1000,
+  DAY = 24 * 60 * 60 * 1000,
 }
-
-export const TIME_UNIT_NAMES = {
-  day: 'day',
-  days: 'days',
-  hour: 'hour',
-  hours: 'hours',
-  minute: 'min',
-  minutes: 'min',
-  second: 's',
-  seconds: 's',
-} as const
 
 export const calculateMilliseconds = (params: {
   days?: number
@@ -25,12 +14,12 @@ export const calculateMilliseconds = (params: {
 }): number => {
   const { days = 0, hours = 0, minutes = 0, seconds = 0 } = params
 
-  const daysInMs = days * TimeUnit.DAY
-  const hoursInMs = hours * TimeUnit.HOUR
-  const minutesInMs = minutes * TimeUnit.MINUTE
-  const secondsInMs = seconds * TimeUnit.SECOND
-
-  return daysInMs + hoursInMs + minutesInMs + secondsInMs
+  return (
+    days * TimeUnit.DAY +
+    hours * TimeUnit.HOUR +
+    minutes * TimeUnit.MINUTE +
+    seconds * TimeUnit.SECOND
+  )
 }
 
 export const millisecondsToTimeUnits = (milliseconds: number) => {

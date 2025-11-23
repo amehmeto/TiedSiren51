@@ -70,11 +70,7 @@ export default function BlockingConditionModal({
   onSelectCondition,
 }: BlockingConditionModalProps) {
   return (
-    <TiedSModal
-      isVisible={visible}
-      onRequestClose={onClose}
-      style={styles.modalContent}
-    >
+    <TiedSModal isVisible={visible} onRequestClose={onClose}>
       <View style={styles.container}>
         <TiedSCloseButton onClose={onClose} />
         <Text style={styles.modalTitle}>{TEXTS.MODAL_TITLE}</Text>
@@ -124,10 +120,6 @@ function BlockingConditionComponent({
 }
 
 const styles = StyleSheet.create({
-  modalContent: {
-    padding: T.spacing.large,
-    alignItems: 'center',
-  },
   container: {
     alignItems: 'stretch',
   },
@@ -137,7 +129,6 @@ const styles = StyleSheet.create({
     fontFamily: T.font.family.primary,
     color: T.color.white,
     marginBottom: T.spacing.small,
-    textAlign: 'left',
   },
   modalSubtitle: {
     fontSize: T.font.size.small,
