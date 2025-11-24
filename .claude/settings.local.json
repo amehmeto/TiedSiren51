@@ -38,14 +38,17 @@
       "WebFetch(domain:www.npmjs.com)",
       "WebSearch",
       "mcp__ide__getDiagnostics",
-      "mcp__github__pull_request_read"
+      "mcp__github__pull_request_read",
+      "mcp__github__pull_request_review_write",
+      "mcp__github__add_issue_comment",
+      "Bash(npm run generate:schema:*)"
     ],
     "deny": [
       "Bash(git push:*)"
     ],
     "ask": [
       "Bash(chmod:*)",
-      "Bash(gh secret:*)"
+      "Bash(gh secret:*)",
       "Bash(git add:*)",
       "Bash(git checkout:*)",
       "Bash(git commit:*)"

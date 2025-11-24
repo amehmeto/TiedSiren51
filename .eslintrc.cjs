@@ -76,6 +76,8 @@ module.exports = {
         allowSimpleElements: true,
       },
     ],
+    'local-rules/one-selector-per-file': 'error',
+    'local-rules/one-usecase-per-file': 'error',
   },
   overrides: [
     {

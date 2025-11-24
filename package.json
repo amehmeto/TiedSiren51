@@ -52,7 +52,7 @@
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/datetimepicker": "8.0.1",
     "@react-native-google-signin/google-signin": "10.1.1",
-    "@react-native-picker/picker": "2.7.5",
+    "@react-native-picker/picker": "^2.7.5",
     "@reduxjs/toolkit": "^2.2.5",
     "@types/react-redux": "^7.1.33",
     "date-fns": "^3.6.0",
