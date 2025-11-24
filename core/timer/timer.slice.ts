@@ -1,11 +1,9 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { Timer } from './timer'
-import {
-  loadTimer,
-  startTimer,
-  stopTimer,
-  extendTimer,
-} from './usecases/timer.usecase'
+import { extendTimer } from './usecases/extend-timer.usecase'
+import { loadTimer } from './usecases/load-timer.usecase'
+import { startTimer } from './usecases/start-timer.usecase'
+import { stopTimer } from './usecases/stop-timer.usecase'
 
 type TimerState = {
   timer: Timer | null
@@ -41,9 +39,14 @@ export const timerSlice = createSlice({
         state.isLoading = true
       })
       .addCase(loadTimer.fulfilled, (state, action) => {
-        state.timer = action.payload
+        const now = Date.now()
+        const loadedTimer = action.payload
+
+        if (loadedTimer && loadedTimer.endTime <= now) state.timer = null
+        else state.timer = loadedTimer
+
         state.isLoading = false
-        state.lastUpdate = Date.now()
+        state.lastUpdate = now
       })
       .addCase(loadTimer.rejected, (state) => {
         state.isLoading = false
@@ -52,12 +55,18 @@ export const timerSlice = createSlice({
         state.timer = action.payload
         state.lastUpdate = Date.now()
       })
+      .addCase(startTimer.rejected, (state) => {
+        state.isLoading = false
+      })
       .addCase(stopTimer.fulfilled, (state) => {
         state.timer = null
       })
       .addCase(extendTimer.fulfilled, (state, action) => {
         state.timer = action.payload
         state.lastUpdate = Date.now()
+      })
+      .addCase(extendTimer.rejected, (state) => {
+        state.isLoading = false
       })
   },
 })

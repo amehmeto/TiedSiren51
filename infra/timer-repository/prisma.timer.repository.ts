@@ -38,7 +38,7 @@ export class PrismaTimerRepository
   }
 
   async clearTimer(userId: string): Promise<void> {
-    await this.baseClient.timer.delete({
+    await this.baseClient.timer.deleteMany({
       where: { id: userId },
     })
   }

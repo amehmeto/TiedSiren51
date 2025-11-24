@@ -5,12 +5,10 @@ import {
   timerWithRemainingTime,
 } from '@/core/_tests_/data-builders/timer.builder'
 import { stateBuilder } from '@/core/_tests_/state-builder'
-import {
-  selectTimer,
-  selectIsTimerActive,
-  selectIsTimerLoading,
-  selectTimeRemaining,
-} from './timer.selectors'
+import { selectIsTimerActive } from './selectIsTimerActive'
+import { selectIsTimerLoading } from './selectIsTimerLoading'
+import { selectTimer } from './selectTimer'
+import { selectTimeRemaining } from './selectTimeRemaining'
 
 describe('Timer Selectors', () => {
   beforeEach(() => {

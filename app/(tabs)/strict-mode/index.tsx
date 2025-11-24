@@ -2,7 +2,7 @@ import React, { useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { CircularTimerDisplay } from '@/ui/design-system/components/shared/CircularTimerDisplay'
 import { LoadingScreen } from '@/ui/design-system/components/shared/LoadingScreen'
-import { StrictModeButtons } from '@/ui/design-system/components/shared/StrictModeButtons'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TimerPickerModal } from '@/ui/design-system/components/shared/TimerPickerModal'
 import { UnlockMethodCard } from '@/ui/design-system/components/shared/UnlockMethodCard'
 import { T } from '@/ui/design-system/theme'
@@ -33,11 +33,19 @@ export default function StrictModeScreen() {
           isActive={isActive}
         />
 
-        <StrictModeButtons
-          isActive={isActive}
-          onStartTimer={() => setShowTimerPicker(true)}
-          onExtendTimer={() => setShowExtendPicker(true)}
-        />
+        <View style={styles.actionButtons}>
+          {!isActive ? (
+            <TiedSButton
+              onPress={() => setShowTimerPicker(true)}
+              text="Start Timer"
+            />
+          ) : (
+            <TiedSButton
+              onPress={() => setShowExtendPicker(true)}
+              text="Extend Timer"
+            />
+          )}
+        </View>
 
         {isActive && <UnlockMethodCard timeRemaining={timeRemaining} />}
       </ScrollView>
@@ -82,5 +90,9 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.xLarge,
     fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.primary,
+  },
+  actionButtons: {
+    paddingHorizontal: T.spacing.large,
+    gap: T.spacing.medium,
   },
 })

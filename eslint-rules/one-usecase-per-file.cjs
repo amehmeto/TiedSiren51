@@ -22,9 +22,7 @@ module.exports = {
     const filename = context.getFilename()
 
     // Only apply this rule to files in a 'usecases' directory
-    if (!filename.includes('/usecases/')) {
-      return {}
-    }
+    if (!filename.includes('/usecases/')) return {}
 
     const useCases = []
 
@@ -50,9 +48,8 @@ module.exports = {
                   !name.endsWith('Result') &&
                   !name.endsWith('Response') &&
                   !name.endsWith('Request')
-                ) {
+                )
                   useCaseName = name
-                }
               }
             })
           }
@@ -63,7 +60,8 @@ module.exports = {
             statement.type === 'ExportNamedDeclaration' &&
             statement.declaration?.type === 'FunctionDeclaration'
           ) {
-            useCaseName = statement.declaration.id?.name
+            const name = statement.declaration.id?.name
+            name?.startsWith('export') && (useCaseName = name)
           }
 
           // Handle: const loadData = ...; export { loadData };
@@ -81,16 +79,13 @@ module.exports = {
                   !name.endsWith('Result') &&
                   !name.endsWith('Response') &&
                   !name.endsWith('Request')
-                ) {
+                )
                   useCaseName = name
-                }
               }
             })
           }
 
-          if (useCaseName) {
-            useCases.push(useCaseName)
-          }
+          if (useCaseName) useCases.push(useCaseName)
         })
       },
 

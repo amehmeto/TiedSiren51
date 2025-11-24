@@ -22,9 +22,7 @@ module.exports = {
     const filename = context.getFilename()
 
     // Only apply this rule to files in a 'selectors' directory
-    if (!filename.includes('/selectors/')) {
-      return {}
-    }
+    if (!filename.includes('/selectors/')) return {}
 
     const selectors = []
 
@@ -38,12 +36,9 @@ module.exports = {
             statement.declaration?.type === 'VariableDeclaration'
           ) {
             statement.declaration.declarations.forEach((declarator) => {
-              if (
-                declarator.id.type === 'Identifier' &&
-                declarator.id.name.startsWith('select')
-              ) {
+              declarator.id.type === 'Identifier' &&
+                declarator.id.name.startsWith('select') &&
                 selectors.push(declarator.id.name)
-              }
             })
           }
 
@@ -53,9 +48,7 @@ module.exports = {
             statement.declaration?.type === 'FunctionDeclaration'
           ) {
             const funcName = statement.declaration.id?.name
-            if (funcName?.startsWith('select')) {
-              selectors.push(funcName)
-            }
+            funcName?.startsWith('select') && selectors.push(funcName)
           }
 
           // Handle: const selectFoo = ...; export { selectFoo };
@@ -64,12 +57,9 @@ module.exports = {
             statement.specifiers?.length > 0
           ) {
             statement.specifiers.forEach((specifier) => {
-              if (
-                specifier.type === 'ExportSpecifier' &&
-                specifier.exported.name.startsWith('select')
-              ) {
+              specifier.type === 'ExportSpecifier' &&
+                specifier.exported.name.startsWith('select') &&
                 selectors.push(specifier.exported.name)
-              }
             })
           }
         })

@@ -37,6 +37,16 @@ describe('Feature: Timer', () => {
 
       fixture.then.timerShouldBeLoadedAs(null)
     })
+
+    it('should clear expired timer automatically', async () => {
+      const expiredTimer = timerWithRemainingTime.expired()
+
+      fixture.given.existingTimer(expiredTimer)
+
+      await fixture.when.loadingTimer()
+
+      fixture.then.timerShouldBeLoadedAs(null)
+    })
   })
 
   describe('startTimer', () => {
@@ -84,6 +94,21 @@ describe('Feature: Timer', () => {
       })
 
       fixture.then.actionShouldBeRejectedWith(action, 'User not authenticated')
+    })
+
+    it('should reject when duration exceeds 30 days', async () => {
+      fixture.given.authenticatedUser()
+
+      const action = await fixture.when.startingTimer({
+        days: 31,
+        hours: 0,
+        minutes: 0,
+      })
+
+      fixture.then.actionShouldBeRejectedWith(
+        action,
+        'Timer duration exceeds maximum allowed (30 days)',
+      )
     })
 
     it('should replace existing timer when starting a new one', async () => {
@@ -201,6 +226,29 @@ describe('Feature: Timer', () => {
       })
 
       fixture.then.actionShouldBeRejectedWith(action, 'User not authenticated')
+    })
+
+    it('should reject when extended duration exceeds 30 days', async () => {
+      const nearLimitDuration = 30 * TimeUnit.DAY - TimeUnit.HOUR
+      const now = Date.now()
+      const existingTimer = buildTimer({
+        endTime: now + nearLimitDuration,
+        duration: nearLimitDuration,
+        isActive: true,
+      })
+
+      fixture.given.existingTimer(existingTimer)
+
+      const action = await fixture.when.extendingTimer({
+        days: 0,
+        hours: 2,
+        minutes: 0,
+      })
+
+      fixture.then.actionShouldBeRejectedWith(
+        action,
+        'Extended timer duration exceeds maximum allowed (30 days)',
+      )
     })
   })
 })

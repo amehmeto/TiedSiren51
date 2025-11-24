@@ -20,9 +20,9 @@ export const TimerPickerModal = ({
   onSave,
   title = 'Set the timer',
 }: Readonly<TimerPickerModalProps>) => {
-  const [selectedDays, setSelectedDays] = useState(1)
+  const [selectedDays, setSelectedDays] = useState(0)
   const [selectedHours, setSelectedHours] = useState(0)
-  const [selectedMinutes, setSelectedMinutes] = useState(0)
+  const [selectedMinutes, setSelectedMinutes] = useState(20)
 
   const isZeroDuration = useMemo(
     () => selectedDays === 0 && selectedHours === 0 && selectedMinutes === 0,
