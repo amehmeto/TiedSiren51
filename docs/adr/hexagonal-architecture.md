@@ -59,22 +59,26 @@ Dependencies point inward: UI and Infra depend on Core, but Core never depends o
 ### Ports and Adapters
 
 **Ports** (interfaces in `/core/_ports_/`):
-- `IAuthGateway` - Authentication operations
-- `IBlockSessionRepository` - Block session persistence
-- `IBlocklistRepository` - Blocklist persistence
-- `ISirensRepository` - Siren data access
-- `IRemoteDeviceRepository` - Device management
-- `INotificationService` - Push notifications
-- `IDatabaseService` - Database initialization
-- `IDateProvider` - Time/date operations
+- `AuthGateway` - Authentication operations
+- `BlockSessionRepository` - Block session persistence
+- `BlocklistRepository` - Blocklist persistence
+- `SirensRepository` - Siren data access
+- `SirenTier` - Platform-specific blocking behavior
+- `SirenLookout` - App launch detection
+- `NotificationService` - Push notifications
+- `DatabaseService` - Database initialization
+- `DateProvider` - Time/date operations
+- `BackgroundTaskService` - Background task scheduling
 
 **Adapters** (implementations in `/infra`):
-- Production: `FirebaseAuthGateway`, `PrismaBlockSessionRepository`, `RealNotificationService`
-- Testing: `FakeAuthGateway`, `FakeDataBlockSessionRepository`, `StubDatabaseService`
+- Production: `FirebaseAuthGateway`, `PrismaBlockSessionRepository`, `AndroidSirenTier`, `RealNotificationService`
+- Testing: `FakeAuthGateway`, `FakeDataBlockSessionRepository`, `InMemorySirenTier`, `StubDatabaseService`
+
+**Note**: Port interfaces follow TypeScript convention with no I-prefix. See [Port Naming Convention ADR](core/port-naming-convention.md) for details.
 
 ### Dependency Injection
 
-Dependencies are injected via factory pattern:
+Dependencies are injected via a factory pattern:
 - Production: `/ui/dependencies.ts` creates real implementations
 - Testing: `/core/_tests_/createTestStore.ts` creates fake/stub implementations
 - Dependencies passed to Redux store via thunk `extraArgument`
@@ -134,6 +138,7 @@ Dependencies are injected via factory pattern:
 - Migrated from PouchDB to Prisma cleanly due to repository abstraction
 
 ### Related ADRs
+- [Port Naming Convention](core/port-naming-convention.md) - No I-prefix for port interfaces
 - [Redux Toolkit for Business Logic](../state-management/redux-toolkit-for-business-logic.md)
 - [Repository Pattern](core/repository-pattern.md)
 - [Dependency Injection Pattern](core/dependency-injection-pattern.md)
