@@ -11,7 +11,7 @@ import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-reposito
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
 import { PrismaSirensRepository } from '@/infra/siren-repository/prisma.sirens-repository'
 import { InMemorySirenLookout } from '@/infra/siren-tier/in-memory.siren-lookout'
-import { InMemorySirenTier } from '@/infra/siren-tier/in-memory.siren-tier'
+import { RealSirenTier } from '@/infra/siren-tier/real.siren-tier'
 
 const mobileDependencies = {
   authGateway: process.env.EXPO_PUBLIC_E2E
@@ -26,7 +26,7 @@ const mobileDependencies = {
   installedAppRepository: new ExpoListInstalledAppsRepository(),
   notificationService: new ExpoNotificationService(),
   sirenLookout: new InMemorySirenLookout(),
-  sirenTier: new InMemorySirenTier(),
+  sirenTier: new RealSirenTier(),
   sirensRepository: new PrismaSirensRepository(),
 }
 

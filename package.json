@@ -45,6 +45,7 @@
   "dependencies": {
     "@amehmeto/expo-accessibility-service": "github:amehmeto/expo-accessibility-service",
     "@amehmeto/expo-list-installed-apps": "github:amehmeto/expo-list-installed-apps",
+    "@amehmeto/tied-siren-blocking-overlay": "file:../tied-siren-blocking-overlay",
     "@expo/vector-icons": "14.0.3",
     "@faker-js/faker": "^8.4.1",
     "@prisma/client": "5.22.0",
