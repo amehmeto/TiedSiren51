@@ -35,7 +35,7 @@ export const formatInlineRemaining = (timeRemaining: TimeRemaining): string => {
 
   if (hasSeconds) parts.push(`${timeRemaining.seconds}s`)
 
-  return parts.join(' ')
+  return `${parts.join(' ')}`
 }
 
 const getAmPm = (hour: number): string => {

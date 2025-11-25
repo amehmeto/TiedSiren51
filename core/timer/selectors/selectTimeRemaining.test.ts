@@ -1,22 +1,15 @@
-import { describe, expect, test, vi, beforeEach, afterEach } from 'vitest'
+import { describe, expect, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { timerWithRemainingTime } from '@/core/_tests_/data-builders/timer.builder'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { selectTimeRemaining } from './selectTimeRemaining'
 
 describe('selectTimeRemaining', () => {
-  beforeEach(() => {
-    vi.useFakeTimers()
-  })
-
-  afterEach(() => {
-    vi.useRealTimers()
-  })
-
   test('should return empty time when there is no timer', () => {
     const store = createTestStore({}, stateBuilder().withTimer(null).build())
 
-    const timeRemaining = selectTimeRemaining(store.getState())
+    const now = Date.now()
+    const timeRemaining = selectTimeRemaining(store.getState(), now)
 
     expect(timeRemaining).toEqual({
       days: 0,
@@ -32,7 +25,8 @@ describe('selectTimeRemaining', () => {
 
     const store = createTestStore({}, stateBuilder().withTimer(timer).build())
 
-    const timeRemaining = selectTimeRemaining(store.getState())
+    const now = Date.now()
+    const timeRemaining = selectTimeRemaining(store.getState(), now)
 
     expect(timeRemaining).toEqual({
       days: 0,
@@ -45,13 +39,12 @@ describe('selectTimeRemaining', () => {
 
   test('should return empty time when timer has expired', () => {
     const now = Date.now()
-    vi.setSystemTime(now)
 
     const timer = timerWithRemainingTime.expired()
 
     const store = createTestStore({}, stateBuilder().withTimer(timer).build())
 
-    const timeRemaining = selectTimeRemaining(store.getState())
+    const timeRemaining = selectTimeRemaining(store.getState(), now)
 
     expect(timeRemaining).toEqual({
       days: 0,
@@ -112,16 +105,12 @@ describe('selectTimeRemaining', () => {
     'should calculate remaining time correctly for $description',
     ({ timerBuilder, expected }) => {
       const now = Date.now()
-      vi.setSystemTime(now)
 
       const timer = timerBuilder()
 
-      const store = createTestStore(
-        {},
-        stateBuilder().withTimer(timer).build(),
-      )
+      const store = createTestStore({}, stateBuilder().withTimer(timer).build())
 
-      const timeRemaining = selectTimeRemaining(store.getState())
+      const timeRemaining = selectTimeRemaining(store.getState(), now)
 
       expect(timeRemaining).toEqual(expected)
     },
@@ -187,16 +176,12 @@ describe('selectTimeRemaining', () => {
     'should calculate time remaining correctly for $description',
     ({ timerBuilder, expected }) => {
       const now = Date.now()
-      vi.setSystemTime(now)
 
       const timer = timerBuilder()
 
-      const store = createTestStore(
-        {},
-        stateBuilder().withTimer(timer).build(),
-      )
+      const store = createTestStore({}, stateBuilder().withTimer(timer).build())
 
-      const timeRemaining = selectTimeRemaining(store.getState())
+      const timeRemaining = selectTimeRemaining(store.getState(), now)
 
       expect(timeRemaining).toEqual(expected)
     },

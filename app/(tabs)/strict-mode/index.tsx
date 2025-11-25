@@ -1,12 +1,15 @@
+import { Ionicons } from '@expo/vector-icons'
 import React, { useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { CircularTimerDisplay } from '@/ui/design-system/components/shared/CircularTimerDisplay'
 import { LoadingScreen } from '@/ui/design-system/components/shared/LoadingScreen'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
+import { TiedSTitle } from '@/ui/design-system/components/shared/TiedSTitle'
 import { TimerPickerModal } from '@/ui/design-system/components/shared/TimerPickerModal'
-import { UnlockMethodCard } from '@/ui/design-system/components/shared/UnlockMethodCard'
 import { T } from '@/ui/design-system/theme'
 import { useStrictModeTimer } from '@/ui/hooks/useStrictModeTimer'
+import { formatInlineRemaining } from '@/ui/utils/timeFormat'
 
 export default function StrictModeScreen() {
   const [showTimerPicker, setShowTimerPicker] = useState(false)
@@ -24,9 +27,7 @@ export default function StrictModeScreen() {
         contentContainerStyle={styles.scrollContent}
         showsVerticalScrollIndicator={false}
       >
-        <View style={styles.header}>
-          <Text style={styles.headerTitle}>{'Strict Mode'}</Text>
-        </View>
+        <TiedSTitle text="Strict Mode" />
 
         <CircularTimerDisplay
           timeRemaining={timeRemaining}
@@ -47,7 +48,26 @@ export default function StrictModeScreen() {
           )}
         </View>
 
-        {isActive && <UnlockMethodCard timeRemaining={timeRemaining} />}
+        {isActive && (
+          <View style={styles.unlockSection}>
+            <Text style={styles.sectionTitle}>{'UNLOCK METHOD'}</Text>
+            <TiedSCard style={styles.unlockCard}>
+              <View style={styles.unlockCardContent}>
+                <View style={styles.unlockCardLeft}>
+                  <Ionicons
+                    name="time-outline"
+                    size={T.icon.size.medium}
+                    color={T.color.lightBlue}
+                  />
+                  <Text style={styles.unlockLabel}>{'Timer'}</Text>
+                </View>
+                <Text style={styles.unlockValue}>
+                  {formatInlineRemaining(timeRemaining)}
+                </Text>
+              </View>
+            </TiedSCard>
+          </View>
+        )}
       </ScrollView>
 
       <TimerPickerModal
@@ -77,22 +97,47 @@ const styles = StyleSheet.create({
   scrollContent: {
     paddingBottom: T.spacing.xx_large,
   },
-  header: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    paddingTop: T.spacing.large,
-    paddingHorizontal: T.spacing.large,
-    position: 'relative',
-  },
-  headerTitle: {
-    color: T.color.white,
-    fontSize: T.font.size.xLarge,
-    fontWeight: T.font.weight.bold,
-    fontFamily: T.font.family.primary,
-  },
+
   actionButtons: {
     paddingHorizontal: T.spacing.large,
     gap: T.spacing.medium,
+  },
+  unlockSection: {
+    paddingHorizontal: T.spacing.large,
+    marginTop: T.spacing.xx_large,
+  },
+  sectionTitle: {
+    color: T.color.grey,
+    fontSize: T.font.size.small,
+    fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.primary,
+    marginBottom: T.spacing.medium,
+    letterSpacing: T.font.letterSpacing.normal,
+  },
+  unlockCard: {
+    flexDirection: 'column',
+    borderWidth: T.border.width.thin,
+    borderColor: T.color.lightBlueShade,
+  },
+  unlockCardContent: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    width: '100%',
+  },
+  unlockCardLeft: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: T.spacing.medium,
+  },
+  unlockLabel: {
+    color: T.color.white,
+    fontSize: T.font.size.regular,
+    fontFamily: T.font.family.primary,
+  },
+  unlockValue: {
+    color: T.color.grey,
+    fontSize: T.font.size.regular,
+    fontFamily: T.font.family.primary,
   },
 })

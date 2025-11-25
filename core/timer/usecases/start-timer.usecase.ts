@@ -8,6 +8,7 @@ export type StartTimerPayload = {
   days: number
   hours: number
   minutes: number
+  now: number
 }
 
 export const startTimer = createAppAsyncThunk<Timer, StartTimerPayload>(
@@ -22,7 +23,7 @@ export const startTimer = createAppAsyncThunk<Timer, StartTimerPayload>(
     if (durationMs > MAX_DURATION_MS)
       throw new Error('Timer duration exceeds maximum allowed (30 days)')
 
-    const endTime = Date.now() + durationMs
+    const endTime = payload.now + durationMs
 
     const timerData: Timer = {
       endTime,

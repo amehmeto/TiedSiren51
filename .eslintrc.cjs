@@ -297,5 +297,20 @@ module.exports = {
         ],
       },
     },
+    // Allow Date and faker in test infrastructure files
+    {
+      files: [
+        'core/_tests_/**/*.ts',
+        'core/**/*.builder.ts',
+        'core/**/*.fixture.ts',
+        'core/_ports_/**/*.ts',
+        'infra/**/*.ts',
+      ],
+      rules: {
+        'no-restricted-globals': 'off',
+        'no-restricted-imports': 'off',
+        'no-restricted-properties': 'off',
+      },
+    },
   ],
 }

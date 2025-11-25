@@ -8,6 +8,7 @@ export type ExtendTimerPayload = {
   days: number
   hours: number
   minutes: number
+  now: number
 }
 
 export const extendTimer = createAppAsyncThunk<Timer, ExtendTimerPayload>(

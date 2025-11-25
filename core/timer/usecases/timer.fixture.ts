@@ -50,23 +50,26 @@ export function timerFixture(
       },
     },
     when: {
-      loadingTimer: async () => {
+      loadingTimer: async (now: number = Date.now()) => {
         store = createTestStore(
           { timerRepository },
           testStateBuilderProvider.getState(),
         )
-        return store.dispatch(loadTimer())
+        return store.dispatch(loadTimer(now))
       },
       startingTimer: async (payload: {
         days: number
         hours: number
         minutes: number
+        now?: number
       }) => {
         store = createTestStore(
           { timerRepository },
           testStateBuilderProvider.getState(),
         )
-        return store.dispatch(startTimer(payload))
+        return store.dispatch(
+          startTimer({ ...payload, now: payload.now ?? Date.now() }),
+        )
       },
       stoppingTimer: async () => {
         store = createTestStore(
@@ -79,12 +82,15 @@ export function timerFixture(
         days: number
         hours: number
         minutes: number
+        now?: number
       }) => {
         store = createTestStore(
           { timerRepository },
           testStateBuilderProvider.getState(),
         )
-        return store.dispatch(extendTimer(payload))
+        return store.dispatch(
+          extendTimer({ ...payload, now: payload.now ?? Date.now() }),
+        )
       },
     },
     then: {

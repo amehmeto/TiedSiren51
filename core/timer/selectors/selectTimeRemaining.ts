@@ -13,11 +13,14 @@ const EMPTY_TIME: TimeRemaining = {
 }
 
 export const selectTimeRemaining = createSelector(
-  [selectTimer, (state: RootState) => state.timer.lastUpdate],
-  (timer): TimeRemaining => {
+  [
+    selectTimer,
+    (state: RootState) => state.timer.lastUpdate,
+    (_state: RootState, now: number) => now,
+  ],
+  (timer, _lastUpdate, now): TimeRemaining => {
     if (!timer?.isActive) return EMPTY_TIME
 
-    const now = Date.now()
     const difference = timer.endTime - now
 
     if (difference <= 0) return EMPTY_TIME

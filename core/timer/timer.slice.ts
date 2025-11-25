@@ -14,23 +14,26 @@ type TimerState = {
 const initialState: TimerState = {
   timer: null,
   isLoading: true,
-  lastUpdate: Date.now(),
+  lastUpdate: 0,
 }
 
 export const timerSlice = createSlice({
   name: 'timer',
   initialState,
   reducers: {
-    setTimer: (state, action: PayloadAction<Timer | null>) => {
-      state.timer = action.payload
+    setTimer: (
+      state,
+      action: PayloadAction<{ timer: Timer | null; now: number }>,
+    ) => {
+      state.timer = action.payload.timer
       state.isLoading = false
-      state.lastUpdate = Date.now()
+      state.lastUpdate = action.payload.now
     },
     clearTimer: (state) => {
       state.timer = null
     },
-    tickTimer: (state) => {
-      state.lastUpdate = Date.now()
+    tickTimer: (state, action: PayloadAction<number>) => {
+      state.lastUpdate = action.payload
     },
   },
   extraReducers(builder) {
@@ -39,7 +42,7 @@ export const timerSlice = createSlice({
         state.isLoading = true
       })
       .addCase(loadTimer.fulfilled, (state, action) => {
-        const now = Date.now()
+        const now = action.meta.arg
         const loadedTimer = action.payload
 
         if (loadedTimer && loadedTimer.endTime <= now) state.timer = null
@@ -53,7 +56,7 @@ export const timerSlice = createSlice({
       })
       .addCase(startTimer.fulfilled, (state, action) => {
         state.timer = action.payload
-        state.lastUpdate = Date.now()
+        state.lastUpdate = action.meta.arg.now
       })
       .addCase(startTimer.rejected, (state) => {
         state.isLoading = false
@@ -63,7 +66,7 @@ export const timerSlice = createSlice({
       })
       .addCase(extendTimer.fulfilled, (state, action) => {
         state.timer = action.payload
-        state.lastUpdate = Date.now()
+        state.lastUpdate = action.meta.arg.now
       })
       .addCase(extendTimer.rejected, (state) => {
         state.isLoading = false

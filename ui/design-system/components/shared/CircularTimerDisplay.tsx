@@ -3,7 +3,7 @@ import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { TimeRemaining } from '@/core/timer/timer'
 import { T } from '@/ui/design-system/theme'
-import { formatCountdown, formatInlineRemaining } from '@/ui/utils/timeFormat'
+import { formatCountdown, formatEndFromOffsets } from '@/ui/utils/timeFormat'
 
 type CircularTimerDisplayProps = {
   timeRemaining: TimeRemaining
@@ -27,7 +27,13 @@ export const CircularTimerDisplay = ({
       )}
       <Text style={styles.timerText}>{formatCountdown(timeRemaining)}</Text>
       {shouldShowInline && (
-        <Text style={styles.title}>{formatInlineRemaining(timeRemaining)}</Text>
+        <Text style={styles.title}>
+          {formatEndFromOffsets({
+            days: timeRemaining.days,
+            hours: timeRemaining.hours,
+            minutes: timeRemaining.minutes,
+          })}
+        </Text>
       )}
 
       <Text style={styles.statusMessage}>
