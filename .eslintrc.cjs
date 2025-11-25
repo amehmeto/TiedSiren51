@@ -300,7 +300,6 @@ module.exports = {
     // Allow Date and faker in test infrastructure files
     {
       files: [
-        'core/_tests_/**/*.ts',
         'core/**/*.builder.ts',
         'core/**/*.fixture.ts',
         'core/_ports_/**/*.ts',

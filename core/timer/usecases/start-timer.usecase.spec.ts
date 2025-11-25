@@ -13,7 +13,7 @@ describe('startTimer use case', () => {
   it('should start a timer with given duration', async () => {
     fixture.given.authenticatedUser()
 
-    const now = Date.now()
+    const now = fixture.dateProvider.getNow().getTime()
 
     const expectedDuration = TimeUnit.HOUR + TimeUnit.MINUTE * 30
 
@@ -76,7 +76,7 @@ describe('startTimer use case', () => {
   it('should replace existing timer when starting a new one', async () => {
     fixture.given.authenticatedUser()
 
-    const now = Date.now()
+    const now = fixture.dateProvider.getNow().getTime()
 
     const existingTimer = timerWithRemainingTime.oneHour()
     fixture.given.existingTimer(existingTimer)

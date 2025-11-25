@@ -2,12 +2,20 @@ import type { PartialDeep } from 'type-fest'
 import { Timer } from '../../timer/timer'
 import { TimeUnit } from '../../timer/timer.utils'
 
+const DEFAULT_BASE_TIME = 0
+
+export type TimerBuilderOptions = {
+  baseTime?: number
+}
+
+const resolveBaseTime = (options?: TimerBuilderOptions) =>
+  options?.baseTime ?? DEFAULT_BASE_TIME
+
 export function buildTimer(wantedTimer: PartialDeep<Timer> = {}): Timer {
-  const now = Date.now()
   const defaultDuration = TimeUnit.HOUR // 1 hour default
 
   const defaultTimer: Timer = {
-    endTime: now + defaultDuration,
+    endTime: defaultDuration,
     duration: defaultDuration,
     isActive: true,
   }
@@ -19,32 +27,34 @@ export function buildTimer(wantedTimer: PartialDeep<Timer> = {}): Timer {
 }
 
 export const timerWithRemainingTime = {
-  oneHour: () => {
-    const now = Date.now()
+  oneHour: (options?: TimerBuilderOptions) => {
+    const baseTime = resolveBaseTime(options)
     return buildTimer({
       duration: TimeUnit.HOUR,
-      endTime: now + TimeUnit.HOUR,
+      endTime: baseTime + TimeUnit.HOUR,
     })
   },
 
-  thirtyMinutes: () => {
-    const now = Date.now()
+  thirtyMinutes: (options?: TimerBuilderOptions) => {
+    const baseTime = resolveBaseTime(options)
     return buildTimer({
       duration: TimeUnit.MINUTE * 30,
-      endTime: now + TimeUnit.MINUTE * 30,
+      endTime: baseTime + TimeUnit.MINUTE * 30,
     })
   },
 
-  fortyFiveSeconds: () => {
-    const now = Date.now()
+  fortyFiveSeconds: (options?: TimerBuilderOptions) => {
+    const baseTime = resolveBaseTime(options)
     return buildTimer({
       duration: TimeUnit.SECOND * 45,
-      endTime: now + TimeUnit.SECOND * 45,
+      endTime: baseTime + TimeUnit.SECOND * 45,
     })
   },
 
-  oneDayTwoHoursThirtyMinutesFortyFiveSeconds: () => {
-    const now = Date.now()
+  oneDayTwoHoursThirtyMinutesFortyFiveSeconds: (
+    options?: TimerBuilderOptions,
+  ) => {
+    const baseTime = resolveBaseTime(options)
     const duration =
       TimeUnit.DAY +
       TimeUnit.HOUR * 2 +
@@ -52,66 +62,66 @@ export const timerWithRemainingTime = {
       TimeUnit.SECOND * 45
     return buildTimer({
       duration,
-      endTime: now + duration,
+      endTime: baseTime + duration,
     })
   },
 
-  sixtyOneSeconds: () => {
-    const now = Date.now()
+  sixtyOneSeconds: (options?: TimerBuilderOptions) => {
+    const baseTime = resolveBaseTime(options)
     return buildTimer({
       duration: TimeUnit.SECOND * 61,
-      endTime: now + TimeUnit.SECOND * 61,
+      endTime: baseTime + TimeUnit.SECOND * 61,
     })
   },
 
-  sixtySeconds: () => {
-    const now = Date.now()
+  sixtySeconds: (options?: TimerBuilderOptions) => {
+    const baseTime = resolveBaseTime(options)
     return buildTimer({
       duration: TimeUnit.MINUTE,
-      endTime: now + TimeUnit.MINUTE,
+      endTime: baseTime + TimeUnit.MINUTE,
     })
   },
 
-  fiftyNineSeconds: () => {
-    const now = Date.now()
+  fiftyNineSeconds: (options?: TimerBuilderOptions) => {
+    const baseTime = resolveBaseTime(options)
     return buildTimer({
       duration: TimeUnit.SECOND * 59,
-      endTime: now + TimeUnit.SECOND * 59,
+      endTime: baseTime + TimeUnit.SECOND * 59,
     })
   },
 
-  oneHourOneMinuteOneSecond: () => {
-    const now = Date.now()
+  oneHourOneMinuteOneSecond: (options?: TimerBuilderOptions) => {
+    const baseTime = resolveBaseTime(options)
     const duration = TimeUnit.HOUR + TimeUnit.MINUTE + TimeUnit.SECOND
     return buildTimer({
       duration,
-      endTime: now + duration,
+      endTime: baseTime + duration,
     })
   },
 
-  twoMinutesFiveSeconds: () => {
-    const now = Date.now()
+  twoMinutesFiveSeconds: (options?: TimerBuilderOptions) => {
+    const baseTime = resolveBaseTime(options)
     const duration = TimeUnit.MINUTE * 2 + TimeUnit.SECOND * 5
     return buildTimer({
       duration,
-      endTime: now + duration,
+      endTime: baseTime + duration,
     })
   },
 
-  expired: () => {
-    const now = Date.now()
+  expired: (options?: TimerBuilderOptions) => {
+    const baseTime = resolveBaseTime(options)
     return buildTimer({
       duration: TimeUnit.HOUR,
-      endTime: now - TimeUnit.SECOND,
+      endTime: baseTime - TimeUnit.SECOND,
       isActive: true,
     })
   },
 
-  inactive: () => {
-    const now = Date.now()
+  inactive: (options?: TimerBuilderOptions) => {
+    const baseTime = resolveBaseTime(options)
     return buildTimer({
       duration: TimeUnit.HOUR,
-      endTime: now + TimeUnit.HOUR,
+      endTime: baseTime + TimeUnit.HOUR,
       isActive: false,
     })
   },

@@ -4,6 +4,7 @@ import { createTestStore } from '@/core/_tests_/createTestStore'
 import { Fixture } from '@/core/_tests_/fixture.types'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { AuthUser } from '@/core/auth/authUser'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
 import { selectTimer } from '../selectors/selectTimer'
 import { Timer } from '../timer'
@@ -14,11 +15,20 @@ import { stopTimer } from './stop-timer.usecase'
 
 const DEFAULT_USER_ID = 'test-user-id'
 
+const DEFAULT_TEST_DATE = new Date('2024-01-01T00:00:00.000Z')
+
+type TimerFixture = Fixture & {
+  dateProvider: StubDateProvider
+}
+
 export function timerFixture(
   testStateBuilderProvider = stateBuilderProvider(),
-): Fixture {
+): TimerFixture {
   let store: AppStore
   const timerRepository = new FakeDataTimerRepository()
+  const dateProvider = new StubDateProvider()
+  dateProvider.now = new Date(DEFAULT_TEST_DATE)
+  const getNow = () => dateProvider.getNow().getTime()
   const defaultAuthUser: AuthUser = {
     id: DEFAULT_USER_ID,
     email: 'test@example.com',
@@ -50,9 +60,9 @@ export function timerFixture(
       },
     },
     when: {
-      loadingTimer: async (now: number = Date.now()) => {
+      loadingTimer: async (now: number = getNow()) => {
         store = createTestStore(
-          { timerRepository },
+          { timerRepository, dateProvider },
           testStateBuilderProvider.getState(),
         )
         return store.dispatch(loadTimer(now))
@@ -64,16 +74,15 @@ export function timerFixture(
         now?: number
       }) => {
         store = createTestStore(
-          { timerRepository },
+          { timerRepository, dateProvider },
           testStateBuilderProvider.getState(),
         )
-        return store.dispatch(
-          startTimer({ ...payload, now: payload.now ?? Date.now() }),
-        )
+        const now = payload.now ?? getNow()
+        return store.dispatch(startTimer({ ...payload, now }))
       },
       stoppingTimer: async () => {
         store = createTestStore(
-          { timerRepository },
+          { timerRepository, dateProvider },
           testStateBuilderProvider.getState(),
         )
         return store.dispatch(stopTimer())
@@ -85,12 +94,11 @@ export function timerFixture(
         now?: number
       }) => {
         store = createTestStore(
-          { timerRepository },
+          { timerRepository, dateProvider },
           testStateBuilderProvider.getState(),
         )
-        return store.dispatch(
-          extendTimer({ ...payload, now: payload.now ?? Date.now() }),
-        )
+        const now = payload.now ?? getNow()
+        return store.dispatch(extendTimer({ ...payload, now }))
       },
     },
     then: {
@@ -143,5 +151,6 @@ export function timerFixture(
           expect(action.error.message).toBe(expectedErrorMessage)
       },
     },
+    dateProvider,
   }
 }

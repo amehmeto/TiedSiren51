@@ -14,7 +14,7 @@ describe('extendTimer use case', () => {
   })
 
   it('should extend an active timer', async () => {
-    const now = Date.now()
+    const now = fixture.dateProvider.getNow().getTime()
 
     const initialDuration = TimeUnit.HOUR
     const additionalDuration = TimeUnit.MINUTE * 30
@@ -80,7 +80,7 @@ describe('extendTimer use case', () => {
 
   it('should reject when extended duration exceeds 30 days', async () => {
     const nearLimitDuration = 30 * TimeUnit.DAY - TimeUnit.HOUR
-    const now = Date.now()
+    const now = fixture.dateProvider.getNow().getTime()
     const existingTimer = buildTimer({
       endTime: now + nearLimitDuration,
       duration: nearLimitDuration,

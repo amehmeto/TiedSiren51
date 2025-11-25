@@ -1,14 +1,31 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, test, beforeEach } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
-import { timerWithRemainingTime } from '@/core/_tests_/data-builders/timer.builder'
+import {
+  TimerBuilderOptions,
+  timerWithRemainingTime,
+} from '@/core/_tests_/data-builders/timer.builder'
 import { stateBuilder } from '@/core/_tests_/state-builder'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { selectTimeRemaining } from './selectTimeRemaining'
 
 describe('selectTimeRemaining', () => {
-  test('should return empty time when there is no timer', () => {
-    const store = createTestStore({}, stateBuilder().withTimer(null).build())
+  let dateProvider: StubDateProvider
+  let now: number
+  let timerBuilderOptions: TimerBuilderOptions
 
-    const now = Date.now()
+  beforeEach(() => {
+    dateProvider = new StubDateProvider()
+    dateProvider.now = new Date('2024-01-01T10:00:00.000Z')
+    now = dateProvider.getNow().getTime()
+    timerBuilderOptions = { baseTime: now }
+  })
+
+  test('should return empty time when there is no timer', () => {
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withTimer(null).build(),
+    )
+
     const timeRemaining = selectTimeRemaining(store.getState(), now)
 
     expect(timeRemaining).toEqual({
@@ -21,11 +38,13 @@ describe('selectTimeRemaining', () => {
   })
 
   test('should return empty time when timer is not active', () => {
-    const timer = timerWithRemainingTime.inactive()
+    const timer = timerWithRemainingTime.inactive(timerBuilderOptions)
 
-    const store = createTestStore({}, stateBuilder().withTimer(timer).build())
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withTimer(timer).build(),
+    )
 
-    const now = Date.now()
     const timeRemaining = selectTimeRemaining(store.getState(), now)
 
     expect(timeRemaining).toEqual({
@@ -38,11 +57,12 @@ describe('selectTimeRemaining', () => {
   })
 
   test('should return empty time when timer has expired', () => {
-    const now = Date.now()
+    const timer = timerWithRemainingTime.expired(timerBuilderOptions)
 
-    const timer = timerWithRemainingTime.expired()
-
-    const store = createTestStore({}, stateBuilder().withTimer(timer).build())
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withTimer(timer).build(),
+    )
 
     const timeRemaining = selectTimeRemaining(store.getState(), now)
 
@@ -104,11 +124,12 @@ describe('selectTimeRemaining', () => {
   ])(
     'should calculate remaining time correctly for $description',
     ({ timerBuilder, expected }) => {
-      const now = Date.now()
+      const timer = timerBuilder(timerBuilderOptions)
 
-      const timer = timerBuilder()
-
-      const store = createTestStore({}, stateBuilder().withTimer(timer).build())
+      const store = createTestStore(
+        { dateProvider },
+        stateBuilder().withTimer(timer).build(),
+      )
 
       const timeRemaining = selectTimeRemaining(store.getState(), now)
 
@@ -175,11 +196,12 @@ describe('selectTimeRemaining', () => {
   ])(
     'should calculate time remaining correctly for $description',
     ({ timerBuilder, expected }) => {
-      const now = Date.now()
+      const timer = timerBuilder(timerBuilderOptions)
 
-      const timer = timerBuilder()
-
-      const store = createTestStore({}, stateBuilder().withTimer(timer).build())
+      const store = createTestStore(
+        { dateProvider },
+        stateBuilder().withTimer(timer).build(),
+      )
 
       const timeRemaining = selectTimeRemaining(store.getState(), now)
 
