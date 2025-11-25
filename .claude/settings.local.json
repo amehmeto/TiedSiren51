@@ -41,7 +41,12 @@
       "mcp__github__pull_request_read",
       "mcp__github__pull_request_review_write",
       "mcp__github__add_issue_comment",
-      "Bash(npm run generate:schema:*)"
+      "Bash(npm run generate:schema:*)",
+      "Bash(cloc:*)",
+      "Bash(xargs cloc:*)",
+      "mcp__github__list_pull_requests",
+      "Bash(sfltool dumpbtm:*)",
+      "Bash(launchctl unload:*)"
     ],
     "deny": [
       "Bash(git push:*)"
