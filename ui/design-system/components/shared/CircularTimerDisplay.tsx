@@ -21,7 +21,7 @@ export const CircularTimerDisplay = ({
       {isActive && (
         <Ionicons
           name="lock-closed-outline"
-          size={28}
+          size={T.icon.size.xLarge}
           color={T.color.lightBlue}
         />
       )}
@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.xxLarge,
     fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.primary,
-    letterSpacing: 1,
+    letterSpacing: T.font.letterSpacing.normal,
   },
   statusMessage: {
     color: T.color.grey,

@@ -18,7 +18,7 @@ export const UnlockMethodCard = ({
       <View style={styles.unlockMethodCard}>
         <View style={styles.unlockMethodRow}>
           <View style={styles.unlockMethodLeft}>
-            <Ionicons name="time-outline" size={22} color={T.color.lightBlue} />
+            <Ionicons name="time-outline" size={T.icon.size.medium} color={T.color.lightBlue} />
             <Text style={styles.unlockMethodLabel}>{'Timer'}</Text>
           </View>
           <Text style={styles.unlockMethodValue}>
@@ -41,7 +41,7 @@ const styles = StyleSheet.create({
     fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.primary,
     marginBottom: T.spacing.medium,
-    letterSpacing: 1,
+    letterSpacing: T.font.letterSpacing.normal,
   },
   unlockMethodCard: {
     backgroundColor: T.color.darkBlueGray,

@@ -68,6 +68,7 @@ module.exports = {
     'react-native/no-single-element-style-arrays': 'error',
     'react-native/no-unused-styles': 'error',
     // Custom local rules
+    'local-rules/no-icon-size-magic-numbers': 'error',
     'local-rules/no-stylesheet-magic-numbers': 'error',
     'local-rules/no-complex-jsx-in-conditionals': [
       'error',

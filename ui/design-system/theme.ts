@@ -45,6 +45,12 @@ export const T = {
       relaxed: 1.75,
       loose: 2,
     },
+    letterSpacing: {
+      none: 0,
+      tight: 0.5,
+      normal: 1,
+      wide: 2,
+    },
     family: {
       primary: Platform.select({
         ios: 'Helvetica Neue',
@@ -121,10 +127,12 @@ export const T = {
   },
   icon: {
     size: {
-      small: 16,
-      medium: 20,
+      xSmall: 16,
+      small: 20,
+      medium: 22,
       large: 24,
-      xLarge: 32,
+      xLarge: 28,
+      xxLarge: 32,
     },
   },
   opacity: {

@@ -102,7 +102,7 @@ const styles = StyleSheet.create({
     backgroundColor: T.color.lightBlue,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: 0,
+    padding: T.spacing.none,
     marginBottom: T.spacing.extraSmall,
     minWidth: T.spacing.x_large,
     maxWidth: T.spacing.x_large,
