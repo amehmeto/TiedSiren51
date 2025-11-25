@@ -10,8 +10,8 @@ import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.r
 import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-repository/expo-list-installed-apps.repository'
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
 import { PrismaSirensRepository } from '@/infra/siren-repository/prisma.sirens-repository'
+import { AndroidSirenTier } from '@/infra/siren-tier/android.siren-tier'
 import { InMemorySirenLookout } from '@/infra/siren-tier/in-memory.siren-lookout'
-import { RealSirenTier } from '@/infra/siren-tier/real.siren-tier'
 
 const mobileDependencies = {
   authGateway: process.env.EXPO_PUBLIC_E2E
@@ -26,7 +26,7 @@ const mobileDependencies = {
   installedAppRepository: new ExpoListInstalledAppsRepository(),
   notificationService: new ExpoNotificationService(),
   sirenLookout: new InMemorySirenLookout(),
-  sirenTier: new RealSirenTier(),
+  sirenTier: new AndroidSirenTier(),
   sirensRepository: new PrismaSirensRepository(),
 }
 

@@ -1,0 +1,85 @@
+import { showOverlay } from '@amehmeto/tied-siren-blocking-overlay'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { Sirens } from '@core/siren/sirens'
+import { AndroidSirenTier } from './android.siren-tier'
+
+vi.mock('@amehmeto/tied-siren-blocking-overlay', () => ({
+  showOverlay: vi.fn(),
+}))
+
+const mockShowOverlay = vi.mocked(showOverlay)
+
+describe('AndroidSirenTier', () => {
+  let androidSirenTier: AndroidSirenTier
+
+  beforeEach(() => {
+    vi.clearAllMocks()
+    androidSirenTier = new AndroidSirenTier()
+  })
+
+  describe('block', () => {
+    it('calls showOverlay with correct packageName', async () => {
+      const packageName = 'com.facebook.katana'
+      mockShowOverlay.mockResolvedValueOnce(undefined)
+
+      await androidSirenTier.block(packageName)
+
+      expect(mockShowOverlay).toHaveBeenCalledTimes(1)
+      expect(mockShowOverlay).toHaveBeenCalledWith(packageName)
+    })
+
+    it('handles ERR_INVALID_PACKAGE error gracefully', async () => {
+      const error = Object.assign(new Error('Package name cannot be empty'), {
+        code: 'ERR_INVALID_PACKAGE',
+      })
+      mockShowOverlay.mockRejectedValueOnce(error)
+
+      await expect(androidSirenTier.block('')).rejects.toThrow(
+        'Package name cannot be empty',
+      )
+    })
+
+    it('handles ERR_OVERLAY_LAUNCH error gracefully', async () => {
+      const error = Object.assign(new Error('Failed to launch overlay'), {
+        code: 'ERR_OVERLAY_LAUNCH',
+      })
+      mockShowOverlay.mockRejectedValueOnce(error)
+
+      await expect(androidSirenTier.block('com.example.app')).rejects.toThrow(
+        'Failed to launch overlay',
+      )
+    })
+  })
+
+  describe('target', () => {
+    it('logs targeted sirens', async () => {
+      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
+
+      const sirens: Sirens = {
+        android: [
+          { appName: 'Facebook', packageName: 'com.facebook.katana', icon: '' },
+          {
+            appName: 'Instagram',
+            packageName: 'com.instagram.android',
+            icon: '',
+          },
+        ],
+        ios: [],
+        windows: [],
+        macos: [],
+        linux: [],
+        websites: [],
+        keywords: [],
+      }
+
+      await androidSirenTier.target(sirens)
+
+      expect(consoleSpy).toHaveBeenCalledWith('Targeted sirens:', [
+        'Facebook',
+        'Instagram',
+      ])
+
+      consoleSpy.mockRestore()
+    })
+  })
+})

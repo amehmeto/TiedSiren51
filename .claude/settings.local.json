@@ -44,7 +44,18 @@
       "mcp__github__issue_write",
       "mcp__github__list_issues",
       "mcp__github__pull_request_read",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(npx create-expo-module:*)",
+      "Bash(npm run build:*)",
+      "Bash(npx create-expo-app:*)",
+      "Bash(npx husky init)",
+      "Bash(npx expo prebuild:*)",
+      "Bash(./gradlew :tied-siren-blocking-overlay:testDebugUnitTest:*)",
+      "Bash(npx expo run:android)",
+      "Bash(./gradlew:*)",
+      "SlashCommand(/speckit.specify)",
+      "Bash(uv tool list:*)",
+      "Bash(npm run lint:fix:*)"
     ],
     "deny": [],
     "ask": [
