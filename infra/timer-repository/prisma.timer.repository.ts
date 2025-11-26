@@ -12,12 +12,10 @@ export class PrismaTimerRepository
         id: userId,
         userId,
         endAt: data.endAt,
-        duration: data.duration,
         isActive: data.isActive ? 1 : 0,
       },
       update: {
         endAt: data.endAt,
-        duration: data.duration,
         isActive: data.isActive ? 1 : 0,
       },
     })
@@ -32,7 +30,6 @@ export class PrismaTimerRepository
 
     return {
       endAt: timer.endAt,
-      duration: timer.duration,
       isActive: timer.isActive === 1,
     }
   }

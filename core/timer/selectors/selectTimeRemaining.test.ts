@@ -74,7 +74,7 @@ describe('selectTimeRemaining', () => {
   test.each([
     {
       description: '1 hour',
-      duration: TimeUnit.HOUR,
+      remainingMs: TimeUnit.HOUR,
       expected: {
         days: 0,
         hours: 1,
@@ -85,7 +85,7 @@ describe('selectTimeRemaining', () => {
     },
     {
       description: '1 day 2 hours 30 minutes 45 seconds',
-      duration:
+      remainingMs:
         TimeUnit.DAY +
         TimeUnit.HOUR * 2 +
         TimeUnit.MINUTE * 30 +
@@ -100,7 +100,7 @@ describe('selectTimeRemaining', () => {
     },
     {
       description: '30 minutes',
-      duration: TimeUnit.MINUTE * 30,
+      remainingMs: TimeUnit.MINUTE * 30,
       expected: {
         days: 0,
         hours: 0,
@@ -111,7 +111,7 @@ describe('selectTimeRemaining', () => {
     },
     {
       description: '45 seconds',
-      duration: TimeUnit.SECOND * 45,
+      remainingMs: TimeUnit.SECOND * 45,
       expected: {
         days: 0,
         hours: 0,
@@ -122,11 +122,11 @@ describe('selectTimeRemaining', () => {
     },
   ])(
     'should calculate remaining time correctly for $description',
-    ({ duration, expected }) => {
+    ({ remainingMs, expected }) => {
       const store = createTestStore(
         { dateProvider },
         stateBuilder()
-          .withTimer(buildTimer({ endAt: now + duration, duration }))
+          .withTimer(buildTimer({ endAt: now + remainingMs }))
           .build(),
       )
 
@@ -139,7 +139,7 @@ describe('selectTimeRemaining', () => {
   test.each([
     {
       description: '61 seconds remaining',
-      duration: TimeUnit.SECOND * 61,
+      remainingMs: TimeUnit.SECOND * 61,
       expected: {
         days: 0,
         hours: 0,
@@ -150,7 +150,7 @@ describe('selectTimeRemaining', () => {
     },
     {
       description: '60 seconds remaining',
-      duration: TimeUnit.MINUTE,
+      remainingMs: TimeUnit.MINUTE,
       expected: {
         days: 0,
         hours: 0,
@@ -161,7 +161,7 @@ describe('selectTimeRemaining', () => {
     },
     {
       description: '59 seconds remaining',
-      duration: TimeUnit.SECOND * 59,
+      remainingMs: TimeUnit.SECOND * 59,
       expected: {
         days: 0,
         hours: 0,
@@ -172,7 +172,7 @@ describe('selectTimeRemaining', () => {
     },
     {
       description: '3661 seconds remaining (1 hour 1 minute 1 second)',
-      duration: TimeUnit.HOUR + TimeUnit.MINUTE + TimeUnit.SECOND,
+      remainingMs: TimeUnit.HOUR + TimeUnit.MINUTE + TimeUnit.SECOND,
       expected: {
         days: 0,
         hours: 1,
@@ -183,7 +183,7 @@ describe('selectTimeRemaining', () => {
     },
     {
       description: '125 seconds remaining (2 minutes 5 seconds)',
-      duration: TimeUnit.MINUTE * 2 + TimeUnit.SECOND * 5,
+      remainingMs: TimeUnit.MINUTE * 2 + TimeUnit.SECOND * 5,
       expected: {
         days: 0,
         hours: 0,
@@ -194,11 +194,11 @@ describe('selectTimeRemaining', () => {
     },
   ])(
     'should calculate time remaining correctly for $description',
-    ({ duration, expected }) => {
+    ({ remainingMs, expected }) => {
       const store = createTestStore(
         { dateProvider },
         stateBuilder()
-          .withTimer(buildTimer({ endAt: now + duration, duration }))
+          .withTimer(buildTimer({ endAt: now + remainingMs }))
           .build(),
       )
 

@@ -54,7 +54,6 @@ model Timer {
   id        String   @id
   userId    String
   endAt     Float
-  duration  Float
   isActive  Int      @default(0) // 0 = false, 1 = true (SQLite doesn't have boolean)
   updatedAt DateTime @default(now()) @updatedAt
 }

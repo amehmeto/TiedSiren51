@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react'
+import React, { useMemo } from 'react'
 import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { formatEndFromOffsets } from '@/ui/utils/timeFormat'
@@ -7,10 +7,18 @@ import { TiedSCloseButton } from './TiedSCloseButton'
 import { TiedSModal } from './TiedSModal'
 import { TimeStepper } from './TimeStepper'
 
+export type TimerDuration = {
+  days: number
+  hours: number
+  minutes: number
+}
+
 type TimerPickerModalProps = {
   visible: boolean
   onClose: () => void
-  onSave: (days: number, hours: number, minutes: number) => void
+  onSave: () => void
+  duration: TimerDuration
+  onDurationChange: (duration: TimerDuration) => void
   title?: string
 }
 
@@ -18,30 +26,18 @@ export const TimerPickerModal = ({
   visible,
   onClose,
   onSave,
+  duration,
+  onDurationChange,
   title = 'Set the timer',
 }: Readonly<TimerPickerModalProps>) => {
-  const [selectedDays, setSelectedDays] = useState(0)
-  const [selectedHours, setSelectedHours] = useState(0)
-  const [selectedMinutes, setSelectedMinutes] = useState(20)
+  const isZeroDuration =
+    duration.days === 0 && duration.hours === 0 && duration.minutes === 0
 
-  const isZeroDuration = useMemo(
-    () => selectedDays === 0 && selectedHours === 0 && selectedMinutes === 0,
-    [selectedDays, selectedHours, selectedMinutes],
-  )
-
-  const endDateTime = useMemo(
-    () =>
-      formatEndFromOffsets({
-        days: selectedDays,
-        hours: selectedHours,
-        minutes: selectedMinutes,
-      }),
-    [selectedDays, selectedHours, selectedMinutes],
-  )
+  const endDateTime = useMemo(() => formatEndFromOffsets(duration), [duration])
 
   const handleSave = () => {
     if (isZeroDuration) return
-    onSave(selectedDays, selectedHours, selectedMinutes)
+    onSave()
     onClose()
   }
 
@@ -54,22 +50,24 @@ export const TimerPickerModal = ({
 
         <View style={styles.pickerContainer}>
           <TimeStepper
-            selectedValue={selectedDays}
-            onValueChange={setSelectedDays}
+            selectedValue={duration.days}
+            onValueChange={(days) => onDurationChange({ ...duration, days })}
             max={30}
             labelSingular="day"
             labelPlural="days"
           />
           <TimeStepper
-            selectedValue={selectedHours}
-            onValueChange={setSelectedHours}
+            selectedValue={duration.hours}
+            onValueChange={(hours) => onDurationChange({ ...duration, hours })}
             max={23}
             labelSingular="hour"
             labelPlural="hours"
           />
           <TimeStepper
-            selectedValue={selectedMinutes}
-            onValueChange={setSelectedMinutes}
+            selectedValue={duration.minutes}
+            onValueChange={(minutes) =>
+              onDurationChange({ ...duration, minutes })
+            }
             max={59}
             labelSingular="min"
             labelPlural="min"

@@ -15,7 +15,7 @@ describe('startTimer use case', () => {
 
     const now = fixture.dateProvider.getNow().getTime()
 
-    const expectedDuration = TimeUnit.HOUR + TimeUnit.MINUTE * 30
+    const durationMs = TimeUnit.HOUR + TimeUnit.MINUTE * 30
 
     await fixture.when.startingTimer({
       days: 0,
@@ -25,8 +25,7 @@ describe('startTimer use case', () => {
     })
 
     fixture.then.timerShouldBeStoredAs({
-      endAt: now + expectedDuration,
-      duration: expectedDuration,
+      endAt: now + durationMs,
       isActive: true,
     })
   })
@@ -80,7 +79,7 @@ describe('startTimer use case', () => {
 
     fixture.given.existingTimer(buildTimer({}))
 
-    const newDuration = TimeUnit.MINUTE * 30
+    const durationMs = TimeUnit.MINUTE * 30
     await fixture.when.startingTimer({
       days: 0,
       hours: 0,
@@ -89,8 +88,7 @@ describe('startTimer use case', () => {
     })
 
     fixture.then.timerShouldBeStoredAs({
-      endAt: now + newDuration,
-      duration: newDuration,
+      endAt: now + durationMs,
       isActive: true,
     })
   })

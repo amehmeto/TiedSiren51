@@ -4,14 +4,23 @@ import { CircularTimerDisplay } from '@/ui/design-system/components/shared/Circu
 import { LoadingScreen } from '@/ui/design-system/components/shared/LoadingScreen'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTitle } from '@/ui/design-system/components/shared/TiedSTitle'
-import { TimerPickerModal } from '@/ui/design-system/components/shared/TimerPickerModal'
+import {
+  TimerDuration,
+  TimerPickerModal,
+} from '@/ui/design-system/components/shared/TimerPickerModal'
 import { T } from '@/ui/design-system/theme'
 import { useStrictModeTimer } from '@/ui/hooks/useStrictModeTimer'
 import { UnLockMethodCard } from '@ui/screens/StrictMode/UnLockMethodCard'
 
+const DEFAULT_DURATION: TimerDuration = { days: 0, hours: 0, minutes: 20 }
+
 export default function StrictModeScreen() {
   const [showTimerPicker, setShowTimerPicker] = useState(false)
   const [showExtendPicker, setShowExtendPicker] = useState(false)
+  const [timerDuration, setTimerDuration] =
+    useState<TimerDuration>(DEFAULT_DURATION)
+  const [extendDuration, setExtendDuration] =
+    useState<TimerDuration>(DEFAULT_DURATION)
 
   const { timeRemaining, isActive, isLoading, startTimer, extendTimer } =
     useStrictModeTimer()
@@ -57,14 +66,30 @@ export default function StrictModeScreen() {
       <TimerPickerModal
         visible={showTimerPicker}
         onClose={() => setShowTimerPicker(false)}
-        onSave={startTimer}
+        onSave={() =>
+          startTimer(
+            timerDuration.days,
+            timerDuration.hours,
+            timerDuration.minutes,
+          )
+        }
+        duration={timerDuration}
+        onDurationChange={setTimerDuration}
         title={'Set the timer'}
       />
 
       <TimerPickerModal
         visible={showExtendPicker}
         onClose={() => setShowExtendPicker(false)}
-        onSave={extendTimer}
+        onSave={() =>
+          extendTimer(
+            extendDuration.days,
+            extendDuration.hours,
+            extendDuration.minutes,
+          )
+        }
+        duration={extendDuration}
+        onDurationChange={setExtendDuration}
         title={'Extend timer by'}
       />
     </View>

@@ -25,7 +25,8 @@ export const extendTimer = createAppAsyncThunk<Timer, ExtendTimerPayload>(
 
     if (additionalMs <= 0) throw new Error('Invalid extension duration')
 
-    const newTotalDuration = currentTimer.duration + additionalMs
+    const remainingMs = currentTimer.endAt - payload.now
+    const newTotalDuration = remainingMs + additionalMs
     if (newTotalDuration > MAX_DURATION_MS) {
       throw new Error(
         'Extended timer duration exceeds maximum allowed (30 days)',
@@ -34,13 +35,12 @@ export const extendTimer = createAppAsyncThunk<Timer, ExtendTimerPayload>(
 
     const newEndAt = currentTimer.endAt + additionalMs
 
-    const updatedTimer: Timer = {
+    const timer: Timer = {
       endAt: newEndAt,
-      duration: currentTimer.duration + additionalMs,
       isActive: true,
     }
 
-    await timerRepository.saveTimer(userId, updatedTimer)
-    return updatedTimer
+    await timerRepository.saveTimer(userId, timer)
+    return timer
   },
 )

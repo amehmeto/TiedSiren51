@@ -14,16 +14,9 @@ describe('extendAtr use case', () => {
     const now = fixture.dateProvider.getNow().getTime()
 
     const initialDuration = TimeUnit.HOUR
-    const additionalDuration = TimeUnit.MINUTE * 30
-    const expectedDuration = initialDuration + additionalDuration
+    const extensionDuration = TimeUnit.MINUTE * 30
 
-    const existingTimer = buildTimer({
-      endAt: now + initialDuration,
-      duration: initialDuration,
-      isActive: true,
-    })
-
-    fixture.given.existingTimer(existingTimer)
+    fixture.given.existingTimer(buildTimer({ endAt: now + initialDuration }))
 
     await fixture.when.extendingTimer({
       days: 0,
@@ -33,8 +26,7 @@ describe('extendAtr use case', () => {
     })
 
     fixture.then.timerShouldBeStoredAs({
-      endAt: now + expectedDuration,
-      duration: expectedDuration,
+      endAt: now + initialDuration + extensionDuration,
       isActive: true,
     })
   })
@@ -75,20 +67,16 @@ describe('extendAtr use case', () => {
   })
 
   it('should reject when extended duration exceeds 30 days', async () => {
-    const nearLimitDuration = 30 * TimeUnit.DAY - TimeUnit.HOUR
     const now = fixture.dateProvider.getNow().getTime()
-    const existingTimer = buildTimer({
-      endAt: now + nearLimitDuration,
-      duration: nearLimitDuration,
-      isActive: true,
-    })
+    const nearLimitDuration = 30 * TimeUnit.DAY - TimeUnit.HOUR
 
-    fixture.given.existingTimer(existingTimer)
+    fixture.given.existingTimer(buildTimer({ endAt: now + nearLimitDuration }))
 
     const action = await fixture.when.extendingTimer({
       days: 0,
       hours: 2,
       minutes: 0,
+      now,
     })
 
     fixture.then.actionShouldBeRejectedWith(
