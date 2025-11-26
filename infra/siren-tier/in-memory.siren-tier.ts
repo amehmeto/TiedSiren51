@@ -1,3 +1,4 @@
+import { Logger } from '@/core/_ports_/logger'
 import { SirenTier } from '@core/_ports_/siren.tier'
 import { Sirens } from '@core/siren/sirens'
 
@@ -6,18 +7,27 @@ export class InMemorySirenTier implements SirenTier {
 
   blockedApps: string[] = []
 
+  constructor(private readonly logger: Logger) {}
+
   async target(sirens: Sirens): Promise<void> {
-    // eslint-disable-next-line no-console
-    console.log(
-      'Targeted sirens:',
-      sirens.android.map((app) => app.appName),
-    )
-    this.sirens = sirens
+    try {
+      this.logger.info(
+        `Targeted sirens: ${sirens.android.map((app) => app.appName).join(', ')}`,
+      )
+      this.sirens = sirens
+    } catch (error) {
+      this.logger.error(`Failed to target sirens: ${error}`)
+      throw error
+    }
   }
 
   async block(packageName: string): Promise<void> {
-    // eslint-disable-next-line no-console
-    console.log('Blocking app:', packageName)
-    this.blockedApps.push(packageName)
+    try {
+      this.logger.info(`Blocking app: ${packageName}`)
+      this.blockedApps.push(packageName)
+    } catch (error) {
+      this.logger.error(`Failed to block app "${packageName}": ${error}`)
+      throw error
+    }
   }
 }

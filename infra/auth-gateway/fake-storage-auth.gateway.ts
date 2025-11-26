@@ -1,13 +1,16 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { AuthGateway } from '@/core/_ports_/auth.gateway'
+import { Logger } from '@/core/_ports_/logger'
 import { AuthUser } from '@/core/auth/authUser'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 
 export class FakeStorageAuthGateway implements AuthGateway {
-  constructor(private readonly fakeAuthGateway: FakeAuthGateway) {
+  constructor(
+    private readonly fakeAuthGateway: FakeAuthGateway,
+    private readonly logger: Logger,
+  ) {
     this.verifyUserIsAuthenticated().catch((err) =>
-      // eslint-disable-next-line no-console
-      console.error('Failed to verify authentication:', err),
+      this.logger.error(`Failed to verify authentication: ${err}`),
     )
   }
 
@@ -61,8 +64,7 @@ export class FakeStorageAuthGateway implements AuthGateway {
         this.fakeAuthGateway.simulateUserLoggedIn(parsedAuthUser)
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.warn('Error verifying authentication:', error)
+      this.logger.warn(`Error verifying authentication: ${error}`)
     }
   }
 }

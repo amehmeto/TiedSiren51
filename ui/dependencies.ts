@@ -8,28 +8,32 @@ import { PrismaDatabaseService } from '@/infra/database-service/prisma.database.
 import { RealDateProvider } from '@/infra/date-provider/real.date-provider'
 import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
 import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-repository/expo-list-installed-apps.repository'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
 import { PrismaSirensRepository } from '@/infra/siren-repository/prisma.sirens-repository'
 import { InMemorySirenLookout } from '@/infra/siren-tier/in-memory.siren-lookout'
 import { InMemorySirenTier } from '@/infra/siren-tier/in-memory.siren-tier'
 import { PrismaTimerRepository } from '@/infra/timer-repository/prisma.timer.repository'
 
+const dateProvider = new RealDateProvider()
+const logger = new InMemoryLogger(dateProvider)
+
 const mobileDependencies = {
   authGateway: process.env.EXPO_PUBLIC_E2E
     ? new FakeAuthGateway()
     : new FirebaseAuthGateway(),
-  backgroundTaskService: new RealBackgroundTaskService(),
-  blockSessionRepository: new PrismaBlockSessionRepository(),
-  blocklistRepository: new PrismaBlocklistRepository(),
-  databaseService: new PrismaDatabaseService(),
-  dateProvider: new RealDateProvider(),
-  deviceRepository: new PrismaRemoteDeviceRepository(),
+  backgroundTaskService: new RealBackgroundTaskService(logger),
+  blockSessionRepository: new PrismaBlockSessionRepository(logger),
+  blocklistRepository: new PrismaBlocklistRepository(logger),
+  databaseService: new PrismaDatabaseService(logger),
+  dateProvider,
+  deviceRepository: new PrismaRemoteDeviceRepository(logger),
   installedAppRepository: new ExpoListInstalledAppsRepository(),
-  notificationService: new ExpoNotificationService(),
-  sirenLookout: new InMemorySirenLookout(),
-  sirenTier: new InMemorySirenTier(),
-  sirensRepository: new PrismaSirensRepository(),
-  timerRepository: new PrismaTimerRepository(),
+  notificationService: new ExpoNotificationService(logger),
+  sirenLookout: new InMemorySirenLookout(logger),
+  sirenTier: new InMemorySirenTier(logger),
+  sirensRepository: new PrismaSirensRepository(logger),
+  timerRepository: new PrismaTimerRepository(logger),
 }
 
 export const dependencies: Dependencies = mobileDependencies

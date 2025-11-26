@@ -1,11 +1,15 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PrismaSirensRepository } from './prisma.sirens-repository'
 
 describe('PrismaSirensRepository', () => {
   let repository: PrismaSirensRepository
 
   beforeEach(async () => {
-    repository = new PrismaSirensRepository()
+    const dateProvider = new StubDateProvider()
+    const logger = new InMemoryLogger(dateProvider)
+    repository = new PrismaSirensRepository(logger)
     await repository.initialize()
   })
 

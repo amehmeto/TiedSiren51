@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 
 describe('PrismaBlockSessionRepository', () => {
@@ -10,14 +12,16 @@ describe('PrismaBlockSessionRepository', () => {
   let prismaClient: PrismaClient
 
   beforeEach(async () => {
-    repository = new PrismaBlockSessionRepository()
+    const dateProvider = new StubDateProvider()
+    const logger = new InMemoryLogger(dateProvider)
+    repository = new PrismaBlockSessionRepository(logger)
     await repository.initialize()
     prismaClient = repository.getClient()
 
     // Clear junction tables first
     await prismaClient.$executeRaw`DELETE FROM "_BlockSessionToDevice"`
     await prismaClient.$executeRaw`DELETE FROM "_BlockSessionToBlocklist"`
-    // Then clear main tables
+    // Then clear the main tables
     await prismaClient.blockSession.deleteMany()
     await prismaClient.device.deleteMany()
     await prismaClient.blocklist.deleteMany()

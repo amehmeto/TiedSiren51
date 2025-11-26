@@ -22,7 +22,7 @@
     "test:cov": "c8 --all --reporter=text --reporter=json-summary vitest --run",
     "test:cov:track": "c8 --reporter=json vitest --run && node scripts/track-coverage.js",
     "test:cov:history": "node scripts/view-coverage-history.js",
-    "test:e2e": "maestro test maestro/",
+    "test:e2e": "EXPO_PUBLIC_E2E=true maestro test maestro/",
     "prebuild": "npx expo prebuild",
     "prebuild:android": "npx expo prebuild --platform android",
     "prebuild:ios": "npx expo prebuild --platform ios",

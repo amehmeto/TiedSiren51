@@ -50,7 +50,7 @@
       "Bash(npx vitest:*)",
       "Bash(npm view:*)"
     ],
-    "deny": [],
+    "deny": ["BashOutput(*)"],
     "ask": [
       "Bash(chmod:*)",
       "Bash(gh secret:*)",
