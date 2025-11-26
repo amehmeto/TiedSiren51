@@ -82,8 +82,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   button: {
-    width: T.spacing.x_large,
-    height: T.spacing.x_large,
     borderRadius: T.border.radius.fullRound,
     backgroundColor: T.color.lightBlue,
     alignItems: 'center',
