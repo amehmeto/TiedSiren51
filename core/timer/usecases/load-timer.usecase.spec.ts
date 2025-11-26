@@ -1,5 +1,4 @@
 import { beforeEach, describe, it } from 'vitest'
-import { buildTimer } from '@/core/_tests_/data-builders/timer.builder'
 import { TimeUnit } from '@/core/timer/timer.utils'
 import { timerFixture } from './timer.fixture'
 
@@ -11,14 +10,16 @@ describe('loadTimer use case', () => {
   })
 
   it('should load timer from repository', async () => {
-    const now = fixture.dateProvider.getNow().getTime()
-    const existingTimer = buildTimer({ endAt: now + TimeUnit.HOUR })
+    const nowMs = fixture.dateProvider.getNowMs()
+    const existingEndAt = fixture.dateProvider.msToISOString(
+      nowMs + TimeUnit.HOUR,
+    )
 
-    fixture.given.existingTimer(existingTimer)
+    fixture.given.existingTimer(existingEndAt)
 
-    await fixture.when.loadingTimer(now)
+    await fixture.when.loadingTimer()
 
-    fixture.then.timerShouldBeLoadedAs(existingTimer)
+    fixture.then.timerShouldBeLoadedAs(existingEndAt)
   })
 
   it('should return null when no timer exists', async () => {
@@ -36,12 +37,14 @@ describe('loadTimer use case', () => {
   })
 
   it('should clear expired timer automatically', async () => {
-    const now = fixture.dateProvider.getNow().getTime()
-    const expiredTimer = buildTimer({ endAt: now - TimeUnit.SECOND })
+    const nowMs = fixture.dateProvider.getNowMs()
+    const expiredEndAt = fixture.dateProvider.msToISOString(
+      nowMs - TimeUnit.SECOND,
+    )
 
-    fixture.given.existingTimer(expiredTimer)
+    fixture.given.existingTimer(expiredEndAt)
 
-    await fixture.when.loadingTimer(now)
+    await fixture.when.loadingTimer()
 
     fixture.then.timerShouldBeLoadedAs(null)
   })

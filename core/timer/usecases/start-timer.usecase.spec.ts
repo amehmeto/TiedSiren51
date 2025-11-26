@@ -1,5 +1,4 @@
 import { beforeEach, describe, it } from 'vitest'
-import { buildTimer } from '@/core/_tests_/data-builders/timer.builder'
 import { TimeUnit } from '@/core/timer/timer.utils'
 import { timerFixture } from './timer.fixture'
 
@@ -13,20 +12,18 @@ describe('startTimer use case', () => {
   it('should start a timer with given duration', async () => {
     fixture.given.authenticatedUser()
 
-    const now = fixture.dateProvider.getNow().getTime()
-
+    const nowMs = fixture.dateProvider.getNowMs()
     const durationMs = TimeUnit.HOUR + TimeUnit.MINUTE * 30
 
     await fixture.when.startingTimer({
       days: 0,
       hours: 1,
       minutes: 30,
-      now,
     })
 
-    fixture.then.timerShouldBeStoredAs({
-      endAt: now + durationMs,
-    })
+    fixture.then.timerShouldBeStoredAs(
+      fixture.dateProvider.msToISOString(nowMs + durationMs),
+    )
   })
 
   it.each([
@@ -74,20 +71,20 @@ describe('startTimer use case', () => {
   it('should replace existing timer when starting a new one', async () => {
     fixture.given.authenticatedUser()
 
-    const now = fixture.dateProvider.getNow().getTime()
-
-    fixture.given.existingTimer(buildTimer({}))
+    const nowMs = fixture.dateProvider.getNowMs()
+    fixture.given.existingTimer(
+      fixture.dateProvider.msToISOString(nowMs + TimeUnit.HOUR),
+    )
 
     const durationMs = TimeUnit.MINUTE * 30
     await fixture.when.startingTimer({
       days: 0,
       hours: 0,
       minutes: 30,
-      now,
     })
 
-    fixture.then.timerShouldBeStoredAs({
-      endAt: now + durationMs,
-    })
+    fixture.then.timerShouldBeStoredAs(
+      fixture.dateProvider.msToISOString(nowMs + durationMs),
+    )
   })
 })

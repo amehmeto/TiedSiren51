@@ -1,11 +1,17 @@
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
-import { Timer } from '../timer'
 
-export const loadTimer = createAppAsyncThunk<Timer | null, number>(
+export const loadTimer = createAppAsyncThunk<string | null, void>(
   'timer/loadTimer',
-  async (_now, { extra: { timerRepository }, getState }) => {
+  async (_payload, { extra: { timerRepository, dateProvider }, getState }) => {
     const userId = getState().auth.authUser?.id
     if (!userId) return null
-    return timerRepository.loadTimer(userId)
+
+    const endAt = await timerRepository.loadTimer(userId)
+    if (!endAt) return null
+
+    const isExpired =
+      dateProvider.parseISOString(endAt).getTime() <= dateProvider.getNowMs()
+
+    return isExpired ? null : endAt
   },
 )

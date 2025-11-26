@@ -22,7 +22,7 @@ export default function StrictModeScreen() {
   const [extendDuration, setExtendDuration] =
     useState<TimerDuration>(DEFAULT_DURATION)
 
-  const { timeRemaining, isActive, isLoading, startTimer, extendTimer } =
+  const { timeLeft, isActive, isLoading, startTimer, extendTimer } =
     useStrictModeTimer()
 
   if (isLoading) return <LoadingScreen />
@@ -36,10 +36,7 @@ export default function StrictModeScreen() {
       >
         <TiedSTitle text="Strict Mode" />
 
-        <CircularTimerDisplay
-          timeRemaining={timeRemaining}
-          isActive={isActive}
-        />
+        <CircularTimerDisplay timeLeft={timeLeft} isActive={isActive} />
 
         <View style={styles.actionButtons}>
           {!isActive ? (
@@ -58,7 +55,7 @@ export default function StrictModeScreen() {
         {isActive && (
           <View style={styles.unlockSection}>
             <Text style={styles.sectionTitle}>{'UNLOCK METHOD'}</Text>
-            <UnLockMethodCard timeRemaining={timeRemaining} />
+            <UnLockMethodCard timeLeft={timeLeft} />
           </View>
         )}
       </ScrollView>

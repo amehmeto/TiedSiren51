@@ -1,5 +1,4 @@
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
-import { Timer } from '../timer'
 import { calculateMilliseconds, TimeUnit } from '../timer.utils'
 
 const MAX_DURATION_MS = 30 * TimeUnit.DAY
@@ -8,25 +7,27 @@ export type ExtendTimerPayload = {
   days: number
   hours: number
   minutes: number
-  now: number
 }
 
-export const extendTimer = createAppAsyncThunk<Timer, ExtendTimerPayload>(
+export const extendTimer = createAppAsyncThunk<string, ExtendTimerPayload>(
   'timer/extendTimer',
-  async (payload, { extra: { timerRepository }, getState }) => {
+  async (payload, { extra: { timerRepository, dateProvider }, getState }) => {
     const userId = getState().auth.authUser?.id
     if (!userId) throw new Error('User not authenticated')
 
-    const currentTimer = getState().timer.timer
+    const nowMs = dateProvider.getNowMs()
+    const currentEndAt = getState().timer.endAt
+    const currentEndAtMs = currentEndAt
+      ? dateProvider.parseISOString(currentEndAt).getTime()
+      : 0
 
-    if (!currentTimer || currentTimer.endAt <= payload.now)
+    if (!currentEndAt || currentEndAtMs <= nowMs)
       throw new Error('No active timer to extend')
 
     const additionalMs = calculateMilliseconds(payload)
-
     if (additionalMs <= 0) throw new Error('Invalid extension duration')
 
-    const remainingMs = currentTimer.endAt - payload.now
+    const remainingMs = currentEndAtMs - nowMs
     const newTotalDuration = remainingMs + additionalMs
     if (newTotalDuration > MAX_DURATION_MS) {
       throw new Error(
@@ -34,13 +35,9 @@ export const extendTimer = createAppAsyncThunk<Timer, ExtendTimerPayload>(
       )
     }
 
-    const newEndAt = currentTimer.endAt + additionalMs
+    const endAt = dateProvider.msToISOString(currentEndAtMs + additionalMs)
 
-    const timer: Timer = {
-      endAt: newEndAt,
-    }
-
-    await timerRepository.saveTimer(userId, timer)
-    return timer
+    await timerRepository.saveTimer(userId, endAt)
+    return endAt
   },
 )

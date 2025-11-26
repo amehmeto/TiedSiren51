@@ -1,35 +1,34 @@
 import { describe, expect, test, beforeEach } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
-import { buildTimer } from '@/core/_tests_/data-builders/timer.builder'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { TimeUnit } from '../timer.utils'
-import { selectTimeRemaining } from './selectTimeRemaining'
+import { selectTimeLeft } from './selectTimeLeft'
 
-describe('selectTimeRemaining', () => {
+describe('selectTimeLeft', () => {
   let dateProvider: StubDateProvider
-  let now: number
+  let nowMs: number
 
   beforeEach(() => {
     dateProvider = new StubDateProvider()
     dateProvider.now = new Date('2024-01-01T10:00:00.000Z')
-    now = dateProvider.getNow().getTime()
+    nowMs = dateProvider.getNow().getTime()
   })
 
   test('should return empty time when there is no timer', () => {
     const store = createTestStore(
       { dateProvider },
-      stateBuilder().withTimer(null).build(),
+      stateBuilder().withTimerEndAt(null).build(),
     )
 
-    const timeRemaining = selectTimeRemaining(store.getState(), now)
+    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
 
-    expect(timeRemaining).toEqual({
+    expect(timeLeft).toEqual({
       days: 0,
       hours: 0,
       minutes: 0,
       seconds: 0,
-      total: 0,
+      timeLeft: 0,
     })
   })
 
@@ -37,18 +36,18 @@ describe('selectTimeRemaining', () => {
     const store = createTestStore(
       { dateProvider },
       stateBuilder()
-        .withTimer(buildTimer({ endAt: now - TimeUnit.SECOND }))
+        .withTimerEndAt(dateProvider.msToISOString(nowMs - TimeUnit.SECOND))
         .build(),
     )
 
-    const timeRemaining = selectTimeRemaining(store.getState(), now)
+    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
 
-    expect(timeRemaining).toEqual({
+    expect(timeLeft).toEqual({
       days: 0,
       hours: 0,
       minutes: 0,
       seconds: 0,
-      total: 0,
+      timeLeft: 0,
     })
   })
 
@@ -61,7 +60,7 @@ describe('selectTimeRemaining', () => {
         hours: 1,
         minutes: 0,
         seconds: 0,
-        total: 3600000,
+        timeLeft: 3600000,
       },
     },
     {
@@ -76,7 +75,7 @@ describe('selectTimeRemaining', () => {
         hours: 2,
         minutes: 30,
         seconds: 45,
-        total: 86400000 + 7200000 + 1800000 + 45000,
+        timeLeft: 86400000 + 7200000 + 1800000 + 45000,
       },
     },
     {
@@ -87,7 +86,7 @@ describe('selectTimeRemaining', () => {
         hours: 0,
         minutes: 30,
         seconds: 0,
-        total: 1800000,
+        timeLeft: 1800000,
       },
     },
     {
@@ -98,7 +97,7 @@ describe('selectTimeRemaining', () => {
         hours: 0,
         minutes: 0,
         seconds: 45,
-        total: 45000,
+        timeLeft: 45000,
       },
     },
   ])(
@@ -107,13 +106,13 @@ describe('selectTimeRemaining', () => {
       const store = createTestStore(
         { dateProvider },
         stateBuilder()
-          .withTimer(buildTimer({ endAt: now + remainingMs }))
+          .withTimerEndAt(dateProvider.msToISOString(nowMs + remainingMs))
           .build(),
       )
 
-      const timeRemaining = selectTimeRemaining(store.getState(), now)
+      const timeLeft = selectTimeLeft(store.getState(), dateProvider)
 
-      expect(timeRemaining).toEqual(expected)
+      expect(timeLeft).toEqual(expected)
     },
   )
 
@@ -126,7 +125,7 @@ describe('selectTimeRemaining', () => {
         hours: 0,
         minutes: 1,
         seconds: 1,
-        total: 61000,
+        timeLeft: 61000,
       },
     },
     {
@@ -137,7 +136,7 @@ describe('selectTimeRemaining', () => {
         hours: 0,
         minutes: 1,
         seconds: 0,
-        total: 60000,
+        timeLeft: 60000,
       },
     },
     {
@@ -148,7 +147,7 @@ describe('selectTimeRemaining', () => {
         hours: 0,
         minutes: 0,
         seconds: 59,
-        total: 59000,
+        timeLeft: 59000,
       },
     },
     {
@@ -159,7 +158,7 @@ describe('selectTimeRemaining', () => {
         hours: 1,
         minutes: 1,
         seconds: 1,
-        total: 3661000,
+        timeLeft: 3661000,
       },
     },
     {
@@ -170,7 +169,7 @@ describe('selectTimeRemaining', () => {
         hours: 0,
         minutes: 2,
         seconds: 5,
-        total: 125000,
+        timeLeft: 125000,
       },
     },
   ])(
@@ -179,13 +178,13 @@ describe('selectTimeRemaining', () => {
       const store = createTestStore(
         { dateProvider },
         stateBuilder()
-          .withTimer(buildTimer({ endAt: now + remainingMs }))
+          .withTimerEndAt(dateProvider.msToISOString(nowMs + remainingMs))
           .build(),
       )
 
-      const timeRemaining = selectTimeRemaining(store.getState(), now)
+      const timeLeft = selectTimeLeft(store.getState(), dateProvider)
 
-      expect(timeRemaining).toEqual(expected)
+      expect(timeLeft).toEqual(expected)
     },
   )
 })

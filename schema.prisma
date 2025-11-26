@@ -53,6 +53,6 @@ model Siren {
 model Timer {
   id        String   @id
   userId    String
-  endAt     Float
+  endAt     String
   updatedAt DateTime @default(now()) @updatedAt
 }

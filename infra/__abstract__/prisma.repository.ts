@@ -142,7 +142,7 @@ export abstract class PrismaRepository {
       CREATE TABLE IF NOT EXISTS "Timer" (
         "id" TEXT PRIMARY KEY NOT NULL,
         "userId" TEXT NOT NULL,
-        "endAt" REAL NOT NULL,
+        "endAt" TEXT NOT NULL,
         "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     `

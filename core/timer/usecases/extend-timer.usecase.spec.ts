@@ -1,9 +1,8 @@
 import { beforeEach, describe, it } from 'vitest'
-import { buildTimer } from '@/core/_tests_/data-builders/timer.builder'
 import { TimeUnit } from '@/core/timer/timer.utils'
 import { timerFixture } from './timer.fixture'
 
-describe('extendAtr use case', () => {
+describe('extendTimer use case', () => {
   let fixture: ReturnType<typeof timerFixture>
 
   beforeEach(() => {
@@ -11,23 +10,25 @@ describe('extendAtr use case', () => {
   })
 
   it('should extend an active timer', async () => {
-    const now = fixture.dateProvider.getNow().getTime()
+    const nowMs = fixture.dateProvider.getNowMs()
 
     const initialDuration = TimeUnit.HOUR
     const extensionDuration = TimeUnit.MINUTE * 30
+    const initialEndAtMs = nowMs + initialDuration
 
-    fixture.given.existingTimer(buildTimer({ endAt: now + initialDuration }))
+    fixture.given.existingTimer(
+      fixture.dateProvider.msToISOString(initialEndAtMs),
+    )
 
     await fixture.when.extendingTimer({
       days: 0,
       hours: 0,
       minutes: 30,
-      now,
     })
 
-    fixture.then.timerShouldBeStoredAs({
-      endAt: now + initialDuration + extensionDuration,
-    })
+    fixture.then.timerShouldBeStoredAs(
+      fixture.dateProvider.msToISOString(initialEndAtMs + extensionDuration),
+    )
   })
 
   it.each([
@@ -40,8 +41,10 @@ describe('extendAtr use case', () => {
     {
       description: 'timer has expired',
       setup: () => {
-        const now = fixture.dateProvider.getNow().getTime()
-        fixture.given.existingTimer(buildTimer({ endAt: now - 1000 }))
+        const nowMs = fixture.dateProvider.getNowMs()
+        fixture.given.existingTimer(
+          fixture.dateProvider.msToISOString(nowMs - 1000),
+        )
       },
     },
   ])('should reject when $description', async ({ setup }) => {
@@ -67,16 +70,17 @@ describe('extendAtr use case', () => {
   })
 
   it('should reject when extended duration exceeds 30 days', async () => {
-    const now = fixture.dateProvider.getNow().getTime()
+    const nowMs = fixture.dateProvider.getNowMs()
     const nearLimitDuration = 30 * TimeUnit.DAY - TimeUnit.HOUR
 
-    fixture.given.existingTimer(buildTimer({ endAt: now + nearLimitDuration }))
+    fixture.given.existingTimer(
+      fixture.dateProvider.msToISOString(nowMs + nearLimitDuration),
+    )
 
     const action = await fixture.when.extendingTimer({
       days: 0,
       hours: 2,
       minutes: 0,
-      now,
     })
 
     fixture.then.actionShouldBeRejectedWith(

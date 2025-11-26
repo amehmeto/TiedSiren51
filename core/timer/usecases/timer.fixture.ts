@@ -6,8 +6,6 @@ import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { AuthUser } from '@/core/auth/authUser'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
-import { selectTimer } from '../selectors/selectTimer'
-import { Timer } from '../timer'
 import { extendTimer } from './extend-timer.usecase'
 import { loadTimer } from './load-timer.usecase'
 import { startTimer } from './start-timer.usecase'
@@ -27,7 +25,6 @@ export function timerFixture(
   const timerRepository = new FakeDataTimerRepository()
   const dateProvider = new StubDateProvider()
   dateProvider.now = new Date(DEFAULT_TEST_DATE)
-  const getNow = () => dateProvider.getNow().getTime()
   const defaultAuthUser: AuthUser = {
     id: DEFAULT_USER_ID,
     email: 'test@example.com',
@@ -35,15 +32,15 @@ export function timerFixture(
 
   return {
     given: {
-      existingTimer(timer: Timer) {
-        timerRepository.saveTimer(DEFAULT_USER_ID, timer)
+      existingTimer(endAt: string) {
+        timerRepository.saveTimer(DEFAULT_USER_ID, endAt)
         testStateBuilderProvider.setState((builder) =>
-          builder.withAuthUser(defaultAuthUser).withTimer(timer),
+          builder.withAuthUser(defaultAuthUser).withTimerEndAt(endAt),
         )
       },
       noTimer() {
         testStateBuilderProvider.setState((builder) =>
-          builder.withAuthUser(defaultAuthUser).withTimer(null),
+          builder.withAuthUser(defaultAuthUser).withTimerEndAt(null),
         )
       },
       authenticatedUser(authUser: AuthUser = defaultAuthUser) {
@@ -58,54 +55,47 @@ export function timerFixture(
       },
     },
     when: {
-      loadingTimer: async (now: number = getNow()) => {
+      loadingTimer: async () => {
         store = createTestStore(
           { timerRepository, dateProvider },
           testStateBuilderProvider.getState(),
         )
-        return store.dispatch(loadTimer(now))
+        return store.dispatch(loadTimer())
       },
       startingTimer: async (payload: {
         days: number
         hours: number
         minutes: number
-        now?: number
       }) => {
         store = createTestStore(
           { timerRepository, dateProvider },
           testStateBuilderProvider.getState(),
         )
-        const now = payload.now ?? getNow()
-        return store.dispatch(startTimer({ ...payload, now }))
+        return store.dispatch(startTimer(payload))
       },
       extendingTimer: async (payload: {
         days: number
         hours: number
         minutes: number
-        now?: number
       }) => {
         store = createTestStore(
           { timerRepository, dateProvider },
           testStateBuilderProvider.getState(),
         )
-        const now = payload.now ?? getNow()
-        return store.dispatch(extendTimer({ ...payload, now }))
+        return store.dispatch(extendTimer(payload))
       },
     },
     then: {
-      timerShouldBeLoadedAs(expectedTimer: Timer | null) {
-        const timer = selectTimer(store.getState())
-        expect(timer).toStrictEqual(expectedTimer)
+      timerShouldBeLoadedAs(expectedEndAt: string | null) {
+        expect(store.getState().timer.endAt).toStrictEqual(expectedEndAt)
       },
-      timerShouldBeStoredAs(expectedTimer: Timer) {
-        const timer = selectTimer(store.getState())
-        expect(timer).toStrictEqual(expectedTimer)
-        return timer
+      timerShouldBeStoredAs(expectedEndAt: string) {
+        expect(store.getState().timer.endAt).toStrictEqual(expectedEndAt)
       },
-      async timerShouldBeSavedInRepositoryAs(expectedTimer: Timer) {
+      async timerShouldBeSavedInRepositoryAs(expectedEndAt: string) {
         const userId = store.getState().auth.authUser?.id ?? DEFAULT_USER_ID
-        const timer = await timerRepository.loadTimer(userId)
-        expect(timer).toStrictEqual(expectedTimer)
+        const endAt = await timerRepository.loadTimer(userId)
+        expect(endAt).toStrictEqual(expectedEndAt)
       },
       actionShouldBeRejectedWith(
         action: unknown,

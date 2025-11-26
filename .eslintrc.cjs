@@ -9,6 +9,7 @@ module.exports = {
     'react-hooks',
     'react-native',
     'sonarjs',
+    'unicorn',
     'local-rules',
   ],
   rules: {
@@ -47,6 +48,7 @@ module.exports = {
     'sonarjs/prefer-immediate-return': 'error',
     'sonarjs/prefer-object-literal': 'error',
     'sonarjs/prefer-single-boolean-return': 'error',
+    'unicorn/prefer-ternary': 'error',
     'prettier/prettier': 'error',
     complexity: ['warn', { max: 10 }],
     curly: ['error', 'multi-or-nest'],

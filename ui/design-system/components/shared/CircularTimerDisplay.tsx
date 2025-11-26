@@ -6,16 +6,14 @@ import { T } from '@/ui/design-system/theme'
 import { formatCountdown, formatEndFromOffsets } from '@/ui/utils/timeFormat'
 
 type CircularTimerDisplayProps = {
-  timeRemaining: TimeRemaining
+  timeLeft: TimeRemaining
   isActive: boolean
 }
 
 export const CircularTimerDisplay = ({
-  timeRemaining,
+  timeLeft,
   isActive,
 }: Readonly<CircularTimerDisplayProps>) => {
-  const shouldShowInline = isActive && timeRemaining.total > 0
-
   return (
     <View style={styles.container}>
       {isActive && (
@@ -25,13 +23,13 @@ export const CircularTimerDisplay = ({
           color={T.color.lightBlue}
         />
       )}
-      <Text style={styles.timerText}>{formatCountdown(timeRemaining)}</Text>
-      {shouldShowInline && (
+      <Text style={styles.timerText}>{formatCountdown(timeLeft)}</Text>
+      {isActive && (
         <Text style={styles.title}>
           {formatEndFromOffsets({
-            days: timeRemaining.days,
-            hours: timeRemaining.hours,
-            minutes: timeRemaining.minutes,
+            days: timeLeft.days,
+            hours: timeLeft.hours,
+            minutes: timeLeft.minutes,
           })}
         </Text>
       )}

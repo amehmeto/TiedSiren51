@@ -5,7 +5,10 @@ import { selectIsTimerLoading } from './selectIsTimerLoading'
 
 describe('selectIsTimerLoading', () => {
   test('should return loading state from timer slice', () => {
-    const store = createTestStore({}, stateBuilder().withTimer(null).build())
+    const store = createTestStore(
+      {},
+      stateBuilder().withTimerEndAt(null).build(),
+    )
 
     const isLoading = selectIsTimerLoading(store.getState())
 

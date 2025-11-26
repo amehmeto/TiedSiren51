@@ -1,11 +1,12 @@
-import { createSelector } from '@reduxjs/toolkit'
+import { DateProvider } from '@/core/_ports_/port.date-provider'
 import { RootState } from '@/core/_redux_/createStore'
-import { selectTimer } from './selectTimer'
 
-export const selectIsTimerActive = createSelector(
-  [selectTimer, (_state: RootState, now: number) => now],
-  (timer, now) => {
-    if (!timer) return false
-    return timer.endAt > now
-  },
-)
+export function selectIsTimerActive(
+  state: RootState,
+  dateProvider: DateProvider,
+): boolean {
+  const endAt = state.timer.endAt
+  if (!endAt) return false
+
+  return dateProvider.parseISOString(endAt).getTime() > dateProvider.getNowMs()
+}

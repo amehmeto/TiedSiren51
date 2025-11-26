@@ -1,39 +1,39 @@
 import { TimeRemaining } from '@/core/timer/timer'
 import { calculateMilliseconds } from '@/core/timer/timer.utils'
 
-export const formatCountdown = (timeRemaining: TimeRemaining): string => {
+export const formatCountdown = (timeLeft: TimeRemaining): string => {
   const parts: string[] = []
 
-  const hasDays = timeRemaining.days > 0
-  const hasHours = timeRemaining.hours > 0
-  const hasMinutes = timeRemaining.minutes > 0
+  const hasDays = timeLeft.days > 0
+  const hasHours = timeLeft.hours > 0
+  const hasMinutes = timeLeft.minutes > 0
 
-  if (hasDays) parts.push(`${timeRemaining.days}d`)
+  if (hasDays) parts.push(`${timeLeft.days}d`)
 
-  if (hasHours || hasDays) parts.push(`${timeRemaining.hours}h`)
+  if (hasHours || hasDays) parts.push(`${timeLeft.hours}h`)
 
-  if (hasMinutes || hasHours || hasDays) parts.push(`${timeRemaining.minutes}m`)
+  if (hasMinutes || hasHours || hasDays) parts.push(`${timeLeft.minutes}m`)
 
-  parts.push(`${timeRemaining.seconds}s`)
+  parts.push(`${timeLeft.seconds}s`)
 
   return parts.join(' ')
 }
 
-export const formatInlineRemaining = (timeRemaining: TimeRemaining): string => {
+export const formatInlineRemaining = (timeLeft: TimeRemaining): string => {
   const parts: string[] = []
 
-  const hasDays = timeRemaining.days > 0
-  const hasHours = timeRemaining.hours > 0
-  const hasMinutes = timeRemaining.minutes > 0
-  const hasSeconds = timeRemaining.seconds > 0
+  const hasDays = timeLeft.days > 0
+  const hasHours = timeLeft.hours > 0
+  const hasMinutes = timeLeft.minutes > 0
+  const hasSeconds = timeLeft.seconds > 0
 
-  if (hasDays) parts.push(`${timeRemaining.days}d`)
+  if (hasDays) parts.push(`${timeLeft.days}d`)
 
-  if (hasHours || hasDays) parts.push(`${timeRemaining.hours}h`)
+  if (hasHours || hasDays) parts.push(`${timeLeft.hours}h`)
 
-  if (hasMinutes || hasHours || hasDays) parts.push(`${timeRemaining.minutes}m`)
+  if (hasMinutes || hasHours || hasDays) parts.push(`${timeLeft.minutes}m`)
 
-  if (hasSeconds) parts.push(`${timeRemaining.seconds}s`)
+  if (hasSeconds) parts.push(`${timeLeft.seconds}s`)
 
   return `${parts.join(' ')}`
 }

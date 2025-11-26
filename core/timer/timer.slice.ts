@@ -1,35 +1,25 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { Timer } from './timer'
 import { extendTimer } from './usecases/extend-timer.usecase'
 import { loadTimer } from './usecases/load-timer.usecase'
 import { startTimer } from './usecases/start-timer.usecase'
 
 type TimerState = {
-  timer: Timer | null
+  endAt: string | null
   isLoading: boolean
-  lastUpdate: number
 }
 
 const initialState: TimerState = {
-  timer: null,
+  endAt: null,
   isLoading: true,
-  lastUpdate: 0,
 }
 
 export const timerSlice = createSlice({
   name: 'timer',
   initialState,
   reducers: {
-    setTimer: (
-      state,
-      action: PayloadAction<{ timer: Timer | null; now: number }>,
-    ) => {
-      state.timer = action.payload.timer
+    setEndAt: (state, action: PayloadAction<string | null>) => {
+      state.endAt = action.payload
       state.isLoading = false
-      state.lastUpdate = action.payload.now
-    },
-    tickTimer: (state, action: PayloadAction<number>) => {
-      state.lastUpdate = action.payload
     },
   },
   extraReducers(builder) {
@@ -38,28 +28,20 @@ export const timerSlice = createSlice({
         state.isLoading = true
       })
       .addCase(loadTimer.fulfilled, (state, action) => {
-        const now = action.meta.arg
-        const loadedTimer = action.payload
-
-        if (loadedTimer && loadedTimer.endAt <= now) state.timer = null
-        else state.timer = loadedTimer
-
+        state.endAt = action.payload
         state.isLoading = false
-        state.lastUpdate = now
       })
       .addCase(loadTimer.rejected, (state) => {
         state.isLoading = false
       })
       .addCase(startTimer.fulfilled, (state, action) => {
-        state.timer = action.payload
-        state.lastUpdate = action.meta.arg.now
+        state.endAt = action.payload
       })
       .addCase(startTimer.rejected, (state) => {
         state.isLoading = false
       })
       .addCase(extendTimer.fulfilled, (state, action) => {
-        state.timer = action.payload
-        state.lastUpdate = action.meta.arg.now
+        state.endAt = action.payload
       })
       .addCase(extendTimer.rejected, (state) => {
         state.isLoading = false
@@ -67,4 +49,4 @@ export const timerSlice = createSlice({
   },
 })
 
-export const { setTimer, tickTimer } = timerSlice.actions
+export const { setEndAt } = timerSlice.actions

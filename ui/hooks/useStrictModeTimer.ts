@@ -1,97 +1,73 @@
-import { useEffect, useCallback } from 'react'
-import { AppState, AppStateStatus, Alert } from 'react-native'
+import { useEffect, useCallback, useState } from 'react'
+import { AppState, AppStateStatus } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsTimerActive } from '@/core/timer/selectors/selectIsTimerActive'
 import { selectIsTimerLoading } from '@/core/timer/selectors/selectIsTimerLoading'
-import { selectTimeRemaining } from '@/core/timer/selectors/selectTimeRemaining'
-import { tickTimer } from '@/core/timer/timer.slice'
+import { selectTimeLeft } from '@/core/timer/selectors/selectTimeLeft'
 import { extendTimer } from '@/core/timer/usecases/extend-timer.usecase'
 import { loadTimer } from '@/core/timer/usecases/load-timer.usecase'
 import { startTimer } from '@/core/timer/usecases/start-timer.usecase'
 import { dependencies } from '@/ui/dependencies'
-import { handleUIError } from '@/ui/utils/handleUIError'
 
 const UPDATE_INTERVAL_MS = 1000
-const ALERT_TITLE = 'Error'
 
 export const useStrictModeTimer = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { dateProvider } = dependencies
-  const now = dateProvider.getNow().getTime()
-  const timeRemaining = useSelector((state: RootState) =>
-    selectTimeRemaining(state, now),
+  const [now, setNow] = useState<Date>(dateProvider.getNow())
+  const timeLeft = useSelector((state: RootState) =>
+    selectTimeLeft(state, dateProvider),
   )
   const isActive = useSelector((state: RootState) =>
-    selectIsTimerActive(state, now),
+    selectIsTimerActive(state, dateProvider),
   )
   const isLoading = useSelector(selectIsTimerLoading)
 
-  const reportError = useCallback((error: unknown, context: string) => {
-    const message = handleUIError(error, context)
-    Alert.alert(ALERT_TITLE, message)
-  }, [])
-
   const handleStartTimer = useCallback(
-    async (days: number, hours: number, minutes: number) => {
-      try {
-        const now = dateProvider.getNow().getTime()
-        await dispatch(startTimer({ days, hours, minutes, now })).unwrap()
-      } catch (error) {
-        reportError(error, 'Failed to start timer')
-      }
+    (days: number, hours: number, minutes: number) => {
+      dispatch(startTimer({ days, hours, minutes }))
     },
-    [dispatch, reportError, dateProvider],
+    [dispatch],
   )
 
   const handleExtendTimer = useCallback(
-    async (
+    (
       additionalDays: number,
       additionalHours: number,
       additionalMinutes: number,
     ) => {
-      try {
-        const now = dateProvider.getNow().getTime()
-        await dispatch(
-          extendTimer({
-            days: additionalDays,
-            hours: additionalHours,
-            minutes: additionalMinutes,
-            now,
-          }),
-        ).unwrap()
-      } catch (error) {
-        reportError(error, 'Failed to extend timer')
-      }
+      dispatch(
+        extendTimer({
+          days: additionalDays,
+          hours: additionalHours,
+          minutes: additionalMinutes,
+        }),
+      )
     },
-    [dispatch, reportError, dateProvider],
+    [dispatch],
   )
 
   useEffect(() => {
-    const now = dateProvider.getNow().getTime()
-    dispatch(loadTimer(now))
-  }, [dispatch, dateProvider])
+    dispatch(loadTimer())
+  }, [dispatch])
 
   useEffect(() => {
     if (!isActive) return
 
     const intervalId = setInterval(() => {
-      const now = dateProvider.getNow().getTime()
-      dispatch(tickTimer(now))
+      setNow(dateProvider.getNow())
     }, UPDATE_INTERVAL_MS)
 
     return () => {
       clearInterval(intervalId)
     }
-  }, [isActive, dispatch, dateProvider])
+  }, [isActive, dateProvider, now])
 
   useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       const isComingToForeground = nextAppState === 'active'
-      if (isComingToForeground) {
-        const now = dateProvider.getNow().getTime()
-        dispatch(loadTimer(now))
-      }
+      if (isComingToForeground) dispatch(loadTimer())
     }
 
     const subscription = AppState.addEventListener(
@@ -100,10 +76,10 @@ export const useStrictModeTimer = () => {
     )
 
     return () => subscription.remove()
-  }, [dispatch, dateProvider])
+  }, [dispatch])
 
   return {
-    timeRemaining,
+    timeLeft,
     isActive,
     isLoading,
     startTimer: handleStartTimer,

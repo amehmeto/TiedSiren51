@@ -9,6 +9,10 @@ export class StubDateProvider implements DateProvider {
     return this.now
   }
 
+  getNowMs(): number {
+    return this.now.getTime()
+  }
+
   getISOStringNow(): string {
     return this.now.toISOString()
   }
@@ -45,5 +49,17 @@ export class StubDateProvider implements DateProvider {
 
   getMinutesFromNow(minutes: number): Date {
     return new Date(this.now.getTime() + minutes * 60 * 1000)
+  }
+
+  parseISOString(isoString: string): Date {
+    return new Date(isoString)
+  }
+
+  toISOString(date: Date): string {
+    return date.toISOString()
+  }
+
+  msToISOString(ms: number): string {
+    return new Date(ms).toISOString()
   }
 }

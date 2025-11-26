@@ -6,7 +6,7 @@ import { TiedSCard } from '@ui/design-system/components/shared/TiedSCard'
 import { T } from '@ui/design-system/theme'
 import { formatInlineRemaining } from '@ui/utils/timeFormat'
 
-export function UnLockMethodCard(props: { timeRemaining: TimeRemaining }) {
+export function UnLockMethodCard(props: { timeLeft: TimeRemaining }) {
   return (
     <TiedSCard style={styles.unlockCard}>
       <View style={styles.unlockCardContent}>
@@ -19,7 +19,7 @@ export function UnLockMethodCard(props: { timeRemaining: TimeRemaining }) {
           <Text style={styles.unlockLabel}>{'Timer'}</Text>
         </View>
         <Text style={styles.unlockValue}>
-          {formatInlineRemaining(props.timeRemaining)}
+          {formatInlineRemaining(props.timeLeft)}
         </Text>
       </View>
     </TiedSCard>

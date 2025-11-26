@@ -12,7 +12,6 @@ import {
 } from '../block-session/block.session'
 import { Blocklist, blocklistAdapter } from '../blocklist/blocklist'
 import { Sirens } from '../siren/sirens'
-import { Timer } from '../timer/timer'
 
 const initialState = rootReducer(undefined, { type: 'unknown' })
 
@@ -23,7 +22,7 @@ const withAuthUser = createAction<AuthUser>('withAuthUser')
 const withoutAuthUser = createAction<{}>('withoutAuthUser')
 const withAuthError = createAction<string>('withAuthError')
 const withAuthLoading = createAction<boolean>('withAuthLoading')
-const withTimer = createAction<Timer | null>('withTimer')
+const withTimerEndAt = createAction<string | null>('withTimerEndAt')
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -48,8 +47,8 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withAuthLoading, (state, action) => {
       state.auth.isLoading = action.payload
     })
-    .addCase(withTimer, (state, action) => {
-      state.timer.timer = action.payload
+    .addCase(withTimerEndAt, (state, action) => {
+      state.timer.endAt = action.payload
     })
 })
 
@@ -70,7 +69,7 @@ export const stateBuilder = (baseState = initialState) => {
     withAvailableSirens: reduce(withAvailableSirens),
     withAuthError: reduce(withAuthError),
     withAuthLoading: reduce(withAuthLoading),
-    withTimer: reduce(withTimer),
+    withTimerEndAt: reduce(withTimerEndAt),
   }
 }
 

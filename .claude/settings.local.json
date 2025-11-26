@@ -45,7 +45,10 @@
       "mcp__github__pull_request_review_write",
       "mcp__ide__getDiagnostics",
       "WebSearch",
-      "Bash(npm run lint:fix:*)"
+      "Bash(npm run lint:fix:*)",
+      "Bash(npx prisma generate:*)",
+      "Bash(npx vitest:*)",
+      "Bash(npm view:*)"
     ],
     "deny": [],
     "ask": [

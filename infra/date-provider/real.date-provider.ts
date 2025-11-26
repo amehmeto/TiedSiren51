@@ -11,6 +11,10 @@ export class RealDateProvider implements DateProvider {
     return new Date()
   }
 
+  getNowMs(): number {
+    return Date.now()
+  }
+
   getMinutesFromNow(minutes: number): Date {
     return new Date(new Date().getTime() + minutes * 60 * 1000)
   }
@@ -42,5 +46,17 @@ export class RealDateProvider implements DateProvider {
     const hours = String(date.getHours()).padStart(2, '0')
     const minutes = String(date.getMinutes()).padStart(2, '0')
     return `${hours}:${minutes}`
+  }
+
+  parseISOString(isoString: string): Date {
+    return new Date(isoString)
+  }
+
+  toISOString(date: Date): string {
+    return date.toISOString()
+  }
+
+  msToISOString(ms: number): string {
+    return new Date(ms).toISOString()
   }
 }
