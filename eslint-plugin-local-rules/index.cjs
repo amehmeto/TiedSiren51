@@ -8,6 +8,7 @@ const noIconSizeMagicNumbers = require('../eslint-rules/no-icon-size-magic-numbe
 const noStylesheetMagicNumbers = require('../eslint-rules/no-stylesheet-magic-numbers.cjs')
 const oneSelectorPerFile = require('../eslint-rules/one-selector-per-file.cjs')
 const oneUsecasePerFile = require('../eslint-rules/one-usecase-per-file.cjs')
+const timeConstantMultiplication = require('../eslint-rules/time-constant-multiplication.cjs')
 
 module.exports = {
   rules: {
@@ -17,5 +18,6 @@ module.exports = {
     'no-stylesheet-magic-numbers': noStylesheetMagicNumbers,
     'one-selector-per-file': oneSelectorPerFile,
     'one-usecase-per-file': oneUsecasePerFile,
+    'time-constant-multiplication': timeConstantMultiplication,
   },
 }

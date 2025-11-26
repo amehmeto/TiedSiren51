@@ -1,5 +1,5 @@
 import { beforeEach, describe, it } from 'vitest'
-import { TimeUnit } from '@/core/timer/timer.utils'
+import { HOUR, SECOND } from '@/core/__constants__/time'
 import { timerFixture } from './timer.fixture'
 
 describe('loadTimer use case', () => {
@@ -11,9 +11,7 @@ describe('loadTimer use case', () => {
 
   it('should load timer from repository', async () => {
     const nowMs = fixture.dateProvider.getNowMs()
-    const existingEndAt = fixture.dateProvider.msToISOString(
-      nowMs + TimeUnit.HOUR,
-    )
+    const existingEndAt = fixture.dateProvider.msToISOString(nowMs + 1 * HOUR)
 
     fixture.given.existingTimer(existingEndAt)
 
@@ -38,9 +36,7 @@ describe('loadTimer use case', () => {
 
   it('should clear expired timer automatically', async () => {
     const nowMs = fixture.dateProvider.getNowMs()
-    const expiredEndAt = fixture.dateProvider.msToISOString(
-      nowMs - TimeUnit.SECOND,
-    )
+    const expiredEndAt = fixture.dateProvider.msToISOString(nowMs - 1 * SECOND)
 
     fixture.given.existingTimer(expiredEndAt)
 

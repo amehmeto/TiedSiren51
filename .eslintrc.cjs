@@ -82,6 +82,7 @@ module.exports = {
     'local-rules/one-selector-per-file': 'error',
     'local-rules/one-usecase-per-file': 'error',
     'local-rules/core-test-file-naming': 'error',
+    'local-rules/time-constant-multiplication': 'error',
   },
   overrides: [
     {

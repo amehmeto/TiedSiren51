@@ -1,8 +1,8 @@
 import { describe, expect, test, beforeEach } from 'vitest'
+import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
-import { TimeUnit } from '../timer.utils'
 import { selectTimeLeft } from './selectTimeLeft'
 
 describe('selectTimeLeft', () => {
@@ -36,7 +36,7 @@ describe('selectTimeLeft', () => {
     const store = createTestStore(
       { dateProvider },
       stateBuilder()
-        .withTimerEndAt(dateProvider.msToISOString(nowMs - TimeUnit.SECOND))
+        .withTimerEndAt(dateProvider.msToISOString(nowMs - 1 * SECOND))
         .build(),
     )
 
@@ -54,7 +54,7 @@ describe('selectTimeLeft', () => {
   test.each([
     {
       description: '1 hour',
-      remainingMs: TimeUnit.HOUR,
+      remainingMs: 1 * HOUR,
       expected: {
         days: 0,
         hours: 1,
@@ -65,11 +65,7 @@ describe('selectTimeLeft', () => {
     },
     {
       description: '1 day 2 hours 30 minutes 45 seconds',
-      remainingMs:
-        TimeUnit.DAY +
-        TimeUnit.HOUR * 2 +
-        TimeUnit.MINUTE * 30 +
-        TimeUnit.SECOND * 45,
+      remainingMs: 1 * DAY + 2 * HOUR + 30 * MINUTE + 45 * SECOND,
       expected: {
         days: 1,
         hours: 2,
@@ -80,7 +76,7 @@ describe('selectTimeLeft', () => {
     },
     {
       description: '30 minutes',
-      remainingMs: TimeUnit.MINUTE * 30,
+      remainingMs: 30 * MINUTE,
       expected: {
         days: 0,
         hours: 0,
@@ -91,7 +87,7 @@ describe('selectTimeLeft', () => {
     },
     {
       description: '45 seconds',
-      remainingMs: TimeUnit.SECOND * 45,
+      remainingMs: 45 * SECOND,
       expected: {
         days: 0,
         hours: 0,
@@ -119,7 +115,7 @@ describe('selectTimeLeft', () => {
   test.each([
     {
       description: '61 seconds remaining',
-      remainingMs: TimeUnit.SECOND * 61,
+      remainingMs: 61 * SECOND,
       expected: {
         days: 0,
         hours: 0,
@@ -130,7 +126,7 @@ describe('selectTimeLeft', () => {
     },
     {
       description: '60 seconds remaining',
-      remainingMs: TimeUnit.MINUTE,
+      remainingMs: 1 * MINUTE,
       expected: {
         days: 0,
         hours: 0,
@@ -141,7 +137,7 @@ describe('selectTimeLeft', () => {
     },
     {
       description: '59 seconds remaining',
-      remainingMs: TimeUnit.SECOND * 59,
+      remainingMs: 59 * SECOND,
       expected: {
         days: 0,
         hours: 0,
@@ -152,7 +148,7 @@ describe('selectTimeLeft', () => {
     },
     {
       description: '3661 seconds remaining (1 hour 1 minute 1 second)',
-      remainingMs: TimeUnit.HOUR + TimeUnit.MINUTE + TimeUnit.SECOND,
+      remainingMs: 1 * HOUR + 1 * MINUTE + 1 * SECOND,
       expected: {
         days: 0,
         hours: 1,
@@ -163,7 +159,7 @@ describe('selectTimeLeft', () => {
     },
     {
       description: '125 seconds remaining (2 minutes 5 seconds)',
-      remainingMs: TimeUnit.MINUTE * 2 + TimeUnit.SECOND * 5,
+      remainingMs: 2 * MINUTE + 5 * SECOND,
       expected: {
         days: 0,
         hours: 0,

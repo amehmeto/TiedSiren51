@@ -1,5 +1,5 @@
 import { beforeEach, describe, it } from 'vitest'
-import { TimeUnit } from '@/core/timer/timer.utils'
+import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
 import { timerFixture } from './timer.fixture'
 
 describe('extendTimer use case', () => {
@@ -12,8 +12,8 @@ describe('extendTimer use case', () => {
   it('should extend an active timer', async () => {
     const nowMs = fixture.dateProvider.getNowMs()
 
-    const initialDuration = TimeUnit.HOUR
-    const extensionDuration = TimeUnit.MINUTE * 30
+    const initialDuration = 1 * HOUR
+    const extensionDuration = 30 * MINUTE
     const initialEndAtMs = nowMs + initialDuration
 
     fixture.given.existingTimer(
@@ -43,7 +43,7 @@ describe('extendTimer use case', () => {
       setup: () => {
         const nowMs = fixture.dateProvider.getNowMs()
         fixture.given.existingTimer(
-          fixture.dateProvider.msToISOString(nowMs - 1000),
+          fixture.dateProvider.msToISOString(nowMs - 1 * SECOND),
         )
       },
     },
@@ -71,7 +71,7 @@ describe('extendTimer use case', () => {
 
   it('should reject when extended duration exceeds 30 days', async () => {
     const nowMs = fixture.dateProvider.getNowMs()
-    const nearLimitDuration = 30 * TimeUnit.DAY - TimeUnit.HOUR
+    const nearLimitDuration = 30 * DAY - 1 * HOUR
 
     fixture.given.existingTimer(
       fixture.dateProvider.msToISOString(nowMs + nearLimitDuration),

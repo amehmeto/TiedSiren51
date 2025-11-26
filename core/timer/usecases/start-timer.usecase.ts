@@ -1,7 +1,8 @@
+import { DAY } from '@/core/__constants__/time'
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
-import { calculateMilliseconds, TimeUnit } from '../timer.utils'
+import { calculateMilliseconds } from '../timer.utils'
 
-const MAX_DURATION_MS = 30 * TimeUnit.DAY
+const MAX_DURATION_MS = 30 * DAY
 
 export type StartTimerPayload = {
   days: number

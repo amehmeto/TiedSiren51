@@ -1,5 +1,5 @@
 import { beforeEach, describe, it } from 'vitest'
-import { TimeUnit } from '@/core/timer/timer.utils'
+import { HOUR, MINUTE } from '@/core/__constants__/time'
 import { timerFixture } from './timer.fixture'
 
 describe('startTimer use case', () => {
@@ -13,7 +13,7 @@ describe('startTimer use case', () => {
     fixture.given.authenticatedUser()
 
     const nowMs = fixture.dateProvider.getNowMs()
-    const durationMs = TimeUnit.HOUR + TimeUnit.MINUTE * 30
+    const durationMs = 1 * HOUR + 30 * MINUTE
 
     await fixture.when.startingTimer({
       days: 0,
@@ -73,10 +73,10 @@ describe('startTimer use case', () => {
 
     const nowMs = fixture.dateProvider.getNowMs()
     fixture.given.existingTimer(
-      fixture.dateProvider.msToISOString(nowMs + TimeUnit.HOUR),
+      fixture.dateProvider.msToISOString(nowMs + 1 * HOUR),
     )
 
-    const durationMs = TimeUnit.MINUTE * 30
+    const durationMs = 30 * MINUTE
     await fixture.when.startingTimer({
       days: 0,
       hours: 0,

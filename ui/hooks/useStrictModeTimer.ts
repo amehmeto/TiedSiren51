@@ -1,6 +1,7 @@
 import { useEffect, useCallback, useState } from 'react'
 import { AppState, AppStateStatus } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
+import { SECOND } from '@/core/__constants__/time'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsTimerActive } from '@/core/timer/selectors/selectIsTimerActive'
 import { selectIsTimerLoading } from '@/core/timer/selectors/selectIsTimerLoading'
@@ -9,8 +10,6 @@ import { extendTimer } from '@/core/timer/usecases/extend-timer.usecase'
 import { loadTimer } from '@/core/timer/usecases/load-timer.usecase'
 import { startTimer } from '@/core/timer/usecases/start-timer.usecase'
 import { dependencies } from '@/ui/dependencies'
-
-const UPDATE_INTERVAL_MS = 1000
 
 export const useStrictModeTimer = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -57,7 +56,7 @@ export const useStrictModeTimer = () => {
 
     const intervalId = setInterval(() => {
       setNow(dateProvider.getNow())
-    }, UPDATE_INTERVAL_MS)
+    }, 1 * SECOND)
 
     return () => {
       clearInterval(intervalId)

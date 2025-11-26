@@ -1,8 +1,7 @@
+import { DAY, MINUTE } from '@/core/__constants__/time'
 import { DateProvider } from '@/core/_ports_/port.date-provider'
 
 export class RealDateProvider implements DateProvider {
-  private MILLISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000
-
   getISOStringNow(): string {
     return new Date().toISOString()
   }
@@ -16,7 +15,7 @@ export class RealDateProvider implements DateProvider {
   }
 
   getMinutesFromNow(minutes: number): Date {
-    return new Date(new Date().getTime() + minutes * 60 * 1000)
+    return new Date(new Date().getTime() + minutes * MINUTE)
   }
 
   getHHmmMinutesFromNow(minutes: number): string {
@@ -36,7 +35,7 @@ export class RealDateProvider implements DateProvider {
     const [hours, minutes] = timeInHHmm.split(':').map(Number)
 
     const today = new Date().getTime()
-    const yesterdayWithNewTime = new Date(today - this.MILLISECONDS_IN_A_DAY)
+    const yesterdayWithNewTime = new Date(today - 1 * DAY)
     yesterdayWithNewTime.setHours(hours, minutes, 0, 0)
 
     return yesterdayWithNewTime
