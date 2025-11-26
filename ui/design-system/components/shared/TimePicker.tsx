@@ -5,7 +5,7 @@ import { T } from '@/ui/design-system/theme'
 
 type TimePickerProps = {
   selectedValue: number
-  onValueChange: (value: number) => void
+  onValueChange: (timeUnit: number) => void
   max: number
   labelSingular: string
   labelPlural: string
@@ -18,26 +18,26 @@ export const TimePicker = ({
   labelSingular,
   labelPlural,
 }: Readonly<TimePickerProps>) => {
-  const items = useMemo(
-    () => Array.from({ length: max + 1 }, (_, i) => i),
-    [max],
-  )
+  const createRangeFromZeroTo = (max: number) =>
+    Array.from({ length: max + 1 }, (_, i) => i)
+
+  const timeOptions = useMemo(() => createRangeFromZeroTo(max), [max])
 
   return (
     <View style={styles.pickerWrapper}>
       <Picker
         selectedValue={selectedValue}
-        onValueChange={(value) => onValueChange(value)}
+        onValueChange={(timeUnit) => onValueChange(timeUnit)}
         style={styles.picker}
         itemStyle={styles.pickerItem}
         mode={Platform.OS === 'android' ? 'dropdown' : 'dialog'}
         dropdownIconColor={T.color.white}
       >
-        {items.map((value) => (
+        {timeOptions.map((timeUnit) => (
           <Picker.Item
-            key={`${labelSingular}-${value}`}
-            label={`${value} ${value !== 1 ? labelPlural : labelSingular}`}
-            value={value}
+            key={`${labelSingular}-${timeUnit}`}
+            label={`${timeUnit} ${timeUnit !== 1 ? labelPlural : labelSingular}`}
+            value={timeUnit}
             color={T.color.textSecondary}
           />
         ))}
