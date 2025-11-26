@@ -297,18 +297,18 @@ module.exports = {
         ],
       },
     },
-    // Allow Date and faker in test infrastructure files
+    // Allow faker in data builders (they generate test data)
     {
-      files: [
-        'core/**/*.builder.ts',
-        'core/**/*.fixture.ts',
-        'core/_ports_/**/*.ts',
-        'infra/**/*.ts',
-      ],
+      files: ['core/**/*.builder.ts'],
+      rules: {
+        'no-restricted-imports': 'off',
+      },
+    },
+    // Allow Date in port type definitions and test fixtures
+    {
+      files: ['core/_ports_/**/*.ts', 'core/**/*.fixture.ts'],
       rules: {
         'no-restricted-globals': 'off',
-        'no-restricted-imports': 'off',
-        'no-restricted-properties': 'off',
       },
     },
   ],
