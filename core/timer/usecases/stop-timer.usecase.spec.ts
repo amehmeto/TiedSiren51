@@ -1,5 +1,5 @@
 import { beforeEach, describe, it } from 'vitest'
-import { timerWithRemainingTime } from '@/core/_tests_/data-builders/timer.builder'
+import { buildTimer } from '@/core/_tests_/data-builders/timer.builder'
 import { timerFixture } from './timer.fixture'
 
 describe('stopTimer use case', () => {
@@ -10,9 +10,7 @@ describe('stopTimer use case', () => {
   })
 
   it('should clear timer from repository and store', async () => {
-    const existingTimer = timerWithRemainingTime.oneHour()
-
-    fixture.given.existingTimer(existingTimer)
+    fixture.given.existingTimer(buildTimer({}))
 
     await fixture.when.stoppingTimer()
 

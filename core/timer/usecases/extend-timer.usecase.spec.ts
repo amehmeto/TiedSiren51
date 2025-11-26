@@ -1,8 +1,5 @@
 import { beforeEach, describe, it } from 'vitest'
-import {
-  buildTimer,
-  timerWithRemainingTime,
-} from '@/core/_tests_/data-builders/timer.builder'
+import { buildTimer } from '@/core/_tests_/data-builders/timer.builder'
 import { TimeUnit } from '@/core/timer/timer.utils'
 import { timerFixture } from './timer.fixture'
 
@@ -52,8 +49,7 @@ describe('extendTimer use case', () => {
     {
       description: 'timer is not active',
       setup: () => {
-        const inactiveTimer = timerWithRemainingTime.inactive()
-        fixture.given.existingTimer(inactiveTimer)
+        fixture.given.existingTimer(buildTimer({ isActive: false }))
       },
     },
   ])('should reject when $description', async ({ setup }) => {

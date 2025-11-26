@@ -1,5 +1,5 @@
 import { beforeEach, describe, it } from 'vitest'
-import { timerWithRemainingTime } from '@/core/_tests_/data-builders/timer.builder'
+import { buildTimer } from '@/core/_tests_/data-builders/timer.builder'
 import { TimeUnit } from '@/core/timer/timer.utils'
 import { timerFixture } from './timer.fixture'
 
@@ -78,8 +78,7 @@ describe('startTimer use case', () => {
 
     const now = fixture.dateProvider.getNow().getTime()
 
-    const existingTimer = timerWithRemainingTime.oneHour()
-    fixture.given.existingTimer(existingTimer)
+    fixture.given.existingTimer(buildTimer({}))
 
     const newDuration = TimeUnit.MINUTE * 30
     await fixture.when.startingTimer({

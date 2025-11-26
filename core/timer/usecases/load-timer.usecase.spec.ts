@@ -1,5 +1,6 @@
 import { beforeEach, describe, it } from 'vitest'
-import { timerWithRemainingTime } from '@/core/_tests_/data-builders/timer.builder'
+import { buildTimer } from '@/core/_tests_/data-builders/timer.builder'
+import { TimeUnit } from '@/core/timer/timer.utils'
 import { timerFixture } from './timer.fixture'
 
 describe('loadTimer use case', () => {
@@ -11,7 +12,7 @@ describe('loadTimer use case', () => {
 
   it('should load timer from repository', async () => {
     const now = fixture.dateProvider.getNow().getTime()
-    const existingTimer = timerWithRemainingTime.oneHour({ baseTime: now })
+    const existingTimer = buildTimer({ baseTime: now })
 
     fixture.given.existingTimer(existingTimer)
 
@@ -36,7 +37,10 @@ describe('loadTimer use case', () => {
 
   it('should clear expired timer automatically', async () => {
     const now = fixture.dateProvider.getNow().getTime()
-    const expiredTimer = timerWithRemainingTime.expired({ baseTime: now })
+    const expiredTimer = buildTimer({
+      baseTime: now,
+      endTime: now - TimeUnit.SECOND,
+    })
 
     fixture.given.existingTimer(expiredTimer)
 
