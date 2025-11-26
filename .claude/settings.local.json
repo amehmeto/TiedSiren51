@@ -55,7 +55,8 @@
       "Bash(./gradlew:*)",
       "SlashCommand(/speckit.specify)",
       "Bash(uv tool list:*)",
-      "Bash(npm run lint:fix:*)"
+      "Bash(npm run lint:fix:*)",
+      "Bash(gh repo edit:*)"
     ],
     "deny": [],
     "ask": [
