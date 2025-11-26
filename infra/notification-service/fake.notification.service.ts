@@ -1,4 +1,5 @@
 import uuid from 'react-native-uuid'
+import { Logger } from '@/core/_ports_/logger'
 import {
   NotificationService,
   NotificationTrigger,
@@ -13,9 +14,10 @@ export class FakeNotificationService implements NotificationService {
 
   lastCancelledNotificationIds: string[] = []
 
+  constructor(private readonly logger: Logger) {}
+
   async sendPushNotification(message: string): Promise<void> {
-    // eslint-disable-next-line no-console
-    console.log(`Fake notification: ${message}`)
+    this.logger.info(`Fake notification: ${message}`)
   }
 
   scheduleLocalNotification(

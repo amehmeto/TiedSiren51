@@ -1,5 +1,6 @@
 import { BlocklistRepository } from '@/core/_ports_/blocklist.repository'
 import { CreatePayload } from '@/core/_ports_/create.payload'
+import { Logger } from '@/core/_ports_/logger'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
@@ -14,46 +15,78 @@ export class PrismaBlocklistRepository
   extends PrismaRepository
   implements BlocklistRepository
 {
-  async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
-    const created = await this.baseClient.blocklist.create({
-      data: {
-        name: blocklistPayload.name,
-        sirens: JSON.stringify(blocklistPayload.sirens),
-      },
-    })
+  protected readonly logger: Logger
 
-    return this.mapToBlocklist(created)
+  constructor(logger: Logger) {
+    super()
+    this.logger = logger
+  }
+
+  async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
+    try {
+      const created = await this.baseClient.blocklist.create({
+        data: {
+          name: blocklistPayload.name,
+          sirens: JSON.stringify(blocklistPayload.sirens),
+        },
+      })
+
+      return this.mapToBlocklist(created)
+    } catch (error) {
+      this.logger.error(`Failed to create blocklist: ${error}`)
+      throw error
+    }
   }
 
   async findAll(): Promise<Blocklist[]> {
-    const blocklists = await this.baseClient.blocklist.findMany()
-    return blocklists.map(this.mapToBlocklist)
+    try {
+      const blocklists = await this.baseClient.blocklist.findMany()
+      return blocklists.map(this.mapToBlocklist)
+    } catch (error) {
+      this.logger.error(`Failed to find all blocklists: ${error}`)
+      throw error
+    }
   }
 
   async update(payload: UpdatePayload<Blocklist>): Promise<void> {
-    await this.baseClient.blocklist.update({
-      where: { id: payload.id },
-      data: {
-        name: payload.name,
-        sirens: JSON.stringify(payload.sirens),
-      },
-    })
+    try {
+      await this.baseClient.blocklist.update({
+        where: { id: payload.id },
+        data: {
+          name: payload.name,
+          sirens: JSON.stringify(payload.sirens),
+        },
+      })
+    } catch (error) {
+      this.logger.error(`Failed to update blocklist ${payload.id}: ${error}`)
+      throw error
+    }
   }
 
   async findById(id: string): Promise<Blocklist> {
-    const blocklist = await this.baseClient.blocklist.findUnique({
-      where: { id },
-    })
+    try {
+      const blocklist = await this.baseClient.blocklist.findUnique({
+        where: { id },
+      })
 
-    if (!blocklist) throw new Error(`Blocklist ${id} not found`)
+      if (!blocklist) throw new Error(`Blocklist ${id} not found`)
 
-    return this.mapToBlocklist(blocklist)
+      return this.mapToBlocklist(blocklist)
+    } catch (error) {
+      this.logger.error(`Failed to find blocklist ${id}: ${error}`)
+      throw error
+    }
   }
 
   async delete(id: string): Promise<void> {
-    await this.baseClient.blocklist.delete({
-      where: { id },
-    })
+    try {
+      await this.baseClient.blocklist.delete({
+        where: { id },
+      })
+    } catch (error) {
+      this.logger.error(`Failed to delete blocklist ${id}: ${error}`)
+      throw error
+    }
   }
 
   private mapToBlocklist(dbBlocklist: DbBlocklist): Blocklist {

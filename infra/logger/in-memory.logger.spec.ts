@@ -1,0 +1,122 @@
+import { describe, it, expect, beforeEach } from 'vitest'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
+import { InMemoryLogger } from './in-memory.logger'
+
+describe('InMemoryLogger', () => {
+  let logger: InMemoryLogger
+  let dateProvider: StubDateProvider
+
+  beforeEach(() => {
+    dateProvider = new StubDateProvider()
+    dateProvider.now = new Date('2025-11-26T10:00:00.000Z')
+    logger = new InMemoryLogger(dateProvider)
+  })
+
+  it('should start with empty logs', () => {
+    expect(logger.getLogs()).toEqual([])
+  })
+
+  describe('info()', () => {
+    it('should store entry with level info', () => {
+      logger.info('Test info message')
+
+      const logs = logger.getLogs()
+      expect(logs).toHaveLength(1)
+      expect(logs[0].level).toBe('info')
+    })
+
+    it('should store the correct message', () => {
+      logger.info('Test info message')
+
+      const logs = logger.getLogs()
+      expect(logs[0].message).toBe('Test info message')
+    })
+
+    it('should store the correct timestamp from DateProvider', () => {
+      logger.info('Test info message')
+
+      const logs = logger.getLogs()
+      expect(logs[0].timestamp).toBe('2025-11-26T10:00:00.000Z')
+    })
+  })
+
+  describe('warn()', () => {
+    it('should store entry with level warn', () => {
+      logger.warn('Test warning message')
+
+      const logs = logger.getLogs()
+      expect(logs).toHaveLength(1)
+      expect(logs[0].level).toBe('warn')
+    })
+
+    it('should store the correct message', () => {
+      logger.warn('Test warning message')
+
+      const logs = logger.getLogs()
+      expect(logs[0].message).toBe('Test warning message')
+    })
+  })
+
+  describe('error()', () => {
+    it('should store entry with level error', () => {
+      logger.error('Test error message')
+
+      const logs = logger.getLogs()
+      expect(logs).toHaveLength(1)
+      expect(logs[0].level).toBe('error')
+    })
+
+    it('should store the correct message', () => {
+      logger.error('Test error message')
+
+      const logs = logger.getLogs()
+      expect(logs[0].message).toBe('Test error message')
+    })
+  })
+
+  describe('getLogs()', () => {
+    it('should return all logged entries in order', () => {
+      logger.info('First message')
+      logger.warn('Second message')
+      logger.error('Third message')
+
+      const logs = logger.getLogs()
+      expect(logs).toHaveLength(3)
+      expect(logs[0].message).toBe('First message')
+      expect(logs[1].message).toBe('Second message')
+      expect(logs[2].message).toBe('Third message')
+    })
+
+    it('should return a copy, not the internal array reference', () => {
+      logger.info('Test message')
+
+      const logs1 = logger.getLogs()
+      const logs2 = logger.getLogs()
+
+      expect(logs1).not.toBe(logs2)
+      expect(logs1).toEqual(logs2)
+    })
+  })
+
+  describe('clear()', () => {
+    it('should remove all entries', () => {
+      logger.info('First message')
+      logger.warn('Second message')
+      logger.error('Third message')
+
+      logger.clear()
+
+      expect(logger.getLogs()).toEqual([])
+    })
+  })
+
+  describe('multiple log calls', () => {
+    it('should accumulate entries', () => {
+      logger.info('Message 1')
+      logger.info('Message 2')
+      logger.warn('Message 3')
+
+      expect(logger.getLogs()).toHaveLength(3)
+    })
+  })
+})

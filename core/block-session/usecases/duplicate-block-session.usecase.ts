@@ -29,7 +29,7 @@ export const duplicateBlockSession = createAppAsyncThunk(
         },
       )
 
-    const { id, ...sessionWithoutId } = sessionToBeCopied
+    const { id: _id, ...sessionWithoutId } = sessionToBeCopied
     const duplicatedSession = {
       ...sessionWithoutId,
       name: payload.name,
