@@ -37,7 +37,7 @@ describe('selectTimeRemaining', () => {
     const store = createTestStore(
       { dateProvider },
       stateBuilder()
-        .withTimer(buildTimer({ baseTime: now, isActive: false }))
+        .withTimer(buildTimer({ isActive: false }))
         .build(),
     )
 
@@ -56,9 +56,7 @@ describe('selectTimeRemaining', () => {
     const store = createTestStore(
       { dateProvider },
       stateBuilder()
-        .withTimer(
-          buildTimer({ baseTime: now, endTime: now - TimeUnit.SECOND }),
-        )
+        .withTimer(buildTimer({ endAt: now - TimeUnit.SECOND }))
         .build(),
     )
 
@@ -128,7 +126,7 @@ describe('selectTimeRemaining', () => {
       const store = createTestStore(
         { dateProvider },
         stateBuilder()
-          .withTimer(buildTimer({ baseTime: now, duration }))
+          .withTimer(buildTimer({ endAt: now + duration, duration }))
           .build(),
       )
 
@@ -200,7 +198,7 @@ describe('selectTimeRemaining', () => {
       const store = createTestStore(
         { dateProvider },
         stateBuilder()
-          .withTimer(buildTimer({ baseTime: now, duration }))
+          .withTimer(buildTimer({ endAt: now + duration, duration }))
           .build(),
       )
 

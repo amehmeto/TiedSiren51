@@ -12,7 +12,7 @@ describe('loadTimer use case', () => {
 
   it('should load timer from repository', async () => {
     const now = fixture.dateProvider.getNow().getTime()
-    const existingTimer = buildTimer({ baseTime: now })
+    const existingTimer = buildTimer({ endAt: now + TimeUnit.HOUR })
 
     fixture.given.existingTimer(existingTimer)
 
@@ -37,10 +37,7 @@ describe('loadTimer use case', () => {
 
   it('should clear expired timer automatically', async () => {
     const now = fixture.dateProvider.getNow().getTime()
-    const expiredTimer = buildTimer({
-      baseTime: now,
-      endTime: now - TimeUnit.SECOND,
-    })
+    const expiredTimer = buildTimer({ endAt: now - TimeUnit.SECOND })
 
     fixture.given.existingTimer(expiredTimer)
 

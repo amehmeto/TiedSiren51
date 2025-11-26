@@ -25,7 +25,7 @@ describe('startTimer use case', () => {
     })
 
     fixture.then.timerShouldBeStoredAs({
-      endTime: now + expectedDuration,
+      endAt: now + expectedDuration,
       duration: expectedDuration,
       isActive: true,
     })
@@ -89,7 +89,7 @@ describe('startTimer use case', () => {
     })
 
     fixture.then.timerShouldBeStoredAs({
-      endTime: now + newDuration,
+      endAt: now + newDuration,
       duration: newDuration,
       isActive: true,
     })

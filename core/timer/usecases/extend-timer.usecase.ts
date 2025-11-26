@@ -32,10 +32,10 @@ export const extendTimer = createAppAsyncThunk<Timer, ExtendTimerPayload>(
       )
     }
 
-    const newEndTime = currentTimer.endTime + additionalMs
+    const newEndAt = currentTimer.endAt + additionalMs
 
     const updatedTimer: Timer = {
-      endTime: newEndTime,
+      endAt: newEndAt,
       duration: currentTimer.duration + additionalMs,
       isActive: true,
     }

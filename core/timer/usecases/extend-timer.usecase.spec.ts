@@ -3,7 +3,7 @@ import { buildTimer } from '@/core/_tests_/data-builders/timer.builder'
 import { TimeUnit } from '@/core/timer/timer.utils'
 import { timerFixture } from './timer.fixture'
 
-describe('extendTimer use case', () => {
+describe('extendAtr use case', () => {
   let fixture: ReturnType<typeof timerFixture>
 
   beforeEach(() => {
@@ -18,7 +18,7 @@ describe('extendTimer use case', () => {
     const expectedDuration = initialDuration + additionalDuration
 
     const existingTimer = buildTimer({
-      endTime: now + initialDuration,
+      endAt: now + initialDuration,
       duration: initialDuration,
       isActive: true,
     })
@@ -33,7 +33,7 @@ describe('extendTimer use case', () => {
     })
 
     fixture.then.timerShouldBeStoredAs({
-      endTime: now + expectedDuration,
+      endAt: now + expectedDuration,
       duration: expectedDuration,
       isActive: true,
     })
@@ -78,7 +78,7 @@ describe('extendTimer use case', () => {
     const nearLimitDuration = 30 * TimeUnit.DAY - TimeUnit.HOUR
     const now = fixture.dateProvider.getNow().getTime()
     const existingTimer = buildTimer({
-      endTime: now + nearLimitDuration,
+      endAt: now + nearLimitDuration,
       duration: nearLimitDuration,
       isActive: true,
     })

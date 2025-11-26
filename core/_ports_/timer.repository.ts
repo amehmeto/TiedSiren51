@@ -1,5 +1,5 @@
 export type TimerData = {
-  endTime: number
+  endAt: number
   duration: number
   isActive: boolean
 }

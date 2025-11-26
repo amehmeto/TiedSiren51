@@ -21,7 +21,7 @@ export const selectTimeRemaining = createSelector(
   (timer, _lastUpdate, now): TimeRemaining => {
     if (!timer?.isActive) return EMPTY_TIME
 
-    const difference = timer.endTime - now
+    const difference = timer.endAt - now
 
     if (difference <= 0) return EMPTY_TIME
 

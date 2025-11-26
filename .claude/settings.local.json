@@ -44,15 +44,17 @@
       "mcp__github__pull_request_read",
       "mcp__github__pull_request_review_write",
       "mcp__ide__getDiagnostics",
-      "WebSearch"
+      "WebSearch",
+      "Bash(npm run lint:fix:*)"
     ],
-    "deny": ["Bash(git push:*)"],
+    "deny": [],
     "ask": [
       "Bash(chmod:*)",
       "Bash(gh secret:*)",
       "Bash(git add:*)",
       "Bash(git checkout:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }

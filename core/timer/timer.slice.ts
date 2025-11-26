@@ -45,7 +45,7 @@ export const timerSlice = createSlice({
         const now = action.meta.arg
         const loadedTimer = action.payload
 
-        if (loadedTimer && loadedTimer.endTime <= now) state.timer = null
+        if (loadedTimer && loadedTimer.endAt <= now) state.timer = null
         else state.timer = loadedTimer
 
         state.isLoading = false
