@@ -1,77 +1,64 @@
 import { Ionicons } from '@expo/vector-icons'
-import React from 'react'
+import React, { useCallback, useMemo } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { TiedSButton } from './TiedSButton'
 
 type TimeStepperProps = {
   selectedValue: number
-  onValueChange: (value: number) => void
   max: number
   labelSingular: string
   labelPlural: string
+  onValueChange: (value: number) => void
 }
 
 export const TimeStepper = ({
   selectedValue,
-  onValueChange,
   max,
   labelSingular,
   labelPlural,
+  onValueChange,
 }: Readonly<TimeStepperProps>) => {
-  const handleIncrement = () => {
-    if (selectedValue < max) onValueChange(selectedValue + 1)
-  }
+  const isMin = selectedValue <= 0
+  const isMax = selectedValue >= max
 
-  const handleDecrement = () => {
-    if (selectedValue > 0) onValueChange(selectedValue - 1)
-  }
-
-  const label = selectedValue !== 1 ? labelPlural : labelSingular
-  const displayText = `${selectedValue} ${label}`
-
-  const isDecrementDisabled = selectedValue === 0
-  const isIncrementDisabled = selectedValue === max
-
-  const decrementIconColor = isDecrementDisabled
-    ? T.color.modalBackgroundColor
-    : T.color.white
-  const incrementIconColor = isIncrementDisabled
-    ? T.color.modalBackgroundColor
-    : T.color.white
-
-  const decrementButtonStyle = [
-    styles.button,
-    isDecrementDisabled && styles.buttonDisabled,
-  ]
-  const incrementButtonStyle = [
-    styles.button,
-    isIncrementDisabled && styles.buttonDisabled,
-  ]
-
-  const decrementIcon = (
-    <Ionicons
-      name="remove-circle"
-      size={T.icon.size.large}
-      color={decrementIconColor}
-    />
+  const displayText = useMemo(
+    () =>
+      `${selectedValue} ${selectedValue === 1 ? labelSingular : labelPlural}`,
+    [selectedValue, labelSingular, labelPlural],
   )
 
-  const incrementIcon = (
-    <Ionicons
-      name="add-circle"
-      size={T.icon.size.large}
-      color={incrementIconColor}
-    />
+  const changeValue = useCallback(
+    (delta: number) => {
+      const next = selectedValue + delta
+      if (next >= 0 && next <= max) onValueChange(next)
+    },
+    [selectedValue, max, onValueChange],
   )
+
+  const renderIcon = useCallback(
+    (name: 'add-circle' | 'remove-circle', disabled: boolean) => (
+      <Ionicons
+        name={name}
+        size={T.icon.size.large}
+        color={disabled ? T.color.modalBackgroundColor : T.color.white}
+      />
+    ),
+    [],
+  )
+
+  const buttonStyle = (disabled: boolean) => [
+    styles.button,
+    disabled && styles.buttonDisabled,
+  ]
 
   return (
     <View style={styles.container}>
       <TiedSButton
-        onPress={handleDecrement}
-        disabled={isDecrementDisabled}
-        text={decrementIcon}
-        style={decrementButtonStyle}
+        disabled={isMin}
+        style={buttonStyle(isMin)}
+        onPress={() => changeValue(-1)}
+        text={renderIcon('remove-circle', isMin)}
       />
 
       <View style={styles.valueContainer}>
@@ -79,10 +66,10 @@ export const TimeStepper = ({
       </View>
 
       <TiedSButton
-        onPress={handleIncrement}
-        disabled={isIncrementDisabled}
-        text={incrementIcon}
-        style={incrementButtonStyle}
+        disabled={isMax}
+        style={buttonStyle(isMax)}
+        onPress={() => changeValue(1)}
+        text={renderIcon('add-circle', isMax)}
       />
     </View>
   )
@@ -91,7 +78,6 @@ export const TimeStepper = ({
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    flexDirection: 'column',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -102,10 +88,7 @@ const styles = StyleSheet.create({
     backgroundColor: T.color.lightBlue,
     alignItems: 'center',
     justifyContent: 'center',
-    padding: T.spacing.none,
     marginBottom: T.spacing.extraSmall,
-    minWidth: T.spacing.x_large,
-    maxWidth: T.spacing.x_large,
   },
   buttonDisabled: {
     backgroundColor: T.color.textSecondary,
