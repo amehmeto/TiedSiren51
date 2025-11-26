@@ -38,15 +38,14 @@
       "mcp__ide__getDiagnostics",
       "mcp__github__pull_request_read"
     ],
-    "deny": [
-      "Bash(git push:*)"
-    ],
+    "deny": ["BashOutput(*)"],
     "ask": [
       "Bash(chmod:*)",
-      "Bash(gh secret:*)"
+      "Bash(gh secret:*)",
       "Bash(git add:*)",
       "Bash(git checkout:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(git push:*)"
     ]
   }
 }

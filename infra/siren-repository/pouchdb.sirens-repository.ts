@@ -21,13 +21,11 @@ export class PouchdbSirensRepository implements SirensRepository {
       websites: [],
       keywords: [],
     })
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { _id, _rev, ...sirens } = await this.db.get('sirens')
     return sirens
   }
 
   async getSelectableSirens(): Promise<Sirens> {
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { _id, _rev, ...sirens } = await this.db.get('sirens')
     return sirens
   }

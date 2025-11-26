@@ -6,6 +6,7 @@ import { StubDatabaseService } from '@/infra/database-service/stub.database.serv
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataDeviceRepository } from '@/infra/device-repository/fake-data.device.repository'
 import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
 import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
 import { FakeSirenLookout } from '@infra/siren-tier/fake.siren-lookout'
@@ -14,19 +15,22 @@ import { createStore } from '../_redux_/createStore'
 import { Dependencies } from '../_redux_/dependencies'
 import { rootReducer } from '../_redux_/rootReducer'
 
+const testDateProvider = new StubDateProvider()
+const testLogger = new InMemoryLogger(testDateProvider)
+
 export const createTestStore = (
   {
     authGateway = new FakeAuthGateway(),
-    backgroundTaskService = new FakeBackgroundTaskService(),
+    backgroundTaskService = new FakeBackgroundTaskService(testLogger),
     blockSessionRepository = new FakeDataBlockSessionRepository(),
     blocklistRepository = new FakeDataBlocklistRepository(),
     databaseService = new StubDatabaseService(),
     dateProvider = new StubDateProvider(),
     deviceRepository = new FakeDataDeviceRepository(),
     installedAppRepository = new FakeDataInstalledAppsRepository(),
-    notificationService = new FakeNotificationService(),
+    notificationService = new FakeNotificationService(testLogger),
     sirenLookout = new FakeSirenLookout(),
-    sirenTier = new InMemorySirenTier(),
+    sirenTier = new InMemorySirenTier(testLogger),
     sirensRepository = new FakeDataSirensRepository(),
   }: Partial<Dependencies> = {},
   preloadedState?: Partial<ReturnType<typeof rootReducer>>,

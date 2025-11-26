@@ -12,11 +12,11 @@ import { SirenTier } from '@/core/_ports_/siren.tier'
 import { SirensRepository } from '@/core/_ports_/sirens.repository'
 
 export type Dependencies = {
-  databaseService: DatabaseService
   authGateway: AuthGateway
   backgroundTaskService: BackgroundTaskService
   blockSessionRepository: BlockSessionRepository
   blocklistRepository: BlocklistRepository
+  databaseService: DatabaseService
   dateProvider: DateProvider
   deviceRepository: RemoteDeviceRepository
   installedAppRepository: InstalledAppRepository

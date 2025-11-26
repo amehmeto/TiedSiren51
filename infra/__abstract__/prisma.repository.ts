@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client/react-native'
 import * as FileSystem from 'expo-file-system'
 import { Platform } from 'react-native'
 import '@prisma/react-native'
+import { Logger } from '@/core/_ports_/logger'
 
 export abstract class PrismaRepository {
   private _isInitialized = false
@@ -12,7 +13,9 @@ export abstract class PrismaRepository {
 
   protected baseClient: PrismaClient
 
-  public constructor() {
+  protected abstract readonly logger: Logger
+
+  protected constructor() {
     this.dbPath = this.getDbPath()
     this.baseClient = this.getPrismaClient()
     this.initialize()
@@ -68,8 +71,7 @@ export abstract class PrismaRepository {
         })
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error ensuring database file:', error)
+      this.logger.error(`Error ensuring database file: ${error}`)
       throw error
     }
   }
@@ -79,8 +81,7 @@ export abstract class PrismaRepository {
       await this.baseClient.$connect()
       await this.baseClient.$executeRaw`PRAGMA foreign_keys = ON;`
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error connecting to database:', error)
+      this.logger.error(`Error connecting to database: ${error}`)
       throw error
     }
   }
@@ -90,8 +91,7 @@ export abstract class PrismaRepository {
       await this.createMainTables()
       await this.createJunctionTables()
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error creating tables:', error)
+      this.logger.error(`Error creating tables: ${error}`)
       throw error
     }
   }
@@ -163,8 +163,7 @@ export abstract class PrismaRepository {
       await this.baseClient.siren.findMany()
       await this.baseClient.blocklist.findMany()
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error loading initial data:', error)
+      this.logger.error(`Error loading initial data: ${error}`)
     }
   }
 }
