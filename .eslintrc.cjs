@@ -94,6 +94,19 @@ module.exports = {
             assertionStyle: 'never',
           },
         ],
+        // Enforce no I-prefix for interfaces (TypeScript convention)
+        // See: docs/adr/core/port-naming-convention.md
+        '@typescript-eslint/naming-convention': [
+          'error',
+          {
+            selector: 'interface',
+            format: ['PascalCase'],
+            custom: {
+              regex: '^I[A-Z]',
+              match: false,
+            },
+          },
+        ],
       },
     },
     {
