@@ -9,7 +9,6 @@ import { tickTimer } from '@/core/timer/timer.slice'
 import { extendTimer } from '@/core/timer/usecases/extend-timer.usecase'
 import { loadTimer } from '@/core/timer/usecases/load-timer.usecase'
 import { startTimer } from '@/core/timer/usecases/start-timer.usecase'
-import { stopTimer } from '@/core/timer/usecases/stop-timer.usecase'
 import { dependencies } from '@/ui/dependencies'
 import { handleUIError } from '@/ui/utils/handleUIError'
 
@@ -23,7 +22,9 @@ export const useStrictModeTimer = () => {
   const timeRemaining = useSelector((state: RootState) =>
     selectTimeRemaining(state, now),
   )
-  const isActive = useSelector(selectIsTimerActive)
+  const isActive = useSelector((state: RootState) =>
+    selectIsTimerActive(state, now),
+  )
   const isLoading = useSelector(selectIsTimerLoading)
 
   const reportError = useCallback((error: unknown, context: string) => {
@@ -42,14 +43,6 @@ export const useStrictModeTimer = () => {
     },
     [dispatch, reportError, dateProvider],
   )
-
-  const handleStopTimer = useCallback(async () => {
-    try {
-      await dispatch(stopTimer()).unwrap()
-    } catch (error) {
-      reportError(error, 'Failed to stop timer')
-    }
-  }, [dispatch, reportError])
 
   const handleExtendTimer = useCallback(
     async (
@@ -93,20 +86,6 @@ export const useStrictModeTimer = () => {
   }, [isActive, dispatch, dateProvider])
 
   useEffect(() => {
-    if (!isActive || timeRemaining.total > 0) return
-
-    const stopIfExpired = async () => {
-      try {
-        await dispatch(stopTimer()).unwrap()
-      } catch (error) {
-        reportError(error, 'Failed to stop timer')
-      }
-    }
-
-    stopIfExpired()
-  }, [isActive, timeRemaining.total, dispatch, reportError])
-
-  useEffect(() => {
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       const isComingToForeground = nextAppState === 'active'
       if (isComingToForeground) {
@@ -128,7 +107,6 @@ export const useStrictModeTimer = () => {
     isActive,
     isLoading,
     startTimer: handleStartTimer,
-    stopTimer: handleStopTimer,
     extendTimer: handleExtendTimer,
   }
 }

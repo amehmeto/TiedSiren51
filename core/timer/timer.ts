@@ -1,6 +1,5 @@
 export type Timer = {
   endAt: number
-  isActive: boolean
 }
 
 export type TimeRemaining = {

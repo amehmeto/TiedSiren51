@@ -19,7 +19,8 @@ export const extendTimer = createAppAsyncThunk<Timer, ExtendTimerPayload>(
 
     const currentTimer = getState().timer.timer
 
-    if (!currentTimer?.isActive) throw new Error('No active timer to extend')
+    if (!currentTimer || currentTimer.endAt <= payload.now)
+      throw new Error('No active timer to extend')
 
     const additionalMs = calculateMilliseconds(payload)
 
@@ -37,7 +38,6 @@ export const extendTimer = createAppAsyncThunk<Timer, ExtendTimerPayload>(
 
     const timer: Timer = {
       endAt: newEndAt,
-      isActive: true,
     }
 
     await timerRepository.saveTimer(userId, timer)

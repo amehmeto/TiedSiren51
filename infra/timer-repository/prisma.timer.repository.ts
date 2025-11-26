@@ -12,11 +12,9 @@ export class PrismaTimerRepository
         id: userId,
         userId,
         endAt: data.endAt,
-        isActive: data.isActive ? 1 : 0,
       },
       update: {
         endAt: data.endAt,
-        isActive: data.isActive ? 1 : 0,
       },
     })
   }
@@ -30,13 +28,6 @@ export class PrismaTimerRepository
 
     return {
       endAt: timer.endAt,
-      isActive: timer.isActive === 1,
     }
-  }
-
-  async clearTimer(userId: string): Promise<void> {
-    await this.baseClient.timer.deleteMany({
-      where: { id: userId },
-    })
   }
 }

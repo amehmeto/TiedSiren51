@@ -11,7 +11,6 @@ import { Timer } from '../timer'
 import { extendTimer } from './extend-timer.usecase'
 import { loadTimer } from './load-timer.usecase'
 import { startTimer } from './start-timer.usecase'
-import { stopTimer } from './stop-timer.usecase'
 
 const DEFAULT_USER_ID = 'test-user-id'
 
@@ -43,7 +42,6 @@ export function timerFixture(
         )
       },
       noTimer() {
-        timerRepository.clearTimer(DEFAULT_USER_ID)
         testStateBuilderProvider.setState((builder) =>
           builder.withAuthUser(defaultAuthUser).withTimer(null),
         )
@@ -80,13 +78,6 @@ export function timerFixture(
         const now = payload.now ?? getNow()
         return store.dispatch(startTimer({ ...payload, now }))
       },
-      stoppingTimer: async () => {
-        store = createTestStore(
-          { timerRepository, dateProvider },
-          testStateBuilderProvider.getState(),
-        )
-        return store.dispatch(stopTimer())
-      },
       extendingTimer: async (payload: {
         days: number
         hours: number
@@ -111,19 +102,10 @@ export function timerFixture(
         expect(timer).toStrictEqual(expectedTimer)
         return timer
       },
-      timerShouldBeCleared() {
-        const timer = selectTimer(store.getState())
-        expect(timer).toBeNull()
-      },
       async timerShouldBeSavedInRepositoryAs(expectedTimer: Timer) {
         const userId = store.getState().auth.authUser?.id ?? DEFAULT_USER_ID
         const timer = await timerRepository.loadTimer(userId)
         expect(timer).toStrictEqual(expectedTimer)
-      },
-      async timerShouldNotBeInRepository() {
-        const userId = store.getState().auth.authUser?.id ?? DEFAULT_USER_ID
-        const timer = await timerRepository.loadTimer(userId)
-        expect(timer).toBeNull()
       },
       actionShouldBeRejectedWith(
         action: unknown,

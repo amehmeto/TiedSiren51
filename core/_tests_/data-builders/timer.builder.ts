@@ -5,7 +5,6 @@ import { TimeUnit } from '../../timer/timer.utils'
 export function buildTimer(overrides: PartialDeep<Timer> = {}): Timer {
   const defaultTimer: Timer = {
     endAt: TimeUnit.HOUR,
-    isActive: true,
   }
 
   return {

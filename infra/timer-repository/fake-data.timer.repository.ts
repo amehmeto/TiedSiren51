@@ -10,8 +10,4 @@ export class FakeDataTimerRepository implements TimerRepository {
   async loadTimer(userId: string): Promise<TimerData | null> {
     return this.timers.get(userId) ?? null
   }
-
-  async clearTimer(userId: string): Promise<void> {
-    this.timers.delete(userId)
-  }
 }

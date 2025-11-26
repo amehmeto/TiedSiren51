@@ -27,7 +27,6 @@ describe('extendAtr use case', () => {
 
     fixture.then.timerShouldBeStoredAs({
       endAt: now + initialDuration + extensionDuration,
-      isActive: true,
     })
   })
 
@@ -39,9 +38,10 @@ describe('extendAtr use case', () => {
       },
     },
     {
-      description: 'timer is not active',
+      description: 'timer has expired',
       setup: () => {
-        fixture.given.existingTimer(buildTimer({ isActive: false }))
+        const now = fixture.dateProvider.getNow().getTime()
+        fixture.given.existingTimer(buildTimer({ endAt: now - 1000 }))
       },
     },
   ])('should reject when $description', async ({ setup }) => {

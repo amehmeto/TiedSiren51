@@ -27,7 +27,6 @@ export const startTimer = createAppAsyncThunk<Timer, StartTimerPayload>(
 
     const timer: Timer = {
       endAt,
-      isActive: true,
     }
 
     await timerRepository.saveTimer(userId, timer)

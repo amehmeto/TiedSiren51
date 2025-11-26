@@ -3,7 +3,6 @@ import { Timer } from './timer'
 import { extendTimer } from './usecases/extend-timer.usecase'
 import { loadTimer } from './usecases/load-timer.usecase'
 import { startTimer } from './usecases/start-timer.usecase'
-import { stopTimer } from './usecases/stop-timer.usecase'
 
 type TimerState = {
   timer: Timer | null
@@ -28,9 +27,6 @@ export const timerSlice = createSlice({
       state.timer = action.payload.timer
       state.isLoading = false
       state.lastUpdate = action.payload.now
-    },
-    clearTimer: (state) => {
-      state.timer = null
     },
     tickTimer: (state, action: PayloadAction<number>) => {
       state.lastUpdate = action.payload
@@ -61,9 +57,6 @@ export const timerSlice = createSlice({
       .addCase(startTimer.rejected, (state) => {
         state.isLoading = false
       })
-      .addCase(stopTimer.fulfilled, (state) => {
-        state.timer = null
-      })
       .addCase(extendTimer.fulfilled, (state, action) => {
         state.timer = action.payload
         state.lastUpdate = action.meta.arg.now
@@ -74,4 +67,4 @@ export const timerSlice = createSlice({
   },
 })
 
-export const { setTimer, clearTimer, tickTimer } = timerSlice.actions
+export const { setTimer, tickTimer } = timerSlice.actions

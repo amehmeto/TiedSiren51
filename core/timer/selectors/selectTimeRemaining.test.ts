@@ -33,25 +33,6 @@ describe('selectTimeRemaining', () => {
     })
   })
 
-  test('should return empty time when timer is not active', () => {
-    const store = createTestStore(
-      { dateProvider },
-      stateBuilder()
-        .withTimer(buildTimer({ isActive: false }))
-        .build(),
-    )
-
-    const timeRemaining = selectTimeRemaining(store.getState(), now)
-
-    expect(timeRemaining).toEqual({
-      days: 0,
-      hours: 0,
-      minutes: 0,
-      seconds: 0,
-      total: 0,
-    })
-  })
-
   test('should return empty time when timer has expired', () => {
     const store = createTestStore(
       { dateProvider },
