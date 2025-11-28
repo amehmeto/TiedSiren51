@@ -38,7 +38,11 @@
       "mcp__ide__getDiagnostics",
       "mcp__github__pull_request_read"
     ],
-    "deny": ["BashOutput(*)"],
+    "deny": [
+      "BashOutput(*)",
+      "Bash(git push --no-verify:*)",
+      "Bash(git commit --no-verify:*)"
+    ],
     "ask": [
       "Bash(chmod:*)",
       "Bash(gh secret:*)",

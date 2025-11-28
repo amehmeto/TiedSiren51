@@ -6,7 +6,38 @@
 
 name: Cerberus
 
-on: [pull_request]
+on:
+  pull_request:
+    paths:
+      # Source code
+      - 'app/**'
+      - 'core/**'
+      - 'ui/**'
+      - 'infra/**'
+      - 'pdb-*/**'
+      # Config files that affect the build
+      - 'app.config.js'
+      - 'package.json'
+      - 'package-lock.json'
+      - 'tsconfig.json'
+      - 'babel.config.cjs'
+      - 'metro.config.cjs'
+      - 'eas.json'
+      - 'schema.prisma'
+      - 'index.js'
+      # Android specific
+      - 'android/**'
+      # Assets
+      - 'assets/**'
+      # Environment files
+      - '.env*'
+      # Test and lint config
+      - 'vitest.config.js'
+      - '.eslintrc.cjs'
+      # Scripts used by CI
+      - 'scripts/**'
+      # This workflow itself
+      - '.github/workflows/cerberus.yml'
 
 jobs:
   test:
