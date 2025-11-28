@@ -1,5 +1,11 @@
 #!/bin/sh
 # Check if developer has verified e2e tests
+# Set SKIP_E2E_CHECK=1 to bypass this check in non-interactive environments
+
+if [ "$SKIP_E2E_CHECK" = "1" ]; then
+    echo "⚠️  Skipping e2e test check (SKIP_E2E_CHECK=1)"
+    exit 0
+fi
 
 exec < /dev/tty  # Redirect input to terminal
 
