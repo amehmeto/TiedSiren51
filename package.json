@@ -9,6 +9,7 @@
   },
   "scripts": {
     "preinstall": "npx only-allow npm",
+    "postinstall": "npx prisma generate",
     "install:clean": "rm -rf node_modules && npm ci",
     "start": "expo start",
     "android": "expo run:android",

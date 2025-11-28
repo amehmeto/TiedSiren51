@@ -48,9 +48,12 @@
       "Bash(npm run lint:fix:*)",
       "Bash(npx prisma generate:*)",
       "Bash(npx vitest:*)",
-      "Bash(npm view:*)"
+      "Bash(npm view:*)",
+      "Bash(/Users/arthurmehmetoglu/Development/tied-siren-project/TiedSiren51/.specify/scripts/bash/check-prerequisites.sh:*)"
     ],
-    "deny": ["BashOutput(*)"],
+    "deny": [
+      "BashOutput(*)"
+    ],
     "ask": [
       "Bash(chmod:*)",
       "Bash(gh secret:*)",
