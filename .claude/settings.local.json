@@ -26,14 +26,19 @@
       "Bash(gh workflow:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
+      "Bash(git stash:*)",
       "Bash(grep:*)",
       "Bash(npm install:*)",
       "Bash(npm run generate:schema:*)",
       "Bash(npm run lint:*)",
+      "Bash(npm run lint:fix:*)",
       "Bash(npm run test:*)",
       "Bash(npm test:*)",
+      "Bash(npm view:*)",
       "Bash(npx eslint:*)",
+      "Bash(npx prisma generate:*)",
       "Bash(npx tsc:*)",
+      "Bash(npx vitest:*)",
       "Bash(xargs cloc:*)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
@@ -44,22 +49,17 @@
       "mcp__github__pull_request_read",
       "mcp__github__pull_request_review_write",
       "mcp__ide__getDiagnostics",
-      "WebSearch",
-      "Bash(npm run lint:fix:*)",
-      "Bash(npx prisma generate:*)",
-      "Bash(npx vitest:*)",
-      "Bash(npm view:*)",
-      "Bash(/Users/arthurmehmetoglu/Development/tied-siren-project/TiedSiren51/.specify/scripts/bash/check-prerequisites.sh:*)"
+      "WebSearch"
     ],
-    "deny": [
-      "BashOutput(*)"
-    ],
+    "deny": ["BashOutput(*)"],
     "ask": [
+      "Bash(SKIP_E2E_CHECK=1 git push:*)",
       "Bash(chmod:*)",
       "Bash(gh secret:*)",
       "Bash(git add:*)",
       "Bash(git checkout:*)",
       "Bash(git commit:*)",
+      "Bash(git merge:*)",
       "Bash(git push:*)"
     ]
   }
