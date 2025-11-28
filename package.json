@@ -103,6 +103,8 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@semantic-release/changelog": "^6.0.3",
+    "@semantic-release/git": "^10.0.1",
     "@types/pouchdb": "^6.4.2",
     "@types/react": "~18.2.45",
     "@types/react-test-renderer": "^18.0.7",
@@ -128,6 +130,7 @@
     "lint-staged": "^15.2.5",
     "prettier": "^3.3.0",
     "react-test-renderer": "18.2.0",
+    "semantic-release": "^25.0.2",
     "type-fest": "^4.41.0",
     "typescript": "~5.3.3",
     "vite": "^5.2.12",
