@@ -1,19 +1,21 @@
 import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
 import { View, Text, StyleSheet } from 'react-native'
-import { TimeRemaining } from '@/core/timer/timer'
 import { T } from '@/ui/design-system/theme'
-import { formatCountdown, formatEndFromOffsets } from '@/ui/utils/timeFormat'
+import {
+  StrictModeViewModel,
+  StrictModeViewState,
+} from '@/ui/screens/StrictMode/strictMode.view-model'
 
 type CircularTimerDisplayProps = {
-  timeLeft: TimeRemaining
-  isActive: boolean
+  viewModel: StrictModeViewModel
 }
 
 export const CircularTimerDisplay = ({
-  timeLeft,
-  isActive,
+  viewModel,
 }: Readonly<CircularTimerDisplayProps>) => {
+  const isActive = viewModel.type === StrictModeViewState.Active
+
   return (
     <View style={styles.container}>
       {isActive && (
@@ -23,22 +25,12 @@ export const CircularTimerDisplay = ({
           color={T.color.lightBlue}
         />
       )}
-      <Text style={styles.timerText}>{formatCountdown(timeLeft)}</Text>
-      {isActive && (
-        <Text style={styles.title}>
-          {formatEndFromOffsets({
-            days: timeLeft.days,
-            hours: timeLeft.hours,
-            minutes: timeLeft.minutes,
-          })}
-        </Text>
+      <Text style={styles.timerText}>{viewModel.countdown}</Text>
+      {viewModel.type === StrictModeViewState.Active && (
+        <Text style={styles.title}>{viewModel.endDateTime}</Text>
       )}
 
-      <Text style={styles.statusMessage}>
-        {isActive
-          ? 'Your blockings are locked against any\nbypassing.'
-          : 'Set a timer to activate strict mode'}
-      </Text>
+      <Text style={styles.statusMessage}>{viewModel.statusMessage}</Text>
     </View>
   )
 }

@@ -168,8 +168,7 @@ export abstract class PrismaRepository {
         `
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error migrating Timer table:', error)
+      this.logger.error(`Error migrating Timer table: ${error}`)
     }
   }
 

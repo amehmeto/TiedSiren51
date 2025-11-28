@@ -1,12 +1,10 @@
 import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
 import { Text, StyleSheet, View } from 'react-native'
-import { TimeRemaining } from '@core/timer/timer'
 import { TiedSCard } from '@ui/design-system/components/shared/TiedSCard'
 import { T } from '@ui/design-system/theme'
-import { formatInlineRemaining } from '@ui/utils/timeFormat'
 
-export function UnLockMethodCard(props: { timeLeft: TimeRemaining }) {
+export function UnLockMethodCard(props: { inlineRemaining: string }) {
   return (
     <TiedSCard style={styles.unlockCard}>
       <View style={styles.unlockCardContent}>
@@ -18,9 +16,7 @@ export function UnLockMethodCard(props: { timeLeft: TimeRemaining }) {
           />
           <Text style={styles.unlockLabel}>{'Timer'}</Text>
         </View>
-        <Text style={styles.unlockValue}>
-          {formatInlineRemaining(props.timeLeft)}
-        </Text>
+        <Text style={styles.unlockValue}>{props.inlineRemaining}</Text>
       </View>
     </TiedSCard>
   )

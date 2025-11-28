@@ -3,24 +3,24 @@ import { AppState, AppStateStatus } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { SECOND } from '@/core/__constants__/time'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
-import { selectIsTimerActive } from '@/core/timer/selectors/selectIsTimerActive'
 import { selectIsTimerLoading } from '@/core/timer/selectors/selectIsTimerLoading'
-import { selectTimeLeft } from '@/core/timer/selectors/selectTimeLeft'
 import { extendTimer } from '@/core/timer/usecases/extend-timer.usecase'
 import { loadTimer } from '@/core/timer/usecases/load-timer.usecase'
 import { startTimer } from '@/core/timer/usecases/start-timer.usecase'
 import { dependencies } from '@/ui/dependencies'
+import {
+  selectStrictModeViewModel,
+  StrictModeViewState,
+} from '@/ui/screens/StrictMode/strictMode.view-model'
 
 export const useStrictModeTimer = () => {
   const dispatch = useDispatch<AppDispatch>()
   const { dateProvider } = dependencies
   const [now, setNow] = useState<Date>(dateProvider.getNow())
-  const timeLeft = useSelector((state: RootState) =>
-    selectTimeLeft(state, dateProvider),
+  const viewModel = useSelector((state: RootState) =>
+    selectStrictModeViewModel(state, dateProvider),
   )
-  const isActive = useSelector((state: RootState) =>
-    selectIsTimerActive(state, dateProvider),
-  )
+  const isActive = viewModel.type === StrictModeViewState.Active
   const isLoading = useSelector(selectIsTimerLoading)
 
   const handleStartTimer = useCallback(
@@ -78,7 +78,7 @@ export const useStrictModeTimer = () => {
   }, [dispatch])
 
   return {
-    timeLeft,
+    viewModel,
     isActive,
     isLoading,
     startTimer: handleStartTimer,

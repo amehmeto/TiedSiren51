@@ -10,6 +10,7 @@ import {
 } from '@/ui/design-system/components/shared/TimerPickerModal'
 import { T } from '@/ui/design-system/theme'
 import { useStrictModeTimer } from '@/ui/hooks/useStrictModeTimer'
+import { StrictModeViewState } from '@/ui/screens/StrictMode/strictMode.view-model'
 import { UnLockMethodCard } from '@ui/screens/StrictMode/UnLockMethodCard'
 
 const DEFAULT_DURATION: TimerDuration = { days: 0, hours: 0, minutes: 20 }
@@ -22,7 +23,7 @@ export default function StrictModeScreen() {
   const [extendDuration, setExtendDuration] =
     useState<TimerDuration>(DEFAULT_DURATION)
 
-  const { timeLeft, isActive, isLoading, startTimer, extendTimer } =
+  const { viewModel, isActive, isLoading, startTimer, extendTimer } =
     useStrictModeTimer()
 
   if (isLoading) return <LoadingScreen />
@@ -36,26 +37,21 @@ export default function StrictModeScreen() {
       >
         <TiedSTitle text="Strict Mode" />
 
-        <CircularTimerDisplay timeLeft={timeLeft} isActive={isActive} />
+        <CircularTimerDisplay viewModel={viewModel} />
 
         <View style={styles.actionButtons}>
-          {!isActive ? (
-            <TiedSButton
-              onPress={() => setShowTimerPicker(true)}
-              text="Start Timer"
-            />
-          ) : (
-            <TiedSButton
-              onPress={() => setShowExtendPicker(true)}
-              text="Extend Timer"
-            />
-          )}
+          <TiedSButton
+            onPress={() =>
+              isActive ? setShowExtendPicker(true) : setShowTimerPicker(true)
+            }
+            text={viewModel.buttonText}
+          />
         </View>
 
-        {isActive && (
+        {viewModel.type === StrictModeViewState.Active && (
           <View style={styles.unlockSection}>
             <Text style={styles.sectionTitle}>{'UNLOCK METHOD'}</Text>
-            <UnLockMethodCard timeLeft={timeLeft} />
+            <UnLockMethodCard inlineRemaining={viewModel.inlineRemaining} />
           </View>
         )}
       </ScrollView>
