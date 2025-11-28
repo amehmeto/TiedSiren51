@@ -1,5 +1,6 @@
 import { createSelector } from '@reduxjs/toolkit'
 import { formatDistance } from 'date-fns'
+import { DAY } from '@/core/__constants__/time'
 import { DateProvider } from '@/core/_ports_/port.date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 import { BlockSession } from '@/core/block-session/block.session'
@@ -37,7 +38,7 @@ function generateEndTime(
   if (!isOvernight || isAfterMidnightBeforeEnd)
     return 'Ends ' + formatDistance(todayEnd, now, { addSuffix: true })
 
-  const tomorrowEnd = new Date(now.getTime() + 24 * 60 * 60 * 1000)
+  const tomorrowEnd = new Date(now.getTime() + 1 * DAY)
   const [hourStr, minuteStr] = session.endedAt.split(':')
   const hour = parseInt(hourStr, 10)
   const minute = parseInt(minuteStr, 10)

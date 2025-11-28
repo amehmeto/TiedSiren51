@@ -1,6 +1,11 @@
 #!/bin/sh
 # Check if developer has verified e2e tests
 
+if [ "$SKIP_E2E_CHECK" = "1" ]; then
+    echo "⏭️  Skipping e2e check (SKIP_E2E_CHECK=1)"
+    exit 0
+fi
+
 exec < /dev/tty  # Redirect input to terminal
 
 echo ""

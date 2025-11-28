@@ -79,11 +79,11 @@ export default function LoginScreen() {
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
+      <TiedSCloseButton onClose={handleClose} />
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
         <Text style={styles.subtitle}>{'LOG INTO YOUR ACCOUNT'}</Text>
         <TiedSSocialButton
           iconName="logo-google"

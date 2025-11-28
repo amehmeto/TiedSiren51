@@ -1,0 +1,186 @@
+import { describe, expect, test, beforeEach } from 'vitest'
+import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
+import { createTestStore } from '@/core/_tests_/createTestStore'
+import { stateBuilder } from '@/core/_tests_/state-builder'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
+import { selectTimeLeft } from './selectTimeLeft'
+
+describe('selectTimeLeft', () => {
+  let dateProvider: StubDateProvider
+  let nowMs: number
+
+  beforeEach(() => {
+    dateProvider = new StubDateProvider()
+    dateProvider.now = new Date('2024-01-01T10:00:00.000Z')
+    nowMs = dateProvider.getNow().getTime()
+  })
+
+  test('should return empty time when there is no timer', () => {
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withTimerEndAt(null).build(),
+    )
+
+    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
+
+    expect(timeLeft).toEqual({
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      timeLeft: 0,
+    })
+  })
+
+  test('should return empty time when timer has expired', () => {
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder()
+        .withTimerEndAt(dateProvider.msToISOString(nowMs - 1 * SECOND))
+        .build(),
+    )
+
+    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
+
+    expect(timeLeft).toEqual({
+      days: 0,
+      hours: 0,
+      minutes: 0,
+      seconds: 0,
+      timeLeft: 0,
+    })
+  })
+
+  test.each([
+    {
+      description: '1 hour',
+      remainingMs: 1 * HOUR,
+      expected: {
+        days: 0,
+        hours: 1,
+        minutes: 0,
+        seconds: 0,
+        timeLeft: 3600000,
+      },
+    },
+    {
+      description: '1 day 2 hours 30 minutes 45 seconds',
+      remainingMs: 1 * DAY + 2 * HOUR + 30 * MINUTE + 45 * SECOND,
+      expected: {
+        days: 1,
+        hours: 2,
+        minutes: 30,
+        seconds: 45,
+        timeLeft: 86400000 + 7200000 + 1800000 + 45000,
+      },
+    },
+    {
+      description: '30 minutes',
+      remainingMs: 30 * MINUTE,
+      expected: {
+        days: 0,
+        hours: 0,
+        minutes: 30,
+        seconds: 0,
+        timeLeft: 1800000,
+      },
+    },
+    {
+      description: '45 seconds',
+      remainingMs: 45 * SECOND,
+      expected: {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 45,
+        timeLeft: 45000,
+      },
+    },
+  ])(
+    'should calculate remaining time correctly for $description',
+    ({ remainingMs, expected }) => {
+      const store = createTestStore(
+        { dateProvider },
+        stateBuilder()
+          .withTimerEndAt(dateProvider.msToISOString(nowMs + remainingMs))
+          .build(),
+      )
+
+      const timeLeft = selectTimeLeft(store.getState(), dateProvider)
+
+      expect(timeLeft).toEqual(expected)
+    },
+  )
+
+  test.each([
+    {
+      description: '61 seconds remaining',
+      remainingMs: 61 * SECOND,
+      expected: {
+        days: 0,
+        hours: 0,
+        minutes: 1,
+        seconds: 1,
+        timeLeft: 61000,
+      },
+    },
+    {
+      description: '60 seconds remaining',
+      remainingMs: 1 * MINUTE,
+      expected: {
+        days: 0,
+        hours: 0,
+        minutes: 1,
+        seconds: 0,
+        timeLeft: 60000,
+      },
+    },
+    {
+      description: '59 seconds remaining',
+      remainingMs: 59 * SECOND,
+      expected: {
+        days: 0,
+        hours: 0,
+        minutes: 0,
+        seconds: 59,
+        timeLeft: 59000,
+      },
+    },
+    {
+      description: '3661 seconds remaining (1 hour 1 minute 1 second)',
+      remainingMs: 1 * HOUR + 1 * MINUTE + 1 * SECOND,
+      expected: {
+        days: 0,
+        hours: 1,
+        minutes: 1,
+        seconds: 1,
+        timeLeft: 3661000,
+      },
+    },
+    {
+      description: '125 seconds remaining (2 minutes 5 seconds)',
+      remainingMs: 2 * MINUTE + 5 * SECOND,
+      expected: {
+        days: 0,
+        hours: 0,
+        minutes: 2,
+        seconds: 5,
+        timeLeft: 125000,
+      },
+    },
+  ])(
+    'should calculate time remaining correctly for $description',
+    ({ remainingMs, expected }) => {
+      const store = createTestStore(
+        { dateProvider },
+        stateBuilder()
+          .withTimerEndAt(dateProvider.msToISOString(nowMs + remainingMs))
+          .build(),
+      )
+
+      const timeLeft = selectTimeLeft(store.getState(), dateProvider)
+
+      expect(timeLeft).toEqual(expected)
+    },
+  )
+})

@@ -1,6 +1,7 @@
 # View Model Pattern for UI State
 
 Date: 2025-01-28
+Updated: 2025-11-28
 
 ## Status
 
@@ -10,112 +11,206 @@ Accepted
 
 TiedSiren51's UI screens need to:
 
-- Display data from Redux store
-- Handle user interactions
-- Trigger business logic actions
-- Manage local UI state (form inputs, loading states)
-- Compute derived data for display
-- Keep components simple and presentational
+- Display data from Redux store in display-ready format
+- Handle multiple UI states (loading, empty, active, etc.)
+- Keep formatting/presentation logic out of components
+- Remain testable without rendering React components
+- Support time-dependent displays that update every second
 
 Challenges:
-- **React components shouldn't contain business logic**: Business logic belongs in core
-- **Selector complexity**: Complex data transformations needed for display
-- **Reusability**: Same logic needed across multiple components
-- **Testing**: Need to test UI logic without rendering components
-- **Separation**: UI state vs business state
-- **Performance**: Avoid unnecessary re-renders
 
-Traditional approaches:
-- **Logic in components**: Couples UI to business logic, hard to test
-- **Direct selectors**: Components know too much about store structure
-- **Container components**: Extra layer, but still couples component to Redux
+- **Formatting in components**: Components shouldn't transform raw data to display strings
+- **Conditional rendering complexity**: Multiple UI states lead to complex conditional logic
+- **Time-dependent data**: Countdown timers and relative times need `DateProvider` injection
+- **Type safety**: Different UI states have different available properties
+- **Testing**: Need to verify formatting and state logic without React rendering
 
 ## Decision
 
-Use **View Model Pattern** to bridge Redux state and UI components.
+Use **Selector-Based View Models** that return **discriminated unions** representing distinct UI states.
+
+### Core Principles
+
+1. **Selectors, not hooks**: View models are pure selector functions, not React hooks
+2. **Discriminated unions**: Use `type` field to distinguish UI states
+3. **Pre-formatted strings**: Return display-ready strings, not raw data
+4. **DateProvider injection**: Pass `DateProvider` for time-dependent formatting
+5. **Exhaustive handling**: TypeScript enforces handling all states in components
 
 ### Implementation
 
-**1. View Model Hook** (`/ui/screens/{Screen}/{screen}.view-model.ts`)
+**1. View Model Selector** (`/ui/screens/{Screen}/{screen}.view-model.ts`)
 
 ```typescript
-// /ui/screens/Home/HomeScreen/home.view-model.ts
-export const useHomeViewModel = () => {
-  const dispatch = useAppDispatch()
+// StrictMode example - simple binary state
+export enum StrictModeViewState {
+  Active = 'ACTIVE',
+  Inactive = 'INACTIVE',
+}
 
-  // Select data from store
-  const activeSessions = useAppSelector(selectActiveSessions)
-  const blocklists = useAppSelector(selectAllBlocklists)
-  const sirens = useAppSelector(selectAllSirens)
+type InactiveViewModel = {
+  type: StrictModeViewState.Inactive
+  countdown: string        // "0h 0m 0s"
+  statusMessage: string    // "Set a timer to activate strict mode"
+  buttonText: string       // "Start Timer"
+}
 
-  // Compute derived data
-  const hasActiveSession = activeSessions.length > 0
-  const totalBlockedItems = sirens.length
+type ActiveViewModel = {
+  type: StrictModeViewState.Active
+  countdown: string        // "1h 30m 45s"
+  endDateTime: string      // "Ends 28/11, 3:30 p.m."
+  inlineRemaining: string  // "1h 30m 45s"
+  statusMessage: string    // "Your blockings are locked..."
+  buttonText: string       // "Extend Timer"
+}
 
-  // Action handlers
-  const handleStartSession = useCallback((blocklistId: string) => {
-    dispatch(startBlockSession({ blocklistId }))
-  }, [dispatch])
+export type StrictModeViewModel = InactiveViewModel | ActiveViewModel
 
-  const handleStopSession = useCallback(() => {
-    dispatch(stopBlockSession())
-  }, [dispatch])
+export function selectStrictModeViewModel(
+  state: RootState,
+  dateProvider: DateProvider,
+): StrictModeViewModel {
+  const isActive = selectIsTimerActive(state, dateProvider)
 
-  // Return UI-friendly API
+  if (!isActive) {
+    return {
+      type: StrictModeViewState.Inactive,
+      countdown: '0h 0m 0s',
+      statusMessage: 'Set a timer to activate strict mode',
+      buttonText: 'Start Timer',
+    }
+  }
+
+  const timeLeft = selectTimeLeft(state, dateProvider)
+
   return {
-    // Data
-    activeSessions,
-    blocklists,
-    hasActiveSession,
-    totalBlockedItems,
-
-    // Actions
-    handleStartSession,
-    handleStopSession,
+    type: StrictModeViewState.Active,
+    countdown: formatCountdown(timeLeft),
+    endDateTime: formatEndDateTime(timeLeft, dateProvider.getNow()),
+    inlineRemaining: formatCountdown(timeLeft),
+    statusMessage: 'Your blockings are locked against any bypassing.',
+    buttonText: 'Extend Timer',
   }
 }
 ```
 
-**2. Presentational Component** (`/ui/screens/{Screen}/index.tsx`)
+**2. Complex State Example** (HomeScreen with 4 states)
 
 ```typescript
-export const HomeScreen = () => {
-  const vm = useHomeViewModel()
+// Home example - multiple combined states
+export enum HomeViewModel {
+  WithoutActiveNorScheduledSessions = 'WITHOUT_ACTIVE_NOR_SCHEDULED_SESSIONS',
+  WithActiveWithoutScheduledSessions = 'WITH_ACTIVE_WITHOUT_SCHEDULED_SESSIONS',
+  WithoutActiveWithScheduledSessions = 'WITHOUT_ACTIVE_WITH_SCHEDULED_SESSIONS',
+  WithActiveAndScheduledSessions = 'WITH_ACTIVE_AND_SCHEDULED_SESSIONS',
+}
+
+// Each state type has different structure
+type WithoutActiveNorScheduledSessions = {
+  type: HomeViewModel.WithoutActiveNorScheduledSessions
+  greetings: Greetings
+  activeSessions: { title: string; message: string }      // Empty state
+  scheduledSessions: { title: string; message: string }   // Empty state
+}
+
+type WithActiveAndScheduledSessions = {
+  type: HomeViewModel.WithActiveAndScheduledSessions
+  greetings: Greetings
+  activeSessions: { title: string; blockSessions: ViewModelBlockSession[] }
+  scheduledSessions: { title: string; blockSessions: ViewModelBlockSession[] }
+}
+
+// Union of all possible states
+export type HomeViewModelType =
+  | WithoutActiveNorScheduledSessions
+  | WithActiveWithoutScheduledSessions
+  | WithoutActiveWithScheduledSessions
+  | WithActiveAndScheduledSessions
+```
+
+**3. Component Usage with Exhaustive Switch**
+
+```typescript
+export default function HomeScreen() {
+  const { dateProvider } = dependencies
+  const [now, setNow] = useState<Date>(dateProvider.getNow())
+
+  // Select view model with dateProvider for time formatting
+  const viewModel = useSelector<RootState, HomeViewModelType>(
+    (state) => selectHomeViewModel(state, now, dateProvider)
+  )
+
+  // Exhaustive switch ensures all states handled
+  const [activeNode, scheduledNode] = (() => {
+    switch (viewModel.type) {
+      case HomeViewModel.WithoutActiveNorScheduledSessions:
+        return [
+          <NoSessionBoard sessions={viewModel.activeSessions} />,
+          <NoSessionBoard sessions={viewModel.scheduledSessions} />,
+        ]
+      case HomeViewModel.WithActiveWithoutScheduledSessions:
+        return [
+          <SessionsBoard sessions={viewModel.activeSessions} />,
+          <NoSessionBoard sessions={viewModel.scheduledSessions} />,
+        ]
+      // ... other cases
+      default:
+        return exhaustiveGuard(viewModel) // TypeScript compile error if case missed
+    }
+  })()
 
   return (
-    <View>
-      <Text>Blocked Items: {vm.totalBlockedItems}</Text>
-
-      {vm.hasActiveSession ? (
-        <Button onPress={vm.handleStopSession}>Stop Session</Button>
-      ) : (
-        <BlocklistSelector
-          blocklists={vm.blocklists}
-          onSelect={vm.handleStartSession}
-        />
-      )}
-    </View>
+    <>
+      <Text>{viewModel.greetings}</Text>  {/* Common to all states */}
+      {activeNode}
+      {scheduledNode}
+    </>
   )
 }
 ```
 
-**3. View Model Testing** (`/ui/screens/{Screen}/{screen}.view-model.test.ts`)
+**4. View Model Testing** (No React rendering needed)
 
 ```typescript
-import { renderHook } from '@testing-library/react-hooks'
-import { useHomeViewModel } from './home.view-model'
+describe('selectStrictModeViewModel', () => {
+  let dateProvider: StubDateProvider
 
-it('computes derived state correctly', () => {
-  const store = createTestStore(/* state with data */)
-
-  const { result } = renderHook(() => useHomeViewModel(), {
-    wrapper: ({ children }) => (
-      <Provider store={store}>{children}</Provider>
-    ),
+  beforeEach(() => {
+    dateProvider = new StubDateProvider()
+    dateProvider.now = new Date('2024-01-01T10:00:00.000Z')
   })
 
-  expect(result.current.hasActiveSession).toBe(true)
-  expect(result.current.totalBlockedItems).toBe(10)
+  test('should return inactive view model when no timer is set', () => {
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withTimerEndAt(null).build(),
+    )
+
+    const viewModel = selectStrictModeViewModel(store.getState(), dateProvider)
+
+    expect(viewModel).toEqual({
+      type: StrictModeViewState.Inactive,
+      countdown: '0h 0m 0s',
+      statusMessage: 'Set a timer to activate strict mode',
+      buttonText: 'Start Timer',
+    })
+  })
+
+  test('should return active view model with formatted countdown', () => {
+    const endAt = dateProvider.msToISOString(nowMs + 1 * HOUR + 30 * MINUTE)
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withTimerEndAt(endAt).build(),
+    )
+
+    const viewModel = selectStrictModeViewModel(store.getState(), dateProvider)
+
+    expect(viewModel).toMatchObject({
+      type: StrictModeViewState.Active,
+      countdown: '1h 30m 0s',
+      buttonText: 'Extend Timer',
+    })
+  })
 })
 ```
 
@@ -123,182 +218,155 @@ it('computes derived state correctly', () => {
 
 ### Positive
 
-- **Separation of concerns**: Component only handles rendering
-- **Testability**: View model logic tested without rendering
-- **Reusability**: Same view model can power multiple components
-- **Simplicity**: Components are simple, declarative, presentational
-- **Performance**: Memoization in view model prevents re-renders
-- **Type safety**: View model provides typed interface to components
-- **Discoverability**: IDE autocomplete shows available data/actions
-- **Maintainability**: Business logic changes don't require component changes
-- **Composability**: View models can use other view models
-- **Clear contract**: View model is explicit API for screen
+- **Pure functions**: Selectors are pure, easy to test without React
+- **Type-safe UI states**: Discriminated unions enforce exhaustive handling
+- **Pre-formatted output**: Components receive display-ready strings
+- **Testable time logic**: DateProvider injection enables deterministic tests
+- **No formatting in components**: All string formatting in view model
+- **Compile-time safety**: Missing state handling causes TypeScript errors
+- **Centralized formatting**: Single source of truth for display strings
 
 ### Negative
 
-- **Extra file**: Each screen needs view model file
-- **Indirection**: Must look at view model to see what data is used
-- **Boilerplate**: Hook wrapper around selectors/dispatch
-- **Learning curve**: Team must understand view model pattern
-- **Not React**: Pattern from other frameworks (WPF, Android)
-- **Overkill for simple screens**: Simple list might not need view model
+- **Verbose type definitions**: Each UI state needs explicit type
+- **String coupling**: Changes to display text require view model changes
+- **No memoization by default**: Must use `createSelector` for expensive computations
 
 ### Neutral
 
-- **Hook-based**: Modern React pattern (not class-based like original MVVM)
-- **Redux coupling**: View models couple to Redux (acceptable trade-off)
+- **Selector vs Hook**: Different from hook-based MVVM (but simpler for this use case)
+- **Co-location**: View model files co-located with screen components
 
 ## Alternatives Considered
 
-### 1. Logic in Components
-**Rejected because**:
-- Couples component to Redux store structure
-- Hard to test (must render component)
-- Business logic mixed with presentation
-- Difficult to reuse logic
+### 1. Hook-Based View Models
 
-### 2. Container/Presentational Split
-**Rejected because**:
-- Extra container component file
-- Container still couples to Redux
-- More boilerplate than view model
-- Doesn't solve testing problem
+```typescript
+export const useHomeViewModel = () => {
+  const data = useSelector(selectData)
+  const formatted = useMemo(() => format(data), [data])
+  return { formatted }
+}
+```
 
-### 3. Direct Selectors in Components
 **Rejected because**:
-- Components know too much about store
-- Complex selector logic in components
-- Hard to reuse across components
-- Difficult to test derived data
+- Requires React rendering to test
+- Harder to pass DateProvider without context
+- Less explicit state transitions
 
-### 4. Render Props
-**Rejected because**:
-- Awkward syntax
-- Callback hell
-- Less composable than hooks
-- Outdated pattern
+### 2. Formatting in Components
 
-### 5. Higher-Order Components (HOC)
+```typescript
+const HomeScreen = () => {
+  const timeLeft = useSelector(selectTimeLeft)
+  return <Text>{`${timeLeft.hours}h ${timeLeft.minutes}m`}</Text>
+}
+```
+
 **Rejected because**:
-- Less composable than hooks
-- Wrapper hell
-- Harder to type
-- Outdated pattern
+- Formatting logic scattered across components
+- Hard to test formatting without rendering
+- Duplicated formatting logic
+
+### 3. Single Object Return (No Discriminated Union)
+
+```typescript
+type ViewModel = {
+  isActive: boolean
+  countdown: string | null
+  message: string | null
+}
+```
+
+**Rejected because**:
+- Nullable fields lead to defensive checks
+- No compile-time guarantee of field availability
+- Easy to access wrong field for current state
 
 ## Implementation Notes
 
 ### Key Files
-- `/ui/screens/Home/HomeScreen/home.view-model.ts` - Home screen view model
-- `/ui/screens/Home/HomeScreen/home.view-model.test.ts` - View model tests
-- Various screen view models in `/ui/screens/`
+
+- `ui/screens/Home/HomeScreen/home.view-model.ts` - Complex multi-state example
+- `ui/screens/Home/HomeScreen/home-view-model.types.ts` - Type definitions
+- `ui/screens/StrictMode/strictMode.view-model.ts` - Simple binary state example
 
 ### View Model Structure
 
 ```typescript
-export const use{Screen}ViewModel = () => {
-  // 1. Get data from Redux
-  const data = useAppSelector(selectData)
+// 1. Define state enum
+export enum ScreenViewState {
+  StateA = 'STATE_A',
+  StateB = 'STATE_B',
+}
 
-  // 2. Compute derived data
-  const derived = useMemo(() => computeValue(data), [data])
+// 2. Define type for each state
+type StateAViewModel = {
+  type: ScreenViewState.StateA
+  // properties specific to this state
+}
 
-  // 3. Define action handlers
-  const handleAction = useCallback(() => {
-    dispatch(action())
-  }, [dispatch])
+type StateBViewModel = {
+  type: ScreenViewState.StateB
+  // properties specific to this state
+}
 
-  // 4. Local UI state (if needed)
-  const [localState, setLocalState] = useState(false)
+// 3. Union type
+export type ScreenViewModel = StateAViewModel | StateBViewModel
 
-  // 5. Return public API
-  return {
-    data,
-    derived,
-    handleAction,
-    localState,
-  }
+// 4. Selector function
+export function selectScreenViewModel(
+  state: RootState,
+  dateProvider: DateProvider,
+): ScreenViewModel {
+  // Determine state and return appropriate view model
 }
 ```
 
-### Naming Conventions
-- File: `{screen-name}.view-model.ts`
-- Hook: `use{ScreenName}ViewModel`
-- Test: `{screen-name}.view-model.test.ts`
-- Location: Co-located with screen component
+### Formatting Functions
 
-### Best Practices
-
-1. **Keep components dumb**: All logic in view model
-2. **Memoize expensive computations**: Use `useMemo`
-3. **Memoize callbacks**: Use `useCallback`
-4. **Return object**: Easier to add properties than array destructuring
-5. **Test view model**: Focus tests on view model, not component
-6. **Local UI state**: OK to have in view model (modal open, form state)
-7. **Composition**: View models can call other view models
-
-### Performance Optimization
+Keep formatting functions private within the view model file:
 
 ```typescript
-export const useBlocklistViewModel = () => {
-  // Memoized selector
-  const blocklists = useAppSelector(selectAllBlocklists)
-
-  // Memoized computation
-  const sortedBlocklists = useMemo(
-    () => [...blocklists].sort((a, b) => a.name.localeCompare(b.name)),
-    [blocklists]
-  )
-
-  // Memoized callback
-  const handleDelete = useCallback((id: string) => {
-    dispatch(deleteBlocklist(id))
-  }, [dispatch])
-
-  return { sortedBlocklists, handleDelete }
+// Private - not exported
+function formatCountdown(timeLeft: TimeRemaining): string {
+  const parts: string[] = []
+  if (timeLeft.days > 0) parts.push(`${timeLeft.days}d`)
+  if (timeLeft.hours > 0 || timeLeft.days > 0) parts.push(`${timeLeft.hours}h`)
+  parts.push(`${timeLeft.minutes}m`)
+  parts.push(`${timeLeft.seconds}s`)
+  return parts.join(' ')
 }
+
+// Public - exported
+export function selectStrictModeViewModel(...) { ... }
 ```
 
-### Testing Pattern
+### Time-Dependent Updates
+
+Combine with local state tick pattern (see `local-state-for-ui-ticks.md`):
 
 ```typescript
-describe('HomeViewModel', () => {
-  it('provides session data', () => {
-    const store = createTestStore(
-      stateBuilder()
-        .withActiveSessions([sessionFixture()])
-        .build()
-    )
+const [now, setNow] = useState(dateProvider.getNow())
 
-    const { result } = renderHook(() => useHomeViewModel(), {
-      wrapper: ({ children }) => <Provider store={store}>{children}</Provider>,
-    })
+useEffect(() => {
+  const id = setInterval(() => setNow(dateProvider.getNow()), 1000)
+  return () => clearInterval(id)
+}, [dateProvider])
 
-    expect(result.current.hasActiveSession).toBe(true)
-  })
-
-  it('starts session when requested', () => {
-    const store = createTestStore()
-
-    const { result } = renderHook(() => useHomeViewModel(), {
-      wrapper: ({ children }) => <Provider store={store}>{children}</Provider>,
-    })
-
-    act(() => {
-      result.current.handleStartSession('blocklist-1')
-    })
-
-    const state = store.getState()
-    expect(selectActiveSession(state)).toBeDefined()
-  })
-})
+const viewModel = useSelector((state) =>
+  selectViewModel(state, dateProvider)
+)
 ```
 
 ### Related ADRs
-- [Redux Toolkit for Business Logic](../state-management/redux-toolkit-for-business-logic.md)
-- [Hexagonal Architecture](hexagonal-architecture.md)
+
+- [Local State for UI Ticks](./local-state-for-ui-ticks.md) - Timer refresh pattern
+- [DateProvider Pattern](../infrastructure/date-provider-pattern.md) - Time abstraction
+- [Redux Toolkit for Business Logic](../core/redux-toolkit-for-business-logic.md) - State management
 
 ## References
 
-- [MVVM Pattern](https://en.wikipedia.org/wiki/Model%E2%80%93view%E2%80%93viewmodel)
-- [Presentational and Container Components](https://medium.com/@dan_abramov/smart-and-dumb-components-7ca2f9a7c7d0)
-- `/ui/screens/` - Implementation examples
+- `ui/screens/Home/HomeScreen/home.view-model.ts` - Full implementation
+- `ui/screens/StrictMode/strictMode.view-model.ts` - Simple implementation
+- [Discriminated Unions in TypeScript](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions)

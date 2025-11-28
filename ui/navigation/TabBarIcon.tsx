@@ -10,7 +10,13 @@ export function TabBarIcon({
   style,
   ...rest
 }: IconProps<ComponentProps<typeof Ionicons>['name']>) {
-  return <Ionicons size={28} style={[styles.tabIcon, style]} {...rest} />
+  return (
+    <Ionicons
+      size={T.icon.size.xLarge}
+      style={[styles.tabIcon, style]}
+      {...rest}
+    />
+  )
 }
 
 const styles = StyleSheet.create({

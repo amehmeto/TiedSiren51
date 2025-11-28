@@ -9,6 +9,7 @@ import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-reposito
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
 import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
+import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
 import { FakeSirenLookout } from '@infra/siren-tier/fake.siren-lookout'
 import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 import { createStore } from '../_redux_/createStore'
@@ -32,6 +33,7 @@ export const createTestStore = (
     sirenLookout = new FakeSirenLookout(),
     sirenTier = new InMemorySirenTier(testLogger),
     sirensRepository = new FakeDataSirensRepository(),
+    timerRepository = new FakeDataTimerRepository(),
   }: Partial<Dependencies> = {},
   preloadedState?: Partial<ReturnType<typeof rootReducer>>,
 ) =>
@@ -49,6 +51,7 @@ export const createTestStore = (
       sirenLookout,
       sirenTier,
       sirensRepository,
+      timerRepository,
     },
     preloadedState,
   )

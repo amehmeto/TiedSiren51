@@ -1,12 +1,15 @@
+import { DAY, MINUTE } from '@/core/__constants__/time'
 import { DateProvider } from '@/core/_ports_/port.date-provider'
 
 export class StubDateProvider implements DateProvider {
-  private MILLISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000
-
   now = new Date()
 
   getNow(): Date {
     return this.now
+  }
+
+  getNowMs(): number {
+    return this.now.getTime()
   }
 
   getISOStringNow(): string {
@@ -31,9 +34,7 @@ export class StubDateProvider implements DateProvider {
   recoverYesterdayDate(timeInHHmm: string): Date {
     const [hours, minutes] = timeInHHmm.split(':').map(Number)
 
-    const todayWithNewTime = new Date(
-      this.now.getTime() - this.MILLISECONDS_IN_A_DAY,
-    )
+    const todayWithNewTime = new Date(this.now.getTime() - 1 * DAY)
     todayWithNewTime.setHours(hours, minutes, 0, 0)
 
     return todayWithNewTime
@@ -44,6 +45,18 @@ export class StubDateProvider implements DateProvider {
   }
 
   getMinutesFromNow(minutes: number): Date {
-    return new Date(this.now.getTime() + minutes * 60 * 1000)
+    return new Date(this.now.getTime() + minutes * MINUTE)
+  }
+
+  parseISOString(isoString: string): Date {
+    return new Date(isoString)
+  }
+
+  toISOString(date: Date): string {
+    return date.toISOString()
+  }
+
+  msToISOString(ms: number): string {
+    return new Date(ms).toISOString()
   }
 }

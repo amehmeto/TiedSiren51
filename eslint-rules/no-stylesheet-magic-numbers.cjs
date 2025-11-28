@@ -82,8 +82,8 @@ module.exports = {
       // Note: shadowOpacity is intentionally excluded - it's contextual to the specific shadow effect
     ])
 
-    // Numbers that are always acceptable (even in restricted properties)
-    const ALLOWED_VALUES = new Set([0, 1, -1])
+    // No magic numbers are allowed - all values must come from theme
+    // Use T.spacing.none, T.border.width.none, T.border.width.thin, etc.
 
     function isStyleSheetCreate(node) {
       return (
@@ -111,17 +111,14 @@ module.exports = {
         if (RESTRICTED_PROPERTIES.has(propertyName)) {
           // Check if value is a numeric literal
           if (value.type === 'Literal' && typeof value.value === 'number') {
-            // Allow specific values like 0, 1, -1
-            if (!ALLOWED_VALUES.has(value.value)) {
-              context.report({
-                node: value,
-                messageId: 'noMagicNumber',
-                data: {
-                  value: value.value,
-                  property: propertyName,
-                },
-              })
-            }
+            context.report({
+              node: value,
+              messageId: 'noMagicNumber',
+              data: {
+                value: value.value,
+                property: propertyName,
+              },
+            })
           }
 
           // Check if value is a unary expression like -10
@@ -132,16 +129,14 @@ module.exports = {
             typeof value.argument.value === 'number'
           ) {
             const numValue = -value.argument.value
-            if (!ALLOWED_VALUES.has(numValue)) {
-              context.report({
-                node: value,
-                messageId: 'noMagicNumber',
-                data: {
-                  value: numValue,
-                  property: propertyName,
-                },
-              })
-            }
+            context.report({
+              node: value,
+              messageId: 'noMagicNumber',
+              data: {
+                value: numValue,
+                property: propertyName,
+              },
+            })
           }
         }
       })

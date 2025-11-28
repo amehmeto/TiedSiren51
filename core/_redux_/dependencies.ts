@@ -10,6 +10,7 @@ import { RemoteDeviceRepository } from '@/core/_ports_/remote-device.repository'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { SirenTier } from '@/core/_ports_/siren.tier'
 import { SirensRepository } from '@/core/_ports_/sirens.repository'
+import { TimerRepository } from '@/core/_ports_/timer.repository'
 
 export type Dependencies = {
   authGateway: AuthGateway
@@ -24,4 +25,5 @@ export type Dependencies = {
   sirenLookout: SirenLookout
   sirenTier: SirenTier
   sirensRepository: SirensRepository
+  timerRepository: TimerRepository
 }
