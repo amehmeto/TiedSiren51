@@ -23,7 +23,9 @@ const withAuthUser = createAction<AuthUser>('withAuthUser')
 const withoutAuthUser = createAction<{}>('withoutAuthUser')
 const withAuthError = createAction<string>('withAuthError')
 const withAuthLoading = createAction<boolean>('withAuthLoading')
-const withTimerEndedAt = createAction<ISODateString | null>('withTimerEndedAt')
+const withStrictModeEndedAt = createAction<ISODateString | null>(
+  'withStrictModeEndedAt',
+)
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -48,7 +50,7 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withAuthLoading, (state, action) => {
       state.auth.isLoading = action.payload
     })
-    .addCase(withTimerEndedAt, (state, action) => {
+    .addCase(withStrictModeEndedAt, (state, action) => {
       state.strictMode.endedAt = action.payload
     })
 })
@@ -70,7 +72,7 @@ export const stateBuilder = (baseState = initialState) => {
     withAvailableSirens: reduce(withAvailableSirens),
     withAuthError: reduce(withAuthError),
     withAuthLoading: reduce(withAuthLoading),
-    withTimerEndedAt: reduce(withTimerEndedAt),
+    withStrictModeEndedAt: reduce(withStrictModeEndedAt),
   }
 }
 

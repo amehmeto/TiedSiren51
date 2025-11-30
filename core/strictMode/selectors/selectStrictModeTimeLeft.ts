@@ -1,7 +1,7 @@
 import { millisecondsToTimeUnits } from '@/core/__utils__/time.utils'
 import { DateProvider } from '@/core/_ports_/port.date-provider'
 import { RootState } from '@/core/_redux_/createStore'
-import { TimeLeft } from '../strictMode'
+import { TimeLeft } from '../timeLeft'
 
 const EMPTY_TIME: TimeLeft = {
   days: 0,
@@ -11,7 +11,7 @@ const EMPTY_TIME: TimeLeft = {
   totalMs: 0,
 }
 
-export function selectTimeLeft(
+export function selectStrictModeTimeLeft(
   state: RootState,
   dateProvider: DateProvider,
 ): TimeLeft {

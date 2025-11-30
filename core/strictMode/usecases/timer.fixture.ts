@@ -36,12 +36,12 @@ export function timerFixture(
       existingTimer(endedAt: ISODateString) {
         timerRepository.saveTimer(DEFAULT_USER_ID, endedAt)
         testStateBuilderProvider.setState((builder) =>
-          builder.withAuthUser(defaultAuthUser).withTimerEndedAt(endedAt),
+          builder.withAuthUser(defaultAuthUser).withStrictModeEndedAt(endedAt),
         )
       },
       noTimer() {
         testStateBuilderProvider.setState((builder) =>
-          builder.withAuthUser(defaultAuthUser).withTimerEndedAt(null),
+          builder.withAuthUser(defaultAuthUser).withStrictModeEndedAt(null),
         )
       },
       authenticatedUser(authUser: AuthUser = defaultAuthUser) {

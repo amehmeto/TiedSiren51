@@ -3,9 +3,9 @@ import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
-import { selectTimeLeft } from './selectTimeLeft'
+import { selectStrictModeTimeLeft } from './selectStrictModeTimeLeft'
 
-describe('selectTimeLeft', () => {
+describe('selectStrictModeTimeLeft', () => {
   let dateProvider: StubDateProvider
   let nowMs: number
 
@@ -15,10 +15,10 @@ describe('selectTimeLeft', () => {
     nowMs = dateProvider.getNow().getTime()
   })
 
-  test('should return empty time when there is no timer', () => {
+  test('should return empty time when strict mode is not active', () => {
     const store = createTestStore(
       { dateProvider },
-      stateBuilder().withTimerEndedAt(null).build(),
+      stateBuilder().withStrictModeEndedAt(null).build(),
     )
     const expectedTimeLeft = {
       days: 0,
@@ -28,16 +28,16 @@ describe('selectTimeLeft', () => {
       totalMs: 0,
     }
 
-    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
+    const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
 
     expect(timeLeft).toEqual(expectedTimeLeft)
   })
 
-  test('should return empty time when timer has expired', () => {
+  test('should return empty time when strict mode has expired', () => {
     const store = createTestStore(
       { dateProvider },
       stateBuilder()
-        .withTimerEndedAt(dateProvider.msToISOString(nowMs - 1 * SECOND))
+        .withStrictModeEndedAt(dateProvider.msToISOString(nowMs - 1 * SECOND))
         .build(),
     )
     const expectedTimeLeft = {
@@ -48,7 +48,7 @@ describe('selectTimeLeft', () => {
       totalMs: 0,
     }
 
-    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
+    const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
 
     expect(timeLeft).toEqual(expectedTimeLeft)
   })
@@ -104,11 +104,13 @@ describe('selectTimeLeft', () => {
       const store = createTestStore(
         { dateProvider },
         stateBuilder()
-          .withTimerEndedAt(dateProvider.msToISOString(nowMs + remainingMs))
+          .withStrictModeEndedAt(
+            dateProvider.msToISOString(nowMs + remainingMs),
+          )
           .build(),
       )
 
-      const timeLeft = selectTimeLeft(store.getState(), dateProvider)
+      const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
 
       expect(timeLeft).toEqual(expected)
     },
@@ -176,11 +178,13 @@ describe('selectTimeLeft', () => {
       const store = createTestStore(
         { dateProvider },
         stateBuilder()
-          .withTimerEndedAt(dateProvider.msToISOString(nowMs + remainingMs))
+          .withStrictModeEndedAt(
+            dateProvider.msToISOString(nowMs + remainingMs),
+          )
           .build(),
       )
 
-      const timeLeft = selectTimeLeft(store.getState(), dateProvider)
+      const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
 
       expect(timeLeft).toEqual(expected)
     },

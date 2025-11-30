@@ -3,7 +3,7 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { SECOND } from '@/core/__constants__/time'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
-import { selectIsTimerLoading } from '@/core/strictMode/selectors/selectIsTimerLoading'
+import { selectIsStrictModeLoading } from '@/core/strictMode/selectors/selectIsStrictModeLoading'
 import { extendTimer } from '@/core/strictMode/usecases/extend-timer.usecase'
 import { loadTimer } from '@/core/strictMode/usecases/load-timer.usecase'
 import { startTimer } from '@/core/strictMode/usecases/start-timer.usecase'
@@ -41,7 +41,7 @@ export default function StrictModeScreen() {
     selectStrictModeViewModel(state, dateProvider),
   )
   const isActive = viewModel.type === StrictModeViewState.Active
-  const isLoading = useSelector(selectIsTimerLoading)
+  const isLoading = useSelector(selectIsStrictModeLoading)
 
   useTick(1 * SECOND, isActive)
 

@@ -1,9 +1,9 @@
 import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
 import { DateProvider } from '@/core/_ports_/port.date-provider'
 import { RootState } from '@/core/_redux_/createStore'
-import { selectIsTimerActive } from '@/core/strictMode/selectors/selectIsTimerActive'
-import { selectTimeLeft } from '@/core/strictMode/selectors/selectTimeLeft'
-import { TimeLeft } from '@/core/strictMode/strictMode'
+import { selectIsStrictModeActive } from '@/core/strictMode/selectors/selectIsStrictModeActive'
+import { selectStrictModeTimeLeft } from '@/core/strictMode/selectors/selectStrictModeTimeLeft'
+import { TimeLeft } from '@core/strictMode/timeLeft'
 
 export enum StrictModeViewState {
   Active = 'ACTIVE',
@@ -67,7 +67,7 @@ export function selectStrictModeViewModel(
   state: RootState,
   dateProvider: DateProvider,
 ): StrictModeViewModel {
-  const isActive = selectIsTimerActive(state, dateProvider)
+  const isActive = selectIsStrictModeActive(state, dateProvider)
 
   if (!isActive) {
     return {
@@ -78,7 +78,7 @@ export function selectStrictModeViewModel(
     }
   }
 
-  const timeLeft = selectTimeLeft(state, dateProvider)
+  const timeLeft = selectStrictModeTimeLeft(state, dateProvider)
   const countdown = formatCountdown(timeLeft)
 
   return {

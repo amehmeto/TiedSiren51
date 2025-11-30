@@ -1,7 +1,7 @@
 import { DateProvider } from '@/core/_ports_/port.date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 
-export function selectIsTimerActive(
+export function selectIsStrictModeActive(
   state: RootState,
   dateProvider: DateProvider,
 ): boolean {

@@ -22,7 +22,7 @@ describe('selectStrictModeViewModel', () => {
     test('should return inactive view model when no timer is set', () => {
       const store = createTestStore(
         { dateProvider },
-        stateBuilder().withTimerEndedAt(null).build(),
+        stateBuilder().withStrictModeEndedAt(null).build(),
       )
       const expectedViewModel = {
         type: StrictModeViewState.Inactive,
@@ -47,7 +47,7 @@ describe('selectStrictModeViewModel', () => {
       )
       const store = createTestStore(
         { dateProvider },
-        stateBuilder().withTimerEndedAt(endedAt).build(),
+        stateBuilder().withStrictModeEndedAt(endedAt).build(),
       )
       const expectedViewModel = {
         type: StrictModeViewState.Active,
@@ -72,7 +72,7 @@ describe('selectStrictModeViewModel', () => {
       )
       const store = createTestStore(
         { dateProvider },
-        stateBuilder().withTimerEndedAt(endedAt).build(),
+        stateBuilder().withStrictModeEndedAt(endedAt).build(),
       )
       const expectedViewModel = {
         type: StrictModeViewState.Active,
@@ -91,7 +91,7 @@ describe('selectStrictModeViewModel', () => {
       const endedAt = dateProvider.msToISOString(nowMs + 2 * HOUR + 30 * MINUTE)
       const store = createTestStore(
         { dateProvider },
-        stateBuilder().withTimerEndedAt(endedAt).build(),
+        stateBuilder().withStrictModeEndedAt(endedAt).build(),
       )
       const expectedViewModel = {
         endDateTime: expect.stringMatching(

@@ -1,7 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit'
 import { RootState } from '@/core/_redux_/createStore'
 
-export const selectIsTimerLoading = createSelector(
+export const selectIsStrictModeLoading = createSelector(
   [(state: RootState) => state.strictMode],
-  (timerState) => timerState.isLoading,
+  (strictModeState) => strictModeState.isLoading,
 )
