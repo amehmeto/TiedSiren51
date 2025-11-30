@@ -351,30 +351,31 @@ it('handles session spanning midnight', () => {
 
 The following examples show how ISO strings flow through the entire stack:
 
-**1. Domain Type** (`core/timer/timer.ts`):
+**1. Redux State** (`core/timer/timer.slice.ts`):
 
 ```typescript
-// ✅ Dates stored as ISO strings
-export type Timer = {
-  endAt: string  // ISO 8601 format: "2025-01-15T10:00:00.000Z"
+// ✅ Dates stored as ISO strings in Redux state
+type TimerState = {
+  endAt: string | null  // ISO 8601 format: "2025-01-15T10:00:00.000Z"
+  isLoading: boolean
 }
 ```
 
 **2. Use Case** (`core/timer/usecases/start-timer.usecase.ts`):
 
 ```typescript
-export const startTimer = createAppAsyncThunk<Timer, StartTimerPayload>(
+export const startTimer = createAppAsyncThunk<string, StartTimerPayload>(
   'timer/startTimer',
   async (payload, { extra: { timerRepository, dateProvider }, getState }) => {
     const { days, hours, minutes } = payload
     const durationMs = days * DAY + hours * HOUR + minutes * MINUTE
 
     // Use dateProvider to get current time and convert to ISO string
-    const now = dateProvider.getNow()
-    const endAt = dateProvider.msToISOString(now.getTime() + durationMs)
+    const nowMs = dateProvider.getNowMs()
+    const endAt = dateProvider.msToISOString(nowMs + durationMs)
 
-    await timerRepository.saveTimer(userId, endAt)
-    return { endAt }  // Returns ISO string
+    await timerRepository.save(endAt)
+    return endAt  // Returns ISO string
   },
 )
 ```
@@ -386,13 +387,11 @@ export function selectIsTimerActive(
   state: RootState,
   dateProvider: DateProvider,  // Injected for parsing and current time
 ): boolean {
-  const timer = selectTimer(state)
-  if (!timer) return false
+  const endAt = state.timer.endAt
+  if (!endAt) return false
 
-  const now = dateProvider.getNow()
   // Parse ISO string back to Date for comparison
-  const endAtMs = dateProvider.parseISOString(timer.endAt).getTime()
-  return endAtMs > now.getTime()
+  return dateProvider.parseISOString(endAt).getTime() > dateProvider.getNowMs()
 }
 ```
 
