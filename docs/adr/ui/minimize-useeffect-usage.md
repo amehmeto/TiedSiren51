@@ -173,7 +173,7 @@ const useTimer = () => {
 }
 ```
 
-**After (minimal useEffect):**
+**After (minimal useEffect, business logic in core):**
 
 ```typescript
 const useTimer = () => {
