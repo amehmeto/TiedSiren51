@@ -10,46 +10,17 @@ on:
   push:
     branches:
       - main
-    paths:
-      # Source code
-      - 'app/**'
-      - 'core/**'
-      - 'ui/**'
-      - 'infra/**'
-      - 'pdb-block-sessions/**'
-      - 'pdb-blocklists/**'
-      - 'pdb-remote-devices/**'
-      - 'pdb-sirens/**'
-      # Config files that affect the build
-      - 'app.config.js'
-      - 'package.json'
-      - 'package-lock.json'
-      - 'tsconfig.json'
-      - 'babel.config.cjs'
-      - 'metro.config.cjs'
-      - 'eas.json'
-      - 'schema.prisma'
-      - 'index.js'
-      # Platform specific
-      - 'android/**'
-      - 'ios/**'
-      # Assets
-      - 'assets/**'
-      # Environment files
-      - '.env*'
-      # Test and lint config (can affect build)
-      - 'vitest.config.js'
-      - '.eslintrc.cjs'
-      # Scripts used by CI
-      - 'scripts/**'
-      # This workflow itself
-      - '.github/workflows/hades.yml'
   pull_request:
     types: [closed]
 
 jobs:
-  build-preview:
+  path-filter:
     if: github.event_name == 'push'
+    uses: ./.github/workflows/path-filter.yml
+
+  build-preview:
+    needs: path-filter
+    if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
