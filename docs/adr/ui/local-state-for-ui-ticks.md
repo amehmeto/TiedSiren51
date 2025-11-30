@@ -1,6 +1,6 @@
 # Local State for UI Tick/Refresh Triggers
 
-Date: 2024-11-26
+Date: 2024-11-26 (Updated: 2025-11-30)
 
 ## Status
 
@@ -18,21 +18,44 @@ The question is: where should the "tick" mechanism live that triggers these re-e
 
 ## Decision
 
-Use **local React state** to trigger periodic re-renders for time-based UI updates.
+Use **local React state** to trigger periodic re-renders for time-based UI updates. This pattern is encapsulated in the `useTick` custom hook.
+
+### The `useTick` Hook
 
 ```typescript
-// In the component or hook
-const [now, setNow] = useState<Date>(dateProvider.getNow())
+import { useTick } from '@/ui/hooks/useTick'
 
-useEffect(() => {
-  const intervalId = setInterval(() => {
-    setNow(dateProvider.getNow())
-  }, 1_000)
-  return () => clearInterval(intervalId)
-}, [dateProvider, now])
+// Re-render every second (default)
+useTick()
+
+// Re-render every 500ms
+useTick(500)
+
+// Only tick when timer is active
+useTick(1000, isTimerActive)
 ```
 
-The `now` state value triggers re-renders. When the component re-renders, selectors are called with the current `dateProvider`, which returns fresh time values.
+The hook manages the interval lifecycle internally, triggering re-renders at the specified interval. When the component re-renders, selectors are called with the current `dateProvider`, which returns fresh time values.
+
+### Implementation
+
+```typescript
+export function useTick(intervalMs: number = 1 * SECOND, enabled = true): number {
+  const [tick, setTick] = useState(0)
+
+  useEffect(() => {
+    if (!enabled) return
+
+    const intervalId = setInterval(() => {
+      setTick((t) => t + 1)
+    }, intervalMs)
+
+    return () => clearInterval(intervalId)
+  }, [intervalMs, enabled])
+
+  return tick
+}
+```
 
 ## Consequences
 
@@ -42,11 +65,12 @@ The `now` state value triggers re-renders. When the component re-renders, select
 - **Performance**: Local state changes don't go through Redux middleware or notify unrelated subscribers
 - **Simplicity**: No need for actions/reducers that have no business meaning
 - **Consistency**: All time-based UI updates use the same pattern
+- **Reusable**: The `useTick` hook encapsulates the pattern for easy reuse
+- **Conditional**: The `enabled` parameter allows pausing ticks when not needed
 
 ### Negative
 
-- Each component/hook that needs ticking must implement its own interval
-- The `now` state variable appears unused (it's only there to trigger re-renders)
+- Adds a small dependency for components needing periodic updates
 
 ### Neutral
 
@@ -78,17 +102,24 @@ useEffect(() => {
 
 ## Implementation Notes
 
-### Key files using this pattern
+### Key files
 
-- `app/(tabs)/home/index.tsx` - Home screen tick
-- `ui/hooks/useStrictModeTimer.ts` - Timer screen tick
+- `ui/hooks/useTick.ts` - The reusable tick hook
+- `app/(tabs)/home/index.tsx` - Home screen using `useTick()`
+- `ui/hooks/useStrictModeTimer.ts` - Timer hook using `useTick(1000, isActive)`
 
-### Pattern details
+### Usage patterns
 
-1. Store `now` in local state (even if not directly used in render)
-2. Set up interval in `useEffect` that updates `now`
-3. Include `now` in dependency array to ensure interval is recreated if needed
-4. Selectors receive `dateProvider` and call `dateProvider.getNow()` internally
+**Always-on ticking** (e.g., Home screen):
+```typescript
+useTick() // Ticks every second, always enabled
+```
+
+**Conditional ticking** (e.g., Timer screen):
+```typescript
+const isActive = viewModel.type === StrictModeViewState.Active
+useTick(1000, isActive) // Only tick when timer is active
+```
 
 ## References
 
