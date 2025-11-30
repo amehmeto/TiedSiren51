@@ -1,7 +1,13 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import { SECOND } from '@/core/__constants__/time'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { selectIsTimerLoading } from '@/core/timer/selectors/selectIsTimerLoading'
 import { extendTimer } from '@/core/timer/usecases/extend-timer.usecase'
+import { loadTimer } from '@/core/timer/usecases/load-timer.usecase'
 import { startTimer } from '@/core/timer/usecases/start-timer.usecase'
+import { dependencies } from '@/ui/dependencies'
 import { CircularTimerDisplay } from '@/ui/design-system/components/shared/CircularTimerDisplay'
 import { LoadingScreen } from '@/ui/design-system/components/shared/LoadingScreen'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -11,8 +17,12 @@ import {
   TimerPickerModal,
 } from '@/ui/design-system/components/shared/TimerPickerModal'
 import { T } from '@/ui/design-system/theme'
-import { useStrictModeTimer } from '@/ui/hooks/useStrictModeTimer'
-import { StrictModeViewState } from '@/ui/screens/StrictMode/strictMode.view-model'
+import { useAppForeground } from '@/ui/hooks/useAppForeground'
+import { useTick } from '@/ui/hooks/useTick'
+import {
+  selectStrictModeViewModel,
+  StrictModeViewState,
+} from '@/ui/screens/StrictMode/strictMode.view-model'
 import { UnLockMethodCard } from '@ui/screens/StrictMode/UnLockMethodCard'
 
 const DEFAULT_DURATION: TimerDuration = { days: 0, hours: 0, minutes: 20 }
@@ -25,7 +35,21 @@ export default function StrictModeScreen() {
   const [extendDuration, setExtendDuration] =
     useState<TimerDuration>(DEFAULT_DURATION)
 
-  const { dispatch, viewModel, isActive, isLoading } = useStrictModeTimer()
+  const dispatch = useDispatch<AppDispatch>()
+  const { dateProvider } = dependencies
+  const viewModel = useSelector((state: RootState) =>
+    selectStrictModeViewModel(state, dateProvider),
+  )
+  const isActive = viewModel.type === StrictModeViewState.Active
+  const isLoading = useSelector(selectIsTimerLoading)
+
+  useTick(1 * SECOND, isActive)
+
+  const loadTimerFromRepository = useCallback(() => {
+    dispatch(loadTimer())
+  }, [dispatch])
+
+  useAppForeground(loadTimerFromRepository)
 
   if (isLoading) return <LoadingScreen />
 
