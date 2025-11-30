@@ -28,7 +28,7 @@ describe('selectTimeLeft', () => {
       hours: 0,
       minutes: 0,
       seconds: 0,
-      timeLeft: 0,
+      totalMs: 0,
     })
   })
 
@@ -47,7 +47,7 @@ describe('selectTimeLeft', () => {
       hours: 0,
       minutes: 0,
       seconds: 0,
-      timeLeft: 0,
+      totalMs: 0,
     })
   })
 
@@ -60,7 +60,7 @@ describe('selectTimeLeft', () => {
         hours: 1,
         minutes: 0,
         seconds: 0,
-        timeLeft: 3600000,
+        totalMs: 3600000,
       },
     },
     {
@@ -71,7 +71,7 @@ describe('selectTimeLeft', () => {
         hours: 2,
         minutes: 30,
         seconds: 45,
-        timeLeft: 86400000 + 7200000 + 1800000 + 45000,
+        totalMs: 86400000 + 7200000 + 1800000 + 45000,
       },
     },
     {
@@ -82,7 +82,7 @@ describe('selectTimeLeft', () => {
         hours: 0,
         minutes: 30,
         seconds: 0,
-        timeLeft: 1800000,
+        totalMs: 1800000,
       },
     },
     {
@@ -93,7 +93,7 @@ describe('selectTimeLeft', () => {
         hours: 0,
         minutes: 0,
         seconds: 45,
-        timeLeft: 45000,
+        totalMs: 45000,
       },
     },
   ])(
@@ -121,7 +121,7 @@ describe('selectTimeLeft', () => {
         hours: 0,
         minutes: 1,
         seconds: 1,
-        timeLeft: 61000,
+        totalMs: 61000,
       },
     },
     {
@@ -132,7 +132,7 @@ describe('selectTimeLeft', () => {
         hours: 0,
         minutes: 1,
         seconds: 0,
-        timeLeft: 60000,
+        totalMs: 60000,
       },
     },
     {
@@ -143,7 +143,7 @@ describe('selectTimeLeft', () => {
         hours: 0,
         minutes: 0,
         seconds: 59,
-        timeLeft: 59000,
+        totalMs: 59000,
       },
     },
     {
@@ -154,7 +154,7 @@ describe('selectTimeLeft', () => {
         hours: 1,
         minutes: 1,
         seconds: 1,
-        timeLeft: 3661000,
+        totalMs: 3661000,
       },
     },
     {
@@ -165,7 +165,7 @@ describe('selectTimeLeft', () => {
         hours: 0,
         minutes: 2,
         seconds: 5,
-        timeLeft: 125000,
+        totalMs: 125000,
       },
     },
   ])(

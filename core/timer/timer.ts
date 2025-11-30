@@ -3,5 +3,5 @@ export type TimeLeft = {
   hours: number
   minutes: number
   seconds: number
-  timeLeft: number
+  totalMs: number
 }

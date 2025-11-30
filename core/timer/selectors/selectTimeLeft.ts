@@ -8,7 +8,7 @@ const EMPTY_TIME: TimeLeft = {
   hours: 0,
   minutes: 0,
   seconds: 0,
-  timeLeft: 0,
+  totalMs: 0,
 }
 
 export function selectTimeLeft(
@@ -18,11 +18,11 @@ export function selectTimeLeft(
   const endAt = state.timer.endAt
   if (!endAt) return EMPTY_TIME
 
-  const timeLeft =
+  const totalMs =
     dateProvider.parseISOString(endAt).getTime() - dateProvider.getNowMs()
 
-  if (timeLeft <= 0) return EMPTY_TIME
+  if (totalMs <= 0) return EMPTY_TIME
 
-  const timeUnits = millisecondsToTimeUnits(timeLeft)
-  return { ...timeUnits, timeLeft }
+  const timeUnits = millisecondsToTimeUnits(totalMs)
+  return { ...timeUnits, totalMs }
 }
