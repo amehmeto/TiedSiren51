@@ -6,10 +6,16 @@
 
 name: Cerberus
 
-on: [pull_request]
+on:
+  pull_request:
 
 jobs:
+  path-filter:
+    uses: ./.github/workflows/path-filter.yml
+
   test:
+    needs: path-filter
+    if: needs.path-filter.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -114,12 +120,12 @@ jobs:
             '${{ toJSON(github) }}' \
             '${{ steps.find_apk.outputs.apk_path }}'
 
-#      - name: Upload APK artifact
-#        uses: actions/upload-artifact@v4
-#        with:
-#          name: app-debug-${{ github.run_number }}
-#          path: ${{ steps.find_apk.outputs.apk_path }}
-#          retention-days: 7
+      - name: Upload APK artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-debug-${{ github.run_number }}
+          path: ${{ steps.find_apk.outputs.apk_path }}
+          retention-days: 7
 
 #      - name: Send APK notification to Slack
 #        if: success()

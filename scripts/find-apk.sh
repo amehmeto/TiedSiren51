@@ -11,6 +11,10 @@ if [ -z "$APK_PATH" ]; then
   exit 1
 fi
 
+# Rename APK with project prefix
+NEW_APK_PATH="./build-tied-siren-51-$(basename "$APK_PATH" | sed 's/^build-//')"
+mv "$APK_PATH" "$NEW_APK_PATH"
+APK_PATH="$NEW_APK_PATH"
 APK_NAME=$(basename "$APK_PATH")
 
 # Output for GitHub Actions
