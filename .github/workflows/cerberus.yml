@@ -6,10 +6,16 @@
 
 name: Cerberus
 
-on: [pull_request]
+on:
+  pull_request:
 
 jobs:
+  path-filter:
+    uses: ./.github/workflows/path-filter.yml
+
   test:
+    needs: path-filter
+    if: needs.path-filter.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -121,14 +127,14 @@ jobs:
           path: ${{ steps.find_apk.outputs.apk_path }}
           retention-days: 7
 
-      - name: Send APK notification to Slack
-        if: success()
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          bash scripts/send-slack-notification.sh \
-            '${{ toJSON(github) }}' \
-            '${{ toJSON(steps) }}'
+#      - name: Send APK notification to Slack
+#        if: success()
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#        run: |
+#          bash scripts/send-slack-notification.sh \
+#            '${{ toJSON(github) }}' \
+#            '${{ toJSON(steps) }}'
 
 #      - name: EAS Cloud Preview Build
 #        run: eas build -p android --profile preview --non-interactive

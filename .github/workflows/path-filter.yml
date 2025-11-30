@@ -1,0 +1,63 @@
+# Shared path filter configuration
+# This reusable workflow checks if app-related files have changed.
+# Used by Cerberus and Hades to avoid redundant builds.
+
+name: Path Filter
+
+on:
+  workflow_call:
+    outputs:
+      app-changed:
+        description: 'Whether app-related files have changed'
+        value: ${{ jobs.check-paths.outputs.app-changed }}
+
+jobs:
+  check-paths:
+    runs-on: ubuntu-latest
+    outputs:
+      app-changed: ${{ steps.filter.outputs.app }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for app changes
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            app:
+              # Source code
+              - 'app/**'
+              - 'core/**'
+              - 'ui/**'
+              - 'infra/**'
+              - 'pdb-block-sessions/**'
+              - 'pdb-blocklists/**'
+              - 'pdb-remote-devices/**'
+              - 'pdb-sirens/**'
+              # Config files that affect the build
+              - 'app.config.js'
+              - 'package.json'
+              - 'package-lock.json'
+              - 'tsconfig.json'
+              - 'babel.config.cjs'
+              - 'metro.config.cjs'
+              - 'eas.json'
+              - 'schema.prisma'
+              - 'index.js'
+              # Platform specific
+              - 'android/**'
+              - 'ios/**'
+              # Assets
+              - 'assets/**'
+              # Environment files
+              - '.env*'
+              # Test and lint config
+              - 'vitest.config.js'
+              - '.eslintrc.cjs'
+              # Scripts used by CI
+              - 'scripts/**'
+              # Workflow files (so changes to CI trigger builds)
+              - '.github/workflows/cerberus.yml'
+              - '.github/workflows/hades.yml'
+              - '.github/workflows/path-filter.yml'

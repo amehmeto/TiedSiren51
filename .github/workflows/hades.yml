@@ -14,8 +14,13 @@ on:
     types: [closed]
 
 jobs:
-  build-preview:
+  path-filter:
     if: github.event_name == 'push'
+    uses: ./.github/workflows/path-filter.yml
+
+  build-preview:
+    needs: path-filter
+    if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
