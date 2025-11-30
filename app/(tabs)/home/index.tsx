@@ -8,14 +8,67 @@ import { RootState } from '@/core/_redux_/createStore'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
-import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { useTick } from '@/ui/hooks/useTick'
 import { AccessibilityPermissionCard } from '@/ui/screens/Home/HomeScreen/AccessibilityPermissionCard'
-import { HomeViewModel } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
+import {
+  HomeViewModel,
+  HomeViewModelType,
+} from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 import { NoSessionBoard } from '@/ui/screens/Home/HomeScreen/NoSessionBoard'
 import { SessionsBoard } from '@/ui/screens/Home/HomeScreen/SessionsBoard'
 import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
+
+type SessionNodes = [ReactNode, ReactNode]
+
+type ViewModelRenderers = {
+  [K in HomeViewModel]: (
+    vm: Extract<HomeViewModelType, { type: K }>,
+  ) => SessionNodes
+}
+
+const viewModelRenderers: ViewModelRenderers = {
+  [HomeViewModel.WithoutActiveNorScheduledSessions]: (vm) => [
+    <NoSessionBoard key="active" sessions={vm.activeSessions} />,
+    <NoSessionBoard key="scheduled" sessions={vm.scheduledSessions} />,
+  ],
+  [HomeViewModel.WithActiveWithoutScheduledSessions]: (vm) => [
+    <SessionsBoard
+      key="active"
+      sessions={vm.activeSessions}
+      type={SessionType.ACTIVE}
+    />,
+    <NoSessionBoard key="scheduled" sessions={vm.scheduledSessions} />,
+  ],
+  [HomeViewModel.WithoutActiveWithScheduledSessions]: (vm) => [
+    <NoSessionBoard key="active" sessions={vm.activeSessions} />,
+    <SessionsBoard
+      key="scheduled"
+      sessions={vm.scheduledSessions}
+      type={SessionType.SCHEDULED}
+    />,
+  ],
+  [HomeViewModel.WithActiveAndScheduledSessions]: (vm) => [
+    <SessionsBoard
+      key="active"
+      sessions={vm.activeSessions}
+      type={SessionType.ACTIVE}
+    />,
+    <SessionsBoard
+      key="scheduled"
+      sessions={vm.scheduledSessions}
+      type={SessionType.SCHEDULED}
+    />,
+  ],
+}
+
+function renderViewModel(vm: HomeViewModelType): SessionNodes {
+  // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Type-safe at runtime due to exhaustive ViewModelRenderers type
+  const renderer = viewModelRenderers[vm.type] as (
+    vm: HomeViewModelType,
+  ) => SessionNodes
+  return renderer(vm)
+}
 
 export default function HomeScreen() {
   const router = useRouter()
@@ -44,49 +97,7 @@ export default function HomeScreen() {
     void checkPermission()
   }, [sirenLookout])
 
-  const [activeSessionsNode, scheduledSessionsNode]: ReactNode[] = (() => {
-    // eslint-disable-next-line no-switch-statements/no-switch
-    switch (viewModel.type) {
-      case HomeViewModel.WithoutActiveNorScheduledSessions:
-        return [
-          <NoSessionBoard key={0} sessions={viewModel.activeSessions} />,
-          <NoSessionBoard key={1} sessions={viewModel.scheduledSessions} />,
-        ]
-      case HomeViewModel.WithActiveWithoutScheduledSessions:
-        return [
-          <SessionsBoard
-            key={0}
-            sessions={viewModel.activeSessions}
-            type={SessionType.ACTIVE}
-          />,
-          <NoSessionBoard key={1} sessions={viewModel.scheduledSessions} />,
-        ]
-      case HomeViewModel.WithoutActiveWithScheduledSessions:
-        return [
-          <NoSessionBoard key={0} sessions={viewModel.activeSessions} />,
-          <SessionsBoard
-            key={1}
-            sessions={viewModel.scheduledSessions}
-            type={SessionType.SCHEDULED}
-          />,
-        ]
-      case HomeViewModel.WithActiveAndScheduledSessions:
-        return [
-          <SessionsBoard
-            key={0}
-            sessions={viewModel.activeSessions}
-            type={SessionType.ACTIVE}
-          />,
-          <SessionsBoard
-            key={1}
-            sessions={viewModel.scheduledSessions}
-            type={SessionType.SCHEDULED}
-          />,
-        ]
-      default:
-        return exhaustiveGuard(viewModel)
-    }
-  })()
+  const [activeSessionsNode, scheduledSessionsNode] = renderViewModel(viewModel)
 
   return (
     <>

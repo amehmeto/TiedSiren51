@@ -5,7 +5,7 @@ Updated: 2025-11-28
 
 ## Status
 
-Accepted
+Double read by amehmeto
 
 ## Context
 
