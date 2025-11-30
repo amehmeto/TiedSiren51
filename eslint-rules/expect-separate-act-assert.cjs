@@ -37,6 +37,8 @@ module.exports = {
         'Extract expected value to a descriptive variable in the Arrange phase. Example: const expectedUser = { ... }; expect(result).toEqual(expectedUser)',
       genericExpectedName:
         'Use a descriptive name instead of just "expected". Example: expectedUser, expectedBlocklist, expectedTimeUnits',
+      extractDeepProperty:
+        'Extract deep property access to a variable before asserting. Example: const {{propertyName}} = {{expression}}; expect({{propertyName}}).toEqual(...)',
     },
     schema: [
       {
@@ -95,11 +97,42 @@ module.exports = {
       return null
     }
 
+    function getMemberExpressionDepth(node) {
+      let depth = 0
+      let current = node
+      while (current.type === 'MemberExpression') {
+        depth++
+        current = current.object
+      }
+      return depth
+    }
+
+    function getDeepestPropertyName(node) {
+      if (node.type === 'MemberExpression' && node.property.type === 'Identifier') {
+        return node.property.name
+      }
+      return null
+    }
+
+    function getMemberExpressionString(node) {
+      if (node.type === 'Identifier') {
+        return node.name
+      }
+      if (node.type === 'MemberExpression') {
+        const objStr = getMemberExpressionString(node.object)
+        const propStr = node.property.type === 'Identifier' ? node.property.name : '[...]'
+        return `${objStr}.${propStr}`
+      }
+      return '...'
+    }
+
     function isSimpleExpression(node) {
       // Allow simple identifiers (variables)
       if (node.type === 'Identifier') return true
 
-      // Allow simple member expressions (object.property)
+      // Allow simple member expressions (object.property) - only ONE level deep
+      // e.g., allow: result.value, state.timer
+      // disallow: state.siren.availableSirens (2 levels)
       if (
         node.type === 'MemberExpression' &&
         node.object.type === 'Identifier' &&
@@ -119,6 +152,15 @@ module.exports = {
         return isSimpleExpression(node.argument)
       }
 
+      return false
+    }
+
+    function isDeepMemberExpression(node) {
+      // Check if it's a member expression with depth > 1
+      // e.g., state.siren.availableSirens has depth 2
+      if (node.type === 'MemberExpression') {
+        return getMemberExpressionDepth(node) > 1
+      }
       return false
     }
 
@@ -213,6 +255,20 @@ module.exports = {
 
         // If it's a simple expression, allow it
         if (isSimpleExpression(arg)) return
+
+        // Check for deep member expressions (Law of Demeter)
+        // e.g., state.siren.availableSirens should be extracted to availableSirens first
+        if (isDeepMemberExpression(arg)) {
+          context.report({
+            node: arg,
+            messageId: 'extractDeepProperty',
+            data: {
+              propertyName: getDeepestPropertyName(arg),
+              expression: getMemberExpressionString(arg),
+            },
+          })
+          return
+        }
 
         // Check if it's a function call
         if (arg.type === 'CallExpression') {

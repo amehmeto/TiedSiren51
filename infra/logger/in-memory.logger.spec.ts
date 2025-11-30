@@ -21,22 +21,28 @@ describe('InMemoryLogger', () => {
       logger.info('Test info message')
 
       const logs = logger.getLogs()
+      const logLevel = logs[0].level
+
       expect(logs).toHaveLength(1)
-      expect(logs[0].level).toBe('info')
+      expect(logLevel).toBe('info')
     })
 
     it('should store the correct message', () => {
       logger.info('Test info message')
 
       const logs = logger.getLogs()
-      expect(logs[0].message).toBe('Test info message')
+      const logMessage = logs[0].message
+
+      expect(logMessage).toBe('Test info message')
     })
 
     it('should store the correct timestamp from DateProvider', () => {
       logger.info('Test info message')
 
       const logs = logger.getLogs()
-      expect(logs[0].timestamp).toBe('2025-11-26T10:00:00.000Z')
+      const logTimestamp = logs[0].timestamp
+
+      expect(logTimestamp).toBe('2025-11-26T10:00:00.000Z')
     })
   })
 
@@ -45,15 +51,19 @@ describe('InMemoryLogger', () => {
       logger.warn('Test warning message')
 
       const logs = logger.getLogs()
+      const logLevel = logs[0].level
+
       expect(logs).toHaveLength(1)
-      expect(logs[0].level).toBe('warn')
+      expect(logLevel).toBe('warn')
     })
 
     it('should store the correct message', () => {
       logger.warn('Test warning message')
 
       const logs = logger.getLogs()
-      expect(logs[0].message).toBe('Test warning message')
+      const logMessage = logs[0].message
+
+      expect(logMessage).toBe('Test warning message')
     })
   })
 
@@ -62,15 +72,19 @@ describe('InMemoryLogger', () => {
       logger.error('Test error message')
 
       const logs = logger.getLogs()
+      const logLevel = logs[0].level
+
       expect(logs).toHaveLength(1)
-      expect(logs[0].level).toBe('error')
+      expect(logLevel).toBe('error')
     })
 
     it('should store the correct message', () => {
       logger.error('Test error message')
 
       const logs = logger.getLogs()
-      expect(logs[0].message).toBe('Test error message')
+      const logMessage = logs[0].message
+
+      expect(logMessage).toBe('Test error message')
     })
   })
 
@@ -81,10 +95,14 @@ describe('InMemoryLogger', () => {
       logger.error('Third message')
 
       const logs = logger.getLogs()
+      const firstMessage = logs[0].message
+      const secondMessage = logs[1].message
+      const thirdMessage = logs[2].message
+
       expect(logs).toHaveLength(3)
-      expect(logs[0].message).toBe('First message')
-      expect(logs[1].message).toBe('Second message')
-      expect(logs[2].message).toBe('Third message')
+      expect(firstMessage).toBe('First message')
+      expect(secondMessage).toBe('Second message')
+      expect(thirdMessage).toBe('Third message')
     })
 
     it('should return a copy, not the internal array reference', () => {
