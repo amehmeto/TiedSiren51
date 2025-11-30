@@ -107,7 +107,7 @@ useEffect(() => {
 
 - `ui/hooks/useTick.ts` - The reusable tick hook
 - `app/(tabs)/home/index.tsx` - Home screen using `useTick()`
-- `ui/hooks/useStrictModeTimer.ts` - Timer hook using `useTick(1000, isActive)`
+- `app/(tabs)/strict-mode/index.tsx` - Strict mode screen using `useTick(1 * SECOND, isActive)`
 
 ### Usage patterns
 

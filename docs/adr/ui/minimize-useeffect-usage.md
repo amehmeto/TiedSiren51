@@ -298,13 +298,19 @@ For existing code with heavy `useEffect` usage:
 
 **Good** (necessary effect):
 ```typescript
-// ui/hooks/useStrictModeTimer.ts
+// ui/hooks/useAppForeground.ts
 useEffect(() => {
+  if (runOnMount) callback()
+
+  const handleAppStateChange = (nextAppState: AppStateStatus) => {
+    if (nextAppState === 'active') callback()
+  }
+
   const subscription = AppState.addEventListener('change', handleAppStateChange)
   return () => subscription.remove()
-}, [dispatch])
+}, [callback, runOnMount])
 ```
-✅ Subscribing to external system (React Native API)
+✅ Subscribing to external system (React Native AppState API)
 
 **Bad** (business logic in effect):
 ```typescript
