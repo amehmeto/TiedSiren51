@@ -4,12 +4,12 @@ import { extendTimer } from './usecases/extend-timer.usecase'
 import { loadTimer } from './usecases/load-timer.usecase'
 import { startTimer } from './usecases/start-timer.usecase'
 
-type TimerState = {
+type StrictModeState = {
   endedAt: ISODateString | null
   isLoading: boolean
 }
 
-const initialState: TimerState = {
+const initialState: StrictModeState = {
   endedAt: null,
   isLoading: true,
 }

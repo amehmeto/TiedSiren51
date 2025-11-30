@@ -2,6 +2,7 @@ import { DAY } from '@/core/__constants__/time'
 import { calculateMilliseconds } from '@/core/__utils__/time.utils'
 import { ISODateString } from '@/core/_ports_/port.date-provider'
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
+import { selectAuthUserId } from '@/core/auth/selectors/selectAuthUserId'
 
 const MAX_DURATION_MS = 30 * DAY
 
@@ -14,8 +15,7 @@ export type StartTimerPayload = {
 export const startTimer = createAppAsyncThunk<ISODateString, StartTimerPayload>(
   'timer/startTimer',
   async (payload, { extra: { timerRepository, dateProvider }, getState }) => {
-    const userId = getState().auth.authUser?.id
-    if (!userId) throw new Error('User not authenticated')
+    const userId = selectAuthUserId(getState())
 
     const durationMs = calculateMilliseconds(payload)
 

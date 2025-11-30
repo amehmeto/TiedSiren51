@@ -1,10 +1,11 @@
 import { ISODateString } from '@/core/_ports_/port.date-provider'
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
+import { selectAuthUserIdOrNull } from '@/core/auth/selectors/selectAuthUserIdOrNull'
 
 export const loadTimer = createAppAsyncThunk<ISODateString | null, void>(
   'timer/loadTimer',
   async (_payload, { extra: { timerRepository, dateProvider }, getState }) => {
-    const userId = getState().auth.authUser?.id
+    const userId = selectAuthUserIdOrNull(getState())
     if (!userId) return null
 
     const endedAt = await timerRepository.loadTimer(userId)

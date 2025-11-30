@@ -5,6 +5,7 @@ import { createTestStore } from '@/core/_tests_/createTestStore'
 import { Fixture } from '@/core/_tests_/fixture.types'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { AuthUser } from '@/core/auth/authUser'
+import { selectAuthUserIdOrNull } from '@/core/auth/selectors/selectAuthUserIdOrNull'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
 import { extendTimer } from './extend-timer.usecase'
@@ -98,7 +99,8 @@ export function timerFixture(
         )
       },
       async timerShouldBeSavedInRepositoryAs(expectedEndedAt: string) {
-        const userId = store.getState().auth.authUser?.id ?? DEFAULT_USER_ID
+        const userId =
+          selectAuthUserIdOrNull(store.getState()) ?? DEFAULT_USER_ID
         const endedAt = await timerRepository.loadTimer(userId)
         expect(endedAt).toStrictEqual(expectedEndedAt)
       },
