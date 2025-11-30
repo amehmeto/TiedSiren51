@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { extendTimer } from '@/core/timer/usecases/extend-timer.usecase'
+import { startTimer } from '@/core/timer/usecases/start-timer.usecase'
 import { CircularTimerDisplay } from '@/ui/design-system/components/shared/CircularTimerDisplay'
 import { LoadingScreen } from '@/ui/design-system/components/shared/LoadingScreen'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -23,8 +25,7 @@ export default function StrictModeScreen() {
   const [extendDuration, setExtendDuration] =
     useState<TimerDuration>(DEFAULT_DURATION)
 
-  const { viewModel, isActive, isLoading, startTimer, extendTimer } =
-    useStrictModeTimer()
+  const { dispatch, viewModel, isActive, isLoading } = useStrictModeTimer()
 
   if (isLoading) return <LoadingScreen />
 
@@ -60,10 +61,12 @@ export default function StrictModeScreen() {
         visible={showTimerPicker}
         onClose={() => setShowTimerPicker(false)}
         onSave={() =>
-          startTimer(
-            timerDuration.days,
-            timerDuration.hours,
-            timerDuration.minutes,
+          dispatch(
+            startTimer({
+              days: timerDuration.days,
+              hours: timerDuration.hours,
+              minutes: timerDuration.minutes,
+            }),
           )
         }
         duration={timerDuration}
@@ -75,10 +78,12 @@ export default function StrictModeScreen() {
         visible={showExtendPicker}
         onClose={() => setShowExtendPicker(false)}
         onSave={() =>
-          extendTimer(
-            extendDuration.days,
-            extendDuration.hours,
-            extendDuration.minutes,
+          dispatch(
+            extendTimer({
+              days: extendDuration.days,
+              hours: extendDuration.hours,
+              minutes: extendDuration.minutes,
+            }),
           )
         }
         duration={extendDuration}

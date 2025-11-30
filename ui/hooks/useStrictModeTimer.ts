@@ -1,11 +1,9 @@
-import { useCallback, useEffect } from 'react'
+import { useEffect } from 'react'
 import { AppState, AppStateStatus } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsTimerLoading } from '@/core/timer/selectors/selectIsTimerLoading'
-import { extendTimer } from '@/core/timer/usecases/extend-timer.usecase'
 import { loadTimer } from '@/core/timer/usecases/load-timer.usecase'
-import { startTimer } from '@/core/timer/usecases/start-timer.usecase'
 import { dependencies } from '@/ui/dependencies'
 import { useTick } from '@/ui/hooks/useTick'
 import {
@@ -24,30 +22,6 @@ export const useStrictModeTimer = () => {
   const isLoading = useSelector(selectIsTimerLoading)
 
   useTick(1 * SECOND, isActive)
-
-  const handleStartTimer = useCallback(
-    (days: number, hours: number, minutes: number) => {
-      dispatch(startTimer({ days, hours, minutes }))
-    },
-    [dispatch],
-  )
-
-  const handleExtendTimer = useCallback(
-    (
-      additionalDays: number,
-      additionalHours: number,
-      additionalMinutes: number,
-    ) => {
-      dispatch(
-        extendTimer({
-          days: additionalDays,
-          hours: additionalHours,
-          minutes: additionalMinutes,
-        }),
-      )
-    },
-    [dispatch],
-  )
 
   useEffect(() => {
     dispatch(loadTimer())
@@ -68,10 +42,9 @@ export const useStrictModeTimer = () => {
   }, [dispatch])
 
   return {
+    dispatch,
     viewModel,
     isActive,
     isLoading,
-    startTimer: handleStartTimer,
-    extendTimer: handleExtendTimer,
   }
 }
