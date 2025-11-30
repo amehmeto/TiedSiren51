@@ -20,16 +20,17 @@ describe('selectTimeLeft', () => {
       { dateProvider },
       stateBuilder().withTimerEndedAt(null).build(),
     )
-
-    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
-
-    expect(timeLeft).toEqual({
+    const expectedTimeLeft = {
       days: 0,
       hours: 0,
       minutes: 0,
       seconds: 0,
       totalMs: 0,
-    })
+    }
+
+    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
+
+    expect(timeLeft).toEqual(expectedTimeLeft)
   })
 
   test('should return empty time when timer has expired', () => {
@@ -39,16 +40,17 @@ describe('selectTimeLeft', () => {
         .withTimerEndedAt(dateProvider.msToISOString(nowMs - 1 * SECOND))
         .build(),
     )
-
-    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
-
-    expect(timeLeft).toEqual({
+    const expectedTimeLeft = {
       days: 0,
       hours: 0,
       minutes: 0,
       seconds: 0,
       totalMs: 0,
-    })
+    }
+
+    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
+
+    expect(timeLeft).toEqual(expectedTimeLeft)
   })
 
   test.each([

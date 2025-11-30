@@ -25,13 +25,14 @@ describe('PrismaBlocklistRepository', () => {
     const blocklistPayload = buildBlocklist()
     // @ts-expect-error - removing id for creation
     delete blocklistPayload.id
+    const expectedBlocklist = {
+      ...blocklistPayload,
+      id: expect.any(String),
+    }
 
     const created = await repository.create(blocklistPayload)
 
-    expect(created).toStrictEqual({
-      ...blocklistPayload,
-      id: expect.any(String),
-    })
+    expect(created).toStrictEqual(expectedBlocklist)
   })
 
   it('should find a blocklist by id', async () => {
@@ -96,6 +97,8 @@ describe('PrismaBlocklistRepository', () => {
     const created = await repository.create(blocklistPayload)
     await repository.delete(created.id)
 
-    await expect(repository.findById(created.id)).rejects.toThrow()
+    const promise = repository.findById(created.id)
+
+    await expect(promise).rejects.toThrow()
   })
 })

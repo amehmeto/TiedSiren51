@@ -77,8 +77,11 @@ describe('loadUser usecase', () => {
 
     const state = store.getState()
 
-    expect(Object.keys(state.blocklist.entities)).toHaveLength(0)
-    expect(Object.keys(state.blockSession.entities)).toHaveLength(0)
+    const blocklistKeys = Object.keys(state.blocklist.entities)
+    const blockSessionKeys = Object.keys(state.blockSession.entities)
+
+    expect(blocklistKeys).toHaveLength(0)
+    expect(blockSessionKeys).toHaveLength(0)
     expect(state.siren.availableSirens).toEqual(emptySirens)
   })
 })

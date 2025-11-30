@@ -24,18 +24,19 @@ describe('selectStrictModeViewModel', () => {
         { dateProvider },
         stateBuilder().withTimerEndedAt(null).build(),
       )
+      const expectedViewModel = {
+        type: StrictModeViewState.Inactive,
+        countdown: '0h 0m 0s',
+        statusMessage: 'Set a timer to activate strict mode',
+        buttonText: 'Start Timer',
+      }
 
       const viewModel = selectStrictModeViewModel(
         store.getState(),
         dateProvider,
       )
 
-      expect(viewModel).toEqual({
-        type: StrictModeViewState.Inactive,
-        countdown: '0h 0m 0s',
-        statusMessage: 'Set a timer to activate strict mode',
-        buttonText: 'Start Timer',
-      })
+      expect(viewModel).toEqual(expectedViewModel)
     })
   })
 
@@ -48,20 +49,21 @@ describe('selectStrictModeViewModel', () => {
         { dateProvider },
         stateBuilder().withTimerEndedAt(endedAt).build(),
       )
-
-      const viewModel = selectStrictModeViewModel(
-        store.getState(),
-        dateProvider,
-      )
-
-      expect(viewModel).toEqual({
+      const expectedViewModel = {
         type: StrictModeViewState.Active,
         countdown: '1h 30m 45s',
         endDateTime: expect.any(String),
         inlineRemaining: '1h 30m 45s',
         statusMessage: 'Your blockings are locked against any\nbypassing.',
         buttonText: 'Extend Timer',
-      })
+      }
+
+      const viewModel = selectStrictModeViewModel(
+        store.getState(),
+        dateProvider,
+      )
+
+      expect(viewModel).toEqual(expectedViewModel)
     })
 
     test('should include days in countdown when timer has days', () => {
@@ -72,16 +74,17 @@ describe('selectStrictModeViewModel', () => {
         { dateProvider },
         stateBuilder().withTimerEndedAt(endedAt).build(),
       )
+      const expectedViewModel = {
+        type: StrictModeViewState.Active,
+        countdown: '2d 5h 30m 15s',
+      }
 
       const viewModel = selectStrictModeViewModel(
         store.getState(),
         dateProvider,
       )
 
-      expect(viewModel).toMatchObject({
-        type: StrictModeViewState.Active,
-        countdown: '2d 5h 30m 15s',
-      })
+      expect(viewModel).toMatchObject(expectedViewModel)
     })
 
     test('should format endDateTime with Ends prefix', () => {
@@ -90,6 +93,11 @@ describe('selectStrictModeViewModel', () => {
         { dateProvider },
         stateBuilder().withTimerEndedAt(endedAt).build(),
       )
+      const expectedViewModel = {
+        endDateTime: expect.stringMatching(
+          /^Ends \d+\/\d+, \d+:\d+ [ap]\.m\.$/,
+        ),
+      }
 
       const viewModel = selectStrictModeViewModel(
         store.getState(),
@@ -97,11 +105,7 @@ describe('selectStrictModeViewModel', () => {
       )
 
       expect(viewModel.type).toBe(StrictModeViewState.Active)
-      expect(viewModel).toMatchObject({
-        endDateTime: expect.stringMatching(
-          /^Ends \d+\/\d+, \d+:\d+ [ap]\.m\.$/,
-        ),
-      })
+      expect(viewModel).toMatchObject(expectedViewModel)
     })
   })
 })

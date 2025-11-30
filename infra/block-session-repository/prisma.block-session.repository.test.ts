@@ -54,12 +54,14 @@ describe('PrismaBlockSessionRepository', () => {
 
   it('should create a block session', async () => {
     const sessionPayload = await prepareSessionPayload()
-    const created = await repository.create(sessionPayload)
-
-    expect(created).toStrictEqual({
+    const expectedBlockSession = {
       ...sessionPayload,
       id: expect.any(String),
-    })
+    }
+
+    const created = await repository.create(sessionPayload)
+
+    expect(created).toStrictEqual(expectedBlockSession)
   })
 
   it('should find a block session by id', async () => {
@@ -130,13 +132,15 @@ describe('PrismaBlockSessionRepository', () => {
       name: 'Updated name',
     }
 
+    const expectedBlockSession = {
+      ...created,
+      name: 'Updated name',
+    }
+
     await repository.update(updateSessionPayload)
     const updated = await repository.findById(created.id)
 
-    expect(updated).toStrictEqual({
-      ...created,
-      name: 'Updated name',
-    })
+    expect(updated).toStrictEqual(expectedBlockSession)
   })
 
   it('should delete a block session', async () => {
@@ -144,7 +148,9 @@ describe('PrismaBlockSessionRepository', () => {
     const created = await repository.create(sessionPayload)
     await repository.delete(created.id)
 
-    await expect(repository.findById(created.id)).rejects.toThrow(
+    const promise = repository.findById(created.id)
+
+    await expect(promise).rejects.toThrow(
       `BlockSession ${created.id} not found`,
     )
   })

@@ -4,7 +4,9 @@ import { calculateMilliseconds, millisecondsToTimeUnits } from './time.utils'
 
 describe('calculateMilliseconds', () => {
   test('should return 0 when no parameters provided', () => {
-    expect(calculateMilliseconds({})).toBe(0)
+    const result = calculateMilliseconds({})
+
+    expect(result).toBe(0)
   })
 
   test.each([
@@ -13,7 +15,9 @@ describe('calculateMilliseconds', () => {
     { input: { hours: 1 }, expected: 1 * HOUR },
     { input: { days: 1 }, expected: 1 * DAY },
   ])('should convert $input to $expected ms', ({ input, expected }) => {
-    expect(calculateMilliseconds(input)).toBe(expected)
+    const result = calculateMilliseconds(input)
+
+    expect(result).toBe(expected)
   })
 
   test('should combine all units correctly', () => {
@@ -39,12 +43,16 @@ describe('calculateMilliseconds', () => {
 
 describe('millisecondsToTimeUnits', () => {
   test('should return zeros for 0 milliseconds', () => {
-    expect(millisecondsToTimeUnits(0)).toEqual({
+    const expectedTimeUnits = {
       days: 0,
       hours: 0,
       minutes: 0,
       seconds: 0,
-    })
+    }
+
+    const result = millisecondsToTimeUnits(0)
+
+    expect(result).toEqual(expectedTimeUnits)
   })
 
   test.each([
@@ -65,45 +73,57 @@ describe('millisecondsToTimeUnits', () => {
       expected: { days: 1, hours: 0, minutes: 0, seconds: 0 },
     },
   ])('should convert $input ms to time units', ({ input, expected }) => {
-    expect(millisecondsToTimeUnits(input)).toEqual(expected)
+    const result = millisecondsToTimeUnits(input)
+
+    expect(result).toEqual(expected)
   })
 
   test('should break down complex duration correctly', () => {
     const input = 1 * DAY + 2 * HOUR + 30 * MINUTE + 45 * SECOND
-
-    expect(millisecondsToTimeUnits(input)).toEqual({
+    const expectedTimeUnits = {
       days: 1,
       hours: 2,
       minutes: 30,
       seconds: 45,
-    })
+    }
+
+    const result = millisecondsToTimeUnits(input)
+
+    expect(result).toEqual(expectedTimeUnits)
   })
 
   test('should handle overflow correctly (e.g., 90 minutes becomes 1 hour 30 minutes)', () => {
     const input = 90 * MINUTE
-
-    expect(millisecondsToTimeUnits(input)).toEqual({
+    const expectedTimeUnits = {
       days: 0,
       hours: 1,
       minutes: 30,
       seconds: 0,
-    })
+    }
+
+    const result = millisecondsToTimeUnits(input)
+
+    expect(result).toEqual(expectedTimeUnits)
   })
 
   test('should floor partial seconds', () => {
     const input = 1 * SECOND + 500
-
-    expect(millisecondsToTimeUnits(input)).toEqual({
+    const expectedTimeUnits = {
       days: 0,
       hours: 0,
       minutes: 0,
       seconds: 1,
-    })
+    }
+
+    const result = millisecondsToTimeUnits(input)
+
+    expect(result).toEqual(expectedTimeUnits)
   })
 
   test('should be inverse of calculateMilliseconds', () => {
     const original = { days: 2, hours: 5, minutes: 43, seconds: 12 }
     const ms = calculateMilliseconds(original)
+
     const result = millisecondsToTimeUnits(ms)
 
     expect(result).toEqual(original)

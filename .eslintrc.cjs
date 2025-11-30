@@ -126,6 +126,7 @@ module.exports = {
         'vitest/prefer-each': 'error',
         'vitest/prefer-hooks-in-order': 'error',
         'vitest/prefer-hooks-on-top': 'error',
+        'local-rules/expect-separate-act-assert': 'error',
       },
     },
     // No non-deterministic values in core (use injected dependencies)
