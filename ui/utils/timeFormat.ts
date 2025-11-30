@@ -1,4 +1,4 @@
-import { calculateMilliseconds } from '@/core/timer/timer.utils'
+import { calculateMilliseconds } from '@/core/__utils__/time.utils'
 
 const getAmPm = (hour: number): string => {
   const isAfternoon = hour >= 12

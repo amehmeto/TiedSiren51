@@ -1,6 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
-import { calculateMilliseconds, millisecondsToTimeUnits } from './timer.utils'
+import { calculateMilliseconds, millisecondsToTimeUnits } from './time.utils'
 
 describe('calculateMilliseconds', () => {
   test('should return 0 when no parameters provided', () => {

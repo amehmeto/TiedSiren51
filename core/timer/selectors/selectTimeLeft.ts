@@ -1,7 +1,7 @@
+import { millisecondsToTimeUnits } from '@/core/__utils__/time.utils'
 import { DateProvider } from '@/core/_ports_/port.date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 import { TimeLeft } from '../timer'
-import { millisecondsToTimeUnits } from '../timer.utils'
 
 const EMPTY_TIME: TimeLeft = {
   days: 0,
