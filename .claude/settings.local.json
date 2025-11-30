@@ -52,7 +52,9 @@
       "Bash(/Users/arthurmehmetoglu/Development/tied-siren-project/TiedSiren51/.specify/scripts/bash/check-prerequisites.sh:*)"
     ],
     "deny": [
-      "BashOutput(*)"
+      "BashOutput(*)",
+      "Bash(git push --no-verify:*)",
+      "Bash(git commit --no-verify:*)"
     ],
     "ask": [
       "Bash(chmod:*)",
