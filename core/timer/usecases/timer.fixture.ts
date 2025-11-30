@@ -33,15 +33,15 @@ export function timerFixture(
 
   return {
     given: {
-      existingTimer(endAt: ISODateString) {
-        timerRepository.saveTimer(DEFAULT_USER_ID, endAt)
+      existingTimer(endedAt: ISODateString) {
+        timerRepository.saveTimer(DEFAULT_USER_ID, endedAt)
         testStateBuilderProvider.setState((builder) =>
-          builder.withAuthUser(defaultAuthUser).withTimerEndAt(endAt),
+          builder.withAuthUser(defaultAuthUser).withTimerEndedAt(endedAt),
         )
       },
       noTimer() {
         testStateBuilderProvider.setState((builder) =>
-          builder.withAuthUser(defaultAuthUser).withTimerEndAt(null),
+          builder.withAuthUser(defaultAuthUser).withTimerEndedAt(null),
         )
       },
       authenticatedUser(authUser: AuthUser = defaultAuthUser) {
@@ -87,16 +87,16 @@ export function timerFixture(
       },
     },
     then: {
-      timerShouldBeLoadedAs(expectedEndAt: string | null) {
-        expect(store.getState().timer.endAt).toStrictEqual(expectedEndAt)
+      timerShouldBeLoadedAs(expectedEndedAt: string | null) {
+        expect(store.getState().timer.endedAt).toStrictEqual(expectedEndedAt)
       },
-      timerShouldBeStoredAs(expectedEndAt: string) {
-        expect(store.getState().timer.endAt).toStrictEqual(expectedEndAt)
+      timerShouldBeStoredAs(expectedEndedAt: string) {
+        expect(store.getState().timer.endedAt).toStrictEqual(expectedEndedAt)
       },
-      async timerShouldBeSavedInRepositoryAs(expectedEndAt: string) {
+      async timerShouldBeSavedInRepositoryAs(expectedEndedAt: string) {
         const userId = store.getState().auth.authUser?.id ?? DEFAULT_USER_ID
-        const endAt = await timerRepository.loadTimer(userId)
-        expect(endAt).toStrictEqual(expectedEndAt)
+        const endedAt = await timerRepository.loadTimer(userId)
+        expect(endedAt).toStrictEqual(expectedEndedAt)
       },
       actionShouldBeRejectedWith(
         action: unknown,

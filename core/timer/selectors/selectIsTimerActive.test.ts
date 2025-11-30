@@ -15,7 +15,7 @@ describe('selectIsTimerActive', () => {
   test('should return false when there is no timer', () => {
     const store = createTestStore(
       { dateProvider },
-      stateBuilder().withTimerEndAt(null).build(),
+      stateBuilder().withTimerEndedAt(null).build(),
     )
 
     const isActive = selectIsTimerActive(store.getState(), dateProvider)
@@ -24,10 +24,10 @@ describe('selectIsTimerActive', () => {
   })
 
   test('should return false when timer has expired', () => {
-    const expiredEndAt = '2024-01-01T09:59:59.000Z'
+    const expiredEndedAt = '2024-01-01T09:59:59.000Z'
     const store = createTestStore(
       { dateProvider },
-      stateBuilder().withTimerEndAt(expiredEndAt).build(),
+      stateBuilder().withTimerEndedAt(expiredEndedAt).build(),
     )
 
     const isActive = selectIsTimerActive(store.getState(), dateProvider)
@@ -35,11 +35,11 @@ describe('selectIsTimerActive', () => {
     expect(isActive).toBe(false)
   })
 
-  test('should return true when timer endAt is in the future', () => {
-    const futureEndAt = '2024-01-01T11:00:00.000Z'
+  test('should return true when timer endedAt is in the future', () => {
+    const futureEndedAt = '2024-01-01T11:00:00.000Z'
     const store = createTestStore(
       { dateProvider },
-      stateBuilder().withTimerEndAt(futureEndAt).build(),
+      stateBuilder().withTimerEndedAt(futureEndedAt).build(),
     )
 
     const isActive = selectIsTimerActive(store.getState(), dateProvider)

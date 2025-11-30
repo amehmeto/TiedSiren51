@@ -22,7 +22,7 @@ describe('selectStrictModeViewModel', () => {
     test('should return inactive view model when no timer is set', () => {
       const store = createTestStore(
         { dateProvider },
-        stateBuilder().withTimerEndAt(null).build(),
+        stateBuilder().withTimerEndedAt(null).build(),
       )
 
       const viewModel = selectStrictModeViewModel(
@@ -41,12 +41,12 @@ describe('selectStrictModeViewModel', () => {
 
   describe('Active state', () => {
     test('should return active view model with formatted countdown', () => {
-      const endAt = dateProvider.msToISOString(
+      const endedAt = dateProvider.msToISOString(
         nowMs + 1 * HOUR + 30 * MINUTE + 45 * SECOND,
       )
       const store = createTestStore(
         { dateProvider },
-        stateBuilder().withTimerEndAt(endAt).build(),
+        stateBuilder().withTimerEndedAt(endedAt).build(),
       )
 
       const viewModel = selectStrictModeViewModel(
@@ -65,12 +65,12 @@ describe('selectStrictModeViewModel', () => {
     })
 
     test('should include days in countdown when timer has days', () => {
-      const endAt = dateProvider.msToISOString(
+      const endedAt = dateProvider.msToISOString(
         nowMs + 2 * DAY + 5 * HOUR + 30 * MINUTE + 15 * SECOND,
       )
       const store = createTestStore(
         { dateProvider },
-        stateBuilder().withTimerEndAt(endAt).build(),
+        stateBuilder().withTimerEndedAt(endedAt).build(),
       )
 
       const viewModel = selectStrictModeViewModel(
@@ -85,10 +85,10 @@ describe('selectStrictModeViewModel', () => {
     })
 
     test('should format endDateTime with Ends prefix', () => {
-      const endAt = dateProvider.msToISOString(nowMs + 2 * HOUR + 30 * MINUTE)
+      const endedAt = dateProvider.msToISOString(nowMs + 2 * HOUR + 30 * MINUTE)
       const store = createTestStore(
         { dateProvider },
-        stateBuilder().withTimerEndAt(endAt).build(),
+        stateBuilder().withTimerEndedAt(endedAt).build(),
       )
 
       const viewModel = selectStrictModeViewModel(

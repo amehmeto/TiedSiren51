@@ -5,8 +5,10 @@ export function selectIsTimerActive(
   state: RootState,
   dateProvider: DateProvider,
 ): boolean {
-  const endAt = state.timer.endAt
-  if (!endAt) return false
+  const endedAt = state.timer.endedAt
+  if (!endedAt) return false
 
-  return dateProvider.parseISOString(endAt).getTime() > dateProvider.getNowMs()
+  return (
+    dateProvider.parseISOString(endedAt).getTime() > dateProvider.getNowMs()
+  )
 }

@@ -7,7 +7,7 @@ describe('selectIsTimerLoading', () => {
   test('should return loading state from timer slice', () => {
     const store = createTestStore(
       {},
-      stateBuilder().withTimerEndAt(null).build(),
+      stateBuilder().withTimerEndedAt(null).build(),
     )
 
     const isLoading = selectIsTimerLoading(store.getState())

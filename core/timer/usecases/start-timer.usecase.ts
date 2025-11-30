@@ -23,11 +23,11 @@ export const startTimer = createAppAsyncThunk<ISODateString, StartTimerPayload>(
     if (durationMs > MAX_DURATION_MS)
       throw new Error('Timer duration exceeds maximum allowed (30 days)')
 
-    const endAt = dateProvider.msToISOString(
+    const endedAt = dateProvider.msToISOString(
       dateProvider.getNowMs() + durationMs,
     )
 
-    await timerRepository.saveTimer(userId, endAt)
-    return endAt
+    await timerRepository.saveTimer(userId, endedAt)
+    return endedAt
   },
 )

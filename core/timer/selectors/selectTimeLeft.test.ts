@@ -18,7 +18,7 @@ describe('selectTimeLeft', () => {
   test('should return empty time when there is no timer', () => {
     const store = createTestStore(
       { dateProvider },
-      stateBuilder().withTimerEndAt(null).build(),
+      stateBuilder().withTimerEndedAt(null).build(),
     )
 
     const timeLeft = selectTimeLeft(store.getState(), dateProvider)
@@ -36,7 +36,7 @@ describe('selectTimeLeft', () => {
     const store = createTestStore(
       { dateProvider },
       stateBuilder()
-        .withTimerEndAt(dateProvider.msToISOString(nowMs - 1 * SECOND))
+        .withTimerEndedAt(dateProvider.msToISOString(nowMs - 1 * SECOND))
         .build(),
     )
 
@@ -102,7 +102,7 @@ describe('selectTimeLeft', () => {
       const store = createTestStore(
         { dateProvider },
         stateBuilder()
-          .withTimerEndAt(dateProvider.msToISOString(nowMs + remainingMs))
+          .withTimerEndedAt(dateProvider.msToISOString(nowMs + remainingMs))
           .build(),
       )
 
@@ -174,7 +174,7 @@ describe('selectTimeLeft', () => {
       const store = createTestStore(
         { dateProvider },
         stateBuilder()
-          .withTimerEndAt(dateProvider.msToISOString(nowMs + remainingMs))
+          .withTimerEndedAt(dateProvider.msToISOString(nowMs + remainingMs))
           .build(),
       )
 

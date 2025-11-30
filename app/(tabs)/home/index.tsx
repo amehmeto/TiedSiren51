@@ -23,7 +23,6 @@ export default function HomeScreen() {
   const [hasAccessibilityPermission, setHasAccessibilityPermission] =
     useState(true)
 
-  // Trigger re-renders every second to update time-based displays
   useTick()
 
   const viewModel = useSelector<

@@ -15,11 +15,11 @@ export function selectTimeLeft(
   state: RootState,
   dateProvider: DateProvider,
 ): TimeLeft {
-  const endAt = state.timer.endAt
-  if (!endAt) return EMPTY_TIME
+  const endedAt = state.timer.endedAt
+  if (!endedAt) return EMPTY_TIME
 
   const totalMs =
-    dateProvider.parseISOString(endAt).getTime() - dateProvider.getNowMs()
+    dateProvider.parseISOString(endedAt).getTime() - dateProvider.getNowMs()
 
   if (totalMs <= 0) return EMPTY_TIME
 

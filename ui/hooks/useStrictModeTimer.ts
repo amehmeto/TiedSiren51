@@ -1,4 +1,4 @@
-import { useEffect, useCallback } from 'react'
+import { useCallback, useEffect } from 'react'
 import { AppState, AppStateStatus } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
@@ -12,6 +12,7 @@ import {
   selectStrictModeViewModel,
   StrictModeViewState,
 } from '@/ui/screens/StrictMode/strictMode.view-model'
+import { SECOND } from '@core/__constants__/time'
 
 export const useStrictModeTimer = () => {
   const dispatch = useDispatch<AppDispatch>()
@@ -22,8 +23,7 @@ export const useStrictModeTimer = () => {
   const isActive = viewModel.type === StrictModeViewState.Active
   const isLoading = useSelector(selectIsTimerLoading)
 
-  // Trigger re-renders every second when timer is active
-  useTick(1000, isActive)
+  useTick(1 * SECOND, isActive)
 
   const handleStartTimer = useCallback(
     (days: number, hours: number, minutes: number) => {

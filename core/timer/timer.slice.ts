@@ -5,12 +5,12 @@ import { loadTimer } from './usecases/load-timer.usecase'
 import { startTimer } from './usecases/start-timer.usecase'
 
 type TimerState = {
-  endAt: ISODateString | null
+  endedAt: ISODateString | null
   isLoading: boolean
 }
 
 const initialState: TimerState = {
-  endAt: null,
+  endedAt: null,
   isLoading: true,
 }
 
@@ -18,8 +18,8 @@ export const timerSlice = createSlice({
   name: 'timer',
   initialState,
   reducers: {
-    setEndAt: (state, action: PayloadAction<ISODateString | null>) => {
-      state.endAt = action.payload
+    setEndedAt: (state, action: PayloadAction<ISODateString | null>) => {
+      state.endedAt = action.payload
       state.isLoading = false
     },
   },
@@ -29,20 +29,20 @@ export const timerSlice = createSlice({
         state.isLoading = true
       })
       .addCase(loadTimer.fulfilled, (state, action) => {
-        state.endAt = action.payload
+        state.endedAt = action.payload
         state.isLoading = false
       })
       .addCase(loadTimer.rejected, (state) => {
         state.isLoading = false
       })
       .addCase(startTimer.fulfilled, (state, action) => {
-        state.endAt = action.payload
+        state.endedAt = action.payload
       })
       .addCase(startTimer.rejected, (state) => {
         state.isLoading = false
       })
       .addCase(extendTimer.fulfilled, (state, action) => {
-        state.endAt = action.payload
+        state.endedAt = action.payload
       })
       .addCase(extendTimer.rejected, (state) => {
         state.isLoading = false
@@ -50,4 +50,4 @@ export const timerSlice = createSlice({
   },
 })
 
-export const { setEndAt } = timerSlice.actions
+export const { setEndedAt } = timerSlice.actions

@@ -51,7 +51,7 @@ Abstract date/time operations behind a port interface, with real and stub implem
 
 Store and pass dates as **ISO 8601 strings** throughout the entire application stack:
 
-- **Domain types**: `Timer.endAt: string`, `BlockSession.startedAt: string`
+- **Domain types**: `Timer.endedAt: string`, `BlockSession.startedAt: string`
 - **Redux state**: Timer and BlockSession slices store ISO strings
 - **Selectors**: Receive `dateProvider` to parse ISO strings for comparisons
 - **Use cases**: Use `dateProvider` to convert between strings and Date objects
@@ -356,7 +356,7 @@ The following examples show how ISO strings flow through the entire stack:
 ```typescript
 // ✅ Dates stored as ISO strings in Redux state
 type TimerState = {
-  endAt: string | null  // ISO 8601 format: "2025-01-15T10:00:00.000Z"
+  endedAt: string | null  // ISO 8601 format: "2025-01-15T10:00:00.000Z"
   isLoading: boolean
 }
 ```
@@ -372,10 +372,10 @@ export const startTimer = createAppAsyncThunk<string, StartTimerPayload>(
 
     // Use dateProvider to get current time and convert to ISO string
     const nowMs = dateProvider.getNowMs()
-    const endAt = dateProvider.msToISOString(nowMs + durationMs)
+    const endedAt = dateProvider.msToISOString(nowMs + durationMs)
 
-    await timerRepository.save(endAt)
-    return endAt  // Returns ISO string
+    await timerRepository.save(endedAt)
+    return endedAt  // Returns ISO string
   },
 )
 ```
@@ -387,11 +387,11 @@ export function selectIsTimerActive(
   state: RootState,
   dateProvider: DateProvider,  // Injected for parsing and current time
 ): boolean {
-  const endAt = state.timer.endAt
-  if (!endAt) return false
+  const endedAt = state.timer.endedAt
+  if (!endedAt) return false
 
   // Parse ISO string back to Date for comparison
-  return dateProvider.parseISOString(endAt).getTime() > dateProvider.getNowMs()
+  return dateProvider.parseISOString(endedAt).getTime() > dateProvider.getNowMs()
 }
 ```
 
@@ -413,12 +413,12 @@ export const useStrictModeTimer = () => {
 **5. Repository** (`infra/timer-repository/prisma.timer-repository.ts`):
 
 ```typescript
-async saveTimer(userId: string, endAt: string): Promise<void> {
+async saveTimer(userId: string, endedAt: string): Promise<void> {
   // ISO string stored directly in database
   await this.prisma.strictModeTimer.upsert({
     where: { userId },
-    update: { endAt },
-    create: { userId, endAt },
+    update: { endedAt },
+    create: { userId, endedAt },
   })
 }
 ```
@@ -427,8 +427,8 @@ async saveTimer(userId: string, endAt: string): Promise<void> {
 
 ```prisma
 model StrictModeTimer {
-  userId String @id
-  endAt  String  // ISO string stored as text
+  userId  String @id
+  endedAt String  // ISO string stored as text
 }
 ```
 

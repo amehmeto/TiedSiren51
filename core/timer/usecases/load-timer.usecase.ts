@@ -7,12 +7,12 @@ export const loadTimer = createAppAsyncThunk<ISODateString | null, void>(
     const userId = getState().auth.authUser?.id
     if (!userId) return null
 
-    const endAt = await timerRepository.loadTimer(userId)
-    if (!endAt) return null
+    const endedAt = await timerRepository.loadTimer(userId)
+    if (!endedAt) return null
 
     const isExpired =
-      dateProvider.parseISOString(endAt).getTime() <= dateProvider.getNowMs()
+      dateProvider.parseISOString(endedAt).getTime() <= dateProvider.getNowMs()
 
-    return isExpired ? null : endAt
+    return isExpired ? null : endedAt
   },
 )

@@ -14,16 +14,16 @@ export class PrismaTimerRepository
     this.logger = logger
   }
 
-  async saveTimer(userId: string, endAt: ISODateString): Promise<void> {
+  async saveTimer(userId: string, endedAt: ISODateString): Promise<void> {
     await this.baseClient.timer.upsert({
       where: { id: userId },
       create: {
         id: userId,
         userId,
-        endAt,
+        endedAt,
       },
       update: {
-        endAt,
+        endedAt,
       },
     })
   }
@@ -36,6 +36,6 @@ export class PrismaTimerRepository
     if (!timer) return null
 
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Prisma stores ISO strings
-    return timer.endAt as ISODateString
+    return timer.endedAt as ISODateString
   }
 }

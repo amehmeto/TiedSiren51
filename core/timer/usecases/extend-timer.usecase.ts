@@ -21,18 +21,18 @@ export const extendTimer = createAppAsyncThunk<
     if (!userId) throw new Error('User not authenticated')
 
     const nowMs = dateProvider.getNowMs()
-    const currentEndAt = getState().timer.endAt
-    const currentEndAtMs = currentEndAt
-      ? dateProvider.parseISOString(currentEndAt).getTime()
+    const currentEndedAt = getState().timer.endedAt
+    const currentEndedAtMs = currentEndedAt
+      ? dateProvider.parseISOString(currentEndedAt).getTime()
       : 0
 
-    if (!currentEndAt || currentEndAtMs <= nowMs)
+    if (!currentEndedAt || currentEndedAtMs <= nowMs)
       throw new Error('No active timer to extend')
 
     const additionalMs = calculateMilliseconds(payload)
     if (additionalMs <= 0) throw new Error('Invalid extension duration')
 
-    const remainingMs = currentEndAtMs - nowMs
+    const remainingMs = currentEndedAtMs - nowMs
     const newTotalDuration = remainingMs + additionalMs
     if (newTotalDuration > MAX_DURATION_MS) {
       throw new Error(
@@ -40,9 +40,9 @@ export const extendTimer = createAppAsyncThunk<
       )
     }
 
-    const endAt = dateProvider.msToISOString(currentEndAtMs + additionalMs)
+    const endedAt = dateProvider.msToISOString(currentEndedAtMs + additionalMs)
 
-    await timerRepository.saveTimer(userId, endAt)
-    return endAt
+    await timerRepository.saveTimer(userId, endedAt)
+    return endedAt
   },
 )
