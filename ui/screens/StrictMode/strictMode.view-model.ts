@@ -1,9 +1,9 @@
 import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
 import { DateProvider } from '@/core/_ports_/port.date-provider'
 import { RootState } from '@/core/_redux_/createStore'
-import { selectIsTimerActive } from '@/core/timer/selectors/selectIsTimerActive'
-import { selectTimeLeft } from '@/core/timer/selectors/selectTimeLeft'
-import { TimeLeft } from '@/core/timer/timer'
+import { selectIsTimerActive } from '@/core/strictMode/selectors/selectIsTimerActive'
+import { selectTimeLeft } from '@/core/strictMode/selectors/selectTimeLeft'
+import { TimeLeft } from '@/core/strictMode/strictMode'
 
 export enum StrictModeViewState {
   Active = 'ACTIVE',

@@ -5,7 +5,7 @@ export function selectIsTimerActive(
   state: RootState,
   dateProvider: DateProvider,
 ): boolean {
-  const endedAt = state.timer.endedAt
+  const endedAt = state.strictMode.endedAt
   if (!endedAt) return false
 
   return (

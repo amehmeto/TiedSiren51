@@ -21,7 +21,7 @@ export const extendTimer = createAppAsyncThunk<
     if (!userId) throw new Error('User not authenticated')
 
     const nowMs = dateProvider.getNowMs()
-    const currentEndedAt = getState().timer.endedAt
+    const currentEndedAt = getState().strictMode.endedAt
     const currentEndedAtMs = currentEndedAt
       ? dateProvider.parseISOString(currentEndedAt).getTime()
       : 0

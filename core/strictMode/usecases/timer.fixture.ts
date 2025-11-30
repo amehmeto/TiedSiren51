@@ -88,10 +88,14 @@ export function timerFixture(
     },
     then: {
       timerShouldBeLoadedAs(expectedEndedAt: string | null) {
-        expect(store.getState().timer.endedAt).toStrictEqual(expectedEndedAt)
+        expect(store.getState().strictMode.endedAt).toStrictEqual(
+          expectedEndedAt,
+        )
       },
       timerShouldBeStoredAs(expectedEndedAt: string) {
-        expect(store.getState().timer.endedAt).toStrictEqual(expectedEndedAt)
+        expect(store.getState().strictMode.endedAt).toStrictEqual(
+          expectedEndedAt,
+        )
       },
       async timerShouldBeSavedInRepositoryAs(expectedEndedAt: string) {
         const userId = store.getState().auth.authUser?.id ?? DEFAULT_USER_ID

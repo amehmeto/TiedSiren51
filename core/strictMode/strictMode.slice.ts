@@ -14,8 +14,8 @@ const initialState: TimerState = {
   isLoading: true,
 }
 
-export const timerSlice = createSlice({
-  name: 'timer',
+export const strictModeSlice = createSlice({
+  name: 'strictMode',
   initialState,
   reducers: {
     setEndedAt: (state, action: PayloadAction<ISODateString | null>) => {
@@ -50,4 +50,4 @@ export const timerSlice = createSlice({
   },
 })
 
-export const { setEndedAt } = timerSlice.actions
+export const { setEndedAt } = strictModeSlice.actions

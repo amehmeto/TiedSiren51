@@ -49,7 +49,7 @@ const reducer = createReducer(initialState, (builder) => {
       state.auth.isLoading = action.payload
     })
     .addCase(withTimerEndedAt, (state, action) => {
-      state.timer.endedAt = action.payload
+      state.strictMode.endedAt = action.payload
     })
 })
 
