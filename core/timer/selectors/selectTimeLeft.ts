@@ -1,9 +1,9 @@
 import { DateProvider } from '@/core/_ports_/port.date-provider'
 import { RootState } from '@/core/_redux_/createStore'
-import { TimeRemaining } from '../timer'
+import { TimeLeft } from '../timer'
 import { millisecondsToTimeUnits } from '../timer.utils'
 
-const EMPTY_TIME: TimeRemaining = {
+const EMPTY_TIME: TimeLeft = {
   days: 0,
   hours: 0,
   minutes: 0,
@@ -14,7 +14,7 @@ const EMPTY_TIME: TimeRemaining = {
 export function selectTimeLeft(
   state: RootState,
   dateProvider: DateProvider,
-): TimeRemaining {
+): TimeLeft {
   const endAt = state.timer.endAt
   if (!endAt) return EMPTY_TIME
 

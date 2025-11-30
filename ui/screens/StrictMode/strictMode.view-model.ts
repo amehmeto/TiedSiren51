@@ -3,7 +3,7 @@ import { DateProvider } from '@/core/_ports_/port.date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectIsTimerActive } from '@/core/timer/selectors/selectIsTimerActive'
 import { selectTimeLeft } from '@/core/timer/selectors/selectTimeLeft'
-import { TimeRemaining } from '@/core/timer/timer'
+import { TimeLeft } from '@/core/timer/timer'
 
 export enum StrictModeViewState {
   Active = 'ACTIVE',
@@ -28,7 +28,7 @@ type ActiveViewModel = {
 
 export type StrictModeViewModel = InactiveViewModel | ActiveViewModel
 
-function formatCountdown(timeLeft: TimeRemaining): string {
+function formatCountdown(timeLeft: TimeLeft): string {
   const parts: string[] = []
 
   const hasDays = timeLeft.days > 0
@@ -43,7 +43,7 @@ function formatCountdown(timeLeft: TimeRemaining): string {
   return parts.join(' ')
 }
 
-function formatEndDateTime(timeLeft: TimeRemaining, now: Date): string {
+function formatEndDateTime(timeLeft: TimeLeft, now: Date): string {
   const durationMs =
     timeLeft.days * DAY +
     timeLeft.hours * HOUR +
