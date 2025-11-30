@@ -1,6 +1,7 @@
+import { ISODateString } from '@/core/_ports_/port.date-provider'
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
 
-export const loadTimer = createAppAsyncThunk<string | null, void>(
+export const loadTimer = createAppAsyncThunk<ISODateString | null, void>(
   'timer/loadTimer',
   async (_payload, { extra: { timerRepository, dateProvider }, getState }) => {
     const userId = getState().auth.authUser?.id

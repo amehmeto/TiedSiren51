@@ -1,4 +1,5 @@
 import { DAY } from '@/core/__constants__/time'
+import { ISODateString } from '@/core/_ports_/port.date-provider'
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
 import { calculateMilliseconds } from '../timer.utils'
 
@@ -10,7 +11,10 @@ export type ExtendTimerPayload = {
   minutes: number
 }
 
-export const extendTimer = createAppAsyncThunk<string, ExtendTimerPayload>(
+export const extendTimer = createAppAsyncThunk<
+  ISODateString,
+  ExtendTimerPayload
+>(
   'timer/extendTimer',
   async (payload, { extra: { timerRepository, dateProvider }, getState }) => {
     const userId = getState().auth.authUser?.id

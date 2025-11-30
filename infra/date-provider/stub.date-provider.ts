@@ -1,5 +1,5 @@
 import { DAY, MINUTE } from '@/core/__constants__/time'
-import { DateProvider } from '@/core/_ports_/port.date-provider'
+import { DateProvider, ISODateString } from '@/core/_ports_/port.date-provider'
 
 export class StubDateProvider implements DateProvider {
   now = new Date()
@@ -12,8 +12,9 @@ export class StubDateProvider implements DateProvider {
     return this.now.getTime()
   }
 
-  getISOStringNow(): string {
-    return this.now.toISOString()
+  getISOStringNow(): ISODateString {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
+    return this.now.toISOString() as ISODateString
   }
 
   recoverDate(timeInHHmm: string): Date {
@@ -48,15 +49,17 @@ export class StubDateProvider implements DateProvider {
     return new Date(this.now.getTime() + minutes * MINUTE)
   }
 
-  parseISOString(isoString: string): Date {
+  parseISOString(isoString: ISODateString): Date {
     return new Date(isoString)
   }
 
-  toISOString(date: Date): string {
-    return date.toISOString()
+  toISOString(date: Date): ISODateString {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
+    return date.toISOString() as ISODateString
   }
 
-  msToISOString(ms: number): string {
-    return new Date(ms).toISOString()
+  msToISOString(ms: number): ISODateString {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
+    return new Date(ms).toISOString() as ISODateString
   }
 }
