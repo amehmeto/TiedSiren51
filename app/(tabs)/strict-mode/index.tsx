@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useCallback, useState } from 'react'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { SECOND } from '@/core/__constants__/time'
@@ -37,6 +37,7 @@ export default function StrictModeScreen() {
 
   const dispatch = useDispatch<AppDispatch>()
   const { dateProvider } = dependencies
+
   const viewModel = useSelector((state: RootState) =>
     selectStrictModeViewModel(state, dateProvider),
   )
@@ -45,9 +46,11 @@ export default function StrictModeScreen() {
 
   useTick(1 * SECOND, isActive)
 
-  useAppForeground(() => {
+  const handleLoadTimer = useCallback(() => {
     dispatch(loadTimer())
-  })
+  }, [dispatch])
+
+  useAppForeground(handleLoadTimer)
 
   if (isLoading) return <LoadingScreen />
 
