@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
-import React, { ReactNode, useEffect, useState } from 'react'
-import { Image, StyleSheet, Text } from 'react-native'
+import React, { ReactNode, useCallback, useEffect, useState } from 'react'
+import { AppState, Image, StyleSheet, Text } from 'react-native'
 import 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
 import { isAndroidSirenLookout } from '@/core/_ports_/siren.lookout'
@@ -32,16 +32,23 @@ export default function HomeScreen() {
     selectHomeViewModel(rootState, dateProvider.getNow(), dateProvider),
   )
 
-  useEffect(() => {
-    const checkPermission = async () => {
-      if (isAndroidSirenLookout(sirenLookout)) {
-        const isEnabled = await sirenLookout.isEnabled()
-        setHasAccessibilityPermission(isEnabled)
-      } else setHasAccessibilityPermission(true)
-    }
-
-    void checkPermission()
+  const checkPermission = useCallback(async () => {
+    if (isAndroidSirenLookout(sirenLookout)) {
+      const isEnabled = await sirenLookout.isEnabled()
+      setHasAccessibilityPermission(isEnabled)
+    } else setHasAccessibilityPermission(true)
   }, [sirenLookout])
+
+  useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    void checkPermission()
+
+    const subscription = AppState.addEventListener('change', (nextAppState) => {
+      if (nextAppState === 'active') void checkPermission()
+    })
+
+    return () => subscription.remove()
+  }, [checkPermission])
 
   const [activeSessionsNode, scheduledSessionsNode]: ReactNode[] = (() => {
     // eslint-disable-next-line no-switch-statements/no-switch
