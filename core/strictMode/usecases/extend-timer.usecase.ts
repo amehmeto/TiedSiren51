@@ -4,12 +4,10 @@ import { ISODateString } from '@/core/_ports_/port.date-provider'
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
 import { selectAuthUserId } from '@/core/auth/selectors/selectAuthUserId'
 
-const MAX_DURATION_MS = 30 * DAY
-
 export type ExtendTimerPayload = {
-  days: number
-  hours: number
-  minutes: number
+  days?: number
+  hours?: number
+  minutes?: number
 }
 
 export const extendTimer = createAppAsyncThunk<
@@ -18,6 +16,7 @@ export const extendTimer = createAppAsyncThunk<
 >(
   'timer/extendTimer',
   async (payload, { extra: { timerRepository, dateProvider }, getState }) => {
+    const MAX_DURATION_MS = 30 * DAY
     const userId = selectAuthUserId(getState())
 
     const nowMs = dateProvider.getNowMs()

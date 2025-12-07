@@ -10,7 +10,7 @@ import {
   StrictModeViewState,
 } from './strict-mode.view-model'
 
-const NOW = new Date('2024-01-01T10:00:00.000Z')
+const NOW = new Date(2024, 0, 1, 10, 0, 0, 0)
 const NOW_MS = NOW.getTime()
 
 function endedAtFromNow(offsetMs: number): ISODateString {
@@ -47,9 +47,7 @@ describe('selectStrictModeViewModel', () => {
       {
         type: StrictModeViewState.Active,
         countdown: '1h 30m 45s',
-        endDateTime: expect.stringMatching(
-          /^Ends \d+\/\d+, \d+:\d+ [ap]\.m\.$/,
-        ),
+        endDateTime: 'Ends 1/1, 11:30 a.m.',
         inlineRemaining: '1h 30m 45s',
         statusMessage: 'Your blockings are locked against any\nbypassing.',
         buttonText: 'Extend Timer',
@@ -65,9 +63,7 @@ describe('selectStrictModeViewModel', () => {
       {
         type: StrictModeViewState.Active,
         countdown: '2d 5h 30m 15s',
-        endDateTime: expect.stringMatching(
-          /^Ends \d+\/\d+, \d+:\d+ [ap]\.m\.$/,
-        ),
+        endDateTime: 'Ends 3/1, 3:30 p.m.',
         inlineRemaining: '2d 5h 30m 15s',
         statusMessage: 'Your blockings are locked against any\nbypassing.',
         buttonText: 'Extend Timer',
@@ -81,9 +77,7 @@ describe('selectStrictModeViewModel', () => {
       {
         type: StrictModeViewState.Active,
         countdown: '45m 30s',
-        endDateTime: expect.stringMatching(
-          /^Ends \d+\/\d+, \d+:\d+ [ap]\.m\.$/,
-        ),
+        endDateTime: 'Ends 1/1, 10:45 a.m.',
         inlineRemaining: '45m 30s',
         statusMessage: 'Your blockings are locked against any\nbypassing.',
         buttonText: 'Extend Timer',
@@ -97,9 +91,7 @@ describe('selectStrictModeViewModel', () => {
       {
         type: StrictModeViewState.Active,
         countdown: '30s',
-        endDateTime: expect.stringMatching(
-          /^Ends \d+\/\d+, \d+:\d+ [ap]\.m\.$/,
-        ),
+        endDateTime: 'Ends 1/1, 10:00 a.m.',
         inlineRemaining: '30s',
         statusMessage: 'Your blockings are locked against any\nbypassing.',
         buttonText: 'Extend Timer',

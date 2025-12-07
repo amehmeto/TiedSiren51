@@ -1,4 +1,4 @@
-import { describe, expect, test, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, test } from 'vitest'
 import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
@@ -34,11 +34,10 @@ describe('selectStrictModeTimeLeft', () => {
   })
 
   test('should return empty time when strict mode has expired', () => {
+    const expiredDate = dateProvider.msToISOString(nowMs - 1 * SECOND)
     const store = createTestStore(
       { dateProvider },
-      stateBuilder()
-        .withStrictModeEndedAt(dateProvider.msToISOString(nowMs - 1 * SECOND))
-        .build(),
+      stateBuilder().withStrictModeEndedAt(expiredDate).build(),
     )
     const expectedTimeLeft = {
       days: 0,
@@ -62,7 +61,7 @@ describe('selectStrictModeTimeLeft', () => {
         hours: 1,
         minutes: 0,
         seconds: 0,
-        totalMs: 3600000,
+        totalMs: 1 * HOUR,
       },
     },
     {
@@ -73,7 +72,7 @@ describe('selectStrictModeTimeLeft', () => {
         hours: 2,
         minutes: 30,
         seconds: 45,
-        totalMs: 86400000 + 7200000 + 1800000 + 45000,
+        totalMs: 1 * DAY + 2 * HOUR + 30 * MINUTE + 45 * SECOND,
       },
     },
     {
@@ -84,7 +83,7 @@ describe('selectStrictModeTimeLeft', () => {
         hours: 0,
         minutes: 30,
         seconds: 0,
-        totalMs: 1800000,
+        totalMs: 30 * MINUTE,
       },
     },
     {
@@ -95,93 +94,71 @@ describe('selectStrictModeTimeLeft', () => {
         hours: 0,
         minutes: 0,
         seconds: 45,
-        totalMs: 45000,
+        totalMs: 45 * SECOND,
       },
     },
-  ])(
-    'should calculate remaining time correctly for $description',
-    ({ remainingMs, expected }) => {
-      const store = createTestStore(
-        { dateProvider },
-        stateBuilder()
-          .withStrictModeEndedAt(
-            dateProvider.msToISOString(nowMs + remainingMs),
-          )
-          .build(),
-      )
-
-      const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
-
-      expect(timeLeft).toStrictEqual(expected)
-    },
-  )
-
-  test.each([
     {
-      description: '61 seconds remaining',
+      description: '61 seconds (1 minute 1 second)',
       remainingMs: 61 * SECOND,
       expected: {
         days: 0,
         hours: 0,
         minutes: 1,
         seconds: 1,
-        totalMs: 61000,
+        totalMs: 61 * SECOND,
       },
     },
     {
-      description: '60 seconds remaining',
+      description: '60 seconds (1 minute)',
       remainingMs: 1 * MINUTE,
       expected: {
         days: 0,
         hours: 0,
         minutes: 1,
         seconds: 0,
-        totalMs: 60000,
+        totalMs: 1 * MINUTE,
       },
     },
     {
-      description: '59 seconds remaining',
+      description: '59 seconds',
       remainingMs: 59 * SECOND,
       expected: {
         days: 0,
         hours: 0,
         minutes: 0,
         seconds: 59,
-        totalMs: 59000,
+        totalMs: 59 * SECOND,
       },
     },
     {
-      description: '3661 seconds remaining (1 hour 1 minute 1 second)',
+      description: '1 hour 1 minute 1 second',
       remainingMs: 1 * HOUR + 1 * MINUTE + 1 * SECOND,
       expected: {
         days: 0,
         hours: 1,
         minutes: 1,
         seconds: 1,
-        totalMs: 3661000,
+        totalMs: 1 * HOUR + 1 * MINUTE + 1 * SECOND,
       },
     },
     {
-      description: '125 seconds remaining (2 minutes 5 seconds)',
+      description: '2 minutes 5 seconds',
       remainingMs: 2 * MINUTE + 5 * SECOND,
       expected: {
         days: 0,
         hours: 0,
         minutes: 2,
         seconds: 5,
-        totalMs: 125000,
+        totalMs: 2 * MINUTE + 5 * SECOND,
       },
     },
   ])(
-    'should calculate time remaining correctly for $description',
+    'should calculate remaining time correctly for $description',
     ({ remainingMs, expected }) => {
+      const endedAt = dateProvider.msToISOString(nowMs + remainingMs)
       const store = createTestStore(
         { dateProvider },
-        stateBuilder()
-          .withStrictModeEndedAt(
-            dateProvider.msToISOString(nowMs + remainingMs),
-          )
-          .build(),
+        stateBuilder().withStrictModeEndedAt(endedAt).build(),
       )
 
       const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)

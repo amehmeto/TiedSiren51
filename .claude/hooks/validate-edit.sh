@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 
 # PostToolUse hook for validating TypeScript/ESLint after file edits
-# Exit code 2 blocks the edit and sends feedback to Claude
+# Outputs JSON with decision: "block" to provide feedback to Claude
 
 # Parse the JSON input from stdin
 input=$(cat)
@@ -27,29 +27,23 @@ if [ ! -f "$file_path" ]; then
   exit 0
 fi
 
-errors=""
-
 # Run ESLint on the file (with auto-fix for trivial issues)
-eslint_output=$(npx eslint "$file_path" --fix 2>&1) || {
-  eslint_exit=$?
-  if [ $eslint_exit -ne 0 ]; then
-    # Filter out the summary line and only keep actual errors
-    filtered_output=$(echo "$eslint_output" | grep -v "^$" | grep -v "problems")
-    if [ -n "$filtered_output" ]; then
-      errors+="ESLint errors:
-$filtered_output
+eslint_output=$(npx eslint "$file_path" --fix 2>&1)
+eslint_exit=$?
 
-"
-    fi
-  fi
-}
+if [ $eslint_exit -ne 0 ]; then
+  # Filter to get just the error lines
+  filtered_output=$(echo "$eslint_output" | grep -E "^\s+[0-9]+:[0-9]+\s+error" || echo "$eslint_output")
 
-# If there are errors, exit with code 2 to block and provide feedback
-if [ -n "$errors" ]; then
-  echo "File validation failed for: $file_path" >&2
-  echo "" >&2
-  echo "$errors" >&2
-  echo "Please fix these issues before proceeding." >&2
+  # Output JSON to stdout for Claude to see
+  jq -n \
+    --arg reason "ESLint validation failed for $file_path" \
+    --arg errors "$filtered_output" \
+    '{
+      "decision": "block",
+      "reason": $reason,
+      "eslintErrors": $errors
+    }'
   exit 2
 fi
 

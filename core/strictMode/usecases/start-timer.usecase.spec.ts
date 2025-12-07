@@ -1,5 +1,5 @@
 import { beforeEach, describe, it } from 'vitest'
-import { HOUR, MINUTE } from '@/core/__constants__/time'
+import { StartTimerPayload } from './start-timer.usecase'
 import { timerFixture } from './timer.fixture'
 
 describe('startTimer use case', () => {
@@ -12,79 +12,58 @@ describe('startTimer use case', () => {
   it('should start a timer with given duration', async () => {
     fixture.given.authenticatedUser()
 
-    const nowMs = fixture.dateProvider.getNowMs()
-    const durationMs = 1 * HOUR + 30 * MINUTE
+    await fixture.when.startingTimer({ hours: 1, minutes: 30 })
 
-    await fixture.when.startingTimer({
-      days: 0,
-      hours: 1,
-      minutes: 30,
-    })
-
-    fixture.then.timerShouldBeStoredAs(
-      fixture.dateProvider.msToISOString(nowMs + durationMs),
-    )
-  })
-
-  it.each([
-    {
-      description: 'duration is zero',
-      payload: { days: 0, hours: 0, minutes: 0 },
-    },
-    {
-      description: 'duration is negative',
-      payload: { days: -1, hours: 0, minutes: 0 },
-    },
-  ])('should reject when $description', async ({ payload }) => {
-    fixture.given.authenticatedUser()
-
-    const action = await fixture.when.startingTimer(payload)
-
-    fixture.then.actionShouldBeRejectedWith(action, 'Invalid timer duration')
-  })
-
-  it('should reject when user is not authenticated', async () => {
-    const action = await fixture.when.startingTimer({
-      days: 0,
-      hours: 1,
-      minutes: 0,
-    })
-
-    fixture.then.actionShouldBeRejectedWith(action, 'User not authenticated')
-  })
-
-  it('should reject when duration exceeds 30 days', async () => {
-    fixture.given.authenticatedUser()
-
-    const action = await fixture.when.startingTimer({
-      days: 31,
-      hours: 0,
-      minutes: 0,
-    })
-
-    fixture.then.actionShouldBeRejectedWith(
-      action,
-      'Timer duration exceeds maximum allowed (30 days)',
-    )
+    fixture.then.timerShouldBeStoredAs('2024-01-01T01:30:00.000Z')
   })
 
   it('should replace existing timer when starting a new one', async () => {
     fixture.given.authenticatedUser()
+    fixture.given.existingTimer('2024-01-01T01:00:00.000Z')
 
-    const nowMs = fixture.dateProvider.getNowMs()
-    fixture.given.existingTimer(
-      fixture.dateProvider.msToISOString(nowMs + 1 * HOUR),
-    )
+    await fixture.when.startingTimer({ minutes: 30 })
 
-    const durationMs = 30 * MINUTE
-    await fixture.when.startingTimer({
-      days: 0,
-      hours: 0,
-      minutes: 30,
-    })
-
-    fixture.then.timerShouldBeStoredAs(
-      fixture.dateProvider.msToISOString(nowMs + durationMs),
-    )
+    fixture.then.timerShouldBeStoredAs('2024-01-01T00:30:00.000Z')
   })
+
+  it.each<{
+    scenario: string
+    given: () => void
+    payload: StartTimerPayload
+    expectedError: string
+  }>([
+    {
+      scenario: 'duration is zero',
+      given: () => fixture.given.authenticatedUser(),
+      payload: {},
+      expectedError: 'Invalid timer duration',
+    },
+    {
+      scenario: 'duration is negative',
+      given: () => fixture.given.authenticatedUser(),
+      payload: { days: -1 },
+      expectedError: 'Invalid timer duration',
+    },
+    {
+      scenario: 'duration exceeds 30 days',
+      given: () => fixture.given.authenticatedUser(),
+      payload: { days: 31 },
+      expectedError: 'Timer duration exceeds maximum allowed (30 days)',
+    },
+    {
+      scenario: 'user is not authenticated',
+      given: () => {},
+      payload: { hours: 1 },
+      expectedError: 'User not authenticated',
+    },
+  ])(
+    'should reject when $scenario',
+    async ({ given, payload, expectedError }) => {
+      given()
+
+      const action = await fixture.when.startingTimer(payload)
+
+      fixture.then.actionShouldBeRejectedWith(action, expectedError)
+    },
+  )
 })

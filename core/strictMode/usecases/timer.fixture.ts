@@ -8,9 +8,9 @@ import { AuthUser } from '@/core/auth/authUser'
 import { selectAuthUserIdOrNull } from '@/core/auth/selectors/selectAuthUserIdOrNull'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
-import { extendTimer } from './extend-timer.usecase'
+import { extendTimer, ExtendTimerPayload } from './extend-timer.usecase'
 import { loadTimer } from './load-timer.usecase'
-import { startTimer } from './start-timer.usecase'
+import { startTimer, StartTimerPayload } from './start-timer.usecase'
 
 const DEFAULT_USER_ID = 'test-user-id'
 
@@ -64,22 +64,14 @@ export function timerFixture(
         )
         return store.dispatch(loadTimer())
       },
-      startingTimer: async (payload: {
-        days: number
-        hours: number
-        minutes: number
-      }) => {
+      startingTimer: async (payload: StartTimerPayload) => {
         store = createTestStore(
           { timerRepository, dateProvider },
           testStateBuilderProvider.getState(),
         )
         return store.dispatch(startTimer(payload))
       },
-      extendingTimer: async (payload: {
-        days: number
-        hours: number
-        minutes: number
-      }) => {
+      extendingTimerOf: async (payload: ExtendTimerPayload) => {
         store = createTestStore(
           { timerRepository, dateProvider },
           testStateBuilderProvider.getState(),
@@ -98,7 +90,7 @@ export function timerFixture(
           expectedEndedAt,
         )
       },
-      async timerShouldBeSavedInRepositoryAs(expectedEndedAt: string) {
+      async timerShouldBePersisted(expectedEndedAt: string) {
         const userId =
           selectAuthUserIdOrNull(store.getState()) ?? DEFAULT_USER_ID
         const endedAt = await timerRepository.loadTimer(userId)
