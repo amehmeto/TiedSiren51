@@ -13,6 +13,12 @@ import {
 } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 
+function createFixedTestDate(hours: number, minutes: number): Date {
+  const date = new Date('2024-01-01T00:00:00')
+  date.setHours(hours, minutes, 0, 0)
+  return date
+}
+
 describe('Home View Model', () => {
   let dateProvider: StubDateProvider
 
@@ -36,7 +42,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
-      { hours: 13, minutes: 48 },
+      createFixedTestDate(13, 48),
     ],
     [
       'one active session',
@@ -70,7 +76,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
-      { hours: 13, minutes: 48 },
+      createFixedTestDate(13, 48),
     ],
     [
       'one active session',
@@ -104,7 +110,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
-      { hours: 13, minutes: 48 },
+      createFixedTestDate(13, 48),
     ],
     [
       'one active session that has just started',
@@ -138,7 +144,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
-      { hours: 13, minutes: 48 },
+      createFixedTestDate(13, 48),
     ],
     [
       'one active session that has started the day before',
@@ -172,7 +178,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
-      { hours: 13, minutes: 48 },
+      createFixedTestDate(13, 48),
     ],
     [
       'two sessions',
@@ -219,7 +225,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
-      { hours: 13, minutes: 48 },
+      createFixedTestDate(13, 48),
     ],
     [
       'one scheduled session and 0 active session',
@@ -253,7 +259,7 @@ describe('Home View Model', () => {
           ],
         },
       },
-      { hours: 13, minutes: 48 },
+      createFixedTestDate(13, 48),
     ],
     [
       'one scheduled session and 1 active session',
@@ -301,7 +307,7 @@ describe('Home View Model', () => {
           ],
         },
       },
-      { hours: 13, minutes: 48 },
+      createFixedTestDate(13, 48),
     ],
     [
       'overnight session (evening) when current time is after start but before midnight',
@@ -335,7 +341,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
-      { hours: 23, minutes: 30 },
+      createFixedTestDate(23, 30),
     ],
     [
       'overnight session (morning) when current time is after midnight but before end',
@@ -369,7 +375,7 @@ describe('Home View Model', () => {
           message: SessionBoardMessage.NO_SCHEDULED_SESSIONS,
         },
       },
-      { hours: 6, minutes: 0 },
+      createFixedTestDate(6, 0),
     ],
     [
       'overnight session when current time is before start',
@@ -403,7 +409,7 @@ describe('Home View Model', () => {
           ],
         },
       },
-      { hours: 21, minutes: 0 },
+      createFixedTestDate(21, 0),
     ],
     [
       'overnight session when current time is after end',
@@ -437,14 +443,12 @@ describe('Home View Model', () => {
           ],
         },
       },
-      { hours: 8, minutes: 0 },
+      createFixedTestDate(8, 0),
     ],
   ])(
     'Example: there is %s',
-    (_, preloadedState: PreloadedState, expectedViewModel, timeSettings) => {
+    (_, preloadedState: PreloadedState, expectedViewModel, now: Date) => {
       const store = createTestStore({}, preloadedState)
-      const now = new Date()
-      now.setHours(timeSettings.hours, timeSettings.minutes, 0, 0)
       dateProvider.now = now
 
       const homeViewModel = selectHomeViewModel(
@@ -481,8 +485,7 @@ describe('Home View Model', () => {
         {},
       )
       const [hours, minutes] = nowHHmm.split(':').map(Number)
-      const now = new Date()
-      now.setHours(hours, minutes)
+      const now = createFixedTestDate(hours, minutes)
       dateProvider.now = now
 
       const homeViewModel = selectHomeViewModel(

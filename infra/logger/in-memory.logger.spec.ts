@@ -13,7 +13,7 @@ describe('InMemoryLogger', () => {
   })
 
   it('should start with empty logs', () => {
-    expect(logger.getLogs()).toEqual([])
+    expect(logger.getLogs()).toStrictEqual([])
   })
 
   describe('info()', () => {
@@ -112,7 +112,7 @@ describe('InMemoryLogger', () => {
       const logs2 = logger.getLogs()
 
       expect(logs1).not.toBe(logs2)
-      expect(logs1).toEqual(logs2)
+      expect(logs1).toStrictEqual(logs2)
     })
   })
 
@@ -124,7 +124,7 @@ describe('InMemoryLogger', () => {
 
       logger.clear()
 
-      expect(logger.getLogs()).toEqual([])
+      expect(logger.getLogs()).toStrictEqual([])
     })
   })
 

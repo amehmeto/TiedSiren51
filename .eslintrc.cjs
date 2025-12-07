@@ -1,7 +1,13 @@
 // https://docs.expo.dev/guides/using-eslint/
 // ESM configuration file
 module.exports = {
-  extends: ['expo', 'prettier', 'plugin:no-switch-statements/recommended'],
+  ignorePatterns: ['!.claude'],
+  extends: [
+    'expo',
+    'prettier',
+    'plugin:no-switch-statements/recommended',
+    'plugin:jsonc/recommended-with-json',
+  ],
   plugins: [
     'prettier',
     'no-switch-statements',
@@ -11,6 +17,7 @@ module.exports = {
     'sonarjs',
     'unicorn',
     'local-rules',
+    'jsonc',
   ],
   rules: {
     'import/order': [
@@ -126,6 +133,7 @@ module.exports = {
         'vitest/prefer-each': 'error',
         'vitest/prefer-hooks-in-order': 'error',
         'vitest/prefer-hooks-on-top': 'error',
+        'vitest/prefer-strict-equal': 'error',
         'local-rules/expect-separate-act-assert': 'error',
       },
     },
@@ -317,6 +325,51 @@ module.exports = {
       files: ['core/_ports_/**/*.ts', 'core/**/*.fixture.ts'],
       rules: {
         'no-restricted-globals': 'off',
+      },
+    },
+    // JSON files linting
+    {
+      files: ['*.json', '**/*.json'],
+      excludedFiles: [
+        'tsconfig.json',
+        'tsconfig.*.json',
+        '.claude/settings.local.json',
+      ],
+      parser: 'jsonc-eslint-parser',
+      rules: {
+        'jsonc/indent': ['error', 2],
+        'jsonc/key-spacing': 'error',
+        'jsonc/no-dupe-keys': 'error',
+        'jsonc/sort-keys': 'off',
+      },
+    },
+    // Claude settings - enforce sorted arrays for permissions
+    {
+      files: ['.claude/settings.local.json', '.claude/settings.json'],
+      parser: 'jsonc-eslint-parser',
+      rules: {
+        'jsonc/indent': ['error', 2],
+        'jsonc/key-spacing': 'error',
+        'jsonc/no-dupe-keys': 'error',
+        'jsonc/sort-array-values': [
+          'error',
+          {
+            pathPattern: '^permissions\\.(allow|deny|ask)$',
+            order: { type: 'asc' },
+          },
+        ],
+      },
+    },
+    // JSONC files (tsconfig allows comments)
+    {
+      files: ['tsconfig.json', 'tsconfig.*.json'],
+      parser: 'jsonc-eslint-parser',
+      rules: {
+        'jsonc/indent': ['error', 2],
+        'jsonc/key-spacing': 'error',
+        'jsonc/no-dupe-keys': 'error',
+        'jsonc/no-comments': 'off',
+        'jsonc/sort-keys': 'off',
       },
     },
   ],

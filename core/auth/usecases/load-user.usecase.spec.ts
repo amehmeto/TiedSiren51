@@ -46,7 +46,7 @@ describe('loadUser usecase', () => {
 
     expect(blocklistEntities).toHaveProperty('blocklist-1')
     expect(blockSessionEntities).toHaveProperty('session-1')
-    expect(availableSirens).toEqual(mockSirens)
+    expect(availableSirens).toStrictEqual(mockSirens)
   })
 
   test('should handle empty repositories', async () => {
@@ -88,6 +88,6 @@ describe('loadUser usecase', () => {
 
     expect(blocklistKeys).toHaveLength(0)
     expect(blockSessionKeys).toHaveLength(0)
-    expect(availableSirens).toEqual(emptySirens)
+    expect(availableSirens).toStrictEqual(emptySirens)
   })
 })

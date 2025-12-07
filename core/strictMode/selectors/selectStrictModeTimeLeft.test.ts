@@ -30,7 +30,7 @@ describe('selectStrictModeTimeLeft', () => {
 
     const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
 
-    expect(timeLeft).toEqual(expectedTimeLeft)
+    expect(timeLeft).toStrictEqual(expectedTimeLeft)
   })
 
   test('should return empty time when strict mode has expired', () => {
@@ -50,7 +50,7 @@ describe('selectStrictModeTimeLeft', () => {
 
     const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
 
-    expect(timeLeft).toEqual(expectedTimeLeft)
+    expect(timeLeft).toStrictEqual(expectedTimeLeft)
   })
 
   test.each([
@@ -112,7 +112,7 @@ describe('selectStrictModeTimeLeft', () => {
 
       const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
 
-      expect(timeLeft).toEqual(expected)
+      expect(timeLeft).toStrictEqual(expected)
     },
   )
 
@@ -186,7 +186,7 @@ describe('selectStrictModeTimeLeft', () => {
 
       const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
 
-      expect(timeLeft).toEqual(expected)
+      expect(timeLeft).toStrictEqual(expected)
     },
   )
 })

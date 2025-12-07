@@ -22,7 +22,7 @@ import { useTick } from '@/ui/hooks/useTick'
 import {
   selectStrictModeViewModel,
   StrictModeViewState,
-} from '@/ui/screens/StrictMode/strictMode.view-model'
+} from '@ui/screens/StrictMode/strict-mode.view-model'
 import { UnLockMethodCard } from '@ui/screens/StrictMode/UnLockMethodCard'
 
 const DEFAULT_DURATION: TimerDuration = { days: 0, hours: 0, minutes: 20 }

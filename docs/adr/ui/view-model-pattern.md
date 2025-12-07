@@ -289,7 +289,7 @@ type ViewModel = {
 
 - `ui/screens/Home/HomeScreen/home.view-model.ts` - Complex multi-state example
 - `ui/screens/Home/HomeScreen/home-view-model.types.ts` - Type definitions
-- `ui/screens/StrictMode/strictMode.view-model.ts` - Simple binary state example
+- `ui/screens/StrictMode/strict-mode.view-model.ts` - Simple binary state example
 
 ### View Model Structure
 
@@ -368,5 +368,5 @@ const viewModel = useSelector((state) =>
 ## References
 
 - `ui/screens/Home/HomeScreen/home.view-model.ts` - Full implementation
-- `ui/screens/StrictMode/strictMode.view-model.ts` - Simple implementation
+- `ui/screens/StrictMode/strict-mode.view-model.ts` - Simple implementation
 - [Discriminated Unions in TypeScript](https://www.typescriptlang.org/docs/handbook/2/narrowing.html#discriminated-unions)

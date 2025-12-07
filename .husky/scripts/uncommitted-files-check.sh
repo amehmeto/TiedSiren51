@@ -1,3 +1,5 @@
+#!/usr/bin/env bash
+
 echo "Running 'npm run check:uncommitted'..."
 
 if npm run check:uncommitted; then

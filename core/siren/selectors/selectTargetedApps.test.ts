@@ -37,7 +37,7 @@ describe('selectTargetedApps', () => {
 
     const targetedApps = selectTargetedApps(store.getState(), dateProvider)
 
-    expect(targetedApps).toEqual([])
+    expect(targetedApps).toStrictEqual([])
   })
 
   test('should return targeted apps from single active block session', () => {
@@ -65,7 +65,10 @@ describe('selectTargetedApps', () => {
 
     const targetedApps = selectTargetedApps(store.getState(), dateProvider)
 
-    expect(targetedApps).toEqual([facebookAndroidSiren, instagramAndroidSiren])
+    expect(targetedApps).toStrictEqual([
+      facebookAndroidSiren,
+      instagramAndroidSiren,
+    ])
   })
 
   test('should return targeted apps from multiple active block sessions', () => {
@@ -104,7 +107,7 @@ describe('selectTargetedApps', () => {
 
     const targetedApps = selectTargetedApps(store.getState(), dateProvider)
 
-    expect(targetedApps).toEqual([
+    expect(targetedApps).toStrictEqual([
       facebookAndroidSiren,
       instagramAndroidSiren,
       youtubeAndroidSiren,
@@ -141,6 +144,9 @@ describe('selectTargetedApps', () => {
 
     const targetedApps = selectTargetedApps(store.getState(), dateProvider)
 
-    expect(targetedApps).toEqual([facebookAndroidSiren, instagramAndroidSiren])
+    expect(targetedApps).toStrictEqual([
+      facebookAndroidSiren,
+      instagramAndroidSiren,
+    ])
   })
 })

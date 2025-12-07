@@ -52,7 +52,7 @@ describe('millisecondsToTimeUnits', () => {
 
     const result = millisecondsToTimeUnits(0)
 
-    expect(result).toEqual(expectedTimeUnits)
+    expect(result).toStrictEqual(expectedTimeUnits)
   })
 
   test.each([
@@ -75,7 +75,7 @@ describe('millisecondsToTimeUnits', () => {
   ])('should convert $input ms to time units', ({ input, expected }) => {
     const result = millisecondsToTimeUnits(input)
 
-    expect(result).toEqual(expected)
+    expect(result).toStrictEqual(expected)
   })
 
   test('should break down complex duration correctly', () => {
@@ -89,7 +89,7 @@ describe('millisecondsToTimeUnits', () => {
 
     const result = millisecondsToTimeUnits(input)
 
-    expect(result).toEqual(expectedTimeUnits)
+    expect(result).toStrictEqual(expectedTimeUnits)
   })
 
   test('should handle overflow correctly (e.g., 90 minutes becomes 1 hour 30 minutes)', () => {
@@ -103,7 +103,7 @@ describe('millisecondsToTimeUnits', () => {
 
     const result = millisecondsToTimeUnits(input)
 
-    expect(result).toEqual(expectedTimeUnits)
+    expect(result).toStrictEqual(expectedTimeUnits)
   })
 
   test('should floor partial seconds', () => {
@@ -117,7 +117,7 @@ describe('millisecondsToTimeUnits', () => {
 
     const result = millisecondsToTimeUnits(input)
 
-    expect(result).toEqual(expectedTimeUnits)
+    expect(result).toStrictEqual(expectedTimeUnits)
   })
 
   test('should be inverse of calculateMilliseconds', () => {
@@ -126,6 +126,6 @@ describe('millisecondsToTimeUnits', () => {
 
     const result = millisecondsToTimeUnits(ms)
 
-    expect(result).toEqual(original)
+    expect(result).toStrictEqual(original)
   })
 })

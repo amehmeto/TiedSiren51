@@ -28,6 +28,7 @@
       "Bash(git log:*)",
       "Bash(git stash:*)",
       "Bash(grep:*)",
+      "Bash(ls:*)",
       "Bash(npm install:*)",
       "Bash(npm run generate:schema:*)",
       "Bash(npm run lint:*)",
@@ -44,17 +45,19 @@
       "WebFetch(domain:github.com)",
       "WebFetch(domain:stackoverflow.com)",
       "WebFetch(domain:www.npmjs.com)",
+      "WebSearch",
       "mcp__github__add_issue_comment",
       "mcp__github__list_pull_requests",
       "mcp__github__pull_request_read",
       "mcp__github__pull_request_review_write",
       "mcp__ide__getDiagnostics",
-      "WebSearch"
+      "Bash(npm run lint:sh:*)",
+      "Bash(npx prettier:*)"
     ],
     "deny": [
-      "BashOutput(*)",
+      "Bash(git commit --no-verify:*)",
       "Bash(git push --no-verify:*)",
-      "Bash(git commit --no-verify:*)"
+      "BashOutput(*)"
     ],
     "ask": [
       "Bash(SKIP_E2E_CHECK=1 git push:*)",
@@ -65,6 +68,19 @@
       "Bash(git commit:*)",
       "Bash(git merge:*)",
       "Bash(git push:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/validate-edit.sh"
+          }
+        ]
+      }
     ]
   }
 }

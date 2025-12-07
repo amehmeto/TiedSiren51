@@ -1,11 +1,11 @@
 import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import {
   StrictModeViewModel,
   StrictModeViewState,
-} from '@/ui/screens/StrictMode/strictMode.view-model'
+} from '@ui/screens/StrictMode/strict-mode.view-model'
 
 type CircularTimerDisplayProps = {
   viewModel: StrictModeViewModel
