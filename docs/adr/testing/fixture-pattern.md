@@ -279,6 +279,121 @@ const store = createTestStore(state)
 4. **Immutability**: Fixtures shouldn't modify shared state
 5. **Type safety**: Use `Partial<T>` for overrides
 
+### DSL Conventions
+
+The fixture pattern follows a strict given/when/then DSL that separates concerns:
+
+#### 1. `given` - Set Up Preconditions
+
+`given` functions configure the initial state before testing. They should:
+- Set up data in repositories/stores
+- Configure authenticaiton state
+- Prepare any external dependencies
+
+```typescript
+const fixture = timerFixture()
+
+// Setting up preconditions
+fixture.given.existingTimer('2024-01-01T01:00:00.000Z')
+fixture.given.authenticatedUser({ id: 'user-1', email: 'test@example.com' })
+fixture.given.noTimer()  // Explicit empty state
+```
+
+#### 2. `when` - Trigger Actions
+
+`when` functions execute the action being tested. They should:
+- Call the use case or action under test
+- Return any result that needs to be verified
+
+```typescript
+// Triggering the action
+const action = await fixture.when.startingTimer({ minutes: 30 })
+await fixture.when.extendingTimerOf({ hours: 1 })
+await fixture.when.loadingTimer()
+```
+
+#### 3. `then` - Verify Outcomes
+
+`then` functions assert the expected outcomes. They should:
+- Check the store state
+- Verify persistence
+- Validate error conditions
+
+```typescript
+// Verifying outcomes
+fixture.then.timerShouldBeStoredAs('2024-01-01T01:30:00.000Z')
+await fixture.then.timerShouldBePersisted('2024-01-01T01:30:00.000Z')
+fixture.then.actionShouldBeRejectedWith(action, 'No active timer')
+```
+
+### Domain Language
+
+Use domain-specific language in fixture methods, not technical terms:
+
+**Good (Domain Language)**:
+```typescript
+fixture.then.timerShouldBePersisted(expectedEndAt)
+fixture.then.timerShouldBeStoredAs(expectedEndAt)
+fixture.given.existingTimer(endAt)
+fixture.given.noTimer()
+```
+
+**Avoid (Technical Terms)**:
+```typescript
+fixture.then.timerShouldBeSavedInRepositoryAs(expectedEndAt)  // Too technical
+fixture.then.stateShouldEqual(expectedState)  // Implementation detail
+fixture.given.setRepositoryData(data)  // Technical operation
+```
+
+### Consolidating Tests with it.each
+
+When multiple test cases share the same structure but differ in inputs/outputs, use `it.each` with `given` functions to avoid conditionals in tests.
+
+**Problem**: The `vitest/no-conditional-in-test` ESLint rule forbids if/else in tests.
+
+**Solution**: Use `given` functions in test data:
+
+```typescript
+it.each<{
+  scenario: string
+  given: () => void
+  payload: ExtendTimerPayload
+  expectedError: string
+}>([
+  {
+    scenario: 'no active timer exists',
+    given: () => fixture.given.noTimer(),
+    payload: { minutes: 30 },
+    expectedError: 'No active timer to extend',
+  },
+  {
+    scenario: 'timer has expired',
+    given: () => fixture.given.existingTimer('2023-12-31T23:59:59.000Z'),
+    payload: { minutes: 30 },
+    expectedError: 'No active timer to extend',
+  },
+  {
+    scenario: 'extended duration exceeds maximum',
+    given: () => fixture.given.existingTimer('2024-01-30T23:00:00.000Z'),
+    payload: { hours: 2 },
+    expectedError: 'Extended timer duration exceeds maximum allowed (30 days)',
+  },
+])(
+  'should reject when $scenario',
+  async ({ given, payload, expectedError }) => {
+    given()  // Execute the given function
+    const action = await fixture.when.extendingTimerOf(payload)
+    fixture.then.actionShouldBeRejectedWith(action, expectedError)
+  },
+)
+```
+
+This pattern:
+- Eliminates conditionals in tests
+- Makes test data declarative
+- Keeps tests DRY while readable
+- Satisfies `vitest/no-conditional-in-test` rule
+
 ### Example Test
 
 ```typescript

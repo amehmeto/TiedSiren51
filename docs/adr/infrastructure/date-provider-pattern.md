@@ -1,16 +1,17 @@
-# Date Provider Pattern
+# Date Provider Pattern and ISO String Date Handling
 
-Date: 2025-11-23
+Date: 2025-11-23 (Updated: 2025-11-26)
 
 ## Status
 
-Accepted
+Double read by amehmeto
 
 ## Context
 
 TiedSiren51 extensively uses dates and times for:
 
 - **Block session scheduling**: Determining when sessions start/end
+- **Timer countdown**: Tracking when strict mode timer expires
 - **Time-based triggers**: Activating blocking at specific times
 - **Notifications**: Scheduling notifications for future times
 - **Logging**: Recording when events occurred
@@ -23,6 +24,7 @@ Problems with direct `new Date()` usage:
 - **Hard to test edge cases**: Midnight rollovers, timezone changes
 - **Tightly coupled**: Business logic coupled to system clock
 - **Difficult debugging**: Can't easily simulate specific times
+- **ESLint restriction**: `Date` is restricted in core to enforce this pattern
 
 Example of untestable code:
 
@@ -41,7 +43,22 @@ it('session is active', () => {
 
 ## Decision
 
-Use the **Date Provider Pattern** - abstract date/time operations behind a port interface, with real and stub implementations.
+### 1. Date Provider Pattern
+
+Abstract date/time operations behind a port interface, with real and stub implementations.
+
+### 2. ISO Strings for Date Representation
+
+Store and pass dates as **ISO 8601 strings** throughout the entire application stack:
+
+- **Domain types**: `Timer.endedAt: string`, `BlockSession.startedAt: string`
+- **Redux state**: Timer and BlockSession slices store ISO strings
+- **Selectors**: Receive `dateProvider` to parse ISO strings for comparisons
+- **Use cases**: Use `dateProvider` to convert between strings and Date objects
+- **Repository layer**: Pass ISO strings directly
+- **Database**: Prisma schema uses `String` type for dates
+
+All conversions between ISO strings and Date objects go through `DateProvider` methods.
 
 ### Implementation
 
@@ -56,6 +73,10 @@ export interface DateProvider {
   recoverDate(timeInHHmm: string): Date
   recoverYesterdayDate(timeInHHmm: string): Date
   toHHmm(date: Date): string
+  // ISO string conversion methods
+  parseISOString(isoString: string): Date
+  toISOString(date: Date): string
+  msToISOString(ms: number): string
 }
 ```
 
@@ -252,6 +273,26 @@ Global singleton that can be swapped for testing.
 - Doesn't follow hexagonal architecture principles
 - Harder to reason about
 
+### 6. Store Dates as Date Objects
+
+Store JavaScript `Date` objects directly in Redux state.
+
+**Rejected because**:
+- Redux recommends serializable state (Date objects are not serializable)
+- Redux DevTools can't display Date objects properly
+- Time-travel debugging breaks with non-serializable values
+- Persistence (Redux Persist) fails with Date objects
+
+### 7. Store Dates as Unix Timestamps (numbers)
+
+Store dates as milliseconds since epoch.
+
+**Rejected because**:
+- Less readable in debugging (1705312800000 vs "2025-01-15T10:00:00.000Z")
+- Requires conversion for display
+- ISO strings are human-readable and self-documenting
+- ISO strings are the standard JSON format for dates
+
 ## Implementation Notes
 
 ### Domain-Specific Methods
@@ -304,6 +345,91 @@ it('handles session spanning midnight', () => {
   const session = createSession('22:00', '02:00')
   expect(isActive(session, dateProvider)).toBe(true)
 })
+```
+
+### ISO String Data Flow
+
+The following examples show how ISO strings flow through the entire stack:
+
+**1. Redux State** (`core/strictMode/timer.slice.ts`):
+
+```typescript
+// ✅ Dates stored as ISO strings in Redux state
+type TimerState = {
+  endedAt: string | null  // ISO 8601 format: "2025-01-15T10:00:00.000Z"
+  isLoading: boolean
+}
+```
+
+**2. Use Case** (`core/strictMode/usecases/start-timer.usecase.ts`):
+
+```typescript
+export const startTimer = createAppAsyncThunk<string, StartTimerPayload>(
+  'timer/startTimer',
+  async (payload, { extra: { timerRepository, dateProvider }, getState }) => {
+    const { days, hours, minutes } = payload
+    const durationMs = days * DAY + hours * HOUR + minutes * MINUTE
+
+    // Use dateProvider to get current time and convert to ISO string
+    const nowMs = dateProvider.getNowMs()
+    const endedAt = dateProvider.msToISOString(nowMs + durationMs)
+
+    await timerRepository.save(endedAt)
+    return endedAt  // Returns ISO string
+  },
+)
+```
+
+**3. Selector** (`core/strictMode/selectors/selectIsTimerActive.ts`):
+
+```typescript
+export function selectIsTimerActive(
+  state: RootState,
+  dateProvider: DateProvider,  // Injected for parsing and current time
+): boolean {
+  const endedAt = state.strictMode.endedAt
+  if (!endedAt) return false
+
+  // Parse ISO string back to Date for comparison
+  return dateProvider.parseISOString(endedAt).getTime() > dateProvider.getNowMs()
+}
+```
+
+**4. UI Hook** (`ui/hooks/useStrictModeTimer.ts`):
+
+```typescript
+export const useStrictModeTimer = () => {
+  const { dateProvider } = dependencies
+
+  // Pass dateProvider to selectors
+  const isActive = useSelector((state: RootState) =>
+    selectIsTimerActive(state, dateProvider),
+  )
+
+  // ...
+}
+```
+
+**5. Repository** (`infra/timer-repository/prisma.timer-repository.ts`):
+
+```typescript
+async saveTimer(userId: string, endedAt: string): Promise<void> {
+  // ISO string stored directly in database
+  await this.prisma.strictModeTimer.upsert({
+    where: { userId },
+    update: { endedAt },
+    create: { userId, endedAt },
+  })
+}
+```
+
+**6. Database Schema** (`prisma/schema.prisma`):
+
+```prisma
+model StrictModeTimer {
+  userId  String @id
+  endedAt String  // ISO string stored as text
+}
 ```
 
 ### Real-World Usage
@@ -361,4 +487,13 @@ export class CreateBlockSessionUseCase {
 
 - [Clock abstraction pattern](https://blog.ploeh.dk/2014/05/19/di-friendly-framework/)
 - [Dealing with time in tests](https://martinfowler.com/articles/mocksArentStubs.html)
-- Implementation: `infra/date-provider/real.date-provider.ts`
+- [Redux: Normalizing State Shape](https://redux.js.org/usage/structuring-reducers/normalizing-state-shape)
+
+### Implementation Files
+
+- Port: `core/_ports_/port.date-provider.ts`
+- Real implementation: `infra/date-provider/real.date-provider.ts`
+- Stub implementation: `infra/date-provider/stub.date-provider.ts`
+- Timer use cases: `core/strictMode/usecases/start-timer.usecase.ts`
+- Timer selectors: `core/strictMode/selectors/selectIsTimerActive.ts`
+- UI hook: `ui/hooks/useStrictModeTimer.ts`

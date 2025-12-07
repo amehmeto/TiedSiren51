@@ -1,4 +1,4 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
 # Configuration: Set TICKET_PREFIX to require ticket numbers in branch names
 # Examples: TICKET_PREFIX="MA2" or TICKET_PREFIX="JIRA"
