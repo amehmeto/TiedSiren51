@@ -1,13 +1,18 @@
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 import { AppState, AppStateStatus } from 'react-native'
 
 export function useAppForeground(callback: () => void, runOnMount = true) {
+  const callbackRef = useRef(callback)
+
   useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect -- Legitimate use: sync external state (e.g. permission status) on mount and foreground
-    if (runOnMount) callback()
+    callbackRef.current = callback
+  }, [callback])
+
+  useEffect(() => {
+    if (runOnMount) callbackRef.current()
 
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
-      if (nextAppState === 'active') callback()
+      if (nextAppState === 'active') callbackRef.current()
     }
 
     const subscription = AppState.addEventListener(
@@ -16,5 +21,5 @@ export function useAppForeground(callback: () => void, runOnMount = true) {
     )
 
     return () => subscription.remove()
-  }, [callback, runOnMount])
+  }, [runOnMount])
 }
