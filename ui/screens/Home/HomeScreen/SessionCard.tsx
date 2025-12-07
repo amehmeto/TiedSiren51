@@ -61,8 +61,8 @@ export function SessionCard(
     {
       name: 'Delete',
       iconName: 'trash-outline' as const,
-      action: () => {
-        dispatch(deleteBlockSession(props.session.id))
+      action: async () => {
+        await dispatch(deleteBlockSession(props.session.id))
       },
     },
   ]
@@ -113,8 +113,8 @@ export function SessionCard(
         onCancel={() => {
           setIsRenameModalVisible(false)
         }}
-        onSave={(inputText: string) => {
-          dispatch(
+        onSave={async (inputText: string) => {
+          await dispatch(
             renameBlockSession({ id: props.session.id, name: inputText }),
           )
           setIsRenameModalVisible(false)
@@ -130,8 +130,8 @@ export function SessionCard(
         onCancel={() => {
           setIsDuplicateModalVisible(false)
         }}
-        onSave={(inputText: string) => {
-          dispatch(
+        onSave={async (inputText: string) => {
+          await dispatch(
             duplicateBlockSession({ id: props.session.id, name: inputText }),
           )
           setIsDuplicateModalVisible(false)

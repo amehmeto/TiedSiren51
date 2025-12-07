@@ -54,8 +54,8 @@ export function BlocklistCard(
     {
       name: 'Delete',
       iconName: 'trash-outline' as const,
-      action: () => {
-        dispatch(deleteBlocklist(props.blocklist.id))
+      action: async () => {
+        await dispatch(deleteBlocklist(props.blocklist.id))
       },
     },
   ]
@@ -91,8 +91,10 @@ export function BlocklistCard(
         onCancel={() => {
           setRenameModalVisible(false)
         }}
-        onSave={(inputText: string) => {
-          dispatch(renameBlocklist({ id: props.blocklist.id, name: inputText }))
+        onSave={async (inputText: string) => {
+          await dispatch(
+            renameBlocklist({ id: props.blocklist.id, name: inputText }),
+          )
           setRenameModalVisible(false)
         }}
       />
@@ -106,8 +108,8 @@ export function BlocklistCard(
         onCancel={() => {
           setIsDuplicateModalVisible(false)
         }}
-        onSave={(inputText: string) => {
-          dispatch(
+        onSave={async (inputText: string) => {
+          await dispatch(
             duplicateBlocklist({ id: props.blocklist.id, name: inputText }),
           )
           setIsDuplicateModalVisible(false)

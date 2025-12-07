@@ -43,12 +43,12 @@ export function BlockSessionForm({
   const router = useRouter()
 
   function saveBlockSession() {
-    return (session: Session) => {
+    return async (session: Session) => {
       assertIsBlockSession(session)
 
-      if (mode === 'edit' && 'id' in session)
-        dispatch(updateBlockSession(session))
-      else dispatch(createBlockSession(session))
+      await (mode === 'edit' && 'id' in session
+        ? dispatch(updateBlockSession(session))
+        : dispatch(createBlockSession(session)))
 
       router.push('/(tabs)')
     }
