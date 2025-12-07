@@ -56,12 +56,13 @@ jobs:
 
   release:
     needs: path-filter
-    if: github.event_name == 'push'
+    if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
       issues: write
       pull-requests: write
+      id-token: write
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

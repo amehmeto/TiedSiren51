@@ -19,7 +19,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       app-changed: ${{ steps.filter.outputs.app }}
-      shell-only: ${{ steps.filter.outputs.shell && !steps.filter.outputs.app }}
+      shell-only: ${{ steps.filter.outputs.shell == 'true' && steps.filter.outputs.app != 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
