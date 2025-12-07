@@ -22,6 +22,7 @@ Presentation layer: components, screens, design system, routing.
 - [Design System Principles](ui/design-system-principles.md)
 - [View Model Pattern](ui/view-model-pattern.md)
 - [Expo Router File-Based Routing](ui/expo-router-file-based.md)
+- [Minimize useEffect Hook Usage](ui/minimize-useeffect-usage.md)
 
 #### Core Layer (`core/`)
 Business logic: domain patterns, state management, use cases.

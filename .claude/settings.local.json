@@ -3,6 +3,7 @@
     "allow": [
       "Bash(base64:*)",
       "Bash(cat:*)",
+      "Bash(cloc:*)",
       "Bash(eas:*)",
       "Bash(echo:*)",
       "Bash(find:*)",
@@ -25,31 +26,61 @@
       "Bash(gh workflow:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
+      "Bash(git stash:*)",
       "Bash(grep:*)",
+      "Bash(ls:*)",
       "Bash(npm install:*)",
+      "Bash(npm run generate:schema:*)",
       "Bash(npm run lint:*)",
+      "Bash(npm run lint:fix:*)",
+      "Bash(npm run lint:sh:*)",
       "Bash(npm run test:*)",
       "Bash(npm test:*)",
+      "Bash(npm view:*)",
+      "Bash(npx eslint:*)",
+      "Bash(npx prettier:*)",
+      "Bash(npx prisma generate:*)",
       "Bash(npx tsc:*)",
+      "Bash(npx vitest:*)",
+      "Bash(xargs cloc:*)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:stackoverflow.com)",
+      "WebFetch(domain:www.npmjs.com)",
       "WebSearch",
-      "mcp__ide__getDiagnostics",
-      "mcp__github__pull_request_read"
+      "mcp__github__add_issue_comment",
+      "mcp__github__list_pull_requests",
+      "mcp__github__pull_request_read",
+      "mcp__github__pull_request_review_write",
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [
-      "BashOutput(*)",
+      "Bash(git commit --no-verify:*)",
       "Bash(git push --no-verify:*)",
-      "Bash(git commit --no-verify:*)"
+      "BashOutput(*)"
     ],
     "ask": [
+      "Bash(SKIP_E2E_CHECK=1 git push:*)",
       "Bash(chmod:*)",
       "Bash(gh secret:*)",
       "Bash(git add:*)",
       "Bash(git checkout:*)",
       "Bash(git commit:*)",
+      "Bash(git merge:*)",
       "Bash(git push:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/validate-edit.sh"
+          }
+        ]
+      }
     ]
   }
 }
