@@ -9,8 +9,11 @@ describe('Feature: Listen to user logged out events', () => {
 
     authGateway.simulateUserLoggedOut()
     const dispatchedActions = store.getActions()
-    expect(
-      dispatchedActions.some((action) => action.type === 'auth/logOut/pending'),
-    ).toBe(true)
+
+    const hasLogOutPending = dispatchedActions.some(
+      (action) => action.type === 'auth/logOut/pending',
+    )
+
+    expect(hasLogOutPending).toBe(true)
   })
 })

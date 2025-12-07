@@ -11,7 +11,7 @@ export function TiedSCard(
 ) {
   return (
     <BlurView
-      intensity={90}
+      intensity={T.effects.blur.intensity.strong}
       style={[styles.container, props.style]}
       tint={'dark'}
     >

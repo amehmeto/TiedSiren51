@@ -13,6 +13,7 @@ import { ExpoNotificationService } from '@/infra/notification-service/expo.notif
 import { PrismaSirensRepository } from '@/infra/siren-repository/prisma.sirens-repository'
 import { InMemorySirenLookout } from '@/infra/siren-tier/in-memory.siren-lookout'
 import { InMemorySirenTier } from '@/infra/siren-tier/in-memory.siren-tier'
+import { PrismaTimerRepository } from '@/infra/timer-repository/prisma.timer.repository'
 
 const dateProvider = new RealDateProvider()
 const logger = new InMemoryLogger(dateProvider)
@@ -32,6 +33,7 @@ const mobileDependencies = {
   sirenLookout: new InMemorySirenLookout(logger),
   sirenTier: new InMemorySirenTier(logger),
   sirensRepository: new PrismaSirensRepository(logger),
+  timerRepository: new PrismaTimerRepository(logger),
 }
 
 export const dependencies: Dependencies = mobileDependencies

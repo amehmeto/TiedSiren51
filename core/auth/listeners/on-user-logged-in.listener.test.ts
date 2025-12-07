@@ -10,31 +10,28 @@ describe('onUserLoggedIn listener', () => {
       authGateway,
     })
 
-    authGateway.simulateUserLoggedIn({
+    const userPayload = {
       id: 'wesh alors',
       email: 'jul@gmail.com',
       username: 'Jul',
-    })
+    }
+    const expectedAction = userAuthenticated(userPayload)
+
+    authGateway.simulateUserLoggedIn(userPayload)
     const dispatchedActions = store.getActions()
 
-    expect(dispatchedActions).toContainEqual(
-      userAuthenticated({
-        id: 'wesh alors',
-        email: 'jul@gmail.com',
-        username: 'Jul',
-      }),
+    expect(dispatchedActions).toContainEqual(expectedAction)
+
+    const hasLoadUserPending = dispatchedActions.some(
+      (action) => action.type === 'auth/loadUser/pending',
     )
 
-    expect(
-      dispatchedActions.some(
-        (action) => action.type === 'auth/loadUser/pending',
-      ),
-    ).toBe(true)
+    expect(hasLoadUserPending).toBe(true)
 
-    expect(
-      dispatchedActions.some(
-        (action) => action.type === 'siren/targetSirens/pending',
-      ),
-    ).toBe(true)
+    const hasTargetSirensPending = dispatchedActions.some(
+      (action) => action.type === 'siren/targetSirens/pending',
+    )
+
+    expect(hasTargetSirensPending).toBe(true)
   })
 })

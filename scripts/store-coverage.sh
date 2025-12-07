@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Store coverage summary to a specified output file
 
 OUTPUT_FILE=$1

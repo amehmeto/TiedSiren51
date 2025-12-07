@@ -1,16 +1,20 @@
-import { DateProvider } from '@/core/_ports_/port.date-provider'
+import { DAY, MINUTE } from '@/core/__constants__/time'
+import { DateProvider, ISODateString } from '@/core/_ports_/port.date-provider'
 
 export class StubDateProvider implements DateProvider {
-  private MILLISECONDS_IN_A_DAY = 24 * 60 * 60 * 1000
-
   now = new Date()
 
   getNow(): Date {
     return this.now
   }
 
-  getISOStringNow(): string {
-    return this.now.toISOString()
+  getNowMs(): number {
+    return this.now.getTime()
+  }
+
+  getISOStringNow(): ISODateString {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
+    return this.now.toISOString() as ISODateString
   }
 
   recoverDate(timeInHHmm: string): Date {
@@ -31,9 +35,7 @@ export class StubDateProvider implements DateProvider {
   recoverYesterdayDate(timeInHHmm: string): Date {
     const [hours, minutes] = timeInHHmm.split(':').map(Number)
 
-    const todayWithNewTime = new Date(
-      this.now.getTime() - this.MILLISECONDS_IN_A_DAY,
-    )
+    const todayWithNewTime = new Date(this.now.getTime() - 1 * DAY)
     todayWithNewTime.setHours(hours, minutes, 0, 0)
 
     return todayWithNewTime
@@ -44,6 +46,20 @@ export class StubDateProvider implements DateProvider {
   }
 
   getMinutesFromNow(minutes: number): Date {
-    return new Date(this.now.getTime() + minutes * 60 * 1000)
+    return new Date(this.now.getTime() + minutes * MINUTE)
+  }
+
+  parseISOString(isoString: ISODateString): Date {
+    return new Date(isoString)
+  }
+
+  toISOString(date: Date): ISODateString {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
+    return date.toISOString() as ISODateString
+  }
+
+  msToISOString(ms: number): ISODateString {
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
+    return new Date(ms).toISOString() as ISODateString
   }
 }

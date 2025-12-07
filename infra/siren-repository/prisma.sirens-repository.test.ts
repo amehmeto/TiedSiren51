@@ -14,9 +14,7 @@ describe('PrismaSirensRepository', () => {
   })
 
   it('should init selectable sirens when empty', async () => {
-    const sirens = await repository.getSelectableSirens()
-
-    expect(sirens).toStrictEqual({
+    const expectedSirens = {
       android: [],
       ios: [],
       windows: [],
@@ -24,52 +22,50 @@ describe('PrismaSirensRepository', () => {
       linux: [],
       websites: [],
       keywords: [],
-    })
+    }
+
+    const sirens = await repository.getSelectableSirens()
+
+    expect(sirens).toStrictEqual(expectedSirens)
   })
 
   it('should add keywords to sirens', async () => {
+    const expectedKeywords = ['keyword', 'justin bieber']
+
     await repository.addKeywordToSirens('keyword')
     await repository.addKeywordToSirens('justin bieber')
-
     const sirens = await repository.getSelectableSirens()
-    expect(sirens.keywords).toStrictEqual(['keyword', 'justin bieber'])
+
+    expect(sirens.keywords).toStrictEqual(expectedKeywords)
   })
 
   it('should add websites to sirens', async () => {
+    const expectedWebsites = ['www.google.com', 'www.facebook.com']
+
     await repository.addWebsiteToSirens('www.google.com')
     await repository.addWebsiteToSirens('www.facebook.com')
-
     const sirens = await repository.getSelectableSirens()
-    expect(sirens.websites).toStrictEqual([
-      'www.google.com',
-      'www.facebook.com',
-    ])
+
+    expect(sirens.websites).toStrictEqual(expectedWebsites)
   })
 
   it('should add android apps to sirens', async () => {
-    await repository.addAndroidSirenToSirens({
+    const youtubeSiren = {
       packageName: 'com.youtube.android',
       appName: 'YouTube',
       icon: 'youtube.png',
-    })
-    await repository.addAndroidSirenToSirens({
+    }
+    const facebookSiren = {
       packageName: 'com.facebook.android',
       appName: 'Facebook',
       icon: 'facebook.png',
-    })
+    }
+    const expectedAndroidSirens = [youtubeSiren, facebookSiren]
 
+    await repository.addAndroidSirenToSirens(youtubeSiren)
+    await repository.addAndroidSirenToSirens(facebookSiren)
     const sirens = await repository.getSelectableSirens()
-    expect(sirens.android).toStrictEqual([
-      {
-        packageName: 'com.youtube.android',
-        appName: 'YouTube',
-        icon: 'youtube.png',
-      },
-      {
-        packageName: 'com.facebook.android',
-        appName: 'Facebook',
-        icon: 'facebook.png',
-      },
-    ])
+
+    expect(sirens.android).toStrictEqual(expectedAndroidSirens)
   })
 })

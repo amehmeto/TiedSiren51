@@ -16,7 +16,6 @@ fi
 # Extract values from GitHub context JSON
 PR_NUMBER=$(echo "$GITHUB_CONTEXT" | jq -r '.event.pull_request.number')
 RUN_NUMBER=$(echo "$GITHUB_CONTEXT" | jq -r '.run_number')
-PR_TITLE=$(echo "$GITHUB_CONTEXT" | jq -r '.event.pull_request.title')
 BRANCH=$(echo "$GITHUB_CONTEXT" | jq -r '.head_ref')
 AUTHOR=$(echo "$GITHUB_CONTEXT" | jq -r '.event.pull_request.user.login')
 COMMIT_SHA=$(echo "$GITHUB_CONTEXT" | jq -r '.event.pull_request.head.sha')

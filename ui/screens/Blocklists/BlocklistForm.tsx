@@ -210,9 +210,9 @@ export function BlocklistForm({
   const saveBlocklist = useCallback(async () => {
     if (!validateForm(blocklist)) return
 
-    if (mode === 'edit' && 'id' in blocklist)
-      await dispatch(updateBlocklist(blocklist))
-    else await dispatch(createBlocklist(blocklist))
+    await (mode === 'edit' && 'id' in blocklist
+      ? dispatch(updateBlocklist(blocklist))
+      : dispatch(createBlocklist(blocklist)))
 
     router.push('/(tabs)/blocklists')
   }, [blocklist, mode, dispatch, router, validateForm])

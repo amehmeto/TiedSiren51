@@ -10,7 +10,7 @@ describe('selectAllBlocklists', () => {
 
     const blocklists = selectAllBlocklists(store.getState())
 
-    expect(blocklists).toEqual([])
+    expect(blocklists).toStrictEqual([])
   })
 
   test('should return single blocklist', () => {
@@ -26,7 +26,7 @@ describe('selectAllBlocklists', () => {
 
     const blocklists = selectAllBlocklists(store.getState())
 
-    expect(blocklists).toEqual([blocklist])
+    expect(blocklists).toStrictEqual([blocklist])
   })
 
   test('should return multiple blocklists', () => {
@@ -52,6 +52,6 @@ describe('selectAllBlocklists', () => {
 
     const blocklists = selectAllBlocklists(store.getState())
 
-    expect(blocklists).toEqual([blocklist1, blocklist2, blocklist3])
+    expect(blocklists).toStrictEqual([blocklist1, blocklist2, blocklist3])
   })
 })
