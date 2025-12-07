@@ -4,7 +4,7 @@ Date: 2025-11-24
 
 ## Status
 
-Accepted
+Double read by amehmeto
 
 ## Context
 
@@ -86,7 +86,7 @@ Use `useEffect` **only** for these scenarios:
 #### 1. Redux Listeners (for cross-slice side effects)
 
 ```typescript
-// core/timer/listeners/timer.listeners.ts
+// core/strictMode/listeners/timer.listeners.ts
 export const registerTimerListeners = (startListening: AppStartListening) => {
   startListening({
     matcher: isAnyOf(timerStarted, timerExtended),
@@ -173,7 +173,7 @@ const useTimer = () => {
 }
 ```
 
-**After (minimal useEffect):**
+**After (minimal useEffect, business logic in core):**
 
 ```typescript
 const useTimer = () => {
@@ -192,7 +192,7 @@ const useTimer = () => {
   return timeRemaining
 }
 
-// Business logic in core/timer/timer.slice.ts
+// Business logic in core/strictMode/timer.slice.ts
 extraReducers: (builder) => {
   builder.addCase(tickTimer, (state) => {
     const now = Date.now()
@@ -298,13 +298,19 @@ For existing code with heavy `useEffect` usage:
 
 **Good** (necessary effect):
 ```typescript
-// ui/hooks/useStrictModeTimer.ts
+// ui/hooks/useAppForeground.ts
 useEffect(() => {
+  if (runOnMount) callback()
+
+  const handleAppStateChange = (nextAppState: AppStateStatus) => {
+    if (nextAppState === 'active') callback()
+  }
+
   const subscription = AppState.addEventListener('change', handleAppStateChange)
   return () => subscription.remove()
-}, [dispatch])
+}, [callback, runOnMount])
 ```
-✅ Subscribing to external system (React Native API)
+✅ Subscribing to external system (React Native AppState API)
 
 **Bad** (business logic in effect):
 ```typescript
@@ -318,7 +324,7 @@ useEffect(() => {
 
 **Refactored** (logic in core):
 ```typescript
-// core/timer/timer.slice.ts
+// core/strictMode/timer.slice.ts
 builder.addCase(tickTimer, (state) => {
   state.lastUpdate = Date.now()
   // Core decides when to stop
@@ -342,5 +348,5 @@ builder.addCase(tickTimer, (state) => {
 - [React useEffect Guide](https://react.dev/reference/react/useEffect)
 - [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
 - [Redux Listeners](https://redux-toolkit.js.org/api/createListenerMiddleware)
-- `/core/timer/listeners/` - Listener pattern examples
+- `/core/strictMode/listeners/` - Listener pattern examples
 - `/core/*/usecases/` - Thunk pattern examples

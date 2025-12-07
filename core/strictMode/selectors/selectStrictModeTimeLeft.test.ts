@@ -1,11 +1,11 @@
-import { describe, expect, test, beforeEach } from 'vitest'
+import { beforeEach, describe, expect, test } from 'vitest'
 import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
-import { selectTimeLeft } from './selectTimeLeft'
+import { selectStrictModeTimeLeft } from './selectStrictModeTimeLeft'
 
-describe('selectTimeLeft', () => {
+describe('selectStrictModeTimeLeft', () => {
   let dateProvider: StubDateProvider
   let nowMs: number
 
@@ -15,40 +15,41 @@ describe('selectTimeLeft', () => {
     nowMs = dateProvider.getNow().getTime()
   })
 
-  test('should return empty time when there is no timer', () => {
+  test('should return empty time when strict mode is not active', () => {
     const store = createTestStore(
       { dateProvider },
-      stateBuilder().withTimerEndAt(null).build(),
+      stateBuilder().withStrictModeEndedAt(null).build(),
     )
-
-    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
-
-    expect(timeLeft).toEqual({
+    const expectedTimeLeft = {
       days: 0,
       hours: 0,
       minutes: 0,
       seconds: 0,
-      timeLeft: 0,
-    })
+      totalMs: 0,
+    }
+
+    const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
+
+    expect(timeLeft).toStrictEqual(expectedTimeLeft)
   })
 
-  test('should return empty time when timer has expired', () => {
+  test('should return empty time when strict mode has expired', () => {
+    const expiredDate = dateProvider.msToISOString(nowMs - 1 * SECOND)
     const store = createTestStore(
       { dateProvider },
-      stateBuilder()
-        .withTimerEndAt(dateProvider.msToISOString(nowMs - 1 * SECOND))
-        .build(),
+      stateBuilder().withStrictModeEndedAt(expiredDate).build(),
     )
-
-    const timeLeft = selectTimeLeft(store.getState(), dateProvider)
-
-    expect(timeLeft).toEqual({
+    const expectedTimeLeft = {
       days: 0,
       hours: 0,
       minutes: 0,
       seconds: 0,
-      timeLeft: 0,
-    })
+      totalMs: 0,
+    }
+
+    const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
+
+    expect(timeLeft).toStrictEqual(expectedTimeLeft)
   })
 
   test.each([
@@ -60,7 +61,7 @@ describe('selectTimeLeft', () => {
         hours: 1,
         minutes: 0,
         seconds: 0,
-        timeLeft: 3600000,
+        totalMs: 1 * HOUR,
       },
     },
     {
@@ -71,7 +72,7 @@ describe('selectTimeLeft', () => {
         hours: 2,
         minutes: 30,
         seconds: 45,
-        timeLeft: 86400000 + 7200000 + 1800000 + 45000,
+        totalMs: 1 * DAY + 2 * HOUR + 30 * MINUTE + 45 * SECOND,
       },
     },
     {
@@ -82,7 +83,7 @@ describe('selectTimeLeft', () => {
         hours: 0,
         minutes: 30,
         seconds: 0,
-        timeLeft: 1800000,
+        totalMs: 30 * MINUTE,
       },
     },
     {
@@ -93,94 +94,76 @@ describe('selectTimeLeft', () => {
         hours: 0,
         minutes: 0,
         seconds: 45,
-        timeLeft: 45000,
+        totalMs: 45 * SECOND,
       },
     },
-  ])(
-    'should calculate remaining time correctly for $description',
-    ({ remainingMs, expected }) => {
-      const store = createTestStore(
-        { dateProvider },
-        stateBuilder()
-          .withTimerEndAt(dateProvider.msToISOString(nowMs + remainingMs))
-          .build(),
-      )
-
-      const timeLeft = selectTimeLeft(store.getState(), dateProvider)
-
-      expect(timeLeft).toEqual(expected)
-    },
-  )
-
-  test.each([
     {
-      description: '61 seconds remaining',
+      description: '61 seconds (1 minute 1 second)',
       remainingMs: 61 * SECOND,
       expected: {
         days: 0,
         hours: 0,
         minutes: 1,
         seconds: 1,
-        timeLeft: 61000,
+        totalMs: 61 * SECOND,
       },
     },
     {
-      description: '60 seconds remaining',
+      description: '60 seconds (1 minute)',
       remainingMs: 1 * MINUTE,
       expected: {
         days: 0,
         hours: 0,
         minutes: 1,
         seconds: 0,
-        timeLeft: 60000,
+        totalMs: 1 * MINUTE,
       },
     },
     {
-      description: '59 seconds remaining',
+      description: '59 seconds',
       remainingMs: 59 * SECOND,
       expected: {
         days: 0,
         hours: 0,
         minutes: 0,
         seconds: 59,
-        timeLeft: 59000,
+        totalMs: 59 * SECOND,
       },
     },
     {
-      description: '3661 seconds remaining (1 hour 1 minute 1 second)',
+      description: '1 hour 1 minute 1 second',
       remainingMs: 1 * HOUR + 1 * MINUTE + 1 * SECOND,
       expected: {
         days: 0,
         hours: 1,
         minutes: 1,
         seconds: 1,
-        timeLeft: 3661000,
+        totalMs: 1 * HOUR + 1 * MINUTE + 1 * SECOND,
       },
     },
     {
-      description: '125 seconds remaining (2 minutes 5 seconds)',
+      description: '2 minutes 5 seconds',
       remainingMs: 2 * MINUTE + 5 * SECOND,
       expected: {
         days: 0,
         hours: 0,
         minutes: 2,
         seconds: 5,
-        timeLeft: 125000,
+        totalMs: 2 * MINUTE + 5 * SECOND,
       },
     },
   ])(
-    'should calculate time remaining correctly for $description',
+    'should calculate remaining time correctly for $description',
     ({ remainingMs, expected }) => {
+      const endedAt = dateProvider.msToISOString(nowMs + remainingMs)
       const store = createTestStore(
         { dateProvider },
-        stateBuilder()
-          .withTimerEndAt(dateProvider.msToISOString(nowMs + remainingMs))
-          .build(),
+        stateBuilder().withStrictModeEndedAt(endedAt).build(),
       )
 
-      const timeLeft = selectTimeLeft(store.getState(), dateProvider)
+      const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)
 
-      expect(timeLeft).toEqual(expected)
+      expect(timeLeft).toStrictEqual(expected)
     },
   )
 })

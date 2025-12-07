@@ -142,7 +142,7 @@ export abstract class PrismaRepository {
       CREATE TABLE IF NOT EXISTS "Timer" (
         "id" TEXT PRIMARY KEY NOT NULL,
         "userId" TEXT NOT NULL,
-        "endAt" TEXT NOT NULL,
+        "endedAt" TEXT NOT NULL,
         "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     `
@@ -157,6 +157,8 @@ export abstract class PrismaRepository {
       `
 
       const hasUserIdColumn = tableInfo.some((col) => col.name === 'userId')
+      const hasEndAtColumn = tableInfo.some((col) => col.name === 'endAt')
+      const hasEndedAtColumn = tableInfo.some((col) => col.name === 'endedAt')
 
       if (!hasUserIdColumn) {
         await this.baseClient.$executeRaw`
@@ -167,9 +169,16 @@ export abstract class PrismaRepository {
           UPDATE "Timer" SET "userId" = "id" WHERE "userId" IS NULL;
         `
       }
+
+      // Migration: Rename endAt to endedAt if needed
+      if (hasEndAtColumn && !hasEndedAtColumn) {
+        await this.baseClient.$executeRaw`
+          ALTER TABLE "Timer" RENAME COLUMN "endAt" TO "endedAt";
+        `
+        this.logger.info('Migrated Timer table: renamed endAt to endedAt')
+      }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error migrating Timer table:', error)
+      this.logger.error(`Error migrating Timer table: ${error}`)
     }
   }
 

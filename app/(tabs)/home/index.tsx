@@ -9,6 +9,7 @@ import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
 import { exhaustiveGuard } from '@/ui/exhaustive-guard'
+import { useTick } from '@/ui/hooks/useTick'
 import { AccessibilityPermissionCard } from '@/ui/screens/Home/HomeScreen/AccessibilityPermissionCard'
 import { HomeViewModel } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
@@ -19,20 +20,17 @@ import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 export default function HomeScreen() {
   const router = useRouter()
   const { dateProvider, sirenLookout } = dependencies
-  const [now, setNow] = useState<Date>(dateProvider.getNow())
   const [hasAccessibilityPermission, setHasAccessibilityPermission] =
     useState(true)
+
+  useTick()
+
   const viewModel = useSelector<
     RootState,
     ReturnType<typeof selectHomeViewModel>
-  >((rootState) => selectHomeViewModel(rootState, now, dateProvider))
-
-  useEffect(() => {
-    const intervalId = setInterval(() => {
-      setNow(dateProvider.getNow())
-    }, 1_000)
-    return () => clearInterval(intervalId)
-  }, [dateProvider, now])
+  >((rootState) =>
+    selectHomeViewModel(rootState, dateProvider.getNow(), dateProvider),
+  )
 
   useEffect(() => {
     const checkPermission = async () => {

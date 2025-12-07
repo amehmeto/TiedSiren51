@@ -1,14 +1,16 @@
 import { expect } from 'vitest'
+import { ISODateString } from '@/core/_ports_/port.date-provider'
 import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { Fixture } from '@/core/_tests_/fixture.types'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { AuthUser } from '@/core/auth/authUser'
+import { selectAuthUserIdOrNull } from '@/core/auth/selectors/selectAuthUserIdOrNull'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
-import { extendTimer } from './extend-timer.usecase'
+import { extendTimer, ExtendTimerPayload } from './extend-timer.usecase'
 import { loadTimer } from './load-timer.usecase'
-import { startTimer } from './start-timer.usecase'
+import { startTimer, StartTimerPayload } from './start-timer.usecase'
 
 const DEFAULT_USER_ID = 'test-user-id'
 
@@ -32,15 +34,15 @@ export function timerFixture(
 
   return {
     given: {
-      existingTimer(endAt: string) {
-        timerRepository.saveTimer(DEFAULT_USER_ID, endAt)
+      existingTimer(endedAt: ISODateString) {
+        timerRepository.saveTimer(DEFAULT_USER_ID, endedAt)
         testStateBuilderProvider.setState((builder) =>
-          builder.withAuthUser(defaultAuthUser).withTimerEndAt(endAt),
+          builder.withAuthUser(defaultAuthUser).withStrictModeEndedAt(endedAt),
         )
       },
       noTimer() {
         testStateBuilderProvider.setState((builder) =>
-          builder.withAuthUser(defaultAuthUser).withTimerEndAt(null),
+          builder.withAuthUser(defaultAuthUser).withStrictModeEndedAt(null),
         )
       },
       authenticatedUser(authUser: AuthUser = defaultAuthUser) {
@@ -62,22 +64,14 @@ export function timerFixture(
         )
         return store.dispatch(loadTimer())
       },
-      startingTimer: async (payload: {
-        days: number
-        hours: number
-        minutes: number
-      }) => {
+      startingTimer: async (payload: StartTimerPayload) => {
         store = createTestStore(
           { timerRepository, dateProvider },
           testStateBuilderProvider.getState(),
         )
         return store.dispatch(startTimer(payload))
       },
-      extendingTimer: async (payload: {
-        days: number
-        hours: number
-        minutes: number
-      }) => {
+      extendingTimerOf: async (payload: ExtendTimerPayload) => {
         store = createTestStore(
           { timerRepository, dateProvider },
           testStateBuilderProvider.getState(),
@@ -86,16 +80,21 @@ export function timerFixture(
       },
     },
     then: {
-      timerShouldBeLoadedAs(expectedEndAt: string | null) {
-        expect(store.getState().timer.endAt).toStrictEqual(expectedEndAt)
+      timerShouldBeLoadedAs(expectedEndedAt: string | null) {
+        expect(store.getState().strictMode.endedAt).toStrictEqual(
+          expectedEndedAt,
+        )
       },
-      timerShouldBeStoredAs(expectedEndAt: string) {
-        expect(store.getState().timer.endAt).toStrictEqual(expectedEndAt)
+      timerShouldBeStoredAs(expectedEndedAt: string) {
+        expect(store.getState().strictMode.endedAt).toStrictEqual(
+          expectedEndedAt,
+        )
       },
-      async timerShouldBeSavedInRepositoryAs(expectedEndAt: string) {
-        const userId = store.getState().auth.authUser?.id ?? DEFAULT_USER_ID
-        const endAt = await timerRepository.loadTimer(userId)
-        expect(endAt).toStrictEqual(expectedEndAt)
+      async timerShouldBePersisted(expectedEndedAt: string) {
+        const userId =
+          selectAuthUserIdOrNull(store.getState()) ?? DEFAULT_USER_ID
+        const endedAt = await timerRepository.loadTimer(userId)
+        expect(endedAt).toStrictEqual(expectedEndedAt)
       },
       actionShouldBeRejectedWith(
         action: unknown,

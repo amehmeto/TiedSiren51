@@ -22,13 +22,14 @@ describe('PouchDBBlocklistRepository', () => {
 
   it('should create a blocklist', async () => {
     const blocklistPayload = buildBlocklistPayload()
+    const expectedBlocklist = {
+      id: expect.any(String),
+      ...blocklistPayload,
+    }
 
     const createdBlocklist = await blocklistRepository.create(blocklistPayload)
 
-    expect(createdBlocklist).toStrictEqual({
-      id: expect.any(String),
-      ...blocklistPayload,
-    })
+    expect(createdBlocklist).toStrictEqual(expectedBlocklist)
   })
 
   it('should find a blocklist by id', async () => {
@@ -82,8 +83,8 @@ describe('PouchDBBlocklistRepository', () => {
 
     await blocklistRepository.delete(createdBlocklist.id)
 
-    await expect(
-      blocklistRepository.findById(createdBlocklist.id),
-    ).rejects.toThrow()
+    const promise = blocklistRepository.findById(createdBlocklist.id)
+
+    await expect(promise).rejects.toThrow()
   })
 })

@@ -118,9 +118,9 @@ describe('FirebaseAuthGateway - Error Translation', () => {
 
         vi.mocked(authMethod).mockRejectedValue(mockError)
 
-        await expect(
-          gateway[method]('test@example.com', 'password123'),
-        ).rejects.toThrow(expected)
+        const promise = gateway[method]('test@example.com', 'password123')
+
+        await expect(promise).rejects.toThrow(expected)
       },
     )
 
@@ -134,9 +134,9 @@ describe('FirebaseAuthGateway - Error Translation', () => {
         mockError,
       )
 
-      await expect(
-        gateway.signInWithEmail('test@example.com', 'password123'),
-      ).rejects.toThrow('Some unknown Firebase error')
+      const promise = gateway.signInWithEmail('test@example.com', 'password123')
+
+      await expect(promise).rejects.toThrow('Some unknown Firebase error')
     })
   })
 
@@ -165,7 +165,9 @@ describe('FirebaseAuthGateway - Error Translation', () => {
           vi.mocked(GoogleSignin.hasPlayServices).mockResolvedValue(true)
           vi.mocked(GoogleSignin.signIn).mockRejectedValue(mockError)
 
-          await expect(gateway.signInWithGoogle()).rejects.toThrow(expected)
+          const promise = gateway.signInWithGoogle()
+
+          await expect(promise).rejects.toThrow(expected)
         },
       )
     })
@@ -178,7 +180,9 @@ describe('FirebaseAuthGateway - Error Translation', () => {
 
         vi.mocked(GoogleSignin.hasPlayServices).mockRejectedValue(mockError)
 
-        await expect(gateway.signInWithGoogle()).rejects.toThrow(
+        const promise = gateway.signInWithGoogle()
+
+        await expect(promise).rejects.toThrow(
           'Google Play Services not available.',
         )
       })
@@ -190,9 +194,9 @@ describe('FirebaseAuthGateway - Error Translation', () => {
       vi.mocked(GoogleSignin.hasPlayServices).mockResolvedValue(true)
       vi.mocked(GoogleSignin.signIn).mockRejectedValue(mockError)
 
-      await expect(gateway.signInWithGoogle()).rejects.toThrow(
-        'Some unknown Google error',
-      )
+      const promise = gateway.signInWithGoogle()
+
+      await expect(promise).rejects.toThrow('Some unknown Google error')
     })
   })
 
@@ -202,9 +206,9 @@ describe('FirebaseAuthGateway - Error Translation', () => {
         'some string error',
       )
 
-      await expect(
-        gateway.signInWithEmail('test@example.com', 'password123'),
-      ).rejects.toThrow('Unknown error occurred.')
+      const promise = gateway.signInWithEmail('test@example.com', 'password123')
+
+      await expect(promise).rejects.toThrow('Unknown error occurred.')
     })
   })
 

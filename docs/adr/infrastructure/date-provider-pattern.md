@@ -4,7 +4,7 @@ Date: 2025-11-23 (Updated: 2025-11-26)
 
 ## Status
 
-Accepted
+Double read by amehmeto
 
 ## Context
 
@@ -51,7 +51,7 @@ Abstract date/time operations behind a port interface, with real and stub implem
 
 Store and pass dates as **ISO 8601 strings** throughout the entire application stack:
 
-- **Domain types**: `Timer.endAt: string`, `BlockSession.startedAt: string`
+- **Domain types**: `Timer.endedAt: string`, `BlockSession.startedAt: string`
 - **Redux state**: Timer and BlockSession slices store ISO strings
 - **Selectors**: Receive `dateProvider` to parse ISO strings for comparisons
 - **Use cases**: Use `dateProvider` to convert between strings and Date objects
@@ -351,48 +351,47 @@ it('handles session spanning midnight', () => {
 
 The following examples show how ISO strings flow through the entire stack:
 
-**1. Domain Type** (`core/timer/timer.ts`):
+**1. Redux State** (`core/strictMode/timer.slice.ts`):
 
 ```typescript
-// ✅ Dates stored as ISO strings
-export type Timer = {
-  endAt: string  // ISO 8601 format: "2025-01-15T10:00:00.000Z"
+// ✅ Dates stored as ISO strings in Redux state
+type TimerState = {
+  endedAt: string | null  // ISO 8601 format: "2025-01-15T10:00:00.000Z"
+  isLoading: boolean
 }
 ```
 
-**2. Use Case** (`core/timer/usecases/start-timer.usecase.ts`):
+**2. Use Case** (`core/strictMode/usecases/start-timer.usecase.ts`):
 
 ```typescript
-export const startTimer = createAppAsyncThunk<Timer, StartTimerPayload>(
+export const startTimer = createAppAsyncThunk<string, StartTimerPayload>(
   'timer/startTimer',
   async (payload, { extra: { timerRepository, dateProvider }, getState }) => {
     const { days, hours, minutes } = payload
     const durationMs = days * DAY + hours * HOUR + minutes * MINUTE
 
     // Use dateProvider to get current time and convert to ISO string
-    const now = dateProvider.getNow()
-    const endAt = dateProvider.msToISOString(now.getTime() + durationMs)
+    const nowMs = dateProvider.getNowMs()
+    const endedAt = dateProvider.msToISOString(nowMs + durationMs)
 
-    await timerRepository.saveTimer(userId, endAt)
-    return { endAt }  // Returns ISO string
+    await timerRepository.save(endedAt)
+    return endedAt  // Returns ISO string
   },
 )
 ```
 
-**3. Selector** (`core/timer/selectors/selectIsTimerActive.ts`):
+**3. Selector** (`core/strictMode/selectors/selectIsTimerActive.ts`):
 
 ```typescript
 export function selectIsTimerActive(
   state: RootState,
   dateProvider: DateProvider,  // Injected for parsing and current time
 ): boolean {
-  const timer = selectTimer(state)
-  if (!timer) return false
+  const endedAt = state.strictMode.endedAt
+  if (!endedAt) return false
 
-  const now = dateProvider.getNow()
   // Parse ISO string back to Date for comparison
-  const endAtMs = dateProvider.parseISOString(timer.endAt).getTime()
-  return endAtMs > now.getTime()
+  return dateProvider.parseISOString(endedAt).getTime() > dateProvider.getNowMs()
 }
 ```
 
@@ -414,12 +413,12 @@ export const useStrictModeTimer = () => {
 **5. Repository** (`infra/timer-repository/prisma.timer-repository.ts`):
 
 ```typescript
-async saveTimer(userId: string, endAt: string): Promise<void> {
+async saveTimer(userId: string, endedAt: string): Promise<void> {
   // ISO string stored directly in database
   await this.prisma.strictModeTimer.upsert({
     where: { userId },
-    update: { endAt },
-    create: { userId, endAt },
+    update: { endedAt },
+    create: { userId, endedAt },
   })
 }
 ```
@@ -428,8 +427,8 @@ async saveTimer(userId: string, endAt: string): Promise<void> {
 
 ```prisma
 model StrictModeTimer {
-  userId String @id
-  endAt  String  // ISO string stored as text
+  userId  String @id
+  endedAt String  // ISO string stored as text
 }
 ```
 
@@ -495,6 +494,6 @@ export class CreateBlockSessionUseCase {
 - Port: `core/_ports_/port.date-provider.ts`
 - Real implementation: `infra/date-provider/real.date-provider.ts`
 - Stub implementation: `infra/date-provider/stub.date-provider.ts`
-- Timer use cases: `core/timer/usecases/start-timer.usecase.ts`
-- Timer selectors: `core/timer/selectors/selectIsTimerActive.ts`
+- Timer use cases: `core/strictMode/usecases/start-timer.usecase.ts`
+- Timer selectors: `core/strictMode/selectors/selectIsTimerActive.ts`
 - UI hook: `ui/hooks/useStrictModeTimer.ts`

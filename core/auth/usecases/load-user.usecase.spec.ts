@@ -40,10 +40,13 @@ describe('loadUser usecase', () => {
     await store.dispatch(loadUser())
 
     const state = store.getState()
+    const blocklistEntities = state.blocklist.entities
+    const blockSessionEntities = state.blockSession.entities
+    const availableSirens = state.siren.availableSirens
 
-    expect(state.blocklist.entities).toHaveProperty('blocklist-1')
-    expect(state.blockSession.entities).toHaveProperty('session-1')
-    expect(state.siren.availableSirens).toEqual(mockSirens)
+    expect(blocklistEntities).toHaveProperty('blocklist-1')
+    expect(blockSessionEntities).toHaveProperty('session-1')
+    expect(availableSirens).toStrictEqual(mockSirens)
   })
 
   test('should handle empty repositories', async () => {
@@ -76,9 +79,15 @@ describe('loadUser usecase', () => {
     await store.dispatch(loadUser())
 
     const state = store.getState()
+    const blocklistEntities = state.blocklist.entities
+    const blockSessionEntities = state.blockSession.entities
+    const availableSirens = state.siren.availableSirens
 
-    expect(Object.keys(state.blocklist.entities)).toHaveLength(0)
-    expect(Object.keys(state.blockSession.entities)).toHaveLength(0)
-    expect(state.siren.availableSirens).toEqual(emptySirens)
+    const blocklistKeys = Object.keys(blocklistEntities)
+    const blockSessionKeys = Object.keys(blockSessionEntities)
+
+    expect(blocklistKeys).toHaveLength(0)
+    expect(blockSessionKeys).toHaveLength(0)
+    expect(availableSirens).toStrictEqual(emptySirens)
   })
 })

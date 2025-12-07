@@ -1,13 +1,16 @@
+export type ISODateString =
+  `${number}-${number}-${number}T${number}:${number}:${number}.${number}Z`
+
 export interface DateProvider {
   getNow(): Date
   getNowMs(): number
-  getISOStringNow(): string
+  getISOStringNow(): ISODateString
   recoverDate(timeInHHmm: string): Date
   recoverYesterdayDate(startedAt: string): Date
   toHHmm(date: Date): string
   getMinutesFromNow(minutes: number): Date
   getHHmmMinutesFromNow(minutes: number): string
-  parseISOString(isoString: string): Date
-  toISOString(date: Date): string
-  msToISOString(ms: number): string
+  parseISOString(isoString: ISODateString): Date
+  toISOString(date: Date): ISODateString
+  msToISOString(ms: number): ISODateString
 }
