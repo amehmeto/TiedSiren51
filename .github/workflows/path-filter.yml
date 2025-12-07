@@ -10,12 +10,16 @@ on:
       app-changed:
         description: 'Whether app-related files have changed'
         value: ${{ jobs.check-paths.outputs.app-changed }}
+      shell-only:
+        description: 'Whether only shell scripts have changed'
+        value: ${{ jobs.check-paths.outputs.shell-only }}
 
 jobs:
   check-paths:
     runs-on: ubuntu-latest
     outputs:
       app-changed: ${{ steps.filter.outputs.app }}
+      shell-only: ${{ steps.filter.outputs.shell && !steps.filter.outputs.app }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -25,6 +29,10 @@ jobs:
         id: filter
         with:
           filters: |
+            shell:
+              - '**/*.sh'
+              - '.husky/**'
+              - '.claude/hooks/**'
             app:
               # Source code
               - 'app/**'
