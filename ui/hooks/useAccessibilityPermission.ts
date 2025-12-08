@@ -1,11 +1,10 @@
 import { useCallback, useState } from 'react'
-import {
-  isAndroidSirenLookout,
-  SirenLookout,
-} from '@/core/_ports_/siren.lookout'
+import { isAndroidSirenLookout } from '@/core/_ports_/siren.lookout'
+import { dependencies } from '@/ui/dependencies'
 import { useAppForeground } from './useAppForeground'
 
-export function useAccessibilityPermission(sirenLookout: SirenLookout) {
+export function useAccessibilityPermission() {
+  const { sirenLookout } = dependencies
   const [hasPermission, setHasPermission] = useState(true)
 
   const checkPermission = useCallback(async () => {

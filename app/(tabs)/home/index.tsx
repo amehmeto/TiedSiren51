@@ -24,7 +24,7 @@ export default function HomeScreen() {
 
   useTick()
 
-  const hasAccessibilityPermission = useAccessibilityPermission(sirenLookout)
+  const hasAccessibilityPermission = useAccessibilityPermission()
 
   const viewModel = useSelector<
     RootState,
