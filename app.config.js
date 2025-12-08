@@ -42,6 +42,7 @@ export default {
       '@react-native-google-signin/google-signin',
       'expo-apple-authentication',
       'expo-router',
+      '@sentry/react-native/expo',
     ],
     experiments: {
       typedRoutes: true,
