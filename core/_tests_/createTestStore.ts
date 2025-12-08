@@ -47,6 +47,7 @@ export const createTestStore = (
       dateProvider,
       deviceRepository,
       installedAppRepository,
+      logger: testLogger,
       notificationService,
       sirenLookout,
       sirenTier,

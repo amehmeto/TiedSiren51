@@ -40,9 +40,9 @@ export default {
     plugins: [
       '@prisma/react-native',
       '@react-native-google-signin/google-signin',
+      '@sentry/react-native/expo',
       'expo-apple-authentication',
       'expo-router',
-      '@sentry/react-native/expo',
     ],
     experiments: {
       typedRoutes: true,

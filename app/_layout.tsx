@@ -1,4 +1,3 @@
-import * as Sentry from '@sentry/react-native'
 import { Stack, useRouter } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
@@ -10,12 +9,6 @@ import { dependencies } from '@/ui/dependencies'
 import { InitializingView } from '@/ui/design-system/components/shared/InitializingView'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
-
-Sentry.init({
-  dsn: process.env.EXPO_PUBLIC_SENTRY_DSN,
-  enabled: !__DEV__,
-  tracesSampleRate: 1.0,
-})
 
 const store = createStore(dependencies)
 
