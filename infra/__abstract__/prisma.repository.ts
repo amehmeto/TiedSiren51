@@ -4,69 +4,94 @@ import { Platform } from 'react-native'
 import '@prisma/react-native'
 import { Logger } from '@/core/_ports_/logger'
 
+// Singleton state for shared PrismaClient
+let sharedClient: PrismaClient | null = null
+let sharedInitPromise: Promise<void> | null = null
+let isSharedInitialized = false
+
+function getDbPath(): string {
+  const dbName = 'app.db'
+  return Platform.OS === 'android'
+    ? `${FileSystem.documentDirectory}databases/${dbName}`
+    : `${FileSystem.documentDirectory}${dbName}`
+}
+
+function getOrCreateSharedClient(): PrismaClient {
+  if (!sharedClient) {
+    const dbPath = getDbPath()
+    sharedClient = new PrismaClient({
+      log: [{ emit: 'stdout', level: 'error' }],
+      datasources: {
+        db: {
+          url: `file:${dbPath}`,
+        },
+      },
+    })
+  }
+  return sharedClient
+}
+
 export abstract class PrismaRepository {
-  private _isInitialized = false
-
-  private readonly dbName = 'app.db'
-
-  private readonly dbPath: string
-
   protected baseClient: PrismaClient
 
   protected abstract readonly logger: Logger
 
   protected constructor() {
-    this.dbPath = this.getDbPath()
-    this.baseClient = this.getPrismaClient()
-    this.initialize()
+    this.baseClient = getOrCreateSharedClient()
   }
 
-  private getPrismaClient() {
-    return new PrismaClient({
-      log: [{ emit: 'stdout', level: 'error' }],
-      datasources: {
-        db: {
-          url: `file:${this.dbPath}`,
-        },
-      },
-    })
-  }
-
-  public getDbPath() {
-    return Platform.OS === 'android'
-      ? `${FileSystem.documentDirectory}databases/${this.dbName}`
-      : `${FileSystem.documentDirectory}${this.dbName}`
+  public getDbPath(): string {
+    return getDbPath()
   }
 
   public async initialize(): Promise<void> {
-    if (this._isInitialized) return
+    // If already initialized, return immediately
+    if (isSharedInitialized) return
 
+    // If initialization is in progress, wait for it
+    if (sharedInitPromise) {
+      await sharedInitPromise
+      return
+    }
+
+    // Start initialization and store the promise
+    sharedInitPromise = this.doInitialize()
+    try {
+      await sharedInitPromise
+      isSharedInitialized = true
+    } catch (error) {
+      sharedInitPromise = null
+      throw error
+    }
+  }
+
+  private async doInitialize(): Promise<void> {
     try {
       await this.ensureDatabaseFile()
       await this.connectToDatabase()
       await this.createAllTables()
       await this.loadInitialData()
-      this._isInitialized = true
     } catch (error) {
       throw new Error(`Failed to initialize database: ${error}`)
     }
   }
 
   public getClient(): PrismaClient {
-    if (!this._isInitialized) throw new Error('Database not initialized')
+    if (!isSharedInitialized) throw new Error('Database not initialized')
 
     return this.baseClient
   }
 
   private async ensureDatabaseFile(): Promise<void> {
+    const dbPath = getDbPath()
     try {
-      const fileInfo = await FileSystem.getInfoAsync(this.dbPath)
+      const fileInfo = await FileSystem.getInfoAsync(dbPath)
 
       if (!fileInfo.exists) {
-        const dirPath = this.dbPath.substring(0, this.dbPath.lastIndexOf('/'))
+        const dirPath = dbPath.substring(0, dbPath.lastIndexOf('/'))
         await FileSystem.makeDirectoryAsync(dirPath, { intermediates: true })
 
-        await FileSystem.writeAsStringAsync(this.dbPath, '', {
+        await FileSystem.writeAsStringAsync(dbPath, '', {
           encoding: FileSystem.EncodingType.UTF8,
         })
       }
