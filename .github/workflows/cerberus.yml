@@ -48,8 +48,8 @@ jobs:
       - name: Install dependencies
         run: npm ci
 
-      - name: Install rollup platform binary
-        run: npm install --no-save @rollup/rollup-linux-x64-gnu
+      - name: Install platform-specific binaries
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu
 
       - name: Generate Prisma Client
         run: npx prisma generate
