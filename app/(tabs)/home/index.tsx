@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import React, { ReactNode, useEffect, useState } from 'react'
+import React, { ReactNode } from 'react'
 import { Image, StyleSheet, Text } from 'react-native'
 import 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
@@ -9,6 +9,7 @@ import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
 import { exhaustiveGuard } from '@/ui/exhaustive-guard'
+import { useAccessibilityPermission } from '@/ui/hooks/useAccessibilityPermission'
 import { useTick } from '@/ui/hooks/useTick'
 import { AccessibilityPermissionCard } from '@/ui/screens/Home/HomeScreen/AccessibilityPermissionCard'
 import { HomeViewModel } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
@@ -20,10 +21,10 @@ import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 export default function HomeScreen() {
   const router = useRouter()
   const { dateProvider, sirenLookout } = dependencies
-  const [hasAccessibilityPermission, setHasAccessibilityPermission] =
-    useState(true)
 
   useTick()
+
+  const hasAccessibilityPermission = useAccessibilityPermission()
 
   const viewModel = useSelector<
     RootState,
@@ -31,17 +32,6 @@ export default function HomeScreen() {
   >((rootState) =>
     selectHomeViewModel(rootState, dateProvider.getNow(), dateProvider),
   )
-
-  useEffect(() => {
-    const checkPermission = async () => {
-      if (isAndroidSirenLookout(sirenLookout)) {
-        const isEnabled = await sirenLookout.isEnabled()
-        setHasAccessibilityPermission(isEnabled)
-      } else setHasAccessibilityPermission(true)
-    }
-
-    void checkPermission()
-  }, [sirenLookout])
 
   const [activeSessionsNode, scheduledSessionsNode]: ReactNode[] = (() => {
     // eslint-disable-next-line no-switch-statements/no-switch
