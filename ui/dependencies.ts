@@ -29,6 +29,7 @@ const mobileDependencies = {
   dateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
   installedAppRepository: new ExpoListInstalledAppsRepository(),
+  logger,
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new InMemorySirenLookout(logger),
   sirenTier: new InMemorySirenTier(logger),

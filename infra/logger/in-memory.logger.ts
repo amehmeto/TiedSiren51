@@ -27,10 +27,16 @@ export class InMemoryLogger implements Logger {
   }
 
   private log(level: LogLevel, message: string): void {
-    this.logs.push({
+    const entry = {
       timestamp: this.dateProvider.getISOStringNow(),
       level,
       message,
-    })
+    }
+    this.logs.push(entry)
+
+    // Also output to console for debugging
+    // eslint-disable-next-line no-console
+    const consoleMethod = level === 'error' ? console.error : console.log
+    consoleMethod(`[${entry.timestamp}] [${level.toUpperCase()}] ${message}`)
   }
 }

@@ -40,6 +40,10 @@ export class PrismaBlockSessionRepository
   async create(
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
+    this.logger.info('[PrismaBlockSessionRepository.create] Starting')
+    this.logger.info(
+      `[PrismaBlockSessionRepository.create] Payload: ${JSON.stringify(sessionPayload)}`,
+    )
     try {
       const blocklistIds = sessionPayload.blocklists.map((b) => ({
         where: { id: b.id },
@@ -59,6 +63,9 @@ export class PrismaBlockSessionRepository
         },
       }))
 
+      this.logger.info(
+        '[PrismaBlockSessionRepository.create] Calling baseClient.blockSession.create',
+      )
       const created = await this.baseClient.blockSession.create({
         data: {
           id: String(uuid.v4()),
@@ -76,6 +83,9 @@ export class PrismaBlockSessionRepository
           devices: true,
         },
       })
+      this.logger.info(
+        `[PrismaBlockSessionRepository.create] Created: ${JSON.stringify(created)}`,
+      )
 
       return this.mapToBlockSession(created)
     } catch (error) {

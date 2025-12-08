@@ -16,13 +16,21 @@ export const createBlockSession = createAppAsyncThunk(
         notificationService,
         dateProvider,
         backgroundTaskService,
+        logger,
       },
     },
   ) => {
+    logger.info('[createBlockSession] Starting block session creation')
+    logger.info(`[createBlockSession] Payload: ${JSON.stringify(payload)}`)
+
     await backgroundTaskService.scheduleTask('tie-sirens')
+    logger.info('[createBlockSession] Background task scheduled')
+
     const now = dateProvider.getNow()
     const startedAt = dateProvider.recoverDate(payload.startedAt)
     const endedAt = dateProvider.recoverDate(payload.endedAt)
+
+    logger.info(`[createBlockSession] Scheduling start notification`)
     const startNotificationId =
       await notificationService.scheduleLocalNotification(
         'Tied Siren',
@@ -31,6 +39,11 @@ export const createBlockSession = createAppAsyncThunk(
           seconds: differenceInSeconds(startedAt, now),
         },
       )
+    logger.info(
+      `[createBlockSession] Start notification scheduled: ${startNotificationId}`,
+    )
+
+    logger.info(`[createBlockSession] Scheduling end notification`)
     const endNotificationId =
       await notificationService.scheduleLocalNotification(
         'Tied Siren',
@@ -39,10 +52,20 @@ export const createBlockSession = createAppAsyncThunk(
           seconds: differenceInSeconds(endedAt, now),
         },
       )
-    return blockSessionRepository.create({
+    logger.info(
+      `[createBlockSession] End notification scheduled: ${endNotificationId}`,
+    )
+
+    logger.info('[createBlockSession] Creating block session in repository')
+    const result = await blockSessionRepository.create({
       ...payload,
       startNotificationId,
       endNotificationId,
     })
+    logger.info(
+      `[createBlockSession] Block session created: ${JSON.stringify(result)}`,
+    )
+
+    return result
   },
 )
