@@ -47,6 +47,12 @@ describe('SentryLogger', () => {
         level: 'info',
       })
     })
+
+    it('should not capture the message when verbose logging is disabled', () => {
+      logger.info('Test info message')
+
+      expect(Sentry.captureMessage).not.toHaveBeenCalled()
+    })
   })
 
   describe('warn()', () => {
@@ -57,6 +63,12 @@ describe('SentryLogger', () => {
         message: 'Test warning message',
         level: 'warning',
       })
+    })
+
+    it('should not capture the message when verbose logging is disabled', () => {
+      logger.warn('Test warning message')
+
+      expect(Sentry.captureMessage).not.toHaveBeenCalled()
     })
   })
 
