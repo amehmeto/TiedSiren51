@@ -16,7 +16,7 @@ import { InMemorySirenTier } from '@/infra/siren-tier/in-memory.siren-tier'
 import { PrismaTimerRepository } from '@/infra/timer-repository/prisma.timer.repository'
 
 const dateProvider = new RealDateProvider()
-const logger = new SentryLogger(dateProvider)
+const logger = new SentryLogger()
 
 const mobileDependencies = {
   authGateway: process.env.EXPO_PUBLIC_E2E

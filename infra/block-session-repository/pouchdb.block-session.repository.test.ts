@@ -4,7 +4,6 @@ import { CreatePayload } from '@/core/_ports_/create.payload'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
-import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PouchdbBlockSessionRepository } from './pouchdb.block-session.repository'
 
@@ -16,8 +15,7 @@ describe('PouchDBBlockSessionRepository', () => {
     db = new PouchDB('pdb-block-sessions')
     await db.destroy()
 
-    const dateProvider = new StubDateProvider()
-    const logger = new InMemoryLogger(dateProvider)
+    const logger = new InMemoryLogger()
     blockSessionRepository = new PouchdbBlockSessionRepository(logger)
   })
 

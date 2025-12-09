@@ -16,8 +16,7 @@ import { createStore } from '../_redux_/createStore'
 import { Dependencies } from '../_redux_/dependencies'
 import { rootReducer } from '../_redux_/rootReducer'
 
-const testDateProvider = new StubDateProvider()
-const testLogger = new InMemoryLogger(testDateProvider)
+const testLogger = new InMemoryLogger()
 
 export const createTestStore = (
   {
