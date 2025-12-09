@@ -1,15 +1,11 @@
 import { describe, it, expect, beforeEach } from 'vitest'
-import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemoryLogger } from './in-memory.logger'
 
 describe('InMemoryLogger', () => {
   let logger: InMemoryLogger
-  let dateProvider: StubDateProvider
 
   beforeEach(() => {
-    dateProvider = new StubDateProvider()
-    dateProvider.now = new Date('2025-11-26T10:00:00.000Z')
-    logger = new InMemoryLogger(dateProvider)
+    logger = new InMemoryLogger()
   })
 
   it('should start with empty logs', () => {
@@ -34,15 +30,6 @@ describe('InMemoryLogger', () => {
       const logMessage = logs[0].message
 
       expect(logMessage).toBe('Test info message')
-    })
-
-    it('should store the correct timestamp from DateProvider', () => {
-      logger.info('Test info message')
-
-      const logs = logger.getLogs()
-      const logTimestamp = logs[0].timestamp
-
-      expect(logTimestamp).toBe('2025-11-26T10:00:00.000Z')
     })
   })
 
