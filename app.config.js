@@ -40,7 +40,13 @@ export default {
     plugins: [
       '@prisma/react-native',
       '@react-native-google-signin/google-signin',
-      '@sentry/react-native/expo',
+      [
+        '@sentry/react-native/expo',
+        {
+          organization: process.env.SENTRY_ORG,
+          project: process.env.SENTRY_PROJECT,
+        },
+      ],
       'expo-apple-authentication',
       'expo-router',
     ],
