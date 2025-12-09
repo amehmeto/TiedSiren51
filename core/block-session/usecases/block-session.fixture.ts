@@ -28,7 +28,7 @@ export function blockSessionFixture(
   let store: AppStore
   const blockSessionRepository = new FakeDataBlockSessionRepository()
   const dateProvider = new StubDateProvider()
-  const logger = new InMemoryLogger(dateProvider)
+  const logger = new InMemoryLogger()
   const notificationService = new FakeNotificationService(logger)
   const backgroundTaskService = new FakeBackgroundTaskService(logger)
   const dateTest = dateFixture(dateProvider)

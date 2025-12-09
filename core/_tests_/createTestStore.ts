@@ -16,8 +16,7 @@ import { createStore } from '../_redux_/createStore'
 import { Dependencies } from '../_redux_/dependencies'
 import { rootReducer } from '../_redux_/rootReducer'
 
-const testDateProvider = new StubDateProvider()
-const testLogger = new InMemoryLogger(testDateProvider)
+const testLogger = new InMemoryLogger()
 
 export const createTestStore = (
   {
@@ -29,7 +28,7 @@ export const createTestStore = (
     dateProvider = new StubDateProvider(),
     deviceRepository = new FakeDataDeviceRepository(),
     installedAppRepository = new FakeDataInstalledAppsRepository(),
-    logger = new InMemoryLogger(testDateProvider),
+    logger = testLogger,
     notificationService = new FakeNotificationService(testLogger),
     sirenLookout = new FakeSirenLookout(),
     sirenTier = new InMemorySirenTier(testLogger),

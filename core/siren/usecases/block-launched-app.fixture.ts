@@ -14,7 +14,7 @@ export function blockLaunchedAppFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ): Fixture {
   const dateProvider = new StubDateProvider()
-  const logger = new InMemoryLogger(dateProvider)
+  const logger = new InMemoryLogger()
   const sirenTier = new InMemorySirenTier(logger)
   const dateTest = dateFixture(dateProvider)
 

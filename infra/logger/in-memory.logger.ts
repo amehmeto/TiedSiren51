@@ -1,10 +1,11 @@
 import { Logger, LogEntry, LogLevel } from '@/core/_ports_/logger'
-import { DateProvider } from '@/core/_ports_/port.date-provider'
 
 export class InMemoryLogger implements Logger {
   private logs: LogEntry[] = []
 
-  constructor(private readonly dateProvider: DateProvider) {}
+  initialize(): void {
+    // No-op for in-memory logger (used in tests)
+  }
 
   info(message: string): void {
     this.log('info', message)
@@ -27,16 +28,6 @@ export class InMemoryLogger implements Logger {
   }
 
   private log(level: LogLevel, message: string): void {
-    const entry = {
-      timestamp: this.dateProvider.getISOStringNow(),
-      level,
-      message,
-    }
-    this.logs.push(entry)
-
-    // Also output to console for debugging
-    // eslint-disable-next-line no-console
-    const consoleMethod = level === 'error' ? console.error : console.log
-    consoleMethod(`[${entry.timestamp}] [${level.toUpperCase()}] ${message}`)
+    this.logs.push({ level, message })
   }
 }

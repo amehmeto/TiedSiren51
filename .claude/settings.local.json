@@ -27,8 +27,10 @@
       "Bash(git diff:*)",
       "Bash(git log:*)",
       "Bash(git stash:*)",
+      "Bash(git worktree:*)",
       "Bash(grep:*)",
       "Bash(ls:*)",
+      "Bash(npm ci:*)",
       "Bash(npm install:*)",
       "Bash(npm run generate:schema:*)",
       "Bash(npm run lint:*)",
@@ -56,7 +58,11 @@
     ],
     "deny": [
       "Bash(git commit --no-verify:*)",
+      "Bash(git push --force-with-lease:*)",
+      "Bash(git push --force:*)",
       "Bash(git push --no-verify:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push:*)",
       "BashOutput(*)"
     ],
     "ask": [
@@ -66,8 +72,7 @@
       "Bash(git add:*)",
       "Bash(git checkout:*)",
       "Bash(git commit:*)",
-      "Bash(git merge:*)",
-      "Bash(git push:*)"
+      "Bash(git merge:*)"
     ]
   },
   "hooks": {

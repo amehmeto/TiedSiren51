@@ -1,6 +1,5 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
-import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PrismaBlocklistRepository } from './prisma.blocklist.repository'
 
@@ -14,8 +13,7 @@ describe('PrismaBlocklistRepository', () => {
   let repository: TestPrismaBlocklistRepository
 
   beforeEach(async () => {
-    const dateProvider = new StubDateProvider()
-    const logger = new InMemoryLogger(dateProvider)
+    const logger = new InMemoryLogger()
     repository = new TestPrismaBlocklistRepository(logger)
     await repository.initialize()
     await repository.reset()
