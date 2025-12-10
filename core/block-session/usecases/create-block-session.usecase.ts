@@ -23,7 +23,7 @@ export const createBlockSession = createAppAsyncThunk(
     logger.info('[createBlockSession] Starting block session creation')
     logger.info(`[createBlockSession] Payload: ${JSON.stringify(payload)}`)
 
-    await backgroundTaskService.scheduleTask('tie-sirens')
+    await backgroundTaskService.scheduleTask('target-sirens')
     logger.info('[createBlockSession] Background task scheduled')
 
     const now = dateProvider.getNow()
