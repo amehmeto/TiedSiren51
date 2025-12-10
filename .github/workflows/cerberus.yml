@@ -9,6 +9,10 @@ name: Cerberus
 on:
   pull_request:
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
 jobs:
   path-filter:
     uses: ./.github/workflows/path-filter.yml
@@ -44,12 +48,19 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
       - name: Install platform-specific binaries
         run: npm install --no-save @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu
+
+      - name: Cache Prisma Client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: prisma-${{ hashFiles('schema.prisma') }}
 
       - name: Generate Prisma Client
         run: npx prisma generate
@@ -101,6 +112,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: 'npm'
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
