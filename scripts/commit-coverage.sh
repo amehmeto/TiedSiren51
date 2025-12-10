@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Commit coverage if changed
 # This script commits the coverage summary file if it has changed
 

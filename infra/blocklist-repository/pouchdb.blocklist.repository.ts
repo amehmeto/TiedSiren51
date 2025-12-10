@@ -32,7 +32,6 @@ export class PouchdbBlocklistRepository implements BlocklistRepository {
 
   async findById(blocklistId: string): Promise<Blocklist> {
     const retrievedBlocklist = await this.db.get(blocklistId)
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const { _id, _rev, ...blocklistWithoutInternalIds } = retrievedBlocklist
     return Promise.resolve(blocklistWithoutInternalIds)
   }

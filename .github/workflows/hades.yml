@@ -14,8 +14,13 @@ on:
     types: [closed]
 
 jobs:
-  build-preview:
+  path-filter:
     if: github.event_name == 'push'
+    uses: ./.github/workflows/path-filter.yml
+
+  build-preview:
+    needs: path-filter
+    if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -25,6 +30,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: 'npm'
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -48,6 +54,36 @@ jobs:
         run: eas build -p android --profile preview --non-interactive
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+
+  release:
+    needs: path-filter
+    if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+      id-token: write
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Release
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: npx semantic-release
 
   cleanup-pr-releases:
     if: github.event_name == 'pull_request'

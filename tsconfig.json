@@ -23,7 +23,10 @@
       "@ui/*": ["ui/*"],
       "@app/*": ["app/*"],
       "@assets/*": ["assets/*"],
-      "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
+      "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"],
+      "@amehmeto/tied-siren-blocking-overlay": [
+        "./modules/tied-siren-blocking-overlay/src/index.ts"
+      ]
     },
     "typeRoots": ["./node_modules/@types", "./prisma.d.ts"]
   },

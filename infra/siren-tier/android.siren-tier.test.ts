@@ -1,5 +1,5 @@
-import { showOverlay } from '@amehmeto/tied-siren-blocking-overlay'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { showOverlay } from '@amehmeto/tied-siren-blocking-overlay'
 import { Sirens } from '@core/siren/sirens'
 import { AndroidSirenTier } from './android.siren-tier'
 
@@ -34,9 +34,9 @@ describe('AndroidSirenTier', () => {
       })
       mockShowOverlay.mockRejectedValueOnce(error)
 
-      await expect(androidSirenTier.block('')).rejects.toThrow(
-        'Package name cannot be empty',
-      )
+      const blockPromise = androidSirenTier.block('')
+
+      await expect(blockPromise).rejects.toThrow('Package name cannot be empty')
     })
 
     it('handles ERR_OVERLAY_LAUNCH error gracefully', async () => {
@@ -45,9 +45,9 @@ describe('AndroidSirenTier', () => {
       })
       mockShowOverlay.mockRejectedValueOnce(error)
 
-      await expect(androidSirenTier.block('com.example.app')).rejects.toThrow(
-        'Failed to launch overlay',
-      )
+      const blockPromise = androidSirenTier.block('com.example.app')
+
+      await expect(blockPromise).rejects.toThrow('Failed to launch overlay')
     })
   })
 

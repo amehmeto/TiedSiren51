@@ -41,6 +41,6 @@ const styles = StyleSheet.create({
   },
   labelText: { color: T.color.white, textAlign: 'center' },
   tabBar: { backgroundColor: T.color.transparent },
-  tabBarStyle: { marginLeft: 0, paddingLeft: 0 },
-  indicator: { height: 0, display: 'none', width: 0 },
+  tabBarStyle: { marginLeft: T.spacing.none, paddingLeft: T.spacing.none },
+  indicator: { height: T.spacing.none, display: 'none', width: T.spacing.none },
 })

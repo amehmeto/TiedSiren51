@@ -34,7 +34,7 @@ export function TiedSButton(
 
 const styles = StyleSheet.create({
   container: {
-    borderRadius: T.border.radius.roundedSmall,
+    borderRadius: T.border.radius.roundedMedium,
     backgroundColor: T.color.lightBlue,
     marginTop: T.spacing.large,
     padding: T.spacing.small,

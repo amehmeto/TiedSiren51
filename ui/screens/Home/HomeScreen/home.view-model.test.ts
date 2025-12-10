@@ -13,6 +13,18 @@ import {
 } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 
+function createFixedTestDate({
+  hours = 0,
+  minutes = 0,
+}: {
+  hours?: number
+  minutes?: number
+}): Date {
+  const date = new Date('2024-01-01T00:00:00')
+  date.setHours(hours, minutes, 0, 0)
+  return date
+}
+
 describe('Home View Model', () => {
   let dateProvider: StubDateProvider
 
@@ -441,10 +453,14 @@ describe('Home View Model', () => {
     ],
   ])(
     'Example: there is %s',
-    (_, preloadedState: PreloadedState, expectedViewModel, timeSettings) => {
+    (
+      _,
+      preloadedState: PreloadedState,
+      expectedViewModel,
+      nowTime: { hours: number; minutes: number },
+    ) => {
       const store = createTestStore({}, preloadedState)
-      const now = new Date()
-      now.setHours(timeSettings.hours, timeSettings.minutes, 0, 0)
+      const now = createFixedTestDate(nowTime)
       dateProvider.now = now
 
       const homeViewModel = selectHomeViewModel(
@@ -481,8 +497,7 @@ describe('Home View Model', () => {
         {},
       )
       const [hours, minutes] = nowHHmm.split(':').map(Number)
-      const now = new Date()
-      now.setHours(hours, minutes)
+      const now = createFixedTestDate({ hours, minutes })
       dateProvider.now = now
 
       const homeViewModel = selectHomeViewModel(

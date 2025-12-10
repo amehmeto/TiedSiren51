@@ -4,6 +4,7 @@ import { CreatePayload } from '@/core/_ports_/create.payload'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { BlockSession } from '@/core/block-session/block.session'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PouchdbBlockSessionRepository } from './pouchdb.block-session.repository'
 
 describe('PouchDBBlockSessionRepository', () => {
@@ -14,29 +15,30 @@ describe('PouchDBBlockSessionRepository', () => {
     db = new PouchDB('pdb-block-sessions')
     await db.destroy()
 
-    blockSessionRepository = new PouchdbBlockSessionRepository()
+    const logger = new InMemoryLogger()
+    blockSessionRepository = new PouchdbBlockSessionRepository(logger)
   })
 
+  const buildSessionPayload = (): CreatePayload<BlockSession> => {
+    const { id: _id, ...sessionPayload } = buildBlockSession()
+    return sessionPayload
+  }
+
   it('should create a block session', async () => {
-    const sessionPayload: CreatePayload<BlockSession> = buildBlockSession()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete sessionPayload.id
+    const sessionPayload = buildSessionPayload()
+    const expectedBlockSession = {
+      id: expect.any(String),
+      ...sessionPayload,
+    }
 
     const createdBlockSession =
       await blockSessionRepository.create(sessionPayload)
 
-    expect(createdBlockSession).toStrictEqual({
-      id: expect.any(String),
-      ...sessionPayload,
-    })
+    expect(createdBlockSession).toStrictEqual(expectedBlockSession)
   })
 
   it('should find a block session by id', async () => {
-    const sessionPayload: CreatePayload<BlockSession> = buildBlockSession()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete sessionPayload.id
+    const sessionPayload = buildSessionPayload()
 
     const createdBlockSession =
       await blockSessionRepository.create(sessionPayload)
@@ -48,33 +50,26 @@ describe('PouchDBBlockSessionRepository', () => {
   })
 
   it('should find all current block sessions', async () => {
-    const createSessionPayload: CreatePayload<BlockSession> =
-      buildBlockSession()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete createSessionPayload.id
+    const createSessionPayload = buildSessionPayload()
 
-    await blockSessionRepository.create(createSessionPayload)
+    const createdSession1 =
+      await blockSessionRepository.create(createSessionPayload)
 
-    const createSessionPayload2: CreatePayload<BlockSession> =
-      buildBlockSession()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete createSessionPayload2.id
+    const createSessionPayload2 = buildSessionPayload()
 
-    await blockSessionRepository.create(createSessionPayload2)
+    const createdSession2 = await blockSessionRepository.create(
+      createSessionPayload2,
+    )
 
     const currentSessions = await blockSessionRepository.findAll()
 
-    expect(currentSessions).toStrictEqual([])
+    expect(currentSessions).toHaveLength(2)
+    expect(currentSessions).toContainEqual(createdSession1)
+    expect(currentSessions).toContainEqual(createdSession2)
   })
 
   it('should update a block session', async () => {
-    const createSessionPayload: CreatePayload<BlockSession> =
-      buildBlockSession()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete createSessionPayload.id
+    const createSessionPayload = buildSessionPayload()
 
     const createdBlockSession =
       await blockSessionRepository.create(createSessionPayload)
@@ -84,31 +79,29 @@ describe('PouchDBBlockSessionRepository', () => {
       name: 'Updated name',
     }
 
+    const expectedBlockSession = {
+      ...createdBlockSession,
+      name: 'Updated name',
+    }
+
     await blockSessionRepository.update(updateSessionPayload)
     const updatedBlockSession = await blockSessionRepository.findById(
       updateSessionPayload.id,
     )
 
-    expect(updatedBlockSession).toStrictEqual({
-      ...createdBlockSession,
-      name: 'Updated name',
-    })
+    expect(updatedBlockSession).toStrictEqual(expectedBlockSession)
   })
 
   it('should delete a block session', async () => {
-    const createSessionPayload: CreatePayload<BlockSession> =
-      buildBlockSession()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete createSessionPayload.id
+    const createSessionPayload = buildSessionPayload()
 
     const createdBlockSession =
       await blockSessionRepository.create(createSessionPayload)
 
     await blockSessionRepository.delete(createdBlockSession.id)
 
-    await expect(
-      blockSessionRepository.findById(createdBlockSession.id),
-    ).rejects.toThrow()
+    const promise = blockSessionRepository.findById(createdBlockSession.id)
+
+    await expect(promise).rejects.toThrow()
   })
 })

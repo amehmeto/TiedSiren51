@@ -2,6 +2,7 @@ import { expect } from 'vitest'
 import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
 import { NotificationTrigger } from '../../_ports_/notification.service'
 import { AppStore } from '../../_redux_/createStore'
@@ -26,9 +27,10 @@ export function blockSessionFixture(
 ): Fixture {
   let store: AppStore
   const blockSessionRepository = new FakeDataBlockSessionRepository()
-  const notificationService = new FakeNotificationService()
   const dateProvider = new StubDateProvider()
-  const backgroundTaskService = new FakeBackgroundTaskService()
+  const logger = new InMemoryLogger()
+  const notificationService = new FakeNotificationService(logger)
+  const backgroundTaskService = new FakeBackgroundTaskService(logger)
   const dateTest = dateFixture(dateProvider)
 
   return {

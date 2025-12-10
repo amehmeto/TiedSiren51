@@ -6,10 +6,34 @@
 
 name: Cerberus
 
-on: [pull_request]
+on:
+  pull_request:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
 
 jobs:
+  path-filter:
+    uses: ./.github/workflows/path-filter.yml
+
+  shellcheck-only:
+    needs: path-filter
+    if: needs.path-filter.outputs.shell-only == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
+      - name: Run shellcheck
+        run: shellcheck .husky/scripts/*.sh scripts/*.sh .claude/hooks/*.sh
+
   test:
+    needs: path-filter
+    if: needs.path-filter.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -24,18 +48,30 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
 
-      - name: Install rollup platform binary
-        run: npm install --no-save @rollup/rollup-linux-x64-gnu
+      - name: Install platform-specific binaries
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu
+
+      - name: Cache Prisma Client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: prisma-${{ hashFiles('schema.prisma') }}
 
       - name: Generate Prisma Client
         run: npx prisma generate
 
+      - name: Install shellcheck
+        run: sudo apt-get install -y shellcheck
+
       - name: Lint
         run: npm run lint
+        env:
+          SHELLCHECK_PATH: /usr/bin/shellcheck
 
       - name: Run unit tests with coverage
         run: npm run test:cov
@@ -76,6 +112,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
+          cache: 'npm'
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -98,6 +135,9 @@ jobs:
       - name: Local Build
         env:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+          SENTRY_AUTH_TOKEN: ${{ secrets.SENTRY_AUTH_TOKEN }}
+          SENTRY_ORG: ${{ secrets.SENTRY_ORG }}
+          SENTRY_PROJECT: ${{ secrets.SENTRY_PROJECT }}
         run: |
           npm run build:android:apk:local -- --non-interactive
 
@@ -121,14 +161,14 @@ jobs:
           path: ${{ steps.find_apk.outputs.apk_path }}
           retention-days: 7
 
-      - name: Send APK notification to Slack
-        if: success()
-        env:
-          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        run: |
-          bash scripts/send-slack-notification.sh \
-            '${{ toJSON(github) }}' \
-            '${{ toJSON(steps) }}'
+#      - name: Send APK notification to Slack
+#        if: success()
+#        env:
+#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#        run: |
+#          bash scripts/send-slack-notification.sh \
+#            '${{ toJSON(github) }}' \
+#            '${{ toJSON(steps) }}'
 
 #      - name: EAS Cloud Preview Build
 #        run: eas build -p android --profile preview --non-interactive

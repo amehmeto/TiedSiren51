@@ -15,26 +15,25 @@ describe('PouchDBBlocklistRepository', () => {
     blocklistRepository = new PouchdbBlocklistRepository()
   })
 
-  it('should create a blocklist', async () => {
-    const blocklistPayload: CreatePayload<Blocklist> = buildBlocklist()
+  const buildBlocklistPayload = (): CreatePayload<Blocklist> => {
+    const { id: _id, ...blocklistPayload } = buildBlocklist()
+    return blocklistPayload
+  }
 
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete blocklistPayload.id
+  it('should create a blocklist', async () => {
+    const blocklistPayload = buildBlocklistPayload()
+    const expectedBlocklist = {
+      id: expect.any(String),
+      ...blocklistPayload,
+    }
 
     const createdBlocklist = await blocklistRepository.create(blocklistPayload)
 
-    expect(createdBlocklist).toStrictEqual({
-      id: expect.any(String),
-      ...blocklistPayload,
-    })
+    expect(createdBlocklist).toStrictEqual(expectedBlocklist)
   })
 
   it('should find a blocklist by id', async () => {
-    const blocklistPayload: CreatePayload<Blocklist> = buildBlocklist()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete blocklistPayload.id
+    const blocklistPayload = buildBlocklistPayload()
 
     const createdBlocklist = await blocklistRepository.create(blocklistPayload)
 
@@ -45,17 +44,11 @@ describe('PouchDBBlocklistRepository', () => {
   })
 
   it('should find all current blocklists', async () => {
-    const createBlocklistPayload: CreatePayload<Blocklist> = buildBlocklist()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete createBlocklistPayload.id
+    const createBlocklistPayload = buildBlocklistPayload()
 
     await blocklistRepository.create(createBlocklistPayload)
 
-    const createBlocklistPayload2: CreatePayload<Blocklist> = buildBlocklist()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete createBlocklistPayload2.id
+    const createBlocklistPayload2 = buildBlocklistPayload()
 
     await blocklistRepository.create(createBlocklistPayload2)
 
@@ -65,10 +58,7 @@ describe('PouchDBBlocklistRepository', () => {
   })
 
   it('should update a blocklist', async () => {
-    const blocklistPayload: CreatePayload<Blocklist> = buildBlocklist()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete blocklistPayload.id
+    const blocklistPayload = buildBlocklistPayload()
 
     const createdBlocklist = await blocklistRepository.create(blocklistPayload)
 
@@ -87,17 +77,14 @@ describe('PouchDBBlocklistRepository', () => {
   })
 
   it('should delete a blocklist', async () => {
-    const blocklistPayload: CreatePayload<Blocklist> = buildBlocklist()
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
-    delete blocklistPayload.id
+    const blocklistPayload = buildBlocklistPayload()
 
     const createdBlocklist = await blocklistRepository.create(blocklistPayload)
 
     await blocklistRepository.delete(createdBlocklist.id)
 
-    await expect(
-      blocklistRepository.findById(createdBlocklist.id),
-    ).rejects.toThrow()
+    const promise = blocklistRepository.findById(createdBlocklist.id)
+
+    await expect(promise).rejects.toThrow()
   })
 })

@@ -40,10 +40,7 @@ export const sirenSlice = createSlice({
       .addCase(addWebsiteToSirens.fulfilled, (state, action) => {
         state.availableSirens.websites.push(action.payload)
       })
-      .addCase(targetSirens.fulfilled, () => {
-        // eslint-disable-next-line no-console
-        console.log('sirens targeted!')
-      })
+      .addCase(targetSirens.fulfilled, () => {})
   },
 })
 

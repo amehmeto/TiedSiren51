@@ -13,10 +13,10 @@ describe('onSirenDetected listener', () => {
 
     const dispatchedActions = store.getActions()
 
-    expect(
-      dispatchedActions.some(
-        (action) => action.type === 'siren/blockLaunchedApp/pending',
-      ),
-    ).toBe(true)
+    const hasBlockLaunchedAppPending = dispatchedActions.some(
+      (action) => action.type === 'siren/blockLaunchedApp/pending',
+    )
+
+    expect(hasBlockLaunchedAppPending).toBe(true)
   })
 })

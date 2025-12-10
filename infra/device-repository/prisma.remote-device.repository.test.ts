@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { Device } from '@/core/device/device'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PrismaRemoteDeviceRepository } from './prisma.remote-device.repository'
 
 class TestPrismaRemoteDeviceRepository extends PrismaRemoteDeviceRepository {
@@ -18,7 +19,8 @@ describe('PrismaRemoteDeviceRepository', () => {
   let repository: TestPrismaRemoteDeviceRepository
 
   beforeEach(async () => {
-    repository = new TestPrismaRemoteDeviceRepository()
+    const logger = new InMemoryLogger()
+    repository = new TestPrismaRemoteDeviceRepository(logger)
     await repository.initialize()
     await repository.reset()
   })

@@ -3,6 +3,7 @@ import {
   createAction,
   createReducer,
 } from '@reduxjs/toolkit'
+import { ISODateString } from '@/core/_ports_/port.date-provider'
 import { AuthUser } from '@/core/auth/authUser'
 import { RootState } from '../_redux_/createStore'
 import { rootReducer } from '../_redux_/rootReducer'
@@ -22,6 +23,9 @@ const withAuthUser = createAction<AuthUser>('withAuthUser')
 const withoutAuthUser = createAction<{}>('withoutAuthUser')
 const withAuthError = createAction<string>('withAuthError')
 const withAuthLoading = createAction<boolean>('withAuthLoading')
+const withStrictModeEndedAt = createAction<ISODateString | null>(
+  'withStrictModeEndedAt',
+)
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -46,6 +50,9 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withAuthLoading, (state, action) => {
       state.auth.isLoading = action.payload
     })
+    .addCase(withStrictModeEndedAt, (state, action) => {
+      state.strictMode.endedAt = action.payload
+    })
 })
 
 export const stateBuilder = (baseState = initialState) => {
@@ -65,6 +72,7 @@ export const stateBuilder = (baseState = initialState) => {
     withAvailableSirens: reduce(withAvailableSirens),
     withAuthError: reduce(withAuthError),
     withAuthLoading: reduce(withAuthLoading),
+    withStrictModeEndedAt: reduce(withStrictModeEndedAt),
   }
 }
 

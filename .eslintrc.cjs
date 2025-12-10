@@ -1,7 +1,13 @@
 // https://docs.expo.dev/guides/using-eslint/
 // ESM configuration file
 module.exports = {
-  extends: ['expo', 'prettier', 'plugin:no-switch-statements/recommended'],
+  ignorePatterns: ['node_modules', '!.claude'],
+  extends: [
+    'expo',
+    'prettier',
+    'plugin:no-switch-statements/recommended',
+    'plugin:jsonc/recommended-with-json',
+  ],
   plugins: [
     'prettier',
     'no-switch-statements',
@@ -9,7 +15,9 @@ module.exports = {
     'react-hooks',
     'react-native',
     'sonarjs',
+    'unicorn',
     'local-rules',
+    'jsonc',
   ],
   rules: {
     'import/order': [
@@ -47,6 +55,7 @@ module.exports = {
     'sonarjs/prefer-immediate-return': 'error',
     'sonarjs/prefer-object-literal': 'error',
     'sonarjs/prefer-single-boolean-return': 'error',
+    'unicorn/prefer-ternary': 'error',
     'prettier/prettier': 'error',
     complexity: ['warn', { max: 10 }],
     curly: ['error', 'multi-or-nest'],
@@ -68,6 +77,7 @@ module.exports = {
     'react-native/no-single-element-style-arrays': 'error',
     'react-native/no-unused-styles': 'error',
     // Custom local rules
+    'local-rules/no-icon-size-magic-numbers': 'error',
     'local-rules/no-stylesheet-magic-numbers': 'error',
     'local-rules/no-complex-jsx-in-conditionals': [
       'error',
@@ -76,6 +86,10 @@ module.exports = {
         allowSimpleElements: true,
       },
     ],
+    'local-rules/one-selector-per-file': 'error',
+    'local-rules/one-usecase-per-file': 'error',
+    'local-rules/core-test-file-naming': 'error',
+    'local-rules/time-constant-multiplication': 'error',
   },
   overrides: [
     {
@@ -84,6 +98,10 @@ module.exports = {
         project: './tsconfig.json',
       },
       rules: {
+        '@typescript-eslint/no-unused-vars': [
+          'error',
+          { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        ],
         '@typescript-eslint/no-explicit-any': 'error',
         '@typescript-eslint/no-unnecessary-condition': 'error',
         '@typescript-eslint/prefer-optional-chain': 'error',
@@ -128,6 +146,433 @@ module.exports = {
         'vitest/prefer-each': 'error',
         'vitest/prefer-hooks-in-order': 'error',
         'vitest/prefer-hooks-on-top': 'error',
+        'vitest/prefer-strict-equal': 'error',
+        'local-rules/expect-separate-act-assert': 'error',
+      },
+    },
+    // No non-deterministic values in core (use injected dependencies)
+    {
+      files: ['core/**/*.ts'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
+        'no-restricted-globals': [
+          'error',
+          // Time
+          {
+            name: 'Date',
+            message:
+              'Non-deterministic: Use DateProvider dependency instead of Date in core.',
+          },
+          {
+            name: 'performance',
+            message:
+              'Non-deterministic: Use DateProvider dependency instead of performance in core.',
+          },
+          // Async timing
+          {
+            name: 'setTimeout',
+            message:
+              'Non-deterministic: Use TimerProvider dependency instead of setTimeout in core.',
+          },
+          {
+            name: 'setInterval',
+            message:
+              'Non-deterministic: Use TimerProvider dependency instead of setInterval in core.',
+          },
+          // Randomness
+          {
+            name: 'crypto',
+            message:
+              'Non-deterministic: Use UuidProvider dependency instead of crypto in core.',
+          },
+          // Network I/O
+          {
+            name: 'fetch',
+            message:
+              'Non-deterministic: Use a Repository/Gateway dependency instead of fetch in core.',
+          },
+          {
+            name: 'XMLHttpRequest',
+            message:
+              'Non-deterministic: Use a Repository/Gateway dependency instead of XMLHttpRequest in core.',
+          },
+          // External state
+          {
+            name: 'localStorage',
+            message:
+              'Non-deterministic: Use a Repository dependency instead of localStorage in core.',
+          },
+          {
+            name: 'sessionStorage',
+            message:
+              'Non-deterministic: Use a Repository dependency instead of sessionStorage in core.',
+          },
+          // Environment/device info
+          {
+            name: 'navigator',
+            message:
+              'Non-deterministic: Use a DeviceProvider dependency instead of navigator in core.',
+          },
+          {
+            name: 'location',
+            message:
+              'Non-deterministic: Use a RouterProvider dependency instead of location in core.',
+          },
+        ],
+        'no-restricted-properties': [
+          'error',
+          {
+            object: 'Math',
+            property: 'random',
+            message:
+              'Non-deterministic: Use RandomProvider dependency instead of Math.random() in core.',
+          },
+          {
+            object: 'process',
+            property: 'env',
+            message:
+              'Non-deterministic: Use ConfigProvider dependency instead of process.env in core.',
+          },
+          {
+            object: 'window',
+            property: 'location',
+            message:
+              'Non-deterministic: Use RouterProvider dependency instead of window.location in core.',
+          },
+          {
+            object: 'window',
+            property: 'localStorage',
+            message:
+              'Non-deterministic: Use a Repository dependency instead of window.localStorage in core.',
+          },
+          {
+            object: 'window',
+            property: 'sessionStorage',
+            message:
+              'Non-deterministic: Use a Repository dependency instead of window.sessionStorage in core.',
+          },
+        ],
+        'no-restricted-imports': [
+          'error',
+          {
+            paths: [
+              {
+                name: 'uuid',
+                message:
+                  'Non-deterministic: Use UuidProvider dependency instead of uuid in core.',
+              },
+              {
+                name: 'react-native-uuid',
+                message:
+                  'Non-deterministic: Use UuidProvider dependency instead of react-native-uuid in core.',
+              },
+              {
+                name: 'crypto',
+                message:
+                  'Non-deterministic: Use UuidProvider dependency instead of crypto in core.',
+              },
+              {
+                name: '@faker-js/faker',
+                message:
+                  'Non-deterministic: Use data builders with injected dependencies instead of faker in core.',
+              },
+            ],
+          },
+        ],
+      },
+    },
+    // No vi/jest mocking in core tests (use dependency injection)
+    {
+      files: ['core/**/*.test.ts', 'core/**/*.spec.ts'],
+      rules: {
+        'no-restricted-properties': [
+          'error',
+          {
+            object: 'vi',
+            property: 'useFakeTimers',
+            message:
+              'Use DateProvider dependency injection instead of vi.useFakeTimers() in core tests.',
+          },
+          {
+            object: 'vi',
+            property: 'useRealTimers',
+            message:
+              'Use DateProvider dependency injection instead of vi.useRealTimers() in core tests.',
+          },
+          {
+            object: 'vi',
+            property: 'spyOn',
+            message:
+              'Use dependency injection (fakes/stubs) instead of vi.spyOn() in core tests.',
+          },
+          {
+            object: 'jest',
+            property: 'useFakeTimers',
+            message:
+              'Use DateProvider dependency injection instead of jest.useFakeTimers() in core tests.',
+          },
+          {
+            object: 'jest',
+            property: 'useRealTimers',
+            message:
+              'Use DateProvider dependency injection instead of jest.useRealTimers() in core tests.',
+          },
+          {
+            object: 'jest',
+            property: 'spyOn',
+            message:
+              'Use dependency injection (fakes/stubs) instead of jest.spyOn() in core tests.',
+          },
+        ],
+      },
+    },
+    // Allow faker in data builders (they generate test data)
+    {
+      files: ['core/**/*.builder.ts'],
+      rules: {
+        'no-restricted-imports': 'off',
+      },
+    },
+    // Allow Date in port type definitions and test fixtures
+    {
+      files: ['core/_ports_/**/*.ts', 'core/**/*.fixture.ts'],
+      rules: {
+        'no-restricted-globals': 'off',
+      },
+    },
+    // JSON files linting
+    {
+      files: ['*.json', '**/*.json'],
+      excludedFiles: [
+        'tsconfig.json',
+        'tsconfig.*.json',
+        '.claude/settings.local.json',
+      ],
+      parser: 'jsonc-eslint-parser',
+      rules: {
+        'jsonc/indent': ['error', 2],
+        'jsonc/key-spacing': 'error',
+        'jsonc/no-dupe-keys': 'error',
+        'jsonc/sort-keys': 'off',
+      },
+    },
+    // Claude settings - enforce sorted arrays for permissions
+    {
+      files: ['.claude/settings.local.json', '.claude/settings.json'],
+      parser: 'jsonc-eslint-parser',
+      rules: {
+        'jsonc/indent': ['error', 2],
+        'jsonc/key-spacing': 'error',
+        'jsonc/no-dupe-keys': 'error',
+        'jsonc/sort-array-values': [
+          'error',
+          {
+            pathPattern: '^permissions\\.(allow|deny|ask)$',
+            order: { type: 'asc' },
+          },
+        ],
+      },
+    },
+    // JSONC files (tsconfig allows comments)
+    {
+      files: ['tsconfig.json', 'tsconfig.*.json'],
+      parser: 'jsonc-eslint-parser',
+      rules: {
+        'jsonc/indent': ['error', 2],
+        'jsonc/key-spacing': 'error',
+        'jsonc/no-dupe-keys': 'error',
+        'jsonc/no-comments': 'off',
+        'jsonc/sort-keys': 'off',
+      },
+    },
+    // No non-deterministic values in core (use injected dependencies)
+    {
+      files: ['core/**/*.ts'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
+        'no-restricted-globals': [
+          'error',
+          // Time
+          {
+            name: 'Date',
+            message:
+              'Non-deterministic: Use DateProvider dependency instead of Date in core.',
+          },
+          {
+            name: 'performance',
+            message:
+              'Non-deterministic: Use DateProvider dependency instead of performance in core.',
+          },
+          // Async timing
+          {
+            name: 'setTimeout',
+            message:
+              'Non-deterministic: Use TimerProvider dependency instead of setTimeout in core.',
+          },
+          {
+            name: 'setInterval',
+            message:
+              'Non-deterministic: Use TimerProvider dependency instead of setInterval in core.',
+          },
+          // Randomness
+          {
+            name: 'crypto',
+            message:
+              'Non-deterministic: Use UuidProvider dependency instead of crypto in core.',
+          },
+          // Network I/O
+          {
+            name: 'fetch',
+            message:
+              'Non-deterministic: Use a Repository/Gateway dependency instead of fetch in core.',
+          },
+          {
+            name: 'XMLHttpRequest',
+            message:
+              'Non-deterministic: Use a Repository/Gateway dependency instead of XMLHttpRequest in core.',
+          },
+          // External state
+          {
+            name: 'localStorage',
+            message:
+              'Non-deterministic: Use a Repository dependency instead of localStorage in core.',
+          },
+          {
+            name: 'sessionStorage',
+            message:
+              'Non-deterministic: Use a Repository dependency instead of sessionStorage in core.',
+          },
+          // Environment/device info
+          {
+            name: 'navigator',
+            message:
+              'Non-deterministic: Use a DeviceProvider dependency instead of navigator in core.',
+          },
+          {
+            name: 'location',
+            message:
+              'Non-deterministic: Use a RouterProvider dependency instead of location in core.',
+          },
+        ],
+        'no-restricted-properties': [
+          'error',
+          {
+            object: 'Math',
+            property: 'random',
+            message:
+              'Non-deterministic: Use RandomProvider dependency instead of Math.random() in core.',
+          },
+          {
+            object: 'process',
+            property: 'env',
+            message:
+              'Non-deterministic: Use ConfigProvider dependency instead of process.env in core.',
+          },
+          {
+            object: 'window',
+            property: 'location',
+            message:
+              'Non-deterministic: Use RouterProvider dependency instead of window.location in core.',
+          },
+          {
+            object: 'window',
+            property: 'localStorage',
+            message:
+              'Non-deterministic: Use a Repository dependency instead of window.localStorage in core.',
+          },
+          {
+            object: 'window',
+            property: 'sessionStorage',
+            message:
+              'Non-deterministic: Use a Repository dependency instead of window.sessionStorage in core.',
+          },
+        ],
+        'no-restricted-imports': [
+          'error',
+          {
+            paths: [
+              {
+                name: 'uuid',
+                message:
+                  'Non-deterministic: Use UuidProvider dependency instead of uuid in core.',
+              },
+              {
+                name: 'react-native-uuid',
+                message:
+                  'Non-deterministic: Use UuidProvider dependency instead of react-native-uuid in core.',
+              },
+              {
+                name: 'crypto',
+                message:
+                  'Non-deterministic: Use UuidProvider dependency instead of crypto in core.',
+              },
+              {
+                name: '@faker-js/faker',
+                message:
+                  'Non-deterministic: Use data builders with injected dependencies instead of faker in core.',
+              },
+            ],
+          },
+        ],
+      },
+    },
+    // No vi/jest mocking in core tests (use dependency injection)
+    {
+      files: ['core/**/*.test.ts', 'core/**/*.spec.ts'],
+      rules: {
+        'no-restricted-properties': [
+          'error',
+          {
+            object: 'vi',
+            property: 'useFakeTimers',
+            message:
+              'Use DateProvider dependency injection instead of vi.useFakeTimers() in core tests.',
+          },
+          {
+            object: 'vi',
+            property: 'useRealTimers',
+            message:
+              'Use DateProvider dependency injection instead of vi.useRealTimers() in core tests.',
+          },
+          {
+            object: 'vi',
+            property: 'spyOn',
+            message:
+              'Use dependency injection (fakes/stubs) instead of vi.spyOn() in core tests.',
+          },
+          {
+            object: 'jest',
+            property: 'useFakeTimers',
+            message:
+              'Use DateProvider dependency injection instead of jest.useFakeTimers() in core tests.',
+          },
+          {
+            object: 'jest',
+            property: 'useRealTimers',
+            message:
+              'Use DateProvider dependency injection instead of jest.useRealTimers() in core tests.',
+          },
+          {
+            object: 'jest',
+            property: 'spyOn',
+            message:
+              'Use dependency injection (fakes/stubs) instead of jest.spyOn() in core tests.',
+          },
+        ],
+      },
+    },
+    // Allow faker in data builders (they generate test data)
+    {
+      files: ['core/**/*.builder.ts'],
+      rules: {
+        'no-restricted-imports': 'off',
+      },
+    },
+    // Allow Date in port type definitions and test fixtures
+    {
+      files: ['core/_ports_/**/*.ts', 'core/**/*.fixture.ts'],
+      rules: {
+        'no-restricted-globals': 'off',
       },
     },
   ],

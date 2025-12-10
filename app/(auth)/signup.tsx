@@ -73,11 +73,11 @@ export default function SignUpScreen() {
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
+      <TiedSCloseButton onClose={handleClose} />
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <TiedSCloseButton onClose={handleClose} iconColor={T.color.white} />
         <Text style={styles.subtitle}>{'GET STARTED FOR FREE'}</Text>
         <TiedSSocialButton
           iconName="logo-google"

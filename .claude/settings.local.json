@@ -1,10 +1,14 @@
 {
   "permissions": {
     "allow": [
+      "Bash(./gradlew :tied-siren-blocking-overlay:testDebugUnitTest:*)",
+      "Bash(./gradlew:*)",
       "Bash(.specify/scripts/bash/check-prerequisites.sh:*)",
       "Bash(.specify/scripts/bash/update-agent-context.sh:*)",
+      "Bash(adb logcat:*)",
       "Bash(base64:*)",
       "Bash(cat:*)",
+      "Bash(cloc:*)",
       "Bash(eas:*)",
       "Bash(echo:*)",
       "Bash(find:*)",
@@ -17,6 +21,7 @@
       "Bash(gh pr:*)",
       "Bash(gh release list:*)",
       "Bash(gh release view:*)",
+      "Bash(gh repo edit:*)",
       "Bash(gh repo view:*)",
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
@@ -27,47 +32,79 @@
       "Bash(gh workflow:*)",
       "Bash(git diff:*)",
       "Bash(git log:*)",
+      "Bash(git stash:*)",
+      "Bash(git worktree:*)",
       "Bash(grep:*)",
+      "Bash(ls:*)",
+      "Bash(npm ci:*)",
       "Bash(npm install:*)",
+      "Bash(npm run android:*)",
+      "Bash(npm run build:*)",
+      "Bash(npm run generate:schema:*)",
       "Bash(npm run lint:*)",
+      "Bash(npm run lint:fix:*)",
+      "Bash(npm run lint:sh:*)",
       "Bash(npm run test:*)",
       "Bash(npm test:*)",
+      "Bash(npm view:*)",
+      "Bash(npx create-expo-app:*)",
+      "Bash(npx create-expo-module:*)",
       "Bash(npx eslint:*)",
+      "Bash(npx expo prebuild:*)",
+      "Bash(npx expo run:android)",
+      "Bash(npx husky init)",
+      "Bash(npx prettier:*)",
+      "Bash(npx prisma generate:*)",
       "Bash(npx tsc:*)",
+      "Bash(npx vitest:*)",
+      "Bash(uv tool list:*)",
+      "Bash(xargs cloc:*)",
+      "SlashCommand(/speckit.specify)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:stackoverflow.com)",
+      "WebFetch(domain:www.npmjs.com)",
       "WebSearch",
       "mcp__github__add_issue_comment",
       "mcp__github__get_me",
       "mcp__github__issue_read",
       "mcp__github__issue_write",
       "mcp__github__list_issues",
+      "mcp__github__list_pull_requests",
       "mcp__github__pull_request_read",
-      "mcp__ide__getDiagnostics",
-      "Bash(npx create-expo-module:*)",
-      "Bash(npm run build:*)",
-      "Bash(npx create-expo-app:*)",
-      "Bash(npx husky init)",
-      "Bash(npx expo prebuild:*)",
-      "Bash(./gradlew :tied-siren-blocking-overlay:testDebugUnitTest:*)",
-      "Bash(npx expo run:android)",
-      "Bash(./gradlew:*)",
-      "SlashCommand(/speckit.specify)",
-      "Bash(uv tool list:*)",
-      "Bash(npm run lint:fix:*)",
-      "Bash(gh repo edit:*)",
-      "Bash(npm run android:*)",
-      "Bash(adb logcat:*)"
+      "mcp__github__pull_request_review_write",
+      "mcp__ide__getDiagnostics"
     ],
-    "deny": [],
+    "deny": [
+      "Bash(git commit --no-verify:*)",
+      "Bash(git push --force-with-lease:*)",
+      "Bash(git push --force:*)",
+      "Bash(git push --no-verify:*)",
+      "Bash(git push -f:*)",
+      "Bash(git push:*)",
+      "BashOutput(*)"
+    ],
     "ask": [
+      "Bash(SKIP_E2E_CHECK=1 git push:*)",
       "Bash(chmod:*)",
       "Bash(gh secret:*)",
       "Bash(git add:*)",
       "Bash(git checkout:*)",
       "Bash(git commit:*)",
-      "Bash(git push:*)"
+      "Bash(git merge:*)"
+    ]
+  },
+  "hooks": {
+    "PostToolUse": [
+      {
+        "matcher": "Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/validate-edit.sh"
+          }
+        ]
+      }
     ]
   }
 }

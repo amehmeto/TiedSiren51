@@ -2,6 +2,7 @@ import { PrismaClient } from '@prisma/client/react-native'
 import * as FileSystem from 'expo-file-system'
 import { Platform } from 'react-native'
 import '@prisma/react-native'
+import { Logger } from '@/core/_ports_/logger'
 
 export abstract class PrismaRepository {
   private _isInitialized = false
@@ -12,7 +13,9 @@ export abstract class PrismaRepository {
 
   protected baseClient: PrismaClient
 
-  public constructor() {
+  protected abstract readonly logger: Logger
+
+  protected constructor() {
     this.dbPath = this.getDbPath()
     this.baseClient = this.getPrismaClient()
     this.initialize()
@@ -68,8 +71,7 @@ export abstract class PrismaRepository {
         })
       }
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error ensuring database file:', error)
+      this.logger.error(`Error ensuring database file: ${error}`)
       throw error
     }
   }
@@ -79,8 +81,7 @@ export abstract class PrismaRepository {
       await this.baseClient.$connect()
       await this.baseClient.$executeRaw`PRAGMA foreign_keys = ON;`
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error connecting to database:', error)
+      this.logger.error(`Error connecting to database: ${error}`)
       throw error
     }
   }
@@ -89,9 +90,9 @@ export abstract class PrismaRepository {
     try {
       await this.createMainTables()
       await this.createJunctionTables()
+      await this.migrateTimerTable()
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error creating tables:', error)
+      this.logger.error(`Error creating tables: ${error}`)
       throw error
     }
   }
@@ -136,6 +137,49 @@ export abstract class PrismaRepository {
         "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
       );
     `
+
+    await this.baseClient.$executeRaw`
+      CREATE TABLE IF NOT EXISTS "Timer" (
+        "id" TEXT PRIMARY KEY NOT NULL,
+        "userId" TEXT NOT NULL,
+        "endedAt" TEXT NOT NULL,
+        "updatedAt" DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+      );
+    `
+  }
+
+  private async migrateTimerTable(): Promise<void> {
+    try {
+      const tableInfo = await this.baseClient.$queryRaw<
+        { name: string; type: string }[]
+      >`
+        PRAGMA table_info("Timer");
+      `
+
+      const hasUserIdColumn = tableInfo.some((col) => col.name === 'userId')
+      const hasEndAtColumn = tableInfo.some((col) => col.name === 'endAt')
+      const hasEndedAtColumn = tableInfo.some((col) => col.name === 'endedAt')
+
+      if (!hasUserIdColumn) {
+        await this.baseClient.$executeRaw`
+          ALTER TABLE "Timer" ADD COLUMN "userId" TEXT;
+        `
+
+        await this.baseClient.$executeRaw`
+          UPDATE "Timer" SET "userId" = "id" WHERE "userId" IS NULL;
+        `
+      }
+
+      // Migration: Rename endAt to endedAt if needed
+      if (hasEndAtColumn && !hasEndedAtColumn) {
+        await this.baseClient.$executeRaw`
+          ALTER TABLE "Timer" RENAME COLUMN "endAt" TO "endedAt";
+        `
+        this.logger.info('Migrated Timer table: renamed endAt to endedAt')
+      }
+    } catch (error) {
+      this.logger.error(`Error migrating Timer table: ${error}`)
+    }
   }
 
   private async createJunctionTables(): Promise<void> {
@@ -163,8 +207,7 @@ export abstract class PrismaRepository {
       await this.baseClient.siren.findMany()
       await this.baseClient.blocklist.findMany()
     } catch (error) {
-      // eslint-disable-next-line no-console
-      console.error('Error loading initial data:', error)
+      this.logger.error(`Error loading initial data: ${error}`)
     }
   }
 }

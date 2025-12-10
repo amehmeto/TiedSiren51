@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 # Get coverage from base branch via git
 # Usage: bash scripts/get-base-coverage.sh <base-branch-ref>
 
