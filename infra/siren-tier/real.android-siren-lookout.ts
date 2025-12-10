@@ -29,6 +29,11 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
   }
 
   onSirenDetected(listener: (packageName: string) => void): void {
+    if (this.listener) {
+      this.logger.warn(
+        'Overwriting existing siren detection listener. Previous listener will be discarded.',
+      )
+    }
     this.listener = listener
   }
 

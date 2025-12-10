@@ -95,7 +95,8 @@
       "Bash(git add:*)",
       "Bash(git checkout:*)",
       "Bash(git commit:*)",
-      "Bash(git merge:*)"
+      "Bash(git merge:*)",
+      "Bash(rm:*)"
     ]
   },
   "hooks": {
@@ -106,6 +107,17 @@
           {
             "type": "command",
             "command": ".claude/hooks/validate-edit.sh"
+          }
+        ]
+      }
+    ],
+    "Notification": [
+      {
+        "matcher": "",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Purr.aiff"
           }
         ]
       }

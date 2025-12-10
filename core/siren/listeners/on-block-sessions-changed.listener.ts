@@ -1,3 +1,4 @@
+import { Logger } from '@/core/_ports_/logger'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { AppStore } from '@/core/_redux_/createStore'
 import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAllBlockSessions'
@@ -15,9 +16,11 @@ import { Sirens } from '@/core/siren/sirens'
 export const onBlockSessionsChangedListener = ({
   store,
   sirenLookout,
+  logger,
 }: {
   store: AppStore
   sirenLookout: SirenLookout
+  logger: Logger
 }) => {
   let previousSessionCount = 0
 
@@ -27,7 +30,11 @@ export const onBlockSessionsChangedListener = ({
 
   if (initialSessions.length > 0) {
     const sirens = extractSirensFromSessions(initialSessions)
-    sirenLookout.watchSirens(sirens)
+    try {
+      sirenLookout.watchSirens(sirens)
+    } catch (error) {
+      logger.error(`Failed to start watching sirens: ${error}`)
+    }
     previousSessionCount = initialSessions.length
   }
 
@@ -43,11 +50,19 @@ export const onBlockSessionsChangedListener = ({
 
     if (hadSessions && !hasSessions) {
       // All sessions removed: stop watching
-      sirenLookout.stopWatching()
+      try {
+        sirenLookout.stopWatching()
+      } catch (error) {
+        logger.error(`Failed to stop watching sirens: ${error}`)
+      }
     } else if (hasSessions && currentSessionCount !== previousSessionCount) {
       // Sessions added or changed: update the watched sirens
       const sirens = extractSirensFromSessions(sessions)
-      sirenLookout.watchSirens(sirens)
+      try {
+        sirenLookout.watchSirens(sirens)
+      } catch (error) {
+        logger.error(`Failed to update watched sirens: ${error}`)
+      }
     }
 
     previousSessionCount = currentSessionCount

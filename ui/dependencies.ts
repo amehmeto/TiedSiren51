@@ -32,7 +32,7 @@ const mobileDependencies = {
   logger,
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),
-  sirenTier: new AndroidSirenTier(),
+  sirenTier: new AndroidSirenTier(logger),
   sirensRepository: new PrismaSirensRepository(logger),
   timerRepository: new PrismaTimerRepository(logger),
 }

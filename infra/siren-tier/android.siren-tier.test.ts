@@ -1,5 +1,6 @@
-import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { showOverlay } from '@amehmeto/tied-siren-blocking-overlay'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { Sirens } from '@core/siren/sirens'
 import { AndroidSirenTier } from './android.siren-tier'
 
@@ -11,10 +12,12 @@ const mockShowOverlay = vi.mocked(showOverlay)
 
 describe('AndroidSirenTier', () => {
   let androidSirenTier: AndroidSirenTier
+  let logger: InMemoryLogger
 
   beforeEach(() => {
     vi.clearAllMocks()
-    androidSirenTier = new AndroidSirenTier()
+    logger = new InMemoryLogger()
+    androidSirenTier = new AndroidSirenTier(logger)
   })
 
   describe('block', () => {
@@ -53,8 +56,6 @@ describe('AndroidSirenTier', () => {
 
   describe('target', () => {
     it('logs targeted sirens', async () => {
-      const consoleSpy = vi.spyOn(console, 'log').mockImplementation(() => {})
-
       const sirens: Sirens = {
         android: [
           { appName: 'Facebook', packageName: 'com.facebook.katana', icon: '' },
@@ -71,15 +72,14 @@ describe('AndroidSirenTier', () => {
         websites: [],
         keywords: [],
       }
+      const expectedLogEntry = {
+        level: 'info',
+        message: 'Targeted sirens: Facebook, Instagram',
+      }
 
       await androidSirenTier.target(sirens)
 
-      expect(consoleSpy).toHaveBeenCalledWith('Targeted sirens:', [
-        'Facebook',
-        'Instagram',
-      ])
-
-      consoleSpy.mockRestore()
+      expect(logger.getLogs()).toContainEqual(expectedLogEntry)
     })
   })
 })
