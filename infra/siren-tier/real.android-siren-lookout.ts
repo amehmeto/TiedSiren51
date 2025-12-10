@@ -1,7 +1,6 @@
 import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import type { AccessibilityEventSubscription } from '@amehmeto/expo-accessibility-service'
 import { Logger } from '@/core/_ports_/logger'
-import { Sirens } from '@/core/siren/sirens'
 import { AndroidSirenLookout } from '@core/_ports_/siren.lookout'
 
 export class RealAndroidSirenLookout implements AndroidSirenLookout {
@@ -11,11 +10,7 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
 
   constructor(private readonly logger: Logger) {}
 
-  watchSirens(sirens: Sirens): void {
-    this.logger.info(
-      `Watching sirens: ${sirens.android.map((app) => app.appName).join(', ')}`,
-    )
-
+  startWatching(): void {
     // Start subscription if not already active
     if (!this.subscription) this.startAccessibilitySubscription()
   }

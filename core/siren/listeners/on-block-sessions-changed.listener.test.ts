@@ -38,8 +38,9 @@ describe('onBlockSessionsChanged listener', () => {
     ],
   }
 
-  it('should start watching when block sessions are added', () => {
+  it('should not be watching when store is created without sessions', () => {
     const sirenLookout = new FakeSirenLookout()
+
     createTestStore({ sirenLookout })
 
     expect(sirenLookout.isWatching()).toBe(false)
@@ -54,10 +55,6 @@ describe('onBlockSessionsChanged listener', () => {
     createTestStore({ sirenLookout }, initialState)
 
     expect(sirenLookout.isWatching()).toBe(true)
-    expect(sirenLookout.sirens?.android).toHaveLength(1)
-    expect(sirenLookout.sirens?.android[0].packageName).toBe(
-      'com.facebook.katana',
-    )
   })
 
   it('should start watching when sessions are added to store', () => {
@@ -85,13 +82,12 @@ describe('onBlockSessionsChanged listener', () => {
     expect(sirenLookout.isWatching()).toBe(false)
   })
 
-  it('should update watched sirens when sessions change', () => {
+  it('should remain watching when sessions change but still have at least one', () => {
     const sirenLookout = new FakeSirenLookout()
     const initialState = stateBuilder()
       .withBlockSessions([blockSession])
       .build()
     const store = createTestStore({ sirenLookout }, initialState)
-
     const newSession: BlockSession = {
       id: 'session-2',
       name: 'Evening Focus',
@@ -126,6 +122,6 @@ describe('onBlockSessionsChanged listener', () => {
 
     store.dispatch(setBlockSessions([blockSession, newSession]))
 
-    expect(sirenLookout.sirens?.android).toHaveLength(2)
+    expect(sirenLookout.isWatching()).toBe(true)
   })
 })

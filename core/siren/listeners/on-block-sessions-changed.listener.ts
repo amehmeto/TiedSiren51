@@ -2,7 +2,6 @@ import { Logger } from '@/core/_ports_/logger'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { AppStore } from '@/core/_redux_/createStore'
 import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAllBlockSessions'
-import { Sirens } from '@/core/siren/sirens'
 
 /**
  * Listens to block session changes and starts/stops the siren lookout accordingly.
@@ -12,6 +11,9 @@ import { Sirens } from '@/core/siren/sirens'
  *
  * This ensures the AccessibilityService subscription is only active when needed,
  * avoiding the persistent notification icon when there's nothing to block.
+ *
+ * Note: The lookout only detects app launches. The actual filtering of which apps
+ * to block happens in the blockLaunchedApp usecase via selectTargetedApps selector.
  */
 export const onBlockSessionsChangedListener = ({
   store,
@@ -21,68 +23,44 @@ export const onBlockSessionsChangedListener = ({
   store: AppStore
   sirenLookout: SirenLookout
   logger: Logger
-}) => {
-  let previousSessionCount = 0
+}): (() => void) => {
+  let previousHadSessions = false
 
   // Check initial state
   const initialState = store.getState()
   const initialSessions = selectAllBlockSessions(initialState.blockSession)
 
   if (initialSessions.length > 0) {
-    const sirens = extractSirensFromSessions(initialSessions)
     try {
-      sirenLookout.watchSirens(sirens)
+      sirenLookout.startWatching()
     } catch (error) {
-      logger.error(`Failed to start watching sirens: ${error}`)
+      logger.error(`Failed to start watching: ${error}`)
     }
-    previousSessionCount = initialSessions.length
+    previousHadSessions = true
   }
 
   // Subscribe to store changes
-  store.subscribe(() => {
+  return store.subscribe(() => {
     const state = store.getState()
     const sessions = selectAllBlockSessions(state.blockSession)
-    const currentSessionCount = sessions.length
+    const hasSessions = sessions.length > 0
 
-    // Only react when session count changes from 0 to >0 or vice versa
-    const hadSessions = previousSessionCount > 0
-    const hasSessions = currentSessionCount > 0
-
-    if (hadSessions && !hasSessions) {
+    if (previousHadSessions && !hasSessions) {
       // All sessions removed: stop watching
       try {
         sirenLookout.stopWatching()
       } catch (error) {
-        logger.error(`Failed to stop watching sirens: ${error}`)
+        logger.error(`Failed to stop watching: ${error}`)
       }
-    } else if (hasSessions && currentSessionCount !== previousSessionCount) {
-      // Sessions added or changed: update the watched sirens
-      const sirens = extractSirensFromSessions(sessions)
+    } else if (!previousHadSessions && hasSessions) {
+      // First session added: start watching
       try {
-        sirenLookout.watchSirens(sirens)
+        sirenLookout.startWatching()
       } catch (error) {
-        logger.error(`Failed to update watched sirens: ${error}`)
+        logger.error(`Failed to start watching: ${error}`)
       }
     }
 
-    previousSessionCount = currentSessionCount
+    previousHadSessions = hasSessions
   })
-}
-
-function extractSirensFromSessions(
-  sessions: ReturnType<typeof selectAllBlockSessions>,
-): Sirens {
-  const androidApps = sessions.flatMap((session) =>
-    session.blocklists.flatMap((blocklist) => blocklist.sirens.android),
-  )
-
-  return {
-    android: androidApps,
-    ios: [],
-    windows: [],
-    macos: [],
-    linux: [],
-    websites: [],
-    keywords: [],
-  }
 }

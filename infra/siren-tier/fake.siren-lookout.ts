@@ -1,22 +1,17 @@
 import { AndroidSirenLookout } from '@/core/_ports_/siren.lookout'
-import { Sirens } from '@/core/siren/sirens'
 
 export class FakeSirenLookout implements AndroidSirenLookout {
-  sirens?: Sirens = undefined
-
   private listener?: (packageName: string) => void
 
   private enabled = true
 
   private watching = false
 
-  watchSirens(sirens: Sirens): void {
-    this.sirens = sirens
+  startWatching(): void {
     this.watching = true
   }
 
   stopWatching(): void {
-    this.sirens = undefined
     this.watching = false
   }
 
