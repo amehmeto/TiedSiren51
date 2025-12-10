@@ -8,8 +8,16 @@ export class FakeSirenLookout implements AndroidSirenLookout {
 
   private enabled = true
 
+  private watching = false
+
   watchSirens(sirens: Sirens): void {
     this.sirens = sirens
+    this.watching = true
+  }
+
+  stopWatching(): void {
+    this.sirens = undefined
+    this.watching = false
   }
 
   onSirenDetected(listener: (packageName: string) => void): void {
@@ -19,6 +27,11 @@ export class FakeSirenLookout implements AndroidSirenLookout {
   // Test helper method to simulate detection
   simulateDetection(packageName: string): void {
     if (this.listener) this.listener(packageName)
+  }
+
+  // Test helper to check if watching is active
+  isWatching(): boolean {
+    return this.watching
   }
 
   async isEnabled(): Promise<boolean> {

@@ -1,12 +1,17 @@
-import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import { Logger } from '@/core/_ports_/logger'
 import { Sirens } from '@/core/siren/sirens'
 import { AndroidSirenLookout } from '@core/_ports_/siren.lookout'
 
+/**
+ * In-memory implementation of SirenLookout for testing purposes.
+ * Does not connect to the real AccessibilityService.
+ */
 export class InMemorySirenLookout implements AndroidSirenLookout {
   sirens?: Sirens = undefined
 
   private listener?: (packageName: string) => void
+
+  private enabled = true
 
   constructor(private readonly logger: Logger) {}
 
@@ -22,6 +27,11 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
     }
   }
 
+  stopWatching(): void {
+    this.sirens = undefined
+    this.logger.info('Stopped watching for sirens')
+  }
+
   onSirenDetected(listener: (packageName: string) => void): void {
     this.listener = listener
   }
@@ -32,22 +42,15 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
   }
 
   async isEnabled(): Promise<boolean> {
-    try {
-      return await AccessibilityService.isEnabled()
-    } catch (error) {
-      this.logger.error(
-        `Failed to check if accessibility service is enabled: ${error}`,
-      )
-      return false
-    }
+    return this.enabled
   }
 
   async askPermission(): Promise<void> {
-    try {
-      await AccessibilityService.askPermission()
-    } catch (error) {
-      this.logger.error(`Failed to ask for accessibility permission: ${error}`)
-      throw error
-    }
+    this.enabled = true
+  }
+
+  // Test helper to set enabled state
+  setEnabled(enabled: boolean): void {
+    this.enabled = enabled
   }
 }

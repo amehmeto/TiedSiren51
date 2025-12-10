@@ -12,7 +12,7 @@ import { SentryLogger } from '@/infra/logger/sentry.logger'
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
 import { PrismaSirensRepository } from '@/infra/siren-repository/prisma.sirens-repository'
 import { AndroidSirenTier } from '@/infra/siren-tier/android.siren-tier'
-import { InMemorySirenLookout } from '@/infra/siren-tier/in-memory.siren-lookout'
+import { RealAndroidSirenLookout } from '@/infra/siren-tier/real.android-siren-lookout'
 import { PrismaTimerRepository } from '@/infra/timer-repository/prisma.timer.repository'
 
 const dateProvider = new RealDateProvider()
@@ -31,7 +31,7 @@ const mobileDependencies = {
   installedAppRepository: new ExpoListInstalledAppsRepository(),
   logger,
   notificationService: new ExpoNotificationService(logger),
-  sirenLookout: new InMemorySirenLookout(logger),
+  sirenLookout: new RealAndroidSirenLookout(logger),
   sirenTier: new AndroidSirenTier(),
   sirensRepository: new PrismaSirensRepository(logger),
   timerRepository: new PrismaTimerRepository(logger),
