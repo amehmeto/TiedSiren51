@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { stateBuilder } from '@/core/_tests_/state-builder'
@@ -7,17 +7,19 @@ import { FakeSirenLookout } from '@/infra/siren-tier/fake.siren-lookout'
 
 describe('onBlockSessionsChanged listener', () => {
   const blockSession = buildBlockSession()
+  let sirenLookout: FakeSirenLookout
+
+  beforeEach(() => {
+    sirenLookout = new FakeSirenLookout()
+  })
 
   it('should not be watching when store is created without sessions', () => {
-    const sirenLookout = new FakeSirenLookout()
-
     createTestStore({ sirenLookout })
 
     expect(sirenLookout.isWatching()).toBe(false)
   })
 
   it('should start watching when store is created with existing sessions', () => {
-    const sirenLookout = new FakeSirenLookout()
     const initialState = stateBuilder()
       .withBlockSessions([blockSession])
       .build()
@@ -28,7 +30,6 @@ describe('onBlockSessionsChanged listener', () => {
   })
 
   it('should start watching when sessions are added to store', () => {
-    const sirenLookout = new FakeSirenLookout()
     const store = createTestStore({ sirenLookout })
 
     expect(sirenLookout.isWatching()).toBe(false)
@@ -39,7 +40,6 @@ describe('onBlockSessionsChanged listener', () => {
   })
 
   it('should stop watching when all sessions are removed', () => {
-    const sirenLookout = new FakeSirenLookout()
     const initialState = stateBuilder()
       .withBlockSessions([blockSession])
       .build()
@@ -53,7 +53,6 @@ describe('onBlockSessionsChanged listener', () => {
   })
 
   it('should remain watching when sessions change but still have at least one', () => {
-    const sirenLookout = new FakeSirenLookout()
     const initialState = stateBuilder()
       .withBlockSessions([blockSession])
       .build()
