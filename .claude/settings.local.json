@@ -52,6 +52,7 @@
       "Bash(npx eslint:*)",
       "Bash(npx expo prebuild:*)",
       "Bash(npx expo run:android)",
+      "Bash(npx expo-modules-autolinking:*)",
       "Bash(npx husky init)",
       "Bash(npx prettier:*)",
       "Bash(npx prisma generate:*)",
@@ -75,12 +76,11 @@
       "mcp__github__issue_write",
       "mcp__github__list_issues",
       "mcp__github__list_pull_requests",
+      "mcp__github__list_releases",
+      "mcp__github__list_tags",
       "mcp__github__pull_request_read",
       "mcp__github__pull_request_review_write",
-      "mcp__ide__getDiagnostics",
-      "Bash(npx expo-modules-autolinking:*)",
-      "mcp__github__list_releases",
-      "mcp__github__list_tags"
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [
       "Bash(git commit --no-verify:*)",
