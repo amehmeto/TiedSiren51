@@ -139,8 +139,9 @@ module.exports = {
         'vitest/prefer-hooks-on-top': 'error',
         'vitest/prefer-strict-equal': 'error',
         'local-rules/expect-separate-act-assert': 'error',
-        // Test structure rule (warning to serve as reminder)
+        // Test structure rules
         'local-rules/no-new-in-test-body': 'warn',
+        'local-rules/use-data-builders': 'error',
       },
     },
     // No non-deterministic values in core (use injected dependencies)
