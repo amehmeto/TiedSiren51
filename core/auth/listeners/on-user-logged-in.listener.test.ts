@@ -1,11 +1,16 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { userAuthenticated } from '@/core/auth/reducer'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 
 describe('onUserLoggedIn listener', () => {
+  let authGateway: FakeAuthGateway
+
+  beforeEach(() => {
+    authGateway = new FakeAuthGateway()
+  })
+
   it('should dispatch a user status changed action when the auth gateway notifies the user is authenticated', async () => {
-    const authGateway = new FakeAuthGateway()
     const store = createTestStore({
       authGateway,
     })

@@ -179,6 +179,7 @@ export abstract class PrismaRepository {
       }
     } catch (error) {
       this.logger.error(`Error migrating Timer table: ${error}`)
+      throw error
     }
   }
 
@@ -208,6 +209,7 @@ export abstract class PrismaRepository {
       await this.baseClient.blocklist.findMany()
     } catch (error) {
       this.logger.error(`Error loading initial data: ${error}`)
+      throw error
     }
   }
 }

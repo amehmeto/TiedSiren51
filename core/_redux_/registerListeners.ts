@@ -14,16 +14,19 @@ export const registerListeners = (
   onUserLoggedInListener({
     store,
     authGateway,
+    logger,
   })
 
   onUserLoggedOutListener({
     store,
     authGateway,
+    logger,
   })
 
   onSirenDetectedListener({
     store,
     sirenLookout,
+    logger,
   })
 
   onBlockSessionsChangedListener({

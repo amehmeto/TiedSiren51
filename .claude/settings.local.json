@@ -54,6 +54,7 @@
       "WebFetch(domain:www.npmjs.com)",
       "WebSearch",
       "mcp__github__add_issue_comment",
+      "mcp__github__create_pull_request",
       "mcp__github__list_pull_requests",
       "mcp__github__pull_request_read",
       "mcp__github__pull_request_review_write",

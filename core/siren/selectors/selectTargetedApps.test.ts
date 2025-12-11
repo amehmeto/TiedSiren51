@@ -1,4 +1,4 @@
-import { describe, expect, test } from 'vitest'
+import { beforeEach, describe, expect, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import {
   facebookAndroidSiren,
@@ -12,8 +12,13 @@ import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { selectTargetedApps } from './selectTargetedApps'
 
 describe('selectTargetedApps', () => {
+  let dateProvider: StubDateProvider
+
+  beforeEach(() => {
+    dateProvider = new StubDateProvider()
+  })
+
   test('should return empty array when there are no active block sessions', () => {
-    const dateProvider = new StubDateProvider()
     dateProvider.now = new Date('2024-01-01T10:00:00')
 
     const store = createTestStore(
@@ -41,7 +46,6 @@ describe('selectTargetedApps', () => {
   })
 
   test('should return targeted apps from single active block session', () => {
-    const dateProvider = new StubDateProvider()
     dateProvider.now = new Date('2024-01-01T14:30:00')
 
     const store = createTestStore(
@@ -72,7 +76,6 @@ describe('selectTargetedApps', () => {
   })
 
   test('should return targeted apps from multiple active block sessions', () => {
-    const dateProvider = new StubDateProvider()
     dateProvider.now = new Date('2024-01-01T14:30:00')
 
     const store = createTestStore(
@@ -115,7 +118,6 @@ describe('selectTargetedApps', () => {
   })
 
   test('should flatten apps from multiple blocklists in same session', () => {
-    const dateProvider = new StubDateProvider()
     dateProvider.now = new Date('2024-01-01T14:30:00')
 
     const store = createTestStore(
