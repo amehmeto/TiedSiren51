@@ -28,7 +28,7 @@ Implement the **Repository Pattern** to abstract all data access operations.
 
 ```typescript
 // Core defines what it needs
-export interface IBlockSessionRepository {
+export interface BlockSessionRepository {
   save(session: BlockSession): Promise<void>
   findById(id: string): Promise<BlockSession | null>
   findAll(): Promise<BlockSession[]>
@@ -41,7 +41,7 @@ export interface IBlockSessionRepository {
 
 ```typescript
 // Infrastructure provides how it's done
-export class PrismaBlockSessionRepository implements IBlockSessionRepository {
+export class PrismaBlockSessionRepository implements BlockSessionRepository {
   constructor(private prisma: PrismaClient) {}
 
   async save(session: BlockSession): Promise<void> {
@@ -158,9 +158,9 @@ export const loadBlockSessions = createAppAsyncThunk(
 ## Implementation Notes
 
 ### Key Files
-- `/core/_ports_/IBlockSessionRepository.ts` - Interface
-- `/core/_ports_/IBlocklistRepository.ts` - Interface
-- `/core/_ports_/ISirensRepository.ts` - Interface
+- `/core/_ports_/block-session.repository.ts` - Interface
+- `/core/_ports_/blocklist.repository.ts` - Interface
+- `/core/_ports_/sirens.repository.ts` - Interface
 - `/infra/block-session-repository/prisma.block-session.repository.ts` - Implementation
 - `/infra/blocklist-repository/prisma.blocklist.repository.ts` - Implementation
 - `/infra/siren-repository/prisma.sirens-repository.ts` - Implementation
@@ -169,17 +169,17 @@ export const loadBlockSessions = createAppAsyncThunk(
 ### Repository Interface Pattern
 
 ```typescript
-export interface I{Domain}Repository {
+export interface {Entity}Repository {
   // CRUD operations
-  save(item: Domain): Promise<void>
-  findById(id: string): Promise<Domain | null>
-  findAll(): Promise<Domain[]>
-  update(id: string, changes: Partial<Domain>): Promise<void>
+  save(item: Entity): Promise<void>
+  findById(id: string): Promise<Entity | null>
+  findAll(): Promise<Entity[]>
+  update(id: string, changes: Partial<Entity>): Promise<void>
   delete(id: string): Promise<void>
 
   // Domain-specific queries
-  findActiveByUserId(userId: string): Promise<Domain[]>
-  findByDateRange(start: Date, end: Date): Promise<Domain[]>
+  findActiveByUserId(userId: string): Promise<Entity[]>
+  findByDateRange(start: Date, end: Date): Promise<Entity[]>
 }
 ```
 
@@ -203,7 +203,7 @@ export abstract class PrismaRepository {
 
 // Domain repositories extend base
 export class PrismaBlockSessionRepository extends PrismaRepository
-  implements IBlockSessionRepository {
+  implements BlockSessionRepository {
   // Inherits initialization, error handling, etc.
 }
 ```
@@ -227,7 +227,7 @@ expect(fakeRepository.saveWasCalled).toBe(true)
 Repositories can have domain-specific queries beyond basic CRUD:
 
 ```typescript
-export interface IBlockSessionRepository {
+export interface BlockSessionRepository {
   // ... basic CRUD
 
   // Domain-specific
@@ -239,6 +239,7 @@ export interface IBlockSessionRepository {
 
 ### Related ADRs
 - [Hexagonal Architecture](../hexagonal-architecture.md)
+- [Port Naming Convention](port-naming-convention.md) - No I-prefix for port interfaces
 - [Dependency Injection Pattern](dependency-injection-pattern.md)
 - [Prisma ORM with SQLite](../data-persistence/prisma-orm-sqlite.md)
 
