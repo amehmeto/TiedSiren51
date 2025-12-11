@@ -38,15 +38,15 @@ Use **Factory Pattern** with manual constructor injection for dependency managem
 
 ```typescript
 export type Dependencies = {
-  authGateway: IAuthGateway
-  blockSessionRepository: IBlockSessionRepository
-  blocklistRepository: IBlocklistRepository
-  sirensRepository: ISirensRepository
-  remoteDeviceRepository: IRemoteDeviceRepository
-  notificationService: INotificationService
-  databaseService: IDatabaseService
-  dateProvider: IDateProvider
-  backgroundTaskService: IBackgroundTaskService
+  authGateway: AuthGateway
+  blockSessionRepository: BlockSessionRepository
+  blocklistRepository: BlocklistRepository
+  sirensRepository: SirensRepository
+  sirenTier: SirenTier
+  notificationService: NotificationService
+  databaseService: DatabaseService
+  dateProvider: DateProvider
+  backgroundTaskService: BackgroundTaskService
 }
 ```
 
@@ -231,6 +231,7 @@ const authGateway = process.env.EXPO_PUBLIC_E2E
 
 ### Related ADRs
 - [Hexagonal Architecture](../hexagonal-architecture.md)
+- [Port Naming Convention](port-naming-convention.md) - No I-prefix for port interfaces
 - [Redux Toolkit for Business Logic](../state-management/redux-toolkit-for-business-logic.md)
 - [Repository Pattern](repository-pattern.md)
 - [Stub vs Fake Implementations](../testing/stub-vs-fake-implementations.md)
