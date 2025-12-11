@@ -5,7 +5,7 @@ export const blockLaunchedApp = createAppAsyncThunk(
   'siren/blockLaunchedApp',
   async (
     { packageName }: { packageName: string },
-    { extra: { sirenTier, dateProvider }, getState },
+    { extra: { sirenTier, dateProvider, logger }, getState },
   ) => {
     const targetedApps = selectTargetedApps(getState(), dateProvider)
 
@@ -13,6 +13,9 @@ export const blockLaunchedApp = createAppAsyncThunk(
       (app) => app.packageName === packageName,
     )
 
-    if (isTargeted) await sirenTier.block(packageName)
+    if (isTargeted) {
+      logger.info(`Siren detected: ${packageName} - blocking`)
+      await sirenTier.block(packageName)
+    } else logger.info(`App launched: ${packageName} - not a siren, ignoring`)
   },
 )

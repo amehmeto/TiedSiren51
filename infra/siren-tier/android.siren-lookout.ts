@@ -1,9 +1,9 @@
-import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import type { AccessibilityEventSubscription } from '@amehmeto/expo-accessibility-service'
+import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import { Logger } from '@/core/_ports_/logger'
-import { AndroidSirenLookout } from '@core/_ports_/siren.lookout'
+import { AndroidSirenLookout } from '@/core/_ports_/siren.lookout'
 
-export class RealAndroidSirenLookout implements AndroidSirenLookout {
+export class AccessibilityServiceSirenLookout implements AndroidSirenLookout {
   private listener?: (packageName: string) => void
 
   private subscription?: AccessibilityEventSubscription

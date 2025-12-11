@@ -126,6 +126,8 @@ module.exports = {
             },
           },
         ],
+        // Extend no I-prefix rule to import aliases
+        'local-rules/no-i-prefix-in-imports': 'error',
       },
     },
     {
