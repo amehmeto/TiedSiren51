@@ -90,6 +90,7 @@ module.exports = {
     'local-rules/one-usecase-per-file': 'error',
     'local-rules/core-test-file-naming': 'error',
     'local-rules/time-constant-multiplication': 'error',
+    'local-rules/try-catch-isolation': 'error',
   },
   overrides: [
     {
@@ -112,6 +113,21 @@ module.exports = {
             assertionStyle: 'never',
           },
         ],
+        // Enforce no I-prefix for interfaces (TypeScript convention)
+        // See: docs/adr/core/port-naming-convention.md
+        '@typescript-eslint/naming-convention': [
+          'error',
+          {
+            selector: 'interface',
+            format: ['PascalCase'],
+            custom: {
+              regex: '^I[A-Z]',
+              match: false,
+            },
+          },
+        ],
+        // Extend no I-prefix rule to import aliases
+        'local-rules/no-i-prefix-in-imports': 'error',
       },
     },
     {
