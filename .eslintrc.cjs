@@ -90,6 +90,10 @@ module.exports = {
     'local-rules/one-usecase-per-file': 'error',
     'local-rules/core-test-file-naming': 'error',
     'local-rules/time-constant-multiplication': 'error',
+    // Error handling convention rules (warnings to serve as reminders)
+    'local-rules/no-try-catch-in-core': 'warn',
+    'local-rules/listener-error-handling': 'warn',
+    'local-rules/infra-must-rethrow': 'warn',
   },
   overrides: [
     {
