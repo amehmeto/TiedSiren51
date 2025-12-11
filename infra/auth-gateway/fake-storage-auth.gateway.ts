@@ -65,6 +65,7 @@ export class FakeStorageAuthGateway implements AuthGateway {
       }
     } catch (error) {
       this.logger.warn(`Error verifying authentication: ${error}`)
+      throw error
     }
   }
 }

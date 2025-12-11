@@ -66,6 +66,22 @@ module.exports = {
           className = node.callee.property.name
         }
 
+        // Allow primitive value objects, common built-ins, and error classes
+        const allowedClasses = [
+          'Date',
+          'Error',
+          'Map',
+          'Set',
+          'WeakMap',
+          'WeakSet',
+          'RegExp',
+          'URL',
+          'URLSearchParams',
+        ]
+        // Also allow any class ending with 'Error' (custom error classes)
+        if (className.endsWith('Error')) return
+        if (allowedClasses.includes(className)) return
+
         context.report({
           node,
           messageId: 'noNewInTestBody',

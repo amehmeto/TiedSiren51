@@ -90,10 +90,10 @@ module.exports = {
     'local-rules/one-usecase-per-file': 'error',
     'local-rules/core-test-file-naming': 'error',
     'local-rules/time-constant-multiplication': 'error',
-    // Error handling convention rules (warnings to serve as reminders)
-    'local-rules/no-try-catch-in-core': 'warn',
-    'local-rules/listener-error-handling': 'warn',
-    'local-rules/infra-must-rethrow': 'warn',
+    // Error handling convention rules
+    'local-rules/no-try-catch-in-core': 'error',
+    'local-rules/listener-error-handling': 'error',
+    'local-rules/infra-must-rethrow': 'error',
   },
   overrides: [
     {
@@ -140,7 +140,7 @@ module.exports = {
         'vitest/prefer-strict-equal': 'error',
         'local-rules/expect-separate-act-assert': 'error',
         // Test structure rules
-        'local-rules/no-new-in-test-body': 'warn',
+        'local-rules/no-new-in-test-body': 'error',
         'local-rules/use-data-builders': 'error',
       },
     },

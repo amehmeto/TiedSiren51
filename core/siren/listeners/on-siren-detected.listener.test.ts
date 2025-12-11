@@ -1,10 +1,15 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { FakeSirenLookout } from '@/infra/siren-tier/fake.siren-lookout'
 
 describe('onSirenDetected listener', () => {
+  let sirenLookout: FakeSirenLookout
+
+  beforeEach(() => {
+    sirenLookout = new FakeSirenLookout()
+  })
+
   it('should trigger blockLaunchedApp use case when siren is detected', () => {
-    const sirenLookout = new FakeSirenLookout()
     const store = createTestStore({
       sirenLookout,
     })

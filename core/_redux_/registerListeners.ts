@@ -8,20 +8,23 @@ export const registerListeners = (
   store: AppStore,
   dependencies: Dependencies,
 ) => {
-  const { authGateway, sirenLookout } = dependencies
+  const { authGateway, sirenLookout, logger } = dependencies
 
   onUserLoggedInListener({
     store,
     authGateway,
+    logger,
   })
 
   onUserLoggedOutListener({
     store,
     authGateway,
+    logger,
   })
 
   onSirenDetectedListener({
     store,
     sirenLookout,
+    logger,
   })
 }
