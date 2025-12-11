@@ -54,7 +54,8 @@
       "mcp__github__list_pull_requests",
       "mcp__github__pull_request_read",
       "mcp__github__pull_request_review_write",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "mcp__github__create_pull_request"
     ],
     "deny": [
       "Bash(git commit --no-verify:*)",
