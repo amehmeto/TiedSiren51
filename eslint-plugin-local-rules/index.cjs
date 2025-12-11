@@ -13,6 +13,7 @@ const timeConstantMultiplication = require('../eslint-rules/time-constant-multip
 const infraMustRethrow = require('../eslint-rules/infra-must-rethrow.cjs')
 const listenerErrorHandling = require('../eslint-rules/listener-error-handling.cjs')
 const noTryCatchInCore = require('../eslint-rules/no-try-catch-in-core.cjs')
+const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
 
 module.exports = {
   rules: {
@@ -27,5 +28,6 @@ module.exports = {
     'infra-must-rethrow': infraMustRethrow,
     'listener-error-handling': listenerErrorHandling,
     'no-try-catch-in-core': noTryCatchInCore,
+    'no-new-in-test-body': noNewInTestBody,
   },
 }
