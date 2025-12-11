@@ -7,6 +7,7 @@ import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.b
 import { PrismaDatabaseService } from '@/infra/database-service/prisma.database.service'
 import { RealDateProvider } from '@/infra/date-provider/real.date-provider'
 import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
+import { ExpoForegroundService } from '@/infra/foreground-service/expo.foreground.service'
 import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-repository/expo-list-installed-apps.repository'
 import { SentryLogger } from '@/infra/logger/sentry.logger'
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
@@ -28,6 +29,7 @@ const mobileDependencies = {
   databaseService: new PrismaDatabaseService(logger),
   dateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
+  foregroundService: new ExpoForegroundService(logger),
   installedAppRepository: new ExpoListInstalledAppsRepository(),
   logger,
   notificationService: new ExpoNotificationService(logger),

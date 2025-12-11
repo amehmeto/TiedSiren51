@@ -81,6 +81,7 @@
     "expo-task-manager": "^11.8.2",
     "expo-web-browser": "~13.0.3",
     "firebase": "^11.9.1",
+    "foreground-ss": "^0.1.49",
     "formik": "^2.4.5",
     "is-ci": "^4.1.0",
     "pouchdb": "^8.0.1",
