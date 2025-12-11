@@ -77,7 +77,10 @@
       "mcp__github__list_pull_requests",
       "mcp__github__pull_request_read",
       "mcp__github__pull_request_review_write",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(npx expo-modules-autolinking:*)",
+      "mcp__github__list_releases",
+      "mcp__github__list_tags"
     ],
     "deny": [
       "Bash(git commit --no-verify:*)",
