@@ -12,8 +12,8 @@ export const signUpWithEmail = createAppAsyncThunk<
     payload: SignUpCredentials,
     { extra: { authGateway }, rejectWithValue },
   ) => {
-    const { email, password } = payload
     try {
+      const { email, password } = payload
       return await authGateway.signUpWithEmail(email, password)
     } catch (error) {
       return rejectWithValue(

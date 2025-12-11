@@ -11,8 +11,24 @@ export class AccessibilityServiceSirenLookout implements AndroidSirenLookout {
   constructor(private readonly logger: Logger) {}
 
   startWatching(): void {
-    // Start subscription if not already active
-    if (!this.subscription) this.startAccessibilitySubscription()
+    try {
+      if (this.subscription) return
+
+      this.subscription = AccessibilityService.addAccessibilityEventListener(
+        (event) => {
+          const packageName = event.packageName
+          if (!packageName) return
+
+          this.logger.info(`Detected app launch: ${packageName}`)
+
+          if (this.listener) this.listener(packageName)
+        },
+      )
+
+      this.logger.info('Started accessibility event subscription')
+    } catch (error) {
+      this.logger.error(`Failed to start accessibility subscription: ${error}`)
+    }
   }
 
   stopWatching(): void {
@@ -49,27 +65,6 @@ export class AccessibilityServiceSirenLookout implements AndroidSirenLookout {
     } catch (error) {
       this.logger.error(`Failed to ask for accessibility permission: ${error}`)
       throw error
-    }
-  }
-
-  private startAccessibilitySubscription(): void {
-    try {
-      this.subscription = AccessibilityService.addAccessibilityEventListener(
-        (event) => {
-          const packageName = event.packageName
-          if (!packageName) return
-
-          this.logger.info(`Detected app launch: ${packageName}`)
-
-          // Notify the listener regardless of whether it's a siren
-          // The business logic (blockLaunchedApp usecase) will decide if blocking is needed
-          if (this.listener) this.listener(packageName)
-        },
-      )
-
-      this.logger.info('Started accessibility event subscription')
-    } catch (error) {
-      this.logger.error(`Failed to start accessibility subscription: ${error}`)
     }
   }
 }

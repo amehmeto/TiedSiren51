@@ -3,9 +3,9 @@ import { AndroidSirenLookout } from '@/core/_ports_/siren.lookout'
 export class FakeSirenLookout implements AndroidSirenLookout {
   private listener?: (packageName: string) => void
 
-  private enabled = true
+  enabled = true
 
-  private watching = false
+  watching = false
 
   startWatching(): void {
     this.watching = true
@@ -19,14 +19,8 @@ export class FakeSirenLookout implements AndroidSirenLookout {
     this.listener = listener
   }
 
-  // Test helper method to simulate detection
   simulateDetection(packageName: string): void {
     if (this.listener) this.listener(packageName)
-  }
-
-  // Test helper to check if watching is active
-  isWatching(): boolean {
-    return this.watching
   }
 
   async isEnabled(): Promise<boolean> {

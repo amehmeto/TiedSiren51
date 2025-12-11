@@ -81,36 +81,8 @@ module.exports = {
       )
       const tryStatement = statements[tryIndex]
 
-      // Rule 2: Try should be the first statement
-      // Allow variable declarations, simple assignments, and early returns before try
-      const statementsBeforeTry = statements.slice(0, tryIndex)
-      const hasNonTrivialBeforeTry = statementsBeforeTry.some((stmt) => {
-        // Allow: const x = ..., let x = ..., variable assignments
-        if (stmt.type === 'VariableDeclaration') return false
-        // Allow: x = ...
-        if (
-          stmt.type === 'ExpressionStatement' &&
-          stmt.expression.type === 'AssignmentExpression'
-        )
-          return false
-        // Allow: if (...) return ... (early return guards)
-        // Also allow if blocks that end with return (may include logging before return)
-        if (stmt.type === 'IfStatement' && stmt.consequent) {
-          if (stmt.consequent.type === 'ReturnStatement') return false
-          if (
-            stmt.consequent.type === 'BlockStatement' &&
-            stmt.consequent.body.length > 0
-          ) {
-            const lastStmt =
-              stmt.consequent.body[stmt.consequent.body.length - 1]
-            if (lastStmt.type === 'ReturnStatement') return false
-          }
-        }
-        // Everything else is non-trivial
-        return true
-      })
-
-      if (hasNonTrivialBeforeTry) {
+      // Rule 2: Try should be the first statement (strict enforcement)
+      if (tryIndex > 0) {
         context.report({
           node: tryStatement,
           messageId: 'tryNotFirst',

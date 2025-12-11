@@ -15,8 +15,8 @@ export function useAppInitialization(store: AppStore) {
   const [isInitializing, setIsInitializing] = useState(true)
 
   const initializeServices = async (appStore: AppStore) => {
-    const { logger } = dependencies
     try {
+      const { logger } = dependencies
       logger.initialize()
       await dependencies.databaseService.initialize()
       await dependencies.notificationService.initialize()
@@ -36,7 +36,7 @@ export function useAppInitialization(store: AppStore) {
       logger.info('[useAppInitialization] App initialization complete')
       setError(null)
     } catch (error) {
-      logger.error(`[useAppInitialization] Error: ${error}`)
+      dependencies.logger.error(`[useAppInitialization] Error: ${error}`)
       const errorMessage = handleUIError(error, 'Service initialization failed')
       setError(errorMessage)
     } finally {

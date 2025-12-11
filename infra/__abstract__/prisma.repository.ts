@@ -39,9 +39,9 @@ export abstract class PrismaRepository {
   }
 
   public async initialize(): Promise<void> {
-    if (this._isInitialized) return
-
     try {
+      if (this._isInitialized) return
+
       await this.ensureDatabaseFile()
       await this.connectToDatabase()
       await this.createAllTables()
