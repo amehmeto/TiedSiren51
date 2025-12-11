@@ -10,6 +10,7 @@ const noStylesheetMagicNumbers = require('../eslint-rules/no-stylesheet-magic-nu
 const oneSelectorPerFile = require('../eslint-rules/one-selector-per-file.cjs')
 const oneUsecasePerFile = require('../eslint-rules/one-usecase-per-file.cjs')
 const timeConstantMultiplication = require('../eslint-rules/time-constant-multiplication.cjs')
+const tryCatchIsolation = require('../eslint-rules/try-catch-isolation.cjs')
 
 module.exports = {
   rules: {
@@ -21,5 +22,6 @@ module.exports = {
     'one-selector-per-file': oneSelectorPerFile,
     'one-usecase-per-file': oneUsecasePerFile,
     'time-constant-multiplication': timeConstantMultiplication,
+    'try-catch-isolation': tryCatchIsolation,
   },
 }

@@ -90,6 +90,7 @@ module.exports = {
     'local-rules/one-usecase-per-file': 'error',
     'local-rules/core-test-file-naming': 'error',
     'local-rules/time-constant-multiplication': 'error',
+    'local-rules/try-catch-isolation': 'error',
   },
   overrides: [
     {

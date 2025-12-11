@@ -24,20 +24,28 @@ export const onBlockSessionsChangedListener = ({
   sirenLookout: SirenLookout
   logger: Logger
 }): (() => void) => {
-  let previousHadSessions = false
-
-  // Check initial state
-  const initialState = store.getState()
-  const initialSessions = selectAllBlockSessions(initialState.blockSession)
-
-  if (initialSessions.length > 0) {
+  const safeStartWatching = () => {
     try {
       sirenLookout.startWatching()
     } catch (error) {
       logger.error(`Failed to start watching: ${error}`)
     }
-    previousHadSessions = true
   }
+
+  const safeStopWatching = () => {
+    try {
+      sirenLookout.stopWatching()
+    } catch (error) {
+      logger.error(`Failed to stop watching: ${error}`)
+    }
+  }
+
+  // Check initial state
+  const initialState = store.getState()
+  const initialSessions = selectAllBlockSessions(initialState.blockSession)
+  let previousHadSessions = initialSessions.length > 0
+
+  if (previousHadSessions) safeStartWatching()
 
   // Subscribe to store changes
   return store.subscribe(() => {
@@ -45,21 +53,8 @@ export const onBlockSessionsChangedListener = ({
     const sessions = selectAllBlockSessions(state.blockSession)
     const hasSessions = sessions.length > 0
 
-    if (previousHadSessions && !hasSessions) {
-      // All sessions removed: stop watching
-      try {
-        sirenLookout.stopWatching()
-      } catch (error) {
-        logger.error(`Failed to stop watching: ${error}`)
-      }
-    } else if (!previousHadSessions && hasSessions) {
-      // First session added: start watching
-      try {
-        sirenLookout.startWatching()
-      } catch (error) {
-        logger.error(`Failed to start watching: ${error}`)
-      }
-    }
+    if (previousHadSessions && !hasSessions) safeStopWatching()
+    else if (!previousHadSessions && hasSessions) safeStartWatching()
 
     previousHadSessions = hasSessions
   })
