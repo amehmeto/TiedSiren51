@@ -31,6 +31,7 @@ export class AccessibilityServiceSirenLookout implements AndroidSirenLookout {
       this.logger.info('Started accessibility event subscription')
     } catch (error) {
       this.logger.error(`Failed to start accessibility subscription: ${error}`)
+      throw error
     }
   }
 
