@@ -12,7 +12,10 @@ export class AccessibilityServiceSirenLookout implements AndroidSirenLookout {
 
   startWatching(): void {
     try {
-      if (this.subscription) return
+      if (this.subscription) {
+        this.logger.info('Already watching for sirens')
+        return
+      }
 
       this.subscription = AccessibilityService.addAccessibilityEventListener(
         (event) => {
