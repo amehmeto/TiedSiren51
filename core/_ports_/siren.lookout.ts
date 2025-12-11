@@ -1,7 +1,6 @@
-import { Sirens } from '../siren/sirens'
-
 export interface SirenLookout {
-  watchSirens(sirens: Sirens): void
+  startWatching(): void
+  stopWatching(): void
   onSirenDetected(listener: (packageName: string) => void): void
 }
 
