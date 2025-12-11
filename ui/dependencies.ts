@@ -31,7 +31,7 @@ const mobileDependencies = {
   installedAppRepository: new ExpoListInstalledAppsRepository(),
   logger,
   notificationService: new ExpoNotificationService(logger),
-  sirenLookout: new InMemorySirenLookout(logger),
+  sirenLookout: new InMemorySirenLookout(),
   sirenTier: new InMemorySirenTier(logger),
   sirensRepository: new PrismaSirensRepository(logger),
   timerRepository: new PrismaTimerRepository(logger),

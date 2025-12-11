@@ -3,14 +3,14 @@ import { createTestStore } from '@/core/_tests_/createTestStore'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { setBlockSessions } from '@/core/block-session/block-session.slice'
-import { FakeSirenLookout } from '@/infra/siren-tier/fake.siren-lookout'
+import { InMemorySirenLookout } from '@/infra/siren-tier/in-memory.siren-lookout'
 
 describe('onBlockSessionsChanged listener', () => {
   const blockSession = buildBlockSession()
-  let sirenLookout: FakeSirenLookout
+  let sirenLookout: InMemorySirenLookout
 
   beforeEach(() => {
-    sirenLookout = new FakeSirenLookout()
+    sirenLookout = new InMemorySirenLookout()
   })
 
   it('should not be watching when store is created without sessions', () => {
