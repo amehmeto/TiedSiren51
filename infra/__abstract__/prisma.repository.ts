@@ -39,9 +39,9 @@ export abstract class PrismaRepository {
   }
 
   public async initialize(): Promise<void> {
-    if (this._isInitialized) return
-
     try {
+      if (this._isInitialized) return
+
       await this.ensureDatabaseFile()
       await this.connectToDatabase()
       await this.createAllTables()
@@ -179,6 +179,7 @@ export abstract class PrismaRepository {
       }
     } catch (error) {
       this.logger.error(`Error migrating Timer table: ${error}`)
+      throw error
     }
   }
 
@@ -208,6 +209,7 @@ export abstract class PrismaRepository {
       await this.baseClient.blocklist.findMany()
     } catch (error) {
       this.logger.error(`Error loading initial data: ${error}`)
+      throw error
     }
   }
 }

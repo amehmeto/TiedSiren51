@@ -21,6 +21,9 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ### Testing
 - [Testing Coverage](testing-coverage.md) - ⚠️ **MEDIUM PRIORITY** - Integration tests and Prisma test fixes
 
+### Performance
+- [Native Siren Filtering](native-siren-filtering.md) - 📋 **LOW PRIORITY** - Filter blocked apps at native level to reduce JS bridge calls
+
 ## Priority Levels
 
 - 🚨 **HIGH**: Critical for production stability or user experience

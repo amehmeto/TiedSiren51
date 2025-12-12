@@ -6,14 +6,14 @@ import fs from 'fs'
 const HISTORY_FILE = 'coverage-history.json'
 
 function viewHistory() {
-  if (!fs.existsSync(HISTORY_FILE)) {
-    console.log(
-      '📊 No coverage history found. Run `npm run test:cov:track` first.',
-    )
-    return
-  }
-
   try {
+    if (!fs.existsSync(HISTORY_FILE)) {
+      console.log(
+        '📊 No coverage history found. Run `npm run test:cov:track` first.',
+      )
+      return
+    }
+
     const history = JSON.parse(fs.readFileSync(HISTORY_FILE, 'utf8'))
 
     if (history.length === 0) {

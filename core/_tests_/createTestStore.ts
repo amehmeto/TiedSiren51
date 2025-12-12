@@ -10,7 +10,7 @@ import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
 import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
-import { FakeSirenLookout } from '@infra/siren-tier/fake.siren-lookout'
+import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
 import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 import { createStore } from '../_redux_/createStore'
 import { Dependencies } from '../_redux_/dependencies'
@@ -29,7 +29,7 @@ export const createTestStore = (
     deviceRepository = new FakeDataDeviceRepository(),
     installedAppRepository = new FakeDataInstalledAppsRepository(),
     notificationService = new FakeNotificationService(testLogger),
-    sirenLookout = new FakeSirenLookout(),
+    sirenLookout = new InMemorySirenLookout(),
     sirenTier = new InMemorySirenTier(testLogger),
     sirensRepository = new FakeDataSirensRepository(),
     timerRepository = new FakeDataTimerRepository(),

@@ -147,9 +147,9 @@ jobs:
         id: create_release
         env:
           GH_TOKEN: ${{ github.token }}
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: |
           bash scripts/create-release-with-apk.sh \
-            '${{ toJSON(github) }}' \
             '${{ steps.find_apk.outputs.apk_path }}'
 
       - name: Upload APK artifact
