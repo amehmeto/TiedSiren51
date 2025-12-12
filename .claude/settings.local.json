@@ -76,7 +76,9 @@
       "mcp__github__pull_request_read",
       "mcp__github__pull_request_review_write",
       "mcp__github__search_pull_requests",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "Bash(git revert:*)",
+      "Bash(SKIP_E2E_CHECK=true git push:*)"
     ],
     "deny": [
       "Bash(git commit --no-verify:*)",
