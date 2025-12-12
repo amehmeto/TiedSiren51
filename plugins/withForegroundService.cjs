@@ -1,6 +1,44 @@
-const { withAndroidManifest } = require('@expo/config-plugins')
+const {
+  withAndroidManifest,
+  withDangerousMod,
+} = require('@expo/config-plugins')
+const fs = require('fs')
+const path = require('path')
 
-const withForegroundService = (config) => {
+const withForegroundServiceDrawable = (config) => {
+  return withDangerousMod(config, [
+    'android',
+    async (config) => {
+      const drawableDir = path.join(
+        config.modRequest.platformProjectRoot,
+        'app',
+        'src',
+        'main',
+        'res',
+        'drawable',
+      )
+
+      if (!fs.existsSync(drawableDir)) {
+        fs.mkdirSync(drawableDir, { recursive: true })
+      }
+
+      // Create a simple solid color drawable as placeholder for missing bgintro
+      // This fixes the foreground-ss package bug where bgintro_layer.xml references
+      // a non-existent @drawable/bgintro resource
+      const bgintroXml = `<?xml version="1.0" encoding="utf-8"?>
+<shape xmlns:android="http://schemas.android.com/apk/res/android">
+    <solid android:color="#0C207A"/>
+</shape>
+`
+      const bgintroPath = path.join(drawableDir, 'bgintro.xml')
+      fs.writeFileSync(bgintroPath, bgintroXml)
+
+      return config
+    },
+  ])
+}
+
+const withForegroundServiceManifest = (config) => {
   return withAndroidManifest(config, (config) => {
     const permissions = [
       'android.permission.POST_NOTIFICATIONS',
@@ -46,6 +84,12 @@ const withForegroundService = (config) => {
 
     return config
   })
+}
+
+const withForegroundService = (config) => {
+  config = withForegroundServiceDrawable(config)
+  config = withForegroundServiceManifest(config)
+  return config
 }
 
 module.exports = withForegroundService
