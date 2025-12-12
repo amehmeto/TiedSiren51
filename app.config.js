@@ -49,6 +49,7 @@ export default {
       ],
       'expo-apple-authentication',
       'expo-router',
+      './plugins/withForegroundService.cjs',
     ],
     experiments: {
       typedRoutes: true,

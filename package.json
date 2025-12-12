@@ -42,7 +42,8 @@
     "generate:schema": "npx prisma generate"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": "npm run lint:fix"
+    "*.{js,ts,jsx,tsx}": "npm run lint:fix",
+    ".claude/**/*.json": "eslint"
   },
   "dependencies": {
     "@amehmeto/expo-accessibility-service": "github:amehmeto/expo-accessibility-service",
@@ -54,7 +55,7 @@
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/datetimepicker": "8.0.1",
     "@react-native-google-signin/google-signin": "10.1.1",
-    "@react-native-picker/picker": "^2.7.5",
+    "@react-native-picker/picker": "2.7.5",
     "@reduxjs/toolkit": "^2.2.5",
     "@sentry/react-native": "~5.24.3",
     "@types/react-redux": "^7.1.33",
@@ -81,6 +82,7 @@
     "expo-task-manager": "^11.8.2",
     "expo-web-browser": "~13.0.3",
     "firebase": "^11.9.1",
+    "foreground-ss": "^0.1.49",
     "formik": "^2.4.5",
     "is-ci": "^4.1.0",
     "pouchdb": "^8.0.1",
@@ -142,6 +144,11 @@
     "vitest": "^1.6.0",
     "vitest-tsconfig-paths": "^3.4.1",
     "wait-on": "^7.2.0"
+  },
+  "overrides": {
+    "foreground-ss": {
+      "@expo/config-plugins": "~8.0.0"
+    }
   },
   "private": true
 }

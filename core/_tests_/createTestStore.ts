@@ -5,6 +5,7 @@ import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-d
 import { StubDatabaseService } from '@/infra/database-service/stub.database.service'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataDeviceRepository } from '@/infra/device-repository/fake-data.device.repository'
+import { InMemoryForegroundService } from '@/infra/foreground-service/in-memory.foreground.service'
 import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
@@ -27,6 +28,7 @@ export const createTestStore = (
     databaseService = new StubDatabaseService(),
     dateProvider = new StubDateProvider(),
     deviceRepository = new FakeDataDeviceRepository(),
+    foregroundService = new InMemoryForegroundService(),
     installedAppRepository = new FakeDataInstalledAppsRepository(),
     notificationService = new FakeNotificationService(testLogger),
     sirenLookout = new InMemorySirenLookout(),
@@ -45,6 +47,7 @@ export const createTestStore = (
       blocklistRepository,
       dateProvider,
       deviceRepository,
+      foregroundService,
       installedAppRepository,
       logger: testLogger,
       notificationService,

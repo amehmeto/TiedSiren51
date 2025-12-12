@@ -1,6 +1,10 @@
 {
   "permissions": {
     "allow": [
+      "Bash(SKIP_E2E_CHECK=1 git push origin chore/*)",
+      "Bash(SKIP_E2E_CHECK=1 git push origin feat/*)",
+      "Bash(SKIP_E2E_CHECK=1 git push origin fix/*)",
+      "Bash(SKIP_E2E_CHECK=1 git push origin refactor/*)",
       "Bash(base64:*)",
       "Bash(cat:*)",
       "Bash(cloc:*)",
@@ -27,6 +31,7 @@
       "Bash(git add:*)",
       "Bash(git commit:*)",
       "Bash(git diff:*)",
+      "Bash(git fetch:*)",
       "Bash(git log:*)",
       "Bash(git stash:*)",
       "Bash(git worktree:*)",
@@ -66,11 +71,12 @@
       "Bash(git push --force:*)",
       "Bash(git push --no-verify:*)",
       "Bash(git push -f:*)",
+      "Bash(git push main:*)",
+      "Bash(git push origin main:*)",
       "Bash(git push:*)",
       "BashOutput(*)"
     ],
     "ask": [
-      "Bash(SKIP_E2E_CHECK=1 git push:*)",
       "Bash(chmod:*)",
       "Bash(gh secret:*)",
       "Bash(git checkout:*)",
