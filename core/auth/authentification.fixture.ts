@@ -8,6 +8,7 @@ import {
 } from '@/core/_tests_/state-builder'
 import { AuthUser } from '@/core/auth/authUser'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
+import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
@@ -72,6 +73,9 @@ export function authentificationFixture(
         )
         return store.dispatch(logOut())
       },
+      resetPassword(email: string) {
+        return store.dispatch(resetPassword({ email }))
+      },
     },
     then: {
       userShouldBeAuthenticated(authUser: AuthUser) {
@@ -93,6 +97,14 @@ export function authentificationFixture(
       shouldNotBeLoading() {
         const state = store.getState()
         expect(state.auth.isLoading).toBe(false)
+      },
+      passwordResetShouldBeSent() {
+        const state = store.getState()
+        expect(state.auth.passwordResetSent).toBe(true)
+      },
+      passwordResetShouldNotBeSent() {
+        const state = store.getState()
+        expect(state.auth.passwordResetSent).toBe(false)
       },
     },
   }

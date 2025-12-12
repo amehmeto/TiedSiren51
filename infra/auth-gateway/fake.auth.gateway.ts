@@ -27,6 +27,10 @@ export class FakeAuthGateway implements AuthGateway {
     return this.willResultWith
   }
 
+  async resetPassword(_email: string): Promise<void> {
+    await this.willResultWith
+  }
+
   onUserLoggedIn(listener: (user: AuthUser) => void): void {
     this.onUserLoggedInListener = listener
   }

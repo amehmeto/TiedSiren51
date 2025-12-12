@@ -1,29 +1,41 @@
 import { z } from 'zod'
 import {
+  forgotPasswordSchema,
   signInSchema,
   signUpSchema,
+  ForgotPasswordInput,
   SignInInput,
   SignUpInput,
 } from './auth-schemas'
 
-export interface ValidationResult {
+export interface ValidationResult<T = SignInInput | SignUpInput> {
   isValid: boolean
   errors: Record<string, string>
-  data?: SignInInput | SignUpInput
+  data?: T
 }
 
-export function validateSignInInput(input: SignInInput): ValidationResult {
+export function validateSignInInput(
+  input: SignInInput,
+): ValidationResult<SignInInput> {
   return validateWithSchema(signInSchema, input)
 }
 
-export function validateSignUpInput(input: SignUpInput): ValidationResult {
+export function validateSignUpInput(
+  input: SignUpInput,
+): ValidationResult<SignUpInput> {
   return validateWithSchema(signUpSchema, input)
 }
 
-function validateWithSchema<T extends SignInInput | SignUpInput>(
+export function validateForgotPasswordInput(
+  input: ForgotPasswordInput,
+): ValidationResult<ForgotPasswordInput> {
+  return validateWithSchema(forgotPasswordSchema, input)
+}
+
+function validateWithSchema<T>(
   schema: z.ZodSchema<T>,
   input: unknown,
-): ValidationResult {
+): ValidationResult<T> {
   const validation = schema.safeParse(input)
 
   if (!validation.success) {

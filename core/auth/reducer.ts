@@ -4,12 +4,14 @@ import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
+import { resetPassword } from './usecases/reset-password.usecase'
 import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
 
 export type AuthState = {
   authUser: AuthUser | null
   isLoading: boolean
   error: string | null
+  passwordResetSent: boolean
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -27,6 +29,7 @@ export const reducer = createReducer<AuthState>(
     authUser: null,
     isLoading: false,
     error: null,
+    passwordResetSent: false,
   },
   (builder) => {
     builder
@@ -70,6 +73,20 @@ export const reducer = createReducer<AuthState>(
       .addCase(clearAuthState, (state) => {
         state.isLoading = false
         state.error = null
+        state.passwordResetSent = false
+      })
+      .addCase(resetPassword.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+        state.passwordResetSent = false
+      })
+      .addCase(resetPassword.fulfilled, (state) => {
+        state.isLoading = false
+        state.passwordResetSent = true
+      })
+      .addCase(resetPassword.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.payload ?? null
       })
       .addCase(signInWithEmail.pending, (state) => {
         state.isLoading = true
