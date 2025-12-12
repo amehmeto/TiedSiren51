@@ -15,9 +15,9 @@ import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
 import { validateForgotPasswordInput } from '@/ui/auth-schemas/validation-helper'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
-import { TiedSErrorText } from '@/ui/design-system/components/shared/TiedSErrorText'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
+import { FormError } from '@/ui/screens/Home/shared/FormError'
 import { PasswordResetSuccessView } from './PasswordResetSuccessView'
 
 export default function ForgotPasswordScreen() {
@@ -103,7 +103,7 @@ export default function ForgotPasswordScreen() {
           style={styles.button}
           disabled={isLoading}
         />
-        {error && <TiedSErrorText message={error} />}
+        {error && <FormError error={error} />}
         <Text style={styles.backText} onPress={handleBackToLogin}>
           {'Back to Login'}
         </Text>
