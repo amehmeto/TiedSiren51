@@ -100,10 +100,22 @@
       "Bash(git cherry-pick:*)",
       "Bash(git merge:*)",
       "Bash(git restore:*)",
-      "Bash(git revert:*)"
+      "Bash(git revert:*)",
+      "Edit(/**/.claude/**)",
+      "Write(/**/.claude/**)"
     ]
   },
   "hooks": {
+    "Notification": [
+      {
+        "hooks": [
+          {
+            "type": "command",
+            "command": "afplay /System/Library/Sounds/Purr.aiff"
+          }
+        ]
+      }
+    ],
     "PostToolUse": [
       {
         "matcher": "Edit|Write",
