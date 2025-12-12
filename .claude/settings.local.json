@@ -2,9 +2,7 @@
   "permissions": {
     "allow": [
       "Bash(./android/gradlew:*)",
-      "Bash(./gradlew :amehmeto-tied-siren-blocking-overlay:clean:*)",
-      "Bash(./gradlew :amehmeto-tied-siren-blocking-overlay:compileReleaseKotlin:*)",
-      "Bash(SKIP_E2E_CHECK=true git push:*)",
+      "Bash(./gradlew:*)",
       "Bash(base64:*)",
       "Bash(cat:*)",
       "Bash(cloc:*)",
@@ -36,7 +34,6 @@
       "Bash(git log:*)",
       "Bash(git mv:*)",
       "Bash(git pull:*)",
-      "Bash(git restore:*)",
       "Bash(git stash:*)",
       "Bash(git worktree:*)",
       "Bash(grep:*)",
@@ -96,7 +93,9 @@
       "Bash(chmod:*)",
       "Bash(gh secret:*)",
       "Bash(git checkout:*)",
-      "Bash(git merge:*)"
+      "Bash(git cherry-pick:*)",
+      "Bash(git merge:*)",
+      "Bash(git restore:*)"
     ]
   },
   "hooks": {
