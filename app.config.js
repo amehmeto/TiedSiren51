@@ -49,7 +49,6 @@ export default {
       ],
       'expo-apple-authentication',
       'expo-router',
-      'foreground-ss',
       './plugins/withForegroundService.js',
     ],
     experiments: {
