@@ -43,7 +43,8 @@
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": "npm run lint:fix",
-    ".claude/**/*.json": "eslint --fix"
+    ".claude/**/*.json": "eslint --fix",
+    "*.sh": "shellcheck"
   },
   "dependencies": {
     "@amehmeto/expo-accessibility-service": "github:amehmeto/expo-accessibility-service",
