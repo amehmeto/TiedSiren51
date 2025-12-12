@@ -72,9 +72,9 @@ export const onBlockSessionsChangedListener = ({
   // Check initial state
   const initialState = store.getState()
   const initialSessions = selectAllBlockSessions(initialState.blockSession)
-  let previousHadSessions = initialSessions.length > 0
+  let didHaveSessions = initialSessions.length > 0
 
-  if (previousHadSessions) startProtection()
+  if (didHaveSessions) startProtection()
 
   // Subscribe to store changes
   return store.subscribe(() => {
@@ -82,9 +82,9 @@ export const onBlockSessionsChangedListener = ({
     const sessions = selectAllBlockSessions(state.blockSession)
     const hasSessions = sessions.length > 0
 
-    if (previousHadSessions && !hasSessions) stopProtection()
-    else if (!previousHadSessions && hasSessions) startProtection()
+    if (didHaveSessions && !hasSessions) stopProtection()
+    else if (!didHaveSessions && hasSessions) startProtection()
 
-    previousHadSessions = hasSessions
+    didHaveSessions = hasSessions
   })
 }

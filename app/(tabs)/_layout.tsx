@@ -109,7 +109,7 @@ export default function TabLayout() {
     route,
     color,
     size,
-    focused,
+    focused: isFocused,
   }: {
     route: { name: string }
     color: string
@@ -120,7 +120,7 @@ export default function TabLayout() {
     if (!tab) return null
 
     return (
-      <TabBarIcon tab={tab} color={color} size={size} isFocused={focused} />
+      <TabBarIcon tab={tab} color={color} size={size} isFocused={isFocused} />
     )
   }
 
