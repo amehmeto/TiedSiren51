@@ -13,6 +13,16 @@ export default {
       },
     },
     exclude: ['infra/**/prisma.*.test.ts', '**/node_modules/**'],
+    coverage: {
+      thresholds: {
+        '**/*.schema.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+      },
+    },
   },
   plugins: [tsconfigPaths()],
 }
