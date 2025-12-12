@@ -1,6 +1,5 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
 import { blocklistFormFixture } from './blocklist-form.fixture'
-import { blocklistSchema } from './blocklist-form.schema'
 
 describe('blocklistSchema', () => {
   let fixture: ReturnType<typeof blocklistFormFixture>
@@ -52,18 +51,14 @@ describe('blocklistSchema', () => {
   })
 
   it('should pass with android apps when other siren arrays are undefined', () => {
-    const result = blocklistSchema.safeParse({
-      name: 'Test',
-      sirens: { android: [{ packageName: 'com.test' }] },
-    })
-    expect(result.success).toBe(true)
+    fixture.given.blocklistWithOnlyAndroidAppsAndUndefinedSirens()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
   })
 
   it('should fail when all siren arrays are undefined', () => {
-    const result = blocklistSchema.safeParse({
-      name: 'Test',
-      sirens: {},
-    })
-    expect(result.success).toBe(false)
+    fixture.given.blocklistWithEmptySirensObject()
+    fixture.when.validate()
+    fixture.then.shouldBeInvalid()
   })
 })

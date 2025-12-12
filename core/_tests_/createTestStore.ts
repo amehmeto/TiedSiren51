@@ -19,38 +19,40 @@ import { rootReducer } from '../_redux_/rootReducer'
 const defaultTestLogger = new InMemoryLogger()
 
 export const createTestStore = (
-  partialDeps: Partial<Dependencies> = {},
+  {
+    authGateway = new FakeAuthGateway(),
+    blockSessionRepository = new FakeDataBlockSessionRepository(),
+    blocklistRepository = new FakeDataBlocklistRepository(),
+    databaseService = new StubDatabaseService(),
+    dateProvider = new StubDateProvider(),
+    deviceRepository = new FakeDataDeviceRepository(),
+    installedAppRepository = new FakeDataInstalledAppsRepository(),
+    logger = defaultTestLogger,
+    sirenLookout = new InMemorySirenLookout(),
+    sirensRepository = new FakeDataSirensRepository(),
+    timerRepository = new FakeDataTimerRepository(),
+    backgroundTaskService = new FakeBackgroundTaskService(logger),
+    notificationService = new FakeNotificationService(logger),
+    sirenTier = new InMemorySirenTier(logger),
+  }: Partial<Dependencies> = {},
   preloadedState?: Partial<ReturnType<typeof rootReducer>>,
-) => {
-  const logger = partialDeps.logger ?? defaultTestLogger
-
-  const deps: Dependencies = {
-    authGateway: partialDeps.authGateway ?? new FakeAuthGateway(),
-    backgroundTaskService:
-      partialDeps.backgroundTaskService ??
-      new FakeBackgroundTaskService(logger),
-    blockSessionRepository:
-      partialDeps.blockSessionRepository ??
-      new FakeDataBlockSessionRepository(),
-    blocklistRepository:
-      partialDeps.blocklistRepository ?? new FakeDataBlocklistRepository(),
-    databaseService: partialDeps.databaseService ?? new StubDatabaseService(),
-    dateProvider: partialDeps.dateProvider ?? new StubDateProvider(),
-    deviceRepository:
-      partialDeps.deviceRepository ?? new FakeDataDeviceRepository(),
-    installedAppRepository:
-      partialDeps.installedAppRepository ??
-      new FakeDataInstalledAppsRepository(),
-    logger,
-    notificationService:
-      partialDeps.notificationService ?? new FakeNotificationService(logger),
-    sirenLookout: partialDeps.sirenLookout ?? new InMemorySirenLookout(),
-    sirenTier: partialDeps.sirenTier ?? new InMemorySirenTier(logger),
-    sirensRepository:
-      partialDeps.sirensRepository ?? new FakeDataSirensRepository(),
-    timerRepository:
-      partialDeps.timerRepository ?? new FakeDataTimerRepository(),
-  }
-
-  return createStore(deps, preloadedState)
-}
+) =>
+  createStore(
+    {
+      authGateway,
+      backgroundTaskService,
+      blockSessionRepository,
+      blocklistRepository,
+      databaseService,
+      dateProvider,
+      deviceRepository,
+      installedAppRepository,
+      logger,
+      notificationService,
+      sirenLookout,
+      sirenTier,
+      sirensRepository,
+      timerRepository,
+    },
+    preloadedState,
+  )

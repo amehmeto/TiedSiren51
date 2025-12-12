@@ -77,6 +77,18 @@ export function blocklistFormFixture(): Fixture {
           sirens: { android: [], websites: [], keywords: ['social'] },
         })
       },
+      blocklistWithOnlyAndroidAppsAndUndefinedSirens: () => {
+        blocklistData = {
+          name: 'Test',
+          sirens: { android: [{ packageName: 'com.test' }] },
+        }
+      },
+      blocklistWithEmptySirensObject: () => {
+        blocklistData = {
+          name: 'Test',
+          sirens: {},
+        }
+      },
     },
     when: {
       validate: () => {
@@ -87,6 +99,9 @@ export function blocklistFormFixture(): Fixture {
     then: {
       shouldBeValid: () => {
         expect(validationResult?.success).toBe(true)
+      },
+      shouldBeInvalid: () => {
+        expect(validationResult?.success).toBe(false)
       },
       shouldBeInvalidWithMessage: (path: string, message: string) => {
         expect(validationResult?.success).toBe(false)
