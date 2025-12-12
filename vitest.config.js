@@ -21,6 +21,18 @@ export default {
           functions: 100,
           lines: 100,
         },
+        '**/selectors/*.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+        '**/*.view-model.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
       },
     },
   },
