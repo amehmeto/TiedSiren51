@@ -33,6 +33,18 @@ export default {
           functions: 100,
           lines: 100,
         },
+        '**/usecases/*.usecase.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+        '**/listeners/*.listener.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
       },
     },
   },

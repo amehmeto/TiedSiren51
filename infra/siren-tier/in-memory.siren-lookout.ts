@@ -7,11 +7,17 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
 
   watching = false
 
+  shouldThrowOnStart = false
+
+  shouldThrowOnStop = false
+
   startWatching(): void {
+    if (this.shouldThrowOnStart) throw new Error('Start watching failed')
     this.watching = true
   }
 
   stopWatching(): void {
+    if (this.shouldThrowOnStop) throw new Error('Stop watching failed')
     this.watching = false
   }
 

@@ -76,6 +76,7 @@
       "mcp__github__list_pull_requests",
       "mcp__github__pull_request_read",
       "mcp__github__pull_request_review_write",
+      "mcp__github__search_code",
       "mcp__github__search_pull_requests",
       "mcp__ide__getDiagnostics"
     ],
