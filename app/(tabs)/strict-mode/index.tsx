@@ -28,8 +28,8 @@ import { UnLockMethodCard } from '@ui/screens/StrictMode/UnLockMethodCard'
 const DEFAULT_DURATION: TimerDuration = { days: 0, hours: 0, minutes: 20 }
 
 export default function StrictModeScreen() {
-  const [showTimerPicker, setShowTimerPicker] = useState(false)
-  const [showExtendPicker, setShowExtendPicker] = useState(false)
+  const [isShowingTimerPicker, setIsShowingTimerPicker] = useState(false)
+  const [isShowingExtendPicker, setIsShowingExtendPicker] = useState(false)
   const [timerDuration, setTimerDuration] =
     useState<TimerDuration>(DEFAULT_DURATION)
   const [extendDuration, setExtendDuration] =
@@ -66,7 +66,9 @@ export default function StrictModeScreen() {
         <View style={styles.actionButtons}>
           <TiedSButton
             onPress={() =>
-              isActive ? setShowExtendPicker(true) : setShowTimerPicker(true)
+              isActive
+                ? setIsShowingExtendPicker(true)
+                : setIsShowingTimerPicker(true)
             }
             text={viewModel.buttonText}
           />
@@ -81,8 +83,8 @@ export default function StrictModeScreen() {
       </ScrollView>
 
       <TimerPickerModal
-        visible={showTimerPicker}
-        onClose={() => setShowTimerPicker(false)}
+        visible={isShowingTimerPicker}
+        onClose={() => setIsShowingTimerPicker(false)}
         onSave={() =>
           dispatch(
             startTimer({
@@ -98,8 +100,8 @@ export default function StrictModeScreen() {
       />
 
       <TimerPickerModal
-        visible={showExtendPicker}
-        onClose={() => setShowExtendPicker(false)}
+        visible={isShowingExtendPicker}
+        onClose={() => setIsShowingExtendPicker(false)}
         onSave={() =>
           dispatch(
             extendTimer({

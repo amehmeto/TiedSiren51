@@ -129,6 +129,26 @@ module.exports = {
               match: false,
             },
           },
+          // Enforce boolean naming convention (is, has, should, can, did, will)
+          {
+            selector: 'variable',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'parameter',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'classProperty',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            leadingUnderscore: 'allow',
+          },
         ],
         // Extend no I-prefix rule to import aliases
         'local-rules/no-i-prefix-in-imports': 'error',
