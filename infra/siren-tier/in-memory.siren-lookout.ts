@@ -7,16 +7,22 @@ import { AndroidSirenLookout } from '@core/_ports_/siren.lookout'
 export class InMemorySirenLookout implements AndroidSirenLookout {
   private listener?: (packageName: string) => void
 
-  enabled = true
+  _isEnabled = true
 
-  watching = false
+  isWatching = false
+
+  shouldThrowOnStart = false
+
+  shouldThrowOnStop = false
 
   startWatching(): void {
-    this.watching = true
+    if (this.shouldThrowOnStart) throw new Error('Start watching failed')
+    this.isWatching = true
   }
 
   stopWatching(): void {
-    this.watching = false
+    if (this.shouldThrowOnStop) throw new Error('Stop watching failed')
+    this.isWatching = false
   }
 
   onSirenDetected(listener: (packageName: string) => void): void {
@@ -28,10 +34,10 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
   }
 
   async isEnabled(): Promise<boolean> {
-    return this.enabled
+    return this._isEnabled
   }
 
   async askPermission(): Promise<void> {
-    this.enabled = true
+    this._isEnabled = true
   }
 }

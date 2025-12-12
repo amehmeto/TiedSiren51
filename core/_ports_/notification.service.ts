@@ -1,6 +1,6 @@
 export type NotificationTrigger = {
   seconds: number
-  repeats?: boolean
+  shouldRepeat?: boolean
 }
 
 export interface NotificationService {

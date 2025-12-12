@@ -42,7 +42,9 @@
     "generate:schema": "npx prisma generate"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": "npm run lint:fix"
+    "*.{js,ts,jsx,tsx}": "npm run lint:fix",
+    ".claude/**/*.json": "eslint --fix",
+    "*.sh": "shellcheck"
   },
   "dependencies": {
     "@amehmeto/expo-accessibility-service": "github:amehmeto/expo-accessibility-service",
@@ -111,6 +113,7 @@
     "@types/pouchdb": "^6.4.2",
     "@types/react": "~18.2.45",
     "@types/react-test-renderer": "^18.0.7",
+    "@vitest/coverage-v8": "^1.6.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "c8": "^9.1.0",
     "concurrently": "^8.2.2",
