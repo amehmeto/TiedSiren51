@@ -13,6 +13,14 @@ export class AndroidSirenTier implements SirenTier {
   }
 
   async block(packageName: string): Promise<void> {
-    await showOverlay(packageName)
+    try {
+      await showOverlay(packageName)
+      this.logger.info(`Blocking overlay shown for: ${packageName}`)
+    } catch (error) {
+      this.logger.error(
+        `Failed to show blocking overlay for ${packageName}: ${error}`,
+      )
+      throw error
+    }
   }
 }

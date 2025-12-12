@@ -31,6 +31,19 @@ describe('AndroidSirenTier', () => {
       expect(mockShowOverlay).toHaveBeenCalledWith(packageName)
     })
 
+    it('logs success message when overlay is shown', async () => {
+      const packageName = 'com.facebook.katana'
+      mockShowOverlay.mockResolvedValueOnce(undefined)
+      const expectedLogEntry = {
+        level: 'info',
+        message: `Blocking overlay shown for: ${packageName}`,
+      }
+
+      await androidSirenTier.block(packageName)
+
+      expect(logger.getLogs()).toContainEqual(expectedLogEntry)
+    })
+
     it('handles ERR_INVALID_PACKAGE error gracefully', async () => {
       const error = Object.assign(new Error('Package name cannot be empty'), {
         code: 'ERR_INVALID_PACKAGE',
@@ -51,6 +64,20 @@ describe('AndroidSirenTier', () => {
       const blockPromise = androidSirenTier.block('com.example.app')
 
       await expect(blockPromise).rejects.toThrow('Failed to launch overlay')
+    })
+
+    it('logs error message when overlay fails to show', async () => {
+      const packageName = 'com.example.app'
+      const error = new Error('Failed to launch overlay')
+      mockShowOverlay.mockRejectedValueOnce(error)
+      const expectedLogEntry = {
+        level: 'error',
+        message: `Failed to show blocking overlay for ${packageName}: ${error}`,
+      }
+
+      await androidSirenTier.block(packageName).catch(() => {})
+
+      expect(logger.getLogs()).toContainEqual(expectedLogEntry)
     })
   })
 

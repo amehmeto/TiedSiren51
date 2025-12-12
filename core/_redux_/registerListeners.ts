@@ -34,10 +34,4 @@ export const registerListeners = (
     sirenLookout,
     logger,
   })
-
-  onBlockSessionsChangedListener({
-    store,
-    sirenLookout,
-    logger,
-  })
 }
