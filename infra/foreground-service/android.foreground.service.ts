@@ -13,7 +13,7 @@ const DEFAULT_CONFIG: ForegroundServiceConfig = {
 
 const POST_NOTIFICATIONS_PERMISSION = 'android.permission.POST_NOTIFICATIONS'
 
-export class ExpoForegroundService implements ForegroundService {
+export class AndroidForegroundService implements ForegroundService {
   private running = false
 
   constructor(private readonly logger: Logger) {}
