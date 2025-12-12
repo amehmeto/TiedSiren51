@@ -67,6 +67,8 @@ jobs:
 
       - name: Lint
         run: npm run lint
+        env:
+          SHELLCHECK_PATH: /usr/bin/shellcheck
 
       - name: Run unit tests with coverage
         run: npm run test:cov
