@@ -15,36 +15,10 @@ import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
 import { validateForgotPasswordInput } from '@/ui/auth-schemas/validation-helper'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
+import { TiedSErrorText } from '@/ui/design-system/components/shared/TiedSErrorText'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
-
-function PasswordResetSuccessView({
-  onClose,
-  onBackToLogin,
-}: {
-  onClose: () => void
-  onBackToLogin: () => void
-}) {
-  return (
-    <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
-      <TiedSCloseButton onClose={onClose} />
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
-        <Text style={styles.title}>{'CHECK YOUR EMAIL'}</Text>
-        <Text style={styles.successText}>
-          {"We've sent a password reset link to your email address."}
-        </Text>
-        <TiedSButton
-          onPress={onBackToLogin}
-          text={'BACK TO LOGIN'}
-          style={styles.button}
-        />
-      </KeyboardAvoidingView>
-    </Pressable>
-  )
-}
+import { PasswordResetSuccessView } from './PasswordResetSuccessView'
 
 export default function ForgotPasswordScreen() {
   const router = useRouter()
@@ -83,12 +57,6 @@ export default function ForgotPasswordScreen() {
     await dispatch(resetPassword({ email }))
   }
 
-  const handleEmailChange = (text: string) => {
-    setEmail(text)
-
-    if (error) dispatch(clearError())
-  }
-
   const handleBackToLogin = () => {
     dispatch(clearAuthState())
     router.replace('/(auth)/login')
@@ -121,7 +89,10 @@ export default function ForgotPasswordScreen() {
           accessibilityLabel="Email"
           placeholderTextColor={T.color.grey}
           value={email}
-          onChangeText={handleEmailChange}
+          onChangeText={(text) => {
+            setEmail(text)
+            if (error) dispatch(clearError())
+          }}
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -132,15 +103,7 @@ export default function ForgotPasswordScreen() {
           style={styles.button}
           disabled={isLoading}
         />
-        {error && (
-          <Text
-            style={styles.errorText}
-            accessibilityLiveRegion="polite"
-            accessibilityRole="alert"
-          >
-            {error}
-          </Text>
-        )}
+        {error && <TiedSErrorText message={error} />}
         <Text style={styles.backText} onPress={handleBackToLogin}>
           {'Back to Login'}
         </Text>
@@ -171,12 +134,6 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: T.spacing.large,
   },
-  successText: {
-    color: T.color.text,
-    fontSize: T.font.size.regular,
-    textAlign: 'center',
-    marginBottom: T.spacing.large,
-  },
   button: {
     paddingVertical: T.spacing.small,
     paddingHorizontal: T.spacing.xx_large,
@@ -184,11 +141,6 @@ const styles = StyleSheet.create({
   },
   backText: {
     color: T.color.text,
-    fontSize: T.font.size.regular,
-    marginBottom: T.spacing.large,
-  },
-  errorText: {
-    color: T.color.red,
     fontSize: T.font.size.regular,
     marginBottom: T.spacing.large,
   },

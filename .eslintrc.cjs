@@ -91,6 +91,7 @@ module.exports = {
     'local-rules/core-test-file-naming': 'error',
     'local-rules/time-constant-multiplication': 'error',
     'local-rules/try-catch-isolation': 'error',
+    'local-rules/inline-single-statement-handlers': 'error',
   },
   overrides: [
     {

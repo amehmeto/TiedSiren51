@@ -7,15 +7,10 @@ import { T } from '@/ui/design-system/theme'
 export default function SettingsScreen() {
   const dispatch = useDispatch<AppDispatch>()
 
-  const handleLogout = () => {
-    // Add your logout logic here (e.g., clear tokens, reset state)
-    dispatch(logOut())
-  }
-
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Settings</Text>
-      <Pressable onPress={handleLogout} style={styles.logoutButton}>
+      <Pressable onPress={() => dispatch(logOut())} style={styles.logoutButton}>
         <Text style={styles.logoutText}>Logout</Text>
       </Pressable>
     </View>

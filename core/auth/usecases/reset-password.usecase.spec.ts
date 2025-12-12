@@ -11,7 +11,7 @@ describe('Feature: Reset Password', () => {
   it('should send password reset email successfully', async () => {
     await fixture.when.resetPassword('user@example.com')
 
-    fixture.then.passwordResetShouldBeSent()
+    fixture.then.passwordResetShouldBeSentTo('user@example.com')
     fixture.then.shouldNotBeLoading()
   })
 

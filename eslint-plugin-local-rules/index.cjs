@@ -4,6 +4,7 @@
 
 const coreTestFileNaming = require('../eslint-rules/core-test-file-naming.cjs')
 const expectSeparateActAssert = require('../eslint-rules/expect-separate-act-assert.cjs')
+const inlineSingleStatementHandlers = require('../eslint-rules/inline-single-statement-handlers.cjs')
 const noComplexJsxInConditionals = require('../eslint-rules/no-complex-jsx-in-conditionals.cjs')
 const noIconSizeMagicNumbers = require('../eslint-rules/no-icon-size-magic-numbers.cjs')
 const noIPrefixInImports = require('../eslint-rules/no-i-prefix-in-imports.cjs')
@@ -17,6 +18,7 @@ module.exports = {
   rules: {
     'core-test-file-naming': coreTestFileNaming,
     'expect-separate-act-assert': expectSeparateActAssert,
+    'inline-single-statement-handlers': inlineSingleStatementHandlers,
     'no-complex-jsx-in-conditionals': noComplexJsxInConditionals,
     'no-icon-size-magic-numbers': noIconSizeMagicNumbers,
     'no-i-prefix-in-imports': noIPrefixInImports,

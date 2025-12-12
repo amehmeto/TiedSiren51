@@ -7,6 +7,8 @@ export class FakeAuthGateway implements AuthGateway {
     email: 'fake-user@gmail.com',
   })
 
+  lastResetPasswordEmail: string | null = null
+
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
@@ -27,8 +29,9 @@ export class FakeAuthGateway implements AuthGateway {
     return this.willResultWith
   }
 
-  async resetPassword(_email: string): Promise<void> {
+  async resetPassword(email: string): Promise<void> {
     await this.willResultWith
+    this.lastResetPasswordEmail = email
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {

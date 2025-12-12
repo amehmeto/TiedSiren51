@@ -98,13 +98,11 @@ export function authentificationFixture(
         const state = store.getState()
         expect(state.auth.isLoading).toBe(false)
       },
-      passwordResetShouldBeSent() {
-        const state = store.getState()
-        expect(state.auth.passwordResetSent).toBe(true)
+      passwordResetShouldBeSentTo(expectedEmail: string) {
+        expect(authGateway.lastResetPasswordEmail).toBe(expectedEmail)
       },
       passwordResetShouldNotBeSent() {
-        const state = store.getState()
-        expect(state.auth.passwordResetSent).toBe(false)
+        expect(authGateway.lastResetPasswordEmail).toBeNull()
       },
     },
   }
