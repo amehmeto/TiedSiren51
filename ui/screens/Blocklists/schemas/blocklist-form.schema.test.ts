@@ -37,4 +37,28 @@ describe('blocklistSchema', () => {
     fixture.when.validate()
     fixture.then.shouldBeValid()
   })
+
+  it('should pass with only websites selected', () => {
+    fixture.given.blocklistWithOnlyWebsites()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
+  })
+
+  it('should pass with only keywords selected', () => {
+    fixture.given.blocklistWithOnlyKeywords()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
+  })
+
+  it('should pass when optional siren fields are undefined', () => {
+    fixture.given.blocklistWithUndefinedSirenFields()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
+  })
+
+  it('should pass when android is undefined but websites exist', () => {
+    fixture.given.blocklistWithUndefinedAndroid()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
+  })
 })

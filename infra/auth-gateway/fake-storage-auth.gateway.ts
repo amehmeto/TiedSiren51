@@ -55,6 +55,10 @@ export class FakeStorageAuthGateway implements AuthGateway {
     return this.fakeAuthGateway.logOut()
   }
 
+  async resetPassword(email: string): Promise<void> {
+    return this.fakeAuthGateway.resetPassword(email)
+  }
+
   private async verifyUserIsAuthenticated(): Promise<void> {
     try {
       const maybeAuthUser = await AsyncStorage.getItem('fake-auth-user')

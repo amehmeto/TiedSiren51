@@ -1,16 +1,66 @@
 import { useRouter } from 'expo-router'
-import React from 'react'
-import { View, Text, StyleSheet, Platform } from 'react-native'
+import React, { useEffect, useState } from 'react'
+import {
+  Keyboard,
+  KeyboardAvoidingView,
+  Platform,
+  Pressable,
+  StyleSheet,
+  Text,
+} from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
+import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
+import { validateForgotPasswordInput } from '@/ui/auth-schemas/validation-helper'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
-import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 
+function PasswordResetSuccessView({
+  onClose,
+  onBackToLogin,
+}: {
+  onClose: () => void
+  onBackToLogin: () => void
+}) {
+  return (
+    <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
+      <TiedSCloseButton onClose={onClose} />
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        <Text style={styles.title}>{'CHECK YOUR EMAIL'}</Text>
+        <Text style={styles.successText}>
+          {"We've sent a password reset link to your email address."}
+        </Text>
+        <TiedSButton
+          onPress={onBackToLogin}
+          text={'BACK TO LOGIN'}
+          style={styles.button}
+        />
+      </KeyboardAvoidingView>
+    </Pressable>
+  )
+}
+
 export default function ForgotPasswordScreen() {
   const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>()
+  const [email, setEmail] = useState('')
+
+  const { isLoading, error, passwordResetSent } = useSelector(
+    (state: RootState) => state.auth,
+  )
+
+  useEffect(() => {
+    dispatch(clearAuthState())
+  }, [dispatch])
 
   const handleClose = () => {
+    dispatch(clearAuthState())
     if (router.canGoBack()) {
       router.back()
       return
@@ -19,34 +69,127 @@ export default function ForgotPasswordScreen() {
     if (Platform.OS === 'ios') router.replace('/(auth)/login')
   }
 
+  const handleResetPassword = async () => {
+    dispatch(clearError())
+
+    const validation = validateForgotPasswordInput({ email })
+
+    if (!validation.isValid) {
+      const errorMessage = Object.values(validation.errors).join(', ')
+      dispatch(setError(errorMessage))
+      return
+    }
+
+    await dispatch(resetPassword({ email }))
+  }
+
+  const handleEmailChange = (text: string) => {
+    setEmail(text)
+
+    if (error) dispatch(clearError())
+  }
+
+  const handleBackToLogin = () => {
+    dispatch(clearAuthState())
+    router.replace('/(auth)/login')
+  }
+
+  if (passwordResetSent) {
+    return (
+      <PasswordResetSuccessView
+        onClose={handleClose}
+        onBackToLogin={handleBackToLogin}
+      />
+    )
+  }
+
   return (
-    <TiedSLinearBackground>
+    <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
       <TiedSCloseButton onClose={handleClose} />
-      <View style={styles.container}>
+      <KeyboardAvoidingView
+        style={styles.container}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
         <Text style={styles.title}>{'RESET YOUR PASSWORD'}</Text>
+        <Text style={styles.subtitle}>
+          {
+            'Enter your email and we will send you a link to reset your password.'
+          }
+        </Text>
         <TiedSTextInput
-          placeholder={'Your Email'}
+          placeholder="Your Email"
+          accessibilityLabel="Email"
           placeholderTextColor={T.color.grey}
+          value={email}
+          onChangeText={handleEmailChange}
+          keyboardType="email-address"
+          autoCapitalize="none"
         />
+
         <TiedSButton
-          onPress={() => router.replace('/(auth)/login')}
-          text={'SEND PASSWORD RESET EMAIL'}
+          onPress={handleResetPassword}
+          text={isLoading ? 'SENDING...' : 'SEND RESET LINK'}
+          style={styles.button}
+          disabled={isLoading}
         />
-      </View>
-    </TiedSLinearBackground>
+        {error && (
+          <Text
+            style={styles.errorText}
+            accessibilityLiveRegion="polite"
+            accessibilityRole="alert"
+          >
+            {error}
+          </Text>
+        )}
+        <Text style={styles.backText} onPress={handleBackToLogin}>
+          {'Back to Login'}
+        </Text>
+      </KeyboardAvoidingView>
+    </Pressable>
   )
 }
 
 const styles = StyleSheet.create({
+  mainContainer: {
+    flex: 1,
+  },
   container: {
     flex: 1,
-    padding: T.spacing.medium,
     justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: T.spacing.large,
   },
   title: {
+    color: T.color.text,
     fontSize: T.font.size.large,
     fontWeight: T.font.weight.bold,
+    marginBottom: T.spacing.medium,
+  },
+  subtitle: {
     color: T.color.text,
+    fontSize: T.font.size.regular,
+    textAlign: 'center',
+    marginBottom: T.spacing.large,
+  },
+  successText: {
+    color: T.color.text,
+    fontSize: T.font.size.regular,
+    textAlign: 'center',
+    marginBottom: T.spacing.large,
+  },
+  button: {
+    paddingVertical: T.spacing.small,
+    paddingHorizontal: T.spacing.xx_large,
+    marginBottom: T.spacing.x_large,
+  },
+  backText: {
+    color: T.color.text,
+    fontSize: T.font.size.regular,
+    marginBottom: T.spacing.large,
+  },
+  errorText: {
+    color: T.color.red,
+    fontSize: T.font.size.regular,
     marginBottom: T.spacing.large,
   },
 })

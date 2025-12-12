@@ -71,6 +71,42 @@ export function blocklistFormFixture(): Fixture {
           },
         })
       },
+      blocklistWithOnlyWebsites: () => {
+        blocklistData = {
+          name: 'Websites Only',
+          sirens: {
+            android: [],
+            websites: ['facebook.com'],
+            keywords: [],
+          },
+        }
+      },
+      blocklistWithOnlyKeywords: () => {
+        blocklistData = {
+          name: 'Keywords Only',
+          sirens: {
+            android: [],
+            websites: [],
+            keywords: ['social'],
+          },
+        }
+      },
+      blocklistWithUndefinedSirenFields: () => {
+        blocklistData = {
+          name: 'Undefined Fields',
+          sirens: {
+            android: [{ packageName: 'com.example' }],
+          },
+        }
+      },
+      blocklistWithUndefinedAndroid: () => {
+        blocklistData = {
+          name: 'No Android',
+          sirens: {
+            websites: ['facebook.com'],
+          },
+        }
+      },
     },
     when: {
       validate: () => {
