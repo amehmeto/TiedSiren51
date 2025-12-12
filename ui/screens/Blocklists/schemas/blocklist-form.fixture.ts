@@ -71,6 +71,26 @@ export function blocklistFormFixture(): Fixture {
           },
         })
       },
+      blocklistWithOnlyWebsites: () => {
+        blocklistData = {
+          name: 'Websites Only',
+          sirens: {
+            android: [],
+            websites: ['facebook.com'],
+            keywords: [],
+          },
+        }
+      },
+      blocklistWithOnlyKeywords: () => {
+        blocklistData = {
+          name: 'Keywords Only',
+          sirens: {
+            android: [],
+            websites: [],
+            keywords: ['social'],
+          },
+        }
+      },
     },
     when: {
       validate: () => {

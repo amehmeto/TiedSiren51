@@ -37,4 +37,16 @@ describe('blocklistSchema', () => {
     fixture.when.validate()
     fixture.then.shouldBeValid()
   })
+
+  it('should pass with only websites selected', () => {
+    fixture.given.blocklistWithOnlyWebsites()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
+  })
+
+  it('should pass with only keywords selected', () => {
+    fixture.given.blocklistWithOnlyKeywords()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
+  })
 })
