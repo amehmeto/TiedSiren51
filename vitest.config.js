@@ -13,6 +13,40 @@ export default {
       },
     },
     exclude: ['infra/**/prisma.*.test.ts', '**/node_modules/**'],
+    coverage: {
+      thresholds: {
+        '**/*.schema.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+        '**/selectors/*.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+        '**/*.view-model.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+        '**/usecases/*.usecase.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+        '**/listeners/*.listener.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+      },
+    },
   },
   plugins: [tsconfigPaths()],
 }

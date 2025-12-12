@@ -16,6 +16,7 @@ const infraMustRethrow = require('../eslint-rules/infra-must-rethrow.cjs')
 const listenerErrorHandling = require('../eslint-rules/listener-error-handling.cjs')
 const noTryCatchInCore = require('../eslint-rules/no-try-catch-in-core.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
+const requireColocatedTest = require('../eslint-rules/require-colocated-test.cjs')
 const useDataBuilders = require('../eslint-rules/use-data-builders.cjs')
 
 module.exports = {
@@ -34,6 +35,7 @@ module.exports = {
     'listener-error-handling': listenerErrorHandling,
     'no-try-catch-in-core': noTryCatchInCore,
     'no-new-in-test-body': noNewInTestBody,
+    'require-colocated-test': requireColocatedTest,
     'use-data-builders': useDataBuilders,
   },
 }
