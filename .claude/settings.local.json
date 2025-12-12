@@ -9,7 +9,6 @@
       "Bash(eas:*)",
       "Bash(echo:*)",
       "Bash(find:*)",
-      "Bash(gh api:*)",
       "Bash(gh auth status:*)",
       "Bash(gh browse:*)",
       "Bash(gh issue list:*)",
@@ -76,9 +75,7 @@
       "mcp__github__pull_request_read",
       "mcp__github__pull_request_review_write",
       "mcp__github__search_pull_requests",
-      "mcp__ide__getDiagnostics",
-      "Bash(git revert:*)",
-      "Bash(SKIP_E2E_CHECK=true git push:*)"
+      "mcp__ide__getDiagnostics"
     ],
     "deny": [
       "Bash(git commit --no-verify:*)",
@@ -88,6 +85,7 @@
       "Bash(git push -f:*)",
       "Bash(git push:*)",
       "BashOutput(*)",
+      "Bash(SKIP_E2E_CHECK=true git push:*)",
       "mcp__github__merge_pull_request"
     ],
     "ask": [
@@ -97,6 +95,8 @@
       "Bash(git checkout:*)",
       "Bash(git cherry-pick:*)",
       "Bash(git merge:*)",
+      "Bash(gh api:*)",
+      "Bash(git revert:*)",
       "Bash(git restore:*)"
     ]
   },
