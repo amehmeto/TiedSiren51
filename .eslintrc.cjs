@@ -370,6 +370,51 @@ module.exports = {
         'no-restricted-globals': 'off',
       },
     },
+    // Enforce boolean naming convention on type properties in core (our domain types)
+    {
+      files: ['core/**/*.ts'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
+        '@typescript-eslint/naming-convention': [
+          'error',
+          // Keep interface naming convention
+          {
+            selector: 'interface',
+            format: ['PascalCase'],
+            custom: {
+              regex: '^I[A-Z]',
+              match: false,
+            },
+          },
+          // Boolean naming for variables, parameters, properties in core
+          {
+            selector: 'variable',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'parameter',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'classProperty',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            leadingUnderscore: 'allow',
+          },
+          {
+            selector: 'typeProperty',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+        ],
+      },
+    },
     // JSON files linting
     {
       files: ['*.json', '**/*.json'],
