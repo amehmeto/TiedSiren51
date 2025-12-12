@@ -28,34 +28,52 @@ export function blocklistFormFixture(): Fixture {
   return {
     given: {
       blocklistWithAllRequiredFields: () => {
-        blocklistData = {
+        blocklistData = buildValidBlocklistFormData({
           name: 'Test',
           sirens: {
-            android: [{ packageName: 'com.example' }],
+            android: [
+              {
+                packageName: 'com.example',
+                appName: 'Example',
+                icon: 'base64',
+              },
+            ],
+            ios: [],
+            linux: [],
+            macos: [],
+            windows: [],
             websites: [],
             keywords: [],
           },
-        }
+        })
       },
       blocklistWithEmptyName: () => {
-        blocklistData = {
+        blocklistData = buildValidBlocklistFormData({
           name: '',
           sirens: {
             android: [],
+            ios: [],
+            linux: [],
+            macos: [],
+            windows: [],
             websites: [],
             keywords: [],
           },
-        }
+        })
       },
       blocklistWithNoSirensSelected: () => {
-        blocklistData = {
+        blocklistData = buildValidBlocklistFormData({
           name: 'Test',
           sirens: {
             android: [],
+            ios: [],
+            linux: [],
+            macos: [],
+            windows: [],
             websites: [],
             keywords: [],
           },
-        }
+        })
       },
       blocklistWithWebsitesAndKeywords: () => {
         blocklistData = buildValidBlocklistFormData({
@@ -72,24 +90,32 @@ export function blocklistFormFixture(): Fixture {
         })
       },
       blocklistWithOnlyWebsites: () => {
-        blocklistData = {
+        blocklistData = buildValidBlocklistFormData({
           name: 'Websites Only',
           sirens: {
             android: [],
+            ios: [],
+            linux: [],
+            macos: [],
+            windows: [],
             websites: ['facebook.com'],
             keywords: [],
           },
-        }
+        })
       },
       blocklistWithOnlyKeywords: () => {
-        blocklistData = {
+        blocklistData = buildValidBlocklistFormData({
           name: 'Keywords Only',
           sirens: {
             android: [],
+            ios: [],
+            linux: [],
+            macos: [],
+            windows: [],
             websites: [],
             keywords: ['social'],
           },
-        }
+        })
       },
     },
     when: {
