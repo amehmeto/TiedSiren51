@@ -13,6 +13,10 @@ on:
   pull_request:
     types: [closed]
 
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
   path-filter:
     if: github.event_name == 'push'
@@ -41,7 +45,7 @@ jobs:
       - name: 🏗 Setup EAS
         uses: expo/expo-github-action@v8
         with:
-          eas-version: latest
+          eas-version: 16.24.1
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Install dependencies

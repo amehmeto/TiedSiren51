@@ -65,13 +65,8 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
-      - name: Install shellcheck
-        run: sudo apt-get install -y shellcheck
-
       - name: Lint
         run: npm run lint
-        env:
-          SHELLCHECK_PATH: /usr/bin/shellcheck
 
       - name: Run unit tests with coverage
         run: npm run test:cov
