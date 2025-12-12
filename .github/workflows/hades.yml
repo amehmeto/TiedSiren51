@@ -56,7 +56,7 @@ jobs:
           EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
   release:
-    needs: path-filter
+    needs: [path-filter, build-preview]
     if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     permissions:
