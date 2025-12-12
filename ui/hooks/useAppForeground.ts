@@ -1,10 +1,7 @@
 import { useEffect, useRef } from 'react'
 import { AppState, AppStateStatus } from 'react-native'
 
-export function useAppForeground(
-  callback: () => void,
-  shouldRunOnMount = true,
-) {
+export function useAppForeground(callback: () => void, runOnMount = true) {
   const callbackRef = useRef(callback)
 
   useEffect(() => {
@@ -12,7 +9,7 @@ export function useAppForeground(
   }, [callback])
 
   useEffect(() => {
-    if (shouldRunOnMount) callbackRef.current()
+    if (runOnMount) callbackRef.current()
 
     const handleAppStateChange = (nextAppState: AppStateStatus) => {
       if (nextAppState === 'active') callbackRef.current()
@@ -24,5 +21,5 @@ export function useAppForeground(
     )
 
     return () => subscription.remove()
-  }, [shouldRunOnMount])
+  }, [runOnMount])
 }

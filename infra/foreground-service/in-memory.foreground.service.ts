@@ -4,7 +4,7 @@ import {
 } from '@/core/_ports_/foreground.service'
 
 export class InMemoryForegroundService implements ForegroundService {
-  private _isRunning = false
+  private running = false
 
   public startCallCount = 0
 
@@ -15,20 +15,20 @@ export class InMemoryForegroundService implements ForegroundService {
   async start(config?: Partial<ForegroundServiceConfig>): Promise<void> {
     this.startCallCount++
     this.lastConfig = config
-    this._isRunning = true
+    this.running = true
   }
 
   async stop(): Promise<void> {
     this.stopCallCount++
-    this._isRunning = false
+    this.running = false
   }
 
   isRunning(): boolean {
-    return this._isRunning
+    return this.running
   }
 
   reset(): void {
-    this._isRunning = false
+    this.running = false
     this.startCallCount = 0
     this.stopCallCount = 0
     this.lastConfig = undefined

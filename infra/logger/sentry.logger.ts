@@ -2,7 +2,7 @@ import * as Sentry from '@sentry/react-native'
 import { Logger } from '@/core/_ports_/logger'
 
 export class SentryLogger implements Logger {
-  private readonly isVerboseLogging =
+  private readonly verboseLogging =
     process.env.EXPO_PUBLIC_VERBOSE_LOGGING === 'true'
 
   initialize(): void {
@@ -15,12 +15,12 @@ export class SentryLogger implements Logger {
 
   info(message: string): void {
     Sentry.addBreadcrumb({ message, level: 'info' })
-    if (this.isVerboseLogging) Sentry.captureMessage(message, 'info')
+    if (this.verboseLogging) Sentry.captureMessage(message, 'info')
   }
 
   warn(message: string): void {
     Sentry.addBreadcrumb({ message, level: 'warning' })
-    if (this.isVerboseLogging) Sentry.captureMessage(message, 'warning')
+    if (this.verboseLogging) Sentry.captureMessage(message, 'warning')
   }
 
   error(message: string): void {

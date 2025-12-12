@@ -19,7 +19,7 @@ describe('onBlockSessionsChanged listener', () => {
   it('should not be watching when store is created without sessions', () => {
     createTestStore({ sirenLookout, foregroundService })
 
-    expect(sirenLookout.isWatching).toBe(false)
+    expect(sirenLookout.watching).toBe(false)
   })
 
   it('should start watching when store is created with existing sessions', () => {
@@ -29,17 +29,17 @@ describe('onBlockSessionsChanged listener', () => {
 
     createTestStore({ sirenLookout, foregroundService }, initialState)
 
-    expect(sirenLookout.isWatching).toBe(true)
+    expect(sirenLookout.watching).toBe(true)
   })
 
   it('should start watching when sessions are added to store', () => {
     const store = createTestStore({ sirenLookout, foregroundService })
 
-    expect(sirenLookout.isWatching).toBe(false)
+    expect(sirenLookout.watching).toBe(false)
 
     store.dispatch(setBlockSessions([blockSession]))
 
-    expect(sirenLookout.isWatching).toBe(true)
+    expect(sirenLookout.watching).toBe(true)
   })
 
   it('should stop watching when all sessions are removed', () => {
@@ -51,11 +51,11 @@ describe('onBlockSessionsChanged listener', () => {
       initialState,
     )
 
-    expect(sirenLookout.isWatching).toBe(true)
+    expect(sirenLookout.watching).toBe(true)
 
     store.dispatch(setBlockSessions([]))
 
-    expect(sirenLookout.isWatching).toBe(false)
+    expect(sirenLookout.watching).toBe(false)
   })
 
   it('should remain watching when sessions change but still have at least one', () => {
@@ -70,7 +70,7 @@ describe('onBlockSessionsChanged listener', () => {
 
     store.dispatch(setBlockSessions([blockSession, newSession]))
 
-    expect(sirenLookout.isWatching).toBe(true)
+    expect(sirenLookout.watching).toBe(true)
   })
 
   describe('foreground service coordination', () => {
@@ -111,7 +111,7 @@ describe('onBlockSessionsChanged listener', () => {
       await flushMicrotasks()
 
       expect(foregroundService.isRunning()).toBe(true)
-      expect(sirenLookout.isWatching).toBe(true)
+      expect(sirenLookout.watching).toBe(true)
     })
 
     it('should stop foreground service after stopping watching when sessions removed', async () => {
@@ -130,7 +130,7 @@ describe('onBlockSessionsChanged listener', () => {
       await flushMicrotasks()
 
       expect(foregroundService.isRunning()).toBe(false)
-      expect(sirenLookout.isWatching).toBe(false)
+      expect(sirenLookout.watching).toBe(false)
       expect(foregroundService.stopCallCount).toBe(1)
     })
   })

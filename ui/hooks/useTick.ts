@@ -21,19 +21,19 @@ import { SECOND } from '@/core/__constants__/time'
  */
 export function useTick(
   intervalMs: number = 1 * SECOND,
-  isEnabled = true,
+  enabled = true,
 ): number {
   const [tick, setTick] = useState(0)
 
   useEffect(() => {
-    if (!isEnabled) return
+    if (!enabled) return
 
     const intervalId = setInterval(() => {
       setTick((t) => t + 1)
     }, intervalMs)
 
     return () => clearInterval(intervalId)
-  }, [intervalMs, isEnabled])
+  }, [intervalMs, enabled])
 
   return tick
 }

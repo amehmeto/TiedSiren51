@@ -19,7 +19,7 @@ interface TiedSTextInputProps extends TextInputProps {
 export function TiedSTextInput({
   label,
   hasPasswordToggle = false,
-  secureTextEntry: isSecureTextEntry,
+  secureTextEntry,
   ...props
 }: TiedSTextInputProps) {
   const [isFocused, setIsFocused] = useState(false)
@@ -36,7 +36,7 @@ export function TiedSTextInput({
           ]}
           placeholderTextColor={T.color.white}
           secureTextEntry={
-            hasPasswordToggle ? !isPasswordShown : isSecureTextEntry
+            hasPasswordToggle ? !isPasswordShown : secureTextEntry
           }
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
@@ -45,7 +45,7 @@ export function TiedSTextInput({
         {hasPasswordToggle && (
           <Pressable
             style={styles.iconContainer}
-            onPress={() => setIsPasswordShown(!isPasswordShown)}
+            onPress={() => setIsPasswordShown((prev) => !prev)}
           >
             <Ionicons
               name={isPasswordShown ? 'eye-outline' : 'eye-off-outline'}

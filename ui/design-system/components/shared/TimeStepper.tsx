@@ -37,19 +37,19 @@ export const TimeStepper = ({
   )
 
   const renderIcon = useCallback(
-    (name: 'add-circle' | 'remove-circle', isDisabled: boolean) => (
+    (name: 'add-circle' | 'remove-circle', disabled: boolean) => (
       <Ionicons
         name={name}
         size={T.icon.size.large}
-        color={isDisabled ? T.color.modalBackgroundColor : T.color.white}
+        color={disabled ? T.color.modalBackgroundColor : T.color.white}
       />
     ),
     [],
   )
 
-  const buttonStyle = (isDisabled: boolean) => [
+  const buttonStyle = (disabled: boolean) => [
     styles.button,
-    isDisabled && styles.buttonDisabled,
+    disabled && styles.buttonDisabled,
   ]
 
   return (

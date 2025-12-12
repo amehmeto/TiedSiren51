@@ -13,12 +13,12 @@ export function ChooseBlockTabBar(props: SceneRendererProps) {
       }}
       {...props}
       indicatorStyle={styles.indicator}
-      renderLabel={({ route, focused: isFocused, color }) => (
+      renderLabel={({ route, focused, color }) => (
         <Pressable
           style={[
             styles.label,
             {
-              backgroundColor: isFocused ? T.color.lightBlue : T.color.darkBlue,
+              backgroundColor: focused ? T.color.lightBlue : T.color.darkBlue,
             },
           ]}
         >

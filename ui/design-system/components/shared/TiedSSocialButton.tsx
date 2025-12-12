@@ -20,10 +20,10 @@ export function TiedSSocialButton({
 }: TiedSSocialButtonProps) {
   return (
     <Pressable
-      style={({ pressed: isPressed }) => [
+      style={({ pressed }) => [
         styles.button,
         style,
-        { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
+        { opacity: pressed ? T.opacity.pressed : T.opacity.full },
       ]}
       onPress={onPress}
     >

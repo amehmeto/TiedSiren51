@@ -86,9 +86,9 @@ export function authentificationFixture(
         const state = store.getState()
         expect(state.auth.error).toBe(expectedError)
       },
-      shouldBeLoading(isLoading: boolean) {
+      shouldBeLoading(loading: boolean) {
         const state = store.getState()
-        expect(state.auth.isLoading).toBe(isLoading)
+        expect(state.auth.isLoading).toBe(loading)
       },
       shouldNotBeLoading() {
         const state = store.getState()
