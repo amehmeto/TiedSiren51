@@ -60,8 +60,8 @@ export const createTestStore = (
     authGateway: new FakeAuthGateway(),
     blockSessionRepository: new FakeDataBlockSessionRepository(),
     blocklistRepository: new FakeDataBlocklistRepository(),
-    sirensRepository: new FakeSirensRepository(),
-    remoteDeviceRepository: new FakeRemoteDeviceRepository(),
+    sirensRepository: new FakeDataSirensRepository(),
+    remoteDeviceRepository: new FakeDataDeviceRepository(),
     notificationService: new FakeNotificationService(),
     databaseService: new StubDatabaseService(),
     dateProvider: new StubDateProvider(),
@@ -209,8 +209,10 @@ import { testStore } from './fixtures'
 
 ### Key Files
 - `/core/_tests_/createTestStore.ts` - Factory implementation
-- `/core/_tests_/stubs/` - Stub implementations
-- `/core/_tests_/fakes/` - Fake implementations
+- `/infra/*/stub.*.ts` - Stub implementations (colocated with real implementations)
+- `/infra/*/fake*.ts` - Fake implementations (colocated with real implementations)
+
+**Note**: Test doubles are colocated with their real implementations in `/infra/` rather than centralized in `/core/_tests_/`. This makes it easier to maintain them alongside the real code.
 
 ### Factory Signature
 
@@ -335,7 +337,7 @@ it('calls repository correctly', async () => {
 
 ### Related ADRs
 - [Stub vs Fake Implementations](stub-vs-fake-implementations.md)
-- [Dependency Injection Pattern](../architecture/dependency-injection-pattern.md)
+- [Dependency Injection Pattern](../core/dependency-injection-pattern.md)
 - [Vitest Over Jest](vitest-over-jest.md)
 - [Fixture Pattern](fixture-pattern.md)
 

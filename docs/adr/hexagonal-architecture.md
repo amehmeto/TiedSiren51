@@ -139,7 +139,7 @@ Dependencies are injected via a factory pattern:
 
 ### Related ADRs
 - [Port Naming Convention](core/port-naming-convention.md) - No I-prefix for port interfaces
-- [Redux Toolkit for Business Logic](../state-management/redux-toolkit-for-business-logic.md)
+- [Redux Toolkit for Business Logic](core/redux-toolkit-for-business-logic.md)
 - [Repository Pattern](core/repository-pattern.md)
 - [Dependency Injection Pattern](core/dependency-injection-pattern.md)
 

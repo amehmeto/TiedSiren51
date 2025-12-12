@@ -8,29 +8,23 @@ Accepted
 
 ## Context
 
-TiedSiren51 has cross-domain side effects that need to be triggered by state changes:
+TiedSiren51 has cross-domain side effects that need to be triggered by external events:
 
 **Examples:**
-- **User logs in** → Load user data + Fetch available sirens
-- **Siren detected** → Block launched app + Show notification
-- **Block session starts** → Schedule background tasks + Update device status
-- **Blocklist updated** → Refresh active session rules + Sync to remote devices
+- **User logs in** (Firebase event) → Load user data + Target sirens
+- **Siren detected** (AccessibilityService event) → Block launched app
+- **Block sessions change** (Redux state) → Start/stop siren lookout
 
 Challenges:
-- Side effects span multiple domains (auth, siren, block-session)
-- Reducers must be pure (can't dispatch actions or call APIs)
-- Thunks can trigger side effects, but they're initiated explicitly, not reactively
-- Need decoupled event → reaction pattern
-- Must maintain testability
-
-Traditional Redux approaches:
-- **Manual chaining**: Call multiple thunks in components (couples UI to business logic)
-- **Thunk → Thunk**: One thunk dispatches another (hard to trace, coupling)
-- **Middleware**: Custom middleware (complex, hard to maintain)
+- Events originate from infrastructure layer (Firebase, native modules)
+- Need to dispatch Redux actions in response to external events
+- Must bridge gateway ports with Redux store
+- Reducers must be pure (can't call external services)
+- Must maintain testability with fake gateways
 
 ## Decision
 
-Use **Redux Toolkit Listener Middleware** pattern for declarative side effects.
+Use **Gateway-Based Event Listeners** that subscribe to port events and dispatch Redux actions.
 
 ### Implementation
 
@@ -38,199 +32,235 @@ Use **Redux Toolkit Listener Middleware** pattern for declarative side effects.
 
 ```typescript
 export const registerListeners = (
-  startListening: AppStartListening
+  store: AppStore,
+  dependencies: Dependencies,
 ) => {
-  startListening(onUserLoggedInListener)
-  startListening(onSirenDetectedListener)
-  startListening(onBlockSessionStartListener)
-  // ... other listeners
+  const { authGateway, logger, sirenLookout } = dependencies
+
+  onUserLoggedInListener({ store, authGateway, logger })
+  onUserLoggedOutListener({ store, authGateway, logger })
+  onSirenDetectedListener({ store, sirenLookout, logger })
+  onBlockSessionsChangedListener({ store, sirenLookout, logger })
 }
 ```
 
-**2. Individual Listeners** (`/core/{domain}/listeners/`)
+**2. Gateway Event Listeners** (`/core/{domain}/listeners/`)
 
 ```typescript
 // /core/auth/listeners/on-user-logged-in.listener.ts
-export const onUserLoggedInListener = {
-  actionCreator: userLoggedIn,
-  effect: async (action, listenerApi) => {
-    const { userId } = action.payload
-
-    // Trigger cross-domain effects
-    await listenerApi.dispatch(loadUser(userId))
-    await listenerApi.dispatch(fetchAvailableSirens())
-
-    // Access dependencies via getState() or extra argument
-    const { notificationService } = listenerApi.extra
-    notificationService.scheduleWelcomeNotification()
-  },
+export const onUserLoggedInListener = ({
+  store,
+  authGateway,
+  logger,
+}: {
+  store: AppStore
+  authGateway: AuthGateway
+  logger: Logger
+}) => {
+  authGateway.onUserLoggedIn((user) => {
+    try {
+      store.dispatch(userAuthenticated(user))
+      store.dispatch(loadUser())
+      store.dispatch(targetSirens())
+    } catch (error) {
+      logger.error(`Error in onUserLoggedIn listener: ${error}`)
+    }
+  })
 }
 ```
 
-**3. Store Setup** (`/core/_redux_/createStore.ts`)
+**3. Store Subscription Listeners** (for Redux state changes)
 
 ```typescript
-const listenerMiddleware = createListenerMiddleware({
-  extra: dependencies, // Inject dependencies
-})
+// /core/siren/listeners/on-block-sessions-changed.listener.ts
+export const onBlockSessionsChangedListener = ({
+  store,
+  sirenLookout,
+  logger,
+}: {
+  store: AppStore
+  sirenLookout: SirenLookout
+  logger: Logger
+}): (() => void) => {
+  let previousHadSessions = false
 
-registerListeners(listenerMiddleware.startListening)
+  return store.subscribe(() => {
+    const sessions = selectAllBlockSessions(store.getState().blockSession)
+    const hasSessions = sessions.length > 0
 
-configureStore({
-  reducer: rootReducer,
-  middleware: (getDefaultMiddleware) =>
-    getDefaultMiddleware({
-      thunk: { extraArgument: dependencies },
-    }).prepend(listenerMiddleware.middleware),
-})
+    if (previousHadSessions && !hasSessions) sirenLookout.stopWatching()
+    else if (!previousHadSessions && hasSessions) sirenLookout.startWatching()
+
+    previousHadSessions = hasSessions
+  })
+}
 ```
+
+### Two Listener Types
+
+| Type | Event Source | Use Case |
+|------|-------------|----------|
+| Gateway Listeners | Port callbacks (`gateway.onEvent()`) | External events (auth, native modules) |
+| Store Listeners | `store.subscribe()` | React to Redux state changes |
 
 ### Listener Examples
 
-**Authentication Flow:**
+**Authentication Flow (Gateway):**
 ```typescript
-// User login triggers data loading
-onUserLoggedIn → loadUser() + fetchAvailableSirens()
+// Firebase auth state change → Redux store update
+authGateway.onUserLoggedIn(user) → dispatch(userAuthenticated(user))
 ```
 
-**Siren Detection:**
+**Siren Detection (Gateway):**
 ```typescript
-// App launched triggers blocking
-onSirenDetected → blockLaunchedApp() + showNotification()
+// AccessibilityService detects app → Block it
+sirenLookout.onSirenDetected(pkg) → dispatch(blockLaunchedApp({ packageName: pkg }))
 ```
 
-**Session Management:**
+**Session Management (Store Subscription):**
 ```typescript
-// Session start triggers background tasks
-onSessionStart → scheduleBackgroundCheck() + syncToDevices()
+// Block session added/removed → Start/stop native monitoring
+store.subscribe() → sirenLookout.startWatching() or stopWatching()
 ```
 
 ## Consequences
 
 ### Positive
 
-- **Declarative**: Side effects declared next to domain logic
-- **Decoupled**: Domains don't directly call each other
-- **Event-driven**: Clear cause → effect relationships
-- **Testable**: Listeners can be tested independently
-- **Centralized**: All listeners registered in one place
+- **Bridges layers**: Connects infrastructure events to Redux store
+- **Decoupled**: Gateways don't know about Redux; listeners handle bridging
+- **Testable**: Fake gateways can trigger events in tests
+- **Simple**: Factory functions, no complex middleware
+- **Explicit dependencies**: Each listener declares what it needs
+- **Error handling**: Try-catch with logging at listener level
 - **Type-safe**: Full TypeScript support
-- **Cancellable**: Listeners can be cancelled mid-execution
-- **Conditional**: Can inspect state before executing effect
-- **Async support**: Built-in async/await support
-- **No race conditions**: Middleware handles timing
-- **Composable**: Multiple listeners can respond to same action
+- **Flexible**: Two patterns for different event sources
 
 ### Negative
 
-- **Indirection**: Following code flow harder (action → listener → effect)
-- **Debugging complexity**: Must trace through listener middleware
-- **Hidden dependencies**: Cross-domain calls not visible at action dispatch site
-- **Learning curve**: Team must understand listener pattern
-- **Execution order**: Multiple listeners for same action execute in registration order (must be careful)
-- **Potential cascades**: Listeners dispatching actions that trigger other listeners (can be complex)
-- **Testing complexity**: Must test listener registration and effects separately
+- **Manual wiring**: Must register each listener explicitly
+- **No cancellation**: Unlike RTK Listener Middleware, no built-in cancellation
+- **Callback-based**: Gateway ports must support event callbacks
+- **Two patterns**: Gateway listeners vs store subscriptions may confuse
 
 ### Neutral
 
-- **Redux-specific**: Pattern tied to Redux Toolkit ecosystem
-- **Alternative to Sagas**: Simpler than redux-saga but less powerful
-- **Middleware stack**: Adds another middleware layer
+- **Not Redux middleware**: Simpler than RTK Listener Middleware but less integrated
+- **Store access**: Direct store access rather than listenerApi
 
 ## Alternatives Considered
 
-### 1. Redux Saga
+### 1. Redux Toolkit Listener Middleware
+**Not used because**:
+- Events originate from gateways, not Redux actions
+- Would require dispatching actions just to trigger middleware
+- Extra indirection for external events
+
+### 2. Redux Saga
 **Rejected because**:
-- Overkill for our use cases
-- Generator syntax has steeper learning curve
+- Overkill for our event bridging needs
+- Generator syntax complexity
 - Larger bundle size
-- More complex testing
-- Listener middleware sufficient for our needs
 
-### 2. Redux Observable (RxJS)
-**Rejected because**:
-- RxJS is heavy dependency
-- Reactive programming learning curve
-- Bundle size concerns
-- Team not familiar with RxJS
-
-### 3. Manual Thunk Chaining
-**Rejected because**:
-- Couples thunks to each other
-- Hard to trace dependencies
-- Creates tight coupling between domains
-- Violates separation of concerns
-
-### 4. Component-level Side Effects
+### 3. Component-level useEffect
 **Rejected because**:
 - Couples UI to business logic
-- Side effects run multiple times (re-renders)
-- Harder to test
-- Can't trigger from non-UI actions
+- Side effects tied to component lifecycle
+- Can't trigger from non-UI events
 
-### 5. Custom Middleware
+### 4. Direct Gateway → Store in Infrastructure
 **Rejected because**:
-- More complex to maintain
-- Reinvents what listener middleware provides
-- Less type-safe
-- Non-standard pattern
+- Violates hexagonal architecture (infra knowing about core)
+- Hard to test
+- Tight coupling
 
 ## Implementation Notes
 
 ### Key Files
 - `/core/_redux_/registerListeners.ts` - Central registration
 - `/core/auth/listeners/on-user-logged-in.listener.ts` - Auth events
-- `/core/siren/listeners/on-siren-detected.listener.ts` - Siren detection events
-- `/core/block-session/listeners/` - Session lifecycle listeners
+- `/core/auth/listeners/on-user-logged-out.listener.ts` - Logout events
+- `/core/siren/listeners/on-siren-detected.listener.ts` - App detection
+- `/core/siren/listeners/on-block-sessions-changed.listener.ts` - Session state changes
 
 ### Listener Structure
 
+**Gateway Listener:**
 ```typescript
-export const onEventListener = {
-  actionCreator: eventAction,      // Which action to listen for
-  effect: async (action, api) => { // What to do
-    const { payload } = action
-    const state = api.getState()
-    const deps = api.extra
+export const onEventListener = ({
+  store,
+  gateway,
+  logger,
+}: {
+  store: AppStore
+  gateway: SomeGateway
+  logger: Logger
+}) => {
+  gateway.onEvent((data) => {
+    try {
+      store.dispatch(someAction(data))
+    } catch (error) {
+      logger.error(`Error in listener: ${error}`)
+    }
+  })
+}
+```
 
-    // Perform side effects
-    await api.dispatch(otherAction())
-    deps.notificationService.notify()
-  },
+**Store Subscription Listener:**
+```typescript
+export const onStateChangeListener = ({
+  store,
+  service,
+  logger,
+}: {
+  store: AppStore
+  service: SomeService
+  logger: Logger
+}): (() => void) => {
+  return store.subscribe(() => {
+    const state = store.getState()
+    // React to state changes
+    service.doSomething(state)
+  })
 }
 ```
 
 ### Best Practices
 
-1. **One responsibility**: Each listener handles one concern
-2. **Naming**: `on-{event}-{action}.listener.ts`
-3. **Location**: Listeners live in the domain that *listens*, not the domain that *emits*
-4. **Testing**: Test listeners with fake dependencies
-5. **Avoid cascades**: Be careful with listeners dispatching actions that trigger other listeners
-6. **Idempotency**: Effects should be safe to run multiple times
+1. **One responsibility**: Each listener handles one event type
+2. **Naming**: `on-{event}.listener.ts`
+3. **Error handling**: Wrap in try-catch with logger
+4. **Location**: Listeners live in the domain that *reacts*, not the domain that *emits*
+5. **Dependencies**: Explicitly declare all dependencies in parameter object
+6. **Return unsubscribe**: Store subscription listeners should return cleanup function
 
 ### Testing Listeners
 
 ```typescript
-it('loads user data when user logs in', async () => {
+it('dispatches userAuthenticated when user logs in', () => {
+  const fakeAuthGateway = new FakeAuthGateway()
   const store = createTestStore()
 
-  await store.dispatch(userLoggedIn({ userId: '123' }))
-
-  // Wait for listener effects
-  await waitFor(() => {
-    expect(selectUser(store.getState())).toBeDefined()
+  onUserLoggedInListener({
+    store,
+    authGateway: fakeAuthGateway,
+    logger: new InMemoryLogger(),
   })
+
+  // Trigger the gateway event
+  fakeAuthGateway.simulateLogin(testUser)
+
+  expect(store.getState().auth.user).toEqual(testUser)
 })
 ```
 
 ### Related ADRs
-- [Redux Toolkit for Business Logic](../state-management/redux-toolkit-for-business-logic.md)
+- [Redux Toolkit for Business Logic](redux-toolkit-for-business-logic.md)
 - [Hexagonal Architecture](../hexagonal-architecture.md)
 - [Dependency Injection Pattern](dependency-injection-pattern.md)
 
 ## References
 
-- [RTK Listener Middleware](https://redux-toolkit.js.org/api/createListenerMiddleware)
 - `/core/_redux_/registerListeners.ts` - Implementation
 - [Event-Driven Architecture](https://martinfowler.com/articles/201701-event-driven.html)
+- [Redux Store Subscriptions](https://redux.js.org/api/store#subscribelistener)

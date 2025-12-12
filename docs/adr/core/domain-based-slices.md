@@ -308,8 +308,7 @@ expect(selectActiveSession(store.getState())).toBeDefined()
 ### Related ADRs
 - [Redux Toolkit for Business Logic](redux-toolkit-for-business-logic.md)
 - [Entity Adapter Normalization](entity-adapter-normalization.md)
-- [Hexagonal Architecture](../architecture/hexagonal-architecture.md)
-- [Feature-Based Domains](../code-organization/feature-based-domains.md)
+- [Hexagonal Architecture](../hexagonal-architecture.md)
 
 ## References
 
