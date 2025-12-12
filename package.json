@@ -42,7 +42,8 @@
     "generate:schema": "npx prisma generate"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": "npm run lint:fix"
+    "*.{js,ts,jsx,tsx}": "npm run lint:fix",
+    ".claude/**/*.json": "eslint"
   },
   "dependencies": {
     "@amehmeto/expo-accessibility-service": "github:amehmeto/expo-accessibility-service",
