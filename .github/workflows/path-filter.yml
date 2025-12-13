@@ -79,6 +79,7 @@ jobs:
       # Check only the latest push (for build optimization)
       # On synchronize: compares against previous HEAD
       # On opened: compares against base branch (same as full PR check)
+      # NOTE: Keep app filter paths in sync with the filter above
       - name: Check for app changes (this push only)
         uses: dorny/paths-filter@v3
         id: filter-push
@@ -86,6 +87,7 @@ jobs:
           base: ${{ github.event.before }}
           filters: |
             app:
+              # Source code
               - 'app/**'
               - 'core/**'
               - 'ui/**'
@@ -94,6 +96,7 @@ jobs:
               - 'pdb-blocklists/**'
               - 'pdb-remote-devices/**'
               - 'pdb-sirens/**'
+              # Config files that affect the build
               - 'app.config.js'
               - 'package.json'
               - 'package-lock.json'
@@ -103,11 +106,19 @@ jobs:
               - 'eas.json'
               - 'schema.prisma'
               - 'index.js'
+              # Platform specific
               - 'android/**'
               - 'ios/**'
+              # Assets
               - 'assets/**'
+              # Environment files
               - '.env*'
+              # Test and lint config
+              - 'vitest.config.js'
+              - '.eslintrc.cjs'
+              # Scripts used by CI
               - 'scripts/**'
+              # Workflow files (so changes to CI trigger builds)
               - '.github/workflows/cerberus.yml'
               - '.github/workflows/hades.yml'
               - '.github/workflows/path-filter.yml'
