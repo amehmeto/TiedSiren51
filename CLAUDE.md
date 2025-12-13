@@ -45,7 +45,7 @@ npx prisma generate   # Regenerate Prisma client after schema changes
 | Hexagonal Architecture | Project-wide | `/docs/adr/hexagonal-architecture.md` |
 | Listener (side effects) | `core/{domain}/listeners/` | `/docs/adr/core/listener-pattern.md` |
 | Repository | `core/_ports_/`, `infra/*-repository/` | `/docs/adr/core/repository-pattern.md` |
-| View Model | `ui/screens/*/use-*.view-model.ts` | `/docs/adr/ui/view-model-pattern.md` |
+| View Model | `ui/screens/*/*.view-model.ts` | `/docs/adr/ui/view-model-pattern.md` |
 | Data Builder | `tests/builders/` | `/docs/adr/testing/data-builder-pattern.md` |
 | Fixture | `tests/fixtures/` | `/docs/adr/testing/fixture-pattern.md` |
 
