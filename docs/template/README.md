@@ -15,7 +15,36 @@ Components from this codebase that can be extracted for any new project.
 |-----------|-------|-------|
 | **Abstract Repository** | `infra/__abstract__/in-memory.repository.ts` | Generic CRUD base class |
 | **Date Provider** | `core/_ports_/port.date-provider.ts`, `infra/date-provider/` | Testable time abstraction |
+| **Notification Service** | `core/_ports_/notification.service.ts`, `infra/notification-service/` | Push notifications |
+| **Background Task Service** | `core/_ports_/background-task.service.ts`, `infra/background-task-service/` | Background processing |
+| **Database Service** | `core/_ports_/database.service.ts`, `infra/database-service/` | DB abstraction |
 | **Fake Implementations** | `infra/*/fake.*.ts` | Test doubles for all ports |
+
+## Utilities
+
+| Utility | File | Notes |
+|---------|------|-------|
+| **Time Utils** | `core/__utils__/time.utils.ts` | Formatting, calculations |
+| **Time Constants** | `core/__constants__/time.ts` | SECOND, MINUTE, HOUR, DAY |
+| **Exhaustive Guard** | `core/__utils__/exhaustive-guard.ts` | TypeScript switch safety |
+
+## Redux Patterns
+
+| Pattern | File | Notes |
+|---------|------|-------|
+| **createAppThunk** | `core/_redux_/create-app-thunk.ts` | Typed thunk with DI |
+| **createStore** | `core/_redux_/createStore.ts` | Store factory with deps |
+| **registerListeners** | `core/_redux_/registerListeners.ts` | Side-effect listeners |
+| **rootReducer** | `core/_redux_/rootReducer.ts` | Reducer composition |
+
+## UI Patterns
+
+| Pattern | Files | Notes |
+|---------|-------|-------|
+| **Zod Schemas** | `ui/auth-schemas/`, `ui/screens/*/schemas/` | Form validation |
+| **View Models** | `*.view-model.ts` | Screen logic separation |
+| **useTick** | `ui/hooks/useTick.ts` | Timer/interval hook |
+| **useAppForeground** | `ui/hooks/useAppForeground.ts` | App state hook |
 
 ## Testing Utilities
 
@@ -55,6 +84,14 @@ Components from this codebase that can be extracted for any new project.
 | `try-catch-isolation` | Focused error handling |
 | `core-test-file-naming` | Test naming conventions |
 | `require-colocated-test` | Tests next to source |
+
+## GitHub Workflows
+
+| Workflow | File | Notes |
+|----------|------|-------|
+| **PR Validation** | `.github/workflows/cerberus.yml` | Lint, test, coverage, build |
+| **Release** | `.github/workflows/hades.yml` | Semantic release, changelog |
+| **Path Filter** | `.github/workflows/path-filter.yml` | Conditional job execution |
 
 ## Architecture
 
