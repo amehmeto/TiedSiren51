@@ -1,7 +1,7 @@
 import { createSelector } from '@reduxjs/toolkit'
 import { formatDistance } from 'date-fns'
 import { DAY } from '@/core/__constants__/time'
-import { DateProvider } from '@/core/_ports_/port.date-provider'
+import { DateProvider } from '@/core/_ports_/date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 import { BlockSession } from '@/core/block-session/block.session'
 import { isActive } from '@/core/block-session/selectors/isActive'

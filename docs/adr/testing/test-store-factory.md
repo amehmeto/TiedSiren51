@@ -44,36 +44,28 @@ Create a **Test Store Factory** that provides pre-configured Redux stores for te
 
 ```typescript
 import { createStore } from '@core/_redux_/createStore'
-import type { RootState } from '@core/_redux_/rootReducer'
 import type { Dependencies } from '@core/_redux_/dependencies'
-import { FakeAuthGateway } from './fakes/fake.auth-gateway'
-import { FakeDataBlockSessionRepository } from './fakes/fake.block-session-repository'
-import { StubDateProvider } from './stubs/stub.date-provider'
+import { rootReducer } from '@core/_redux_/rootReducer'
+import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
+import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 // ... other test doubles
 
 export const createTestStore = (
-  preloadedState?: Partial<RootState>,
-  dependencyOverrides?: Partial<Dependencies>
-) => {
-  // Default test dependencies (all fakes/stubs)
-  const testDependencies: Dependencies = {
-    authGateway: new FakeAuthGateway(),
-    blockSessionRepository: new FakeDataBlockSessionRepository(),
-    blocklistRepository: new FakeDataBlocklistRepository(),
-    sirensRepository: new FakeSirensRepository(),
-    remoteDeviceRepository: new FakeRemoteDeviceRepository(),
-    notificationService: new FakeNotificationService(),
-    databaseService: new StubDatabaseService(),
-    dateProvider: new StubDateProvider(),
-    backgroundTaskService: new FakeBackgroundTaskService(),
-
-    // Allow test-specific overrides
-    ...dependencyOverrides,
-  }
-
-  return createStore(testDependencies, preloadedState as RootState)
-}
+  {
+    authGateway = new FakeAuthGateway(),
+    blockSessionRepository = new FakeDataBlockSessionRepository(),
+    dateProvider = new StubDateProvider(),
+    // ... other dependencies with defaults
+  }: Partial<Dependencies> = {},
+  preloadedState?: Partial<ReturnType<typeof rootReducer>>,
+) => createStore(
+  { authGateway, blockSessionRepository, dateProvider, /* ... */ },
+  preloadedState,
+)
 ```
+
+**Key design choice**: Dependencies are the first parameter with destructured defaults, allowing tests to override only specific dependencies while getting sensible defaults for the rest.
 
 **2. Usage in Tests**
 
@@ -92,8 +84,8 @@ describe('BlockSession Use Cases', () => {
   })
 
   it('starts session with preloaded data', async () => {
-    // ✅ Easy to provide initial state
-    const store = createTestStore({
+    // ✅ Easy to provide initial state (second parameter)
+    const store = createTestStore({}, {
       blocklist: blocklistAdapter.getInitialState({
         entities: { '1': testBlocklist },
         ids: ['1'],
@@ -109,8 +101,8 @@ describe('BlockSession Use Cases', () => {
     const customDateProvider = new StubDateProvider()
     customDateProvider.setNow(new Date('2025-01-01'))
 
-    // ✅ Easy to override specific dependencies
-    const store = createTestStore(undefined, {
+    // ✅ Easy to override specific dependencies (first parameter)
+    const store = createTestStore({
       dateProvider: customDateProvider,
     })
 
@@ -209,21 +201,23 @@ import { testStore } from './fixtures'
 
 ### Key Files
 - `/core/_tests_/createTestStore.ts` - Factory implementation
-- `/core/_tests_/stubs/` - Stub implementations
-- `/core/_tests_/fakes/` - Fake implementations
+- `/infra/*/stub.*.ts` - Stub implementations (colocated with real implementations)
+- `/infra/*/fake*.ts` - Fake implementations (colocated with real implementations)
+
+**Note**: Test doubles are colocated with their real implementations in `/infra/` rather than centralized in `/core/_tests_/`. This makes it easier to maintain them alongside the real code.
 
 ### Factory Signature
 
 ```typescript
 export const createTestStore = (
-  preloadedState?: Partial<RootState>,
-  dependencyOverrides?: Partial<Dependencies>
+  dependencyOverrides?: Partial<Dependencies>,  // First: override specific dependencies
+  preloadedState?: Partial<RootState>,          // Second: initial state
 ): AppStore
 ```
 
 **Parameters**:
+- `dependencyOverrides`: Override specific dependencies (uses destructured defaults)
 - `preloadedState`: Initial Redux state (partial, merged with defaults)
-- `dependencyOverrides`: Override specific dependencies
 
 **Returns**:
 - Fully configured `AppStore` with test doubles
@@ -235,20 +229,10 @@ export const createTestStore = (
 const store = createTestStore()
 ```
 
-**With preloaded state**:
-```typescript
-const store = createTestStore({
-  auth: {
-    user: testUser,
-    isAuthenticated: true,
-  },
-})
-```
-
-**With custom dependency**:
+**With custom dependency** (first parameter):
 ```typescript
 const customRepo = new FakeDataBlockSessionRepository()
-const store = createTestStore(undefined, {
+const store = createTestStore({
   blockSessionRepository: customRepo,
 })
 
@@ -256,14 +240,25 @@ const store = createTestStore(undefined, {
 expect(customRepo.sessions).toHaveLength(0)
 ```
 
-**Both state and dependencies**:
+**With preloaded state** (second parameter):
+```typescript
+const store = createTestStore({}, {
+  auth: {
+    authUser: testUser,
+    isLoading: false,
+    error: null,
+  },
+})
+```
+
+**Both dependencies and state**:
 ```typescript
 const dateProvider = new StubDateProvider()
 dateProvider.setNow(new Date('2025-01-01'))
 
 const store = createTestStore(
-  { auth: { user: testUser } },
-  { dateProvider }
+  { dateProvider },                    // Dependencies first
+  { auth: { authUser: testUser } }     // State second
 )
 ```
 
@@ -275,9 +270,10 @@ Combine with state builder for complex state:
 import { stateBuilder } from '@core/_tests_/state-builder'
 
 const store = createTestStore(
+  {},  // Default dependencies
   stateBuilder()
-    .withAuth(testUser)
-    .withSirens([twitterSiren, redditSiren])
+    .withAuthUser(testUser)
+    .withAvailableSirens(sirens)
     .withBlocklists([focusBlocklist])
     .build()
 )
@@ -304,7 +300,7 @@ it('expires session after duration', async () => {
   const dateProvider = new StubDateProvider()
   dateProvider.setNow(new Date('2025-01-01T10:00:00Z'))
 
-  const store = createTestStore(undefined, { dateProvider })
+  const store = createTestStore({ dateProvider })
 
   await store.dispatch(startBlockSession({ duration: 60 }))
 
@@ -322,7 +318,7 @@ it('expires session after duration', async () => {
 ```typescript
 it('calls repository correctly', async () => {
   const mockRepository = new FakeDataBlockSessionRepository()
-  const store = createTestStore(undefined, {
+  const store = createTestStore({
     blockSessionRepository: mockRepository,
   })
 
@@ -335,7 +331,7 @@ it('calls repository correctly', async () => {
 
 ### Related ADRs
 - [Stub vs Fake Implementations](stub-vs-fake-implementations.md)
-- [Dependency Injection Pattern](../architecture/dependency-injection-pattern.md)
+- [Dependency Injection Pattern](../core/dependency-injection-pattern.md)
 - [Vitest Over Jest](vitest-over-jest.md)
 - [Fixture Pattern](fixture-pattern.md)
 

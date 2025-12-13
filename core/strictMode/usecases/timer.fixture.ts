@@ -1,5 +1,5 @@
 import { expect } from 'vitest'
-import { ISODateString } from '@/core/_ports_/port.date-provider'
+import { ISODateString } from '@/core/_ports_/date-provider'
 import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { Fixture } from '@/core/_tests_/fixture.types'

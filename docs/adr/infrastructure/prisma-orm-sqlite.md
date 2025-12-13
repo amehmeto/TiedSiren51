@@ -165,7 +165,7 @@ model BlockSession {
 ```
 
 ### Migration Strategy
-See [TECH_DEBT.md](/docs/TECH_DEBT.md#4-migration-strategy-) for planned improvements to migration process.
+See [migration-strategy.md](../../tech-debt/migration-strategy.md) for planned improvements to migration process.
 
 ### Known Issues
 - Prisma integration tests excluded in vitest config due to polyfill conflicts
@@ -173,7 +173,7 @@ See [TECH_DEBT.md](/docs/TECH_DEBT.md#4-migration-strategy-) for planned improve
 - Tracked in TECH_DEBT.md #5
 
 ### Related ADRs
-- [Repository Pattern](../architecture/repository-pattern.md)
+- [Repository Pattern](../core/repository-pattern.md)
 - [Abandon PouchDB](abandon-pouchdb.md)
 - [Local-First Architecture](local-first-architecture.md)
 - [Platform-Specific Database Paths](platform-specific-db-paths.md)

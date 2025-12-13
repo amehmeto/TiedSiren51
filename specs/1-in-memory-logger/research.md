@@ -6,7 +6,7 @@
 
 **Decision:** Follow the existing ports & adapters pattern
 **Rationale:** The codebase consistently uses:
-- Interfaces in `core/_ports_/` (e.g., `database.service.ts`, `notification.service.ts`, `port.date-provider.ts`)
+- Interfaces in `core/_ports_/` (e.g., `database.service.ts`, `notification.service.ts`, `date-provider.ts`)
 - Implementations in `infra/{service-name}/` (e.g., `infra/database-service/`, `infra/date-provider/`)
 - Naming convention: `{implementation}.{service-name}.ts` (e.g., `stub.database.service.ts`, `real.date-provider.ts`)
 
