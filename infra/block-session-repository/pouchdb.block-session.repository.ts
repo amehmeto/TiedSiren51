@@ -4,7 +4,7 @@ import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
 import { CreatePayload } from '@/core/_ports_/create.payload'
 import { Logger } from '@/core/_ports_/logger'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
-import { BlockSession } from '@/core/block-session/block.session'
+import { BlockSession } from '@/core/block-session/block-session'
 
 export class PouchdbBlockSessionRepository implements BlockSessionRepository {
   private db: PouchDB.Database<BlockSession>

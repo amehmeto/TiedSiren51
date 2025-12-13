@@ -1,5 +1,5 @@
 import { createAppAsyncThunk } from '../../_redux_/create-app-thunk'
-import { BlockSession } from '../../block-session/block.session'
+import { BlockSession } from '../../block-session/block-session'
 import { selectActiveSessions } from '../../block-session/selectors/selectActiveSessions'
 
 import { Sirens } from '../sirens'

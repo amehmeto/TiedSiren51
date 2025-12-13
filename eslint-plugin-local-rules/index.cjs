@@ -18,10 +18,12 @@ const noTryCatchInCore = require('../eslint-rules/no-try-catch-in-core.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
 const requireColocatedTest = require('../eslint-rules/require-colocated-test.cjs')
 const useDataBuilders = require('../eslint-rules/use-data-builders.cjs')
+const fileNamingConvention = require('../eslint-rules/file-naming-convention.cjs')
 
 module.exports = {
   rules: {
     'core-test-file-naming': coreTestFileNaming,
+    'file-naming-convention': fileNamingConvention,
     'expect-separate-act-assert': expectSeparateActAssert,
     'no-complex-jsx-in-conditionals': noComplexJsxInConditionals,
     'no-icon-size-magic-numbers': noIconSizeMagicNumbers,

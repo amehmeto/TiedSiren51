@@ -1,7 +1,7 @@
 import { differenceInSeconds } from 'date-fns'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
-import { BlockSession } from '@/core/block-session/block.session'
+import { BlockSession } from '@/core/block-session/block-session'
 
 export type UpdateBlockSessionPayload = UpdatePayload<BlockSession>
 

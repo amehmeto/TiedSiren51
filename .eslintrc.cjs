@@ -96,6 +96,7 @@ module.exports = {
     'local-rules/no-try-catch-in-core': 'error',
     'local-rules/listener-error-handling': 'error',
     'local-rules/infra-must-rethrow': 'error',
+    'local-rules/file-naming-convention': 'error',
   },
   overrides: [
     {

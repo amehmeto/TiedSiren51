@@ -1,5 +1,5 @@
 import { expect, describe, it } from 'vitest'
-import { LoginCredentials, SignUpCredentials } from '@/core/auth/authTypes'
+import { LoginCredentials, SignUpCredentials } from '@/core/auth/auth.type'
 import { signInSchema, signUpSchema } from './auth-schemas'
 
 type InvalidCredentialsTestCase = [

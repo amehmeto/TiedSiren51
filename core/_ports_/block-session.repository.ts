@@ -1,4 +1,4 @@
-import { BlockSession } from '../block-session/block.session'
+import { BlockSession } from '../block-session/block-session'
 import { CreatePayload } from './create.payload'
 import { UpdatePayload } from './update.payload'
 

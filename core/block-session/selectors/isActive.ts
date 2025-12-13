@@ -1,6 +1,6 @@
 import { isBefore } from 'date-fns'
 import { DateProvider } from '@/core/_ports_/date-provider'
-import { BlockSession } from '@/core/block-session/block.session'
+import { BlockSession } from '@/core/block-session/block-session'
 
 export function isActive(dateProvider: DateProvider, session: BlockSession) {
   const now = dateProvider.getNow()

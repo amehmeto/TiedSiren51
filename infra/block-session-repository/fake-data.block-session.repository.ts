@@ -9,7 +9,7 @@ import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.bu
 import {
   BlockingConditions,
   BlockSession,
-} from '@/core/block-session/block.session'
+} from '@/core/block-session/block-session'
 import { InMemoryRepository } from '../__abstract__/in-memory.repository'
 
 export class FakeDataBlockSessionRepository
