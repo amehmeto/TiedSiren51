@@ -165,7 +165,7 @@ model BlockSession {
 ```
 
 ### Migration Strategy
-<!-- TODO: Document planned improvements to migration process -->
+See [migration-strategy.md](../../tech-debt/migration-strategy.md) for planned improvements to migration process.
 
 ### Known Issues
 - Prisma integration tests excluded in vitest config due to polyfill conflicts
