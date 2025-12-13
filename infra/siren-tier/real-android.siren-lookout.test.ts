@@ -5,7 +5,7 @@ import type {
 import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
-import { RealAndroidSirenLookout } from './real.android-siren-lookout'
+import { RealAndroidSirenLookout } from './real-android.siren-lookout'
 
 type EventListener = (event: AccessibilityEvent) => void
 
