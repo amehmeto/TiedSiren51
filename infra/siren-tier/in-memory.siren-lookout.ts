@@ -1,5 +1,9 @@
 import { AndroidSirenLookout } from '@core/_ports_/siren.lookout'
 
+/**
+ * In-memory implementation of SirenLookout for testing purposes.
+ * Does not connect to the real AccessibilityService.
+ */
 export class InMemorySirenLookout implements AndroidSirenLookout {
   private listener?: (packageName: string) => void
 
