@@ -1,6 +1,6 @@
 import { DAY } from '@/core/__constants__/time'
 import { calculateMilliseconds } from '@/core/__utils__/time.utils'
-import { ISODateString } from '@/core/_ports_/port.date-provider'
+import { ISODateString } from '@/core/_ports_/date-provider'
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
 import { selectAuthUserId } from '@/core/auth/selectors/selectAuthUserId'
 

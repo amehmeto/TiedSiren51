@@ -62,7 +62,7 @@ All conversions between ISO strings and Date objects go through `DateProvider` m
 
 ### Implementation
 
-**1. Port Definition** (`core/_ports_/port.date-provider.ts`):
+**1. Port Definition** (`core/_ports_/date-provider.ts`):
 
 ```typescript
 export interface DateProvider {
@@ -491,7 +491,7 @@ export class CreateBlockSessionUseCase {
 
 ### Implementation Files
 
-- Port: `core/_ports_/port.date-provider.ts`
+- Port: `core/_ports_/date-provider.ts`
 - Real implementation: `infra/date-provider/real.date-provider.ts`
 - Stub implementation: `infra/date-provider/stub.date-provider.ts`
 - Timer use cases: `core/strictMode/usecases/start-timer.usecase.ts`

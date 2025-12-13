@@ -173,7 +173,7 @@ See [TECH_DEBT.md](/docs/TECH_DEBT.md#4-migration-strategy-) for planned improve
 - Tracked in TECH_DEBT.md #5
 
 ### Related ADRs
-- [Repository Pattern](../architecture/repository-pattern.md)
+- [Repository Pattern](../core/repository-pattern.md)
 - [Abandon PouchDB](abandon-pouchdb.md)
 - [Local-First Architecture](local-first-architecture.md)
 - [Platform-Specific Database Paths](platform-specific-db-paths.md)

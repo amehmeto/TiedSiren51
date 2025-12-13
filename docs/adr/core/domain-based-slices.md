@@ -14,7 +14,7 @@ TiedSiren51's state management needs clear organization for:
 - **Siren**: App/website/keyword definitions to block
 - **Blocklist**: Collections of sirens for different contexts
 - **BlockSession**: Active and historical block sessions
-- **UI**: Application-wide UI state
+- **StrictMode**: Timer for enforced blocking periods
 
 Challenges:
 - **Scalability**: State grows complex as features are added
@@ -38,13 +38,14 @@ Organize Redux state using **Domain-Based Slices** aligned with business domains
 ```
 /core/
   /auth/
-    ├── reducer.ts           # Auth slice
+    ├── reducer.ts           # Auth reducer (createReducer pattern)
     ├── selectors/           # Auth selectors
     ├── usecases/            # Auth async thunks
-    └── listeners/           # Auth side effects
+    ├── listeners/           # Auth side effects (gateway events)
+    └── authentification.fixture.ts  # Test fixture
 
   /siren/
-    ├── siren.ts             # Entity adapter
+    ├── sirens.ts            # Entity types
     ├── siren.slice.ts       # Siren slice
     ├── selectors/           # Siren selectors
     ├── usecases/            # Siren async thunks
@@ -58,10 +59,15 @@ Organize Redux state using **Domain-Based Slices** aligned with business domains
 
   /block-session/
     ├── block.session.ts     # Entity adapter
-    ├── block.session.slice.ts # Session slice
+    ├── block-session.slice.ts # Session slice
     ├── selectors/           # Session selectors
-    ├── usecases/            # Session async thunks
-    └── listeners/           # Session side effects
+    └── usecases/            # Session async thunks
+
+  /strictMode/
+    ├── strict-mode.slice.ts # StrictMode slice
+    ├── timeLeft.ts          # Time calculation types
+    ├── selectors/           # StrictMode selectors
+    └── usecases/            # StrictMode async thunks
 
   /_redux_/
     └── rootReducer.ts       # Combines all slices
@@ -75,6 +81,7 @@ type RootState = {
   siren: SirenState
   blocklist: BlocklistState
   blockSession: BlockSessionState
+  strictMode: StrictModeState
 }
 ```
 
@@ -86,13 +93,15 @@ import { combineReducers } from '@reduxjs/toolkit'
 import { authReducer } from '@core/auth/reducer'
 import { sirenSlice } from '@core/siren/siren.slice'
 import { blocklistSlice } from '@core/blocklist/blocklist.slice'
-import { blockSessionSlice } from '@core/block-session/block.session.slice'
+import { blockSessionSlice } from '@core/block-session/block-session.slice'
+import { strictModeSlice } from '@core/strictMode/strict-mode.slice'
 
 export const rootReducer = combineReducers({
   auth: authReducer,
   siren: sirenSlice.reducer,
   blocklist: blocklistSlice.reducer,
   blockSession: blockSessionSlice.reducer,
+  strictMode: strictModeSlice.reducer,
 })
 
 export type RootState = ReturnType<typeof rootReducer>
@@ -193,10 +202,11 @@ export type RootState = ReturnType<typeof rootReducer>
 
 ### Key Files
 - `/core/_redux_/rootReducer.ts` - Slice combination
-- `/core/auth/reducer.ts` - Auth domain slice
+- `/core/auth/reducer.ts` - Auth domain reducer
 - `/core/siren/siren.slice.ts` - Siren domain slice
 - `/core/blocklist/blocklist.slice.ts` - Blocklist domain slice
-- `/core/block-session/block.session.slice.ts` - BlockSession domain slice
+- `/core/block-session/block-session.slice.ts` - BlockSession domain slice
+- `/core/strictMode/strict-mode.slice.ts` - StrictMode domain slice
 
 ### Slice Structure Pattern
 
@@ -272,6 +282,11 @@ export const selectBlocklistWithSirens = createSelector(
 - Historical sessions
 - Session timing and state
 
+**StrictMode Domain**:
+- Timer for enforced blocking periods
+- Timer end timestamp (ISO string)
+- Loading state for timer operations
+
 ### State Access Pattern
 
 ```typescript
@@ -308,8 +323,7 @@ expect(selectActiveSession(store.getState())).toBeDefined()
 ### Related ADRs
 - [Redux Toolkit for Business Logic](redux-toolkit-for-business-logic.md)
 - [Entity Adapter Normalization](entity-adapter-normalization.md)
-- [Hexagonal Architecture](../architecture/hexagonal-architecture.md)
-- [Feature-Based Domains](../code-organization/feature-based-domains.md)
+- [Hexagonal Architecture](../hexagonal-architecture.md)
 
 ## References
 

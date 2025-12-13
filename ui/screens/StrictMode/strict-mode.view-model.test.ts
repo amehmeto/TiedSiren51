@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
-import { ISODateString } from '@/core/_ports_/port.date-provider'
+import { ISODateString } from '@/core/_ports_/date-provider'
 import { PreloadedState } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'

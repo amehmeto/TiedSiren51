@@ -1,5 +1,5 @@
 import { DAY, MINUTE } from '@/core/__constants__/time'
-import { DateProvider, ISODateString } from '@/core/_ports_/port.date-provider'
+import { DateProvider, ISODateString } from '@/core/_ports_/date-provider'
 
 export class StubDateProvider implements DateProvider {
   now = new Date()

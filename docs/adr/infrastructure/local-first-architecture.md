@@ -212,7 +212,7 @@ it('blocks app during session', async () => {
 ### Related ADRs
 - [Prisma ORM with SQLite](prisma-orm-sqlite.md)
 - [Abandon PouchDB](abandon-pouchdb.md)
-- [Repository Pattern](../architecture/repository-pattern.md)
+- [Repository Pattern](../core/repository-pattern.md)
 
 ## References
 
