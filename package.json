@@ -42,10 +42,13 @@
     "generate:schema": "npx prisma generate"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": "npm run lint:fix",
+    "*.{js,ts,jsx,tsx}": ["eslint --fix", "prettier --write"],
+    "*.json": ["prettier --write --parser json"],
     "*.md": "remark --frail --use remark-validate-links",
     ".claude/**/*.json": "eslint --fix",
-    "*.sh": "shellcheck"
+    "*.sh": ["shellcheck"],
+    "*.{yml,yaml}": ["prettier --write"],
+    "schema.prisma": ["npx prisma validate"]
   },
   "dependencies": {
     "@amehmeto/expo-accessibility-service": "github:amehmeto/expo-accessibility-service",

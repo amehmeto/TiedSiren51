@@ -1,6 +1,7 @@
 #!/usr/bin/env bash
 
-# PostToolUse hook for validating TypeScript/ESLint after file edits
+# PostToolUse hook for validating files after edits
+# Mirrors lint-staged configuration for consistency
 # Outputs JSON with decision: "block" to provide feedback to Claude
 
 # Parse the JSON input from stdin
@@ -12,39 +13,91 @@ if [ -z "$file_path" ]; then
   exit 0
 fi
 
-# Only validate TypeScript/JavaScript files
-if [[ ! "$file_path" =~ \.(ts|tsx|js|jsx)$ ]]; then
+# Skip node_modules and non-existent files
+if [[ "$file_path" =~ node_modules ]] || [ ! -f "$file_path" ]; then
   exit 0
 fi
 
-# Skip node_modules
-if [[ "$file_path" =~ node_modules ]]; then
-  exit 0
-fi
+# Get file extension
+filename=$(basename "$file_path")
+extension="${filename##*.}"
 
-# Check if file exists
-if [ ! -f "$file_path" ]; then
-  exit 0
-fi
-
-# Run ESLint on the file (with auto-fix for trivial issues)
-eslint_output=$(npx eslint "$file_path" --fix 2>&1)
-eslint_exit=$?
-
-if [ $eslint_exit -ne 0 ]; then
-  # Filter to get just the error lines
-  filtered_output=$(echo "$eslint_output" | grep -E "^\s+[0-9]+:[0-9]+\s+error" || echo "$eslint_output")
-
-  # Output JSON to stdout for Claude to see
-  jq -n \
-    --arg reason "ESLint validation failed for $file_path" \
-    --arg errors "$filtered_output" \
-    '{
-      "decision": "block",
-      "reason": $reason,
-      "eslintErrors": $errors
-    }'
-  exit 2
-fi
+# Determine which linters to run based on file type (mirrors lint-staged config)
+case "$extension" in
+  ts|tsx|js|jsx)
+    # ESLint with auto-fix, then prettier
+    output=$(npx eslint "$file_path" --fix 2>&1)
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+      filtered=$(echo "$output" | grep -E "^\s+[0-9]+:[0-9]+\s+error" || echo "$output")
+      jq -n --arg reason "ESLint failed: $file_path" --arg errors "$filtered" \
+        '{"decision": "block", "reason": $reason, "errors": $errors}'
+      exit 2
+    fi
+    npx prettier --write "$file_path" >/dev/null 2>&1
+    ;;
+  json)
+    # Prettier for JSON
+    output=$(npx prettier --write --parser json "$file_path" 2>&1)
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+      jq -n --arg reason "Prettier failed: $file_path" --arg errors "$output" \
+        '{"decision": "block", "reason": $reason, "errors": $errors}'
+      exit 2
+    fi
+    # Also run eslint for .claude/**/*.json files
+    if [[ "$file_path" =~ \.claude/ ]]; then
+      output=$(npx eslint "$file_path" --fix 2>&1)
+      exit_code=$?
+      if [ $exit_code -ne 0 ]; then
+        jq -n --arg reason "ESLint failed: $file_path" --arg errors "$output" \
+          '{"decision": "block", "reason": $reason, "errors": $errors}'
+        exit 2
+      fi
+    fi
+    ;;
+  md)
+    # Remark for markdown link validation
+    output=$(npx remark --frail --use remark-validate-links "$file_path" 2>&1)
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+      jq -n --arg reason "Remark validation failed: $file_path" --arg errors "$output" \
+        '{"decision": "block", "reason": $reason, "errors": $errors}'
+      exit 2
+    fi
+    ;;
+  sh)
+    # Shellcheck for shell scripts
+    output=$(npx shellcheck "$file_path" 2>&1)
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+      jq -n --arg reason "Shellcheck failed: $file_path" --arg errors "$output" \
+        '{"decision": "block", "reason": $reason, "errors": $errors}'
+      exit 2
+    fi
+    ;;
+  yml|yaml)
+    # Prettier for YAML
+    output=$(npx prettier --write "$file_path" 2>&1)
+    exit_code=$?
+    if [ $exit_code -ne 0 ]; then
+      jq -n --arg reason "Prettier failed: $file_path" --arg errors "$output" \
+        '{"decision": "block", "reason": $reason, "errors": $errors}'
+      exit 2
+    fi
+    ;;
+  prisma)
+    # Prisma validate for schema files
+    if [[ "$filename" == "schema.prisma" ]]; then
+      output=$(npx prisma validate 2>&1)
+      exit_code=$?
+      if [ $exit_code -ne 0 ]; then
+        jq -n --arg reason "Prisma validation failed" --arg errors "$output" \
+          '{"decision": "block", "reason": $reason, "errors": $errors}'
+        exit 2
+      fi
+    fi
+    ;;
+esac
 
 exit 0

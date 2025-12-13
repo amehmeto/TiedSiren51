@@ -65,9 +65,6 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
-      - name: Install shellcheck
-        run: sudo apt-get install -y shellcheck
-
       - name: Lint
         run: npm run lint
         env:
@@ -76,8 +73,8 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test:cov
 
-#      - name: Commit coverage if changed
-#        run: bash scripts/commit-coverage.sh
+      #      - name: Commit coverage if changed
+      #        run: bash scripts/commit-coverage.sh
 
       - name: Store PR coverage
         run: bash scripts/store-coverage.sh pr-coverage.json
@@ -93,7 +90,10 @@ jobs:
             await compareAndComment({ github, context });
 
   build:
-    needs: test
+    needs: [test, path-filter]
+    # Only build if: not a draft PR AND this push contains app changes
+    # This prevents rebuilding when only docs/md files are pushed after earlier code changes
+    if: github.event.pull_request.draft == false && needs.path-filter.outputs.app-changed-this-push == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -160,7 +160,6 @@ jobs:
           name: app-debug-${{ github.run_number }}
           path: ${{ steps.find_apk.outputs.apk_path }}
           retention-days: 7
-
 #      - name: Send APK notification to Slack
 #        if: success()
 #        env:
