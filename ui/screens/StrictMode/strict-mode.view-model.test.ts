@@ -97,6 +97,20 @@ describe('selectStrictModeViewModel', () => {
         buttonText: 'Extend Timer',
       },
     ],
+    [
+      'timer ending at noon (12:00)',
+      stateBuilder()
+        .withStrictModeEndedAt(endedAtFromNow(2 * HOUR))
+        .build(),
+      {
+        type: StrictModeViewState.Active,
+        countdown: '2h 0m 0s',
+        endDateTime: 'Ends 1/1, 12:00 p.m.',
+        inlineRemaining: '2h 0m 0s',
+        statusMessage: 'Your blockings are locked against any\nbypassing.',
+        buttonText: 'Extend Timer',
+      },
+    ],
   ])('Example: %s', (_, preloadedState: PreloadedState, expectedViewModel) => {
     const store = createTestStore({ dateProvider }, preloadedState)
 

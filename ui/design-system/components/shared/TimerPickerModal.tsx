@@ -23,7 +23,7 @@ type TimerPickerModalProps = {
 }
 
 export const TimerPickerModal = ({
-  visible,
+  visible: isVisible,
   onClose,
   onSave,
   duration,
@@ -42,7 +42,7 @@ export const TimerPickerModal = ({
   }
 
   return (
-    <TiedSModal isVisible={visible} onRequestClose={onClose}>
+    <TiedSModal isVisible={isVisible} onRequestClose={onClose}>
       <ScrollView contentContainerStyle={styles.container}>
         <TiedSCloseButton onClose={onClose} />
 

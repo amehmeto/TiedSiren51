@@ -37,4 +37,28 @@ describe('blocklistSchema', () => {
     fixture.when.validate()
     fixture.then.shouldBeValid()
   })
+
+  it('should pass with only websites selected', () => {
+    fixture.given.blocklistWithOnlyWebsites()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
+  })
+
+  it('should pass with only keywords selected', () => {
+    fixture.given.blocklistWithOnlyKeywords()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
+  })
+
+  it('should pass with android apps when other siren arrays are undefined', () => {
+    fixture.given.blocklistWithOnlyAndroidAppsAndUndefinedSirens()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
+  })
+
+  it('should fail when all siren arrays are undefined', () => {
+    fixture.given.blocklistWithEmptySirensObject()
+    fixture.when.validate()
+    fixture.then.shouldBeInvalid()
+  })
 })

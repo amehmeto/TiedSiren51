@@ -12,11 +12,11 @@ export function TiedSButton(
 ) {
   return (
     <Pressable
-      style={({ pressed }) => [
+      style={({ pressed: isPressed }) => [
         styles.container,
         props.style,
         props.disabled && styles.disabled,
-        { opacity: pressed ? T.opacity.pressed : T.opacity.full },
+        { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
       ]}
       onPress={props.onPress}
       disabled={props.disabled}
