@@ -89,6 +89,7 @@ module.exports = {
     'local-rules/one-selector-per-file': 'error',
     'local-rules/one-usecase-per-file': 'error',
     'local-rules/core-test-file-naming': 'error',
+    'local-rules/require-colocated-test': 'error',
     'local-rules/time-constant-multiplication': 'error',
     'local-rules/try-catch-isolation': 'error',
     // Error handling convention rules
@@ -128,6 +129,26 @@ module.exports = {
               regex: '^I[A-Z]',
               match: false,
             },
+          },
+          // Enforce boolean naming convention (is, has, should, can, did, will)
+          {
+            selector: 'variable',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'parameter',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'classProperty',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            leadingUnderscore: 'allow',
           },
         ],
         // Extend no I-prefix rule to import aliases
@@ -348,6 +369,51 @@ module.exports = {
       files: ['core/_ports_/**/*.ts', 'core/**/*.fixture.ts'],
       rules: {
         'no-restricted-globals': 'off',
+      },
+    },
+    // Enforce boolean naming convention on type properties in core (our domain types)
+    {
+      files: ['core/**/*.ts'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
+        '@typescript-eslint/naming-convention': [
+          'error',
+          // Keep interface naming convention
+          {
+            selector: 'interface',
+            format: ['PascalCase'],
+            custom: {
+              regex: '^I[A-Z]',
+              match: false,
+            },
+          },
+          // Boolean naming for variables, parameters, properties in core
+          {
+            selector: 'variable',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'parameter',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'classProperty',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            leadingUnderscore: 'allow',
+          },
+          {
+            selector: 'typeProperty',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+        ],
       },
     },
     // JSON files linting

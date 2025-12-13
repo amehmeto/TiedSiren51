@@ -16,37 +16,38 @@ import { createStore } from '../_redux_/createStore'
 import { Dependencies } from '../_redux_/dependencies'
 import { rootReducer } from '../_redux_/rootReducer'
 
-const testLogger = new InMemoryLogger()
+const defaultTestLogger = new InMemoryLogger()
 
 export const createTestStore = (
   {
     authGateway = new FakeAuthGateway(),
-    backgroundTaskService = new FakeBackgroundTaskService(testLogger),
     blockSessionRepository = new FakeDataBlockSessionRepository(),
     blocklistRepository = new FakeDataBlocklistRepository(),
     databaseService = new StubDatabaseService(),
     dateProvider = new StubDateProvider(),
     deviceRepository = new FakeDataDeviceRepository(),
     installedAppRepository = new FakeDataInstalledAppsRepository(),
-    notificationService = new FakeNotificationService(testLogger),
+    logger = defaultTestLogger,
     sirenLookout = new InMemorySirenLookout(),
-    sirenTier = new InMemorySirenTier(testLogger),
     sirensRepository = new FakeDataSirensRepository(),
     timerRepository = new FakeDataTimerRepository(),
+    backgroundTaskService = new FakeBackgroundTaskService(logger),
+    notificationService = new FakeNotificationService(logger),
+    sirenTier = new InMemorySirenTier(logger),
   }: Partial<Dependencies> = {},
   preloadedState?: Partial<ReturnType<typeof rootReducer>>,
 ) =>
   createStore(
     {
-      databaseService,
       authGateway,
       backgroundTaskService,
       blockSessionRepository,
       blocklistRepository,
+      databaseService,
       dateProvider,
       deviceRepository,
       installedAppRepository,
-      logger: testLogger,
+      logger,
       notificationService,
       sirenLookout,
       sirenTier,

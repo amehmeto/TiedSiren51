@@ -1,4 +1,4 @@
-import { ISODateString } from '@/core/_ports_/port.date-provider'
+import { ISODateString } from '@/core/_ports_/date-provider'
 import { TimerRepository } from '@/core/_ports_/timer.repository'
 
 export class FakeDataTimerRepository implements TimerRepository {

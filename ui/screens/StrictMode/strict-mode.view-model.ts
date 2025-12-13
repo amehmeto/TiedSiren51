@@ -1,5 +1,5 @@
 import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
-import { DateProvider } from '@/core/_ports_/port.date-provider'
+import { DateProvider } from '@/core/_ports_/date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectIsStrictModeActive } from '@/core/strictMode/selectors/selectIsStrictModeActive'
 import { selectStrictModeTimeLeft } from '@/core/strictMode/selectors/selectStrictModeTimeLeft'

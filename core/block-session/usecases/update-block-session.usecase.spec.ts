@@ -59,4 +59,27 @@ describe('Feature: Updating block session', () => {
       },
     ])
   })
+
+  it('should keep existing notification ids when times are not updated', async () => {
+    const existingBlockSession = buildBlockSession({
+      id: 'block-session-id',
+      name: 'Sleeping time',
+      startNotificationId: 'existing-start-notification-id',
+      endNotificationId: 'existing-end-notification-id',
+    })
+    const updateBlockSessionPayload: UpdateBlockSessionPayload = {
+      id: 'block-session-id',
+      name: 'Updated name',
+    }
+    fixture.given.existingBlockSession(existingBlockSession)
+
+    await fixture.when.updatingBlockSession(updateBlockSessionPayload)
+
+    fixture.then.blockSessionShouldBeStoredAs({
+      ...existingBlockSession,
+      name: 'Updated name',
+      startNotificationId: 'existing-start-notification-id',
+      endNotificationId: 'existing-end-notification-id',
+    })
+  })
 })

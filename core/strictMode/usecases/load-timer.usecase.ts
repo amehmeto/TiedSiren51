@@ -1,4 +1,4 @@
-import { ISODateString } from '@/core/_ports_/port.date-provider'
+import { ISODateString } from '@/core/_ports_/date-provider'
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
 import { selectAuthUserIdOrNull } from '@/core/auth/selectors/selectAuthUserIdOrNull'
 
