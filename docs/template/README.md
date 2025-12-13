@@ -1,42 +1,64 @@
-# Reusable Project Template
+# Reusable Components Inventory
 
-This documentation captures reusable components from the TiedSiren51 codebase that can be extracted for bootstrapping new TypeScript/React projects.
+Components from this codebase that can be extracted for any new project.
 
-## Quick Reference
+## Domains
 
-| Component | Reusability | Documentation |
-|-----------|-------------|---------------|
-| Prettier/ESLint | 100% | [Configuration](./configuration.md) |
-| TypeScript Config | 90% | [Configuration](./configuration.md) |
-| Vitest Setup | 80% | [Testing](./testing.md) |
-| GitHub Actions | 75% | [CI/CD](./ci-cd.md) |
-| Custom ESLint Rules | 60% | [ESLint Setup](./eslint-setup.md) |
-| Architecture Patterns | 95% | [Architecture](./architecture.md) |
+| Domain | Files | Notes |
+|--------|-------|-------|
+| **Auth** | `core/auth/` | Sign-in/up, logout, user state, listeners |
+| **Logger** | `core/_ports_/logger.ts`, `infra/logger/` | In-memory + Sentry implementations |
 
-## Files to Copy Directly (100% Reusable)
+## Infrastructure Patterns
 
-```bash
-# Copy these files as-is to any new project
-.prettierrc.json      # Prettier configuration
-.npmrc                # npm strict mode
-.nvmrc                # Node version lock
-.releaserc.json       # Semantic release config
-.husky/               # Git hooks directory
-scripts/              # Coverage tracking scripts
-```
+| Component | Files | Notes |
+|-----------|-------|-------|
+| **Abstract Repository** | `infra/__abstract__/in-memory.repository.ts` | Generic CRUD base class |
+| **Date Provider** | `core/_ports_/port.date-provider.ts`, `infra/date-provider/` | Testable time abstraction |
+| **Fake Implementations** | `infra/*/fake.*.ts` | Test doubles for all ports |
 
-## Getting Started
+## Testing Utilities
 
-1. **Configuration Files** - Start with [configuration.md](./configuration.md)
-2. **Linting Setup** - See [eslint-setup.md](./eslint-setup.md)
-3. **Testing Infrastructure** - See [testing.md](./testing.md)
-4. **CI/CD Pipelines** - See [ci-cd.md](./ci-cd.md)
-5. **Architecture Patterns** - See [architecture.md](./architecture.md)
+| Component | Files | Notes |
+|-----------|-------|-------|
+| **Test Store Factory** | `core/_tests_/createTestStore.ts` | DI-based store creation |
+| **State Builder** | `core/_tests_/state-builder.ts` | Fluent test state construction |
+| **Data Builders** | `core/_tests_/data-builders/` | Faker-based entity factories |
 
-## What's Project-Specific (Skip)
+## Configuration Files
 
-- `app.config.js` - Expo/React Native configuration
-- `eas.json` - EAS build configuration
-- Android/iOS native code
-- Domain-specific ESLint rules (icon sizes, stylesheets)
-- Firebase configuration
+| File | Reusability |
+|------|-------------|
+| `.prettierrc.json` | 100% - copy as-is |
+| `.npmrc` | 100% - copy as-is |
+| `.nvmrc` | 100% - update version |
+| `.releaserc.json` | 100% - copy as-is |
+| `tsconfig.json` | 90% - update path aliases |
+| `vitest.config.js` | 80% - update thresholds |
+| `.eslintrc.cjs` | 70% - remove React Native rules |
+
+## Scripts
+
+| Script | Location |
+|--------|----------|
+| Coverage tracking | `scripts/track-coverage.js` |
+| Coverage comparison | `scripts/compare-coverage.cjs` |
+| Branch name validation | `.husky/scripts/branch-name-check.sh` |
+| Push guards | `.husky/scripts/` |
+
+## ESLint Rules (Generic)
+
+| Rule | Purpose |
+|------|---------|
+| `expect-separate-act-assert` | AAA test structure |
+| `time-constant-multiplication` | No magic numbers in time |
+| `try-catch-isolation` | Focused error handling |
+| `core-test-file-naming` | Test naming conventions |
+| `require-colocated-test` | Tests next to source |
+
+## Architecture
+
+- Clean Architecture folder structure (`core/`, `infra/`, `ui/`)
+- Ports/Adapters pattern (`core/_ports_/`)
+- Redux Toolkit with dependency injection
+- Listener pattern for side effects
