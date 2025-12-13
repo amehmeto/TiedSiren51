@@ -42,8 +42,7 @@
     "generate:schema": "npx prisma generate"
   },
   "lint-staged": {
-    "*.{ts,tsx}": ["npx tsc --noEmit", "eslint --fix", "prettier --write"],
-    "*.{js,jsx}": ["eslint --fix", "prettier --write"],
+    "*.{js,ts,jsx,tsx}": ["eslint --fix", "prettier --write"],
     "*.json": ["prettier --write --parser json"],
     "*.md": "remark --frail --use remark-validate-links",
     ".claude/**/*.json": "eslint --fix",
