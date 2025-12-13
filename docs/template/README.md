@@ -45,6 +45,35 @@ Components from this codebase that can be extracted for any new project.
 | **View Models** | `*.view-model.ts` | Screen logic separation |
 | **useTick** | `ui/hooks/useTick.ts` | Timer/interval hook |
 | **useAppForeground** | `ui/hooks/useAppForeground.ts` | App state hook |
+| **useAppInitialization** | `ui/hooks/useAppInitialization.tsx` | App startup logic |
+| **Error Handler** | `ui/utils/handleUIError.tsx` | Centralized UI errors |
+
+## Design System
+
+| Component | File | Notes |
+|-----------|------|-------|
+| **Theme** | `ui/design-system/theme.ts` | Colors, spacing, typography |
+| **TiedSButton** | `ui/design-system/components/shared/` | Reusable button |
+| **TiedSModal** | `ui/design-system/components/shared/` | Modal component |
+| **TiedSTextInput** | `ui/design-system/components/shared/` | Text input |
+| **TiedSCard** | `ui/design-system/components/shared/` | Card component |
+| **LoadingScreen** | `ui/design-system/components/shared/` | Loading state |
+
+## Type Utilities
+
+| Type | File | Notes |
+|------|------|-------|
+| **CreatePayload** | `core/_ports_/create.payload.ts` | Generic create type |
+| **UpdatePayload** | `core/_ports_/update.payload.ts` | Generic update type |
+| **Fixture Types** | `core/_tests_/fixture.types.ts` | Test fixture typing |
+
+## Fixture Patterns
+
+| Pattern | Files | Notes |
+|---------|-------|-------|
+| **Domain Fixtures** | `*.fixture.ts` | Per-domain test setup |
+| **Auth Fixture** | `core/auth/authentification.fixture.ts` | Auth test helpers |
+| **Date Fixture** | `core/_tests_/date.fixture.ts` | Date test helpers |
 
 ## Testing Utilities
 
@@ -92,6 +121,22 @@ Components from this codebase that can be extracted for any new project.
 | **PR Validation** | `.github/workflows/cerberus.yml` | Lint, test, coverage, build |
 | **Release** | `.github/workflows/hades.yml` | Semantic release, changelog |
 | **Path Filter** | `.github/workflows/path-filter.yml` | Conditional job execution |
+
+## Tooling
+
+| Tool | Files | Notes |
+|------|-------|-------|
+| **Claude Commands** | `.claude/commands/` | Custom slash commands |
+| **Claude Hooks** | `.claude/hooks/` | Pre/post tool hooks |
+| **Claude Settings** | `.claude/settings.json` | Permission patterns |
+| **Babel Config** | `babel.config.js` | Module resolution aliases |
+| **Prisma Repository** | `infra/__abstract__/prisma.repository.ts` | DB abstraction base |
+
+## ADRs
+
+| ADR | Location | Notes |
+|-----|----------|-------|
+| **Port Naming** | `docs/adr/core/port-naming-convention.md` | No I-prefix convention |
 
 ## Architecture
 
