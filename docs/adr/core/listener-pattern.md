@@ -24,7 +24,7 @@ Challenges:
 
 ## Decision
 
-Use **Gateway-Based Event Listeners** that subscribe to port events and dispatch Redux actions.
+Use **Event Listeners** that bridge external events and state changes to Redux actions.
 
 ### Implementation
 
