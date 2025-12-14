@@ -31,10 +31,45 @@ BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
+# Check required dependencies
+check_dependencies() {
+  local missing=()
+  if ! command -v gh &>/dev/null; then
+    missing+=("gh (GitHub CLI)")
+  fi
+  if ! command -v jq &>/dev/null; then
+    missing+=("jq")
+  fi
+  if [ ${#missing[@]} -gt 0 ]; then
+    echo -e "${RED}[ERROR]${NC} Missing required dependencies: ${missing[*]}" >&2
+    echo "Install them with: brew install gh jq" >&2
+    exit "$EXIT_INVALID_ARGS"
+  fi
+}
+
 print_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+
+# Parse git worktree list --porcelain output
+# Outputs: path<TAB>branch for each worktree (branch is empty for detached HEAD)
+parse_worktree_list() {
+  local wt_path="" branch=""
+  while IFS= read -r line || [ -n "$line" ]; do
+    if [[ "$line" =~ ^worktree\ (.+)$ ]]; then
+      wt_path="${BASH_REMATCH[1]}"
+    elif [[ "$line" =~ ^branch\ refs/heads/(.+)$ ]]; then
+      branch="${BASH_REMATCH[1]}"
+    elif [[ "$line" == "detached" ]]; then
+      branch=""
+    elif [ -z "$line" ] && [ -n "$wt_path" ]; then
+      printf '%s\t%s\n' "$wt_path" "$branch"
+      wt_path=""
+      branch=""
+    fi
+  done < <(git worktree list --porcelain; echo)
+}
 
 # Print summary block for Claude Code parsing
 print_summary() {
@@ -60,13 +95,9 @@ cleanup_merged_worktrees() {
 
   local cleaned=0
 
-  while IFS= read -r line; do
-    local wt_path branch
-    wt_path=$(echo "$line" | awk '{print $1}')
-    branch=$(echo "$line" | awk '{print $3}' | tr -d '[]')
-
+  while IFS=$'\t' read -r wt_path branch; do
     # Skip main worktree and detached HEAD
-    if [ "$wt_path" = "$REPO_ROOT" ] || [ -z "$branch" ] || [ "$branch" = "detached" ]; then
+    if [ "$wt_path" = "$REPO_ROOT" ] || [ -z "$branch" ]; then
       continue
     fi
 
@@ -83,10 +114,10 @@ cleanup_merged_worktrees() {
         print_warning "Found $pr_state PR #$pr_number for worktree at $wt_path, removing..."
         git worktree remove "$wt_path" --force 2>/dev/null || true
         git branch -D "$branch" 2>/dev/null || true
-        ((cleaned++))
+        ((cleaned++)) || true
       fi
     fi
-  done < <(git worktree list)
+  done < <(parse_worktree_list)
 
   git worktree prune 2>/dev/null || true
 
@@ -104,18 +135,15 @@ list_worktrees() {
   printf "%-50s %-30s %-8s %-10s %s\n" "PATH" "BRANCH" "PR #" "STATUS" "TITLE"
   printf "%-50s %-30s %-8s %-10s %s\n" "----" "------" "----" "------" "-----"
 
-  while IFS= read -r line; do
-    local wt_path branch
-    wt_path=$(echo "$line" | awk '{print $1}')
-    branch=$(echo "$line" | awk '{print $3}' | tr -d '[]')
-
-    if [ -z "$branch" ] || [ "$branch" = "detached" ]; then
-      branch="(detached)"
+  while IFS=$'\t' read -r wt_path branch; do
+    local display_branch="$branch"
+    if [ -z "$branch" ]; then
+      display_branch="(detached)"
     fi
 
     local pr_number="-" pr_state="-" pr_title="-"
 
-    if [ "$branch" != "(detached)" ] && [ "$branch" != "main" ]; then
+    if [ -n "$branch" ] && [ "$branch" != "main" ]; then
       local pr_info
       pr_info=$(gh pr list --head "$branch" --json number,state,title --jq '.[0] // empty' 2>/dev/null || true)
 
@@ -130,8 +158,8 @@ list_worktrees() {
     local short_path
     short_path="${wt_path/$HOME/\~}"
 
-    printf "%-50s %-30s %-8s %-10s %s\n" "$short_path" "$branch" "$pr_number" "$pr_state" "$pr_title"
-  done < <(git worktree list)
+    printf "%-50s %-30s %-8s %-10s %s\n" "$short_path" "$display_branch" "$pr_number" "$pr_state" "$pr_title"
+  done < <(parse_worktree_list)
 
   echo ""
 }
@@ -146,16 +174,14 @@ remove_worktree() {
   fi
 
   # Find worktree by name (partial match)
-  local wt_path branch
-  while IFS= read -r line; do
-    local path
-    path=$(echo "$line" | awk '{print $1}')
+  local wt_path="" branch=""
+  while IFS=$'\t' read -r path br; do
     if [[ "$path" == *"$name"* ]]; then
       wt_path="$path"
-      branch=$(echo "$line" | awk '{print $3}' | tr -d '[]')
+      branch="$br"
       break
     fi
-  done < <(git worktree list)
+  done < <(parse_worktree_list)
 
   if [ -z "$wt_path" ]; then
     print_error "Worktree matching '$name' not found"
@@ -163,7 +189,7 @@ remove_worktree() {
   fi
 
   # Safety check: only allow removal if PR is merged or closed
-  if [ -n "$branch" ] && [ "$branch" != "detached" ] && [ "$branch" != "main" ]; then
+  if [ -n "$branch" ] && [ "$branch" != "main" ]; then
     local pr_info
     pr_info=$(gh pr list --head "$branch" --json number,state --jq '.[0] // empty' 2>/dev/null || true)
 
@@ -190,7 +216,7 @@ remove_worktree() {
     exit "$EXIT_GIT_FAILED"
   fi
 
-  if [ -n "$branch" ] && [ "$branch" != "detached" ]; then
+  if [ -n "$branch" ]; then
     git branch -D "$branch" 2>/dev/null || true
     print_success "Removed worktree and deleted local branch '$branch'"
   else
@@ -199,8 +225,9 @@ remove_worktree() {
 }
 
 # Sanitize branch name for directory name
+# Handles: / : * ? " < > | @ { } and spaces
 sanitize_for_dirname() {
-  echo "$1" | tr '/' '-'
+  echo "$1" | tr '/:*?"<>|@{} ' '-' | sed 's/--*/-/g; s/^-//; s/-$//'
 }
 
 # Create worktree from PR number
@@ -278,9 +305,12 @@ create_from_branch() {
   fi
 
   # Check if PR exists for this branch
-  local existing_pr existing_pr_url
-  existing_pr=$(gh pr list --head "$branch" --json number,url --jq '.[0].number // empty' 2>/dev/null || true)
-  existing_pr_url=$(gh pr list --head "$branch" --json url --jq '.[0].url // empty' 2>/dev/null || true)
+  local existing_pr_info existing_pr existing_pr_url
+  existing_pr_info=$(gh pr list --head "$branch" --json number,url --jq '.[0] // empty' 2>/dev/null || true)
+  if [ -n "$existing_pr_info" ]; then
+    existing_pr=$(echo "$existing_pr_info" | jq -r '.number')
+    existing_pr_url=$(echo "$existing_pr_info" | jq -r '.url')
+  fi
 
   local wt_name
   local wt_path
@@ -329,7 +359,10 @@ create_from_branch() {
     fi
 
     print_info "Pushing branch to origin..."
-    SKIP_E2E_CHECK=true git push -u origin "$branch" 2>/dev/null || true
+    if ! SKIP_E2E_CHECK=true git push -u origin "$branch"; then
+      print_error "Failed to push branch to origin"
+      exit "$EXIT_GIT_FAILED"
+    fi
 
     print_info "Creating draft PR..."
 
@@ -407,6 +440,7 @@ PREOF
 # Main script
 main() {
   cd "$REPO_ROOT"
+  check_dependencies
 
   # Parse arguments
   case "${1:-}" in
