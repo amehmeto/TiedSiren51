@@ -13,7 +13,7 @@ Reference for navigating and modifying this codebase.
 | `foo.builder.ts` | `buildFoo` | `block-session.builder.ts` → `buildBlockSession` |
 | `foo.fixture.ts` | `fooFixture` or `createFooFixture` | `auth.fixture.ts` → `authFixture` |
 | `foo.schema.ts` | `fooSchema` | `block-session.schema.ts` → `blockSessionSchema` |
-| `foo.slice.ts` | `fooSlice` (in folder `foo/`) | `auth/auth.slice.ts` → `authSlice` |
+| `foo.slice.ts` | `fooSlice` (in folder `foo/`) | `block-session/block-session.slice.ts` → `blockSessionSlice` |
 | `prefix.domain.repository.ts` | `PrefixDomainRepository` | `pouchdb.blocklist.repository.ts` → `PouchdbBlocklistRepository` |
 | `prefix.domain.gateway.ts` | `PrefixDomainGateway` | `firebase.auth.gateway.ts` → `FirebaseAuthGateway` |
 
@@ -49,7 +49,7 @@ Copy from these when creating new files:
 | Listener test | `core/auth/listeners/on-user-logged-in.listener.test.ts` |
 | View model | `ui/screens/Home/HomeScreen/home.view-model.ts` |
 | View model test | `ui/screens/Home/HomeScreen/home.view-model.test.ts` |
-| Slice | `core/auth/auth.slice.ts` |
+| Slice | `core/block-session/block-session.slice.ts` |
 | Builder | `core/_tests_/data-builders/block-session.builder.ts` |
 | Fixture | `core/auth/authentification.fixture.ts` |
 | Repository (port) | `core/_ports_/block-session.repository.ts` |
