@@ -31,6 +31,9 @@ const oneListenerPerFile = require('../eslint-rules/one-listener-per-file.cjs')
 const sliceMatchesFolder = require('../eslint-rules/slice-matches-folder.cjs')
 const repositoryImplementationNaming = require('../eslint-rules/repository-implementation-naming.cjs')
 const gatewayImplementationNaming = require('../eslint-rules/gateway-implementation-naming.cjs')
+const schemaMatchesFilename = require('../eslint-rules/schema-matches-filename.cjs')
+const oneViewModelPerFile = require('../eslint-rules/one-view-model-per-file.cjs')
+const reducerInDomainFolder = require('../eslint-rules/reducer-in-domain-folder.cjs')
 
 module.exports = {
   rules: {
@@ -63,5 +66,8 @@ module.exports = {
     'slice-matches-folder': sliceMatchesFolder,
     'repository-implementation-naming': repositoryImplementationNaming,
     'gateway-implementation-naming': gatewayImplementationNaming,
+    'schema-matches-filename': schemaMatchesFilename,
+    'one-view-model-per-file': oneViewModelPerFile,
+    'reducer-in-domain-folder': reducerInDomainFolder,
   },
 }

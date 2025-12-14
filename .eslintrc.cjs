@@ -109,6 +109,9 @@ module.exports = {
     'local-rules/slice-matches-folder': 'error',
     'local-rules/repository-implementation-naming': 'error',
     'local-rules/gateway-implementation-naming': 'error',
+    'local-rules/schema-matches-filename': 'error',
+    'local-rules/one-view-model-per-file': 'error',
+    'local-rules/reducer-in-domain-folder': 'error',
   },
   overrides: [
     {
