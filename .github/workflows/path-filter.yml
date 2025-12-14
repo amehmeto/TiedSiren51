@@ -69,8 +69,6 @@ jobs:
               # Test and lint config
               - 'vitest.config.js'
               - '.eslintrc.cjs'
-              # Scripts used by CI
-              - 'scripts/**'
               # Workflow files (so changes to CI trigger builds)
               - '.github/workflows/cerberus.yml'
               - '.github/workflows/hades.yml'
@@ -116,8 +114,6 @@ jobs:
               # Test and lint config
               - 'vitest.config.js'
               - '.eslintrc.cjs'
-              # Scripts used by CI
-              - 'scripts/**'
               # Workflow files (so changes to CI trigger builds)
               - '.github/workflows/cerberus.yml'
               - '.github/workflows/hades.yml'
