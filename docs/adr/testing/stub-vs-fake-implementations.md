@@ -40,8 +40,8 @@ Use **both stubs and fakes** based on test needs:
 
 **Implementation**:
 ```typescript
-// /core/_tests_/stubs/stub.date-provider.ts
-export class StubDateProvider implements IDateProvider {
+// /infra/date-provider/stub.date-provider.ts
+export class StubDateProvider implements DateProvider {
   private currentDate = new Date('2025-01-28T12:00:00Z')
 
   now(): Date {
@@ -70,8 +70,8 @@ dateProvider.setDate(new Date('2025-01-01'))
 
 **Implementation**:
 ```typescript
-// /core/_tests_/fakes/fake.auth-gateway.ts
-export class FakeAuthGateway implements IAuthGateway {
+// /infra/auth-gateway/fake.auth.gateway.ts
+export class FakeAuthGateway implements AuthGateway {
   private users = new Map<string, AuthUser>()
   private currentUser: AuthUser | null = null
 
@@ -172,8 +172,10 @@ const mockRepository = {
 ## Implementation Notes
 
 ### Key Files
-- `/core/_tests_/stubs/` - Stub implementations
-- `/core/_tests_/fakes/` - Fake implementations
+- `/infra/date-provider/stub.date-provider.ts` - StubDateProvider
+- `/infra/database-service/stub.database.service.ts` - StubDatabaseService
+- `/infra/auth-gateway/fake.auth.gateway.ts` - FakeAuthGateway
+- `/infra/*-repository/fake-data.*.ts` - Repository fakes
 - `/core/_tests_/createTestStore.ts` - Uses both stubs and fakes
 
 ### Naming Conventions
@@ -181,12 +183,14 @@ const mockRepository = {
 **Stubs**:
 - Prefix: `Stub`
 - Example: `StubDateProvider`, `StubDatabaseService`
-- Location: `/core/_tests_/stubs/`
+- Location: Colocated with real implementations in `/infra/{service}/`
 
 **Fakes**:
 - Prefix: `Fake` or `FakeData`
 - Example: `FakeAuthGateway`, `FakeDataBlockSessionRepository`
-- Location: `/core/_tests_/fakes/` or with domain tests
+- Location: Colocated with real implementations in `/infra/{service}/`
+
+**Note**: Test doubles are colocated with their real implementations rather than centralized in `/core/_tests_/`. This keeps related code together and makes it easier to maintain test doubles when the real implementation changes.
 
 ### Decision Matrix
 
@@ -205,7 +209,7 @@ const mockRepository = {
 
 **Date Provider Stub**:
 ```typescript
-export class StubDateProvider implements IDateProvider {
+export class StubDateProvider implements DateProvider {
   private _now = new Date()
 
   now(): Date {
@@ -232,7 +236,7 @@ expect(session.startTime).toEqual(new Date('2025-01-01'))
 
 **Database Service Stub**:
 ```typescript
-export class StubDatabaseService implements IDatabaseService {
+export class StubDatabaseService implements DatabaseService {
   async initialize(): Promise<void> {
     // No-op
   }
@@ -251,7 +255,7 @@ export class StubDatabaseService implements IDatabaseService {
 
 **Auth Gateway Fake**:
 ```typescript
-export class FakeAuthGateway implements IAuthGateway {
+export class FakeAuthGateway implements AuthGateway {
   private users = new Map<string, AuthUser>()
   private currentUser: AuthUser | null = null
 
@@ -286,7 +290,7 @@ export class FakeAuthGateway implements IAuthGateway {
 
 **Repository Fake**:
 ```typescript
-export class FakeDataBlockSessionRepository implements IBlockSessionRepository {
+export class FakeDataBlockSessionRepository implements BlockSessionRepository {
   private sessions: BlockSession[] = []
 
   async save(session: BlockSession): Promise<void> {
@@ -336,7 +340,7 @@ export const createTestStore = (
     authGateway: new FakeAuthGateway(),
     blockSessionRepository: new FakeDataBlockSessionRepository(),
     blocklistRepository: new FakeDataBlocklistRepository(),
-    sirensRepository: new FakeSirensRepository(),
+    sirensRepository: new FakeDataSirensRepository(),
 
     // Override with test-specific doubles
     ...dependencyOverrides,
@@ -347,10 +351,10 @@ export const createTestStore = (
 ```
 
 ### Related ADRs
-- [Dependency Injection Pattern](../architecture/dependency-injection-pattern.md)
+- [Dependency Injection Pattern](../core/dependency-injection-pattern.md)
 - [Test Store Factory](test-store-factory.md)
 - [Fixture Pattern](fixture-pattern.md)
-- [Hexagonal Architecture](../architecture/hexagonal-architecture.md)
+- [Hexagonal Architecture](../hexagonal-architecture.md)
 
 ## References
 

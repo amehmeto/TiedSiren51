@@ -3,10 +3,10 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { SECOND } from '@/core/__constants__/time'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
-import { selectIsStrictModeLoading } from '@/core/strictMode/selectors/selectIsStrictModeLoading'
-import { extendTimer } from '@/core/strictMode/usecases/extend-timer.usecase'
-import { loadTimer } from '@/core/strictMode/usecases/load-timer.usecase'
-import { startTimer } from '@/core/strictMode/usecases/start-timer.usecase'
+import { selectIsStrictModeLoading } from '@/core/strict-mode/selectors/selectIsStrictModeLoading'
+import { extendTimer } from '@/core/strict-mode/usecases/extend-timer.usecase'
+import { loadTimer } from '@/core/strict-mode/usecases/load-timer.usecase'
+import { startTimer } from '@/core/strict-mode/usecases/start-timer.usecase'
 import { dependencies } from '@/ui/dependencies'
 import { CircularTimerDisplay } from '@/ui/design-system/components/shared/CircularTimerDisplay'
 import { LoadingScreen } from '@/ui/design-system/components/shared/LoadingScreen'
@@ -28,8 +28,8 @@ import { UnLockMethodCard } from '@ui/screens/StrictMode/UnLockMethodCard'
 const DEFAULT_DURATION: TimerDuration = { days: 0, hours: 0, minutes: 20 }
 
 export default function StrictModeScreen() {
-  const [showTimerPicker, setShowTimerPicker] = useState(false)
-  const [showExtendPicker, setShowExtendPicker] = useState(false)
+  const [isShowingTimerPicker, setIsShowingTimerPicker] = useState(false)
+  const [isShowingExtendPicker, setIsShowingExtendPicker] = useState(false)
   const [timerDuration, setTimerDuration] =
     useState<TimerDuration>(DEFAULT_DURATION)
   const [extendDuration, setExtendDuration] =
@@ -66,7 +66,9 @@ export default function StrictModeScreen() {
         <View style={styles.actionButtons}>
           <TiedSButton
             onPress={() =>
-              isActive ? setShowExtendPicker(true) : setShowTimerPicker(true)
+              isActive
+                ? setIsShowingExtendPicker(true)
+                : setIsShowingTimerPicker(true)
             }
             text={viewModel.buttonText}
           />
@@ -81,8 +83,8 @@ export default function StrictModeScreen() {
       </ScrollView>
 
       <TimerPickerModal
-        visible={showTimerPicker}
-        onClose={() => setShowTimerPicker(false)}
+        visible={isShowingTimerPicker}
+        onClose={() => setIsShowingTimerPicker(false)}
         onSave={() =>
           dispatch(
             startTimer({
@@ -98,8 +100,8 @@ export default function StrictModeScreen() {
       />
 
       <TimerPickerModal
-        visible={showExtendPicker}
-        onClose={() => setShowExtendPicker(false)}
+        visible={isShowingExtendPicker}
+        onClose={() => setIsShowingExtendPicker(false)}
         onSave={() =>
           dispatch(
             extendTimer({

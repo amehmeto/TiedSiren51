@@ -294,8 +294,8 @@ dispatch(invalidAction()) // Type error if action doesn't exist
 
 ### Related ADRs
 - [Redux Toolkit for Business Logic](redux-toolkit-for-business-logic.md)
-- [Dependency Injection Pattern](../architecture/dependency-injection-pattern.md)
-- [Hexagonal Architecture](../architecture/hexagonal-architecture.md)
+- [Dependency Injection Pattern](dependency-injection-pattern.md)
+- [Hexagonal Architecture](../hexagonal-architecture.md)
 
 ## References
 

@@ -39,6 +39,7 @@ The lookout doesn't know which apps to block - it just detects app launches. Fil
 For performance-critical scenarios (many block sessions, frequent app switching), we could:
 
 1. **Pass target package names to native layer**:
+
    ```typescript
    interface OptimizedSirenLookout extends SirenLookout {
      updateTargets(packageNames: string[]): void
@@ -56,11 +57,13 @@ For performance-critical scenarios (many block sessions, frequent app switching)
 ## Trade-offs
 
 ### Pros
+
 - Fewer JS bridge crossings
 - Lower latency for non-blocked apps
 - Better battery efficiency in high-use scenarios
 
 ### Cons
+
 - Duplicated state (targets in both Redux and native)
 - Sync complexity (must keep native list updated)
 - More complex native module code
@@ -69,6 +72,7 @@ For performance-critical scenarios (many block sessions, frequent app switching)
 ## Trigger Points
 
 Consider implementing when:
+
 - Users report lag when switching apps
 - Profiling shows JS bridge as bottleneck
 - Block lists grow large (50+ apps)
@@ -77,6 +81,7 @@ Consider implementing when:
 ## Implementation Notes
 
 If implementing:
+
 1. Add `updateTargets(packageNames: string[])` to `AndroidSirenLookout`
 2. Modify `onBlockSessionsChangedListener` to extract and pass package names
 3. Update Kotlin native module to filter events
@@ -85,6 +90,6 @@ If implementing:
 ## Related Files
 
 - `core/_ports_/siren.lookout.ts`
-- `infra/siren-tier/real.android-siren-lookout.ts`
+- `infra/siren-tier/real-android.siren-lookout.ts`
 - `core/siren/listeners/on-block-sessions-changed.listener.ts`
 - `core/siren/usecases/block-launched-app.usecase.ts`

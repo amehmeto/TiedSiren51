@@ -1,4 +1,4 @@
-import { DateProvider } from '@/core/_ports_/port.date-provider'
+import { DateProvider } from '@/core/_ports_/date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 
 export function selectIsStrictModeActive(

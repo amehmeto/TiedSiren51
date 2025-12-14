@@ -187,7 +187,7 @@ export class PrismaSirensRepository implements ISirensRepository {
 
 ### Related ADRs
 - [Prisma ORM with SQLite](prisma-orm-sqlite.md)
-- [Repository Pattern](../architecture/repository-pattern.md)
+- [Repository Pattern](../core/repository-pattern.md)
 - [Local-First Architecture](local-first-architecture.md)
 
 ## References

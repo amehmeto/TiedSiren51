@@ -1,12 +1,12 @@
 import { expect } from 'vitest'
 import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
-import { Fixture } from '@/core/_tests_/fixture.types'
+import { Fixture } from '@/core/_tests_/fixture.type'
 import {
   stateBuilder,
   stateBuilderProvider,
 } from '@/core/_tests_/state-builder'
-import { AuthUser } from '@/core/auth/authUser'
+import { AuthUser } from '@/core/auth/auth-user'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
@@ -86,9 +86,9 @@ export function authentificationFixture(
         const state = store.getState()
         expect(state.auth.error).toBe(expectedError)
       },
-      shouldBeLoading(loading: boolean) {
+      shouldBeLoading(isLoading: boolean) {
         const state = store.getState()
-        expect(state.auth.isLoading).toBe(loading)
+        expect(state.auth.isLoading).toBe(isLoading)
       },
       shouldNotBeLoading() {
         const state = store.getState()

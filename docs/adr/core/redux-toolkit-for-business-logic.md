@@ -155,10 +155,10 @@ export const createStore = (dependencies: Dependencies) => {
 ```
 
 ### Related ADRs
-- [Hexagonal Architecture](../architecture/hexagonal-architecture.md)
+- [Hexagonal Architecture](../hexagonal-architecture.md)
 - [Entity Adapter Normalization](entity-adapter-normalization.md)
-- [Listener Pattern for Side Effects](../architecture/listener-pattern.md)
-- [Dependency Injection Pattern](../architecture/dependency-injection-pattern.md)
+- [Listener Pattern for Side Effects](listener-pattern.md)
+- [Dependency Injection Pattern](dependency-injection-pattern.md)
 
 ## References
 

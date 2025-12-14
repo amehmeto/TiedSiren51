@@ -1,5 +1,5 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { ISODateString } from '@/core/_ports_/port.date-provider'
+import { ISODateString } from '@/core/_ports_/date-provider'
 import { extendTimer } from './usecases/extend-timer.usecase'
 import { loadTimer } from './usecases/load-timer.usecase'
 import { startTimer } from './usecases/start-timer.usecase'

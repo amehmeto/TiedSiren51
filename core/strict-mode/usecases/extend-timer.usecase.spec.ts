@@ -36,6 +36,12 @@ describe('extendTimer use case', () => {
       expectedError: 'No active timer to extend',
     },
     {
+      scenario: 'extension duration is zero',
+      given: () => fixture.given.existingTimer('2024-01-01T01:00:00.000Z'),
+      payload: { minutes: 0 },
+      expectedError: 'Invalid extension duration',
+    },
+    {
       scenario: 'extended duration exceeds 30 days',
       given: () => fixture.given.existingTimer('2024-01-30T23:00:00.000Z'),
       payload: { hours: 2 },

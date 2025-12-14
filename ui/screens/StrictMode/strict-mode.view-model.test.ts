@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
-import { ISODateString } from '@/core/_ports_/port.date-provider'
+import { ISODateString } from '@/core/_ports_/date-provider'
 import { PreloadedState } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
@@ -93,6 +93,20 @@ describe('selectStrictModeViewModel', () => {
         countdown: '30s',
         endDateTime: 'Ends 1/1, 10:00 a.m.',
         inlineRemaining: '30s',
+        statusMessage: 'Your blockings are locked against any\nbypassing.',
+        buttonText: 'Extend Timer',
+      },
+    ],
+    [
+      'timer ending at noon (12:00)',
+      stateBuilder()
+        .withStrictModeEndedAt(endedAtFromNow(2 * HOUR))
+        .build(),
+      {
+        type: StrictModeViewState.Active,
+        countdown: '2h 0m 0s',
+        endDateTime: 'Ends 1/1, 12:00 p.m.',
+        inlineRemaining: '2h 0m 0s',
         statusMessage: 'Your blockings are locked against any\nbypassing.',
         buttonText: 'Extend Timer',
       },

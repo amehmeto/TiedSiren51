@@ -13,13 +13,15 @@ Tests in TiedSiren51 need consistent conventions for handling test data:
 - **Date/time values**: Calculations vs hardcoded ISO strings
 - **Payload types**: Required vs optional properties
 - **Test helpers**: Where to invoke helper functions
-- **Parameterized tests**: How to structure test.each/it.each data
+- **Parameterized tests**: When and how to use test.each/it.each
 
 Inconsistent practices lead to:
+
 - Tests that are hard to understand
 - Brittle tests that break when calculations change
 - Verbose test data arrays
 - Duplicated helper calls in test data
+- Duplicate tests that differ only in input/output values
 
 ## Decision
 
@@ -28,6 +30,7 @@ Inconsistent practices lead to:
 Prefer hardcoded ISO strings and values over calculated ones in tests.
 
 **Good**:
+
 ```typescript
 it('should extend an active timer', async () => {
   fixture.given.existingTimer('2024-01-01T01:00:00.000Z')
@@ -37,6 +40,7 @@ it('should extend an active timer', async () => {
 ```
 
 **Avoid**:
+
 ```typescript
 it('should extend an active timer', async () => {
   const givenEndAt = new Date(Date.now() + 60 * 60 * 1000).toISOString()
@@ -49,6 +53,7 @@ it('should extend an active timer', async () => {
 ```
 
 **Why**:
+
 - Hardcoded values are immediately readable
 - No mental math required to understand the test
 - Tests remain stable regardless of when they run
@@ -59,6 +64,7 @@ it('should extend an active timer', async () => {
 When using parameterized tests (test.each/it.each), keep raw input data in the test case array and call helper functions in the test body.
 
 **Good**:
+
 ```typescript
 function createFixedTestDate({
   hours = 0,
@@ -76,19 +82,17 @@ test.each([
   ['afternoon', {}, { hours: 13, minutes: 48 }],
   ['morning', {}, { hours: 8, minutes: 0 }],
   ['evening', {}, { hours: 21, minutes: 30 }],
-])(
-  'Example: %s',
-  (_, preloadedState, nowTime) => {
-    const store = createTestStore({}, preloadedState)
-    const now = createFixedTestDate(nowTime)  // Helper called in test body
+])('Example: %s', (_, preloadedState, nowTime) => {
+  const store = createTestStore({}, preloadedState)
+  const now = createFixedTestDate(nowTime) // Helper called in test body
 
-    const viewModel = selectHomeViewModel(store.getState(), now, dateProvider)
-    expect(viewModel).toBeDefined()
-  },
-)
+  const viewModel = selectHomeViewModel(store.getState(), now, dateProvider)
+  expect(viewModel).toBeDefined()
+})
 ```
 
 **Avoid**:
+
 ```typescript
 test.each([
   ['afternoon', {}, createFixedTestDate({ hours: 13, minutes: 48 })],  // Helper in array
@@ -98,6 +102,7 @@ test.each([
 ```
 
 **Why**:
+
 - Test data arrays are cleaner and more readable
 - Easier to scan and compare test cases
 - Helper functions are called once per test, not during array creation
@@ -108,6 +113,7 @@ test.each([
 Use optional properties in payload types to reduce verbosity in tests.
 
 **Good**:
+
 ```typescript
 export type StartTimerPayload = {
   days?: number
@@ -122,6 +128,7 @@ await fixture.when.startingTimer({ days: 1, hours: 12 })
 ```
 
 **Avoid**:
+
 ```typescript
 export type StartTimerPayload = {
   days: number
@@ -134,6 +141,7 @@ await fixture.when.startingTimer({ days: 0, hours: 0, minutes: 30 })
 ```
 
 **Implementation**:
+
 ```typescript
 export const startTimer = createAppAsyncThunk<ISODateString, StartTimerPayload>(
   'timer/startTimer',
@@ -150,6 +158,7 @@ export const startTimer = createAppAsyncThunk<ISODateString, StartTimerPayload>(
 Use named parameters (object destructuring) for helper functions to improve readability.
 
 **Good**:
+
 ```typescript
 function createFixedTestDate({
   hours = 0,
@@ -168,6 +177,7 @@ const now = createFixedTestDate({ hours: 13, minutes: 48 })
 ```
 
 **Avoid**:
+
 ```typescript
 function createFixedTestDate(hours: number, minutes: number): Date {
   const date = new Date('2024-01-01T00:00:00')
@@ -179,6 +189,67 @@ function createFixedTestDate(hours: number, minutes: number): Date {
 const now = createFixedTestDate(13, 48)
 ```
 
+### 5. Prefer Parameterized Tests for Input/Output Variations
+
+When multiple tests share identical structure and differ only in input/output values, consolidate them into a single parameterized test using `it.each` or `test.each`.
+
+**Good**:
+
+```typescript
+it.each([
+  { mockValue: true, expected: true, scenario: 'enabled' },
+  { mockValue: false, expected: false, scenario: 'disabled' },
+])(
+  'returns $expected when service is $scenario',
+  async ({ mockValue, expected }) => {
+    mockIsEnabled.mockResolvedValueOnce(mockValue)
+
+    const isEnabled = await service.isEnabled()
+
+    expect(isEnabled).toBe(expected)
+  },
+)
+```
+
+**Avoid**:
+
+```typescript
+it('returns true when service is enabled', async () => {
+  mockIsEnabled.mockResolvedValueOnce(true)
+
+  const isEnabled = await service.isEnabled()
+
+  expect(isEnabled).toBe(true)
+})
+
+it('returns false when service is disabled', async () => {
+  mockIsEnabled.mockResolvedValueOnce(false)
+
+  const isEnabled = await service.isEnabled()
+
+  expect(isEnabled).toBe(false)
+})
+```
+
+**When to use parameterized tests**:
+
+- Tests have identical structure (same setup, act, assert pattern)
+- Only input values and expected outputs differ
+- Two or more tests fit this pattern
+
+**When to keep separate tests**:
+
+- Tests have different setup or assertions
+- Edge cases need distinct documentation in test names
+- Failure debugging benefits from isolated test context
+
+**Why**:
+
+- Reduces code duplication
+- Makes the pattern explicit (same logic, different data)
+- Easier to add new test cases
+- Clearly shows the input/output relationship
+
 ## Consequences
 
 ### Positive
@@ -188,6 +259,7 @@ const now = createFixedTestDate(13, 48)
 - **Flexible**: Optional properties reduce boilerplate
 - **Consistent**: Team follows same conventions
 - **Self-documenting**: Named parameters explain themselves
+- **DRY**: Parameterized tests eliminate duplicate test code
 
 ### Negative
 
@@ -202,19 +274,25 @@ const now = createFixedTestDate(13, 48)
 ## Alternatives Considered
 
 ### 1. Calculated Values Everywhere
+
 **Rejected because**:
+
 - Hard to read and understand
 - Requires mental math
 - Can mask bugs in calculation logic
 
 ### 2. Required Payload Properties
+
 **Rejected because**:
+
 - Verbose tests with unnecessary zeros
 - Distracts from what's being tested
 - More typing for simple cases
 
 ### 3. Positional Helper Parameters
+
 **Rejected because**:
+
 - Unclear what values represent
 - Easy to swap arguments by mistake
 - Less self-documenting
@@ -222,17 +300,20 @@ const now = createFixedTestDate(13, 48)
 ## Implementation Notes
 
 ### Key Files
-- `/core/strictMode/usecases/*.spec.ts` - Timer use case tests
+
+- `/core/strict-mode/usecases/*.spec.ts` - Timer use case tests
 - `/ui/screens/Home/HomeScreen/home.view-model.test.ts` - View model tests
 - `/core/__utils__/time.utils.ts` - Utility for handling optional time values
 
 ### ESLint Enforcement
 
 The `vitest/no-conditional-in-test` rule enforces some of these conventions by preventing conditionals in tests, which encourages:
+
 - Using `given` functions in test data
 - Keeping test logic declarative
 
 ### Related ADRs
+
 - [Fixture Pattern](fixture-pattern.md) - given/when/then DSL
 - [Data Builder Pattern](data-builder-pattern.md) - Building test objects
 - [Vitest Over Jest](vitest-over-jest.md) - Test framework choice
@@ -241,4 +322,4 @@ The `vitest/no-conditional-in-test` rule enforces some of these conventions by p
 
 - [Test Data Builders](http://www.natpryce.com/articles/000714.html)
 - [Arrange-Act-Assert Pattern](https://wiki.c2.com/?ArrangeActAssert)
-- `/core/strictMode/usecases/extend-timer.usecase.spec.ts` - Example implementation
+- `/core/strict-mode/usecases/extend-timer.usecase.spec.ts` - Example implementation

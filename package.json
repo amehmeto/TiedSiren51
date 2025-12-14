@@ -42,12 +42,18 @@
     "generate:schema": "npx prisma generate"
   },
   "lint-staged": {
-    "*.{js,ts,jsx,tsx}": "npm run lint:fix",
-    ".claude/**/*.json": "eslint"
+    "*.{js,ts,jsx,tsx}": ["eslint --fix", "prettier --write"],
+    "*.json": ["prettier --write --parser json"],
+    "*.md": "remark --frail --use remark-validate-links",
+    ".claude/**/*.json": "eslint --fix",
+    "*.sh": ["shellcheck"],
+    "*.{yml,yaml}": ["prettier --write"],
+    "schema.prisma": ["npx prisma validate"]
   },
   "dependencies": {
     "@amehmeto/expo-accessibility-service": "github:amehmeto/expo-accessibility-service",
     "@amehmeto/expo-list-installed-apps": "github:amehmeto/expo-list-installed-apps",
+    "@amehmeto/tied-siren-blocking-overlay": "github:amehmeto/tied-siren-blocking-overlay#93e368cdc32be139ac67b8cc405db871680109be",
     "@expo/vector-icons": "14.0.3",
     "@faker-js/faker": "^8.4.1",
     "@prisma/client": "5.22.0",
@@ -55,7 +61,7 @@
     "@react-native-async-storage/async-storage": "1.23.1",
     "@react-native-community/datetimepicker": "8.0.1",
     "@react-native-google-signin/google-signin": "10.1.1",
-    "@react-native-picker/picker": "2.7.5",
+    "@react-native-picker/picker": "^2.7.5",
     "@reduxjs/toolkit": "^2.2.5",
     "@sentry/react-native": "~5.24.3",
     "@types/react-redux": "^7.1.33",
@@ -82,7 +88,6 @@
     "expo-task-manager": "^11.8.2",
     "expo-web-browser": "~13.0.3",
     "firebase": "^11.9.1",
-    "foreground-ss": "^0.1.49",
     "formik": "^2.4.5",
     "is-ci": "^4.1.0",
     "pouchdb": "^8.0.1",
@@ -112,6 +117,7 @@
     "@types/pouchdb": "^6.4.2",
     "@types/react": "~18.2.45",
     "@types/react-test-renderer": "^18.0.7",
+    "@vitest/coverage-v8": "^1.6.0",
     "babel-plugin-module-resolver": "^5.0.2",
     "c8": "^9.1.0",
     "concurrently": "^8.2.2",
@@ -135,6 +141,8 @@
     "lint-staged": "^15.2.5",
     "prettier": "^3.3.0",
     "react-test-renderer": "18.2.0",
+    "remark-cli": "^12.0.1",
+    "remark-validate-links": "^13.1.0",
     "semantic-release": "^22.0.12",
     "shellcheck": "^3.1.0",
     "type-fest": "^4.41.0",
@@ -144,11 +152,6 @@
     "vitest": "^1.6.0",
     "vitest-tsconfig-paths": "^3.4.1",
     "wait-on": "^7.2.0"
-  },
-  "overrides": {
-    "foreground-ss": {
-      "@expo/config-plugins": "~8.0.0"
-    }
   },
   "private": true
 }
