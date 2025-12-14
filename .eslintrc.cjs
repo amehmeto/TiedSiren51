@@ -99,6 +99,7 @@ module.exports = {
     'local-rules/file-naming-convention': 'error',
     'local-rules/no-index-in-core': 'error',
     'local-rules/selector-matches-filename': 'error',
+    'local-rules/usecase-matches-filename': 'error',
   },
   overrides: [
     {

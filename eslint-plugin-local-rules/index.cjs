@@ -21,6 +21,7 @@ const useDataBuilders = require('../eslint-rules/use-data-builders.cjs')
 const fileNamingConvention = require('../eslint-rules/file-naming-convention.cjs')
 const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
 const selectorMatchesFilename = require('../eslint-rules/selector-matches-filename.cjs')
+const usecaseMatchesFilename = require('../eslint-rules/usecase-matches-filename.cjs')
 
 module.exports = {
   rules: {
@@ -43,5 +44,6 @@ module.exports = {
     'no-new-in-test-body': noNewInTestBody,
     'require-colocated-test': requireColocatedTest,
     'use-data-builders': useDataBuilders,
+    'usecase-matches-filename': usecaseMatchesFilename,
   },
 }
