@@ -210,6 +210,28 @@ remove_worktree() {
     fi
   fi
 
+  # Safety check: only allow removal if PR is merged or closed
+  if [ -n "$branch" ] && [ "$branch" != "detached" ] && [ "$branch" != "main" ]; then
+    local pr_info
+    pr_info=$(gh pr list --head "$branch" --json number,state --jq '.[0] // empty' 2>/dev/null || true)
+
+    if [ -n "$pr_info" ]; then
+      local pr_state pr_number
+      pr_state=$(echo "$pr_info" | jq -r '.state')
+      pr_number=$(echo "$pr_info" | jq -r '.number')
+
+      if [ "$pr_state" = "OPEN" ]; then
+        print_error "Cannot remove worktree: PR #$pr_number is still OPEN"
+        print_info "Merge or close the PR first, or use 'gh pr close $pr_number' to close it"
+        exit 1
+      fi
+
+      print_info "PR #$pr_number is $pr_state, safe to remove"
+    else
+      print_warning "No PR found for branch '$branch', allowing removal"
+    fi
+  fi
+
   print_info "Removing worktree at $wt_path (branch: $branch)..."
   if ! git worktree remove "$wt_path" --force; then
     print_error "Failed to remove worktree"
@@ -249,7 +271,7 @@ create_from_pr() {
   pr_url=$(echo "$pr_info" | jq -r '.url')
   local sanitized_branch
   sanitized_branch=$(sanitize_for_dirname "$branch")
-  local wt_name="PR${pr_number}-${sanitized_branch}"
+  local wt_name="${pr_number}-${sanitized_branch}"
   local wt_path="$WORKTREES_DIR/$wt_name"
 
   # Check if worktree already exists
@@ -321,7 +343,7 @@ create_from_branch() {
     # PR exists, use PR number in name
     pr_number="$existing_pr"
     pr_url="$existing_pr_url"
-    wt_name="PR${existing_pr}-${sanitized_branch}"
+    wt_name="${existing_pr}-${sanitized_branch}"
     wt_path="$WORKTREES_DIR/$wt_name"
     print_info "PR #$existing_pr already exists for this branch"
 
@@ -408,7 +430,7 @@ PREOF
     # Get the PR number from the newly created PR
     pr_number=$(gh pr list --head "$branch" --json number --jq '.[0].number' 2>/dev/null)
 
-    wt_name="PR${pr_number}-${sanitized_branch}"
+    wt_name="${pr_number}-${sanitized_branch}"
     wt_path="$WORKTREES_DIR/$wt_name"
 
     # Check if worktree already exists

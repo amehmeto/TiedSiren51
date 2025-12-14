@@ -1,0 +1,29 @@
+# Shared path filter definitions
+# Used by path-filter.yml workflow for both PR-level and push-level checks
+#
+# NOTE: Do not add gitignored paths here (android/, ios/, pdb-*/, .env)
+# They will never trigger since they're never committed.
+
+shell:
+  - '**/*.sh'
+  - '.husky/**'
+  - '.claude/hooks/**'
+
+app:
+  # Source code
+  - 'app/**'
+  - 'core/**'
+  - 'ui/**'
+  - 'infra/**'
+  # Config files that affect the build
+  - 'app.config.js'
+  - 'package.json'
+  - 'package-lock.json'
+  - 'tsconfig.json'
+  - 'babel.config.cjs'
+  - 'metro.config.cjs'
+  - 'eas.json'
+  - 'schema.prisma'
+  - 'index.js'
+  # Assets
+  - 'assets/**'
