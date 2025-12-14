@@ -4,7 +4,6 @@
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
       "Bash(./scripts/worktree.sh:*)",
-      "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(base64:*)",
       "Bash(cat:*)",
       "Bash(cloc:*)",
@@ -75,6 +74,7 @@
       "Bash(npx prettier:*)",
       "Bash(npx prisma generate:*)",
       "Bash(npx remark:*)",
+      "Bash(npx shellcheck:*)",
       "Bash(npx tsc:*)",
       "Bash(npx vitest:*)",
       "Bash(pgrep:*)",
@@ -107,6 +107,7 @@
     "deny": [
       "Bash(SKIP_E2E_CHECK=1 git push origin main:*)",
       "Bash(SKIP_E2E_CHECK=1 git push origin master:*)",
+      "Bash(SKIP_E2E_CHECK=1 git push:*)",
       "Bash(SKIP_E2E_CHECK=true git push origin main:*)",
       "Bash(SKIP_E2E_CHECK=true git push origin master:*)",
       "Bash(curl --data:*)",
@@ -140,7 +141,7 @@
       "mcp__github__merge_pull_request"
     ],
     "ask": [
-      "Bash(SKIP_E2E_CHECK=1 git push:*)",
+      "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(chmod:*)",
       "Bash(curl:*)",
       "Bash(docker:*)",
