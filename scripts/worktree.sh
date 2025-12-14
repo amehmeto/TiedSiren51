@@ -271,7 +271,7 @@ create_from_pr() {
   pr_url=$(echo "$pr_info" | jq -r '.url')
   local sanitized_branch
   sanitized_branch=$(sanitize_for_dirname "$branch")
-  local wt_name="PR${pr_number}-${sanitized_branch}"
+  local wt_name="${pr_number}-${sanitized_branch}"
   local wt_path="$WORKTREES_DIR/$wt_name"
 
   # Check if worktree already exists
@@ -343,7 +343,7 @@ create_from_branch() {
     # PR exists, use PR number in name
     pr_number="$existing_pr"
     pr_url="$existing_pr_url"
-    wt_name="PR${existing_pr}-${sanitized_branch}"
+    wt_name="${existing_pr}-${sanitized_branch}"
     wt_path="$WORKTREES_DIR/$wt_name"
     print_info "PR #$existing_pr already exists for this branch"
 
@@ -430,7 +430,7 @@ PREOF
     # Get the PR number from the newly created PR
     pr_number=$(gh pr list --head "$branch" --json number --jq '.[0].number' 2>/dev/null)
 
-    wt_name="PR${pr_number}-${sanitized_branch}"
+    wt_name="${pr_number}-${sanitized_branch}"
     wt_path="$WORKTREES_DIR/$wt_name"
 
     # Check if worktree already exists
