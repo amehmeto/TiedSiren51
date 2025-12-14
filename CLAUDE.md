@@ -68,8 +68,13 @@ See `/docs/adr/testing/` for patterns: data builders, fixtures, stub vs fake gui
 | Usecases | `core/{domain}/usecases/*.usecase.ts` |
 | Selectors | `core/{domain}/selectors/select*.ts` |
 | Listeners | `core/{domain}/listeners/*.listener.ts` |
+| Slices | `core/{domain}/*.slice.ts` |
+| Reducers | `core/{domain}/reducer.ts` |
+| Schemas | `**/*.schema.ts` |
 | Ports | `core/_ports_/*.ts` |
-| Adapters | `infra/**/` |
+| Repositories | `infra/*-repository/*.repository.ts` |
+| Gateways | `infra/*-gateway/*.gateway.ts` |
 | View Models | `ui/screens/**/*.view-model.ts` |
 | Tests | `*.spec.ts` (co-located) |
 | Builders | `core/_tests_/data-builders/*.builder.ts` |
+| Fixtures | `**/*.fixture.ts` |
