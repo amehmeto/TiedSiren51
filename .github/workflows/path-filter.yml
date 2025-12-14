@@ -66,13 +66,6 @@ jobs:
               - 'assets/**'
               # Environment files
               - '.env*'
-              # Test and lint config
-              - 'vitest.config.js'
-              - '.eslintrc.cjs'
-              # Workflow files (so changes to CI trigger builds)
-              - '.github/workflows/cerberus.yml'
-              - '.github/workflows/hades.yml'
-              - '.github/workflows/path-filter.yml'
 
       # Check only the latest push (for build optimization)
       # On synchronize: compares against previous HEAD
@@ -111,10 +104,3 @@ jobs:
               - 'assets/**'
               # Environment files
               - '.env*'
-              # Test and lint config
-              - 'vitest.config.js'
-              - '.eslintrc.cjs'
-              # Workflow files (so changes to CI trigger builds)
-              - '.github/workflows/cerberus.yml'
-              - '.github/workflows/hades.yml'
-              - '.github/workflows/path-filter.yml'
