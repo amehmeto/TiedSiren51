@@ -1,5 +1,5 @@
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
-import { Fixture } from './fixture.types'
+import { Fixture } from './fixture.type'
 
 export function dateFixture(dateProvider: StubDateProvider): Fixture {
   return {

@@ -1,4 +1,4 @@
-import { BlockSession } from '@/core/block-session/block.session'
+import { BlockSession } from '@/core/block-session/block-session'
 import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 
 function hasSomeEmptyField(values: Session) {

@@ -301,7 +301,7 @@ it('returns false when service is disabled', async () => {
 
 ### Key Files
 
-- `/core/strictMode/usecases/*.spec.ts` - Timer use case tests
+- `/core/strict-mode/usecases/*.spec.ts` - Timer use case tests
 - `/ui/screens/Home/HomeScreen/home.view-model.test.ts` - View model tests
 - `/core/__utils__/time.utils.ts` - Utility for handling optional time values
 
@@ -322,4 +322,4 @@ The `vitest/no-conditional-in-test` rule enforces some of these conventions by p
 
 - [Test Data Builders](http://www.natpryce.com/articles/000714.html)
 - [Arrange-Act-Assert Pattern](https://wiki.c2.com/?ArrangeActAssert)
-- `/core/strictMode/usecases/extend-timer.usecase.spec.ts` - Example implementation
+- `/core/strict-mode/usecases/extend-timer.usecase.spec.ts` - Example implementation

@@ -2,7 +2,7 @@ import { PrismaClient } from '@prisma/client/react-native'
 import { beforeEach, describe, expect, it } from 'vitest'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
-import { BlockSession } from '@/core/block-session/block.session'
+import { BlockSession } from '@/core/block-session/block-session'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 

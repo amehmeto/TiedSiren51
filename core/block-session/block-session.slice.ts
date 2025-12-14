@@ -1,6 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { loadUser } from '../auth/usecases/load-user.usecase'
-import { blockSessionAdapter } from './block.session'
+import { blockSessionAdapter } from './block-session'
 import { createBlockSession } from './usecases/create-block-session.usecase'
 import { deleteBlockSession } from './usecases/delete-block-session.usecase'
 import { duplicateBlockSession } from './usecases/duplicate-block-session.usecase'

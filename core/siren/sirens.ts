@@ -1,4 +1,4 @@
-import { InstalledApp } from '../installed-app/InstalledApp'
+import { InstalledApp } from '../installed-app/installed-app'
 
 export enum SirenType {
   WEBSITES = 'websites',

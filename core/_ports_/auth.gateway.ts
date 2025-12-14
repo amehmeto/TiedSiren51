@@ -1,4 +1,4 @@
-import { AuthUser } from '@/core/auth/authUser'
+import { AuthUser } from '@/core/auth/auth-user'
 
 export interface AuthGateway {
   onUserLoggedIn(listener: (user: AuthUser) => void): void

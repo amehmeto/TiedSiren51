@@ -3,7 +3,7 @@ import { DateProvider } from '@/core/_ports_/date-provider'
 import {
   BlockSession,
   blockSessionAdapter,
-} from '@/core/block-session/block.session'
+} from '@/core/block-session/block-session'
 import { isActive } from './isActive'
 
 export const selectActiveSessions = (

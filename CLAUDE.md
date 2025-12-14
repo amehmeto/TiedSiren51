@@ -60,3 +60,12 @@ npx prisma generate   # Regenerate Prisma client after schema changes
 
 Tests live alongside source in `*.spec.ts` files. Use `createTestStore()` from `core/_tests_/` with fake dependencies.
 See `/docs/adr/testing/` for patterns: data builders, fixtures, stub vs fake guidelines.
+
+## Finding Things
+
+See [CODEBASE-NAVIGATION.md](./CODEBASE-NAVIGATION.md) for:
+- Naming rules (filename → export name mappings)
+- File locations by concept
+- Example files to copy from
+- Checklists for adding usecases, selectors, listeners, etc.
+- Content search patterns and cross-references

@@ -1,5 +1,5 @@
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
-import { AuthUser } from '../authUser'
+import { AuthUser } from '../auth-user'
 
 export const signInWithGoogle = createAppAsyncThunk<AuthUser, void>(
   'auth/signInWithGoogle',
