@@ -3,6 +3,7 @@
     "allow": [
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
+      "Bash(./scripts/worktree.sh:*)",
       "Bash(base64:*)",
       "Bash(cat:*)",
       "Bash(cloc:*)",
@@ -54,6 +55,7 @@
       "Bash(mkdir:*)",
       "Bash(npm ci:*)",
       "Bash(npm install:*)",
+      "Bash(npm ls:*)",
       "Bash(npm pack:*)",
       "Bash(npm run generate:schema:*)",
       "Bash(npm run lint:*)",
@@ -104,8 +106,15 @@
       "mcp__ide__getDiagnostics"
     ],
     "deny": [
+      "Bash(SKIP_E2E_CHECK=1 git push --force-with-lease:*)",
+      "Bash(SKIP_E2E_CHECK=1 git push --force:*)",
+      "Bash(SKIP_E2E_CHECK=1 git push -f:*)",
       "Bash(SKIP_E2E_CHECK=1 git push origin main:*)",
       "Bash(SKIP_E2E_CHECK=1 git push origin master:*)",
+      "Bash(SKIP_E2E_CHECK=1 git push:*)",
+      "Bash(SKIP_E2E_CHECK=true git push --force-with-lease:*)",
+      "Bash(SKIP_E2E_CHECK=true git push --force:*)",
+      "Bash(SKIP_E2E_CHECK=true git push -f:*)",
       "Bash(SKIP_E2E_CHECK=true git push origin main:*)",
       "Bash(SKIP_E2E_CHECK=true git push origin master:*)",
       "Bash(curl --data:*)",
@@ -127,6 +136,7 @@
       "Bash(git push origin main:*)",
       "Bash(git push origin master:*)",
       "Bash(git rebase --no-verify:*)",
+      "Bash(git rebase:*)",
       "Bash(git reset --hard:*)",
       "Bash(git revert --no-verify:*)",
       "Bash(npm publish:*)",
@@ -139,7 +149,6 @@
       "mcp__github__merge_pull_request"
     ],
     "ask": [
-      "Bash(SKIP_E2E_CHECK=1 git push:*)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(chmod:*)",
       "Bash(curl:*)",
