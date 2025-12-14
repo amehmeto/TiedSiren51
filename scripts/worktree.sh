@@ -210,6 +210,28 @@ remove_worktree() {
     fi
   fi
 
+  # Safety check: only allow removal if PR is merged or closed
+  if [ -n "$branch" ] && [ "$branch" != "detached" ] && [ "$branch" != "main" ]; then
+    local pr_info
+    pr_info=$(gh pr list --head "$branch" --json number,state --jq '.[0] // empty' 2>/dev/null || true)
+
+    if [ -n "$pr_info" ]; then
+      local pr_state pr_number
+      pr_state=$(echo "$pr_info" | jq -r '.state')
+      pr_number=$(echo "$pr_info" | jq -r '.number')
+
+      if [ "$pr_state" = "OPEN" ]; then
+        print_error "Cannot remove worktree: PR #$pr_number is still OPEN"
+        print_info "Merge or close the PR first, or use 'gh pr close $pr_number' to close it"
+        exit 1
+      fi
+
+      print_info "PR #$pr_number is $pr_state, safe to remove"
+    else
+      print_warning "No PR found for branch '$branch', allowing removal"
+    fi
+  fi
+
   print_info "Removing worktree at $wt_path (branch: $branch)..."
   if ! git worktree remove "$wt_path" --force; then
     print_error "Failed to remove worktree"
