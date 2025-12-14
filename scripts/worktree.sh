@@ -12,17 +12,47 @@ set -e
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKTREES_DIR="$(dirname "$REPO_ROOT")/worktrees"
 
+# Exit codes
+readonly EXIT_SUCCESS=0
+readonly EXIT_INVALID_ARGS=1
+readonly EXIT_WORKTREE_EXISTS=2
+readonly EXIT_WORKTREE_NOT_FOUND=3
+readonly EXIT_PR_STILL_OPEN=4
+readonly EXIT_BRANCH_NOT_FOUND=5
+readonly EXIT_PR_CREATE_FAILED=6
+readonly EXIT_NPM_CI_FAILED=7
+readonly EXIT_GIT_FAILED=8
+
 # Colors for output
 RED='\033[0;31m'
 GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[0;34m'
+CYAN='\033[0;36m'
 NC='\033[0m' # No Color
 
 print_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+
+# Print summary block for Claude Code parsing
+print_summary() {
+  local wt_path="$1"
+  local branch="$2"
+  local pr_number="$3"
+  local pr_url="$4"
+
+  echo ""
+  echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo -e "${CYAN}SUMMARY${NC}"
+  echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+  echo "WORKTREE_PATH=$wt_path"
+  echo "BRANCH=$branch"
+  echo "PR_NUMBER=${pr_number:-none}"
+  echo "PR_URL=${pr_url:-none}"
+  echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+}
 
 # Cleanup worktrees with merged/closed PRs
 cleanup_merged_worktrees() {
@@ -112,7 +142,7 @@ remove_worktree() {
 
   if [ -z "$name" ]; then
     print_error "Please provide the worktree name to remove"
-    exit 1
+    exit "$EXIT_INVALID_ARGS"
   fi
 
   # Find worktree by name (partial match)
@@ -129,7 +159,7 @@ remove_worktree() {
 
   if [ -z "$wt_path" ]; then
     print_error "Worktree matching '$name' not found"
-    exit 1
+    exit "$EXIT_WORKTREE_NOT_FOUND"
   fi
 
   # Safety check: only allow removal if PR is merged or closed
@@ -145,7 +175,7 @@ remove_worktree() {
       if [ "$pr_state" = "OPEN" ]; then
         print_error "Cannot remove worktree: PR #$pr_number is still OPEN"
         print_info "Merge or close the PR first, or use 'gh pr close $pr_number' to close it"
-        exit 1
+        exit "$EXIT_PR_STILL_OPEN"
       fi
 
       print_info "PR #$pr_number is $pr_state, safe to remove"
@@ -155,7 +185,10 @@ remove_worktree() {
   fi
 
   print_info "Removing worktree at $wt_path (branch: $branch)..."
-  git worktree remove "$wt_path" --force
+  if ! git worktree remove "$wt_path" --force; then
+    print_error "Failed to remove worktree"
+    exit "$EXIT_GIT_FAILED"
+  fi
 
   if [ -n "$branch" ] && [ "$branch" != "detached" ]; then
     git branch -D "$branch" 2>/dev/null || true
@@ -176,34 +209,53 @@ create_from_pr() {
 
   print_info "Fetching PR #$pr_number details..."
 
-  local pr_info
-  pr_info=$(gh pr view "$pr_number" --json headRefName,number 2>/dev/null)
+  local pr_info pr_url
+  pr_info=$(gh pr view "$pr_number" --json headRefName,number,url 2>/dev/null)
 
   if [ -z "$pr_info" ]; then
     print_error "PR #$pr_number not found"
-    exit 1
+    exit "$EXIT_BRANCH_NOT_FOUND"
   fi
 
   local branch
   branch=$(echo "$pr_info" | jq -r '.headRefName')
+  pr_url=$(echo "$pr_info" | jq -r '.url')
   local sanitized_branch
   sanitized_branch=$(sanitize_for_dirname "$branch")
   local wt_name="PR${pr_number}-${sanitized_branch}"
   local wt_path="$WORKTREES_DIR/$wt_name"
 
+  # Check if worktree already exists
+  if [ -d "$wt_path" ]; then
+    print_error "Worktree already exists at $wt_path"
+    exit "$EXIT_WORKTREE_EXISTS"
+  fi
+
   print_info "Creating worktree for PR #$pr_number (branch: $branch)..."
 
-  git fetch origin "$branch"
+  if ! git fetch origin "$branch"; then
+    print_error "Failed to fetch branch '$branch'"
+    exit "$EXIT_GIT_FAILED"
+  fi
+
   mkdir -p "$WORKTREES_DIR"
-  git worktree add "$wt_path" "$branch"
+
+  if ! git worktree add "$wt_path" "$branch"; then
+    print_error "Failed to create worktree"
+    exit "$EXIT_GIT_FAILED"
+  fi
 
   print_info "Installing dependencies..."
-  (cd "$wt_path" && npm ci)
+  if ! (cd "$wt_path" && npm ci); then
+    print_error "Failed to install dependencies"
+    exit "$EXIT_NPM_CI_FAILED"
+  fi
 
   print_success "Worktree created at: $wt_path"
   print_info "To navigate: cd $wt_path"
 
-  # No PR creation needed - PR already exists
+  print_summary "$wt_path" "$branch" "$pr_number" "$pr_url"
+  exit "$EXIT_SUCCESS"
 }
 
 # Create worktree from branch name
@@ -226,14 +278,19 @@ create_from_branch() {
   fi
 
   # Check if PR exists for this branch
-  local existing_pr
-  existing_pr=$(gh pr list --head "$branch" --json number --jq '.[0].number // empty' 2>/dev/null || true)
+  local existing_pr existing_pr_url
+  existing_pr=$(gh pr list --head "$branch" --json number,url --jq '.[0].number // empty' 2>/dev/null || true)
+  existing_pr_url=$(gh pr list --head "$branch" --json url --jq '.[0].url // empty' 2>/dev/null || true)
 
   local wt_name
   local wt_path
+  local pr_number
+  local pr_url
 
   if [ -n "$existing_pr" ]; then
     # PR exists, use PR number in name
+    pr_number="$existing_pr"
+    pr_url="$existing_pr_url"
     wt_name="PR${existing_pr}-${sanitized_branch}"
     wt_path="$WORKTREES_DIR/$wt_name"
     print_info "PR #$existing_pr already exists for this branch"
@@ -241,25 +298,34 @@ create_from_branch() {
     # Check if worktree already exists
     if [ -d "$wt_path" ]; then
       print_error "Worktree already exists at $wt_path"
-      exit 1
+      exit "$EXIT_WORKTREE_EXISTS"
     fi
 
     if [ "$branch_exists" = true ]; then
       print_info "Creating worktree with existing branch '$branch'..."
-      git worktree add "$wt_path" "$branch"
+      if ! git worktree add "$wt_path" "$branch"; then
+        print_error "Failed to create worktree"
+        exit "$EXIT_GIT_FAILED"
+      fi
     else
       print_error "Branch '$branch' doesn't exist but PR #$existing_pr references it"
-      exit 1
+      exit "$EXIT_BRANCH_NOT_FOUND"
     fi
 
     print_info "Installing dependencies..."
-    (cd "$wt_path" && npm ci)
+    if ! (cd "$wt_path" && npm ci); then
+      print_error "Failed to install dependencies"
+      exit "$EXIT_NPM_CI_FAILED"
+    fi
   else
     # No PR yet - create branch, push, create PR, then create worktree with PR number
     if [ "$branch_exists" = false ]; then
       print_info "Creating new branch '$branch' from main..."
       git fetch origin main
-      git branch "$branch" origin/main
+      if ! git branch "$branch" origin/main; then
+        print_error "Failed to create branch"
+        exit "$EXIT_GIT_FAILED"
+      fi
     fi
 
     print_info "Pushing branch to origin..."
@@ -271,7 +337,6 @@ create_from_branch() {
     local pr_title
     pr_title=$(echo "$branch" | sed 's|^feat/|feat: |; s|^fix/|fix: |; s|^refactor/|refactor: |; s|^docs/|docs: |; s|^chore/|chore: |; s|-| |g')
 
-    local pr_url
     pr_url=$(gh pr create --draft --head "$branch" --title "$pr_title" --body "$(cat <<'PREOF'
 ## Summary
 
@@ -300,30 +365,43 @@ Generated with [Claude Code](https://claude.com/claude-code)
 PREOF
 )")
 
+    if [ -z "$pr_url" ]; then
+      print_error "Failed to create PR"
+      exit "$EXIT_PR_CREATE_FAILED"
+    fi
+
     print_success "Draft PR created: $pr_url"
 
     # Get the PR number from the newly created PR
-    local new_pr_number
-    new_pr_number=$(gh pr list --head "$branch" --json number --jq '.[0].number' 2>/dev/null)
+    pr_number=$(gh pr list --head "$branch" --json number --jq '.[0].number' 2>/dev/null)
 
-    wt_name="PR${new_pr_number}-${sanitized_branch}"
+    wt_name="PR${pr_number}-${sanitized_branch}"
     wt_path="$WORKTREES_DIR/$wt_name"
 
     # Check if worktree already exists
     if [ -d "$wt_path" ]; then
       print_error "Worktree already exists at $wt_path"
-      exit 1
+      exit "$EXIT_WORKTREE_EXISTS"
     fi
 
     print_info "Creating worktree with branch '$branch'..."
-    git worktree add "$wt_path" "$branch"
+    if ! git worktree add "$wt_path" "$branch"; then
+      print_error "Failed to create worktree"
+      exit "$EXIT_GIT_FAILED"
+    fi
 
     print_info "Installing dependencies..."
-    (cd "$wt_path" && npm ci)
+    if ! (cd "$wt_path" && npm ci); then
+      print_error "Failed to install dependencies"
+      exit "$EXIT_NPM_CI_FAILED"
+    fi
   fi
 
   print_success "Worktree created at: $wt_path"
   print_info "To navigate: cd $wt_path"
+
+  print_summary "$wt_path" "$branch" "$pr_number" "$pr_url"
+  exit "$EXIT_SUCCESS"
 }
 
 # Main script
@@ -334,15 +412,15 @@ main() {
   case "${1:-}" in
     --list|-l)
       list_worktrees
-      exit 0
+      exit "$EXIT_SUCCESS"
       ;;
     --prune|-p)
       cleanup_merged_worktrees
-      exit 0
+      exit "$EXIT_SUCCESS"
       ;;
     --remove|-r)
       remove_worktree "$2"
-      exit 0
+      exit "$EXIT_SUCCESS"
       ;;
     --help|-h|"")
       echo "Usage: $0 <branch-name|pr-number|option>"
@@ -355,13 +433,24 @@ main() {
       echo "  --remove, -r <name> Remove specific worktree"
       echo "  --help, -h          Show this help message"
       echo ""
+      echo "Exit codes:"
+      echo "  0 - Success"
+      echo "  1 - Invalid arguments"
+      echo "  2 - Worktree already exists"
+      echo "  3 - Worktree not found"
+      echo "  4 - PR still open (cannot remove)"
+      echo "  5 - Branch not found"
+      echo "  6 - PR creation failed"
+      echo "  7 - npm ci failed"
+      echo "  8 - Git operation failed"
+      echo ""
       echo "Examples:"
       echo "  $0 feat/my-feature  # Create worktree for new feature branch"
       echo "  $0 42               # Create worktree for PR #42"
       echo "  $0 --list           # Show all worktrees"
       echo "  $0 --prune          # Cleanup merged worktrees"
       echo "  $0 --remove feat    # Remove worktree matching 'feat'"
-      exit 0
+      exit "$EXIT_SUCCESS"
       ;;
     *)
       # Cleanup first (unless just listing)
