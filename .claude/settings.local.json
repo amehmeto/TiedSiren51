@@ -3,6 +3,8 @@
     "allow": [
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
+      "Bash(./scripts/worktree.sh:*)",
+      "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(base64:*)",
       "Bash(cat:*)",
       "Bash(cloc:*)",
