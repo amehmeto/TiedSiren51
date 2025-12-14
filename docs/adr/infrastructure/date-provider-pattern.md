@@ -351,7 +351,7 @@ it('handles session spanning midnight', () => {
 
 The following examples show how ISO strings flow through the entire stack:
 
-**1. Redux State** (`core/strictMode/timer.slice.ts`):
+**1. Redux State** (`core/strict-mode/timer.slice.ts`):
 
 ```typescript
 // ✅ Dates stored as ISO strings in Redux state
@@ -361,7 +361,7 @@ type TimerState = {
 }
 ```
 
-**2. Use Case** (`core/strictMode/usecases/start-timer.usecase.ts`):
+**2. Use Case** (`core/strict-mode/usecases/start-timer.usecase.ts`):
 
 ```typescript
 export const startTimer = createAppAsyncThunk<string, StartTimerPayload>(
@@ -380,7 +380,7 @@ export const startTimer = createAppAsyncThunk<string, StartTimerPayload>(
 )
 ```
 
-**3. Selector** (`core/strictMode/selectors/selectIsTimerActive.ts`):
+**3. Selector** (`core/strict-mode/selectors/selectIsTimerActive.ts`):
 
 ```typescript
 export function selectIsTimerActive(
@@ -494,6 +494,6 @@ export class CreateBlockSessionUseCase {
 - Port: `core/_ports_/date-provider.ts`
 - Real implementation: `infra/date-provider/real.date-provider.ts`
 - Stub implementation: `infra/date-provider/stub.date-provider.ts`
-- Timer use cases: `core/strictMode/usecases/start-timer.usecase.ts`
-- Timer selectors: `core/strictMode/selectors/selectIsTimerActive.ts`
+- Timer use cases: `core/strict-mode/usecases/start-timer.usecase.ts`
+- Timer selectors: `core/strict-mode/selectors/selectIsTimerActive.ts`
 - UI hook: `ui/hooks/useStrictModeTimer.ts`

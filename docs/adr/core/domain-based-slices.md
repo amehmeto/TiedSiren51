@@ -58,14 +58,14 @@ Organize Redux state using **Domain-Based Slices** aligned with business domains
     └── usecases/            # Blocklist async thunks
 
   /block-session/
-    ├── block.session.ts     # Entity adapter
+    ├── block-session.ts     # Entity adapter
     ├── block-session.slice.ts # Session slice
     ├── selectors/           # Session selectors
     └── usecases/            # Session async thunks
 
-  /strictMode/
+  /strict-mode/
     ├── strict-mode.slice.ts # StrictMode slice
-    ├── timeLeft.ts          # Time calculation types
+    ├── time-left.ts         # Time calculation types
     ├── selectors/           # StrictMode selectors
     └── usecases/            # StrictMode async thunks
 
@@ -94,7 +94,7 @@ import { authReducer } from '@core/auth/reducer'
 import { sirenSlice } from '@core/siren/siren.slice'
 import { blocklistSlice } from '@core/blocklist/blocklist.slice'
 import { blockSessionSlice } from '@core/block-session/block-session.slice'
-import { strictModeSlice } from '@core/strictMode/strict-mode.slice'
+import { strictModeSlice } from '@core/strict-mode/strict-mode.slice'
 
 export const rootReducer = combineReducers({
   auth: authReducer,
@@ -206,7 +206,7 @@ export type RootState = ReturnType<typeof rootReducer>
 - `/core/siren/siren.slice.ts` - Siren domain slice
 - `/core/blocklist/blocklist.slice.ts` - Blocklist domain slice
 - `/core/block-session/block-session.slice.ts` - BlockSession domain slice
-- `/core/strictMode/strict-mode.slice.ts` - StrictMode domain slice
+- `/core/strict-mode/strict-mode.slice.ts` - StrictMode domain slice
 
 ### Slice Structure Pattern
 

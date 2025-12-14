@@ -206,7 +206,7 @@ Fixtures are **colocated with their domains**, not centralized:
 - `/core/siren/usecases/sirens.fixture.ts` - Siren fixtures
 - `/core/blocklist/usecases/blocklist.fixture.ts` - Blocklist fixture
 - `/core/block-session/usecases/block-session.fixture.ts` - BlockSession fixture
-- `/core/strictMode/usecases/timer.fixture.ts` - StrictMode timer fixture
+- `/core/strict-mode/usecases/timer.fixture.ts` - StrictMode timer fixture
 - `/core/_tests_/state-builder.ts` - Redux state builder
 - `/core/_tests_/data-builders/` - Data builders (separate from fixtures)
 

@@ -86,7 +86,7 @@ Use `useEffect` **only** for these scenarios:
 #### 1. Redux Listeners (for cross-slice side effects)
 
 ```typescript
-// core/strictMode/listeners/timer.listeners.ts
+// core/strict-mode/listeners/timer.listeners.ts
 export const registerTimerListeners = (startListening: AppStartListening) => {
   startListening({
     matcher: isAnyOf(timerStarted, timerExtended),
@@ -192,7 +192,7 @@ const useTimer = () => {
   return timeRemaining
 }
 
-// Business logic in core/strictMode/timer.slice.ts
+// Business logic in core/strict-mode/timer.slice.ts
 extraReducers: (builder) => {
   builder.addCase(tickTimer, (state) => {
     const now = Date.now()
@@ -324,7 +324,7 @@ useEffect(() => {
 
 **Refactored** (logic in core):
 ```typescript
-// core/strictMode/timer.slice.ts
+// core/strict-mode/timer.slice.ts
 builder.addCase(tickTimer, (state) => {
   state.lastUpdate = Date.now()
   // Core decides when to stop
@@ -348,5 +348,5 @@ builder.addCase(tickTimer, (state) => {
 - [React useEffect Guide](https://react.dev/reference/react/useEffect)
 - [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
 - [Redux Listeners](https://redux-toolkit.js.org/api/createListenerMiddleware)
-- `/core/strictMode/listeners/` - Listener pattern examples
+- `/core/strict-mode/listeners/` - Listener pattern examples
 - `/core/*/usecases/` - Thunk pattern examples
