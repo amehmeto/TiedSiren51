@@ -97,6 +97,7 @@ module.exports = {
     'local-rules/listener-error-handling': 'error',
     'local-rules/infra-must-rethrow': 'error',
     'local-rules/file-naming-convention': 'error',
+    'local-rules/no-index-in-core': 'error',
   },
   overrides: [
     {
