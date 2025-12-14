@@ -14,7 +14,7 @@ const DEFAULT_CONFIG: ForegroundServiceConfig = {
 const POST_NOTIFICATIONS_PERMISSION = 'android.permission.POST_NOTIFICATIONS'
 
 export class AndroidForegroundService implements ForegroundService {
-  private running = false
+  private isServiceRunning = false
 
   constructor(private readonly logger: Logger) {}
 
@@ -24,7 +24,7 @@ export class AndroidForegroundService implements ForegroundService {
       return
     }
 
-    if (this.running) {
+    if (this.isServiceRunning) {
       this.logger.info('Foreground service already running')
       return
     }
@@ -44,7 +44,7 @@ export class AndroidForegroundService implements ForegroundService {
         0,
       )
 
-      this.running = true
+      this.isServiceRunning = true
       this.logger.info('Foreground service started')
     } catch (error) {
       this.logger.error(`Failed to start foreground service: ${error}`)
@@ -55,7 +55,7 @@ export class AndroidForegroundService implements ForegroundService {
   async stop(): Promise<void> {
     if (Platform.OS !== 'android') return
 
-    if (!this.running) {
+    if (!this.isServiceRunning) {
       this.logger.info('Foreground service not running')
       return
     }
@@ -66,7 +66,7 @@ export class AndroidForegroundService implements ForegroundService {
   private async stopService(): Promise<void> {
     try {
       ForegroundModule.Foreground.stopForegroundService()
-      this.running = false
+      this.isServiceRunning = false
       this.logger.info('Foreground service stopped')
     } catch (error) {
       this.logger.error(`Failed to stop foreground service: ${error}`)
@@ -75,7 +75,7 @@ export class AndroidForegroundService implements ForegroundService {
   }
 
   isRunning(): boolean {
-    return this.running
+    return this.isServiceRunning
   }
 
   private async requestNotificationPermission(): Promise<void> {
