@@ -98,6 +98,7 @@ module.exports = {
     'local-rules/infra-must-rethrow': 'error',
     'local-rules/file-naming-convention': 'error',
     'local-rules/no-index-in-core': 'error',
+    'local-rules/selector-matches-filename': 'error',
   },
   overrides: [
     {

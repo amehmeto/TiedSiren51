@@ -20,12 +20,14 @@ const requireColocatedTest = require('../eslint-rules/require-colocated-test.cjs
 const useDataBuilders = require('../eslint-rules/use-data-builders.cjs')
 const fileNamingConvention = require('../eslint-rules/file-naming-convention.cjs')
 const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
+const selectorMatchesFilename = require('../eslint-rules/selector-matches-filename.cjs')
 
 module.exports = {
   rules: {
     'core-test-file-naming': coreTestFileNaming,
     'file-naming-convention': fileNamingConvention,
     'no-index-in-core': noIndexInCore,
+    'selector-matches-filename': selectorMatchesFilename,
     'expect-separate-act-assert': expectSeparateActAssert,
     'no-complex-jsx-in-conditionals': noComplexJsxInConditionals,
     'no-icon-size-magic-numbers': noIconSizeMagicNumbers,
