@@ -189,13 +189,6 @@ create_from_branch() {
   local branch="$1"
   local sanitized_branch
   sanitized_branch=$(sanitize_for_dirname "$branch")
-  local wt_path="$WORKTREES_DIR/$sanitized_branch"
-
-  # Check if worktree already exists
-  if [ -d "$wt_path" ]; then
-    print_error "Worktree already exists at $wt_path"
-    exit 1
-  fi
 
   mkdir -p "$WORKTREES_DIR"
 
@@ -210,28 +203,45 @@ create_from_branch() {
     git fetch origin "$branch"
   fi
 
-  if [ "$branch_exists" = true ]; then
-    print_info "Creating worktree with existing branch '$branch'..."
-    git worktree add "$wt_path" "$branch"
-  else
-    print_info "Creating worktree with new branch '$branch' from main..."
-    git fetch origin main
-    git worktree add -b "$branch" "$wt_path" origin/main
-  fi
-
-  print_info "Installing dependencies..."
-  (cd "$wt_path" && npm ci)
-
   # Check if PR exists for this branch
   local existing_pr
   existing_pr=$(gh pr list --head "$branch" --json number --jq '.[0].number // empty' 2>/dev/null || true)
 
+  local wt_name
+  local wt_path
+
   if [ -n "$existing_pr" ]; then
+    # PR exists, use PR number in name
+    wt_name="PR${existing_pr}-${sanitized_branch}"
+    wt_path="$WORKTREES_DIR/$wt_name"
     print_info "PR #$existing_pr already exists for this branch"
+
+    # Check if worktree already exists
+    if [ -d "$wt_path" ]; then
+      print_error "Worktree already exists at $wt_path"
+      exit 1
+    fi
+
+    if [ "$branch_exists" = true ]; then
+      print_info "Creating worktree with existing branch '$branch'..."
+      git worktree add "$wt_path" "$branch"
+    else
+      print_error "Branch '$branch' doesn't exist but PR #$existing_pr references it"
+      exit 1
+    fi
+
+    print_info "Installing dependencies..."
+    (cd "$wt_path" && npm ci)
   else
-    # Push and create draft PR
+    # No PR yet - create branch, push, create PR, then create worktree with PR number
+    if [ "$branch_exists" = false ]; then
+      print_info "Creating new branch '$branch' from main..."
+      git fetch origin main
+      git branch "$branch" origin/main
+    fi
+
     print_info "Pushing branch to origin..."
-    (cd "$wt_path" && SKIP_E2E_CHECK=true git push -u origin "$branch")
+    SKIP_E2E_CHECK=true git push -u origin "$branch" 2>/dev/null || true
 
     print_info "Creating draft PR..."
 
@@ -240,7 +250,7 @@ create_from_branch() {
     pr_title=$(echo "$branch" | sed 's|^feat/|feat: |; s|^fix/|fix: |; s|^refactor/|refactor: |; s|^docs/|docs: |; s|^chore/|chore: |; s|-| |g')
 
     local pr_url
-    pr_url=$(cd "$wt_path" && gh pr create --draft --title "$pr_title" --body "$(cat <<'PREOF'
+    pr_url=$(gh pr create --draft --head "$branch" --title "$pr_title" --body "$(cat <<'PREOF'
 ## Summary
 
 <!-- Brief description of what this PR does and why -->
@@ -269,6 +279,25 @@ PREOF
 )")
 
     print_success "Draft PR created: $pr_url"
+
+    # Get the PR number from the newly created PR
+    local new_pr_number
+    new_pr_number=$(gh pr list --head "$branch" --json number --jq '.[0].number' 2>/dev/null)
+
+    wt_name="PR${new_pr_number}-${sanitized_branch}"
+    wt_path="$WORKTREES_DIR/$wt_name"
+
+    # Check if worktree already exists
+    if [ -d "$wt_path" ]; then
+      print_error "Worktree already exists at $wt_path"
+      exit 1
+    fi
+
+    print_info "Creating worktree with branch '$branch'..."
+    git worktree add "$wt_path" "$branch"
+
+    print_info "Installing dependencies..."
+    (cd "$wt_path" && npm ci)
   fi
 
   print_success "Worktree created at: $wt_path"
