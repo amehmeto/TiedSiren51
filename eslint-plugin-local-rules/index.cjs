@@ -23,6 +23,14 @@ const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
 const selectorMatchesFilename = require('../eslint-rules/selector-matches-filename.cjs')
 const usecaseMatchesFilename = require('../eslint-rules/usecase-matches-filename.cjs')
 const noCrossLayerImports = require('../eslint-rules/no-cross-layer-imports.cjs')
+const listenerMatchesFilename = require('../eslint-rules/listener-matches-filename.cjs')
+const viewModelMatchesFilename = require('../eslint-rules/view-model-matches-filename.cjs')
+const builderMatchesFilename = require('../eslint-rules/builder-matches-filename.cjs')
+const fixtureMatchesFilename = require('../eslint-rules/fixture-matches-filename.cjs')
+const oneListenerPerFile = require('../eslint-rules/one-listener-per-file.cjs')
+const sliceMatchesFolder = require('../eslint-rules/slice-matches-folder.cjs')
+const repositoryImplementationNaming = require('../eslint-rules/repository-implementation-naming.cjs')
+const gatewayImplementationNaming = require('../eslint-rules/gateway-implementation-naming.cjs')
 
 module.exports = {
   rules: {
@@ -47,5 +55,13 @@ module.exports = {
     'use-data-builders': useDataBuilders,
     'usecase-matches-filename': usecaseMatchesFilename,
     'no-cross-layer-imports': noCrossLayerImports,
+    'listener-matches-filename': listenerMatchesFilename,
+    'view-model-matches-filename': viewModelMatchesFilename,
+    'builder-matches-filename': builderMatchesFilename,
+    'fixture-matches-filename': fixtureMatchesFilename,
+    'one-listener-per-file': oneListenerPerFile,
+    'slice-matches-folder': sliceMatchesFolder,
+    'repository-implementation-naming': repositoryImplementationNaming,
+    'gateway-implementation-naming': gatewayImplementationNaming,
   },
 }

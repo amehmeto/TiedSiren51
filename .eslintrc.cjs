@@ -101,6 +101,14 @@ module.exports = {
     'local-rules/selector-matches-filename': 'error',
     'local-rules/usecase-matches-filename': 'error',
     'local-rules/no-cross-layer-imports': 'error',
+    'local-rules/listener-matches-filename': 'error',
+    'local-rules/view-model-matches-filename': 'error',
+    'local-rules/builder-matches-filename': 'error',
+    'local-rules/fixture-matches-filename': 'error',
+    'local-rules/one-listener-per-file': 'error',
+    'local-rules/slice-matches-folder': 'error',
+    'local-rules/repository-implementation-naming': 'error',
+    'local-rules/gateway-implementation-naming': 'error',
   },
   overrides: [
     {
