@@ -63,6 +63,8 @@ See `/docs/adr/testing/` for patterns: data builders, fixtures, stub vs fake gui
 
 ## Finding Things
 
+### By File Pattern
+
 | Concept | Pattern |
 |---------|---------|
 | Usecases | `core/{domain}/usecases/*.usecase.ts` |
@@ -78,3 +80,24 @@ See `/docs/adr/testing/` for patterns: data builders, fixtures, stub vs fake gui
 | Tests | `*.spec.ts` (co-located) |
 | Builders | `core/_tests_/data-builders/*.builder.ts` |
 | Fixtures | `**/*.fixture.ts` |
+
+### By Content
+
+| Find | Search for |
+|------|------------|
+| Selector usages | `useAppSelector(selectXxx)` or `selectXxx(state)` |
+| Usecase dispatches | `dispatch(xxxUsecase(` |
+| Port implementations | `implements XxxRepository` or `implements XxxGateway` |
+| Slice actions | `xxxSlice.actions` |
+| Listener registrations | `startListening` in `core/_redux_/registerListeners.ts` |
+| State shape | `xxxSlice.getInitialState()` or type `XxxState` |
+
+### Cross-References
+
+| From | To |
+|------|----|
+| Port interface | Implementation: search `implements PortName` in `infra/` |
+| Selector | Usages: search selector name in `ui/` and `core/` |
+| Usecase | Dispatches: search usecase name in `ui/` and listeners |
+| Slice action | Reducers: check the slice file's `reducers` and `extraReducers` |
+| Domain type | Builders: check `core/_tests_/data-builders/` |
