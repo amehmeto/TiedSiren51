@@ -1,5 +1,5 @@
-import * as ForegroundModule from 'foreground-ss'
-import { PermissionsAndroid, Platform } from 'react-native'
+import * as ExpoForegroundService from '@amehmeto/expo-foreground-service'
+import { Platform } from 'react-native'
 import {
   ForegroundService,
   ForegroundServiceConfig,
@@ -11,7 +11,8 @@ const DEFAULT_CONFIG: ForegroundServiceConfig = {
   description: 'Monitoring for blocked apps',
 }
 
-const POST_NOTIFICATIONS_PERMISSION = 'android.permission.POST_NOTIFICATIONS'
+const CHANNEL_ID = 'tied-siren-foreground-service'
+const CHANNEL_NAME = 'TiedSiren Protection'
 
 export class AndroidForegroundService implements ForegroundService {
   private isServiceRunning = false
@@ -34,15 +35,29 @@ export class AndroidForegroundService implements ForegroundService {
   }
 
   private async startService(config: ForegroundServiceConfig): Promise<void> {
-    try {
-      await this.requestNotificationPermission()
+    const isPermissionGranted = await this.requestNotificationPermission()
+    this.logPermissionStatus(isPermissionGranted)
+    await this.startServiceWithConfig(config)
+  }
 
-      ForegroundModule.Foreground.startForegroundService(
-        '',
-        config.title,
-        config.description,
-        0,
+  private logPermissionStatus(isPermissionGranted: boolean): void {
+    if (!isPermissionGranted) {
+      this.logger.warn(
+        'Notification permission denied, service may not show notification',
       )
+    }
+  }
+
+  private async startServiceWithConfig(
+    config: ForegroundServiceConfig,
+  ): Promise<void> {
+    try {
+      await ExpoForegroundService.startService({
+        channelId: CHANNEL_ID,
+        channelName: CHANNEL_NAME,
+        notificationTitle: config.title,
+        notificationBody: config.description,
+      })
 
       this.isServiceRunning = true
       this.logger.info('Foreground service started')
@@ -65,7 +80,7 @@ export class AndroidForegroundService implements ForegroundService {
 
   private async stopService(): Promise<void> {
     try {
-      ForegroundModule.Foreground.stopForegroundService()
+      await ExpoForegroundService.stopService()
       this.isServiceRunning = false
       this.logger.info('Foreground service stopped')
     } catch (error) {
@@ -78,35 +93,19 @@ export class AndroidForegroundService implements ForegroundService {
     return this.isServiceRunning
   }
 
-  private async requestNotificationPermission(): Promise<void> {
-    if (Platform.OS !== 'android') return
+  private async requestNotificationPermission(): Promise<boolean> {
+    if (Platform.OS !== 'android') return true
 
-    await this.checkAndRequestPermission()
+    return this.doRequestPermission()
   }
 
-  private async checkAndRequestPermission(): Promise<void> {
+  private async doRequestPermission(): Promise<boolean> {
     try {
-      // POST_NOTIFICATIONS is Android 13+ and not in RN's Permission type
-      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-      const permission = POST_NOTIFICATIONS_PERMISSION as Parameters<
-        typeof PermissionsAndroid.check
-      >[0]
-
-      const hasPermission = await PermissionsAndroid.check(permission)
-
-      if (!hasPermission) {
-        await PermissionsAndroid.request(permission, {
-          title: 'TiedSiren Notification Permission',
-          message:
-            'TiedSiren needs notification permission to show protection status',
-          buttonNeutral: 'Ask Me Later',
-          buttonNegative: 'Cancel',
-          buttonPositive: 'OK',
-        })
-      }
+      const result = await ExpoForegroundService.requestPermissions()
+      return result.granted
     } catch (error) {
       this.logger.error(`Failed to request notification permission: ${error}`)
-      throw error
+      return false
     }
   }
 }
