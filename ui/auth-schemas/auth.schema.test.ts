@@ -1,7 +1,6 @@
 import { expect, describe, it } from 'vitest'
 import { LoginCredentials, SignUpCredentials } from '@/core/auth/auth.type'
-import { signInSchema, signUpSchema } from './auth-schemas'
-import { getForgotPasswordValidationError } from './validation-helper'
+import { signInSchema, signUpSchema } from './auth.schema'
 
 type InvalidCredentialsTestCase = [
   description: string,
@@ -80,26 +79,6 @@ describe('Auth Schemas', () => {
       const result = signUpSchema.safeParse(input)
       expect(result.success).toBe(false)
       expect(result.error?.issues[0].message).toBe(expectedMessage)
-    })
-  })
-
-  describe('getForgotPasswordValidationError', () => {
-    it('should return null for valid email', () => {
-      const error = getForgotPasswordValidationError('user@example.com')
-
-      expect(error).toBeNull()
-    })
-
-    it('should return error for empty email', () => {
-      const error = getForgotPasswordValidationError('')
-
-      expect(error).not.toBeNull()
-    })
-
-    it('should return error for invalid email format', () => {
-      const error = getForgotPasswordValidationError('invalid-email')
-
-      expect(error).not.toBeNull()
     })
   })
 })

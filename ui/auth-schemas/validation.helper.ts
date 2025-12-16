@@ -6,7 +6,7 @@ import {
   ForgotPasswordInput,
   SignInInput,
   SignUpInput,
-} from './auth-schemas'
+} from './auth.schema'
 
 export interface ValidationResult<T = SignInInput | SignUpInput> {
   isValid: boolean

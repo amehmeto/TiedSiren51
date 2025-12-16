@@ -25,6 +25,12 @@ export default {
           functions: 100,
           lines: 100,
         },
+        '**/*.helper.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
         '**/selectors/*.ts': {
           statements: 100,
           branches: 100,

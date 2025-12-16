@@ -98,6 +98,8 @@ module.exports = {
         'View model files must be named "kebab-case.view-model.ts". Got: "{{filename}}"',
       uiSchemaNaming:
         'Schema files must be named "kebab-case.schema.ts". Got: "{{filename}}"',
+      uiHelperNaming:
+        'Helper files must be named "kebab-case.helper.ts". Got: "{{filename}}"',
       uiUtilityNaming:
         'UI utility files must be named in kebab-case. Got: "{{filename}}"',
 
@@ -435,6 +437,24 @@ module.exports = {
               context.report({
                 node,
                 messageId: 'uiSchemaNaming',
+                data: { filename: basename },
+              })
+            }
+          }
+          // Helpers: kebab-case.helper.ts
+          else if (basename.includes('.helper.')) {
+            if (isTestFile) {
+              if (!basename.match(/^[a-z][a-z0-9-]*\.helper\.test\.ts$/)) {
+                context.report({
+                  node,
+                  messageId: 'uiHelperNaming',
+                  data: { filename: basename },
+                })
+              }
+            } else if (!basename.match(/^[a-z][a-z0-9-]*\.helper\.ts$/)) {
+              context.report({
+                node,
+                messageId: 'uiHelperNaming',
                 data: { filename: basename },
               })
             }

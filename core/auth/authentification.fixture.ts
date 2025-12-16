@@ -73,7 +73,7 @@ export function authentificationFixture(
         )
         return store.dispatch(logOut())
       },
-      resetPassword(email: string) {
+      resetPasswordFor(email: string) {
         return store.dispatch(resetPassword({ email }))
       },
     },
@@ -90,11 +90,11 @@ export function authentificationFixture(
         const state = store.getState()
         expect(state.auth.error).toBe(expectedError)
       },
-      shouldBeLoading(isLoading: boolean) {
+      authShouldBeLoading(isLoading: boolean) {
         const state = store.getState()
         expect(state.auth.isLoading).toBe(isLoading)
       },
-      shouldNotBeLoading() {
+      authShouldNotBeLoading() {
         const state = store.getState()
         expect(state.auth.isLoading).toBe(false)
       },
