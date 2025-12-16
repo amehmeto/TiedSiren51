@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
-import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { T } from '@/ui/design-system/theme'
 
 export default function RegisterScreen() {
@@ -19,26 +18,24 @@ export default function RegisterScreen() {
   }, [isUserAuthenticated, router])
 
   return (
-    <TiedSLinearBackground>
-      <View style={styles.container}>
-        <Image
-          style={styles.image}
-          source={require('@/assets/tiedsirenlogo.png')}
-        />
-        <Text style={styles.title}>{"Let's make it productive"}</Text>
-        <TiedSButton
-          style={styles.button}
-          text={'SIGN UP'}
-          onPress={() => router.push('/(auth)/signup')}
-        />
-        <Text style={styles.haveAccountText}>{'ALREADY HAVE AN ACCOUNT?'}</Text>
-        <TiedSButton
-          style={styles.button}
-          text={'LOG IN'}
-          onPress={() => router.push('/(auth)/login')}
-        />
-      </View>
-    </TiedSLinearBackground>
+    <View style={styles.container}>
+      <Image
+        style={styles.image}
+        source={require('@/assets/tiedsirenlogo.png')}
+      />
+      <Text style={styles.title}>{"Let's make it productive"}</Text>
+      <TiedSButton
+        style={styles.button}
+        text={'SIGN UP'}
+        onPress={() => router.push('/(auth)/signup')}
+      />
+      <Text style={styles.haveAccountText}>{'ALREADY HAVE AN ACCOUNT?'}</Text>
+      <TiedSButton
+        style={styles.button}
+        text={'LOG IN'}
+        onPress={() => router.push('/(auth)/login')}
+      />
+    </View>
   )
 }
 
