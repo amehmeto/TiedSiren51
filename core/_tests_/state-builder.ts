@@ -3,14 +3,14 @@ import {
   createAction,
   createReducer,
 } from '@reduxjs/toolkit'
-import { ISODateString } from '@/core/_ports_/port.date-provider'
-import { AuthUser } from '@/core/auth/authUser'
+import { ISODateString } from '@/core/_ports_/date-provider'
+import { AuthUser } from '@/core/auth/auth-user'
 import { RootState } from '../_redux_/createStore'
 import { rootReducer } from '../_redux_/rootReducer'
 import {
   BlockSession,
   blockSessionAdapter,
-} from '../block-session/block.session'
+} from '../block-session/block-session'
 import { Blocklist, blocklistAdapter } from '../blocklist/blocklist'
 import { Sirens } from '../siren/sirens'
 

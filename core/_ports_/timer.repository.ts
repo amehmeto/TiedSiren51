@@ -1,4 +1,4 @@
-import { ISODateString } from './port.date-provider'
+import { ISODateString } from './date-provider'
 
 export interface TimerRepository {
   saveTimer(userId: string, endedAt: ISODateString): Promise<void>

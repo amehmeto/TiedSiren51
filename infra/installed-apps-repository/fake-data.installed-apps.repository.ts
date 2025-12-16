@@ -6,7 +6,7 @@ import { TikTokAppIcon } from '@/assets/base64AppIcon/tikTokAppIcon'
 import { WhatsAppAppIcon } from '@/assets/base64AppIcon/whatsAppAppIcon'
 import { YouTubeAppIcon } from '@/assets/base64AppIcon/youTubeAppIcon'
 import { InstalledAppRepository } from '@/core/_ports_/installed-app.repository'
-import { InstalledApp } from '@/core/installed-app/InstalledApp'
+import { InstalledApp } from '@/core/installed-app/installed-app'
 
 export function buildInstalledApp(
   wantedInstalledApp: Partial<InstalledApp>,

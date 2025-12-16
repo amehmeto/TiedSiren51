@@ -1,7 +1,7 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { AuthGateway } from '@/core/_ports_/auth.gateway'
 import { Logger } from '@/core/_ports_/logger'
-import { AuthUser } from '@/core/auth/authUser'
+import { AuthUser } from '@/core/auth/auth-user'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 
 export class FakeStorageAuthGateway implements AuthGateway {
@@ -69,6 +69,7 @@ export class FakeStorageAuthGateway implements AuthGateway {
       }
     } catch (error) {
       this.logger.warn(`Error verifying authentication: ${error}`)
+      throw error
     }
   }
 }

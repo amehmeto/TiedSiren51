@@ -1,7 +1,7 @@
 import { expect } from 'vitest'
 import { z } from 'zod'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
-import { Fixture } from '@/core/_tests_/fixture.types'
+import { Fixture } from '@/core/_tests_/fixture.type'
 import { blocklistSchema } from './blocklist-form.schema'
 
 export type BlockFormData = z.infer<typeof blocklistSchema>
@@ -28,44 +28,38 @@ export function blocklistFormFixture(): Fixture {
   return {
     given: {
       blocklistWithAllRequiredFields: () => {
-        blocklistData = {
+        blocklistData = buildValidBlocklistFormData({
           name: 'Test',
           sirens: {
-            android: [{ packageName: 'com.example' }],
+            android: [
+              {
+                packageName: 'com.example',
+                appName: 'Example',
+                icon: 'base64',
+              },
+            ],
             websites: [],
             keywords: [],
           },
-        }
+        })
       },
       blocklistWithEmptyName: () => {
-        blocklistData = {
+        blocklistData = buildValidBlocklistFormData({
           name: '',
-          sirens: {
-            android: [],
-            websites: [],
-            keywords: [],
-          },
-        }
+          sirens: { android: [], websites: [], keywords: [] },
+        })
       },
       blocklistWithNoSirensSelected: () => {
-        blocklistData = {
+        blocklistData = buildValidBlocklistFormData({
           name: 'Test',
-          sirens: {
-            android: [],
-            websites: [],
-            keywords: [],
-          },
-        }
+          sirens: { android: [], websites: [], keywords: [] },
+        })
       },
       blocklistWithWebsitesAndKeywords: () => {
         blocklistData = buildValidBlocklistFormData({
           name: 'Social Block',
           sirens: {
             android: [],
-            ios: [],
-            linux: [],
-            macos: [],
-            windows: [],
             websites: ['facebook.com'],
             keywords: ['social'],
           },
@@ -107,6 +101,18 @@ export function blocklistFormFixture(): Fixture {
           },
         }
       },
+      blocklistWithOnlyAndroidAppsAndUndefinedSirens: () => {
+        blocklistData = {
+          name: 'Test',
+          sirens: { android: [{ packageName: 'com.test' }] },
+        }
+      },
+      blocklistWithEmptySirensObject: () => {
+        blocklistData = {
+          name: 'Test',
+          sirens: {},
+        }
+      },
     },
     when: {
       validate: () => {
@@ -117,6 +123,9 @@ export function blocklistFormFixture(): Fixture {
     then: {
       shouldBeValid: () => {
         expect(validationResult?.success).toBe(true)
+      },
+      shouldBeInvalid: () => {
+        expect(validationResult?.success).toBe(false)
       },
       shouldBeInvalidWithMessage: (path: string, message: string) => {
         expect(validationResult?.success).toBe(false)

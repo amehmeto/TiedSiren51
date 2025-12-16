@@ -1,16 +1,24 @@
-import { describe, expect, test } from 'vitest'
+import { beforeEach, describe, expect, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { buildSirens } from '@/core/_tests_/data-builders/sirens.builder'
-import { BlockSession } from '@/core/block-session/block.session'
-import { Sirens } from '@/core/siren/sirens'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
 import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
 import { loadUser } from './load-user.usecase'
 
 describe('loadUser usecase', () => {
+  let blocklistRepository: FakeDataBlocklistRepository
+  let blockSessionRepository: FakeDataBlockSessionRepository
+  let sirensRepository: FakeDataSirensRepository
+
+  beforeEach(() => {
+    blocklistRepository = new FakeDataBlocklistRepository()
+    blockSessionRepository = new FakeDataBlockSessionRepository()
+    sirensRepository = new FakeDataSirensRepository()
+  })
+
   test('should load user data from repositories', async () => {
     const mockBlocklists: ReturnType<typeof buildBlocklist>[] = [
       buildBlocklist({ id: 'blocklist-1', name: 'Test Blocklist' }),
@@ -22,10 +30,6 @@ describe('loadUser usecase', () => {
       websites: ['example.com'],
       keywords: ['test'],
     })
-
-    const blocklistRepository = new FakeDataBlocklistRepository()
-    const blockSessionRepository = new FakeDataBlockSessionRepository()
-    const sirensRepository = new FakeDataSirensRepository()
 
     blocklistRepository.findAll = async () => mockBlocklists
     blockSessionRepository.findAll = async () => mockBlockSessions
@@ -51,20 +55,8 @@ describe('loadUser usecase', () => {
 
   test('should handle empty repositories', async () => {
     const emptyBlocklists: ReturnType<typeof buildBlocklist>[] = []
-    const emptyBlockSessions: BlockSession[] = []
-    const emptySirens: Sirens = {
-      android: [],
-      ios: [],
-      windows: [],
-      macos: [],
-      linux: [],
-      websites: [],
-      keywords: [],
-    }
-
-    const blocklistRepository = new FakeDataBlocklistRepository()
-    const blockSessionRepository = new FakeDataBlockSessionRepository()
-    const sirensRepository = new FakeDataSirensRepository()
+    const emptyBlockSessions: ReturnType<typeof buildBlockSession>[] = []
+    const emptySirens = buildSirens()
 
     blocklistRepository.findAll = async () => emptyBlocklists
     blockSessionRepository.findAll = async () => emptyBlockSessions

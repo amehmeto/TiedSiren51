@@ -25,7 +25,7 @@ export default function ForgotPasswordScreen() {
   const dispatch = useDispatch<AppDispatch>()
   const [email, setEmail] = useState('')
 
-  const { isLoading, error, passwordResetSent } = useSelector(
+  const { isLoading, error, isPasswordResetSent } = useSelector(
     (state: RootState) => state.auth,
   )
 
@@ -62,7 +62,7 @@ export default function ForgotPasswordScreen() {
     router.replace('/(auth)/login')
   }
 
-  if (passwordResetSent) {
+  if (isPasswordResetSent) {
     return (
       <PasswordResetSuccessView
         onClose={handleClose}

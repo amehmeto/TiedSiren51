@@ -1,5 +1,5 @@
 import { createAction, createReducer } from '@reduxjs/toolkit'
-import { AuthUser } from '@/core/auth/authUser'
+import { AuthUser } from '@/core/auth/auth-user'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
@@ -11,7 +11,7 @@ export type AuthState = {
   authUser: AuthUser | null
   isLoading: boolean
   error: string | null
-  passwordResetSent: boolean
+  isPasswordResetSent: boolean
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -29,7 +29,7 @@ export const reducer = createReducer<AuthState>(
     authUser: null,
     isLoading: false,
     error: null,
-    passwordResetSent: false,
+    isPasswordResetSent: false,
   },
   (builder) => {
     builder
@@ -73,16 +73,16 @@ export const reducer = createReducer<AuthState>(
       .addCase(clearAuthState, (state) => {
         state.isLoading = false
         state.error = null
-        state.passwordResetSent = false
+        state.isPasswordResetSent = false
       })
       .addCase(resetPassword.pending, (state) => {
         state.isLoading = true
         state.error = null
-        state.passwordResetSent = false
+        state.isPasswordResetSent = false
       })
       .addCase(resetPassword.fulfilled, (state) => {
         state.isLoading = false
-        state.passwordResetSent = true
+        state.isPasswordResetSent = true
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.isLoading = false
@@ -106,19 +106,19 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(signInWithEmail.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload ?? null
+        state.error = action.error.message ?? null
       })
       .addCase(signUpWithEmail.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload ?? null
+        state.error = action.error.message ?? null
       })
       .addCase(signInWithGoogle.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload ?? null
+        state.error = action.error.message ?? null
       })
       .addCase(signInWithApple.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload ?? null
+        state.error = action.error.message ?? null
       })
   },
 )

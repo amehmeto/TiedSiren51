@@ -4,7 +4,7 @@ import {
   instagramAndroidSiren,
 } from '@/core/_tests_/data-builders/android-siren.builder'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
-import { BlockingConditions } from '@/core/block-session/block.session'
+import { BlockingConditions } from '@/core/block-session/block-session'
 import { blockSessionFixture } from './block-session.fixture'
 import { CreateBlockSessionPayload } from './create-block-session.usecase'
 

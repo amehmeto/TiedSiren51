@@ -22,7 +22,7 @@ import {
   User,
 } from 'firebase/auth'
 import { AuthGateway } from '@/core/_ports_/auth.gateway'
-import { AuthUser } from '@/core/auth/authUser'
+import { AuthUser } from '@/core/auth/auth-user'
 import { firebaseConfig } from './firebaseConfig'
 
 enum FirebaseAuthErrorCode {

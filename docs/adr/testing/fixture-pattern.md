@@ -51,7 +51,7 @@ Use **Fixture Pattern** with given/when/then API for test data creation.
 
 ### Implementation
 
-**1. Fixture Builder** (`/core/_tests_/data-builders/sirens.fixture.ts`)
+**1. Fixture Builder** (`/core/{domain}/usecases/{domain}.fixture.ts` or `/core/{domain}/{domain}.fixture.ts`)
 
 ```typescript
 export const sirensFixture = () => {
@@ -199,9 +199,16 @@ expect(sirens).toHaveLength(3)
 ## Implementation Notes
 
 ### Key Files
-- `/core/_tests_/data-builders/sirens.fixture.ts` - Siren fixtures
-- `/core/_tests_/data-builders/` - All domain fixtures
+
+Fixtures are **colocated with their domains**, not centralized:
+
+- `/core/auth/authentification.fixture.ts` - Auth fixture
+- `/core/siren/usecases/sirens.fixture.ts` - Siren fixtures
+- `/core/blocklist/usecases/blocklist.fixture.ts` - Blocklist fixture
+- `/core/block-session/usecases/block-session.fixture.ts` - BlockSession fixture
+- `/core/strict-mode/usecases/timer.fixture.ts` - StrictMode timer fixture
 - `/core/_tests_/state-builder.ts` - Redux state builder
+- `/core/_tests_/data-builders/` - Data builders (separate from fixtures)
 
 ### Fixture Structure
 
@@ -268,8 +275,10 @@ const store = createTestStore(state)
 
 ### Naming Conventions
 - Fixture files: `{domain}.fixture.ts`
-- Builder files: `{domain}.builder.ts`
-- Location: `/core/_tests_/data-builders/`
+- Location: Colocated with domain (`/core/{domain}/` or `/core/{domain}/usecases/`)
+- Builder files: `{domain}.builder.ts` (in `/core/_tests_/data-builders/`)
+
+**Note**: Fixtures are colocated with their domains because they contain domain-specific test setup logic. Data builders are centralized because they're simple object factories reused across all tests.
 
 ### Best Practices
 
@@ -429,4 +438,5 @@ describe('Blocklist Management', () => {
 
 - [Test Data Builders](http://www.natpryce.com/articles/000714.html)
 - [Fixture Pattern](https://en.wikipedia.org/wiki/Test_fixture)
-- `/core/_tests_/data-builders/` - Implementation
+- Fixtures: `/core/{domain}/usecases/{domain}.fixture.ts`
+- Data builders: `/core/_tests_/data-builders/`

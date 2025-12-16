@@ -2,14 +2,19 @@
 set -e
 
 # Script to create a GitHub Release with APK for PR builds
-# Usage: ./create-release-with-apk.sh <github_context_json> <apk_path>
+# Usage: GITHUB_CONTEXT=<json> ./create-release-with-apk.sh <apk_path>
+# The GITHUB_CONTEXT must be passed as an environment variable to avoid shell escaping issues
 
-GITHUB_CONTEXT="$1"
-APK_PATH="$2"
+APK_PATH="$1"
 
-if [ -z "$GITHUB_CONTEXT" ] || [ -z "$APK_PATH" ]; then
-  echo "Error: Missing required arguments"
-  echo "Usage: $0 <github_context_json> <apk_path>"
+if [ -z "$GITHUB_CONTEXT" ]; then
+  echo "Error: GITHUB_CONTEXT environment variable is required"
+  exit 1
+fi
+
+if [ -z "$APK_PATH" ]; then
+  echo "Error: APK path argument is required"
+  echo "Usage: GITHUB_CONTEXT=<json> $0 <apk_path>"
   exit 1
 fi
 

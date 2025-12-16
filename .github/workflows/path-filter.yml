@@ -8,8 +8,11 @@ on:
   workflow_call:
     outputs:
       app-changed:
-        description: 'Whether app-related files have changed'
+        description: 'Whether app-related files have changed in the entire PR'
         value: ${{ jobs.check-paths.outputs.app-changed }}
+      app-changed-this-push:
+        description: 'Whether app-related files have changed in the latest push only'
+        value: ${{ jobs.check-paths.outputs.app-changed-this-push }}
       shell-only:
         description: 'Whether only shell scripts have changed'
         value: ${{ jobs.check-paths.outputs.shell-only }}
@@ -19,53 +22,26 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       app-changed: ${{ steps.filter.outputs.app }}
+      app-changed-this-push: ${{ steps.filter-push.outputs.app }}
       shell-only: ${{ steps.filter.outputs.shell == 'true' && steps.filter.outputs.app != 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
-      - name: Check for app changes
+      - name: Check for app changes (entire PR)
         uses: dorny/paths-filter@v3
         id: filter
         with:
-          filters: |
-            shell:
-              - '**/*.sh'
-              - '.husky/**'
-              - '.claude/hooks/**'
-            app:
-              # Source code
-              - 'app/**'
-              - 'core/**'
-              - 'ui/**'
-              - 'infra/**'
-              - 'pdb-block-sessions/**'
-              - 'pdb-blocklists/**'
-              - 'pdb-remote-devices/**'
-              - 'pdb-sirens/**'
-              # Config files that affect the build
-              - 'app.config.js'
-              - 'package.json'
-              - 'package-lock.json'
-              - 'tsconfig.json'
-              - 'babel.config.cjs'
-              - 'metro.config.cjs'
-              - 'eas.json'
-              - 'schema.prisma'
-              - 'index.js'
-              # Platform specific
-              - 'android/**'
-              - 'ios/**'
-              # Assets
-              - 'assets/**'
-              # Environment files
-              - '.env*'
-              # Test and lint config
-              - 'vitest.config.js'
-              - '.eslintrc.cjs'
-              # Scripts used by CI
-              - 'scripts/**'
-              # Workflow files (so changes to CI trigger builds)
-              - '.github/workflows/cerberus.yml'
-              - '.github/workflows/hades.yml'
-              - '.github/workflows/path-filter.yml'
+          filters: .github/path-filters.yml
+
+      # Check only the latest push (for build optimization)
+      # On synchronize: compares against previous HEAD
+      # On opened: compares against base branch (same as full PR check)
+      - name: Check for app changes (this push only)
+        uses: dorny/paths-filter@v3
+        id: filter-push
+        with:
+          base: ${{ github.event.before }}
+          filters: .github/path-filters.yml

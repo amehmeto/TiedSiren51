@@ -89,9 +89,30 @@ module.exports = {
     'local-rules/one-selector-per-file': 'error',
     'local-rules/one-usecase-per-file': 'error',
     'local-rules/core-test-file-naming': 'error',
+    'local-rules/require-colocated-test': 'error',
     'local-rules/time-constant-multiplication': 'error',
     'local-rules/try-catch-isolation': 'error',
     'local-rules/inline-single-statement-handlers': 'error',
+    // Error handling convention rules
+    'local-rules/no-try-catch-in-core': 'error',
+    'local-rules/listener-error-handling': 'error',
+    'local-rules/infra-must-rethrow': 'error',
+    'local-rules/file-naming-convention': 'error',
+    'local-rules/no-index-in-core': 'error',
+    'local-rules/selector-matches-filename': 'error',
+    'local-rules/usecase-matches-filename': 'error',
+    'local-rules/no-cross-layer-imports': 'error',
+    'local-rules/listener-matches-filename': 'error',
+    'local-rules/view-model-matches-filename': 'error',
+    'local-rules/builder-matches-filename': 'error',
+    'local-rules/fixture-matches-filename': 'error',
+    'local-rules/one-listener-per-file': 'error',
+    'local-rules/slice-matches-folder': 'error',
+    'local-rules/repository-implementation-naming': 'error',
+    'local-rules/gateway-implementation-naming': 'error',
+    'local-rules/schema-matches-filename': 'error',
+    'local-rules/one-view-model-per-file': 'error',
+    'local-rules/reducer-in-domain-folder': 'error',
   },
   overrides: [
     {
@@ -126,6 +147,26 @@ module.exports = {
               match: false,
             },
           },
+          // Enforce boolean naming convention (is, has, should, can, did, will)
+          {
+            selector: 'variable',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'parameter',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'classProperty',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            leadingUnderscore: 'allow',
+          },
         ],
         // Extend no I-prefix rule to import aliases
         'local-rules/no-i-prefix-in-imports': 'error',
@@ -152,6 +193,9 @@ module.exports = {
         'vitest/prefer-hooks-on-top': 'error',
         'vitest/prefer-strict-equal': 'error',
         'local-rules/expect-separate-act-assert': 'error',
+        // Test structure rules
+        'local-rules/no-new-in-test-body': 'error',
+        'local-rules/use-data-builders': 'error',
       },
     },
     // No non-deterministic values in core (use injected dependencies)
@@ -342,6 +386,51 @@ module.exports = {
       files: ['core/_ports_/**/*.ts', 'core/**/*.fixture.ts'],
       rules: {
         'no-restricted-globals': 'off',
+      },
+    },
+    // Enforce boolean naming convention on type properties in core (our domain types)
+    {
+      files: ['core/**/*.ts'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
+        '@typescript-eslint/naming-convention': [
+          'error',
+          // Keep interface naming convention
+          {
+            selector: 'interface',
+            format: ['PascalCase'],
+            custom: {
+              regex: '^I[A-Z]',
+              match: false,
+            },
+          },
+          // Boolean naming for variables, parameters, properties in core
+          {
+            selector: 'variable',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'parameter',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+          {
+            selector: 'classProperty',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            leadingUnderscore: 'allow',
+          },
+          {
+            selector: 'typeProperty',
+            types: ['boolean'],
+            format: ['PascalCase'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+          },
+        ],
       },
     },
     // JSON files linting
@@ -387,196 +476,6 @@ module.exports = {
         'jsonc/no-dupe-keys': 'error',
         'jsonc/no-comments': 'off',
         'jsonc/sort-keys': 'off',
-      },
-    },
-    // No non-deterministic values in core (use injected dependencies)
-    {
-      files: ['core/**/*.ts'],
-      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
-      rules: {
-        'no-restricted-globals': [
-          'error',
-          // Time
-          {
-            name: 'Date',
-            message:
-              'Non-deterministic: Use DateProvider dependency instead of Date in core.',
-          },
-          {
-            name: 'performance',
-            message:
-              'Non-deterministic: Use DateProvider dependency instead of performance in core.',
-          },
-          // Async timing
-          {
-            name: 'setTimeout',
-            message:
-              'Non-deterministic: Use TimerProvider dependency instead of setTimeout in core.',
-          },
-          {
-            name: 'setInterval',
-            message:
-              'Non-deterministic: Use TimerProvider dependency instead of setInterval in core.',
-          },
-          // Randomness
-          {
-            name: 'crypto',
-            message:
-              'Non-deterministic: Use UuidProvider dependency instead of crypto in core.',
-          },
-          // Network I/O
-          {
-            name: 'fetch',
-            message:
-              'Non-deterministic: Use a Repository/Gateway dependency instead of fetch in core.',
-          },
-          {
-            name: 'XMLHttpRequest',
-            message:
-              'Non-deterministic: Use a Repository/Gateway dependency instead of XMLHttpRequest in core.',
-          },
-          // External state
-          {
-            name: 'localStorage',
-            message:
-              'Non-deterministic: Use a Repository dependency instead of localStorage in core.',
-          },
-          {
-            name: 'sessionStorage',
-            message:
-              'Non-deterministic: Use a Repository dependency instead of sessionStorage in core.',
-          },
-          // Environment/device info
-          {
-            name: 'navigator',
-            message:
-              'Non-deterministic: Use a DeviceProvider dependency instead of navigator in core.',
-          },
-          {
-            name: 'location',
-            message:
-              'Non-deterministic: Use a RouterProvider dependency instead of location in core.',
-          },
-        ],
-        'no-restricted-properties': [
-          'error',
-          {
-            object: 'Math',
-            property: 'random',
-            message:
-              'Non-deterministic: Use RandomProvider dependency instead of Math.random() in core.',
-          },
-          {
-            object: 'process',
-            property: 'env',
-            message:
-              'Non-deterministic: Use ConfigProvider dependency instead of process.env in core.',
-          },
-          {
-            object: 'window',
-            property: 'location',
-            message:
-              'Non-deterministic: Use RouterProvider dependency instead of window.location in core.',
-          },
-          {
-            object: 'window',
-            property: 'localStorage',
-            message:
-              'Non-deterministic: Use a Repository dependency instead of window.localStorage in core.',
-          },
-          {
-            object: 'window',
-            property: 'sessionStorage',
-            message:
-              'Non-deterministic: Use a Repository dependency instead of window.sessionStorage in core.',
-          },
-        ],
-        'no-restricted-imports': [
-          'error',
-          {
-            paths: [
-              {
-                name: 'uuid',
-                message:
-                  'Non-deterministic: Use UuidProvider dependency instead of uuid in core.',
-              },
-              {
-                name: 'react-native-uuid',
-                message:
-                  'Non-deterministic: Use UuidProvider dependency instead of react-native-uuid in core.',
-              },
-              {
-                name: 'crypto',
-                message:
-                  'Non-deterministic: Use UuidProvider dependency instead of crypto in core.',
-              },
-              {
-                name: '@faker-js/faker',
-                message:
-                  'Non-deterministic: Use data builders with injected dependencies instead of faker in core.',
-              },
-            ],
-          },
-        ],
-      },
-    },
-    // No vi/jest mocking in core tests (use dependency injection)
-    {
-      files: ['core/**/*.test.ts', 'core/**/*.spec.ts'],
-      rules: {
-        'no-restricted-properties': [
-          'error',
-          {
-            object: 'vi',
-            property: 'useFakeTimers',
-            message:
-              'Use DateProvider dependency injection instead of vi.useFakeTimers() in core tests.',
-          },
-          {
-            object: 'vi',
-            property: 'useRealTimers',
-            message:
-              'Use DateProvider dependency injection instead of vi.useRealTimers() in core tests.',
-          },
-          {
-            object: 'vi',
-            property: 'spyOn',
-            message:
-              'Use dependency injection (fakes/stubs) instead of vi.spyOn() in core tests.',
-          },
-          {
-            object: 'jest',
-            property: 'useFakeTimers',
-            message:
-              'Use DateProvider dependency injection instead of jest.useFakeTimers() in core tests.',
-          },
-          {
-            object: 'jest',
-            property: 'useRealTimers',
-            message:
-              'Use DateProvider dependency injection instead of jest.useRealTimers() in core tests.',
-          },
-          {
-            object: 'jest',
-            property: 'spyOn',
-            message:
-              'Use dependency injection (fakes/stubs) instead of jest.spyOn() in core tests.',
-          },
-        ],
-      },
-    },
-    // Allow faker in data builders (they generate test data)
-    {
-      files: ['core/**/*.builder.ts'],
-      rules: {
-        'no-restricted-imports': 'off',
-      },
-    },
-    // Allow Date in port type definitions and test fixtures
-    {
-      files: ['core/_ports_/**/*.ts', 'core/**/*.fixture.ts'],
-      rules: {
-        'no-restricted-globals': 'off',
       },
     },
   ],

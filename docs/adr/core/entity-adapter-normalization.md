@@ -257,7 +257,7 @@ const testState = {
 
 ### Related ADRs
 - [Redux Toolkit for Business Logic](redux-toolkit-for-business-logic.md)
-- [Hexagonal Architecture](../architecture/hexagonal-architecture.md)
+- [Hexagonal Architecture](../hexagonal-architecture.md)
 
 ## References
 

@@ -48,7 +48,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: 'npm'
 
       - name: Install dependencies
         run: npm ci
@@ -65,9 +64,6 @@ jobs:
       - name: Generate Prisma Client
         run: npx prisma generate
 
-      - name: Install shellcheck
-        run: sudo apt-get install -y shellcheck
-
       - name: Lint
         run: npm run lint
         env:
@@ -76,8 +72,8 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test:cov
 
-#      - name: Commit coverage if changed
-#        run: bash scripts/commit-coverage.sh
+      #      - name: Commit coverage if changed
+      #        run: bash scripts/commit-coverage.sh
 
       - name: Store PR coverage
         run: bash scripts/store-coverage.sh pr-coverage.json
@@ -93,7 +89,10 @@ jobs:
             await compareAndComment({ github, context });
 
   build:
-    needs: test
+    needs: [test, path-filter]
+    # Only build if: not a draft PR AND this push contains app changes
+    # This prevents rebuilding when only docs/md files are pushed after earlier code changes
+    if: github.event.pull_request.draft == false && needs.path-filter.outputs.app-changed-this-push == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -112,7 +111,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-          cache: 'npm'
 
       - name: Set up JDK 17
         uses: actions/setup-java@v4
@@ -149,9 +147,9 @@ jobs:
         id: create_release
         env:
           GH_TOKEN: ${{ github.token }}
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: |
           bash scripts/create-release-with-apk.sh \
-            '${{ toJSON(github) }}' \
             '${{ steps.find_apk.outputs.apk_path }}'
 
       - name: Upload APK artifact
@@ -160,7 +158,6 @@ jobs:
           name: app-debug-${{ github.run_number }}
           path: ${{ steps.find_apk.outputs.apk_path }}
           retention-days: 7
-
 #      - name: Send APK notification to Slack
 #        if: success()
 #        env:

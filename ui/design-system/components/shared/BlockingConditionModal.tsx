@@ -65,12 +65,12 @@ const CONDITIONS: BlockingCondition[] = [
 ]
 
 export default function BlockingConditionModal({
-  visible,
+  visible: isVisible,
   onClose,
   onSelectCondition,
 }: BlockingConditionModalProps) {
   return (
-    <TiedSModal isVisible={visible} onRequestClose={onClose}>
+    <TiedSModal isVisible={isVisible} onRequestClose={onClose}>
       <View style={styles.container}>
         <TiedSCloseButton onClose={onClose} />
         <Text style={styles.modalTitle}>{TEXTS.MODAL_TITLE}</Text>
@@ -99,9 +99,9 @@ function BlockingConditionComponent({
 }: BlockingConditionProps) {
   return (
     <Pressable
-      style={({ pressed }) => [
+      style={({ pressed: isPressed }) => [
         styles.conditionContainer,
-        { opacity: pressed ? T.opacity.pressed : T.opacity.full },
+        { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
       ]}
       onPress={onSelect}
     >

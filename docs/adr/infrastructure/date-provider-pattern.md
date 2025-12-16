@@ -62,7 +62,7 @@ All conversions between ISO strings and Date objects go through `DateProvider` m
 
 ### Implementation
 
-**1. Port Definition** (`core/_ports_/port.date-provider.ts`):
+**1. Port Definition** (`core/_ports_/date-provider.ts`):
 
 ```typescript
 export interface DateProvider {
@@ -351,7 +351,7 @@ it('handles session spanning midnight', () => {
 
 The following examples show how ISO strings flow through the entire stack:
 
-**1. Redux State** (`core/strictMode/timer.slice.ts`):
+**1. Redux State** (`core/strict-mode/timer.slice.ts`):
 
 ```typescript
 // ✅ Dates stored as ISO strings in Redux state
@@ -361,7 +361,7 @@ type TimerState = {
 }
 ```
 
-**2. Use Case** (`core/strictMode/usecases/start-timer.usecase.ts`):
+**2. Use Case** (`core/strict-mode/usecases/start-timer.usecase.ts`):
 
 ```typescript
 export const startTimer = createAppAsyncThunk<string, StartTimerPayload>(
@@ -380,7 +380,7 @@ export const startTimer = createAppAsyncThunk<string, StartTimerPayload>(
 )
 ```
 
-**3. Selector** (`core/strictMode/selectors/selectIsTimerActive.ts`):
+**3. Selector** (`core/strict-mode/selectors/selectIsTimerActive.ts`):
 
 ```typescript
 export function selectIsTimerActive(
@@ -479,7 +479,7 @@ export class CreateBlockSessionUseCase {
 
 ## Related ADRs
 
-- [Hexagonal Architecture](../core/hexagonal-architecture.md) - Port/adapter pattern
+- [Hexagonal Architecture](../hexagonal-architecture.md) - Port/adapter pattern
 - [Dependency Injection Pattern](../core/dependency-injection-pattern.md)
 - [Stub vs Fake Implementations](../testing/stub-vs-fake-implementations.md)
 
@@ -491,9 +491,9 @@ export class CreateBlockSessionUseCase {
 
 ### Implementation Files
 
-- Port: `core/_ports_/port.date-provider.ts`
+- Port: `core/_ports_/date-provider.ts`
 - Real implementation: `infra/date-provider/real.date-provider.ts`
 - Stub implementation: `infra/date-provider/stub.date-provider.ts`
-- Timer use cases: `core/strictMode/usecases/start-timer.usecase.ts`
-- Timer selectors: `core/strictMode/selectors/selectIsTimerActive.ts`
+- Timer use cases: `core/strict-mode/usecases/start-timer.usecase.ts`
+- Timer selectors: `core/strict-mode/selectors/selectIsTimerActive.ts`
 - UI hook: `ui/hooks/useStrictModeTimer.ts`
