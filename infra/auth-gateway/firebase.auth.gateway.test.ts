@@ -2,6 +2,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import { FirebaseError } from 'firebase/app'
 import * as firebaseAuth from 'firebase/auth'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { FirebaseAuthGateway } from './firebase.auth.gateway'
 
 vi.mock('firebase/app', () => {
@@ -67,7 +68,8 @@ describe('FirebaseAuthGateway - Error Translation', () => {
     vi.mocked(firebaseAuth.signOut).mockResolvedValue(undefined)
     vi.mocked(GoogleSignin.isSignedIn).mockResolvedValue(false)
     vi.mocked(GoogleSignin.signOut).mockResolvedValue(null)
-    gateway = new FirebaseAuthGateway()
+    const logger = new InMemoryLogger()
+    gateway = new FirebaseAuthGateway(logger)
   })
 
   describe('Firebase Auth Error Messages', () => {

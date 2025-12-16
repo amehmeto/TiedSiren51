@@ -21,6 +21,7 @@ import {
   User,
 } from 'firebase/auth'
 import { AuthGateway } from '@/core/_ports_/auth.gateway'
+import { Logger } from '@/core/_ports_/logger'
 import { AuthUser } from '@/core/auth/auth-user'
 import { firebaseConfig } from './firebaseConfig'
 
@@ -101,7 +102,7 @@ export class FirebaseAuthGateway implements AuthGateway {
     return !!pattern
   }
 
-  public constructor() {
+  public constructor(private readonly logger: Logger) {
     this.firebaseConfig = FirebaseAuthGateway.FIREBASE_CONFIG
     const app = this.initializeApp()
     this.auth = this.initializeAuth(app)
@@ -221,7 +222,14 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   async signInWithApple(): Promise<AuthUser> {
-    throw new Error('Apple auth not implemented yet')
+    try {
+      throw new Error('Apple auth not implemented yet')
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to signInWithApple: ${error}`,
+      )
+      throw error
+    }
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {

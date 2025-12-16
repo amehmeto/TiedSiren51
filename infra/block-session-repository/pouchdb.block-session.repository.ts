@@ -23,7 +23,9 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
           return sessionWithoutInternalIds
         })
     } catch (error) {
-      this.logger.error(`Failed to find all block sessions: ${error}`)
+      this.logger.error(
+        `[PouchdbBlockSessionRepository] Failed to find all block sessions: ${error}`,
+      )
       throw error
     }
   }
@@ -44,7 +46,9 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
       const { _id, ...sessionWithoutInternalId } = createdBlockSession
       return sessionWithoutInternalId
     } catch (error) {
-      this.logger.error(`Failed to create block session: ${error}`)
+      this.logger.error(
+        `[PouchdbBlockSessionRepository] Failed to create block session: ${error}`,
+      )
       throw error
     }
   }
@@ -55,7 +59,7 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
       await this.db.remove(doc._id, doc._rev)
     } catch (error) {
       this.logger.error(
-        `Failed to delete block session ${blockSessionId}: ${error}`,
+        `[PouchdbBlockSessionRepository] Failed to delete block session ${blockSessionId}: ${error}`,
       )
       throw error
     }
@@ -67,7 +71,9 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
       const { _id, _rev, ...sessionWithoutInternalIds } = retrievedSession
       return sessionWithoutInternalIds
     } catch (error) {
-      this.logger.error(`Failed to find block session ${sessionId}: ${error}`)
+      this.logger.error(
+        `[PouchdbBlockSessionRepository] Failed to find block session ${sessionId}: ${error}`,
+      )
       throw error
     }
   }
@@ -83,7 +89,7 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
       })
     } catch (error) {
       this.logger.error(
-        `Failed to update block session ${updateBlockSession.id}: ${error}`,
+        `[PouchdbBlockSessionRepository] Failed to update block session ${updateBlockSession.id}: ${error}`,
       )
       throw error
     }

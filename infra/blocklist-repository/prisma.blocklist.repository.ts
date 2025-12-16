@@ -33,7 +33,9 @@ export class PrismaBlocklistRepository
 
       return this.mapToBlocklist(created)
     } catch (error) {
-      this.logger.error(`Failed to create blocklist: ${error}`)
+      this.logger.error(
+        `[PrismaBlocklistRepository] Failed to create blocklist: ${error}`,
+      )
       throw error
     }
   }
@@ -43,7 +45,9 @@ export class PrismaBlocklistRepository
       const blocklists = await this.baseClient.blocklist.findMany()
       return blocklists.map(this.mapToBlocklist)
     } catch (error) {
-      this.logger.error(`Failed to find all blocklists: ${error}`)
+      this.logger.error(
+        `[PrismaBlocklistRepository] Failed to find all blocklists: ${error}`,
+      )
       throw error
     }
   }
@@ -58,7 +62,9 @@ export class PrismaBlocklistRepository
         },
       })
     } catch (error) {
-      this.logger.error(`Failed to update blocklist ${payload.id}: ${error}`)
+      this.logger.error(
+        `[PrismaBlocklistRepository] Failed to update blocklist ${payload.id}: ${error}`,
+      )
       throw error
     }
   }
@@ -73,7 +79,9 @@ export class PrismaBlocklistRepository
 
       return this.mapToBlocklist(blocklist)
     } catch (error) {
-      this.logger.error(`Failed to find blocklist ${id}: ${error}`)
+      this.logger.error(
+        `[PrismaBlocklistRepository] Failed to find blocklist ${id}: ${error}`,
+      )
       throw error
     }
   }
@@ -84,7 +92,9 @@ export class PrismaBlocklistRepository
         where: { id },
       })
     } catch (error) {
-      this.logger.error(`Failed to delete blocklist ${id}: ${error}`)
+      this.logger.error(
+        `[PrismaBlocklistRepository] Failed to delete blocklist ${id}: ${error}`,
+      )
       throw error
     }
   }

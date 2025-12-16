@@ -3,6 +3,7 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { CreatePayload } from '@/core/_ports_/create.payload'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { Blocklist } from '@/core/blocklist/blocklist'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PouchdbBlocklistRepository } from './pouchdb.blocklist.repository'
 
 describe('PouchDBBlocklistRepository', () => {
@@ -12,7 +13,8 @@ describe('PouchDBBlocklistRepository', () => {
     const db = new PouchDB('pdb-blocklists')
     await db.destroy()
 
-    blocklistRepository = new PouchdbBlocklistRepository()
+    const logger = new InMemoryLogger()
+    blocklistRepository = new PouchdbBlocklistRepository(logger)
   })
 
   const buildBlocklistPayload = (): CreatePayload<Blocklist> => {

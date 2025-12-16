@@ -18,6 +18,13 @@ export class PrismaDatabaseService
   }
 
   async initialize(): Promise<void> {
-    return super.initialize()
+    try {
+      return super.initialize()
+    } catch (error) {
+      this.logger.error(
+        `[PrismaDatabaseService] Failed to initialize: ${error}`,
+      )
+      throw error
+    }
   }
 }

@@ -15,27 +15,37 @@ export class PrismaTimerRepository
   }
 
   async saveTimer(userId: string, endedAt: ISODateString): Promise<void> {
-    await this.baseClient.timer.upsert({
-      where: { id: userId },
-      create: {
-        id: userId,
-        userId,
-        endedAt,
-      },
-      update: {
-        endedAt,
-      },
-    })
+    try {
+      await this.baseClient.timer.upsert({
+        where: { id: userId },
+        create: {
+          id: userId,
+          userId,
+          endedAt,
+        },
+        update: {
+          endedAt,
+        },
+      })
+    } catch (error) {
+      this.logger.error(`[PrismaTimerRepository] Failed to saveTimer: ${error}`)
+      throw error
+    }
   }
 
   async loadTimer(userId: string): Promise<ISODateString | null> {
-    const timer = await this.baseClient.timer.findUnique({
-      where: { id: userId },
-    })
+    try {
+      const timer = await this.baseClient.timer.findUnique({
+        where: { id: userId },
+      })
 
-    if (!timer) return null
+      if (!timer) return null
 
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Prisma stores ISO strings
-    return timer.endedAt as ISODateString
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Prisma stores ISO strings
+      return timer.endedAt as ISODateString
+    } catch (error) {
+      this.logger.error(`[PrismaTimerRepository] Failed to loadTimer: ${error}`)
+      throw error
+    }
   }
 }

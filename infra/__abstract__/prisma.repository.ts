@@ -71,7 +71,9 @@ export abstract class PrismaRepository {
         })
       }
     } catch (error) {
-      this.logger.error(`Error ensuring database file: ${error}`)
+      this.logger.error(
+        `[PrismaRepository] Error ensuring database file: ${error}`,
+      )
       throw error
     }
   }
@@ -81,7 +83,9 @@ export abstract class PrismaRepository {
       await this.baseClient.$connect()
       await this.baseClient.$executeRaw`PRAGMA foreign_keys = ON;`
     } catch (error) {
-      this.logger.error(`Error connecting to database: ${error}`)
+      this.logger.error(
+        `[PrismaRepository] Error connecting to database: ${error}`,
+      )
       throw error
     }
   }
@@ -92,7 +96,7 @@ export abstract class PrismaRepository {
       await this.createJunctionTables()
       await this.migrateTimerTable()
     } catch (error) {
-      this.logger.error(`Error creating tables: ${error}`)
+      this.logger.error(`[PrismaRepository] Error creating tables: ${error}`)
       throw error
     }
   }
@@ -178,7 +182,9 @@ export abstract class PrismaRepository {
         this.logger.info('Migrated Timer table: renamed endAt to endedAt')
       }
     } catch (error) {
-      this.logger.error(`Error migrating Timer table: ${error}`)
+      this.logger.error(
+        `[PrismaRepository] Error migrating Timer table: ${error}`,
+      )
       throw error
     }
   }
@@ -208,7 +214,9 @@ export abstract class PrismaRepository {
       await this.baseClient.siren.findMany()
       await this.baseClient.blocklist.findMany()
     } catch (error) {
-      this.logger.error(`Error loading initial data: ${error}`)
+      this.logger.error(
+        `[PrismaRepository] Error loading initial data: ${error}`,
+      )
       throw error
     }
   }

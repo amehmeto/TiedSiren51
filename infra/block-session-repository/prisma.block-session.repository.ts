@@ -79,7 +79,9 @@ export class PrismaBlockSessionRepository
 
       return this.mapToBlockSession(created)
     } catch (error) {
-      this.logger.error(`Failed to create block session: ${error}`)
+      this.logger.error(
+        `[PrismaBlockSessionRepository] Failed to create block session: ${error}`,
+      )
       throw error
     }
   }
@@ -112,7 +114,9 @@ export class PrismaBlockSessionRepository
 
       return sessions.map(this.mapToBlockSession)
     } catch (error) {
-      this.logger.error(`Failed to find all block sessions: ${error}`)
+      this.logger.error(
+        `[PrismaBlockSessionRepository] Failed to find all block sessions: ${error}`,
+      )
       throw error
     }
   }
@@ -131,7 +135,9 @@ export class PrismaBlockSessionRepository
 
       return this.mapToBlockSession(session)
     } catch (error) {
-      this.logger.error(`Failed to find block session ${id}: ${error}`)
+      this.logger.error(
+        `[PrismaBlockSessionRepository] Failed to find block session ${id}: ${error}`,
+      )
       throw error
     }
   }
@@ -166,7 +172,7 @@ export class PrismaBlockSessionRepository
       })
     } catch (error) {
       this.logger.error(
-        `Failed to update block session ${payload.id}: ${error}`,
+        `[PrismaBlockSessionRepository] Failed to update block session ${payload.id}: ${error}`,
       )
       throw error
     }
@@ -186,7 +192,9 @@ export class PrismaBlockSessionRepository
         where: { id },
       })
     } catch (error) {
-      this.logger.error(`Failed to delete block session ${id}: ${error}`)
+      this.logger.error(
+        `[PrismaBlockSessionRepository] Failed to delete block session ${id}: ${error}`,
+      )
       throw error
     }
   }

@@ -22,7 +22,7 @@ const logger = new SentryLogger()
 const mobileDependencies = {
   authGateway: process.env.EXPO_PUBLIC_E2E
     ? new FakeAuthGateway()
-    : new FirebaseAuthGateway(),
+    : new FirebaseAuthGateway(logger),
   backgroundTaskService: new RealBackgroundTaskService(logger),
   blockSessionRepository: new PrismaBlockSessionRepository(logger),
   blocklistRepository: new PrismaBlocklistRepository(logger),
@@ -30,7 +30,7 @@ const mobileDependencies = {
   dateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
   foregroundService: new AndroidForegroundService(logger),
-  installedAppRepository: new ExpoListInstalledAppsRepository(),
+  installedAppRepository: new ExpoListInstalledAppsRepository(logger),
   logger,
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),

@@ -1,5 +1,6 @@
 import PouchDB from 'pouchdb'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PouchdbSirensRepository } from './pouchdb.sirens-repository'
 
 describe('PouchDBSirenRepository', () => {
@@ -9,7 +10,8 @@ describe('PouchDBSirenRepository', () => {
     const db = new PouchDB('pdb-sirens')
     await db.destroy()
 
-    sirenRepository = new PouchdbSirensRepository()
+    const logger = new InMemoryLogger()
+    sirenRepository = new PouchdbSirensRepository(logger)
   })
 
   it('should init selectable sirens when empty', async () => {

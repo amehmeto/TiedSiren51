@@ -17,7 +17,9 @@ export class ExpoNotificationService implements NotificationService {
         }),
       })
     } catch (error) {
-      this.logger.error(`Failed to initialize notification service: ${error}`)
+      this.logger.error(
+        `[ExpoNotificationService] Failed to initialize notification service: ${error}`,
+      )
       throw error
     }
   }
@@ -40,7 +42,9 @@ export class ExpoNotificationService implements NotificationService {
       if (finalStatus !== 'granted')
         throw new Error('Failed to get push token for push notification!')
     } catch (error) {
-      this.logger.error(`Failed to request notification permissions: ${error}`)
+      this.logger.error(
+        `[ExpoNotificationService] Failed to request notification permissions: ${error}`,
+      )
       throw error
     }
   }
@@ -58,7 +62,7 @@ export class ExpoNotificationService implements NotificationService {
 
       return token.data
     } catch (error) {
-      this.logger.error(`${error}`)
+      this.logger.error(`[ExpoNotificationService] ${error}`)
       throw error
     }
   }
@@ -85,7 +89,9 @@ export class ExpoNotificationService implements NotificationService {
 
       if (!response.ok) throw new Error('Failed to send push notification')
     } catch (error) {
-      this.logger.error(`Failed to send push notification: ${error}`)
+      this.logger.error(
+        `[ExpoNotificationService] Failed to send push notification: ${error}`,
+      )
       throw error
     }
   }
@@ -110,7 +116,9 @@ export class ExpoNotificationService implements NotificationService {
         trigger,
       })
     } catch (error) {
-      this.logger.error(`Failed to schedule local notification: ${error}`)
+      this.logger.error(
+        `[ExpoNotificationService] Failed to schedule local notification: ${error}`,
+      )
       throw error
     }
   }
@@ -120,7 +128,7 @@ export class ExpoNotificationService implements NotificationService {
       await Notifications.cancelScheduledNotificationAsync(notificationId)
     } catch (error) {
       this.logger.error(
-        `Failed to cancel scheduled notification ${notificationId}: ${error}`,
+        `[ExpoNotificationService] Failed to cancel scheduled notification ${notificationId}: ${error}`,
       )
       throw error
     }
