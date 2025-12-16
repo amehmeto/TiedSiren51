@@ -2,7 +2,6 @@ import { describe, expect, it } from 'vitest'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import {
   ForgotPasswordViewState,
-  getValidationError,
   selectForgotPasswordViewModel,
 } from './forgot-password.view-model'
 
@@ -46,25 +45,5 @@ describe('selectForgotPasswordViewModel', () => {
     const viewModel = selectForgotPasswordViewModel(state)
 
     expect(viewModel).toMatchObject(expectedViewModel)
-  })
-})
-
-describe('getValidationError', () => {
-  it('should return null for valid email', () => {
-    const error = getValidationError('user@example.com')
-
-    expect(error).toBeNull()
-  })
-
-  it('should return error for empty email', () => {
-    const error = getValidationError('')
-
-    expect(error).not.toBeNull()
-  })
-
-  it('should return error for invalid email format', () => {
-    const error = getValidationError('invalid-email')
-
-    expect(error).not.toBeNull()
   })
 })

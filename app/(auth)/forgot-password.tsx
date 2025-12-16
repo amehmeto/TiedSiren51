@@ -12,13 +12,13 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
+import { getForgotPasswordValidationError } from '@/ui/auth-schemas/validation-helper'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 import {
   ForgotPasswordViewState,
-  getValidationError,
   selectForgotPasswordViewModel,
 } from '@/ui/screens/Auth/ForgotPassword/forgot-password.view-model'
 import { PasswordResetSuccessView } from '@/ui/screens/Auth/ForgotPassword/PasswordResetSuccessView'
@@ -50,7 +50,7 @@ export default function ForgotPasswordScreen() {
   const handleResetPassword = async () => {
     dispatch(clearError())
 
-    const validationError = getValidationError(email)
+    const validationError = getForgotPasswordValidationError(email)
     if (validationError) {
       dispatch(setError(validationError))
       return

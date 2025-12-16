@@ -1,5 +1,4 @@
 import { RootState } from '@/core/_redux_/createStore'
-import { validateForgotPasswordInput } from '@/ui/auth-schemas/validation-helper'
 
 export enum ForgotPasswordViewState {
   Form = 'FORM',
@@ -38,12 +37,4 @@ export function selectForgotPasswordViewModel(
     buttonText: isLoading ? 'SENDING...' : 'SEND RESET LINK',
     isInputDisabled: isLoading,
   }
-}
-
-export function getValidationError(email: string): string | null {
-  const validation = validateForgotPasswordInput({ email })
-
-  if (!validation.isValid) return Object.values(validation.errors).join(', ')
-
-  return null
 }

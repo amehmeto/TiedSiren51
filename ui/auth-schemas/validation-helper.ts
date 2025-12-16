@@ -32,6 +32,14 @@ export function validateForgotPasswordInput(
   return validateWithSchema(forgotPasswordSchema, input)
 }
 
+export function getForgotPasswordValidationError(email: string): string | null {
+  const validation = validateForgotPasswordInput({ email })
+
+  if (!validation.isValid) return Object.values(validation.errors).join(', ')
+
+  return null
+}
+
 function validateWithSchema<T>(
   schema: z.ZodSchema<T>,
   input: unknown,
