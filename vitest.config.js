@@ -12,7 +12,11 @@ export default {
         interopDefault: true,
       },
     },
-    exclude: ['infra/**/prisma.*.test.ts', '**/node_modules/**'],
+    exclude: [
+      'infra/**/prisma.*.test.ts',
+      '**/node_modules/**',
+      'eslint-rules/**',
+    ],
     coverage: {
       thresholds: {
         '**/*.schema.ts': {

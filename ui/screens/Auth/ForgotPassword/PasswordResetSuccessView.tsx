@@ -1,5 +1,5 @@
 import React from 'react'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import { T } from '@/ui/design-system/theme'
@@ -14,7 +14,7 @@ export function PasswordResetSuccessView({
   onBackToLogin,
 }: PasswordResetSuccessViewProps) {
   return (
-    <Pressable style={styles.mainContainer}>
+    <View style={styles.mainContainer}>
       <TiedSCloseButton onClose={onClose} />
       <View style={styles.container}>
         <Text style={styles.title}>{'CHECK YOUR EMAIL'}</Text>
@@ -27,7 +27,7 @@ export function PasswordResetSuccessView({
           style={styles.button}
         />
       </View>
-    </Pressable>
+    </View>
   )
 }
 
