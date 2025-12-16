@@ -1,32 +1,24 @@
 import React from 'react'
-import {
-  Keyboard,
-  KeyboardAvoidingView,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-} from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import { T } from '@/ui/design-system/theme'
 
+interface PasswordResetSuccessViewProps {
+  onClose: () => void
+  onBackToLogin: () => void
+}
+
 export function PasswordResetSuccessView({
   onClose,
   onBackToLogin,
-}: {
-  onClose: () => void
-  onBackToLogin: () => void
-}) {
+}: PasswordResetSuccessViewProps) {
   return (
-    <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
+    <Pressable style={styles.mainContainer}>
       <TiedSCloseButton onClose={onClose} />
-      <KeyboardAvoidingView
-        style={styles.container}
-        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      >
+      <View style={styles.container}>
         <Text style={styles.title}>{'CHECK YOUR EMAIL'}</Text>
-        <Text style={styles.successText}>
+        <Text style={styles.messageText}>
           {"We've sent a password reset link to your email address."}
         </Text>
         <TiedSButton
@@ -34,7 +26,7 @@ export function PasswordResetSuccessView({
           text={'BACK TO LOGIN'}
           style={styles.button}
         />
-      </KeyboardAvoidingView>
+      </View>
     </Pressable>
   )
 }
@@ -55,7 +47,7 @@ const styles = StyleSheet.create({
     fontWeight: T.font.weight.bold,
     marginBottom: T.spacing.medium,
   },
-  successText: {
+  messageText: {
     color: T.color.text,
     fontSize: T.font.size.regular,
     textAlign: 'center',

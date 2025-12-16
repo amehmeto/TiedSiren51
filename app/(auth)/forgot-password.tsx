@@ -12,21 +12,25 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
-import { validateForgotPasswordInput } from '@/ui/auth-schemas/validation-helper'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
+import {
+  ForgotPasswordViewState,
+  getValidationError,
+  selectForgotPasswordViewModel,
+} from '@/ui/screens/Auth/ForgotPassword/forgot-password.view-model'
+import { PasswordResetSuccessView } from '@/ui/screens/Auth/ForgotPassword/PasswordResetSuccessView'
 import { FormError } from '@/ui/screens/Home/shared/FormError'
-import { PasswordResetSuccessView } from './password-reset-success-view'
 
 export default function ForgotPasswordScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const [email, setEmail] = useState('')
 
-  const { isLoading, error, isPasswordResetSent } = useSelector(
-    (state: RootState) => state.auth,
+  const viewModel = useSelector((state: RootState) =>
+    selectForgotPasswordViewModel(state),
   )
 
   useEffect(() => {
@@ -46,11 +50,9 @@ export default function ForgotPasswordScreen() {
   const handleResetPassword = async () => {
     dispatch(clearError())
 
-    const validation = validateForgotPasswordInput({ email })
-
-    if (!validation.isValid) {
-      const errorMessage = Object.values(validation.errors).join(', ')
-      dispatch(setError(errorMessage))
+    const validationError = getValidationError(email)
+    if (validationError) {
+      dispatch(setError(validationError))
       return
     }
 
@@ -62,7 +64,7 @@ export default function ForgotPasswordScreen() {
     router.replace('/(auth)/login')
   }
 
-  if (isPasswordResetSent) {
+  if (viewModel.type === ForgotPasswordViewState.Success) {
     return (
       <PasswordResetSuccessView
         onClose={handleClose}
@@ -91,19 +93,20 @@ export default function ForgotPasswordScreen() {
           value={email}
           onChangeText={(text) => {
             setEmail(text)
-            if (error) dispatch(clearError())
+            if (viewModel.error) dispatch(clearError())
           }}
           keyboardType="email-address"
           autoCapitalize="none"
+          editable={!viewModel.isInputDisabled}
         />
 
         <TiedSButton
           onPress={handleResetPassword}
-          text={isLoading ? 'SENDING...' : 'SEND RESET LINK'}
+          text={viewModel.buttonText}
           style={styles.button}
-          disabled={isLoading}
+          disabled={viewModel.isLoading}
         />
-        {error && <FormError error={error} />}
+        {viewModel.error && <FormError error={viewModel.error} />}
         <Text style={styles.backText} onPress={handleBackToLogin}>
           {'Back to Login'}
         </Text>

@@ -26,6 +26,7 @@ const withAuthLoading = createAction<boolean>('withAuthLoading')
 const withStrictModeEndedAt = createAction<ISODateString | null>(
   'withStrictModeEndedAt',
 )
+const withPasswordResetSent = createAction<boolean>('withPasswordResetSent')
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -53,6 +54,9 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withStrictModeEndedAt, (state, action) => {
       state.strictMode.endedAt = action.payload
     })
+    .addCase(withPasswordResetSent, (state, action) => {
+      state.auth.isPasswordResetSent = action.payload
+    })
 })
 
 export const stateBuilder = (baseState = initialState) => {
@@ -73,6 +77,7 @@ export const stateBuilder = (baseState = initialState) => {
     withAuthError: reduce(withAuthError),
     withAuthLoading: reduce(withAuthLoading),
     withStrictModeEndedAt: reduce(withStrictModeEndedAt),
+    withPasswordResetSent: reduce(withPasswordResetSent),
   }
 }
 
