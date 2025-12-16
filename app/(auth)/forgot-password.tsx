@@ -18,7 +18,7 @@ import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSClos
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 import { FormError } from '@/ui/screens/Home/shared/FormError'
-import { PasswordResetSuccessView } from './PasswordResetSuccessView'
+import { PasswordResetSuccessView } from './password-reset-success-view'
 
 export default function ForgotPasswordScreen() {
   const router = useRouter()

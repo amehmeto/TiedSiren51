@@ -86,7 +86,7 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(resetPassword.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.payload ?? null
+        state.error = action.error.message ?? null
       })
       .addCase(signInWithEmail.pending, (state) => {
         state.isLoading = true
