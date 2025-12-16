@@ -60,19 +60,20 @@ Dependencies point inward: UI and Infra depend on Core, but Core never depends o
 
 **Ports** (interfaces in `/core/_ports_/`):
 - `AuthGateway` - Authentication operations
+- `BackgroundTaskService` - Background task scheduling
 - `BlockSessionRepository` - Block session persistence
 - `BlocklistRepository` - Blocklist persistence
-- `SirensRepository` - Siren data access
-- `SirenTier` - Platform-specific blocking behavior
-- `SirenLookout` - App launch detection
-- `NotificationService` - Push notifications
 - `DatabaseService` - Database initialization
 - `DateProvider` - Time/date operations
-- `BackgroundTaskService` - Background task scheduling
+- `ForegroundService` - Android foreground service for background persistence
+- `NotificationService` - Push notifications
+- `SirenLookout` - App launch detection
+- `SirensRepository` - Siren data access
+- `SirenTier` - Platform-specific blocking behavior
 
 **Adapters** (implementations in `/infra`):
-- Production: `FirebaseAuthGateway`, `PrismaBlockSessionRepository`, `AndroidSirenTier`, `RealNotificationService`
-- Testing: `FakeAuthGateway`, `FakeDataBlockSessionRepository`, `InMemorySirenTier`, `StubDatabaseService`
+- Production: `FirebaseAuthGateway`, `PrismaBlockSessionRepository`, `AndroidSirenTier`, `AndroidForegroundService`, `RealNotificationService`
+- Testing: `FakeAuthGateway`, `FakeDataBlockSessionRepository`, `InMemorySirenTier`, `InMemoryForegroundService`, `StubDatabaseService`
 
 **Note**: Port interfaces follow TypeScript convention with no I-prefix. See [Port Naming Convention ADR](core/port-naming-convention.md) for details.
 

@@ -25,7 +25,7 @@ This is a fundamental limitation of React Native: JavaScript code cannot run whe
 
 ## Decision
 
-Integrate the `foreground-ss` Expo module to provide a persistent foreground service that keeps the app process alive when block sessions are active.
+Integrate the `@amehmeto/expo-foreground-service` Expo module to provide a persistent foreground service that keeps the app process alive when block sessions are active.
 
 ### Architecture
 
@@ -45,17 +45,15 @@ export interface ForegroundService {
 }
 ```
 
-**Real Adapter**: `/infra/foreground-service/expo.foreground.service.ts`
-- Uses `foreground-ss` package
+**Real Adapter**: `/infra/foreground-service/android.foreground.service.ts`
+- Uses `@amehmeto/expo-foreground-service` package
 - Handles Android notification permissions (POST_NOTIFICATIONS)
 - No-op on iOS/web
 
 **Fake Adapter**: `/infra/foreground-service/in-memory.foreground.service.ts`
 - For testing, tracks `startCallCount`, `stopCallCount`
 
-**Config Plugin**: `/plugins/withForegroundService.js`
-- Adds Android permissions: FOREGROUND_SERVICE, FOREGROUND_SERVICE_DATA_SYNC, POST_NOTIFICATIONS
-- Registers ForegroundService in AndroidManifest.xml
+The `@amehmeto/expo-foreground-service` module is plugin-free - it handles Android manifest modifications internally via its own Expo config plugin.
 
 ### Lifecycle
 
@@ -79,7 +77,7 @@ The sirenLookout operations remain synchronous to ensure immediate state updates
 ### Negative
 
 - Persistent notification visible when block sessions are active
-- Additional dependency on `foreground-ss` package
+- Additional dependency on `@amehmeto/expo-foreground-service` package
 - More complex listener coordination code
 
 ### Neutral
@@ -116,8 +114,6 @@ The sirenLookout operations remain synchronous to ensure immediate state updates
 - `core/siren/listeners/on-block-sessions-changed.listener.ts` - Coordination logic
 - `core/_redux_/registerListeners.ts` - Pass foregroundService to listener
 - `infra/foreground-service/` - Real and fake adapters
-- `plugins/withForegroundService.js` - Android manifest modifications
-- `app.config.js` - Plugin registration
 - `ui/dependencies.ts` - Production dependency injection
 - `core/_tests_/createTestStore.ts` - Test dependency injection
 
@@ -131,6 +127,6 @@ npx expo prebuild --clean && npx expo run:android
 
 ## References
 
-- [foreground-ss npm package](https://www.npmjs.com/package/foreground-ss)
+- [@amehmeto/expo-foreground-service npm package](https://www.npmjs.com/package/@amehmeto/expo-foreground-service)
 - [Android Foreground Services documentation](https://developer.android.com/develop/background-work/services/foreground-services)
 - [Hexagonal Architecture ADR](../hexagonal-architecture.md)
