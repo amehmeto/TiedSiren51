@@ -1,5 +1,5 @@
 /**
- * @fileoverview Require colocated test files for usecases, listeners, selectors, schemas, and view-models
+ * @fileoverview Require colocated test files for usecases, listeners, selectors, schemas, view-models, and helpers
  * @author TiedSiren
  */
 
@@ -11,7 +11,7 @@ module.exports = {
     type: 'problem',
     docs: {
       description:
-        'Require colocated test files for core modules (usecases, listeners, selectors, schemas, view-models)',
+        'Require colocated test files for core modules (usecases, listeners, selectors, schemas, view-models, helpers)',
       category: 'Best Practices',
       recommended: true,
     },
@@ -26,6 +26,8 @@ module.exports = {
         'Schema "{{filename}}" must have a colocated test file ({{expected}}).',
       missingViewModelTest:
         'View model "{{filename}}" must have a colocated test file ({{expected}}).',
+      missingHelperTest:
+        'Helper "{{filename}}" must have a colocated test file ({{expected}}).',
     },
     schema: [],
   },
@@ -118,6 +120,18 @@ module.exports = {
             context.report({
               node,
               messageId: 'missingViewModelTest',
+              data: { filename: basename, expected },
+            })
+          }
+        }
+
+        // Helper files: *.helper.ts
+        if (basename.endsWith('.helper.ts')) {
+          if (!testFileExists(basename)) {
+            const expected = basename.replace('.ts', '.test.ts')
+            context.report({
+              node,
+              messageId: 'missingHelperTest',
               data: { filename: basename, expected },
             })
           }

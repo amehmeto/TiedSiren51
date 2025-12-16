@@ -92,6 +92,7 @@ module.exports = {
     'local-rules/require-colocated-test': 'error',
     'local-rules/time-constant-multiplication': 'error',
     'local-rules/try-catch-isolation': 'error',
+    'local-rules/inline-single-statement-handlers': 'error',
     // Error handling convention rules
     'local-rules/no-try-catch-in-core': 'error',
     'local-rules/listener-error-handling': 'error',

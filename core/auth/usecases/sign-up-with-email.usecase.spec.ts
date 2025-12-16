@@ -25,7 +25,7 @@ describe('Feature: Authenticate with Email', () => {
       email: 'amehmeto@gmail.com',
       username: 'Arthur',
     })
-    fixture.then.shouldNotBeLoading()
+    fixture.then.authShouldNotBeLoading()
   })
 
   it('should show error when email is already in use', async () => {
@@ -35,7 +35,7 @@ describe('Feature: Authenticate with Email', () => {
 
     fixture.then.authenticationErrorsShouldBe('This email is already in use.')
 
-    fixture.then.shouldNotBeLoading()
+    fixture.then.authShouldNotBeLoading()
   })
 
   it('should show error when password is too weak', async () => {

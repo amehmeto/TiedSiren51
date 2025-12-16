@@ -12,10 +12,20 @@ export default {
         interopDefault: true,
       },
     },
-    exclude: ['infra/**/prisma.*.test.ts', '**/node_modules/**'],
+    exclude: [
+      'infra/**/prisma.*.test.ts',
+      '**/node_modules/**',
+      'eslint-rules/**',
+    ],
     coverage: {
       thresholds: {
         '**/*.schema.ts': {
+          statements: 100,
+          branches: 100,
+          functions: 100,
+          lines: 100,
+        },
+        '**/*.helper.ts': {
           statements: 100,
           branches: 100,
           functions: 100,

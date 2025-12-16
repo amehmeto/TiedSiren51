@@ -25,7 +25,7 @@ describe('Feature: Authenticate with Email', () => {
       email: 'amehmeto@gmail.com',
       username: 'Arthur',
     })
-    fixture.then.shouldNotBeLoading()
+    fixture.then.authShouldNotBeLoading()
   })
 
   it('does not authenticate user when credentials are invalid', async () => {
@@ -34,7 +34,7 @@ describe('Feature: Authenticate with Email', () => {
     await fixture.when.signInWithEmail('amehmeto@gmail.com', 'wrongPassword!')
 
     fixture.then.authenticationErrorsShouldBe('Invalid credentials')
-    fixture.then.shouldNotBeLoading()
+    fixture.then.authShouldNotBeLoading()
   })
 
   it('should fail with invalid email', async () => {
@@ -42,7 +42,7 @@ describe('Feature: Authenticate with Email', () => {
     await fixture.when.signInWithEmail('amehmetomail.com', 'wrongPassword!')
 
     fixture.then.authenticationErrorsShouldBe('Invalid email address')
-    fixture.then.shouldNotBeLoading()
+    fixture.then.authShouldNotBeLoading()
   })
 
   it('should fail with invalid password', async () => {
@@ -50,6 +50,6 @@ describe('Feature: Authenticate with Email', () => {
     await fixture.when.signInWithEmail('amehmeto@gmail.com', 'wrongPassword!')
 
     fixture.then.authenticationErrorsShouldBe('Password is wrong')
-    fixture.then.shouldNotBeLoading()
+    fixture.then.authShouldNotBeLoading()
   })
 })

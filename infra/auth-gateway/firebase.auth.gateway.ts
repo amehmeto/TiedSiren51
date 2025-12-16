@@ -15,6 +15,7 @@ import {
   GoogleAuthProvider,
   initializeAuth,
   onAuthStateChanged,
+  sendPasswordResetEmail,
   signInWithCredential,
   signInWithEmailAndPassword,
   signOut,
@@ -31,6 +32,8 @@ enum FirebaseAuthErrorCode {
   InvalidCredential = 'auth/invalid-credential',
   PopupClosedByUser = 'auth/popup-closed-by-user',
   CancelledByUser = 'auth/cancelled-popup-request',
+  UserNotFound = 'auth/user-not-found',
+  TooManyRequests = 'auth/too-many-requests',
 }
 
 enum GoogleSignInError {
@@ -54,6 +57,9 @@ export class FirebaseAuthGateway implements AuthGateway {
     [FirebaseAuthErrorCode.InvalidCredential]: 'Invalid email or password.',
     [FirebaseAuthErrorCode.PopupClosedByUser]: 'Sign-in cancelled.',
     [FirebaseAuthErrorCode.CancelledByUser]: 'Sign-in cancelled.',
+    [FirebaseAuthErrorCode.UserNotFound]: 'No account found with this email.',
+    [FirebaseAuthErrorCode.TooManyRequests]:
+      'Too many requests. Please try again later.',
   }
 
   private static readonly GOOGLE_SIGN_IN_ERRORS: Record<
@@ -222,6 +228,14 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   async signInWithApple(): Promise<AuthUser> {
     throw new Error('Apple auth not implemented yet')
+  }
+
+  async resetPassword(email: string): Promise<void> {
+    try {
+      await sendPasswordResetEmail(this.auth, email)
+    } catch (error) {
+      throw new Error(this.translateFirebaseError(error))
+    }
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {

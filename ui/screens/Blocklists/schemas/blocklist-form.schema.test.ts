@@ -50,6 +50,18 @@ describe('blocklistSchema', () => {
     fixture.then.shouldBeValid()
   })
 
+  it('should pass when optional siren fields are undefined', () => {
+    fixture.given.blocklistWithUndefinedSirenFields()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
+  })
+
+  it('should pass when android is undefined but websites exist', () => {
+    fixture.given.blocklistWithUndefinedAndroid()
+    fixture.when.validate()
+    fixture.then.shouldBeValid()
+  })
+
   it('should pass with android apps when other siren arrays are undefined', () => {
     fixture.given.blocklistWithOnlyAndroidAppsAndUndefinedSirens()
     fixture.when.validate()

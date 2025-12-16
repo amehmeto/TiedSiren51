@@ -8,6 +8,7 @@ import {
 } from '@/core/_tests_/state-builder'
 import { AuthUser } from '@/core/auth/auth-user'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
+import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
@@ -72,6 +73,9 @@ export function authentificationFixture(
         )
         return store.dispatch(logOut())
       },
+      resetPasswordFor(email: string) {
+        return store.dispatch(resetPassword({ email }))
+      },
     },
     then: {
       userShouldBeAuthenticated(authUser: AuthUser) {
@@ -86,13 +90,19 @@ export function authentificationFixture(
         const state = store.getState()
         expect(state.auth.error).toBe(expectedError)
       },
-      shouldBeLoading(isLoading: boolean) {
+      authShouldBeLoading(isLoading: boolean) {
         const state = store.getState()
         expect(state.auth.isLoading).toBe(isLoading)
       },
-      shouldNotBeLoading() {
+      authShouldNotBeLoading() {
         const state = store.getState()
         expect(state.auth.isLoading).toBe(false)
+      },
+      passwordResetShouldBeSentTo(expectedEmail: string) {
+        expect(authGateway.lastResetPasswordEmail).toBe(expectedEmail)
+      },
+      passwordResetShouldNotBeSent() {
+        expect(authGateway.lastResetPasswordEmail).toBeNull()
       },
     },
   }
