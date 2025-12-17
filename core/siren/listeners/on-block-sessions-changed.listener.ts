@@ -1,3 +1,4 @@
+import { ForegroundService } from '@/core/_ports_/foreground.service'
 import { Logger } from '@/core/_ports_/logger'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { AppStore } from '@/core/_redux_/createStore'
@@ -6,11 +7,11 @@ import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAll
 /**
  * Listens to block session changes and starts/stops the siren lookout accordingly.
  *
- * - When there are block sessions (active or scheduled): starts watching
- * - When there are no block sessions: stops watching
+ * - When there are block sessions (active or scheduled): starts foreground service then watching
+ * - When there are no block sessions: stops watching then foreground service
  *
- * This ensures the AccessibilityService subscription is only active when needed,
- * avoiding the persistent notification icon when there's nothing to block.
+ * The foreground service keeps the app alive in the background via a persistent notification.
+ * This ensures the AccessibilityService subscription receives events even when app is backgrounded.
  *
  * Note: The lookout only detects app launches. The actual filtering of which apps
  * to block happens in the blockLaunchedApp usecase via selectTargetedApps selector.
@@ -18,12 +19,30 @@ import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAll
 export const onBlockSessionsChangedListener = ({
   store,
   sirenLookout,
+  foregroundService,
   logger,
 }: {
   store: AppStore
   sirenLookout: SirenLookout
+  foregroundService: ForegroundService
   logger: Logger
 }): (() => void) => {
+  const safeStartForegroundService = async () => {
+    try {
+      await foregroundService.start()
+    } catch (error) {
+      logger.error(`Failed to start foreground service: ${error}`)
+    }
+  }
+
+  const safeStopForegroundService = async () => {
+    try {
+      await foregroundService.stop()
+    } catch (error) {
+      logger.error(`Failed to stop foreground service: ${error}`)
+    }
+  }
+
   const safeStartWatching = () => {
     try {
       sirenLookout.startWatching()
@@ -40,12 +59,22 @@ export const onBlockSessionsChangedListener = ({
     }
   }
 
+  const startProtection = () => {
+    void safeStartForegroundService()
+    safeStartWatching()
+  }
+
+  const stopProtection = () => {
+    safeStopWatching()
+    void safeStopForegroundService()
+  }
+
   // Check initial state
   const initialState = store.getState()
   const initialSessions = selectAllBlockSessions(initialState.blockSession)
   let didHaveSessions = initialSessions.length > 0
 
-  if (didHaveSessions) safeStartWatching()
+  if (didHaveSessions) startProtection()
 
   // Subscribe to store changes
   return store.subscribe(() => {
@@ -53,8 +82,8 @@ export const onBlockSessionsChangedListener = ({
     const sessions = selectAllBlockSessions(state.blockSession)
     const hasSessions = sessions.length > 0
 
-    if (didHaveSessions && !hasSessions) safeStopWatching()
-    else if (!didHaveSessions && hasSessions) safeStartWatching()
+    if (didHaveSessions && !hasSessions) stopProtection()
+    else if (!didHaveSessions && hasSessions) startProtection()
 
     didHaveSessions = hasSessions
   })

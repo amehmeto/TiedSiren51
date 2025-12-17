@@ -1,7 +1,7 @@
 # Technical Debt & Future Improvements
 
 > Created: January 28, 2025
-> Last Updated: November 23, 2025
+> Last Updated: December 14, 2025
 > Status: Living document
 > Purpose: Track planned improvements across the codebase
 
@@ -12,6 +12,7 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ## Active Technical Debt Items
 
 ### Infrastructure & Database
+- [Expo SDK 54 Upgrade](expo-sdk-54-upgrade.md) - 🔴 **BLOCKED** - Prisma incompatible with New Architecture
 - [Prisma Client Generation](prisma-client-generation.md) - ✅ **COMPLETED** - Automation scripts added
 - [Error Handling Enhancement](error-handling.md) - 🚨 **HIGH PRIORITY** - Custom error types needed
 - [Database Configuration](database-configuration.md) - 📋 **LOW PRIORITY** - Configurable paths
@@ -26,6 +27,7 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 
 ## Priority Levels
 
+- 🔴 **BLOCKED**: External dependency prevents progress
 - 🚨 **HIGH**: Critical for production stability or user experience
 - ⚠️ **MEDIUM**: Important but not blocking, should be addressed soon
 - 📋 **LOW**: Nice to have, address when relevant or when metrics indicate need
@@ -34,6 +36,7 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ## Trigger Points
 
 When to revisit these improvements:
+- **SDK 54 Upgrade**: When @prisma/react-native releases New Architecture support
 - **Error Handling**: When seeing first error reports from users
 - **Migration Strategy**: Before first app update with schema changes
 - **Testing**: When reaching 1000 active users

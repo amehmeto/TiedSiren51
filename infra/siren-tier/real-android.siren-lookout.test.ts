@@ -57,7 +57,7 @@ describe('RealAndroidSirenLookout', () => {
       mockIsEnabled.mockRejectedValueOnce(error)
       const expectedLogEntry = {
         level: 'error',
-        message: `Failed to check if accessibility service is enabled: ${error}`,
+        message: `[RealAndroidSirenLookout] Failed to check if accessibility service is enabled: ${error}`,
       }
 
       const isEnabled = await lookout.isEnabled()
@@ -81,7 +81,7 @@ describe('RealAndroidSirenLookout', () => {
       mockAskPermission.mockRejectedValueOnce(error)
       const expectedLogEntry = {
         level: 'error',
-        message: `Failed to ask for accessibility permission: ${error}`,
+        message: `[RealAndroidSirenLookout] Failed to ask for accessibility permission: ${error}`,
       }
 
       const permissionPromise = lookout.askPermission()
@@ -188,7 +188,7 @@ describe('RealAndroidSirenLookout', () => {
       const expectedLogEntry = {
         level: 'warn',
         message:
-          'Overwriting existing siren detection listener. Previous listener will be discarded.',
+          '[RealAndroidSirenLookout] Overwriting existing siren detection listener. Previous listener will be discarded.',
       }
 
       lookout.onSirenDetected(listener1)

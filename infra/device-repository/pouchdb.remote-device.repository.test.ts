@@ -1,5 +1,6 @@
 import PouchDB from 'pouchdb'
 import { beforeEach, describe, expect, it } from 'vitest'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PouchdbRemoteDeviceRepository } from './pouchdb.remote-device.repository'
 
 describe('PouchDBRemoteDeviceRepository', () => {
@@ -9,7 +10,8 @@ describe('PouchDBRemoteDeviceRepository', () => {
     const db = new PouchDB('pdb-remote-devices')
     await db.destroy()
 
-    deviceRepository = new PouchdbRemoteDeviceRepository()
+    const logger = new InMemoryLogger()
+    deviceRepository = new PouchdbRemoteDeviceRepository(logger)
   })
 
   it('should find all remote devices', async () => {

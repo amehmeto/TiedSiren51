@@ -5,9 +5,11 @@ expo-env.d.ts
 node_modules
 build
 dist
+coverage
 .expo
 .expo-shared
 
 # Generated files
 *.generated.*
+package-lock.json
 

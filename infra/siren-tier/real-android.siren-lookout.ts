@@ -26,7 +26,7 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
   onSirenDetected(listener: (packageName: string) => void): void {
     if (this.listener) {
       this.logger.warn(
-        'Overwriting existing siren detection listener. Previous listener will be discarded.',
+        '[RealAndroidSirenLookout] Overwriting existing siren detection listener. Previous listener will be discarded.',
       )
     }
     this.listener = listener
@@ -37,7 +37,7 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
       return await AccessibilityService.isEnabled()
     } catch (error) {
       this.logger.error(
-        `Failed to check if accessibility service is enabled: ${error}`,
+        `[RealAndroidSirenLookout] Failed to check if accessibility service is enabled: ${error}`,
       )
       return false
     }
@@ -47,7 +47,9 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     try {
       await AccessibilityService.askPermission()
     } catch (error) {
-      this.logger.error(`Failed to ask for accessibility permission: ${error}`)
+      this.logger.error(
+        `[RealAndroidSirenLookout] Failed to ask for accessibility permission: ${error}`,
+      )
       throw error
     }
   }
@@ -69,7 +71,9 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
 
       this.logger.info('Started accessibility event subscription')
     } catch (error) {
-      this.logger.error(`Failed to start accessibility subscription: ${error}`)
+      this.logger.error(
+        `[RealAndroidSirenLookout] Failed to start accessibility subscription: ${error}`,
+      )
       throw error
     }
   }

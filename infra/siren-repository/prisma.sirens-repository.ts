@@ -39,7 +39,9 @@ export class PrismaSirensRepository
           .map((s: PrismaSiren) => s.value),
       }
     } catch (error) {
-      this.logger.error(`Failed to get selectable sirens: ${error}`)
+      this.logger.error(
+        `[PrismaSirensRepository] Failed to get selectable sirens: ${error}`,
+      )
       throw error
     }
   }
@@ -55,7 +57,7 @@ export class PrismaSirensRepository
       })
     } catch (error) {
       this.logger.error(
-        `Failed to add keyword "${keyword}" to sirens: ${error}`,
+        `[PrismaSirensRepository] Failed to add keyword "${keyword}" to sirens: ${error}`,
       )
       throw error
     }
@@ -72,7 +74,7 @@ export class PrismaSirensRepository
       })
     } catch (error) {
       this.logger.error(
-        `Failed to add website "${website}" to sirens: ${error}`,
+        `[PrismaSirensRepository] Failed to add website "${website}" to sirens: ${error}`,
       )
       throw error
     }
@@ -91,7 +93,7 @@ export class PrismaSirensRepository
       })
     } catch (error) {
       this.logger.error(
-        `Failed to add android siren "${androidSiren.packageName}" to sirens: ${error}`,
+        `[PrismaSirensRepository] Failed to add android siren "${androidSiren.packageName}" to sirens: ${error}`,
       )
       throw error
     }

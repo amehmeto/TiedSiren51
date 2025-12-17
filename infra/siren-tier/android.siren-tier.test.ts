@@ -72,7 +72,7 @@ describe('AndroidSirenTier', () => {
       mockShowOverlay.mockRejectedValueOnce(error)
       const expectedLogEntry = {
         level: 'error',
-        message: `Failed to show blocking overlay for ${packageName}: ${error}`,
+        message: `[AndroidSirenTier] Failed to show blocking overlay for ${packageName}: ${error}`,
       }
 
       await androidSirenTier.block(packageName).catch(() => {})

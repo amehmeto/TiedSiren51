@@ -59,6 +59,7 @@ External services, databases, adapters, platform-specific implementations.
 **Platform Adapters:**
 - [Expo List Installed Apps](infrastructure/expo-list-installed-apps.md)
 - [Date Provider Pattern](infrastructure/date-provider-pattern.md)
+- [Foreground Service](infrastructure/foreground-service.md)
 
 ### Cross-Cutting Concerns
 
@@ -74,6 +75,12 @@ Testing strategies, tools, and patterns across all layers.
 - [Maestro for E2E Testing](testing/maestro-for-e2e.md)
 - [Coverage Tracking and History](testing/coverage-tracking.md)
 
+#### Conventions (`conventions/`)
+Coding conventions and style decisions across all layers.
+
+- [Class-Scoped Constants](conventions/class-scoped-constants.md)
+- [Infrastructure Error Handling](conventions/infra-error-handling.md)
+
 ## Creating a New ADR
 
 1. Determine which layer the decision belongs to:
@@ -81,6 +88,7 @@ Testing strategies, tools, and patterns across all layers.
    - `core/` - Business logic, domain patterns, state management
    - `infrastructure/` - External services, databases, platform-specific code
    - `testing/` - Cross-cutting testing concerns
+   - `conventions/` - Coding conventions and style decisions
 2. Copy `template.md` to the appropriate directory
 3. Name it descriptively (e.g., `graphql-api.md`)
 4. Fill in all sections

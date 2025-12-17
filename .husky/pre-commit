@@ -3,4 +3,4 @@ sh .husky/scripts/no-commits-on-main-demo.sh
 # Type check entire project (catches errors in non-staged files that depend on staged changes)
 npx tsc --noEmit
 
-npx lint-staged
+npx lint-staged --allow-empty

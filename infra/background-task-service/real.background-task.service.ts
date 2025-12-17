@@ -20,7 +20,9 @@ export class RealBackgroundTaskService implements BackgroundTaskService {
       TaskManager.defineTask(taskName, taskFunction)
       return Promise.resolve()
     } catch (error) {
-      this.logger.error(`Failed to define task "${taskName}": ${error}`)
+      this.logger.error(
+        `[RealBackgroundTaskService] Failed to define task "${taskName}": ${error}`,
+      )
       throw error
     }
   }
@@ -37,7 +39,7 @@ export class RealBackgroundTaskService implements BackgroundTaskService {
       })
     } catch (error) {
       this.logger.error(
-        `Failed to initialize background task service: ${error}`,
+        `[RealBackgroundTaskService] Failed to initialize: ${error}`,
       )
       throw error
     }
@@ -53,7 +55,9 @@ export class RealBackgroundTaskService implements BackgroundTaskService {
         startOnBoot: true, // android only
       })
     } catch (error) {
-      this.logger.error(`Failed to schedule task "${taskName}": ${error}`)
+      this.logger.error(
+        `[RealBackgroundTaskService] Failed to schedule task "${taskName}": ${error}`,
+      )
       throw error
     }
   }
@@ -62,7 +66,9 @@ export class RealBackgroundTaskService implements BackgroundTaskService {
     try {
       return BackgroundFetch.unregisterTaskAsync(taskName)
     } catch (error) {
-      this.logger.error(`Failed to cancel task "${taskName}": ${error}`)
+      this.logger.error(
+        `[RealBackgroundTaskService] Failed to cancel task "${taskName}": ${error}`,
+      )
       throw error
     }
   }

@@ -4,6 +4,7 @@ import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
 import { BlocklistRepository } from '@/core/_ports_/blocklist.repository'
 import { DatabaseService } from '@/core/_ports_/database.service'
 import { DateProvider } from '@/core/_ports_/date-provider'
+import { ForegroundService } from '@/core/_ports_/foreground.service'
 import { InstalledAppRepository } from '@/core/_ports_/installed-app.repository'
 import { Logger } from '@/core/_ports_/logger'
 import { NotificationService } from '@/core/_ports_/notification.service'
@@ -21,6 +22,7 @@ export type Dependencies = {
   databaseService: DatabaseService
   dateProvider: DateProvider
   deviceRepository: RemoteDeviceRepository
+  foregroundService: ForegroundService
   installedAppRepository: InstalledAppRepository
   logger: Logger
   notificationService: NotificationService

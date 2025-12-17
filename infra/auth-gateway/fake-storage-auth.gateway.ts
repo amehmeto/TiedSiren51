@@ -10,7 +10,9 @@ export class FakeStorageAuthGateway implements AuthGateway {
     private readonly logger: Logger,
   ) {
     this.verifyUserIsAuthenticated().catch((err) =>
-      this.logger.error(`Failed to verify authentication: ${err}`),
+      this.logger.error(
+        `[FakeStorageAuthGateway] Failed to verify authentication: ${err}`,
+      ),
     )
   }
 
@@ -68,7 +70,9 @@ export class FakeStorageAuthGateway implements AuthGateway {
         this.fakeAuthGateway.simulateUserLoggedIn(parsedAuthUser)
       }
     } catch (error) {
-      this.logger.warn(`Error verifying authentication: ${error}`)
+      this.logger.warn(
+        `[FakeStorageAuthGateway] Error verifying authentication: ${error}`,
+      )
       throw error
     }
   }

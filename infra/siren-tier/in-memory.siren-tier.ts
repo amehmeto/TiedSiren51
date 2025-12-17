@@ -16,7 +16,7 @@ export class InMemorySirenTier implements SirenTier {
       )
       this.sirens = sirens
     } catch (error) {
-      this.logger.error(`Failed to target sirens: ${error}`)
+      this.logger.error(`[InMemorySirenTier] Failed to target sirens: ${error}`)
       throw error
     }
   }
@@ -26,7 +26,9 @@ export class InMemorySirenTier implements SirenTier {
       this.logger.info(`Blocking app: ${packageName}`)
       this.blockedApps.push(packageName)
     } catch (error) {
-      this.logger.error(`Failed to block app "${packageName}": ${error}`)
+      this.logger.error(
+        `[InMemorySirenTier] Failed to block app "${packageName}": ${error}`,
+      )
       throw error
     }
   }

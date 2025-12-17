@@ -7,9 +7,14 @@ export class AndroidSirenTier implements SirenTier {
   constructor(private readonly logger: Logger) {}
 
   async target(sirens: Sirens): Promise<void> {
-    this.logger.info(
-      `Targeted sirens: ${sirens.android.map((app) => app.appName).join(', ')}`,
-    )
+    try {
+      this.logger.info(
+        `Targeted sirens: ${sirens.android.map((app) => app.appName).join(', ')}`,
+      )
+    } catch (error) {
+      this.logger.error(`[AndroidSirenTier] Failed to target: ${error}`)
+      throw error
+    }
   }
 
   async block(packageName: string): Promise<void> {
@@ -18,7 +23,7 @@ export class AndroidSirenTier implements SirenTier {
       this.logger.info(`Blocking overlay shown for: ${packageName}`)
     } catch (error) {
       this.logger.error(
-        `Failed to show blocking overlay for ${packageName}: ${error}`,
+        `[AndroidSirenTier] Failed to show blocking overlay for ${packageName}: ${error}`,
       )
       throw error
     }

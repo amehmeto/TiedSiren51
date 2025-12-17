@@ -7,6 +7,7 @@ import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.b
 import { PrismaDatabaseService } from '@/infra/database-service/prisma.database.service'
 import { RealDateProvider } from '@/infra/date-provider/real.date-provider'
 import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
+import { AndroidForegroundService } from '@/infra/foreground-service/android.foreground.service'
 import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-repository/expo-list-installed-apps.repository'
 import { SentryLogger } from '@/infra/logger/sentry.logger'
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
@@ -21,14 +22,15 @@ const logger = new SentryLogger()
 const mobileDependencies = {
   authGateway: process.env.EXPO_PUBLIC_E2E
     ? new FakeAuthGateway()
-    : new FirebaseAuthGateway(),
+    : new FirebaseAuthGateway(logger),
   backgroundTaskService: new RealBackgroundTaskService(logger),
   blockSessionRepository: new PrismaBlockSessionRepository(logger),
   blocklistRepository: new PrismaBlocklistRepository(logger),
   databaseService: new PrismaDatabaseService(logger),
   dateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
-  installedAppRepository: new ExpoListInstalledAppsRepository(),
+  foregroundService: new AndroidForegroundService(logger),
+  installedAppRepository: new ExpoListInstalledAppsRepository(logger),
   logger,
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),

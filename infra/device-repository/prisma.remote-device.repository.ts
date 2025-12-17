@@ -24,7 +24,9 @@ export class PrismaRemoteDeviceRepository
         type: device.type,
       }))
     } catch (error) {
-      this.logger.error(`Failed to find all devices: ${error}`)
+      this.logger.error(
+        `[PrismaRemoteDeviceRepository] Failed to find all devices: ${error}`,
+      )
       throw error
     }
   }

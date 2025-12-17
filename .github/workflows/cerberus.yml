@@ -25,11 +25,16 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v4
 
-      - name: Install shellcheck
-        run: sudo apt-get install -y shellcheck
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install dependencies
+        run: npm ci
 
       - name: Run shellcheck
-        run: shellcheck .husky/scripts/*.sh scripts/*.sh .claude/hooks/*.sh
+        run: npm run lint:sh
 
   test:
     needs: path-filter
