@@ -110,6 +110,7 @@
       "mcp__ide__getDiagnostics"
     ],
     "deny": [
+      "Bash(HUSKY=0:*)",
       "Bash(SKIP_E2E_CHECK=1 git push --force-with-lease:*)",
       "Bash(SKIP_E2E_CHECK=1 git push --force:*)",
       "Bash(SKIP_E2E_CHECK=1 git push -f:*)",
