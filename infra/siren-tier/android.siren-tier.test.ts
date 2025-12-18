@@ -4,7 +4,6 @@ import {
   showOverlay,
 } from '@amehmeto/tied-siren-blocking-overlay'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { buildSirens } from '@/core/_tests_/data-builders/sirens.builder'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { AndroidSirenTier } from './android.siren-tier'
 
@@ -86,29 +85,6 @@ describe('AndroidSirenTier', () => {
       }
 
       await androidSirenTier.block(packageName).catch(() => {})
-
-      expect(logger.getLogs()).toContainEqual(expectedLogEntry)
-    })
-  })
-
-  describe('target', () => {
-    it('logs targeted sirens', async () => {
-      const sirens = buildSirens({
-        android: [
-          { appName: 'Facebook', packageName: 'com.facebook.katana', icon: '' },
-          {
-            appName: 'Instagram',
-            packageName: 'com.instagram.android',
-            icon: '',
-          },
-        ],
-      })
-      const expectedLogEntry = {
-        level: 'info',
-        message: 'Targeted sirens: Facebook, Instagram',
-      }
-
-      await androidSirenTier.target(sirens)
 
       expect(logger.getLogs()).toContainEqual(expectedLogEntry)
     })

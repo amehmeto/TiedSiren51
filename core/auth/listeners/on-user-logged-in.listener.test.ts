@@ -35,12 +35,6 @@ describe('onUserLoggedIn listener', () => {
     )
 
     expect(hasLoadUserPending).toBe(true)
-
-    const hasTargetSirensPending = dispatchedActions.some(
-      (action) => action.type === 'siren/targetSirens/pending',
-    )
-
-    expect(hasTargetSirensPending).toBe(true)
   })
 
   it('should log error when dispatch throws', () => {

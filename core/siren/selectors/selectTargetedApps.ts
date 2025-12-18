@@ -11,13 +11,8 @@ export const selectTargetedApps = createSelector(
   (blockSessionState, dateProvider): AndroidSiren[] => {
     const activeSessions = selectActiveSessions(dateProvider, blockSessionState)
 
-    const targetedApps: AndroidSiren[] = activeSessions.flatMap(
-      (blockSession) =>
-        blockSession.blocklists.flatMap(
-          (blocklist) => blocklist.sirens.android,
-        ),
+    return activeSessions.flatMap((blockSession) =>
+      blockSession.blocklists.flatMap((blocklist) => blocklist.sirens.android),
     )
-
-    return targetedApps
   },
 )
