@@ -7,6 +7,8 @@ export class InMemorySirenTier implements SirenTier {
 
   blockedApps: string[] = []
 
+  isNativeBlockingInitialized = false
+
   constructor(private readonly logger: Logger) {}
 
   async target(sirens: Sirens): Promise<void> {
@@ -31,5 +33,10 @@ export class InMemorySirenTier implements SirenTier {
       )
       throw error
     }
+  }
+
+  async initializeNativeBlocking(): Promise<void> {
+    this.logger.info('Native blocking initialized (in-memory)')
+    this.isNativeBlockingInitialized = true
   }
 }

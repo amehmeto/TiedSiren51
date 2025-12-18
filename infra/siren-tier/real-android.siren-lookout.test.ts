@@ -22,6 +22,10 @@ vi.mock('@amehmeto/expo-accessibility-service', () => ({
   addAccessibilityEventListener: mockAddAccessibilityEventListener,
 }))
 
+vi.mock('@amehmeto/tied-siren-blocking-overlay', () => ({
+  setBlockedApps: vi.fn(),
+}))
+
 const mockIsEnabled = vi.mocked(AccessibilityService.isEnabled)
 const mockAskPermission = vi.mocked(AccessibilityService.askPermission)
 

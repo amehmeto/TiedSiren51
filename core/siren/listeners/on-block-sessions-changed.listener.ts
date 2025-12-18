@@ -1,14 +1,38 @@
+import { DateProvider } from '@/core/_ports_/date-provider'
 import { ForegroundService } from '@/core/_ports_/foreground.service'
 import { Logger } from '@/core/_ports_/logger'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { AppStore } from '@/core/_redux_/createStore'
+import { BlockSession } from '@/core/block-session/block-session'
+import { selectActiveSessions } from '@/core/block-session/selectors/selectActiveSessions'
 import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAllBlockSessions'
+
+/**
+ * Extracts unique package names from active sessions' blocklists.
+ */
+const getBlockedPackagesFromSessions = (sessions: BlockSession[]): string[] => {
+  const packages = new Set<string>()
+
+  for (const session of sessions) {
+    for (const blocklist of session.blocklists) {
+      for (const siren of blocklist.sirens.android)
+        packages.add(siren.packageName)
+    }
+  }
+
+  return Array.from(packages)
+}
 
 /**
  * Listens to block session changes and starts/stops the siren lookout accordingly.
  *
  * - When there are block sessions (active or scheduled): starts foreground service then watching
  * - When there are no block sessions: stops watching then foreground service
+ *
+ * Also syncs blocked apps to native SharedPreferences for native-to-native blocking:
+ * - On protection start: syncs package names from active sessions
+ * - On protection stop: clears blocked apps
+ * - On blocklist changes during active session: re-syncs
  *
  * The foreground service keeps the app alive in the background via a persistent notification.
  * This ensures the AccessibilityService subscription receives events even when app is backgrounded.
@@ -20,11 +44,13 @@ export const onBlockSessionsChangedListener = ({
   store,
   sirenLookout,
   foregroundService,
+  dateProvider,
   logger,
 }: {
   store: AppStore
   sirenLookout: SirenLookout
   foregroundService: ForegroundService
+  dateProvider: DateProvider
   logger: Logger
 }): (() => void) => {
   const safeStartForegroundService = async () => {
@@ -59,12 +85,22 @@ export const onBlockSessionsChangedListener = ({
     }
   }
 
-  const startProtection = () => {
+  const safeSyncBlockedApps = async (packageNames: string[]) => {
+    try {
+      await sirenLookout.updateBlockedApps(packageNames)
+    } catch (error) {
+      logger.error(`Failed to sync blocked apps: ${error}`)
+    }
+  }
+
+  const startProtection = async (blockedPackages: string[]) => {
+    await safeSyncBlockedApps(blockedPackages)
     void safeStartForegroundService()
     safeStartWatching()
   }
 
-  const stopProtection = () => {
+  const stopProtection = async () => {
+    await safeSyncBlockedApps([])
     safeStopWatching()
     void safeStopForegroundService()
   }
@@ -72,18 +108,51 @@ export const onBlockSessionsChangedListener = ({
   // Check initial state
   const initialState = store.getState()
   const initialSessions = selectAllBlockSessions(initialState.blockSession)
+  const initialActiveSessions = selectActiveSessions(
+    dateProvider,
+    initialState.blockSession,
+  )
   let didHaveSessions = initialSessions.length > 0
+  let lastSyncedPackages: string[] = []
 
-  if (didHaveSessions) startProtection()
+  if (didHaveSessions) {
+    const blockedPackages = getBlockedPackagesFromSessions(
+      initialActiveSessions,
+    )
+    lastSyncedPackages = blockedPackages
+    void startProtection(blockedPackages)
+  }
 
   // Subscribe to store changes
   return store.subscribe(() => {
     const state = store.getState()
     const sessions = selectAllBlockSessions(state.blockSession)
+    const activeSessions = selectActiveSessions(
+      dateProvider,
+      state.blockSession,
+    )
     const hasSessions = sessions.length > 0
 
-    if (didHaveSessions && !hasSessions) stopProtection()
-    else if (!didHaveSessions && hasSessions) startProtection()
+    if (didHaveSessions && !hasSessions) {
+      void stopProtection()
+      lastSyncedPackages = []
+    } else if (!didHaveSessions && hasSessions) {
+      const blockedPackages = getBlockedPackagesFromSessions(activeSessions)
+      lastSyncedPackages = blockedPackages
+      void startProtection(blockedPackages)
+    } else if (hasSessions) {
+      // Sessions still exist - check if blocked apps changed (O(n) with Set)
+      const blockedPackages = getBlockedPackagesFromSessions(activeSessions)
+      const lastSyncedSet = new Set(lastSyncedPackages)
+      const hasPackagesChanged =
+        blockedPackages.length !== lastSyncedPackages.length ||
+        blockedPackages.some((pkg) => !lastSyncedSet.has(pkg))
+
+      if (hasPackagesChanged) {
+        lastSyncedPackages = blockedPackages
+        void safeSyncBlockedApps(blockedPackages)
+      }
+    }
 
     didHaveSessions = hasSessions
   })

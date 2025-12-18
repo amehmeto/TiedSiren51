@@ -24,10 +24,11 @@ module.exports = {
   create(context) {
     const filename = context.getFilename()
 
-    // Only apply to */listeners/*.ts files, excluding tests
+    // Only apply to */listeners/*.ts files, excluding tests and fixtures
     if (!filename.includes('/listeners/')) return {}
     if (filename.includes('.test.ts')) return {}
     if (filename.includes('.spec.ts')) return {}
+    if (filename.includes('.fixture.ts')) return {}
 
     let hasTryCatch = false
     let hasSafeCall = false

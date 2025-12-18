@@ -16,11 +16,12 @@ export function useAppInitialization(store: AppStore) {
 
   const initializeServices = async (appStore: AppStore) => {
     try {
-      const { logger } = dependencies
+      const { logger, sirenTier } = dependencies
       logger.initialize()
       await dependencies.databaseService.initialize()
       await dependencies.notificationService.initialize()
       await dependencies.backgroundTaskService.initialize(appStore)
+      await sirenTier.initializeNativeBlocking()
 
       await appStore.dispatch(targetSirens())
       await appStore.dispatch(loadUser())
