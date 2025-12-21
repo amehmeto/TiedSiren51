@@ -104,7 +104,7 @@ describe('AndroidSirenTier', () => {
       mockSetCallbackClass.mockResolvedValueOnce(undefined)
       const expectedLogEntry = {
         level: 'info',
-        message: 'Native blocking initialized',
+        message: '[AndroidSirenTier] Native blocking initialized',
       }
 
       await androidSirenTier.initializeNativeBlocking()

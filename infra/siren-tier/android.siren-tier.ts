@@ -24,7 +24,7 @@ export class AndroidSirenTier implements SirenTier {
   async initializeNativeBlocking(): Promise<void> {
     try {
       await setCallbackClass(BLOCKING_CALLBACK_CLASS)
-      this.logger.info('Native blocking initialized')
+      this.logger.info('[AndroidSirenTier] Native blocking initialized')
     } catch (error) {
       this.logger.error(
         `[AndroidSirenTier] Failed to initialize native blocking: ${error}`,
