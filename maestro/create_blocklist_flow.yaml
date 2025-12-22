@@ -1,8 +1,11 @@
 appId: com.tiedsiren.tiedsiren
 # Test: Create a blocklist by selecting Android System app
 ---
-- launchApp
-- assertVisible: "Let's make it productive"
+- launchApp:
+    clearState: true
+- extendedWaitUntil:
+    visible: '.*productive.*'
+    timeout: 30000
 - tapOn: 'LOG IN'
 - assertVisible: 'LOG INTO YOUR ACCOUNT'
 - tapOn: '.*CONTINUE WITH GOOGLE'
@@ -16,9 +19,12 @@ appId: com.tiedsiren.tiedsiren
 - tapOn:
     id: 'addBlocklistName'
 - inputText: 'My New Blocklist'
-# Select any app from the list (using regex pattern to match any app)
+- hideKeyboard
+# Select an app from the fake installed apps list - tap the checkbox (testID is lowercased on Android)
 - tapOn:
-    id: 'siren-ANDROID-.*'
+    id: 'siren-android-com.example.youtube-checkbox'
 # Save the blocklist
 - tapOn: 'Save Blocklist'
-- assertVisible: 'Blocklist'
+
+# Verify blocklist was created and appears in list
+- assertVisible: 'My New Blocklist'

@@ -1,11 +1,11 @@
 appId: com.tiedsiren.tiedsiren
+# Test: Full block session creation and verification flow
 ---
 - launchApp
 - assertVisible: "Let's make it productive"
 - tapOn: 'LOG IN'
 - assertVisible: 'LOG INTO YOUR ACCOUNT'
 - tapOn: '.*CONTINUE WITH GOOGLE'
-# Navigate to block session
-- tapOn: 'CREATE A BLOCK SESSION'
-- assertVisible: 'Name'
-- tapOn: 'START'
+
+# Run the block session creation flow
+- runFlow: create_block_session_flow.yaml

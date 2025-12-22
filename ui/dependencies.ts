@@ -9,6 +9,7 @@ import { RealDateProvider } from '@/infra/date-provider/real.date-provider'
 import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
 import { AndroidForegroundService } from '@/infra/foreground-service/android.foreground.service'
 import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-repository/expo-list-installed-apps.repository'
+import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
 import { SentryLogger } from '@/infra/logger/sentry.logger'
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
 import { PrismaSirensRepository } from '@/infra/siren-repository/prisma.sirens-repository'
@@ -30,7 +31,9 @@ const mobileDependencies = {
   dateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
   foregroundService: new AndroidForegroundService(logger),
-  installedAppRepository: new ExpoListInstalledAppsRepository(logger),
+  installedAppRepository: process.env.EXPO_PUBLIC_E2E
+    ? new FakeDataInstalledAppsRepository()
+    : new ExpoListInstalledAppsRepository(logger),
   logger,
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),
