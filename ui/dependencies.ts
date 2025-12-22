@@ -6,6 +6,7 @@ import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/p
 import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.blocklist.repository'
 import { PrismaDatabaseService } from '@/infra/database-service/prisma.database.service'
 import { RealDateProvider } from '@/infra/date-provider/real.date-provider'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
 import { AndroidForegroundService } from '@/infra/foreground-service/android.foreground.service'
 import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-repository/expo-list-installed-apps.repository'
@@ -17,7 +18,17 @@ import { AndroidSirenTier } from '@/infra/siren-tier/android.siren-tier'
 import { RealAndroidSirenLookout } from '@/infra/siren-tier/real-android.siren-lookout'
 import { PrismaTimerRepository } from '@/infra/timer-repository/prisma.timer.repository'
 
-const dateProvider = new RealDateProvider()
+function createDateProvider() {
+  if (process.env.EXPO_PUBLIC_E2E) {
+    const stubDateProvider = new StubDateProvider()
+    // Fixed time: 10:00 AM for predictable E2E tests
+    stubDateProvider.now = new Date('2025-01-15T10:00:00.000Z')
+    return stubDateProvider
+  }
+  return new RealDateProvider()
+}
+
+const dateProvider = createDateProvider()
 const logger = new SentryLogger()
 
 const mobileDependencies = {

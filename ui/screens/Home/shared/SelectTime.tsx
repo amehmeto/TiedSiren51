@@ -27,7 +27,7 @@ export function SelectTime({
   handleChange: (field: 'startedAt' | 'endedAt') => void
 }>) {
   const { dateProvider } = dependencies
-  const localeNow = dateProvider.toHHmm(new Date())
+  const localeNow = dateProvider.toHHmm(dateProvider.getNow())
 
   const chosenTime =
     timeField === 'startedAt'

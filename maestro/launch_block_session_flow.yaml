@@ -1,11 +1,52 @@
 appId: com.tiedsiren.tiedsiren
-# Test: Full block session creation and verification flow
+# Test: Create a complete block session and verify it appears on home screen
 ---
-- launchApp
-- assertVisible: "Let's make it productive"
-- tapOn: 'LOG IN'
-- assertVisible: 'LOG INTO YOUR ACCOUNT'
-- tapOn: '.*CONTINUE WITH GOOGLE'
+# First create a blocklist (prerequisite)
+- runFlow: create_blocklist_flow.yaml
 
-# Run the block session creation flow
-- runFlow: create_block_session_flow.yaml
+# Navigate to Home tab
+- tapOn:
+    point: '135,2050'
+- tapOn:
+    text: 'Dismiss'
+    optional: true
+
+# Create block session
+- tapOn: 'CREATE A BLOCK SESSION'
+- assertVisible: 'Name'
+
+# Enter session name - tap the option text to open modal
+- tapOn: 'Choose a name...'
+- assertVisible: 'SAVE'
+- inputText: 'New Block Session'
+- tapOn: 'SAVE'
+
+# Select blocklist - tap to open modal, toggle switch
+- tapOn: 'Select blocklists...'
+- assertVisible: 'My New Blocklist'
+# Tap on the Switch (right side of the blocklist row in modal)
+- tapOn:
+    point: '680,420'
+- tapOn: 'SAVE'
+
+# Select start time - accept default (10:00 from stub dateProvider)
+- tapOn: 'Select start time...'
+- tapOn: 'OK'
+
+# Select end time - scroll to change minutes for a different time
+- tapOn: 'Select end time...'
+# Scroll up on the minutes picker to increase by ~30 minutes
+- swipe:
+    start: '680,1100'
+    end: '680,900'
+- tapOn: 'OK'
+
+# Select blocking condition - tapping an option auto-selects and closes modal
+- tapOn: 'Select blocking conditions...'
+- tapOn: 'Time'
+
+# Start the session
+- tapOn: 'START'
+
+# Verify session appears on home screen
+- assertVisible: 'New Block Session'
