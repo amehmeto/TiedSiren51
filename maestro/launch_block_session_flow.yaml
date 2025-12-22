@@ -4,8 +4,12 @@ appId: com.tiedsiren.tiedsiren
 # First create a blocklist (prerequisite)
 - runFlow: create_blocklist_flow.yaml
 
-# Navigate to Home tab
-- tapOn: 'Home'
+# Verify we're still in app after blocklist creation, then navigate to Home tab
+- assertVisible: 'My New Blocklist'
+# Tap Home tab using percentage coordinates (first tab in bottom tab bar)
+# This avoids collision with Android system home button which has same accessibility text
+- tapOn:
+    point: '12%,93%'
 - tapOn:
     text: 'Dismiss'
     optional: true
@@ -25,6 +29,10 @@ appId: com.tiedsiren.tiedsiren
 - assertVisible: 'My New Blocklist'
 # Tap the switch using its accessibility label
 - tapOn: 'Toggle My New Blocklist'
+- tapOn: 'SAVE'
+
+# Select device - current device should be pre-toggled, just save
+- tapOn: 'Select devices...'
 - tapOn: 'SAVE'
 
 # Select start time - accept default (10:00 from stub dateProvider)
