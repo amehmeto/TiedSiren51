@@ -18,33 +18,18 @@ import { AndroidSirenTier } from '@/infra/siren-tier/android.siren-tier'
 import { RealAndroidSirenLookout } from '@/infra/siren-tier/real-android.siren-lookout'
 import { PrismaTimerRepository } from '@/infra/timer-repository/prisma.timer.repository'
 
-function createDateProvider() {
-  if (process.env.EXPO_PUBLIC_E2E) {
-    const stubDateProvider = new StubDateProvider()
-    // Fixed time: 10:00 AM for predictable E2E tests
-    stubDateProvider.now = new Date('2025-01-15T10:00:00.000Z')
-    return stubDateProvider
-  }
-  return new RealDateProvider()
-}
-
-const dateProvider = createDateProvider()
 const logger = new SentryLogger()
 
-const mobileDependencies = {
-  authGateway: process.env.EXPO_PUBLIC_E2E
-    ? new FakeAuthGateway()
-    : new FirebaseAuthGateway(logger),
+const androidDependencies: Dependencies = {
+  authGateway: new FirebaseAuthGateway(logger),
   backgroundTaskService: new RealBackgroundTaskService(logger),
   blockSessionRepository: new PrismaBlockSessionRepository(logger),
   blocklistRepository: new PrismaBlocklistRepository(logger),
   databaseService: new PrismaDatabaseService(logger),
-  dateProvider,
+  dateProvider: new RealDateProvider(),
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
   foregroundService: new AndroidForegroundService(logger),
-  installedAppRepository: process.env.EXPO_PUBLIC_E2E
-    ? new FakeDataInstalledAppsRepository()
-    : new ExpoListInstalledAppsRepository(logger),
+  installedAppRepository: new ExpoListInstalledAppsRepository(logger),
   logger,
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),
@@ -53,4 +38,31 @@ const mobileDependencies = {
   timerRepository: new PrismaTimerRepository(logger),
 }
 
-export const dependencies: Dependencies = mobileDependencies
+function createE2EDateProvider(): StubDateProvider {
+  const stubDateProvider = new StubDateProvider()
+  // Fixed time: 10:00 AM for predictable E2E tests
+  stubDateProvider.now = new Date('2025-01-15T10:00:00.000Z')
+  return stubDateProvider
+}
+
+const e2eTestsDependencies: Dependencies = {
+  authGateway: new FakeAuthGateway(),
+  backgroundTaskService: new RealBackgroundTaskService(logger),
+  blockSessionRepository: new PrismaBlockSessionRepository(logger),
+  blocklistRepository: new PrismaBlocklistRepository(logger),
+  databaseService: new PrismaDatabaseService(logger),
+  dateProvider: createE2EDateProvider(),
+  deviceRepository: new PrismaRemoteDeviceRepository(logger),
+  foregroundService: new AndroidForegroundService(logger),
+  installedAppRepository: new FakeDataInstalledAppsRepository(),
+  logger,
+  notificationService: new ExpoNotificationService(logger),
+  sirenLookout: new RealAndroidSirenLookout(logger),
+  sirenTier: new AndroidSirenTier(logger),
+  sirensRepository: new PrismaSirensRepository(logger),
+  timerRepository: new PrismaTimerRepository(logger),
+}
+
+export const dependencies: Dependencies = process.env.EXPO_PUBLIC_E2E
+  ? e2eTestsDependencies
+  : androidDependencies
