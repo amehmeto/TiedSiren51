@@ -135,6 +135,7 @@
       "Bash(git -C:*)",
       "Bash(git am --no-verify:*)",
       "Bash(git cherry-pick --no-verify:*)",
+      "Bash(git commit --amend:*)",
       "Bash(git commit --no-verify:*)",
       "Bash(git config --global core.hooksPath:*)",
       "Bash(git config --unset core.hooksPath:*)",

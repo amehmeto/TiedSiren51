@@ -15,6 +15,10 @@ export class RealDateProvider implements DateProvider {
     return Date.now()
   }
 
+  getHHmmNow(): string {
+    return this.toHHmm(this.getNow())
+  }
+
   getMinutesFromNow(minutes: number): Date {
     return new Date(new Date().getTime() + minutes * MINUTE)
   }

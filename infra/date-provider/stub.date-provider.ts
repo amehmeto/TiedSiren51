@@ -17,6 +17,10 @@ export class StubDateProvider implements DateProvider {
     return this.now.toISOString() as ISODateString
   }
 
+  getHHmmNow(): string {
+    return this.toHHmm(this.now)
+  }
+
   recoverDate(timeInHHmm: string): Date {
     const [hours, minutes] = timeInHHmm.split(':').map(Number)
 
