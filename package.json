@@ -41,6 +41,7 @@
     "build:android:local": "eas build --platform android --local",
     "build:android:apk": "eas build -p android --profile preview --no-wait",
     "build:android:apk:local": "eas build -p android --profile preview --local",
+    "build:android:e2e": "EXPO_PUBLIC_E2E=true npx expo run:android",
     "build:ios": "eas build --platform ios",
     "build:ios:simulator": "eas build --profile development-simulator --platform ios",
     "prepare": "is-ci || husky",
