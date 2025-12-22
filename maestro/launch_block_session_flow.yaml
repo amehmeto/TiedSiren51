@@ -5,8 +5,7 @@ appId: com.tiedsiren.tiedsiren
 - runFlow: create_blocklist_flow.yaml
 
 # Navigate to Home tab
-- tapOn:
-    point: '135,2050'
+- tapOn: 'Home'
 - tapOn:
     text: 'Dismiss'
     optional: true
@@ -24,9 +23,8 @@ appId: com.tiedsiren.tiedsiren
 # Select blocklist - tap to open modal, toggle switch
 - tapOn: 'Select blocklists...'
 - assertVisible: 'My New Blocklist'
-# Tap on the Switch (right side of the blocklist row in modal)
-- tapOn:
-    point: '680,420'
+# Tap the switch using its accessibility label
+- tapOn: 'Toggle My New Blocklist'
 - tapOn: 'SAVE'
 
 # Select start time - accept default (10:00 from stub dateProvider)
@@ -35,10 +33,10 @@ appId: com.tiedsiren.tiedsiren
 
 # Select end time - scroll to change minutes for a different time
 - tapOn: 'Select end time...'
-# Scroll up on the minutes picker to increase by ~30 minutes
+# Scroll up on the minutes column of the native time picker (percentage-based for device independence)
 - swipe:
-    start: '680,1100'
-    end: '680,900'
+    start: '63%,50%'
+    end: '63%,35%'
 - tapOn: 'OK'
 
 # Select blocking condition - tapping an option auto-selects and closes modal
