@@ -52,6 +52,12 @@ export function onBlockSessionsChangedFixture(
       syncBlockedAppsWillThrow() {
         sirenLookout.shouldThrowOnSync = true
       },
+      startForegroundServiceWillThrow() {
+        foregroundService.shouldThrowOnStart = true
+      },
+      stopForegroundServiceWillThrow() {
+        foregroundService.shouldThrowOnStop = true
+      },
     },
     when: {
       async blockSessionsChange(sessions: BlockSession[]) {

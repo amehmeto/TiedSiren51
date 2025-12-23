@@ -284,45 +284,45 @@ describe('Feature: Block sessions changed listener', () => {
     })
 
     it('should log error when start foreground service throws', async () => {
-      foregroundService.shouldThrowOnStart = true
-      const initialState = stateBuilder()
-        .withBlockSessions([blockSession])
-        .build()
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.startForegroundServiceWillThrow()
+      fixture.given.storeIsCreated()
 
-      createTestStore({ sirenLookout, foregroundService, logger }, initialState)
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
 
-      await flushMicrotasks()
-
-      const errorLogs = logger.getLogs().filter((log) => log.level === 'error')
-      const hasExpectedError = errorLogs.some((log) =>
-        log.message.includes('Failed to start foreground service'),
-      )
-
-      expect(hasExpectedError).toBe(true)
+      fixture.then.errorShouldBeLogged('Failed to start foreground service')
     })
 
     it('should log error when stop foreground service throws', async () => {
-      foregroundService.shouldThrowOnStop = true
-      const initialState = stateBuilder()
-        .withBlockSessions([blockSession])
-        .build()
-      const store = createTestStore(
-        { sirenLookout, foregroundService, logger },
-        initialState,
-      )
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.initialBlockSessions([
+        buildBlockSession({
+          id: 'session-1',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+      fixture.given.stopForegroundServiceWillThrow()
+      fixture.given.storeIsCreated()
 
-      await flushMicrotasks()
+      await fixture.when.blockSessionsChange([])
 
-      store.dispatch(setBlockSessions([]))
-
-      await flushMicrotasks()
-
-      const errorLogs = logger.getLogs().filter((log) => log.level === 'error')
-      const hasExpectedError = errorLogs.some((log) =>
-        log.message.includes('Failed to stop foreground service'),
-      )
-
-      expect(hasExpectedError).toBe(true)
+      fixture.then.errorShouldBeLogged('Failed to stop foreground service')
     })
   })
 })
