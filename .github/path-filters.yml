@@ -3,28 +3,36 @@
 #
 # NOTE: Do not add gitignored paths here (android/, ios/, pdb-*/, .env)
 # They will never trigger since they're never committed.
+#
+# IMPORTANT: Do NOT use negation patterns (!) in dorny/paths-filter.
+# They match "everything NOT matching pattern" rather than excluding.
+# See: https://github.com/dorny/paths-filter/issues/97
 
 shell:
   - '**/*.sh'
   - '.husky/**'
   - '.claude/hooks/**'
 
-app:
-  # Source code (excluding test files)
+# Source code directories (triggers test job)
+src:
   - 'app/**'
   - 'core/**'
   - 'ui/**'
   - 'infra/**'
-  - '!**/*.spec.ts'
-  - '!**/*.test.ts'
-  - '!**/_tests_/**'
-  - '!**/fixtures/**'
-  - '!**/data-builders/**'
-  - '!**/in-memory.*'
-  # Config files that affect the build (NOT test config)
+
+# Test files only (used to detect test-only changes)
+tests:
+  - '**/*.spec.ts'
+  - '**/*.test.ts'
+  - '**/_tests_/**'
+  - '**/fixtures/**'
+  - '**/data-builders/**'
+  - 'vitest.config.js'
+
+# Config files that affect the build
+config:
   - 'app.config.js'
   - 'package.json'
-  - '!vitest.config.js'
   - 'package-lock.json'
   - 'tsconfig.json'
   - 'babel.config.cjs'
@@ -32,5 +40,4 @@ app:
   - 'eas.json'
   - 'schema.prisma'
   - 'index.js'
-  # Assets
   - 'assets/**'
