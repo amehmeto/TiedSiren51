@@ -22,6 +22,10 @@ appId: com.tiedsiren.tiedsiren
 - tapOn: 'Choose a name...'
 - assertVisible: 'SAVE'
 - inputText: 'New Block Session'
+# Wait for React to process input before tapping SAVE
+- extendedWaitUntil:
+    visible: 'New Block Session'
+    timeout: 3000
 - tapOn: 'SAVE'
 
 # Select blocklist - tap to open modal, toggle switch
@@ -54,5 +58,7 @@ appId: com.tiedsiren.tiedsiren
 # Start the session
 - tapOn: 'START'
 
-# Verify session appears on home screen
-- assertVisible: 'New Block Session'
+# Verify session appears on home screen (wait for navigation to complete)
+- extendedWaitUntil:
+    visible: 'New Block Session'
+    timeout: 5000
