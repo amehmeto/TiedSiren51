@@ -22,6 +22,56 @@ jobs:
     if: github.event_name == 'push'
     uses: ./.github/workflows/path-filter.yml
 
+  # Cache coverage for PR comparisons
+  # This runs on every push to main so PRs always have a baseline to compare against
+  cache-coverage:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install platform-specific binaries
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu
+
+      - name: Cache Prisma Client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: prisma-${{ hashFiles('schema.prisma') }}
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run tests with coverage
+        run: npm run test:cov
+
+      - name: Save coverage to cache
+        uses: actions/cache/save@v4
+        with:
+          path: coverage/coverage-summary.json
+          key: coverage-main-${{ github.sha }}
+
+      # Also save with a stable key that PRs can restore
+      - name: Copy coverage for stable cache key
+        run: cp coverage/coverage-summary.json /tmp/coverage-summary.json
+
+      - name: Save coverage with stable key
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/coverage-summary.json
+          key: coverage-main-latest
+          enableCrossOsArchive: true
+
   build-preview:
     needs: path-filter
     if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'

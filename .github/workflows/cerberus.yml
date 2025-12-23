@@ -77,14 +77,27 @@ jobs:
       - name: Run unit tests with coverage
         run: npm run test:cov
 
-      #      - name: Commit coverage if changed
-      #        run: bash scripts/commit-coverage.sh
-
       - name: Store PR coverage
         run: bash scripts/store-coverage.sh pr-coverage.json
 
-      - name: Get base branch coverage
-        run: bash scripts/get-base-coverage.sh "${{ github.event.pull_request.base.ref }}"
+      - name: Restore base branch coverage from cache
+        id: cache-coverage
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/coverage-summary.json
+          key: coverage-main-latest
+          restore-keys: |
+            coverage-main-
+
+      - name: Prepare base coverage for comparison
+        run: |
+          if [ -f /tmp/coverage-summary.json ]; then
+            cp /tmp/coverage-summary.json base-coverage.json
+            echo "✅ Base coverage restored from cache"
+          else
+            echo "⚠️ No cached coverage found, using empty baseline"
+            echo '{"total":{"statements":{"pct":0},"functions":{"pct":0},"branches":{"pct":0},"lines":{"pct":0}}}' > base-coverage.json
+          fi
 
       - name: Compare coverage and comment
         uses: actions/github-script@v7
