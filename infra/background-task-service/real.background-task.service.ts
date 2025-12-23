@@ -7,7 +7,6 @@ import {
 } from '@/core/_ports_/background-task.service'
 import { Logger } from '@/core/_ports_/logger'
 import { AppStore } from '@/core/_redux_/createStore'
-import { targetSirens } from '@/core/siren/usecases/target-sirens.usecase'
 
 export class RealBackgroundTaskService implements BackgroundTaskService {
   constructor(private readonly logger: Logger) {}
@@ -27,16 +26,9 @@ export class RealBackgroundTaskService implements BackgroundTaskService {
     }
   }
 
-  async initialize(store: AppStore): Promise<void> {
+  async initialize(_store: AppStore): Promise<void> {
     try {
-      TaskManager.defineTask('target-sirens', async () => {
-        const now = Date.now()
-
-        store.dispatch(targetSirens())
-        this.logger.info(
-          `Got background fetch call at date: ${new Date(now).toISOString()}`,
-        )
-      })
+      this.logger.info('[RealBackgroundTaskService] Initialized')
     } catch (error) {
       this.logger.error(
         `[RealBackgroundTaskService] Failed to initialize: ${error}`,

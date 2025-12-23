@@ -92,6 +92,7 @@ export function SelectListModal(
             <View style={styles.item}>
               <Text style={styles.itemText}>{item.name}</Text>
               <Switch
+                accessibilityLabel={`Toggle ${item.name}`}
                 style={styles.itemSelector}
                 value={isSelected(item)}
                 onValueChange={toggleList(item)}

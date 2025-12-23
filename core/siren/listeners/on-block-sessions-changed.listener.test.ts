@@ -1,218 +1,328 @@
-import { beforeEach, describe, expect, it } from 'vitest'
-import { createTestStore } from '@/core/_tests_/createTestStore'
+import { beforeEach, describe, it } from 'vitest'
+import {
+  facebookAndroidSiren,
+  instagramAndroidSiren,
+  tikTokAndroidSiren,
+} from '@/core/_tests_/data-builders/android-siren.builder'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
-import { stateBuilder } from '@/core/_tests_/state-builder'
-import { setBlockSessions } from '@/core/block-session/block-session.slice'
-import { InMemoryForegroundService } from '@/infra/foreground-service/in-memory.foreground.service'
-import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
-import { InMemorySirenLookout } from '@/infra/siren-tier/in-memory.siren-lookout'
+import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
+import { onBlockSessionsChangedFixture } from './block-sessions-changed.fixture'
 
-describe('onBlockSessionsChanged listener', () => {
-  const blockSession = buildBlockSession()
-  let sirenLookout: InMemorySirenLookout
-  let foregroundService: InMemoryForegroundService
-  let logger: InMemoryLogger
+describe('Feature: Block sessions changed listener', () => {
+  let fixture: ReturnType<typeof onBlockSessionsChangedFixture>
 
   beforeEach(() => {
-    sirenLookout = new InMemorySirenLookout()
-    foregroundService = new InMemoryForegroundService()
-    logger = new InMemoryLogger()
+    fixture = onBlockSessionsChangedFixture()
   })
 
-  it('should not be watching when store is created without sessions', () => {
-    createTestStore({ sirenLookout, foregroundService })
+  describe('Syncing blocked apps', () => {
+    it('should sync blocked apps when session starts', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.storeIsCreated()
 
-    expect(sirenLookout.isWatching).toBe(false)
-  })
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
 
-  it('should start watching when store is created with existing sessions', () => {
-    const initialState = stateBuilder()
-      .withBlockSessions([blockSession])
-      .build()
-
-    createTestStore({ sirenLookout, foregroundService }, initialState)
-
-    expect(sirenLookout.isWatching).toBe(true)
-  })
-
-  it('should start watching when sessions are added to store', () => {
-    const store = createTestStore({ sirenLookout, foregroundService })
-
-    expect(sirenLookout.isWatching).toBe(false)
-
-    store.dispatch(setBlockSessions([blockSession]))
-
-    expect(sirenLookout.isWatching).toBe(true)
-  })
-
-  it('should stop watching when all sessions are removed', () => {
-    const initialState = stateBuilder()
-      .withBlockSessions([blockSession])
-      .build()
-    const store = createTestStore(
-      { sirenLookout, foregroundService },
-      initialState,
-    )
-
-    expect(sirenLookout.isWatching).toBe(true)
-
-    store.dispatch(setBlockSessions([]))
-
-    expect(sirenLookout.isWatching).toBe(false)
-  })
-
-  it('should remain watching when sessions change but still have at least one', () => {
-    const initialState = stateBuilder()
-      .withBlockSessions([blockSession])
-      .build()
-    const store = createTestStore(
-      { sirenLookout, foregroundService },
-      initialState,
-    )
-    const newSession = buildBlockSession()
-
-    store.dispatch(setBlockSessions([blockSession, newSession]))
-
-    expect(sirenLookout.isWatching).toBe(true)
-  })
-
-  it('should log error when startWatching throws', () => {
-    sirenLookout.shouldThrowOnStart = true
-    const initialState = stateBuilder()
-      .withBlockSessions([blockSession])
-      .build()
-    const expectedLog = {
-      level: 'error',
-      message: 'Failed to start watching: Error: Start watching failed',
-    }
-
-    createTestStore({ sirenLookout, foregroundService, logger }, initialState)
-
-    const logs = logger.getLogs()
-    expect(logs).toContainEqual(expectedLog)
-  })
-
-  it('should log error when stopWatching throws', () => {
-    sirenLookout.shouldThrowOnStop = true
-    const initialState = stateBuilder()
-      .withBlockSessions([blockSession])
-      .build()
-    const store = createTestStore(
-      { sirenLookout, foregroundService, logger },
-      initialState,
-    )
-    const expectedLog = {
-      level: 'error',
-      message: 'Failed to stop watching: Error: Stop watching failed',
-    }
-
-    store.dispatch(setBlockSessions([]))
-
-    const logs = logger.getLogs()
-    expect(logs).toContainEqual(expectedLog)
-  })
-
-  describe('foreground service coordination', () => {
-    let flushMicrotasks: () => Promise<void>
-
-    beforeEach(() => {
-      flushMicrotasks = () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 0)
-        })
+      fixture.then.blockedAppsShouldBeSyncedTo(['com.facebook.katana'])
     })
 
-    it('should not start foreground service when no sessions', () => {
-      createTestStore({ sirenLookout, foregroundService })
+    it('should clear blocked apps when session ends', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.initialBlockSessions([
+        buildBlockSession({
+          id: 'session-1',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+      fixture.given.storeIsCreated()
 
-      expect(foregroundService.isRunning()).toBe(false)
-      expect(foregroundService.startCallCount).toBe(0)
+      await fixture.when.blockSessionsChange([])
+
+      fixture.then.blockedAppsShouldBeEmpty()
     })
 
-    it('should start foreground service when sessions exist on init', async () => {
-      const initialState = stateBuilder()
-        .withBlockSessions([blockSession])
-        .build()
+    it('should sync combined apps from multiple active sessions', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.storeIsCreated()
 
-      createTestStore({ sirenLookout, foregroundService }, initialState)
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          id: 'session-1',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+        buildBlockSession({
+          id: 'session-2',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [instagramAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
 
-      await flushMicrotasks()
-
-      expect(foregroundService.isRunning()).toBe(true)
-      expect(foregroundService.startCallCount).toBe(1)
+      fixture.then.blockedAppsShouldBeSyncedTo([
+        'com.facebook.katana',
+        'com.example.instagram',
+      ])
     })
 
-    it('should start foreground service before watching when sessions are added', async () => {
-      const store = createTestStore({ sirenLookout, foregroundService })
+    it('should re-sync when blocklist changes during active session', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.initialBlockSessions([
+        buildBlockSession({
+          id: 'session-1',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+      fixture.given.storeIsCreated()
 
-      store.dispatch(setBlockSessions([blockSession]))
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          id: 'session-1',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren, tikTokAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
 
-      await flushMicrotasks()
-
-      expect(foregroundService.isRunning()).toBe(true)
-      expect(sirenLookout.isWatching).toBe(true)
+      fixture.then.blockedAppsShouldBeSyncedTo([
+        'com.facebook.katana',
+        'com.example.tiktok',
+      ])
     })
 
-    it('should stop foreground service after stopping watching when sessions removed', async () => {
-      const initialState = stateBuilder()
-        .withBlockSessions([blockSession])
-        .build()
-      const store = createTestStore(
-        { sirenLookout, foregroundService },
-        initialState,
-      )
+    it('should deduplicate apps across multiple blocklists', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.storeIsCreated()
 
-      await flushMicrotasks()
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          id: 'session-1',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+            buildBlocklist({
+              sirens: {
+                android: [facebookAndroidSiren, instagramAndroidSiren],
+              },
+            }),
+          ],
+        }),
+      ])
 
-      store.dispatch(setBlockSessions([]))
+      fixture.then.blockedAppsShouldBeSyncedTo([
+        'com.facebook.katana',
+        'com.example.instagram',
+      ])
+    })
+  })
 
-      await flushMicrotasks()
+  describe('Foreground service and watching lifecycle', () => {
+    it('should start foreground service and watching when session starts', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.storeIsCreated()
 
-      expect(foregroundService.isRunning()).toBe(false)
-      expect(sirenLookout.isWatching).toBe(false)
-      expect(foregroundService.stopCallCount).toBe(1)
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+
+      fixture.then.foregroundServiceShouldBeStarted()
+      fixture.then.watchingShouldBeStarted()
+    })
+
+    it('should stop foreground service and watching when all sessions end', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.initialBlockSessions([
+        buildBlockSession({
+          id: 'session-1',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+      fixture.given.storeIsCreated()
+
+      await fixture.when.blockSessionsChange([])
+
+      fixture.then.foregroundServiceShouldBeStopped()
+      fixture.then.watchingShouldBeStopped()
+    })
+  })
+
+  describe('Sessions outside active time window', () => {
+    it('should not sync blocked apps for sessions outside active time', async () => {
+      fixture.given.nowIs({ hours: 16, minutes: 30 })
+      fixture.given.storeIsCreated()
+
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+
+      fixture.then.blockedAppsShouldBeEmpty()
+    })
+  })
+
+  describe('Error handling', () => {
+    it('should log error when startWatching throws', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.startWatchingWillThrow()
+      fixture.given.storeIsCreated()
+
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+
+      fixture.then.errorShouldBeLogged('Failed to start watching')
+    })
+
+    it('should log error when stopWatching throws', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.initialBlockSessions([
+        buildBlockSession({
+          id: 'session-1',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+      fixture.given.stopWatchingWillThrow()
+      fixture.given.storeIsCreated()
+
+      await fixture.when.blockSessionsChange([])
+
+      fixture.then.errorShouldBeLogged('Failed to stop watching')
+    })
+
+    it('should log error when syncBlockedApps throws but continue protection', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.syncBlockedAppsWillThrow()
+      fixture.given.storeIsCreated()
+
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+
+      fixture.then.errorShouldBeLogged('Failed to sync blocked apps')
+      fixture.then.watchingShouldBeStarted()
+      fixture.then.foregroundServiceShouldBeStarted()
     })
 
     it('should log error when start foreground service throws', async () => {
-      foregroundService.shouldThrowOnStart = true
-      const initialState = stateBuilder()
-        .withBlockSessions([blockSession])
-        .build()
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.startForegroundServiceWillThrow()
+      fixture.given.storeIsCreated()
 
-      createTestStore({ sirenLookout, foregroundService, logger }, initialState)
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
 
-      await flushMicrotasks()
-
-      const errorLogs = logger.getLogs().filter((log) => log.level === 'error')
-      const hasExpectedError = errorLogs.some((log) =>
-        log.message.includes('Failed to start foreground service'),
-      )
-
-      expect(hasExpectedError).toBe(true)
+      fixture.then.errorShouldBeLogged('Failed to start foreground service')
     })
 
     it('should log error when stop foreground service throws', async () => {
-      foregroundService.shouldThrowOnStop = true
-      const initialState = stateBuilder()
-        .withBlockSessions([blockSession])
-        .build()
-      const store = createTestStore(
-        { sirenLookout, foregroundService, logger },
-        initialState,
-      )
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.initialBlockSessions([
+        buildBlockSession({
+          id: 'session-1',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+      fixture.given.stopForegroundServiceWillThrow()
+      fixture.given.storeIsCreated()
 
-      await flushMicrotasks()
+      await fixture.when.blockSessionsChange([])
 
-      store.dispatch(setBlockSessions([]))
-
-      await flushMicrotasks()
-
-      const errorLogs = logger.getLogs().filter((log) => log.level === 'error')
-      const hasExpectedError = errorLogs.some((log) =>
-        log.message.includes('Failed to stop foreground service'),
-      )
-
-      expect(hasExpectedError).toBe(true)
+      fixture.then.errorShouldBeLogged('Failed to stop foreground service')
     })
   })
 })

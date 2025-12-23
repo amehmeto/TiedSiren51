@@ -2,6 +2,7 @@ export interface SirenLookout {
   startWatching(): void
   stopWatching(): void
   onSirenDetected(listener: (packageName: string) => void): void
+  updateBlockedApps(packageNames: string[]): Promise<void>
 }
 
 export interface AndroidSirenLookout extends SirenLookout {

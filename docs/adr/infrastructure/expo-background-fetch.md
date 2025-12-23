@@ -58,9 +58,9 @@ export interface TaskOptions {
 ```typescript
 export class RealBackgroundTaskService implements BackgroundTaskService {
   async initialize(store: AppStore): Promise<void> {
-    TaskManager.defineTask('target-sirens', async () => {
+    TaskManager.defineTask('sync-data', async () => {
       const now = Date.now()
-      store.dispatch(targetSirens())
+      store.dispatch(syncData())
       console.log(`Got background fetch call at date: ${new Date(now).toISOString()}`)
     })
   }
@@ -91,7 +91,7 @@ export class RealBackgroundTaskService implements BackgroundTaskService {
 // In app initialization
 const backgroundTaskService = new RealBackgroundTaskService()
 await backgroundTaskService.initialize(store)
-await backgroundTaskService.scheduleTask('target-sirens')
+await backgroundTaskService.scheduleTask('sync-data')
 ```
 
 **4. Task Definition with Redux**:
@@ -99,9 +99,9 @@ await backgroundTaskService.scheduleTask('target-sirens')
 Background tasks can dispatch Redux actions:
 
 ```typescript
-TaskManager.defineTask('target-sirens', async () => {
+TaskManager.defineTask('sync-data', async () => {
   // Access Redux store
-  store.dispatch(targetSirens())
+  store.dispatch(syncData())
 
   // Optionally return result status
   // return BackgroundFetch.BackgroundFetchResult.NewData
@@ -271,9 +271,9 @@ const tasks = await TaskManager.getRegisteredTasksAsync()
 ### Error Handling
 
 ```typescript
-TaskManager.defineTask('target-sirens', async () => {
+TaskManager.defineTask('sync-data', async () => {
   try {
-    store.dispatch(targetSirens())
+    store.dispatch(syncData())
   } catch (error) {
     console.error('Background task failed:', error)
     // Don't throw - prevents task from being disabled
@@ -283,7 +283,7 @@ TaskManager.defineTask('target-sirens', async () => {
 
 ## Related ADRs
 
-- [Hexagonal Architecture](../core/hexagonal-architecture.md) - Port/adapter pattern
+- [Hexagonal Architecture](../hexagonal-architecture.md) - Port/adapter pattern
 - [Expo Notifications](expo-notifications.md) - For notification triggers
 - [Redux Toolkit for Business Logic](../core/redux-toolkit-for-business-logic.md) - State management
 

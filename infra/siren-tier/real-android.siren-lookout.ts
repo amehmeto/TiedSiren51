@@ -1,5 +1,6 @@
 import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import type { AccessibilityEventSubscription } from '@amehmeto/expo-accessibility-service'
+import { setBlockedApps } from '@amehmeto/tied-siren-blocking-overlay'
 import { Logger } from '@/core/_ports_/logger'
 import { AndroidSirenLookout } from '@core/_ports_/siren.lookout'
 
@@ -49,6 +50,20 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     } catch (error) {
       this.logger.error(
         `[RealAndroidSirenLookout] Failed to ask for accessibility permission: ${error}`,
+      )
+      throw error
+    }
+  }
+
+  async updateBlockedApps(packageNames: string[]): Promise<void> {
+    try {
+      await setBlockedApps(packageNames)
+      this.logger.info(
+        `Blocked apps synced to native: count=${packageNames.length}`,
+      )
+    } catch (error) {
+      this.logger.error(
+        `[RealAndroidSirenLookout] Failed to sync blocked apps: ${error}`,
       )
       throw error
     }

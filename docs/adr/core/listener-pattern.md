@@ -61,7 +61,6 @@ export const onUserLoggedInListener = ({
     try {
       store.dispatch(userAuthenticated(user))
       store.dispatch(loadUser())
-      store.dispatch(targetSirens())
     } catch (error) {
       logger.error(`Error in onUserLoggedIn listener: ${error}`)
     }
