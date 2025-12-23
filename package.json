@@ -16,8 +16,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "electron:dev": "concurrently \"BROWSER=none npm run web -- --port 19006\" \"wait-on http://localhost:19006 && npm run electron:start\"",
-    "lint": "npm run lint:types && npm run lint:js -- \"**/*.{js,ts,jsx,tsx}\" \".claude/**/*.json\" \"tsconfig*.json\" && npm run lint:format -- \"**/*.{js,ts,jsx,tsx,json,yml,yaml}\" && npm run lint:sh -- scripts/*.sh .husky/scripts/*.sh .claude/hooks/*.sh && npm run lint:schema",
-    "lint:fix": "npm run lint:types && npm run lint:js:fix -- \"**/*.{js,ts,jsx,tsx}\" \".claude/**/*.json\" \"tsconfig*.json\" && npm run lint:format:fix -- \"**/*.{js,ts,jsx,tsx,json,yml,yaml}\" && npm run lint:sh -- scripts/*.sh .husky/scripts/*.sh .claude/hooks/*.sh && npm run lint:schema",
+    "lint": "npm run lint:types && npm run lint:js -- \"**/*.{js,ts,jsx,tsx}\" \".claude/**/*.json\" \"tsconfig*.json\" && npm run lint:format -- \"**/*.{js,ts,jsx,tsx,json,yml,yaml}\" && npm run lint:sh -- scripts/*.sh .husky/scripts/*.sh .claude/hooks/*.sh && npm run lint:workflow && npm run lint:schema",
+    "lint:fix": "npm run lint:types && npm run lint:js:fix -- \"**/*.{js,ts,jsx,tsx}\" \".claude/**/*.json\" \"tsconfig*.json\" && npm run lint:format:fix -- \"**/*.{js,ts,jsx,tsx,json,yml,yaml}\" && npm run lint:sh -- scripts/*.sh .husky/scripts/*.sh .claude/hooks/*.sh && npm run lint:workflow && npm run lint:schema",
     "lint:types": "tsc --noEmit",
     "lint:js": "eslint",
     "lint:js:fix": "eslint --fix",
@@ -25,11 +25,12 @@
     "lint:format:fix": "prettier --write --ignore-path .prettierignore",
     "lint:md": "remark --frail --use remark-validate-links",
     "lint:sh": "shellcheck",
+    "lint:workflow": "bash scripts/lint-workflow-scripts.sh",
     "lint:schema": "npx prisma validate",
     "test": "vitest",
     "test:prepush": "vitest --run",
-    "test:cov": "c8 --all --reporter=text --reporter=json-summary vitest --run",
-    "test:cov:track": "c8 --reporter=json vitest --run && node scripts/track-coverage.js",
+    "test:cov": "vitest --run --coverage",
+    "test:cov:track": "vitest --run --coverage --coverage.reporter=json && node scripts/track-coverage.js",
     "test:cov:history": "node scripts/view-coverage-history.js",
     "test:e2e": "EXPO_PUBLIC_E2E=true maestro test maestro/",
     "prebuild": "npx expo prebuild",
@@ -67,7 +68,8 @@
       "npm run lint:sh --"
     ],
     "*.{yml,yaml}": [
-      "npm run lint:format:fix --"
+      "npm run lint:format:fix --",
+      "npm run lint:workflow --"
     ],
     "schema.prisma": [
       "npm run lint:schema"
@@ -143,7 +145,6 @@
     "@types/react-test-renderer": "^18.0.7",
     "@vitest/coverage-v8": "^1.6.0",
     "babel-plugin-module-resolver": "^5.0.2",
-    "c8": "^9.1.0",
     "concurrently": "^8.2.2",
     "eslint": "^8.57.0",
     "eslint-config-expo": "^7.1.2",
