@@ -22,7 +22,7 @@ check_file() {
   local base_indent=""
 
   while IFS= read -r line || [[ -n "$line" ]]; do
-    ((line_num++))
+    ((++line_num))
 
     # Detect start of multi-line run block (run: |)
     if [[ "$line" =~ ^([[:space:]]*)(-[[:space:]]+)?run:[[:space:]]*\|[[:space:]]*$ ]]; then
@@ -42,13 +42,13 @@ check_file() {
 
         # Empty lines are part of the block
         if [[ -z "${line// /}" ]]; then
-          ((run_block_lines++))
+          ((++run_block_lines))
           continue
         fi
 
         # If current indent is greater than base, still in block
         if [[ ${#current_indent} -gt ${#base_indent} ]]; then
-          ((run_block_lines++))
+          ((++run_block_lines))
           continue
         fi
       fi
