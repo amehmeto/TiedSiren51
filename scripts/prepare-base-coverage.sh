@@ -2,6 +2,8 @@
 # Prepare base coverage for PR comparison
 # Copies cached coverage to base-coverage.json, or creates empty baseline if not found
 
+set -euo pipefail
+
 CACHED_COVERAGE="/tmp/base-coverage/coverage-summary.json"
 OUTPUT_FILE="base-coverage.json"
 

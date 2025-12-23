@@ -23,9 +23,12 @@ jobs:
     uses: ./.github/workflows/path-filter.yml
 
   # Cache coverage for PR comparisons
-  # This runs on every push to main so PRs always have a baseline to compare against
+  # Only runs when app code changes (not for docs-only commits)
+  # Note: GitHub caches expire after 7 days of no access
+  # Note: First PR after this merges will show 0% baseline until main has a cached run
   cache-coverage:
-    if: github.event_name == 'push'
+    needs: path-filter
+    if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
