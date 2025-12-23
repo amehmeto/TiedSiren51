@@ -26,13 +26,23 @@ jobs:
     if: github.event_name == 'push'
     uses: ./.github/workflows/path-filter.yml
 
-  # Refresh coverage cache weekly to prevent expiration
-  # Just restores and re-saves without running tests
+  # Refresh coverage cache weekly to prevent expiration (only if no recent main activity)
+  # Skips if main had commits in last 6 days (cache already fresh)
   refresh-coverage-cache:
     if: github.event_name == 'schedule'
     runs-on: ubuntu-latest
     steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for recent main branch activity
+        id: check-activity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/check-cache-freshness.sh "${{ github.repository }}" "$GITHUB_OUTPUT"
+
       - name: Restore coverage from cache
+        if: steps.check-activity.outputs.skip == 'false'
         id: cache-restore
         uses: actions/cache/restore@v4
         with:
@@ -42,7 +52,7 @@ jobs:
             coverage-main-
 
       - name: Re-save coverage to refresh expiration
-        if: steps.cache-restore.outputs.cache-hit != ''
+        if: steps.check-activity.outputs.skip == 'false' && steps.cache-restore.outputs.cache-hit != ''
         uses: actions/cache/save@v4
         with:
           path: /tmp/base-coverage/coverage-summary.json
