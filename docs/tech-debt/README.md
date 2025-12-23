@@ -25,6 +25,9 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ### Performance
 - [Native Siren Filtering](native-siren-filtering.md) - 📋 **LOW PRIORITY** - Filter blocked apps at native level to reduce JS bridge calls
 
+### Strategic Planning
+- [Cross-Platform Roadmap](cross-platform-roadmap.md) - 📋 **LOW PRIORITY** - Platform-specific adapter strategies for iOS, macOS, Windows, Linux, Web
+
 ## Priority Levels
 
 - 🔴 **BLOCKED**: External dependency prevents progress
