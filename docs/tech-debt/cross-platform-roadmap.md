@@ -5,6 +5,91 @@
 > Priority: 📋 **LOW** - Strategic planning for future expansion
 > Effort: High (multi-year initiative)
 
+## Visual Roadmap (Gross Estimate)
+
+```
+2025                          2026                              2027
+Q1    Q2    Q3    Q4    Q1    Q2    Q3    Q4    Q1    Q2
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+
+ANDROID ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+        ▲         ▲
+        │         └─ v1.0 Stable (6 months)
+        └─ Current
+
+MACOS             ░░░░████████████████░░░░░░░░░░░░░░░░░░░░░░░░
+                      ▲              ▲
+                      │              └─ v1.0 (5 months)
+                      └─ Start after Android stable
+
+CHROME EXT                    ░░████░░░░░░░░░░░░░░░░░░░░░░░░░░
+                                 ▲  ▲
+                                 │  └─ v1.0 (1.5 months)
+                                 └─ Quick win during desktop dev
+
+WINDOWS                           ░░░░████████████░░░░░░░░░░░░
+                                      ▲          ▲
+                                      │          └─ v1.0 (4 months)
+                                      └─ Reuse Tauri patterns from macOS
+
+LINUX                                         ░░░░████████░░░░
+                                                  ▲      ▲
+                                                  │      └─ v1.0 (3 months)
+                                                  └─ After Windows
+
+IOS                                                   ░░░░████████
+                                                          ▲      ▲
+                                                          │      └─ v1.0 (5 months)
+                                                          └─ Last, set expectations
+
+████ = Active development
+░░░░ = Planning/Learning phase
+```
+
+### Time Estimates per Platform
+
+| Platform | Effort | Duration | Key Challenges |
+|----------|--------|----------|----------------|
+| **Android** | ████████ High | 6 months | AccessibilityService, native modules, anti-bypass |
+| **macOS** | ██████ High | 5 months | Learn Swift/Tauri, EndpointSecurity, code signing |
+| **Chrome Ext** | ██ Low | 1.5 months | Simple APIs, MV3 limitations |
+| **Windows** | █████ Medium-High | 4 months | WMI/WFP, service installation, admin rights |
+| **Linux** | ████ Medium | 3 months | Fragmentation (X11/Wayland, distros) |
+| **iOS** | ██████ High | 5 months | Severe limitations, workarounds, partner unlock |
+
+### Total Timeline
+
+```
+Optimistic (1 dev, full-time):  ~24 months (2 years)
+Realistic (1 dev, part-time):   ~36 months (3 years)
+With 2 devs parallel:           ~15-18 months
+```
+
+### Milestone Summary
+
+| Milestone | Target | Platforms | Market Coverage |
+|-----------|--------|-----------|-----------------|
+| **M1: Mobile First** | Q3 2025 | Android | 40% mobile |
+| **M2: Desktop Beta** | Q2 2026 | + macOS, Chrome | + 10% desktop |
+| **M3: Full Desktop** | Q4 2026 | + Windows | + 75% desktop |
+| **M4: Complete** | Q2 2027 | + Linux, iOS | ~95% coverage |
+
+### Revenue Unlock Points
+
+```
+Android v1.0  ───────────────────────────►  First paying users
+                                            Target: $1k MRR
+
+macOS + Chrome ──────────────────────────►  Cross-platform premium
+                                            Target: $5k MRR
+
+Windows ─────────────────────────────────►  Enterprise potential
+                                            Target: $15k MRR
+
+Full platform ───────────────────────────►  Market leader positioning
+                                            Target: $50k MRR
+```
+
 ## Context
 
 TiedSiren51 is currently Android-only. The long-term vision is a cross-platform app blocker with device sync across Android, iOS, macOS, Windows, Linux, and Web (browser extension).
