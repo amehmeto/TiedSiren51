@@ -8,39 +8,39 @@
 ## Visual Roadmap (Gross Estimate)
 
 ```
-2025                          2026                              2027
-Q1    Q2    Q3    Q4    Q1    Q2    Q3    Q4    Q1    Q2
-├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+2025                          2026                        2027
+Q1    Q2    Q3    Q4    Q1    Q2    Q3    Q4    Q1
+├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
 
-ANDROID ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+ANDROID ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
         ▲         ▲
         │         └─ v1.0 Stable (6 months)
         └─ Current
 
-MACOS             ░░░░████████████████░░░░░░░░░░░░░░░░░░░░░░░░
-                      ▲              ▲
-                      │              └─ v1.0 (5 months)
-                      └─ Start after Android stable
+MACOS             ░░████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+                    ▲      ▲
+                    │      └─ v1.0 (3 months) - Electron known!
+                    └─ Start after Android stable
 
-CHROME EXT                    ░░████░░░░░░░░░░░░░░░░░░░░░░░░░░
-                                 ▲  ▲
-                                 │  └─ v1.0 (1.5 months)
-                                 └─ Quick win during desktop dev
+CHROME EXT              ░░████░░░░░░░░░░░░░░░░░░░░░░░░░░░
+                           ▲  ▲
+                           │  └─ v1.0 (1.5 months)
+                           └─ Quick win during macOS dev
 
-WINDOWS                           ░░░░████████████░░░░░░░░░░░░
-                                      ▲          ▲
-                                      │          └─ v1.0 (4 months)
-                                      └─ Reuse Tauri patterns from macOS
+WINDOWS                       ░░████████░░░░░░░░░░░░░░░░░
+                                ▲      ▲
+                                │      └─ v1.0 (3 months) - Reuse Electron
+                                └─ After macOS
 
-LINUX                                         ░░░░████████░░░░
-                                                  ▲      ▲
-                                                  │      └─ v1.0 (3 months)
-                                                  └─ After Windows
+LINUX                                 ░░██████░░░░░░░░░░░
+                                        ▲    ▲
+                                        │    └─ v1.0 (2.5 months)
+                                        └─ After Windows
 
-IOS                                                   ░░░░████████
-                                                          ▲      ▲
-                                                          │      └─ v1.0 (5 months)
-                                                          └─ Last, set expectations
+IOS                                          ░░░░████████
+                                                 ▲      ▲
+                                                 │      └─ v1.0 (5 months)
+                                                 └─ Last, hardest
 
 ████ = Active development
 ░░░░ = Planning/Learning phase
@@ -51,18 +51,19 @@ IOS                                                   ░░░░████�
 | Platform | Effort | Duration | Key Challenges |
 |----------|--------|----------|----------------|
 | **Android** | ████████ High | 6 months | AccessibilityService, native modules, anti-bypass |
-| **macOS** | ██████ High | 5 months | Learn Swift/Tauri, EndpointSecurity, code signing |
+| **macOS** | ████ Medium | 3 months | Electron known, native addons for EndpointSecurity |
 | **Chrome Ext** | ██ Low | 1.5 months | Simple APIs, MV3 limitations |
-| **Windows** | █████ Medium-High | 4 months | WMI/WFP, service installation, admin rights |
-| **Linux** | ████ Medium | 3 months | Fragmentation (X11/Wayland, distros) |
+| **Windows** | ████ Medium | 3 months | Electron known, native addons for WMI/WFP |
+| **Linux** | ███ Medium | 2.5 months | Electron known, less anti-bypass needed |
 | **iOS** | ██████ High | 5 months | Severe limitations, workarounds, partner unlock |
 
 ### Total Timeline
 
 ```
-Optimistic (1 dev, full-time):  ~24 months (2 years)
-Realistic (1 dev, part-time):   ~36 months (3 years)
-With 2 devs parallel:           ~15-18 months
+With Electron experience:
+  Optimistic (1 dev, full-time):  ~18 months
+  Realistic (1 dev, part-time):   ~28 months
+  With 2 devs parallel:           ~12 months
 ```
 
 ### Milestone Summary
@@ -187,10 +188,25 @@ Each platform requires platform-specific adapters for:
 |----------|----------|-----------|--------------|
 | **Android** | Kotlin | Expo Module + React Native | Play Store |
 | **iOS** | Swift | Expo Module + React Native | App Store |
-| **macOS** | Swift + Rust | Tauri | Direct + App Store |
-| **Windows** | Rust + C++ | Tauri | Direct + MS Store |
-| **Linux** | Rust | Tauri | Flatpak/AppImage |
+| **macOS** | TypeScript + Swift | Electron + native addons | Direct + App Store |
+| **Windows** | TypeScript + C++ | Electron + native addons | Direct + MS Store |
+| **Linux** | TypeScript | Electron + native addons | Flatpak/AppImage |
 | **Web Ext** | TypeScript | Plasmo or WXT | Chrome/Firefox stores |
+
+### Electron vs Tauri Decision
+
+**Chosen: Electron** (existing experience)
+
+| Factor | Electron | Tauri |
+|--------|----------|-------|
+| Learning curve | ✅ Already known | ❌ New (Rust) |
+| Bundle size | ❌ ~150MB | ✅ ~10MB |
+| Memory usage | ❌ Higher | ✅ Lower |
+| Native addons | ✅ node-ffi, N-API | ⚠️ Rust FFI |
+| React reuse | ✅ Same codebase | ✅ Same codebase |
+| Time to market | ✅ Faster | ❌ Slower |
+
+For anti-bypass features (block Task Manager, etc.), native addons will be needed regardless of framework choice.
 
 ## iOS Strategy (Hardest Platform)
 
@@ -264,6 +280,8 @@ For each new platform:
 - [Freedom.to](https://freedom.to/) - Cross-platform competitor
 - [Cold Turkey](https://getcoldturkey.com/) - Strictest desktop blocker
 - [AppBlock](https://appblock.app/) - Mobile-focused competitor
-- [Tauri](https://tauri.app/) - Rust-based desktop framework
+- [Electron](https://www.electronjs.org/) - Desktop framework (chosen)
 - [Apple Screen Time API](https://developer.apple.com/documentation/familycontrols)
 - [Android AccessibilityService](https://developer.android.com/reference/android/accessibilityservice/AccessibilityService)
+- [Windows WFP](https://docs.microsoft.com/en-us/windows/win32/fwp/windows-filtering-platform-start-page) - Windows Filtering Platform
+- [macOS EndpointSecurity](https://developer.apple.com/documentation/endpointsecurity) - System extension for monitoring
