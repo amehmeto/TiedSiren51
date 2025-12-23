@@ -1,6 +1,9 @@
 # Shared path filter configuration
 # This reusable workflow checks if app-related files have changed.
 # Used by Cerberus and Hades to avoid redundant builds.
+#
+# Filters are split (src, tests, config) to avoid dorny/paths-filter
+# negation pattern bug. See: https://github.com/dorny/paths-filter/issues/97
 
 name: Path Filter
 
@@ -11,7 +14,7 @@ on:
         description: 'Whether app-related files have changed in the entire PR'
         value: ${{ jobs.check-paths.outputs.app-changed }}
       app-changed-this-push:
-        description: 'Whether app-related files have changed in the latest push only'
+        description: 'Whether app-related files have changed in the latest push only (excluding test-only changes)'
         value: ${{ jobs.check-paths.outputs.app-changed-this-push }}
       shell-only:
         description: 'Whether only shell scripts have changed'
@@ -21,9 +24,11 @@ jobs:
   check-paths:
     runs-on: ubuntu-latest
     outputs:
-      app-changed: ${{ steps.filter.outputs.app }}
-      app-changed-this-push: ${{ steps.filter-push.outputs.app }}
-      shell-only: ${{ steps.filter.outputs.shell == 'true' && steps.filter.outputs.app != 'true' }}
+      # app-changed: src OR config changed (tests run for any code change)
+      app-changed: ${{ steps.filter.outputs.src == 'true' || steps.filter.outputs.config == 'true' }}
+      # app-changed-this-push: src OR config changed (test-only changes don't trigger)
+      app-changed-this-push: ${{ steps.filter-push.outputs.src == 'true' || steps.filter-push.outputs.config == 'true' }}
+      shell-only: ${{ steps.filter.outputs.shell == 'true' && steps.filter.outputs.src != 'true' && steps.filter.outputs.config != 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
