@@ -26,9 +26,8 @@ jobs:
     outputs:
       # app-changed: src OR config changed (tests run for any code change)
       app-changed: ${{ steps.filter.outputs.src == 'true' || steps.filter.outputs.config == 'true' }}
-      # app-changed-this-push: (src OR config) changed AND NOT (only tests changed)
-      # This prevents build from running when only test files are pushed
-      app-changed-this-push: ${{ (steps.filter-push.outputs.src == 'true' || steps.filter-push.outputs.config == 'true') && !(steps.filter-push.outputs.tests == 'true' && steps.filter-push.outputs.src != 'true' && steps.filter-push.outputs.config != 'true') }}
+      # app-changed-this-push: src OR config changed (test-only changes don't trigger)
+      app-changed-this-push: ${{ steps.filter-push.outputs.src == 'true' || steps.filter-push.outputs.config == 'true' }}
       shell-only: ${{ steps.filter.outputs.shell == 'true' && steps.filter.outputs.src != 'true' && steps.filter.outputs.config != 'true' }}
     steps:
       - name: Checkout code
