@@ -54,12 +54,14 @@ External services, databases, adapters, platform-specific implementations.
 
 **Notifications & Background Tasks:**
 - [Expo Notifications](infrastructure/expo-notifications.md)
-- [Expo Background Fetch](infrastructure/expo-background-fetch.md)
+- [Native Blocking Scheduler](infrastructure/native-blocking-scheduler.md)
+- [Expo Background Fetch](infrastructure/expo-background-fetch.md) *(Superseded)*
 
 **Platform Adapters:**
 - [Expo List Installed Apps](infrastructure/expo-list-installed-apps.md)
 - [Date Provider Pattern](infrastructure/date-provider-pattern.md)
 - [Foreground Service](infrastructure/foreground-service.md)
+- [SirenTier Orchestrator Pattern](infrastructure/siren-tier-orchestrator.md)
 
 ### Cross-Cutting Concerns
 
