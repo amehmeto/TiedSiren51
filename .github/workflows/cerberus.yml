@@ -84,8 +84,10 @@ jobs:
         id: cache-coverage
         uses: actions/cache/restore@v4
         with:
-          path: /tmp/coverage-summary.json
-          key: coverage-main-latest
+          path: /tmp/base-coverage/coverage-summary.json
+          # Use prefix matching to get the most recent main branch coverage
+          # GitHub cache returns the most recently created cache matching the prefix
+          key: coverage-main-${{ github.event.pull_request.base.sha }}
           restore-keys: |
             coverage-main-
 

@@ -2,7 +2,7 @@
 # Prepare base coverage for PR comparison
 # Copies cached coverage to base-coverage.json, or creates empty baseline if not found
 
-CACHED_COVERAGE="/tmp/coverage-summary.json"
+CACHED_COVERAGE="/tmp/base-coverage/coverage-summary.json"
 OUTPUT_FILE="base-coverage.json"
 
 if [ -f "$CACHED_COVERAGE" ]; then

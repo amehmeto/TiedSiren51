@@ -55,22 +55,14 @@ jobs:
       - name: Run tests with coverage
         run: npm run test:cov
 
+      - name: Copy coverage for caching
+        run: mkdir -p /tmp/base-coverage && cp coverage/coverage-summary.json /tmp/base-coverage/
+
       - name: Save coverage to cache
         uses: actions/cache/save@v4
         with:
-          path: coverage/coverage-summary.json
+          path: /tmp/base-coverage/coverage-summary.json
           key: coverage-main-${{ github.sha }}
-
-      # Also save with a stable key that PRs can restore
-      - name: Copy coverage for stable cache key
-        run: cp coverage/coverage-summary.json /tmp/coverage-summary.json
-
-      - name: Save coverage with stable key
-        uses: actions/cache/save@v4
-        with:
-          path: /tmp/coverage-summary.json
-          key: coverage-main-latest
-          enableCrossOsArchive: true
 
   build-preview:
     needs: path-filter
