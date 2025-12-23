@@ -10,17 +10,21 @@ shell:
   - '.claude/hooks/**'
 
 app:
-  # Source code
-  # NOTE: Negation patterns removed due to dorny/paths-filter bug
-  # where !**/*.test.ts matches ALL non-test files including docs/
-  # See: https://github.com/dorny/paths-filter/issues/97
+  # Source code (excluding test files)
   - 'app/**'
   - 'core/**'
   - 'ui/**'
   - 'infra/**'
-  # Config files that affect the build
+  - '!**/*.spec.ts'
+  - '!**/*.test.ts'
+  - '!**/_tests_/**'
+  - '!**/fixtures/**'
+  - '!**/data-builders/**'
+  - '!**/in-memory.*'
+  # Config files that affect the build (NOT test config)
   - 'app.config.js'
   - 'package.json'
+  - '!vitest.config.js'
   - 'package-lock.json'
   - 'tsconfig.json'
   - 'babel.config.cjs'
