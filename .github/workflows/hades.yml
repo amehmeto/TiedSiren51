@@ -12,6 +12,10 @@ on:
       - main
   pull_request:
     types: [closed]
+  schedule:
+    # Run weekly on Sunday at 00:00 UTC to keep coverage cache alive
+    # GitHub caches expire after 7 days of no access
+    - cron: '0 0 * * 0'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -22,9 +26,30 @@ jobs:
     if: github.event_name == 'push'
     uses: ./.github/workflows/path-filter.yml
 
+  # Refresh coverage cache weekly to prevent expiration
+  # Just restores and re-saves without running tests
+  refresh-coverage-cache:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Restore coverage from cache
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/base-coverage/coverage-summary.json
+          key: coverage-main-refresh
+          restore-keys: |
+            coverage-main-
+
+      - name: Re-save coverage to refresh expiration
+        if: steps.cache-restore.outputs.cache-hit != ''
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/base-coverage/coverage-summary.json
+          key: coverage-main-refresh-${{ github.run_id }}
+
   # Cache coverage for PR comparisons
   # Only runs when app code changes (not for docs-only commits)
-  # Note: GitHub caches expire after 7 days of no access
   # Note: First PR after this merges will show 0% baseline until main has a cached run
   cache-coverage:
     needs: path-filter
