@@ -31,7 +31,6 @@ export default {
         '**/_tests_/**',
         '**/data-builders/**',
         '**/node_modules/**',
-        'infra/**/prisma.*.ts',
       ],
       thresholds: {
         '**/*.schema.ts': {
