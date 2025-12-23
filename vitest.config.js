@@ -18,6 +18,20 @@ export default {
       'eslint-rules/**',
     ],
     coverage: {
+      provider: 'v8',
+      reporter: ['text', 'json-summary', 'html'],
+      reportsDirectory: './coverage',
+      all: true,
+      include: ['core/**/*.ts', 'infra/**/*.ts', 'ui/**/*.ts'],
+      exclude: [
+        '**/*.test.ts',
+        '**/*.spec.ts',
+        '**/*.fixture.ts',
+        '**/fixtures/**',
+        '**/_tests_/**',
+        '**/data-builders/**',
+        '**/node_modules/**',
+      ],
       thresholds: {
         '**/*.schema.ts': {
           statements: 100,

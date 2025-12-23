@@ -12,6 +12,10 @@ on:
       - main
   pull_request:
     types: [closed]
+  schedule:
+    # Run weekly on Sunday at 00:00 UTC to keep coverage cache alive
+    # GitHub caches expire after 7 days of no access
+    - cron: '0 0 * * 0'
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -21,6 +25,82 @@ jobs:
   path-filter:
     if: github.event_name == 'push'
     uses: ./.github/workflows/path-filter.yml
+
+  # Refresh coverage cache weekly to prevent expiration (only if no recent main activity)
+  # Skips if main had commits in last 6 days (cache already fresh)
+  refresh-coverage-cache:
+    if: github.event_name == 'schedule'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Check for recent main branch activity
+        id: check-activity
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/check-cache-freshness.sh "${{ github.repository }}" "$GITHUB_OUTPUT"
+
+      - name: Restore coverage from cache
+        if: steps.check-activity.outputs.skip == 'false'
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/base-coverage/coverage-summary.json
+          key: coverage-main-refresh
+          restore-keys: |
+            coverage-main-
+
+      - name: Re-save coverage to refresh expiration
+        if: steps.check-activity.outputs.skip == 'false' && steps.cache-restore.outputs.cache-hit != ''
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/base-coverage/coverage-summary.json
+          key: coverage-main-refresh-${{ github.run_id }}
+
+  # Cache coverage for PR comparisons
+  # Only runs when app code changes (not for docs-only commits)
+  # Note: First PR after this merges will show 0% baseline until main has a cached run
+  cache-coverage:
+    needs: path-filter
+    if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Install platform-specific binaries
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu
+
+      - name: Cache Prisma Client
+        uses: actions/cache@v4
+        with:
+          path: node_modules/.prisma
+          key: prisma-${{ hashFiles('schema.prisma') }}
+
+      - name: Generate Prisma Client
+        run: npx prisma generate
+
+      - name: Run tests with coverage
+        run: npm run test:cov
+
+      - name: Copy coverage for caching
+        run: mkdir -p /tmp/base-coverage && cp coverage/coverage-summary.json /tmp/base-coverage/
+
+      - name: Save coverage to cache
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/base-coverage/coverage-summary.json
+          key: coverage-main-${{ github.sha }}
 
   build-preview:
     needs: path-filter

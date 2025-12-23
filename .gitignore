@@ -51,8 +51,9 @@ yarn-error.*
 # typescript
 *.tsbuildinfo
 
-# Coverage - ignore all except summary (tracked by CI)
+# Coverage - generated files, base coverage is cached via GitHub Actions
 coverage/*
+coverage-history.json
 
 # Android
 #
