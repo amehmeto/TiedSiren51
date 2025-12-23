@@ -103,6 +103,46 @@ export const onBlockSessionsChangedListener = ({
 | Gateway Listeners | Port callbacks (`gateway.onEvent()`) | External events (auth, native modules) |
 | Store Listeners | `store.subscribe()` | React to Redux state changes |
 
+### Unified Listeners (Multi-Slice)
+
+Some listeners need to react to changes across multiple Redux slices. For example, blocking state depends on both:
+
+- **blockSession slice**: When sessions start/end
+- **blocklist slice**: When blocklists are edited (apps added/removed)
+
+Rather than having separate listeners for each slice, use a **unified listener** that computes derived state:
+
+```typescript
+// Single listener watching multiple slices
+export const onBlockingStateChangedListener = ({
+  store,
+  sirenTier,
+  dateProvider,
+}: Dependencies): (() => void) => {
+  let lastBlockedPackages: string[] = []
+
+  return store.subscribe(() => {
+    const state = store.getState()
+
+    // Selector joins data from both slices
+    const blockedPackages = selectBlockedPackages(state, dateProvider)
+
+    // Only react if derived state changed
+    if (!arraysEqual(blockedPackages, lastBlockedPackages)) {
+      lastBlockedPackages = blockedPackages
+      void sirenTier.updateSchedule(computeSchedule(state, dateProvider))
+    }
+  })
+}
+```
+
+**Key principles for unified listeners:**
+
+1. **Selector-based**: Use selectors that join data from multiple slices
+2. **Derived state comparison**: Compare computed results, not raw slice state
+3. **Efficient diffing**: Use Set comparisons for O(n) change detection
+4. **Single responsibility**: One listener per "concern" (e.g., blocking state)
+
 ### Listener Examples
 
 **Authentication Flow (Gateway):**

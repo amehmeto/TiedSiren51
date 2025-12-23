@@ -4,7 +4,9 @@ Date: 2025-11-23
 
 ## Status
 
-Accepted
+Superseded by [Native Blocking Scheduler](native-blocking-scheduler.md)
+
+**Superseded (2025-12-23)**: Background fetch polling cannot guarantee precise session start/end times. iOS throttles to ~15min intervals which is unacceptable for blocking reliability. Native AlarmManager scheduling provides sub-second precision.
 
 ## Context
 
@@ -283,7 +285,7 @@ TaskManager.defineTask('target-sirens', async () => {
 
 ## Related ADRs
 
-- [Hexagonal Architecture](../core/hexagonal-architecture.md) - Port/adapter pattern
+- [Hexagonal Architecture](../hexagonal-architecture.md) - Port/adapter pattern
 - [Expo Notifications](expo-notifications.md) - For notification triggers
 - [Redux Toolkit for Business Logic](../core/redux-toolkit-for-business-logic.md) - State management
 
