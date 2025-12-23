@@ -172,5 +172,47 @@ describe('onBlockSessionsChanged listener', () => {
       expect(sirenLookout.isWatching).toBe(false)
       expect(foregroundService.stopCallCount).toBe(1)
     })
+
+    it('should log error when start foreground service throws', async () => {
+      foregroundService.shouldThrowOnStart = true
+      const initialState = stateBuilder()
+        .withBlockSessions([blockSession])
+        .build()
+
+      createTestStore({ sirenLookout, foregroundService, logger }, initialState)
+
+      await flushMicrotasks()
+
+      const errorLogs = logger.getLogs().filter((log) => log.level === 'error')
+      const hasExpectedError = errorLogs.some((log) =>
+        log.message.includes('Failed to start foreground service'),
+      )
+
+      expect(hasExpectedError).toBe(true)
+    })
+
+    it('should log error when stop foreground service throws', async () => {
+      foregroundService.shouldThrowOnStop = true
+      const initialState = stateBuilder()
+        .withBlockSessions([blockSession])
+        .build()
+      const store = createTestStore(
+        { sirenLookout, foregroundService, logger },
+        initialState,
+      )
+
+      await flushMicrotasks()
+
+      store.dispatch(setBlockSessions([]))
+
+      await flushMicrotasks()
+
+      const errorLogs = logger.getLogs().filter((log) => log.level === 'error')
+      const hasExpectedError = errorLogs.some((log) =>
+        log.message.includes('Failed to stop foreground service'),
+      )
+
+      expect(hasExpectedError).toBe(true)
+    })
   })
 })
