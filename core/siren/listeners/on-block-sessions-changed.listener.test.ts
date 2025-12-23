@@ -260,5 +260,27 @@ describe('Feature: Block sessions changed listener', () => {
 
       fixture.then.errorShouldBeLogged('Failed to stop watching')
     })
+
+    it('should log error when syncBlockedApps throws but continue protection', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.syncBlockedAppsWillThrow()
+      fixture.given.storeIsCreated()
+
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+
+      fixture.then.errorShouldBeLogged('Failed to sync blocked apps')
+      fixture.then.watchingShouldBeStarted()
+      fixture.then.foregroundServiceShouldBeStarted()
+    })
   })
 })

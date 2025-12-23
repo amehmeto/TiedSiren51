@@ -49,6 +49,9 @@ export function onBlockSessionsChangedFixture(
       stopWatchingWillThrow() {
         sirenLookout.shouldThrowOnStop = true
       },
+      syncBlockedAppsWillThrow() {
+        sirenLookout.shouldThrowOnSync = true
+      },
     },
     when: {
       async blockSessionsChange(sessions: BlockSession[]) {
