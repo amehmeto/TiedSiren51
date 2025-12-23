@@ -60,8 +60,8 @@ interface ScheduledSession {
 
 ### Flow
 
-1. **JS computes schedule**: When block sessions or blocklists change, JS computes the complete schedule
-2. **JS sends to native**: `sirenTier.updateSchedule(schedule)`
+1. **JS computes schedule**: When block sessions or blocklists change, JS computes the complete schedule via `selectBlockingSchedule` selector
+2. **JS sends to native**: `sirenTier.setBlockingSchedule(schedule)`
 3. **Native sets alarms**: AlarmManager schedules exact alarms for each start/end time
 4. **Native executes**: At scheduled time, native activates/deactivates blocking
 5. **Native persists**: Schedule survives app process death
@@ -71,9 +71,23 @@ interface ScheduledSession {
 ```typescript
 // core/_ports_/siren.tier.ts
 export interface SirenTier {
-  updateSchedule(schedule: BlockingSchedule): Promise<void>
-  getCurrentSchedule(): Promise<BlockingSchedule | null>
-  clearSchedule(): Promise<void>
+  initialize(): Promise<void>
+  setBlockingSchedule(schedule: BlockingSchedule): Promise<void>
+}
+
+export interface BlockingSchedule {
+  windows: BlockingWindow[]
+}
+
+export interface BlockingWindow {
+  id: string
+  startTime: string    // "14:00"
+  endTime: string      // "15:00"
+  sirens: {
+    apps: string[]     // package names
+    websites: string[] // domains (future)
+    keywords: string[] // search terms (future)
+  }
 }
 ```
 
@@ -178,10 +192,16 @@ class BlockingScheduler(private val context: Context) {
 
 ### Key Files
 
+**JS (TiedSiren51):**
 - `core/_ports_/siren.tier.ts` - Port definition
-- `infra/siren-tier/android.siren-tier.ts` - Android adapter
-- `android/app/src/main/java/.../BlockingScheduler.kt` - Native scheduler
-- `android/app/src/main/java/.../BlockingReceiver.kt` - Alarm receiver
+- `core/block-session/selectors/selectBlockingSchedule.ts` - Schedule computation
+- `core/siren/listeners/on-blocking-schedule-changed.listener.ts` - Unified listener
+- `infra/siren-tier/android.siren-tier.ts` - Thin wrapper calling native
+
+**Kotlin (expo-siren-tier module):**
+- `SirenTierModule.kt` - Expo module entry point
+- `BlockingScheduler.kt` - AlarmManager-based scheduling
+- `BlockingReceiver.kt` - Alarm broadcast receiver
 
 ### Android Permissions
 

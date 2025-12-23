@@ -15,6 +15,8 @@
       "Bash(find:*)",
       "Bash(gh auth status:*)",
       "Bash(gh browse:*)",
+      "Bash(gh issue comment:*)",
+      "Bash(gh issue edit:*)",
       "Bash(gh issue list:*)",
       "Bash(gh issue status:*)",
       "Bash(gh issue view:*)",

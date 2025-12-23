@@ -114,34 +114,40 @@ Rather than having separate listeners for each slice, use a **unified listener**
 
 ```typescript
 // Single listener watching multiple slices
-export const onBlockingStateChangedListener = ({
-  store,
-  sirenTier,
-  dateProvider,
-}: Dependencies): (() => void) => {
-  let lastBlockedPackages: string[] = []
+export function createOnBlockingScheduleChangedListener(
+  sirenTier: SirenTier,
+): AppStartListening {
+  return (startListening) => {
+    let lastScheduleHash: string | null = null
 
-  return store.subscribe(() => {
-    const state = store.getState()
+    startListening({
+      predicate: (_, currentState, previousState) =>
+        currentState.blockSession !== previousState.blockSession ||
+        currentState.blocklist !== previousState.blocklist,
+      effect: async (_, listenerApi) => {
+        const state = listenerApi.getState()
 
-    // Selector joins data from both slices
-    const blockedPackages = selectBlockedPackages(state, dateProvider)
+        // Selector joins data from both slices
+        const schedule = selectBlockingSchedule(state)
+        const hash = hashSchedule(schedule)
 
-    // Only react if derived state changed
-    if (!arraysEqual(blockedPackages, lastBlockedPackages)) {
-      lastBlockedPackages = blockedPackages
-      void sirenTier.updateSchedule(computeSchedule(state, dateProvider))
-    }
-  })
+        // Only sync if schedule changed
+        if (hash !== lastScheduleHash) {
+          await sirenTier.setBlockingSchedule(schedule)
+          lastScheduleHash = hash
+        }
+      },
+    })
+  }
 }
 ```
 
 **Key principles for unified listeners:**
 
 1. **Selector-based**: Use selectors that join data from multiple slices
-2. **Derived state comparison**: Compare computed results, not raw slice state
-3. **Efficient diffing**: Use Set comparisons for O(n) change detection
-4. **Single responsibility**: One listener per "concern" (e.g., blocking state)
+2. **Derived state comparison**: Compare computed results (hash), not raw slice state
+3. **Efficient diffing**: Hash comparison for O(1) change detection
+4. **Single responsibility**: One listener per "concern" (e.g., blocking schedule)
 
 ### Listener Examples
 
