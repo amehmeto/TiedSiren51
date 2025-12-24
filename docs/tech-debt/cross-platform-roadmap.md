@@ -66,7 +66,7 @@ Parallel (2 devs):                ~12 months
 Parallel (3+ devs):               ~9 months  ← See below
 ```
 
-### Parallelized Roadmap (3+ devs or outsourcing)
+### Parallelized Roadmap (3+ devs, sequential start)
 
 ```
 2025                    2026
@@ -74,40 +74,132 @@ Q2    Q3    Q4    Q1    Q2    Q3
 ├─────┼─────┼─────┼─────┼─────┤
 
 ANDROID ██████████░░░░░░░░░░░░░░░░░░░░░░  Dev 1 (you)
-        ▲        ▲
-        │        └─ v1.0 (6 months)
-        └─ Current
                   │
-                  ▼ Core stable, ports defined
-                  ┌─────────────────────────────
+                  ▼ Core stable
 MACOS             │ ████████░░░░░░░░░░░░░░░░░░  Dev 2
-                  │    ▲   ▲
-                  │    │   └─ v1.0 (3 months)
-                  │    └─ Electron + native addons
-                  │
 WINDOWS           │ ████████░░░░░░░░░░░░░░░░░░  Dev 3
-                  │    ▲   ▲
-                  │    │   └─ v1.0 (3 months)
-                  │    └─ Same Electron, different native
-                  │
-LINUX             │ ██████░░░░░░░░░░░░░░░░░░░░  Dev 2 or 3
-                  │   ▲  ▲
-                  │   │  └─ v1.0 (2.5 months)
-                  │   └─ Easiest, less anti-bypass
-                  │
-CHROME EXT        │ ████░░░░░░░░░░░░░░░░░░░░░░  Dev 1 (you)
-                  │  ▲ ▲
-                  │  │ └─ v1.0 (1.5 months)
-                  │  └─ Quick win while desktop devs ramp up
-                  │
-IOS               │     ░░░░████████████░░░░░░  Dev 4 or outsource
-                        ▲          ▲
-                        │          └─ v1.0 (5 months)
-                        └─ Start after core stable
+LINUX             │ ██████░░░░░░░░░░░░░░░░░░░░  Dev 2/3
+CHROME EXT        │ ████░░░░░░░░░░░░░░░░░░░░░░  Dev 1
+IOS               │     ████████████░░░░░░░░░░  Dev 4
 
-Total: ~9-10 months from Android v1.0 to full platform coverage
-       ~15-16 months from today
+Total: ~15-16 months from today
 ```
+
+### MAXIMUM Parallelization (5+ devs, start NOW)
+
+**Key insight**: Ports are already designed (ADRs done). Platform work can start with FAKE implementations, then swap in real backends when ready.
+
+```
+2025                    2026
+Q2    Q3    Q4    Q1    Q2
+├─────┼─────┼─────┼─────┼─────┤
+
+PORTS DESIGN ████░░░░░░░░░░░░░░░░░░░░░░░░  Week 1-2 (you)
+             ▲  │
+             │  └─ All interfaces defined, fake impls ready
+             └─ NOW
+                │
+                ▼ All platforms start simultaneously
+                ├─────────────────────────────────────
+ANDROID         │ ████████████░░░░░░░░░░░░░░░░░  Dev 1 (you)
+                │ ▲          ▲
+                │ │          └─ v1.0 (6 months)
+                │ └─ Real implementation
+                │
+MACOS           │ ░░██████████░░░░░░░░░░░░░░░░  Dev 2
+                │   ▲   ▲    ▲
+                │   │   │    └─ v1.0 (4 months total)
+                │   │   └─ Connect real backend (1 month)
+                │   └─ Electron shell + fake ports (3 months)
+                │
+WINDOWS         │ ░░██████████░░░░░░░░░░░░░░░░  Dev 3
+                │   ▲   ▲    ▲
+                │   │   │    └─ v1.0 (4 months total)
+                │   │   └─ Connect real backend
+                │   └─ Electron shell + fake ports
+                │
+LINUX           │ ░░████████░░░░░░░░░░░░░░░░░░  Dev 2 or 3
+                │   ▲      ▲
+                │   │      └─ v1.0 (3 months)
+                │   └─ Simpler, less native code
+                │
+CHROME EXT      │ ██████░░░░░░░░░░░░░░░░░░░░░░  Dev 4
+                │ ▲    ▲
+                │ │    └─ v1.0 (2 months)
+                │ └─ Independent, no native deps
+                │
+IOS             │ ░░░░██████████░░░░░░░░░░░░░░  Dev 5 (iOS specialist)
+                │     ▲        ▲
+                │     │        └─ v1.0 (5 months)
+                │     └─ Screen Time API R&D starts immediately
+
+Total: ~6-7 months to full platform coverage
+       Same as Android v1.0 timeline!
+```
+
+### How "Fake Ports" Parallelization Works
+
+```typescript
+// Phase 1: Desktop dev uses fake SirenTier
+class FakeSirenTier implements SirenTier {
+  async setBlockingSchedule(schedule: BlockingSchedule) {
+    console.log('Would block:', schedule) // Just logs
+    this.fakeBlockedApps = schedule.windows.flatMap(w => w.sirens.apps)
+  }
+}
+
+// Phase 2: Swap to real implementation when native addons ready
+class MacOSSirenTier implements SirenTier {
+  async setBlockingSchedule(schedule: BlockingSchedule) {
+    await this.endpointSecurity.blockProcesses(schedule)  // Real blocking
+  }
+}
+```
+
+**What each dev can build with fake ports:**
+- Full UI/UX
+- Redux integration
+- Firestore sync
+- Notification system
+- Settings/preferences
+- Onboarding flow
+- 80% of the app!
+
+**What needs real ports (last 20%):**
+- Actual blocking
+- Actual detection
+- Anti-bypass measures
+
+### Aggressive Team Composition
+
+**Option D: Full parallel team (Cost: ~$40-60k, fastest)**
+```
+Dev 1 (you):     Android real implementation + architecture decisions
+Dev 2:           macOS Electron + EndpointSecurity native addon
+Dev 3:           Windows Electron + WFP native addon
+Dev 4:           Chrome Extension (can also help with Linux)
+Dev 5:           iOS Screen Time + VPN specialist
+```
+
+**Timeline with 5 devs:**
+```
+Month 1:    Ports finalized, all devs start with fakes
+Month 2-3:  UI/sync working on all platforms (fake blocking)
+Month 4-5:  Real native blocking integrated
+Month 6:    All platforms v1.0 🎉
+
+Total: 6 months instead of 18 months (3x faster)
+```
+
+### Risk Mitigation for Aggressive Parallelization
+
+| Risk | Mitigation |
+|------|------------|
+| Port interface changes mid-development | Freeze port interfaces in Week 2, version them |
+| Devs blocked waiting for your decisions | Daily 15-min sync, async decisions in Slack |
+| Merge conflicts in shared code | Strict module boundaries, platform-specific folders |
+| Quality suffers from speed | Automated tests required before merge |
+| One platform falls behind | Cross-train devs, anyone can help anywhere |
 
 ### Parallelization Constraints
 
