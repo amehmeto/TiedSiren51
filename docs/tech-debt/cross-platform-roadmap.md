@@ -60,10 +60,112 @@ IOS                                          ░░░░███████�
 ### Total Timeline
 
 ```
-With Electron experience:
-  Optimistic (1 dev, full-time):  ~18 months
-  Realistic (1 dev, part-time):   ~28 months
-  With 2 devs parallel:           ~12 months
+Sequential (1 dev, full-time):    ~18 months
+Sequential (1 dev, part-time):    ~28 months
+Parallel (2 devs):                ~12 months
+Parallel (3+ devs):               ~9 months  ← See below
+```
+
+### Parallelized Roadmap (3+ devs or outsourcing)
+
+```
+2025                    2026
+Q2    Q3    Q4    Q1    Q2    Q3
+├─────┼─────┼─────┼─────┼─────┤
+
+ANDROID ██████████░░░░░░░░░░░░░░░░░░░░░░  Dev 1 (you)
+        ▲        ▲
+        │        └─ v1.0 (6 months)
+        └─ Current
+                  │
+                  ▼ Core stable, ports defined
+                  ┌─────────────────────────────
+MACOS             │ ████████░░░░░░░░░░░░░░░░░░  Dev 2
+                  │    ▲   ▲
+                  │    │   └─ v1.0 (3 months)
+                  │    └─ Electron + native addons
+                  │
+WINDOWS           │ ████████░░░░░░░░░░░░░░░░░░  Dev 3
+                  │    ▲   ▲
+                  │    │   └─ v1.0 (3 months)
+                  │    └─ Same Electron, different native
+                  │
+LINUX             │ ██████░░░░░░░░░░░░░░░░░░░░  Dev 2 or 3
+                  │   ▲  ▲
+                  │   │  └─ v1.0 (2.5 months)
+                  │   └─ Easiest, less anti-bypass
+                  │
+CHROME EXT        │ ████░░░░░░░░░░░░░░░░░░░░░░  Dev 1 (you)
+                  │  ▲ ▲
+                  │  │ └─ v1.0 (1.5 months)
+                  │  └─ Quick win while desktop devs ramp up
+                  │
+IOS               │     ░░░░████████████░░░░░░  Dev 4 or outsource
+                        ▲          ▲
+                        │          └─ v1.0 (5 months)
+                        └─ Start after core stable
+
+Total: ~9-10 months from Android v1.0 to full platform coverage
+       ~15-16 months from today
+```
+
+### Parallelization Constraints
+
+| Constraint | Why | Mitigation |
+|------------|-----|------------|
+| **Core must stabilize first** | Ports/interfaces need to be solid before platform work | Wait for Android v1.0 |
+| **Shared Electron knowledge** | Desktop devs need to share native addon patterns | Daily syncs, shared repo |
+| **iOS specialist needed** | Screen Time API + Swift is specialized | Hire iOS contractor |
+| **Code review bottleneck** | You reviewing 3-4 PRs/day | Define standards upfront, trust devs |
+| **Sync protocol must be defined** | All platforms sync via Firestore | Design sync schema before parallel work |
+
+### Team Composition Options
+
+**Option A: Hire 2 contractors (Cost: ~$15-20k)**
+```
+You:           Android → Chrome Extension → Code review
+Contractor 1:  macOS → Linux (Electron expert)
+Contractor 2:  Windows (Electron + C++ for WFP)
+Contractor 3:  iOS (Swift specialist, 3-month contract)
+```
+
+**Option B: Outsource desktop to agency (Cost: ~$30-50k)**
+```
+You:           Android → Chrome → iOS oversight
+Agency:        macOS + Windows + Linux (packaged deal)
+```
+
+**Option C: Open source core, community ports (Cost: $0, slow)**
+```
+You:           Android + Core architecture
+Community:     Desktop ports (unpredictable timeline)
+```
+
+### Critical Path
+
+```
+                           ┌─────────────────┐
+                           │  Android v1.0   │
+                           │   (6 months)    │
+                           └────────┬────────┘
+                                    │
+            ┌───────────────────────┼───────────────────────┐
+            ▼                       ▼                       ▼
+    ┌───────────────┐       ┌───────────────┐       ┌───────────────┐
+    │    Desktop    │       │    Chrome     │       │   iOS R&D     │
+    │  (parallel)   │       │  Extension    │       │  (parallel)   │
+    │   3 months    │       │  1.5 months   │       │   5 months    │
+    └───────┬───────┘       └───────┬───────┘       └───────┬───────┘
+            │                       │                       │
+            └───────────────────────┼───────────────────────┘
+                                    ▼
+                           ┌─────────────────┐
+                           │  Full Platform  │
+                           │   Coverage      │
+                           └─────────────────┘
+
+Critical path: Android (6mo) → iOS (5mo) = 11 months minimum
+Desktop is NOT on critical path (can finish faster than iOS)
 ```
 
 ### Milestone Summary
