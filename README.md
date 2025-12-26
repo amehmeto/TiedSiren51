@@ -106,24 +106,44 @@ yarn android
    npm install
    ```
 
-3. Set up Prisma (if using database features)
-
-   Run Expo prebuild:
+3. Generate native projects (Android/iOS)
 
    ```bash
    npm run prebuild
    ```
 
-   After initializing Prisma:
+   This creates the `android/` and `ios/` folders with all native configuration from `app.config.js`.
 
-   - Generate Prisma Client:
-     ```bash
-     npx prisma generate
-     ```
-   - Run migrations:
-     ```bash
-     npx prisma migrate dev
-     ```
+4. Set up secrets (using eas)
+
+   Make sure you have `eas-cli` installed. Otherwise, install it:
+   ```bash
+   npm install -g eas-cli
+   ```
+
+   Log in to your Expo account (if not already logged in):
+   ```bash
+   eas whoami        # Check if already logged in
+   eas login         # Log in if needed
+   ```
+
+   Then pull secrets from eas:
+   ```bash
+   eas env:pull --environment development
+   ```
+
+   This will create a `.env.local` file with development env variables.
+
+5. Set up Prisma (if using database features)
+
+   The project already has a Prisma schema configured (`schema.prisma`).
+
+   The Prisma Client is automatically generated during `npm install` (via postinstall hook).
+
+   To apply database migrations:
+   ```bash
+   npx prisma migrate dev
+   ```
 
 ## Development
 
