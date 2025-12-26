@@ -116,17 +116,23 @@ yarn android
 
 4. Set up secrets (using eas)
 
-  Make sure you have `eas-cli` installed. Otherwise, install it:
-  ```bash
-  npm install -g eas-cli
-  ```
-  
-  Then pull secrets from eas:
-  ```bash
-  eas env:pull --environment development
-  ```
-  
-  This will create a `.env.local` file with development env variables.
+   Make sure you have `eas-cli` installed. Otherwise, install it:
+   ```bash
+   npm install -g eas-cli
+   ```
+
+   Log in to your Expo account (if not already logged in):
+   ```bash
+   eas whoami        # Check if already logged in
+   eas login         # Log in if needed
+   ```
+
+   Then pull secrets from eas:
+   ```bash
+   eas env:pull --environment development
+   ```
+
+   This will create a `.env.local` file with development env variables.
 
 5. Set up Prisma (if using database features)
 
