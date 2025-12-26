@@ -1,88 +1,85 @@
 # Cross-Platform Adapter Roadmap
 
-> Created: December 24, 2025
+> Created: December 24, 2024
 > Status: Planning
 > Priority: 📋 **LOW** - Strategic planning for future expansion
 > Effort: High (multi-year initiative)
 
-## Visual Roadmap (Gross Estimate)
+## Visual Roadmap (Relative Sequencing)
 
 ```
-2025                          2026                        2027
-Q1    Q2    Q3    Q4    Q1    Q2    Q3    Q4    Q1
-├─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┼─────┤
+Phase       1              2              3              4
+            ├──────────────┼──────────────┼──────────────┤
 
-ANDROID ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-        ▲         ▲
-        │         └─ v1.0 Stable (6 months)
-        └─ Current
+ANDROID     ████████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
+            ▲            ▲
+            │            └─ v1.0 Stable (baseline effort)
+            └─ Current focus
 
-MACOS             ░░████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░
-                    ▲      ▲
-                    │      └─ v1.0 (3 months) - Electron known!
-                    └─ Start after Android stable
+MACOS                    ░░████████░░░░░░░░░░░░░░░░░░░░░░
+                           ▲      ▲
+                           │      └─ v1.0 (~0.5x Android effort)
+                           └─ Start after Android stable
 
-CHROME EXT              ░░████░░░░░░░░░░░░░░░░░░░░░░░░░░░
-                           ▲  ▲
-                           │  └─ v1.0 (1.5 months)
-                           └─ Quick win during macOS dev
+CHROME EXT                   ░░████░░░░░░░░░░░░░░░░░░░░░░
+                                ▲  ▲
+                                │  └─ v1.0 (~0.25x Android effort)
+                                └─ Quick win during macOS dev
 
-WINDOWS                       ░░████████░░░░░░░░░░░░░░░░░
-                                ▲      ▲
-                                │      └─ v1.0 (3 months) - Reuse Electron
-                                └─ After macOS
+WINDOWS                            ░░████████░░░░░░░░░░░░
+                                     ▲      ▲
+                                     │      └─ v1.0 (~0.5x) - Reuse Electron
+                                     └─ After macOS
 
-LINUX                                 ░░██████░░░░░░░░░░░
-                                        ▲    ▲
-                                        │    └─ v1.0 (2.5 months)
-                                        └─ After Windows
+LINUX                                      ░░██████░░░░░░
+                                             ▲    ▲
+                                             │    └─ v1.0 (~0.4x)
+                                             └─ After Windows
 
-IOS                                          ░░░░████████
-                                                 ▲      ▲
-                                                 │      └─ v1.0 (5 months)
-                                                 └─ Last, hardest
+IOS                                               ░░░░████████
+                                                      ▲      ▲
+                                                      │      └─ v1.0 (~0.8x)
+                                                      └─ Last, hardest
 
 ████ = Active development
 ░░░░ = Planning/Learning phase
 ```
 
-### Time Estimates per Platform
+### Relative Effort per Platform
 
-| Platform | Effort | Duration | Key Challenges |
-|----------|--------|----------|----------------|
-| **Android** | ████████ High | 6 months | AccessibilityService, native modules, anti-bypass |
-| **macOS** | ████ Medium | 3 months | Electron known, native addons for EndpointSecurity |
-| **Chrome Ext** | ██ Low | 1.5 months | Simple APIs, MV3 limitations |
-| **Windows** | ████ Medium | 3 months | Electron known, native addons for WMI/WFP |
-| **Linux** | ███ Medium | 2.5 months | Electron known, less anti-bypass needed |
-| **iOS** | ██████ High | 5 months | Severe limitations, workarounds, partner unlock |
+| Platform | Effort | Relative Size | Key Challenges |
+|----------|--------|---------------|----------------|
+| **Android** | ████████ High | 1.0x (baseline) | AccessibilityService, native modules, anti-bypass |
+| **macOS** | ████ Medium | 0.5x | Electron known, native addons for EndpointSecurity |
+| **Chrome Ext** | ██ Low | 0.25x | Simple APIs, MV3 limitations |
+| **Windows** | ████ Medium | 0.5x | Electron known, native addons for WMI/WFP |
+| **Linux** | ███ Medium | 0.4x | Electron known, less anti-bypass needed |
+| **iOS** | ██████ High | 0.8x | Severe limitations, workarounds, partner unlock |
 
-### Total Timeline
+### Parallelization Impact
 
 ```
-Sequential (1 dev, full-time):    ~18 months
-Sequential (1 dev, part-time):    ~28 months
-Parallel (2 devs):                ~12 months
-Parallel (3+ devs):               ~9 months  ← See below
+Sequential (1 dev):     ~3x Android effort
+Parallel (2 devs):      ~2x Android effort
+Parallel (3+ devs):     ~1.5x Android effort ← See below
 ```
 
 ### Parallelized Roadmap (3+ devs, sequential start)
 
 ```
-2025                    2026
-Q2    Q3    Q4    Q1    Q2    Q3
-├─────┼─────┼─────┼─────┼─────┤
+Phase       1              2              3
+            ├──────────────┼──────────────┤
 
-ANDROID ██████████░░░░░░░░░░░░░░░░░░░░░░  Dev 1 (you)
-                  │
-                  ▼ Core stable
-MACOS             │ ████████░░░░░░░░░░░░░░░░░░  Dev 2
-WINDOWS           │ ████████░░░░░░░░░░░░░░░░░░  Dev 3
-LINUX             │ ██████░░░░░░░░░░░░░░░░░░░░  Dev 2/3
-CHROME EXT        │ ████░░░░░░░░░░░░░░░░░░░░░░  Dev 1
-IOS               │     ████████████░░░░░░░░░░  Dev 4
+ANDROID     ██████████░░░░░░░░░░░░░░░░░░░░░░  Dev 1 (you)
+                      │
+                      ▼ Core stable
+MACOS                 │ ████████░░░░░░░░░░░░░░░░░░  Dev 2
+WINDOWS               │ ████████░░░░░░░░░░░░░░░░░░  Dev 3
+LINUX                 │ ██████░░░░░░░░░░░░░░░░░░░░  Dev 2/3
+CHROME EXT            │ ████░░░░░░░░░░░░░░░░░░░░░░  Dev 1
+IOS                   │     ████████████░░░░░░░░░░  Dev 4
 
-Total: ~15-16 months from today
+Result: ~2x Android effort total (parallelized)
 ```
 
 ### MAXIMUM Parallelization (5+ devs, start NOW)
@@ -90,51 +87,49 @@ Total: ~15-16 months from today
 **Key insight**: Ports are already designed (ADRs done). Platform work can start with FAKE implementations, then swap in real backends when ready.
 
 ```
-2025                    2026
-Q2    Q3    Q4    Q1    Q2
-├─────┼─────┼─────┼─────┼─────┤
+Phase       0         1              2              3
+            ├─────────┼──────────────┼──────────────┤
 
-PORTS DESIGN ████░░░░░░░░░░░░░░░░░░░░░░░░  Week 1-2 (you)
-             ▲  │
-             │  └─ All interfaces defined, fake impls ready
-             └─ NOW
-                │
-                ▼ All platforms start simultaneously
-                ├─────────────────────────────────────
-ANDROID         │ ████████████░░░░░░░░░░░░░░░░░  Dev 1 (you)
-                │ ▲          ▲
-                │ │          └─ v1.0 (6 months)
-                │ └─ Real implementation
-                │
-MACOS           │ ░░██████████░░░░░░░░░░░░░░░░  Dev 2
-                │   ▲   ▲    ▲
-                │   │   │    └─ v1.0 (4 months total)
-                │   │   └─ Connect real backend (1 month)
-                │   └─ Electron shell + fake ports (3 months)
-                │
-WINDOWS         │ ░░██████████░░░░░░░░░░░░░░░░  Dev 3
-                │   ▲   ▲    ▲
-                │   │   │    └─ v1.0 (4 months total)
-                │   │   └─ Connect real backend
-                │   └─ Electron shell + fake ports
-                │
-LINUX           │ ░░████████░░░░░░░░░░░░░░░░░░  Dev 2 or 3
-                │   ▲      ▲
-                │   │      └─ v1.0 (3 months)
-                │   └─ Simpler, less native code
-                │
-CHROME EXT      │ ██████░░░░░░░░░░░░░░░░░░░░░░  Dev 4
-                │ ▲    ▲
-                │ │    └─ v1.0 (2 months)
-                │ └─ Independent, no native deps
-                │
-IOS             │ ░░░░██████████░░░░░░░░░░░░░░  Dev 5 (iOS specialist)
-                │     ▲        ▲
-                │     │        └─ v1.0 (5 months)
-                │     └─ Screen Time API R&D starts immediately
+PORTS       ████░░░░░░░░░░░░░░░░░░░░░░░░  Initial design (you)
+            ▲  │
+            │  └─ All interfaces defined, fake impls ready
+            └─ NOW
+               │
+               ▼ All platforms start simultaneously
+               ├─────────────────────────────────────
+ANDROID        │ ████████████░░░░░░░░░░░░░░░░░  Dev 1 (you)
+               │ ▲          ▲
+               │ │          └─ v1.0 (baseline)
+               │ └─ Real implementation
+               │
+MACOS          │ ░░██████████░░░░░░░░░░░░░░░░  Dev 2
+               │   ▲   ▲    ▲
+               │   │   │    └─ v1.0 (~0.7x baseline)
+               │   │   └─ Connect real backend
+               │   └─ Electron shell + fake ports
+               │
+WINDOWS        │ ░░██████████░░░░░░░░░░░░░░░░  Dev 3
+               │   ▲   ▲    ▲
+               │   │   │    └─ v1.0 (~0.7x baseline)
+               │   │   └─ Connect real backend
+               │   └─ Electron shell + fake ports
+               │
+LINUX          │ ░░████████░░░░░░░░░░░░░░░░░░  Dev 2 or 3
+               │   ▲      ▲
+               │   │      └─ v1.0 (~0.5x baseline)
+               │   └─ Simpler, less native code
+               │
+CHROME EXT     │ ██████░░░░░░░░░░░░░░░░░░░░░░  Dev 4
+               │ ▲    ▲
+               │ │    └─ v1.0 (~0.3x baseline)
+               │ └─ Independent, no native deps
+               │
+IOS            │ ░░░░██████████░░░░░░░░░░░░░░  Dev 5 (iOS specialist)
+               │     ▲        ▲
+               │     │        └─ v1.0 (~0.8x baseline)
+               │     └─ Screen Time API R&D starts immediately
 
-Total: ~6-7 months to full platform coverage
-       Same as Android v1.0 timeline!
+Result: Full platform coverage in ~1x Android effort (with 5 devs)
 ```
 
 ### How "Fake Ports" Parallelization Works
@@ -172,7 +167,7 @@ class MacOSSirenTier implements SirenTier {
 
 ### Aggressive Team Composition
 
-**Option D: Full parallel team (Cost: ~$40-60k, fastest)**
+**Option D: Full parallel team (fastest, highest cost)**
 ```
 Dev 1 (you):     Android real implementation + architecture decisions
 Dev 2:           macOS Electron + EndpointSecurity native addon
@@ -181,14 +176,14 @@ Dev 4:           Chrome Extension (can also help with Linux)
 Dev 5:           iOS Screen Time + VPN specialist
 ```
 
-**Timeline with 5 devs:**
+**Phases with 5 devs:**
 ```
-Month 1:    Ports finalized, all devs start with fakes
-Month 2-3:  UI/sync working on all platforms (fake blocking)
-Month 4-5:  Real native blocking integrated
-Month 6:    All platforms v1.0 🎉
+Phase 1:    Ports finalized, all devs start with fakes
+Phase 2:    UI/sync working on all platforms (fake blocking)
+Phase 3:    Real native blocking integrated
+Phase 4:    All platforms v1.0 🎉
 
-Total: 6 months instead of 18 months (3x faster)
+Result: ~3x faster than sequential development
 ```
 
 ### Risk Mitigation for Aggressive Parallelization
@@ -213,24 +208,24 @@ Total: 6 months instead of 18 months (3x faster)
 
 ### Team Composition Options
 
-**Option A: Hire 2 contractors (Cost: ~$15-20k)**
+**Option A: Hire contractors (moderate cost)**
 ```
 You:           Android → Chrome Extension → Code review
 Contractor 1:  macOS → Linux (Electron expert)
 Contractor 2:  Windows (Electron + C++ for WFP)
-Contractor 3:  iOS (Swift specialist, 3-month contract)
+Contractor 3:  iOS (Swift specialist, short-term contract)
 ```
 
-**Option B: Outsource desktop to agency (Cost: ~$30-50k)**
+**Option B: Outsource desktop to agency (higher cost)**
 ```
 You:           Android → Chrome → iOS oversight
 Agency:        macOS + Windows + Linux (packaged deal)
 ```
 
-**Option C: Open source core, community ports (Cost: $0, slow)**
+**Option C: Open source core, community ports (no cost, unpredictable)**
 ```
 You:           Android + Core architecture
-Community:     Desktop ports (unpredictable timeline)
+Community:     Desktop ports (community-driven timeline)
 ```
 
 ### Critical Path
@@ -238,7 +233,7 @@ Community:     Desktop ports (unpredictable timeline)
 ```
                            ┌─────────────────┐
                            │  Android v1.0   │
-                           │   (6 months)    │
+                           │   (baseline)    │
                            └────────┬────────┘
                                     │
             ┌───────────────────────┼───────────────────────┐
@@ -246,7 +241,7 @@ Community:     Desktop ports (unpredictable timeline)
     ┌───────────────┐       ┌───────────────┐       ┌───────────────┐
     │    Desktop    │       │    Chrome     │       │   iOS R&D     │
     │  (parallel)   │       │  Extension    │       │  (parallel)   │
-    │   3 months    │       │  1.5 months   │       │   5 months    │
+    │   ~0.5x each  │       │    ~0.25x     │       │    ~0.8x      │
     └───────┬───────┘       └───────┬───────┘       └───────┬───────┘
             │                       │                       │
             └───────────────────────┼───────────────────────┘
@@ -256,33 +251,33 @@ Community:     Desktop ports (unpredictable timeline)
                            │   Coverage      │
                            └─────────────────┘
 
-Critical path: Android (6mo) → iOS (5mo) = 11 months minimum
+Critical path: Android → iOS (longest sequential chain)
 Desktop is NOT on critical path (can finish faster than iOS)
 ```
 
 ### Milestone Summary
 
-| Milestone | Target | Platforms | Market Coverage |
-|-----------|--------|-----------|-----------------|
-| **M1: Mobile First** | Q3 2025 | Android | 40% mobile |
-| **M2: Desktop Beta** | Q2 2026 | + macOS, Chrome | + 10% desktop |
-| **M3: Full Desktop** | Q4 2026 | + Windows | + 75% desktop |
-| **M4: Complete** | Q2 2027 | + Linux, iOS | ~95% coverage |
+| Milestone | Sequence | Platforms | Market Coverage |
+|-----------|----------|-----------|-----------------|
+| **M1: Mobile First** | First | Android | 40% mobile |
+| **M2: Desktop Beta** | After M1 | + macOS, Chrome | + 10% desktop |
+| **M3: Full Desktop** | After M2 | + Windows | + 75% desktop |
+| **M4: Complete** | After M3 | + Linux, iOS | ~95% coverage |
 
 ### Revenue Unlock Points
 
 ```
 Android v1.0  ───────────────────────────►  First paying users
-                                            Target: $1k MRR
+                                            Unlock: Mobile market
 
 macOS + Chrome ──────────────────────────►  Cross-platform premium
-                                            Target: $5k MRR
+                                            Unlock: Power users
 
 Windows ─────────────────────────────────►  Enterprise potential
-                                            Target: $15k MRR
+                                            Unlock: B2B market
 
 Full platform ───────────────────────────►  Market leader positioning
-                                            Target: $50k MRR
+                                            Unlock: Full TAM
 ```
 
 ## Context
@@ -387,9 +382,9 @@ Each platform requires platform-specific adapters for:
 | **Linux** | TypeScript | Electron + native addons | Flatpak/AppImage |
 | **Web Ext** | TypeScript | Plasmo or WXT | Chrome/Firefox stores |
 
-### Electron vs Tauri Decision
+### Desktop Framework Decision
 
-**Chosen: Electron** (existing experience)
+**Decision: Electron** (existing experience, faster time-to-market)
 
 | Factor | Electron | Tauri |
 |--------|----------|-------|
@@ -400,7 +395,7 @@ Each platform requires platform-specific adapters for:
 | React reuse | ✅ Same codebase | ✅ Same codebase |
 | Time to market | ✅ Faster | ❌ Slower |
 
-For anti-bypass features (block Task Manager, etc.), native addons will be needed regardless of framework choice.
+**Rationale**: While Tauri offers better performance characteristics, Electron's familiarity and mature ecosystem for native addons outweigh the bundle size trade-off. Anti-bypass features (block Task Manager, etc.) require native addons regardless of framework choice.
 
 ## iOS Strategy (Hardest Platform)
 
@@ -457,7 +452,6 @@ For each new platform:
 
 ## Open Questions
 
-- [ ] Tauri vs Electron for desktop? (Tauri preferred for size/perf)
 - [ ] Single codebase or separate repos per platform?
 - [ ] Pricing model for cross-platform? (per-device vs unlimited)
 - [ ] How to handle platform-specific features in UI?

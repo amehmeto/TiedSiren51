@@ -208,3 +208,12 @@ Recommended next: Start #171 and #172 in parallel
 - The dependency data is partially hardcoded based on architectural knowledge
 - New issues should include "Depends on #X" in their body for auto-detection
 - Review the generated graph for accuracy after major changes
+
+## Maintenance
+
+> ⚠️ **Hardcoded Issue Numbers**: The "Known Dependency Mappings" section contains hardcoded issue numbers (#170-#185, #54-#62, #88-#169) based on the current project state. These will need to be updated as:
+> - New issues are created
+> - Issues are closed or renumbered
+> - Dependencies change
+>
+> Consider fetching dependencies dynamically from issue bodies in future iterations.

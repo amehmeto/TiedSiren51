@@ -164,6 +164,7 @@ interface KeywordTier {
 
 ```kotlin
 // SirenTierModule.kt (Expo Module)
+// Note: Uses Expo Modules API. Use @AsyncFunction for async methods.
 class SirenTierModule(
     private val blockingScheduler: BlockingScheduler,
     private val appTier: AppTier,
@@ -171,7 +172,8 @@ class SirenTierModule(
     private val keywordTier: KeywordTier,    // NoopKeywordTier initially
 ) : Module() {
 
-    @ExpoMethod
+    // Expo Modules API uses @AsyncFunction for coroutine-based methods
+    @AsyncFunction
     suspend fun setBlockingSchedule(windows: List<BlockingWindow>) {
         // Cancel existing schedules
         blockingScheduler.cancelAll()

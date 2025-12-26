@@ -210,12 +210,32 @@ class BlockingScheduler(private val context: Context) {
 <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
 ```
 
+### Android 12+ (API 31+) Considerations
+
+Starting with Android 12, apps must request the `SCHEDULE_EXACT_ALARM` permission at runtime:
+
+```kotlin
+// Check if exact alarm permission is granted (Android 12+)
+if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+    val alarmManager = context.getSystemService(AlarmManager::class.java)
+    if (!alarmManager.canScheduleExactAlarms()) {
+        // Direct user to settings to grant permission
+        val intent = Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM)
+        context.startActivity(intent)
+    }
+}
+```
+
+**Note**: On Android 13+, consider using `USE_EXACT_ALARM` instead for apps where exact timing is core functionality (like blocking apps). This permission is auto-granted for qualifying apps.
+
 ### Related GitHub Issues
 
-- Native: "Implement BlockingScheduler with AlarmManager" (tied-siren-blocking-overlay)
-- Native: "Create BlockingReceiver for alarm callbacks" (tied-siren-blocking-overlay)
-- JS: "Create SirenTier port with updateSchedule method" (TiedSiren51)
-- JS: "Implement schedule computation from block sessions" (TiedSiren51)
+These issues track the implementation work:
+
+- **#177** - SirenTier port refactor (TiedSiren51)
+- **#179** - selectBlockingSchedule selector (TiedSiren51)
+- **#182** - AndroidSirenTier setBlockingSchedule implementation (TiedSiren51)
+- See also: tied-siren-blocking-overlay repo for native Kotlin implementation
 
 ## Related ADRs
 

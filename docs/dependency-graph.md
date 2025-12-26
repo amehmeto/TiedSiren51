@@ -169,24 +169,24 @@ Independent from blocking work.
 
 ```mermaid
 flowchart TD
-    subgraph DONE["Completed"]
-        I85["#85 Firebase setup"]
-        I86["#86 Email/password"]
-        I87["#87 Google Sign-In"]
+    subgraph DONE["Completed ✓"]
+        I85["#85 Firebase setup ✓"]
+        I86["#86 Email/password ✓"]
+        I87["#87 Google Sign-In ✓"]
     end
 
     subgraph INPROG["In Progress"]
         I89["#89 Error handling"]
     end
 
-    subgraph TODO["Todo"]
+    subgraph TODO["Ready to Start"]
         I88["#88 Apple Sign-In"]
         I164["#164 Re-authentication"]
         I161["#161 Email verification"]
         I167["#167 Brute force"]
     end
 
-    subgraph DEPENDS["Has Dependencies"]
+    subgraph DEPENDS["Blocked (has dependencies)"]
         I162["#162 Change password"]
         I163["#163 Account deletion"]
         I160["#160 Custom reset"]
@@ -220,23 +220,23 @@ flowchart TD
 
 ## Recommended Execution Order
 
-### Week 1: Foundations (Parallel)
+### Phase 1: Foundations (Parallel - no dependencies)
 - [ ] #171 - Multiple listeners (native)
 - [ ] #172 - Callback system (native)
 - [ ] #177 - SirenTier port (JS)
 - [ ] #178 - SirenLookout port (JS)
 - [ ] #179 - selectBlockingSchedule (JS)
 
-### Week 2: Implementations (Parallel after deps)
+### Phase 2: Implementations (after Phase 1 deps)
 - [ ] #173 - BlockingCallback (needs #171, #172)
 - [ ] #181 - Noop tiers in Kotlin (needs #177, #178)
 - [ ] #180 - Unified listener (needs #177, #178, #179)
 
-### Week 3: Wiring
+### Phase 3: Wiring
 - [ ] #182 - AndroidSirenTier (needs #177, #181)
 - [ ] #183 - Update DI (needs #177, #178, #182)
 
-### Week 4: Cleanup
+### Phase 4: Cleanup
 - [ ] #184 - Deprecate JS path (needs #173, #180, #182, #183)
 - [ ] #185 - Remove legacy code (needs #184)
 
