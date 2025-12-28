@@ -26,6 +26,7 @@ const VALID_LABELS = [
   'blocking',
   'auth',
   'android',
+  'ios',
   'epic',
   'initiative',
   'needs-refinement',
@@ -270,4 +271,25 @@ export default function remarkLintTicket() {
     validateGherkin(tree, file, ticketType)
     validateStoryPointsNotInTitle(tree, file)
   }
+}
+
+// Export for testing
+export {
+  VALID_REPOS,
+  VALID_LABELS,
+  FIBONACCI_POINTS,
+  VALID_SEVERITIES,
+  FEATURE_SECTIONS,
+  BUG_SECTIONS,
+  EPIC_SECTIONS,
+  extractYamlFromCodeBlock,
+  parseYaml,
+  getHeadings,
+  hasGherkinBlocks,
+  hasGherkinPatterns,
+  detectTicketType,
+  validateMetadata,
+  validateRequiredSections,
+  validateGherkin,
+  validateStoryPointsNotInTitle,
 }

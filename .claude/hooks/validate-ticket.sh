@@ -21,28 +21,33 @@ if [[ ! "$command" =~ gh\ issue\ create ]]; then
 fi
 
 # Extract the body content from the command
-# Handles both --body "..." and --body "$(cat <<'EOF'...EOF)"
+# Handles HEREDOC, double-quoted, and single-quoted --body arguments
 extract_body() {
   local cmd="$1"
 
-  # Try to extract HEREDOC content first (most common pattern)
+  # Method 1: HEREDOC pattern (most common for multi-line)
   # Pattern: --body "$(cat <<'EOF' ... EOF )"
-  if [[ "$cmd" =~ \-\-body.*\<\<[\'\"]?EOF ]]; then
-    # Extract content between EOF markers
-    body=$(echo "$cmd" | sed -n '/<<.*EOF/,/^EOF/p' | sed '1d;$d')
-    echo "$body"
+  if [[ "$cmd" =~ \<\<[\'\"]?EOF ]]; then
+    # Extract everything between the first EOF marker and the closing EOF
+    body=$(printf '%s' "$cmd" | perl -0777 -pe "s/.*<<'?\"?EOF'?\"?\n?(.*?)\nEOF.*/\$1/s" 2>/dev/null)
+    if [ -n "$body" ]; then
+      printf '%s' "$body"
+      return 0
+    fi
+  fi
+
+  # Method 2: Use perl for robust double-quote extraction (handles escaped quotes)
+  # Matches --body "..." including escaped quotes inside
+  body=$(printf '%s' "$cmd" | perl -ne 'if (/--body\s+"((?:[^"\\]|\\.)*)"/s) { $b=$1; $b=~s/\\"/"/g; $b=~s/\\n/\n/g; print $b }' 2>/dev/null)
+  if [ -n "$body" ]; then
+    printf '%s' "$body"
     return 0
   fi
 
-  # Try simple --body "..." pattern
-  if [[ "$cmd" =~ --body\ +\"([^\"]+)\" ]]; then
-    echo "${BASH_REMATCH[1]}"
-    return 0
-  fi
-
-  # Try --body '...' pattern
-  if [[ "$cmd" =~ --body\ +\'([^\']+)\' ]]; then
-    echo "${BASH_REMATCH[1]}"
+  # Method 3: Single-quoted string (no escape processing needed)
+  body=$(printf '%s' "$cmd" | perl -ne "if (/--body\\s+'([^']*)'/) { print \$1 }" 2>/dev/null)
+  if [ -n "$body" ]; then
+    printf '%s' "$body"
     return 0
   fi
 
@@ -61,8 +66,8 @@ fi
 temp_file=$(mktemp /tmp/ticket-XXXXXX.md)
 trap 'rm -f "$temp_file"' EXIT
 
-# Write body to temp file
-echo "$body" > "$temp_file"
+# Write body to temp file (use printf to preserve special chars)
+printf '%s\n' "$body" > "$temp_file"
 
 # Run remark linter on the ticket
 # Using the project's .remarkrc.mjs configuration

@@ -14,7 +14,7 @@ This metadata is parsed by the linter and used for tracking.
 ```yaml
 # 📦 METADATA
 repo: TiedSiren51  # TiedSiren51 | expo-accessibility-service | expo-foreground-service | tied-siren-blocking-overlay | expo-list-installed-apps
-story_points: 0    # Fibonacci: 1, 2, 3, 5, 8, 13
+story_points: 0    # Fibonacci: 1, 2, 3, 5, 8, 13, 21
 labels:            # From: enhancement, bug, blocking, auth, android, epic, initiative, needs-refinement
   - enhancement
 depends_on: []     # e.g., [123, 124] - issue numbers this depends on

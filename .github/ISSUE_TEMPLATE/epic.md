@@ -13,7 +13,7 @@ assignees: ''
 ```yaml
 # 📦 METADATA
 repo: TiedSiren51
-story_points: 0    # Total estimated points for epic
+story_points: 0    # Fibonacci: 1, 2, 3, 5, 8, 13, 21 (total for epic)
 labels:
   - epic
 depends_on: []
