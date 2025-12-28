@@ -10,11 +10,21 @@ import remarkLintTicket, {
   FIBONACCI_POINTS,
   parseYaml,
   detectTicketType,
+  isTicketFile,
 } from './index.mjs'
+import { fromMarkdown } from 'mdast-util-from-markdown'
 
 // Helper to run the linter and get messages
 async function lint(markdown) {
   const file = await remark().use(remarkLintTicket).process(markdown)
+  return file.messages.map((m) => m.message)
+}
+
+// Helper to run the linter with a specific file path
+async function lintWithPath(markdown, filePath) {
+  const file = await remark()
+    .use(remarkLintTicket)
+    .process({ value: markdown, path: filePath })
   return file.messages.map((m) => m.message)
 }
 
@@ -75,7 +85,7 @@ describe('remark-lint-ticket', () => {
 
   describe('validateMetadata', () => {
     it('should fail when metadata block is missing', async () => {
-      const messages = await lint('# Just a heading\n\nSome content')
+      const messages = await lintWithPath('# Just a heading\n\nSome content', '.github/ISSUE_TEMPLATE/test.md')
       expect(messages).toContain('❌ Missing YAML metadata block with `# 📦 METADATA` comment')
     })
 
@@ -278,6 +288,53 @@ labels:
 `
       const messages = await lint(markdown)
       expect(messages.some((m) => m.includes('Story points should be in metadata'))).toBe(true)
+    })
+  })
+
+  describe('isTicketFile', () => {
+    it('should identify files in .github/ISSUE_TEMPLATE/', () => {
+      const tree = fromMarkdown('# Just a heading')
+      const file = { path: '.github/ISSUE_TEMPLATE/feature.md' }
+      expect(isTicketFile(file, tree)).toBe(true)
+    })
+
+    it('should identify temp ticket files', () => {
+      const tree = fromMarkdown('# Just a heading')
+      const file = { path: '/tmp/ticket-abc123.md' }
+      expect(isTicketFile(file, tree)).toBe(true)
+    })
+
+    it('should identify files with METADATA block', () => {
+      const tree = fromMarkdown('```yaml\n# 📦 METADATA\nrepo: TiedSiren51\n```')
+      const file = { path: 'random/path.md' }
+      expect(isTicketFile(file, tree)).toBe(true)
+    })
+
+    it('should skip regular markdown files without ticket structure', () => {
+      const tree = fromMarkdown('# Regular ADR\n\nSome content')
+      const file = { path: 'docs/adr/some-decision.md' }
+      expect(isTicketFile(file, tree)).toBe(false)
+    })
+  })
+
+  describe('Non-ticket file handling', () => {
+    it('should not report errors for non-ticket files', async () => {
+      const markdown = `# Architecture Decision Record
+
+## Status
+Accepted
+
+## Context
+Some context here.
+`
+      const messages = await lintWithPath(markdown, 'docs/adr/some-decision.md')
+      expect(messages).toHaveLength(0)
+    })
+
+    it('should still validate files in ISSUE_TEMPLATE even without metadata', async () => {
+      const markdown = '# Incomplete template'
+      const messages = await lintWithPath(markdown, '.github/ISSUE_TEMPLATE/test.md')
+      expect(messages.some((m) => m.includes('Missing YAML metadata block'))).toBe(true)
     })
   })
 })

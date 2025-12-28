@@ -63,6 +63,31 @@ const EPIC_SECTIONS = [
 // ============================================================================
 
 /**
+ * Check if a file should be validated as a ticket.
+ * Only validates:
+ * - Files in .github/ISSUE_TEMPLATE/
+ * - Temp files created by validate-ticket.sh (/tmp/ticket-*)
+ * - Files that have ticket-like structure (METADATA block)
+ */
+function isTicketFile(file, tree) {
+  const filePath = file.path || file.history?.[0] || ''
+
+  // Always validate files in ISSUE_TEMPLATE or temp ticket files
+  if (filePath.includes('.github/ISSUE_TEMPLATE/') || filePath.includes('/tmp/ticket-')) {
+    return true
+  }
+
+  // Check if file has ticket metadata block - if so, validate it
+  const { yamlContent } = extractYamlFromCodeBlock(tree)
+  if (yamlContent) {
+    return true
+  }
+
+  // Not a ticket file - skip validation
+  return false
+}
+
+/**
  * Extract YAML metadata from a code block
  */
 function extractYamlFromCodeBlock(tree) {
@@ -259,6 +284,11 @@ function validateStoryPointsNotInTitle(tree, file) {
 
 export default function remarkLintTicket() {
   return (tree, file) => {
+    // Skip validation for non-ticket files (ADRs, README, etc.)
+    if (!isTicketFile(file, tree)) {
+      return
+    }
+
     // Validate metadata and get parsed data
     const metadata = validateMetadata(tree, file)
 
@@ -282,6 +312,7 @@ export {
   FEATURE_SECTIONS,
   BUG_SECTIONS,
   EPIC_SECTIONS,
+  isTicketFile,
   extractYamlFromCodeBlock,
   parseYaml,
   getHeadings,
