@@ -77,25 +77,76 @@ printf '%s\n' "$body" > "$temp_file"
 project_dir="$(dirname "$0")/../.."
 cd "$project_dir" || exit 0
 
-# Capture output and exit code separately (don't let set -e kill us)
+# First, validate the ticket
 output=$(npx remark --frail --rc-path .remarkrc.mjs "$temp_file" 2>&1) || exit_code=$?
 exit_code=${exit_code:-0}
 
 if [ "$exit_code" -ne 0 ]; then
-  # Format the errors nicely - extract warning lines
-  errors=$(echo "$output" | grep -E "warning" | sed 's/\x1b\[[0-9;]*m//g' | head -20)
+  # Validation failed - try to auto-fix
+  original_content=$(cat "$temp_file")
 
-  jq -n \
-    --arg reason "🎫 Ticket validation failed - please fix the following issues:" \
-    --arg errors "$errors" \
-    --arg hint "See .github/ISSUE_TEMPLATE/ for the expected format" \
-    '{
-      "decision": "block",
-      "reason": $reason,
-      "errors": $errors,
-      "hint": $hint
-    }'
-  exit 2
+  # Run remark in fix mode (writes fixed content back to file)
+  npx remark --output --rc-path .remarkrc.fix.mjs "$temp_file" 2>&1 || true
+
+  fixed_content=$(cat "$temp_file")
+
+  # Check if fix mode added any sections
+  if [ "$original_content" != "$fixed_content" ]; then
+    # Content was fixed - re-validate
+    revalidate_output=$(npx remark --frail --rc-path .remarkrc.mjs "$temp_file" 2>&1) || revalidate_code=$?
+    revalidate_code=${revalidate_code:-0}
+
+    if [ "$revalidate_code" -eq 0 ]; then
+      # Fix succeeded and validation passes - suggest the fixed version
+      # Escape the fixed content for JSON
+      escaped_content=$(printf '%s' "$fixed_content" | jq -Rs .)
+
+      jq -n \
+        --arg reason "🔧 Ticket was auto-fixed! Missing sections have been added." \
+        --argjson fixed_body "$escaped_content" \
+        --arg hint "Please retry with the fixed body content below:" \
+        '{
+          "decision": "block",
+          "reason": $reason,
+          "fixed_body": $fixed_body,
+          "hint": $hint
+        }'
+      exit 2
+    else
+      # Fix wasn't enough - still has errors
+      remaining_errors=$(echo "$revalidate_output" | grep -E "warning" | sed 's/\x1b\[[0-9;]*m//g' | head -20)
+      escaped_content=$(printf '%s' "$fixed_content" | jq -Rs .)
+
+      jq -n \
+        --arg reason "🔧 Ticket was partially fixed, but still has issues:" \
+        --arg errors "$remaining_errors" \
+        --argjson fixed_body "$escaped_content" \
+        --arg hint "Please fix the remaining issues and retry with the partially fixed body:" \
+        '{
+          "decision": "block",
+          "reason": $reason,
+          "errors": $errors,
+          "fixed_body": $fixed_body,
+          "hint": $hint
+        }'
+      exit 2
+    fi
+  else
+    # Fix mode didn't help (probably metadata issues, not missing sections)
+    errors=$(echo "$output" | grep -E "warning" | sed 's/\x1b\[[0-9;]*m//g' | head -20)
+
+    jq -n \
+      --arg reason "🎫 Ticket validation failed - please fix the following issues:" \
+      --arg errors "$errors" \
+      --arg hint "See .github/ISSUE_TEMPLATE/ for the expected format" \
+      '{
+        "decision": "block",
+        "reason": $reason,
+        "errors": $errors,
+        "hint": $hint
+      }'
+    exit 2
+  fi
 fi
 
 # Validation passed

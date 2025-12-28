@@ -4,14 +4,8 @@
 
 import { describe, it, expect } from 'vitest'
 import { remark } from 'remark'
-import remarkLintTicket, {
-  VALID_REPOS,
-  VALID_LABELS,
-  FIBONACCI_POINTS,
-  parseYaml,
-  detectTicketType,
-  isTicketFile,
-} from './index.mjs'
+import remarkLintTicket, { parseYaml, detectTicketType, isTicketFile } from './index.mjs'
+import { VALID_REPOS, VALID_LABELS, FIBONACCI_POINTS } from './config.mjs'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 
 // Helper to run the linter and get messages

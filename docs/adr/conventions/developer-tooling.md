@@ -128,7 +128,9 @@ Plays a sound when Claude completes a task.
 **Behavior:**
 - Extracts `--body` content from command
 - Runs remark linter with `.remarkrc.mjs` configuration
-- Blocks with JSON `{ "decision": "block", ... }` if validation fails
+- If validation fails, attempts auto-fix using `.remarkrc.fix.mjs`
+- If auto-fix adds missing sections, returns the fixed body for retry
+- Blocks with JSON `{ "decision": "block", ... }` if validation still fails
 - Passes silently if valid
 
 #### PostToolUse: Edit Validation (`validate-edit.sh`)
