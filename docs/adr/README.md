@@ -79,6 +79,7 @@ Testing strategies, tools, and patterns across all layers.
 Coding conventions and style decisions across all layers.
 
 - [Class-Scoped Constants](conventions/class-scoped-constants.md)
+- [Developer Tooling](conventions/developer-tooling.md)
 - [Infrastructure Error Handling](conventions/infra-error-handling.md)
 
 ## Creating a New ADR

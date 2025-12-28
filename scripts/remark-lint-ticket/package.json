@@ -1,0 +1,17 @@
+{
+  "name": "remark-lint-ticket",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "index.mjs",
+  "description": "Remark plugin to validate ticket markdown files for LLM consumption",
+  "keywords": [
+    "remark",
+    "lint",
+    "ticket",
+    "markdown"
+  ],
+  "peerDependencies": {
+    "unist-util-visit": "^5.0.0",
+    "js-yaml": "^4.0.0"
+  }
+}
