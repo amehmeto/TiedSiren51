@@ -337,4 +337,153 @@ Some context here.
       expect(messages.some((m) => m.includes('Missing YAML metadata block'))).toBe(true)
     })
   })
+
+  describe('Fix mode', () => {
+    // Helper to run linter in fix mode
+    async function lintWithFix(markdown, filePath) {
+      const file = await remark()
+        .use(remarkLintTicket, { fix: true })
+        .process({ value: markdown, path: filePath })
+      return {
+        messages: file.messages.map((m) => m.message),
+        output: String(file),
+      }
+    }
+
+    it('should insert missing sections in fix mode', async () => {
+      const markdown = `\`\`\`yaml
+# 📦 METADATA
+repo: TiedSiren51
+story_points: 3
+labels:
+  - enhancement
+\`\`\`
+
+## 📝 Summary
+
+This is the summary.
+`
+      const { messages, output } = await lintWithFix(markdown, '.github/ISSUE_TEMPLATE/test.md')
+
+      // Should have added missing sections
+      expect(messages.some((m) => m.includes('🔧 Added missing section: 🎯 Context'))).toBe(true)
+      expect(messages.some((m) => m.includes('🔧 Added missing section: ✅ Acceptance Criteria'))).toBe(
+        true
+      )
+
+      // Output should contain the new sections
+      expect(output).toContain('## 🎯 Context')
+      expect(output).toContain('## ✅ Acceptance Criteria')
+    })
+
+    it('should not duplicate existing sections', async () => {
+      const markdown = `\`\`\`yaml
+# 📦 METADATA
+repo: TiedSiren51
+story_points: 3
+labels:
+  - enhancement
+\`\`\`
+
+## 📝 Summary
+
+Summary here.
+
+## 🎯 Context
+
+Context here.
+
+## ✅ Acceptance Criteria
+
+- [ ] Criterion
+
+## 🎭 Scenarios (Given/When/Then)
+
+\`\`\`gherkin
+Given something
+When action
+Then result
+\`\`\`
+`
+      const { messages, output } = await lintWithFix(markdown, '.github/ISSUE_TEMPLATE/test.md')
+
+      // Should not have added any sections
+      const addedSections = messages.filter((m) => m.includes('🔧 Added'))
+      expect(addedSections).toHaveLength(0)
+
+      // Should only have one of each heading
+      const contextMatches = output.match(/## 🎯 Context/g) || []
+      expect(contextMatches).toHaveLength(1)
+    })
+
+    it('should insert sections before Related section', async () => {
+      const markdown = `\`\`\`yaml
+# 📦 METADATA
+repo: TiedSiren51
+story_points: 3
+labels:
+  - enhancement
+\`\`\`
+
+## 📝 Summary
+
+Summary here.
+
+## 🔗 Related
+
+- Link to something
+`
+      const { output } = await lintWithFix(markdown, '.github/ISSUE_TEMPLATE/test.md')
+
+      // Context should appear before Related
+      const contextIndex = output.indexOf('## 🎯 Context')
+      const relatedIndex = output.indexOf('## 🔗 Related')
+
+      expect(contextIndex).toBeGreaterThan(-1)
+      expect(contextIndex).toBeLessThan(relatedIndex)
+    })
+
+    it('should work for bug tickets', async () => {
+      const markdown = `\`\`\`yaml
+# 📦 METADATA
+repo: TiedSiren51
+story_points: 2
+labels:
+  - bug
+\`\`\`
+
+## 🐛 Bug Summary
+
+Bug description.
+`
+      const { messages, output } = await lintWithFix(markdown, '.github/ISSUE_TEMPLATE/test.md')
+
+      // Should add bug-specific sections
+      expect(messages.some((m) => m.includes('🔧 Added missing section: 🔄 Reproduction'))).toBe(true)
+      expect(output).toContain('## 🔄 Reproduction')
+      expect(output).toContain('Steps to Reproduce')
+    })
+
+    it('should work for epic tickets', async () => {
+      const markdown = `\`\`\`yaml
+# 📦 METADATA
+repo: TiedSiren51
+story_points: 21
+labels:
+  - epic
+\`\`\`
+
+## 🎯 Goal
+
+Epic goal here.
+`
+      const { messages, output } = await lintWithFix(markdown, '.github/ISSUE_TEMPLATE/test.md')
+
+      // Should add epic-specific sections
+      expect(messages.some((m) => m.includes('🔧 Added missing section: 📋 Stories / Tasks'))).toBe(
+        true
+      )
+      expect(output).toContain('## 📋 Stories / Tasks')
+    })
+  })
 })

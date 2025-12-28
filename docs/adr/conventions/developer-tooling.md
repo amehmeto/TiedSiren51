@@ -75,6 +75,13 @@ scripts/                        # Standalone scripts (CI, automation, utilities)
 
 Configuration: `.remarkrc.mjs` at project root.
 
+**npm scripts:**
+- `npm run lint:ticket` - Validate all issue templates in `.github/ISSUE_TEMPLATE/`
+- `npm run lint:ticket:fix` - Auto-insert missing sections into templates
+- `npm run lint:md` - Validate all markdown files (includes ticket linter via `.remarkrc.mjs`)
+
+The fix mode (`lint:ticket:fix`) automatically inserts missing required sections with placeholder content, making it easier to bootstrap new tickets from scratch.
+
 ### Git Hooks (`husky`)
 
 #### Pre-commit (`pre-commit`)

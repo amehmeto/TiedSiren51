@@ -58,6 +58,23 @@ const EPIC_SECTIONS = [
   { pattern: /✅\s*Success Criteria/i, name: '✅ Success Criteria' },
 ]
 
+// Section templates for --fix mode
+const SECTION_TEMPLATES = {
+  '📝 Summary': '<!-- One paragraph explaining what this feature does and why it matters -->',
+  '🎯 Context': '<!-- Background information: Why does this feature exist? What problem does it solve? -->',
+  '✅ Acceptance Criteria':
+    '- [ ] Requirement 1\n- [ ] Requirement 2\n- [ ] Requirement 3',
+  '🎭 Scenarios (Given/When/Then)':
+    '```gherkin\nGiven [initial context]\nWhen [action taken]\nThen [expected outcome]\n```',
+  '🐛 Bug Summary': '<!-- One sentence describing the bug -->',
+  '🔄 Reproduction':
+    '### 📋 Steps to Reproduce\n1. Step 1\n2. Step 2\n3. Step 3\n\n### ❌ Actual Behavior\n<!-- What happens now -->\n\n### ✅ Expected Behavior\n<!-- What should happen -->',
+  '🎯 Goal': '<!-- One paragraph describing the epic\'s objective and business value -->',
+  '📋 Stories / Tasks':
+    '| # | Story | Points | Status | Notes |\n|---|-------|--------|--------|-------|\n| #XX | Story title | 3 | 🔲 Todo | |',
+  '✅ Success Criteria': '- [ ] Criterion 1\n- [ ] Criterion 2\n- [ ] All stories completed',
+}
+
 // ============================================================================
 // 🔧 UTILITY FUNCTIONS
 // ============================================================================
@@ -279,10 +296,199 @@ function validateStoryPointsNotInTitle(tree, file) {
 }
 
 // ============================================================================
+// 🔧 FIX MODE FUNCTIONS
+// ============================================================================
+
+/**
+ * Create a heading node
+ */
+function createHeading(text, depth = 2) {
+  return {
+    type: 'heading',
+    depth,
+    children: [{ type: 'text', value: text }],
+  }
+}
+
+/**
+ * Create a paragraph node with HTML comment or text
+ */
+function createParagraph(text) {
+  // Check if it's an HTML comment
+  if (text.startsWith('<!--') && text.endsWith('-->')) {
+    return {
+      type: 'html',
+      value: text,
+    }
+  }
+  return {
+    type: 'paragraph',
+    children: [{ type: 'text', value: text }],
+  }
+}
+
+/**
+ * Create nodes from template content (handles code blocks, lists, tables)
+ */
+function createContentNodes(template) {
+  const nodes = []
+
+  // Handle code blocks
+  if (template.startsWith('```')) {
+    const match = template.match(/^```(\w*)\n([\s\S]*)\n```$/)
+    if (match) {
+      nodes.push({
+        type: 'code',
+        lang: match[1] || null,
+        value: match[2],
+      })
+      return nodes
+    }
+  }
+
+  // Handle tables (starts with |)
+  if (template.startsWith('|')) {
+    // Split into lines and create a simple HTML table representation
+    // Remark will handle this as raw text which is fine for templates
+    nodes.push({
+      type: 'paragraph',
+      children: [{ type: 'text', value: template }],
+    })
+    return nodes
+  }
+
+  // Handle multi-section content (like Reproduction with sub-headings)
+  if (template.includes('###')) {
+    const lines = template.split('\n')
+    let currentParagraph = []
+
+    for (const line of lines) {
+      if (line.startsWith('### ')) {
+        if (currentParagraph.length > 0) {
+          nodes.push(createParagraph(currentParagraph.join('\n')))
+          currentParagraph = []
+        }
+        nodes.push(createHeading(line.slice(4), 3))
+      } else if (line.startsWith('<!--')) {
+        if (currentParagraph.length > 0) {
+          nodes.push(createParagraph(currentParagraph.join('\n')))
+          currentParagraph = []
+        }
+        nodes.push({ type: 'html', value: line })
+      } else if (line.trim()) {
+        currentParagraph.push(line)
+      }
+    }
+
+    if (currentParagraph.length > 0) {
+      nodes.push(createParagraph(currentParagraph.join('\n')))
+    }
+
+    return nodes
+  }
+
+  // Handle list items
+  if (template.startsWith('- ')) {
+    nodes.push({
+      type: 'list',
+      ordered: false,
+      spread: false,
+      children: template.split('\n').map((line) => ({
+        type: 'listItem',
+        spread: false,
+        children: [
+          {
+            type: 'paragraph',
+            children: [{ type: 'text', value: line.replace(/^- \[[ x]\] /, '').replace(/^- /, '') }],
+          },
+        ],
+      })),
+    })
+    return nodes
+  }
+
+  // Default: simple paragraph or HTML comment
+  nodes.push(createParagraph(template))
+  return nodes
+}
+
+/**
+ * Find missing sections and insert them into the tree
+ */
+function fixMissingSections(tree, file, ticketType) {
+  const headings = getHeadings(tree)
+
+  let requiredSections
+  if (ticketType === 'epic') {
+    requiredSections = EPIC_SECTIONS
+  } else if (ticketType === 'bug') {
+    requiredSections = BUG_SECTIONS
+  } else {
+    requiredSections = FEATURE_SECTIONS
+  }
+
+  const missingSections = []
+  for (const section of requiredSections) {
+    const found = headings.some((h) => section.pattern.test(h.text))
+    if (!found) {
+      missingSections.push(section.name)
+    }
+  }
+
+  if (missingSections.length === 0) {
+    return false // No fixes needed
+  }
+
+  // Find insertion point (before "Related" section or at end)
+  let insertIndex = tree.children.length
+  for (let i = 0; i < tree.children.length; i++) {
+    const node = tree.children[i]
+    if (node.type === 'heading') {
+      const text = node.children?.map((c) => c.value).join('') || ''
+      if (/🔗\s*Related/i.test(text) || /Related/i.test(text)) {
+        insertIndex = i
+        break
+      }
+    }
+  }
+
+  // Create nodes for missing sections
+  const newNodes = []
+  for (const sectionName of missingSections) {
+    // Add thematic break before section
+    newNodes.push({ type: 'thematicBreak' })
+
+    // Add heading
+    newNodes.push(createHeading(sectionName, 2))
+
+    // Add template content
+    const template = SECTION_TEMPLATES[sectionName]
+    if (template) {
+      newNodes.push(...createContentNodes(template))
+    }
+
+    file.message(`🔧 Added missing section: ${sectionName}`)
+  }
+
+  // Insert nodes
+  tree.children.splice(insertIndex, 0, ...newNodes)
+
+  return true // Fixes were made
+}
+
+// ============================================================================
 // 🔌 PLUGIN EXPORT
 // ============================================================================
 
-export default function remarkLintTicket() {
+/**
+ * Remark plugin to validate (and optionally fix) ticket markdown files.
+ *
+ * @param {Object} options - Plugin options
+ * @param {boolean} options.fix - If true, insert missing sections instead of just reporting
+ */
+export default function remarkLintTicket(options = {}) {
+  const { fix = false } = options
+
   return (tree, file) => {
     // Skip validation for non-ticket files (ADRs, README, etc.)
     if (!isTicketFile(file, tree)) {
@@ -296,9 +502,19 @@ export default function remarkLintTicket() {
     const headings = getHeadings(tree)
     const ticketType = detectTicketType(headings, metadata)
 
-    // Run validation rules
-    validateRequiredSections(tree, file, ticketType)
-    validateGherkin(tree, file, ticketType)
+    // In fix mode, insert missing sections
+    if (fix) {
+      fixMissingSections(tree, file, ticketType)
+      // Re-validate gherkin after potential fixes (still warn if missing)
+      if (!hasGherkinBlocks(tree) && !hasGherkinPatterns(tree) && ticketType !== 'epic') {
+        file.message('⚠️ Missing Given/When/Then scenarios (use ```gherkin code blocks)')
+      }
+    } else {
+      // Run validation rules (report mode)
+      validateRequiredSections(tree, file, ticketType)
+      validateGherkin(tree, file, ticketType)
+    }
+
     validateStoryPointsNotInTitle(tree, file)
   }
 }
@@ -312,6 +528,7 @@ export {
   FEATURE_SECTIONS,
   BUG_SECTIONS,
   EPIC_SECTIONS,
+  SECTION_TEMPLATES,
   isTicketFile,
   extractYamlFromCodeBlock,
   parseYaml,
@@ -323,4 +540,8 @@ export {
   validateRequiredSections,
   validateGherkin,
   validateStoryPointsNotInTitle,
+  createHeading,
+  createParagraph,
+  createContentNodes,
+  fixMissingSections,
 }
