@@ -176,7 +176,7 @@ function validateMetadata(tree, file) {
     // Valid: ticket requires creating a new repo
     const newRepoName = data.repo.slice(NEW_REPO_PREFIX.length).trim()
     if (!newRepoName) {
-      file.message(`❌ NEW_REPO: must be followed by the proposed repo name (e.g., "NEW_REPO: expo-new-module")`)
+      file.message(`❌ NEW_REPO: must be followed by the proposed repo name (e.g., "NEW_REPO: my-new-repo")`)
     }
   } else if (!validRepoNames.includes(data.repo)) {
     const repoList = validRepoNames.map((name) => `  - ${name}: ${VALID_REPOS[name]}`).join('\n')

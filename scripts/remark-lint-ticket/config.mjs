@@ -9,7 +9,7 @@
 export const GITHUB_ORG = 'amehmeto'
 
 // Valid repos with their GitHub URLs
-// Use 'NEW_REPO: <name>' when the ticket requires creating a new repository
+// Use 'NEW_REPO: <name>' when the ticket requires creating a new repository (e.g., "NEW_REPO: my-new-repo")
 export const VALID_REPOS = {
   TiedSiren51: `https://github.com/amehmeto/TiedSiren51`,
   'expo-accessibility-service': `https://github.com/amehmeto/expo-accessibility-service`,
