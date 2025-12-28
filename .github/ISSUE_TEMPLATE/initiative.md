@@ -12,6 +12,13 @@ assignees: ''
 
 ```yaml
 # 📦 METADATA
+# repo: Must be one of:
+#   - TiedSiren51 (https://github.com/amehmeto/TiedSiren51)
+#   - expo-accessibility-service (https://github.com/amehmeto/expo-accessibility-service)
+#   - expo-foreground-service (https://github.com/amehmeto/expo-foreground-service)
+#   - tied-siren-blocking-overlay (https://github.com/amehmeto/tied-siren-blocking-overlay)
+#   - expo-list-installed-apps (https://github.com/amehmeto/expo-list-installed-apps)
+#   - NEW_REPO: <name> (if a new repository is needed)
 repo: TiedSiren51
 story_points: 0    # Fibonacci: 1, 2, 3, 5, 8, 13, 21 (total for initiative)
 labels:

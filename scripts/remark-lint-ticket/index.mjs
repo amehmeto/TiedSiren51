@@ -11,6 +11,7 @@ import yaml from 'js-yaml'
 // Import configuration from shared config file
 import {
   VALID_REPOS,
+  NEW_REPO_PREFIX,
   VALID_LABELS,
   FIBONACCI_POINTS,
   VALID_SEVERITIES,
@@ -168,10 +169,20 @@ function validateMetadata(tree, file) {
   }
 
   // Validate required fields
+  const validRepoNames = Object.keys(VALID_REPOS)
   if (!data.repo) {
     file.message('❌ Missing `repo` field in metadata')
-  } else if (!VALID_REPOS.includes(data.repo)) {
-    file.message(`❌ Invalid repo "${data.repo}". Valid: ${VALID_REPOS.join(', ')}`)
+  } else if (data.repo.startsWith(NEW_REPO_PREFIX)) {
+    // Valid: ticket requires creating a new repo
+    const newRepoName = data.repo.slice(NEW_REPO_PREFIX.length).trim()
+    if (!newRepoName) {
+      file.message(`❌ NEW_REPO: must be followed by the proposed repo name (e.g., "NEW_REPO: expo-new-module")`)
+    }
+  } else if (!validRepoNames.includes(data.repo)) {
+    const repoList = validRepoNames.map((name) => `  - ${name}: ${VALID_REPOS[name]}`).join('\n')
+    file.message(
+      `❌ Invalid repo "${data.repo}". Must be one of:\n${repoList}\n  Or use "NEW_REPO: <name>" if a new repository is needed`,
+    )
   }
 
   if (data.story_points === undefined) {
@@ -479,6 +490,7 @@ export default function remarkLintTicket(options = {}) {
 // Export for testing
 export {
   VALID_REPOS,
+  NEW_REPO_PREFIX,
   VALID_LABELS,
   FIBONACCI_POINTS,
   VALID_SEVERITIES,
