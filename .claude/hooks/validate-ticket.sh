@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
 # 🎫 PreToolUse hook for validating GitHub issue tickets
-# Intercepts `gh issue create` commands and validates the body against ticket template rules
-# Outputs JSON with decision: "block" to prevent creating malformed tickets
+# Intercepts `gh issue create` and `gh issue edit` commands and validates the body against ticket template rules
+# Outputs JSON with decision: "block" to prevent creating/editing malformed tickets
 
 set -euo pipefail
 
@@ -11,12 +11,15 @@ input=$(cat)
 tool_name=$(echo "$input" | jq -r '.tool_name // empty')
 command=$(echo "$input" | jq -r '.tool_input.command // empty')
 
-# Only process Bash tool with gh issue create commands
+# Only process Bash tool with gh issue create/edit commands
 if [ "$tool_name" != "Bash" ]; then
   exit 0
 fi
 
-if [[ ! "$command" =~ gh\ issue\ create ]]; then
+# Match gh issue create/edit at start of command or after && ; ||
+# Avoid matching text inside strings (like commit messages mentioning "gh issue")
+if [[ ! "$command" =~ ^gh\ issue\ (create|edit) ]] && \
+   [[ ! "$command" =~ (\&\&|;|\|\|)[[:space:]]*gh\ issue\ (create|edit) ]]; then
   exit 0
 fi
 

@@ -116,8 +116,8 @@ Plays a sound when Claude completes a task.
 
 #### PreToolUse: Ticket Validation (`validate-ticket.sh`)
 
-**Trigger:** `Bash` tool with `gh issue create` command
-**Purpose:** Validate issue body against ticket templates before creation
+**Trigger:** `Bash` tool with `gh issue create` or `gh issue edit` command
+**Purpose:** Validate issue body against ticket templates before creation/modification
 **Behavior:**
 - Extracts `--body` content from command
 - Runs remark linter with `.remarkrc.mjs` configuration
