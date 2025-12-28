@@ -17,6 +17,7 @@ import {
   FEATURE_SECTIONS,
   BUG_SECTIONS,
   EPIC_SECTIONS,
+  INITIATIVE_SECTIONS,
   SECTION_TEMPLATES,
 } from './config.mjs'
 
@@ -129,6 +130,13 @@ function hasGherkinPatterns(tree) {
 function detectTicketType(headings, metadata) {
   const headingTexts = headings.map((h) => h.text.toLowerCase())
 
+  if (
+    metadata?.labels?.includes('initiative') ||
+    headingTexts.some((h) => h.includes('vision') && h.includes('🎯'))
+  ) {
+    return 'initiative'
+  }
+
   if (metadata?.labels?.includes('epic') || headingTexts.some((h) => h.includes('goal') && h.includes('🎯'))) {
     return 'epic'
   }
@@ -203,7 +211,9 @@ function validateRequiredSections(tree, file, ticketType) {
   const headings = getHeadings(tree)
 
   let requiredSections
-  if (ticketType === 'epic') {
+  if (ticketType === 'initiative') {
+    requiredSections = INITIATIVE_SECTIONS
+  } else if (ticketType === 'epic') {
     requiredSections = EPIC_SECTIONS
   } else if (ticketType === 'bug') {
     requiredSections = BUG_SECTIONS
@@ -220,8 +230,8 @@ function validateRequiredSections(tree, file, ticketType) {
 }
 
 function validateGherkin(tree, file, ticketType) {
-  // Epics don't need gherkin
-  if (ticketType === 'epic') {
+  // Epics and initiatives don't need gherkin
+  if (ticketType === 'epic' || ticketType === 'initiative') {
     return
   }
 
@@ -364,7 +374,9 @@ function fixMissingSections(tree, file, ticketType) {
   const headings = getHeadings(tree)
 
   let requiredSections
-  if (ticketType === 'epic') {
+  if (ticketType === 'initiative') {
+    requiredSections = INITIATIVE_SECTIONS
+  } else if (ticketType === 'epic') {
     requiredSections = EPIC_SECTIONS
   } else if (ticketType === 'bug') {
     requiredSections = BUG_SECTIONS
@@ -451,7 +463,7 @@ export default function remarkLintTicket(options = {}) {
     if (fix) {
       fixMissingSections(tree, file, ticketType)
       // Re-validate gherkin after potential fixes (still warn if missing)
-      if (!hasGherkinBlocks(tree) && !hasGherkinPatterns(tree) && ticketType !== 'epic') {
+      if (!hasGherkinBlocks(tree) && !hasGherkinPatterns(tree) && ticketType !== 'epic' && ticketType !== 'initiative') {
         file.message('⚠️ Missing Given/When/Then scenarios (use ```gherkin code blocks)')
       }
     } else {
@@ -473,6 +485,7 @@ export {
   FEATURE_SECTIONS,
   BUG_SECTIONS,
   EPIC_SECTIONS,
+  INITIATIVE_SECTIONS,
   SECTION_TEMPLATES,
   isTicketFile,
   extractYamlFromCodeBlock,

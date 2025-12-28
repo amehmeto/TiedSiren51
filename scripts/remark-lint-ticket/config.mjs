@@ -51,6 +51,12 @@ export const EPIC_SECTIONS = [
   { pattern: /✅\s*Success Criteria/i, name: '✅ Success Criteria' },
 ]
 
+export const INITIATIVE_SECTIONS = [
+  { pattern: /🎯\s*Vision/i, name: '🎯 Vision' },
+  { pattern: /📋\s*Epics/i, name: '📋 Epics' },
+  { pattern: /✅\s*Success Criteria/i, name: '✅ Success Criteria' },
+]
+
 // Section templates for --fix mode
 export const SECTION_TEMPLATES = {
   '📝 Summary': '<!-- One paragraph explaining what this feature does and why it matters -->',
@@ -67,4 +73,7 @@ export const SECTION_TEMPLATES = {
     '| # | Story | Points | Status | Notes |\n|---|-------|--------|--------|-------|\n| #XX | Story title | 3 | 🔲 Todo | |',
   '✅ Success Criteria':
     '- [ ] Criterion 1\n- [ ] Criterion 2\n- [ ] All stories completed',
+  '🎯 Vision': "<!-- One paragraph describing the initiative's strategic objective and why it matters -->",
+  '📋 Epics':
+    '| # | Epic | Status | Notes |\n|---|------|--------|-------|\n| #XX | Epic title | 🔲 Todo | |',
 }
