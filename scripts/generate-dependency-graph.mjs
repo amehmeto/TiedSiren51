@@ -9,11 +9,38 @@
  */
 
 import { execSync } from 'node:child_process'
-import { writeFileSync } from 'node:fs'
+import { writeFileSync, unlinkSync } from 'node:fs'
+import { tmpdir } from 'node:os'
+import { join } from 'node:path'
 import { VALID_REPOS } from './remark-lint-ticket/config.mjs'
 
 const REPO = 'amehmeto/TiedSiren51'
 const OUTPUT_FILE = 'docs/TICKET-DEPENDENCY-GRAPH.md'
+
+// ============================================================================
+// Mermaid Validation
+// ============================================================================
+
+function validateMermaid(code) {
+  const tmpFile = join(tmpdir(), `mermaid-validate-${Date.now()}.mmd`)
+  const outFile = join(tmpdir(), `mermaid-validate-${Date.now()}.svg`)
+
+  try {
+    writeFileSync(tmpFile, code)
+    execSync(`npx --yes @mermaid-js/mermaid-cli -i "${tmpFile}" -o "${outFile}" 2>&1`, {
+      encoding: 'utf-8',
+      stdio: 'pipe',
+    })
+    return { valid: true }
+  } catch (error) {
+    return { valid: false, error: error.stdout || error.message }
+  } finally {
+    try {
+      unlinkSync(tmpFile)
+      unlinkSync(outFile)
+    } catch {}
+  }
+}
 
 // ============================================================================
 // GitHub API
@@ -589,6 +616,19 @@ const liveMode = process.argv.includes('--live')
 if (liveMode) {
   // Generate mermaid.live URL
   const mermaidCode = generateMermaidDiagram(tickets).replace(/```mermaid\n/, '').replace(/\n```$/, '')
+
+  // Validate before opening
+  console.log('Validating mermaid syntax...')
+  const validation = validateMermaid(mermaidCode)
+  if (!validation.valid) {
+    console.error('❌ Mermaid syntax error:')
+    console.error(validation.error)
+    console.error('\nGenerated code:')
+    console.error(mermaidCode)
+    process.exit(1)
+  }
+  console.log('✅ Syntax valid')
+
   const state = JSON.stringify({ code: mermaidCode, mermaid: { theme: 'default' }, autoSync: true, updateDiagram: true })
   const encoded = Buffer.from(state).toString('base64url')
   const url = `https://mermaid.live/edit#base64:${encoded}`
