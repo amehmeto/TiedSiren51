@@ -214,24 +214,23 @@ function generateMermaidDiagram(tickets) {
   const depths = calculateDepths(tickets)
   const maxDepth = Math.max(...depths.values(), 0)
 
-  // Base colors per category (HSL format for easy shade variation)
-  const baseColors = {
-    initiative: { h: 270, s: 70, l: 55 }, // purple
-    epic: { h: 217, s: 70, l: 55 },       // blue
-    auth: { h: 142, s: 60, l: 45 },       // green
-    blocking: { h: 25, s: 90, l: 52 },    // orange
-    bug: { h: 0, s: 75, l: 55 },          // red
-    other: { h: 220, s: 10, l: 50 },      // gray
+  // Base colors per category (hex shades from dark to light)
+  const colorShades = {
+    initiative: ['#7c3aed', '#8b5cf6', '#a78bfa', '#c4b5fd', '#ddd6fe'], // purple
+    epic: ['#2563eb', '#3b82f6', '#60a5fa', '#93c5fd', '#bfdbfe'],       // blue
+    auth: ['#16a34a', '#22c55e', '#4ade80', '#86efac', '#bbf7d0'],       // green
+    blocking: ['#ea580c', '#f97316', '#fb923c', '#fdba74', '#fed7aa'],   // orange
+    bug: ['#dc2626', '#ef4444', '#f87171', '#fca5a5', '#fecaca'],        // red
+    other: ['#4b5563', '#6b7280', '#9ca3af', '#d1d5db', '#e5e7eb'],      // gray
   }
 
   // Generate color classes for each category + depth
-  for (const [category, color] of Object.entries(baseColors)) {
+  for (const [category, shades] of Object.entries(colorShades)) {
     for (let d = 0; d <= maxDepth; d++) {
-      // Lighten as depth increases
-      const lightness = Math.min(color.l + d * 8, 85)
-      const fill = `hsl(${color.h}, ${color.s}%, ${lightness}%)`
-      const stroke = `hsl(${color.h}, ${color.s}%, ${Math.max(lightness - 15, 20)}%)`
-      const textColor = lightness > 60 ? '#000' : '#fff'
+      const idx = Math.min(d, shades.length - 1)
+      const fill = shades[idx]
+      const stroke = shades[Math.max(0, idx - 1)]
+      const textColor = d < 2 ? '#fff' : '#000'
       styles.push(`    classDef ${category}${d} fill:${fill},stroke:${stroke},color:${textColor}`)
     }
   }
