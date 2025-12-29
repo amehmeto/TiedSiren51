@@ -8,8 +8,8 @@ set -euo pipefail
 
 # Parse the JSON input from stdin
 input=$(cat)
-tool_name=$(echo "$input" | jq -r '.tool_name // empty')
-command=$(echo "$input" | jq -r '.tool_input.command // empty')
+tool_name=$(printf '%s' "$input" | jq -r '.tool_name // empty')
+command=$(printf '%s' "$input" | jq -r '.tool_input.command // empty')
 
 # Only process Bash tool with gh issue create/edit commands
 if [ "$tool_name" != "Bash" ]; then
@@ -114,7 +114,7 @@ if [ "$exit_code" -ne 0 ]; then
       exit 2
     else
       # Fix wasn't enough - still has errors
-      remaining_errors=$(echo "$revalidate_output" | grep -E "warning" | sed 's/\x1b\[[0-9;]*m//g' | head -20)
+      remaining_errors=$(printf '%s' "$revalidate_output" | grep -E "warning" | sed 's/\x1b\[[0-9;]*m//g' | head -20)
       escaped_content=$(printf '%s' "$fixed_content" | jq -Rs .)
 
       jq -n \
@@ -133,7 +133,7 @@ if [ "$exit_code" -ne 0 ]; then
     fi
   else
     # Fix mode didn't help (probably metadata issues, not missing sections)
-    errors=$(echo "$output" | grep -E "warning" | sed 's/\x1b\[[0-9;]*m//g' | head -20)
+    errors=$(printf '%s' "$output" | grep -E "warning" | sed 's/\x1b\[[0-9;]*m//g' | head -20)
 
     jq -n \
       --arg reason "🎫 Ticket validation failed - please fix the following issues:" \

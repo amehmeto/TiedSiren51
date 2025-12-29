@@ -30,10 +30,19 @@ function validateMermaid(code) {
     execSync(`npx --yes @mermaid-js/mermaid-cli -i "${tmpFile}" -o "${outFile}" 2>&1`, {
       encoding: 'utf-8',
       stdio: 'pipe',
+      timeout: 60000, // 60s timeout for npx download
     })
     return { valid: true }
   } catch (error) {
-    return { valid: false, error: error.stdout || error.message }
+    const errorMsg = error.stdout || error.stderr || error.message
+    // Check for common failure modes
+    if (errorMsg.includes('ENOENT') || errorMsg.includes('not found')) {
+      return {
+        valid: false,
+        error: 'mermaid-cli not available. Install with: npm install -g @mermaid-js/mermaid-cli',
+      }
+    }
+    return { valid: false, error: errorMsg }
   } finally {
     try {
       unlinkSync(tmpFile)
