@@ -1,9 +1,13 @@
 name: Update Dependency Graph
 
+# DISABLED: Workflow disabled to avoid unnecessary CI runs.
+# To re-enable, uncomment the `issues:` trigger below.
+# For now, run `npm run graph` locally instead.
+
 on:
-  issues:
-    types: [opened, edited, closed, reopened, deleted]
-  workflow_dispatch:
+  # issues:
+  #   types: [opened, edited, closed, reopened, deleted]
+  workflow_dispatch: # Manual trigger only
 
 jobs:
   update-graph:
