@@ -24,5 +24,6 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: node scripts/generate-dependency-graph.mjs
 
-      - name: Commit and push if changed
-        run: bash scripts/commit-graph-update.sh
+      # Disabled: Run `npm run graph` locally instead to avoid git history bloat
+      # - name: Commit and push if changed
+      #   run: bash scripts/commit-graph-update.sh
