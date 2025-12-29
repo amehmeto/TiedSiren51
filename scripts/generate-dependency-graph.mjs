@@ -290,6 +290,59 @@ function validateBidirectional(tickets) {
 }
 
 // ============================================================================
+// ASCII Output
+// ============================================================================
+
+function generateAsciiTree(tickets) {
+  const groups = groupTicketsByType(tickets)
+  const lines = []
+
+  const typeIcons = {
+    initiative: '🚀',
+    epic: '🏔️',
+    bug: '🐛',
+    feature: '✨',
+  }
+
+  const printTicket = (t, indent = '') => {
+    const deps = t.metadata?.depends_on || []
+    const blocks = t.metadata?.blocks || []
+    const depsStr = deps.length ? ` ← [${deps.map((d) => `#${d}`).join(', ')}]` : ''
+    const blocksStr = blocks.length ? ` → [${blocks.map((b) => `#${b}`).join(', ')}]` : ''
+    const shortTitle = t.title.length > 50 ? t.title.substring(0, 50) + '...' : t.title
+    lines.push(`${indent}${typeIcons[t.type]} #${t.number} ${shortTitle}${depsStr}${blocksStr}`)
+  }
+
+  // Group and print
+  for (const [type, list] of Object.entries(groups)) {
+    if (list.length === 0) continue
+    const label = type.charAt(0).toUpperCase() + type.slice(1) + 's'
+    lines.push(`\n${'═'.repeat(60)}`)
+    lines.push(`  ${label} (${list.length})`)
+    lines.push(`${'═'.repeat(60)}`)
+    list.forEach((t) => printTicket(t, '  '))
+  }
+
+  // Critical path (tickets with most blockers)
+  const blockers = tickets
+    .filter((t) => (t.metadata?.blocks?.length || 0) > 0)
+    .sort((a, b) => (b.metadata?.blocks?.length || 0) - (a.metadata?.blocks?.length || 0))
+    .slice(0, 5)
+
+  if (blockers.length > 0) {
+    lines.push(`\n${'─'.repeat(60)}`)
+    lines.push('  Critical Blockers (most downstream dependencies)')
+    lines.push(`${'─'.repeat(60)}`)
+    blockers.forEach((t) => {
+      const blocks = t.metadata?.blocks || []
+      lines.push(`  #${t.number} blocks ${blocks.length} tickets: ${blocks.map((b) => `#${b}`).join(', ')}`)
+    })
+  }
+
+  return lines.join('\n')
+}
+
+// ============================================================================
 // Main
 // ============================================================================
 
@@ -412,9 +465,16 @@ ${Object.entries(VALID_REPOS)
 }
 
 // Run
-console.log('Fetching open issues from GitHub...')
+const asciiMode = process.argv.includes('--ascii')
+
+if (!asciiMode) {
+  console.log('Fetching open issues from GitHub...')
+}
 const issues = fetchOpenIssues()
-console.log(`Found ${issues.length} open issues`)
+
+if (!asciiMode) {
+  console.log(`Found ${issues.length} open issues`)
+}
 
 const tickets = issues.map((issue) => {
   const metadata = extractMetadata(issue.body)
@@ -427,11 +487,16 @@ const tickets = issues.map((issue) => {
   }
 })
 
-console.log('Generating dependency graph...')
-const markdown = generateMarkdown(tickets)
-
-writeFileSync(OUTPUT_FILE, markdown)
-console.log(`Written to ${OUTPUT_FILE}`)
+if (asciiMode) {
+  // ASCII mode: just print to terminal
+  console.log(generateAsciiTree(tickets))
+} else {
+  // Markdown mode: write to file
+  console.log('Generating dependency graph...')
+  const markdown = generateMarkdown(tickets)
+  writeFileSync(OUTPUT_FILE, markdown)
+  console.log(`Written to ${OUTPUT_FILE}`)
+}
 
 // Report validation issues
 const validationIssues = validateBidirectional(tickets)

@@ -52,7 +52,7 @@
     "expo:lint": "expo lint",
     "generate:schema": "npx prisma generate",
     "graph": "node scripts/generate-dependency-graph.mjs",
-    "graph:view": "npm run graph && npx --yes @mermaid-js/mermaid-cli -i docs/TICKET-DEPENDENCY-GRAPH.md -o /tmp/graph.svg && chafa /tmp/graph-1.svg"
+    "graph:view": "node scripts/generate-dependency-graph.mjs --ascii"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
