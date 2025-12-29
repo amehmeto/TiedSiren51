@@ -2,66 +2,74 @@
 
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
+> **Auto-generated** from GitHub issue metadata. Do not edit manually.
+> Last updated: 2025-12-28
+
 ## Complete Ticket Inventory
 
 ### Initiatives (6)
 | # | Title | Depends On | Blocks |
 |---|-------|------------|--------|
-| #62 | Launch Android App | - | #63, #64, #65, #66, #67 |
-| #63 | Launch iOS App | #62 | #64 |
-| #64 | Multi Device Sync | #62, #63 | - |
-| #65 | Launch MacOS | #62 | - |
-| #66 | Launch Windows | #62 | - |
-| #67 | Goal-Based Locking | #62 | - |
+| #62 | [Initiative] Launch Android App | - | #63, #64, #65, #66, #67 |
+| #63 | [Initiative] Launch iOS App | #62 | #64 |
+| #64 | [Initiative] Multi device sync | #62, #63 | - |
+| #65 | [Initiative] Launch MacOS desktop App | #62 | - |
+| #66 | [Initiative] Launch Windows desktop App | #62 | - |
+| #67 | [Initiative] Goal based locking/unlocking | #62 | - |
+
 
 ### Epics (7)
 | # | Title | Depends On | Blocks |
 |---|-------|------------|--------|
-| #54 | User Authentication | - | - |
-| #55 | Blocking Apps on Android | - | #57, #58, #59, #61 |
-| #57 | Strict Mode | #55 | - |
-| #58 | Block Websites on Android | #55 | #59 |
-| #59 | Blocking Keywords on Android | #55, #58 | - |
-| #60 | Polish Design | - | - |
-| #61 | Schedule Recurring Sessions | #55 | - |
+| #54 | [Epic] User Authentification | - | - |
+| #55 | [Epic] Blocking Apps on Android | - | #57, #58, #59, #61 |
+| #57 | [Epic] Strict Mode | #55 | - |
+| #58 | [Epic] Block websites on Android | #55 | #59 |
+| #59 | [Epic] Blocking keywords on Android | #55, #58 | - |
+| #60 | [Epic] Polish design | - | - |
+| #61 | [Epic] Schedule recurring block sessions | #55 | - |
 
-### Bug (1)
-| # | Title | Severity | Related |
-|---|-------|----------|---------|
-| #170 | Blocking overlay never triggers | Critical | Fixed by #171-185 |
-
-### Features - Blocking Architecture (15)
-| # | Title | Depends On | Blocks |
-|---|-------|------------|--------|
-| #96 | Guided Permission Setup | - | - |
-| #171 | Multi-Listener Support (accessibility) | - | #173 |
-| #172 | Callback System (foreground service) | - | #173 |
-| #173 | BlockingCallback + SharedPreferences | #171, #172 | - |
-| #177 | SirenTier Port Refactor | - | #180, #181, #182, #183 |
-| #178 | SirenLookout Port Refactor | - | #181, #183 |
-| #179 | selectBlockingSchedule Selector | - | #180 |
-| #180 | Unified Listener | #177, #179 | #185 |
-| #181 | Noop Implementations | #177, #178 | - |
-| #182 | AndroidSirenTier Implementation | #177 | #183, #184, #185 |
-| #183 | Update Dependency Injection | #177, #178, #182 | - |
-| #184 | Deprecate JS Detection Path | #182 | #185 |
-| #185 | Remove Legacy Code | #180, #182, #184 | - |
 
 ### Features - Authentication (12)
 | # | Title | Depends On | Blocks |
 |---|-------|------------|--------|
-| #88 | Apple Sign-In | - | - |
-| #89 | Error Handling | - | - |
-| #160 | Custom Password Reset | - | #166 |
-| #161 | Email Verification | - | - |
-| #162 | Change Password | - | - |
-| #163 | Account Deletion (GDPR) | #164 | - |
-| #164 | Re-authentication | - | #162, #163 |
-| #165 | Resend Reset Email | - | - |
-| #166 | Invalidate Sessions | #160 | - |
-| #167 | Brute Force Protection | - | - |
-| #168 | Security Notifications | - | - |
-| #169 | Deep Link to Email | - | - |
+| #88 | Implement Apple Sign-In with Firebase | - | - |
+| #89 | Add Authentication Error Handling | - | - |
+| #160 | feat(auth): custom in-app password reset confirmation flow | - | #166 |
+| #161 | feat(auth): implement email verification flow | - | - |
+| #162 | feat(auth): change password when logged in | #164 | - |
+| #163 | feat(auth): account deletion (GDPR compliance) | #164 | - |
+| #164 | feat(auth): re-authentication for sensitive operations | - | #162, #163 |
+| #165 | feat(auth): resend password reset email | - | - |
+| #166 | feat(auth): invalidate sessions after password reset | #160 | - |
+| #167 | feat(auth): brute force protection on login | - | - |
+| #168 | feat(auth): security notification emails | - | - |
+| #169 | feat(auth): deep link to email app after signup | - | - |
+
+
+### Features - Other (1)
+| # | Title | Depends On | Blocks |
+|---|-------|------------|--------|
+| #96 | Setup Phase - Guided Permission Setup - 3sp | - | - |
+
+
+### Features - Blocking Architecture (13)
+| # | Title | Depends On | Blocks |
+|---|-------|------------|--------|
+| #170 | fix(android): Blocking overlay never triggers - JS bridge architecture mismatch | - | - |
+| #171 | feat(expo-accessibility-service): Add multiple listeners support | - | #173 |
+| #172 | feat(expo-foreground-service): Add callback system via reflection | - | #173 |
+| #173 | feat(tied-siren-blocking-overlay): Add BlockingCallback and SharedPreferences support | #171, #172 | - |
+| #177 | Refactor SirenTier port to support sub-dependencies injection | - | #180, #181, #182, #183 |
+| #178 | Refactor SirenLookout port to support sub-dependencies injection | - | #181, #183 |
+| #179 | Create selectBlockingSchedule selector with fresh blocklist join | - | #180 |
+| #180 | Create unified listener for blockSession and blocklist state changes | #177, #179 | #185 |
+| #181 | Create Noop implementations for future tiers and lookouts | #177, #178 | - |
+| #182 | Update AndroidSirenTier to call setBlockingSchedule | #177 | #183, #184, #185 |
+| #183 | Update dependency injection with new architecture | #177, #178, #182 | - |
+| #184 | Deprecate JS detection path (blockLaunchedApp usecase) | #182 | #185 |
+| #185 | Remove legacy updateBlockedApps calls and related code | #180, #182, #184 | - |
+
 
 ---
 
@@ -70,202 +78,113 @@ This document visualizes the dependencies between GitHub issues to help with pla
 ```mermaid
 flowchart TD
     subgraph Initiatives
-        I62["#62 Launch Android App"]
-        I63["#63 Launch iOS App"]
-        I64["#64 Multi Device Sync"]
-        I65["#65 Launch MacOS"]
-        I66["#66 Launch Windows"]
-        I67["#67 Goal-Based Locking"]
+    I62["#62 [Initiative] Launch Android Ap..."]
+    I63["#63 [Initiative] Launch iOS App"]
+    I64["#64 [Initiative] Multi device sync"]
+    I65["#65 [Initiative] Launch MacOS desk..."]
+    I66["#66 [Initiative] Launch Windows de..."]
+    I67["#67 [Initiative] Goal based lockin..."]
     end
-
     subgraph Epics
-        E54["#54 User Authentication"]
-        E55["#55 Blocking Apps on Android"]
-        E57["#57 Strict Mode"]
-        E58["#58 Block Websites"]
-        E59["#59 Blocking Keywords"]
-        E60["#60 Polish Design"]
-        E61["#61 Schedule Recurring Sessions"]
+    E54["#54 [Epic] User Authentification"]
+    E55["#55 [Epic] Blocking Apps on Androi..."]
+    E57["#57 [Epic] Strict Mode"]
+    E58["#58 [Epic] Block websites on Andro..."]
+    E59["#59 [Epic] Blocking keywords on An..."]
+    E60["#60 [Epic] Polish design"]
+    E61["#61 [Epic] Schedule recurring bloc..."]
     end
 
-    %% Initiative dependencies
-    I62 --> I63
+    %% Dependencies
+    F180 --> F185
+    F182 --> F185
+    F184 --> F185
+    F182 --> F184
+    F177 --> F183
+    F178 --> F183
+    F182 --> F183
+    F177 --> F182
+    F177 --> F181
+    F178 --> F181
+    F177 --> F180
+    F179 --> F180
+    F171 --> F173
+    F172 --> F173
+    F160 --> F166
+    F164 --> F163
+    F164 --> F162
+    I62 --> I67
+    I62 --> I66
+    I62 --> I65
     I62 --> I64
     I63 --> I64
-    I62 --> I65
-    I62 --> I66
-    I62 --> I67
-
-    %% Epic dependencies
-    E55 --> E57
-    E55 --> E58
+    I62 --> I63
     E55 --> E61
+    E55 --> E59
     E58 --> E59
+    E55 --> E58
+    E55 --> E57
 ```
 
-## Epic #55: Blocking Apps on Android - Fix Architecture
 
-This epic addresses the critical bug #170 where blocking doesn't work when the app is backgrounded.
+### Features: Authentication
 
 ```mermaid
 flowchart TD
-    subgraph "Native Module Changes"
-        T171["#171 Multi-Listener Support<br/>expo-accessibility-service"]
-        T172["#172 Callback System<br/>expo-foreground-service"]
-        T173["#173 BlockingCallback<br/>+ SharedPreferences"]
-    end
+    F88["#88 Implement Apple Sign-In w..."]
+    F89["#89 Add Authentication Error ..."]
+    F160["#160 feat(auth): custom in-app..."]
+    F161["#161 feat(auth): implement ema..."]
+    F162["#162 feat(auth): change passwo..."]
+    F163["#163 feat(auth): account delet..."]
+    F164["#164 feat(auth): re-authentica..."]
+    F165["#165 feat(auth): resend passwo..."]
+    F166["#166 feat(auth): invalidate se..."]
+    F167["#167 feat(auth): brute force p..."]
+    F168["#168 feat(auth): security noti..."]
+    F169["#169 feat(auth): deep link to ..."]
 
-    subgraph "Port Refactoring"
-        T177["#177 SirenTier Port Refactor"]
-        T178["#178 SirenLookout Port Refactor"]
-    end
-
-    subgraph "Core Implementation"
-        T179["#179 selectBlockingSchedule<br/>Selector"]
-        T180["#180 Unified Listener<br/>for State Changes"]
-        T181["#181 Noop Implementations<br/>for Future Tiers"]
-        T182["#182 AndroidSirenTier<br/>Implementation"]
-    end
-
-    subgraph "Cleanup"
-        T183["#183 Update DI"]
-        T184["#184 Deprecate JS Path"]
-        T185["#185 Remove Legacy Code"]
-    end
-
-    B170{{"#170 BUG<br/>Blocking Overlay<br/>Never Triggers"}}
-
-    %% Native module dependencies
-    T171 --> T173
-    T172 --> T173
-
-    %% Port dependencies
-    T177 --> T180
-    T177 --> T181
-    T177 --> T182
-    T177 --> T183
-    T178 --> T181
-    T178 --> T183
-
-    %% Selector → Listener
-    T179 --> T180
-
-    %% Implementation dependencies
-    T182 --> T183
-    T182 --> T184
-    T182 --> T185
-
-    %% Cleanup chain
-    T184 --> T185
-    T180 --> T185
-
-    %% All fixes contribute to bug resolution
-    T173 -.-> B170
-    T180 -.-> B170
-    T182 -.-> B170
-    T185 -.-> B170
-
-    style B170 fill:#f66,stroke:#333
+    F164 --> F162
+    F164 --> F163
+    F160 --> F166
 ```
 
-## Epic #54: User Authentication
+
+### Features: Blocking Architecture
 
 ```mermaid
 flowchart TD
-    subgraph "Core Auth (Standalone)"
-        A88["#88 Apple Sign-In"]
-        A89["#89 Error Handling"]
-    end
+    F170["#170 fix(android): Blocking ov..."]
+    F171["#171 feat(expo-accessibility-s..."]
+    F172["#172 feat(expo-foreground-serv..."]
+    F173["#173 feat(tied-siren-blocking-..."]
+    F177["#177 Refactor SirenTier port t..."]
+    F178["#178 Refactor SirenLookout por..."]
+    F179["#179 Create selectBlockingSche..."]
+    F180["#180 Create unified listener f..."]
+    F181["#181 Create Noop implementatio..."]
+    F182["#182 Update AndroidSirenTier t..."]
+    F183["#183 Update dependency injecti..."]
+    F184["#184 Deprecate JS detection pa..."]
+    F185["#185 Remove legacy updateBlock..."]
 
-    subgraph "Password Management"
-        A160["#160 Custom Password Reset"]
-        A162["#162 Change Password"]
-        A164["#164 Re-authentication"]
-        A165["#165 Resend Reset Email"]
-        A166["#166 Invalidate Sessions"]
-    end
-
-    subgraph "Email & Security (Standalone)"
-        A161["#161 Email Verification"]
-        A167["#167 Brute Force Protection"]
-        A168["#168 Security Notifications"]
-        A169["#169 Deep Link to Email"]
-    end
-
-    subgraph "Account"
-        A163["#163 Account Deletion (GDPR)"]
-    end
-
-    %% Re-auth is prerequisite for sensitive ops
-    A164 --> A162
-    A164 --> A163
-
-    %% Password reset chain
-    A160 --> A166
-
-    %% Email verification → deep link (optional)
-    A161 -.-> A169
+    F171 --> F173
+    F172 --> F173
+    F177 --> F180
+    F179 --> F180
+    F177 --> F181
+    F178 --> F181
+    F177 --> F182
+    F177 --> F183
+    F178 --> F183
+    F182 --> F183
+    F182 --> F184
+    F180 --> F185
+    F182 --> F185
+    F184 --> F185
 ```
 
-## Recommended Execution Order
-
-### Phase 1: Foundation (No Dependencies)
-| Issue | Title | Points | Epic |
-|-------|-------|--------|------|
-| #177 | SirenTier Port Refactor | 3 | #55 |
-| #178 | SirenLookout Port Refactor | 2 | #55 |
-| #171 | Multi-Listener Support | 3 | #55 |
-| #172 | Callback System | 3 | #55 |
-| #179 | selectBlockingSchedule Selector | 5 | #55 |
-| #88 | Apple Sign-In | 3 | #54 |
-| #89 | Error Handling | 3 | #54 |
-| #164 | Re-authentication | 2 | #54 |
-| #160 | Custom Password Reset | 5 | #54 |
-| #161 | Email Verification | 3 | #54 |
-
-### Phase 2: Core Implementation
-| Issue | Title | Depends On | Epic |
-|-------|-------|------------|------|
-| #173 | BlockingCallback + SharedPreferences | #171, #172 | #55 |
-| #181 | Noop Implementations | #177, #178 | #55 |
-| #182 | AndroidSirenTier Implementation | #177 | #55 |
-| #180 | Unified Listener | #177, #179 | #55 |
-| #162 | Change Password | #164 | #54 |
-| #163 | Account Deletion | #164 | #54 |
-| #166 | Invalidate Sessions | #160 | #54 |
-
-### Phase 3: Integration & Cleanup
-| Issue | Title | Depends On | Epic |
-|-------|-------|------------|------|
-| #183 | Update Dependency Injection | #177, #178, #182 | #55 |
-| #184 | Deprecate JS Detection Path | #182 | #55 |
-| #185 | Remove Legacy Code | #180, #182, #184 | #55 |
-
-### Standalone Features (Can Start Anytime)
-| Issue | Title | Points | Epic |
-|-------|-------|--------|------|
-| #96 | Guided Permission Setup | 3 | #55 |
-| #165 | Resend Reset Email | 1 | #54 |
-| #167 | Brute Force Protection | 2 | #54 |
-| #168 | Security Notifications | 3 | #54 |
-| #169 | Deep Link to Email | 2 | #54 |
-
-## Critical Path
-
-The critical path to fixing **#170** (Blocking overlay never triggers):
-
-```
-#177 (SirenTier Port) ─┬─> #182 (AndroidSirenTier) ─┬─> #184 (Deprecate JS) ─┐
-                       │                            │                        │
-#179 (Selector) ───────┴─> #180 (Unified Listener) ─┴────────────────────────┴─> #185 (Cleanup)
-                                                                                      │
-#171 (Multi-Listener) ─┬─> #173 (BlockingCallback) ──────────────────────────────────┘
-                       │
-#172 (Callback System) ┘
-```
-
-**Minimum viable fix:** Complete #171, #172, #173 for native-to-native blocking.
-**Full architecture:** Complete all Phase 1-3 issues.
+---
 
 ## Dependency Matrix
 
@@ -288,14 +207,29 @@ Quick reference showing what blocks what:
 | #182 | #183, #184, #185 |
 | #184 | #185 |
 
+
+---
+
+## Valid Repositories
+
+| Repo | URL |
+|------|-----|
+| TiedSiren51 | https://github.com/amehmeto/TiedSiren51 |
+| expo-accessibility-service | https://github.com/amehmeto/expo-accessibility-service |
+| expo-foreground-service | https://github.com/amehmeto/expo-foreground-service |
+| tied-siren-blocking-overlay | https://github.com/amehmeto/tied-siren-blocking-overlay |
+| expo-list-installed-apps | https://github.com/amehmeto/expo-list-installed-apps |
+
+---
+
 ## Legend
 
-- **Solid arrows (→)**: Direct dependency (must complete first)
-- **Dotted arrows (-.->)**: Related/contributes to
-- **Red nodes**: Bugs
+- **Solid arrows (`-->`)**: Direct dependency (must complete first)
+- **Initiatives (I)**: Strategic goals
+- **Epics (E)**: Large features with multiple stories
+- **Features (F)**: Individual stories/tasks
 - **Subgraphs**: Logical groupings
 
 ---
 
-*Last updated: 2025-12-28*
-*Generated from issue metadata*
+*Auto-generated on 2025-12-28 from GitHub issue metadata*

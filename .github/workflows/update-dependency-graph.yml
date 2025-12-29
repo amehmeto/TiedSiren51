@@ -1,0 +1,28 @@
+name: Update Dependency Graph
+
+on:
+  issues:
+    types: [opened, edited, closed, reopened, deleted]
+  workflow_dispatch:
+
+jobs:
+  update-graph:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate dependency graph
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/generate-dependency-graph.mjs
+
+      - name: Commit and push if changed
+        run: bash scripts/commit-graph-update.sh
