@@ -503,7 +503,17 @@ const tickets = issues.map((issue) => {
   }
 })
 
-if (asciiMode) {
+const liveMode = process.argv.includes('--live')
+
+if (liveMode) {
+  // Generate mermaid.live URL
+  const mermaidCode = generateMermaidDiagram(tickets).replace(/```mermaid\n/, '').replace(/\n```$/, '')
+  const state = JSON.stringify({ code: mermaidCode, mermaid: { theme: 'default' }, autoSync: true, updateDiagram: true })
+  const encoded = Buffer.from(state).toString('base64url')
+  const url = `https://mermaid.live/edit#base64:${encoded}`
+  console.log('Opening mermaid.live...')
+  execSync(`open "${url}"`)
+} else if (asciiMode) {
   // ASCII box graph
   console.log(generateAsciiGraph(tickets))
 } else {

@@ -52,7 +52,8 @@
     "expo:lint": "expo lint",
     "generate:schema": "npx prisma generate",
     "graph": "node scripts/generate-dependency-graph.mjs",
-    "graph:view": "node scripts/generate-dependency-graph.mjs --ascii"
+    "graph:view": "node scripts/generate-dependency-graph.mjs --ascii",
+    "graph:live": "node scripts/generate-dependency-graph.mjs --live"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [
