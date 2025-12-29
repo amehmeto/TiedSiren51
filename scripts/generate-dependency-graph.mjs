@@ -197,22 +197,24 @@ function generateMermaidDiagram(tickets) {
     if (!nodesByCategory[category]) nodesByCategory[category] = []
 
     const shortTitle = t.title
-      .replace(/^\[?\w+\]?\s*/i, '') // Remove [Epic], [Initiative], feat(), fix() prefixes
+      .replace(/^\[?\w+\]?\s*/i, '') // Remove [Epic], [Initiative] prefixes
       .replace(/^feat\([^)]*\):\s*/i, '')
       .replace(/^fix\([^)]*\):\s*/i, '')
-    const label = shortTitle.length > 35 ? shortTitle.substring(0, 35) + '...' : shortTitle
+      .replace(/[[\]()]/g, '') // Remove brackets and parens
+      .replace(/"/g, "'") // Replace quotes
+    const label = shortTitle.length > 30 ? shortTitle.substring(0, 30) + '...' : shortTitle
 
     nodesByCategory[category].push({ ticket: t, label })
   }
 
   // Add subgraphs by category
   const categoryLabels = {
-    initiative: '🚀 Initiatives',
-    epic: '🏔️ Epics',
-    auth: '🔐 Authentication',
-    blocking: '🛡️ Blocking',
-    bug: '🐛 Bugs',
-    other: '📦 Other',
+    initiative: 'Initiatives',
+    epic: 'Epics',
+    auth: 'Authentication',
+    blocking: 'Blocking',
+    bug: 'Bugs',
+    other: 'Other',
   }
 
   for (const [category, items] of Object.entries(nodesByCategory)) {
@@ -220,7 +222,8 @@ function generateMermaidDiagram(tickets) {
 
     nodes.push(`    subgraph ${categoryLabels[category]}`)
     for (const { ticket: t, label } of items) {
-      nodes.push(`        T${t.number}["#${t.number} ${label}"]:::${category}`)
+      const safeLabel = label.replace(/"/g, "'")
+      nodes.push(`        T${t.number}["#${t.number} ${safeLabel}"]:::${category}`)
     }
     nodes.push('    end')
   }
