@@ -290,28 +290,71 @@ function validateBidirectional(tickets) {
 }
 
 // ============================================================================
-// DOT Output (for graph-easy)
+// ASCII Box Graph
 // ============================================================================
 
-function generateDot(tickets) {
-  const lines = ['digraph G {', '  rankdir=LR;', '  node [shape=box];']
-
-  // Only include tickets with dependencies
+function generateAsciiGraph(tickets) {
   const withDeps = tickets.filter(
     (t) => (t.metadata?.depends_on?.length || 0) > 0 || (t.metadata?.blocks?.length || 0) > 0,
   )
 
-  for (const t of withDeps) {
-    const label = `#${t.number}`
-    lines.push(`  "${label}";`)
+  if (withDeps.length === 0) return 'No dependencies found.'
 
-    const blocks = t.metadata?.blocks || []
-    for (const b of blocks) {
-      lines.push(`  "#${t.number}" -> "#${b}";`)
+  const children = new Map()
+  for (const t of withDeps) {
+    children.set(t.number, t.metadata?.blocks || [])
+  }
+
+  // Find roots
+  const hasParent = new Set()
+  for (const t of withDeps) {
+    for (const b of t.metadata?.blocks || []) hasParent.add(b)
+  }
+  const roots = withDeps.filter((t) => !hasParent.has(t.number)).map((t) => t.number)
+
+  const printed = new Set()
+  const lines = []
+
+  const renderTree = (num, indent = '') => {
+    if (printed.has(num)) {
+      lines.push(`${indent}└─▶ #${num} (↑)`)
+      return
+    }
+    printed.add(num)
+
+    const kids = (children.get(num) || []).filter((k) => withDeps.some((t) => t.number === k))
+    const box = `┌──────┐\n${indent}│ #${String(num).padStart(3)} │\n${indent}└──┬───┘`
+
+    if (kids.length === 0) {
+      lines.push(`${indent}┌──────┐`)
+      lines.push(`${indent}│ #${String(num).padStart(3)} │`)
+      lines.push(`${indent}└──────┘`)
+    } else {
+      lines.push(`${indent}┌──────┐`)
+      lines.push(`${indent}│ #${String(num).padStart(3)} │`)
+      lines.push(`${indent}└──┬───┘`)
+      lines.push(`${indent}   │`)
+
+      kids.forEach((kid, i) => {
+        const isLast = i === kids.length - 1
+        const connector = isLast ? '└─▶ ' : '├─▶ '
+        const childIndent = indent + (isLast ? '    ' : '│   ')
+
+        if (printed.has(kid)) {
+          lines.push(`${indent}   ${connector}#${kid} (↑)`)
+        } else {
+          lines.push(`${indent}   ${connector}`)
+          renderTree(kid, childIndent)
+        }
+      })
     }
   }
 
-  lines.push('}')
+  roots.forEach((root, i) => {
+    if (i > 0) lines.push('\n' + '─'.repeat(40) + '\n')
+    renderTree(root)
+  })
+
   return lines.join('\n')
 }
 
@@ -461,8 +504,8 @@ const tickets = issues.map((issue) => {
 })
 
 if (asciiMode) {
-  // DOT mode: output for graph-easy
-  console.log(generateDot(tickets))
+  // ASCII box graph
+  console.log(generateAsciiGraph(tickets))
 } else {
   // Markdown mode: write to file
   console.log('Generating dependency graph...')
