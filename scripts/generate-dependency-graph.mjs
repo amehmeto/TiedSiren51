@@ -290,64 +290,28 @@ function validateBidirectional(tickets) {
 }
 
 // ============================================================================
-// ASCII Output
+// DOT Output (for graph-easy)
 // ============================================================================
 
-function generateAsciiTree(tickets) {
-  const lines = []
-  const ticketMap = new Map(tickets.map((t) => [t.number, t]))
+function generateDot(tickets) {
+  const lines = ['digraph G {', '  rankdir=LR;', '  node [shape=box];']
 
-  // Find root nodes (no dependencies)
-  const roots = tickets.filter((t) => !t.metadata?.depends_on?.length)
+  // Only include tickets with dependencies
+  const withDeps = tickets.filter(
+    (t) => (t.metadata?.depends_on?.length || 0) > 0 || (t.metadata?.blocks?.length || 0) > 0,
+  )
 
-  // Build children map
-  const childrenMap = new Map()
-  for (const t of tickets) {
-    const deps = t.metadata?.depends_on || []
-    for (const dep of deps) {
-      if (!childrenMap.has(dep)) childrenMap.set(dep, [])
-      childrenMap.get(dep).push(t.number)
+  for (const t of withDeps) {
+    const label = `#${t.number}`
+    lines.push(`  "${label}";`)
+
+    const blocks = t.metadata?.blocks || []
+    for (const b of blocks) {
+      lines.push(`  "#${t.number}" -> "#${b}";`)
     }
   }
 
-  const printed = new Set()
-
-  const printNode = (num, prefix = '', isLast = true) => {
-    if (printed.has(num)) {
-      lines.push(`${prefix}${isLast ? '└── ' : '├── '}#${num} (see above)`)
-      return
-    }
-    printed.add(num)
-
-    const t = ticketMap.get(num)
-    if (!t) return
-
-    const connector = isLast ? '└── ' : '├── '
-    const shortTitle = t.title.length > 45 ? t.title.substring(0, 45) + '...' : t.title
-    lines.push(`${prefix}${connector}#${num} ${shortTitle}`)
-
-    const children = childrenMap.get(num) || []
-    const childPrefix = prefix + (isLast ? '    ' : '│   ')
-    children.forEach((child, i) => {
-      printNode(child, childPrefix, i === children.length - 1)
-    })
-  }
-
-  lines.push('Dependency Graph (→ means "blocks")\n')
-
-  // Print each root tree
-  roots.forEach((root, i) => {
-    const shortTitle = root.title.length > 45 ? root.title.substring(0, 45) + '...' : root.title
-    lines.push(`#${root.number} ${shortTitle}`)
-    printed.add(root.number)
-
-    const children = childrenMap.get(root.number) || []
-    children.forEach((child, j) => {
-      printNode(child, '', j === children.length - 1)
-    })
-    if (i < roots.length - 1) lines.push('')
-  })
-
+  lines.push('}')
   return lines.join('\n')
 }
 
@@ -497,8 +461,8 @@ const tickets = issues.map((issue) => {
 })
 
 if (asciiMode) {
-  // ASCII mode: just print to terminal
-  console.log(generateAsciiTree(tickets))
+  // DOT mode: output for graph-easy
+  console.log(generateDot(tickets))
 } else {
   // Markdown mode: write to file
   console.log('Generating dependency graph...')
