@@ -281,7 +281,32 @@ function generateMermaidDiagram(tickets) {
     nodesByCategory[category].push({ ticket: t, label, depth })
   }
 
-  // Add subgraphs by category
+  // Build initiative lookup for epics
+  const initiatives = tickets.filter((t) => t.type === 'initiative')
+  const epicToInitiative = new Map()
+
+  // Find which initiative each epic belongs to (via initiative's blocks or epic's depends_on)
+  for (const epic of tickets.filter((t) => t.type === 'epic')) {
+    // Check if any initiative blocks this epic
+    for (const init of initiatives) {
+      if (init.metadata?.blocks?.includes(epic.number)) {
+        epicToInitiative.set(epic.number, init)
+        break
+      }
+    }
+    // Or check if epic depends on an initiative
+    if (!epicToInitiative.has(epic.number)) {
+      for (const dep of epic.metadata?.depends_on || []) {
+        const parent = initiatives.find((i) => i.number === dep)
+        if (parent) {
+          epicToInitiative.set(epic.number, parent)
+          break
+        }
+      }
+    }
+  }
+
+  // Add subgraphs by category - ordered: initiatives, epics, then others
   const categoryLabels = {
     initiative: 'Initiatives',
     epic: 'Epics',
@@ -291,13 +316,26 @@ function generateMermaidDiagram(tickets) {
     other: 'Other',
   }
 
-  for (const [category, items] of Object.entries(nodesByCategory)) {
-    if (items.length === 0) continue
+  const categoryOrder = ['initiative', 'epic', 'blocking', 'auth', 'bug', 'other']
+
+  for (const category of categoryOrder) {
+    const items = nodesByCategory[category]
+    if (!items || items.length === 0) continue
 
     nodes.push(`    subgraph ${categoryLabels[category]}`)
     nodes.push(`        direction TB`)
     for (const { ticket: t, label, depth } of items) {
-      const safeLabel = label.replace(/"/g, "'")
+      let safeLabel = label.replace(/"/g, "'")
+
+      // For epics, show parent initiative
+      if (category === 'epic') {
+        const parentInit = epicToInitiative.get(t.number)
+        if (parentInit) {
+          const initName = parentInit.title.replace(/^\[Initiative\]\s*/i, '').substring(0, 15)
+          safeLabel = `${safeLabel} [${initName}]`
+        }
+      }
+
       nodes.push(`        T${t.number}["#${t.number} ${safeLabel}"]:::${category}${depth}`)
     }
     nodes.push('    end')
