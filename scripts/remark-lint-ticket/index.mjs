@@ -11,12 +11,14 @@ import yaml from 'js-yaml'
 // Import configuration from shared config file
 import {
   VALID_REPOS,
+  NEW_REPO_PREFIX,
   VALID_LABELS,
   FIBONACCI_POINTS,
   VALID_SEVERITIES,
   FEATURE_SECTIONS,
   BUG_SECTIONS,
   EPIC_SECTIONS,
+  INITIATIVE_SECTIONS,
   SECTION_TEMPLATES,
 } from './config.mjs'
 
@@ -129,6 +131,13 @@ function hasGherkinPatterns(tree) {
 function detectTicketType(headings, metadata) {
   const headingTexts = headings.map((h) => h.text.toLowerCase())
 
+  if (
+    metadata?.labels?.includes('initiative') ||
+    headingTexts.some((h) => h.includes('vision') && h.includes('🎯'))
+  ) {
+    return 'initiative'
+  }
+
   if (metadata?.labels?.includes('epic') || headingTexts.some((h) => h.includes('goal') && h.includes('🎯'))) {
     return 'epic'
   }
@@ -160,10 +169,20 @@ function validateMetadata(tree, file) {
   }
 
   // Validate required fields
+  const validRepoNames = Object.keys(VALID_REPOS)
   if (!data.repo) {
     file.message('❌ Missing `repo` field in metadata')
-  } else if (!VALID_REPOS.includes(data.repo)) {
-    file.message(`❌ Invalid repo "${data.repo}". Valid: ${VALID_REPOS.join(', ')}`)
+  } else if (data.repo.startsWith(NEW_REPO_PREFIX)) {
+    // Valid: ticket requires creating a new repo
+    const newRepoName = data.repo.slice(NEW_REPO_PREFIX.length).trim()
+    if (!newRepoName) {
+      file.message(`❌ NEW_REPO: must be followed by the proposed repo name (e.g., "NEW_REPO: my-new-repo")`)
+    }
+  } else if (!validRepoNames.includes(data.repo)) {
+    const repoList = validRepoNames.map((name) => `  - ${name}: ${VALID_REPOS[name]}`).join('\n')
+    file.message(
+      `❌ Invalid repo "${data.repo}". Must be one of:\n${repoList}\n  Or use "NEW_REPO: <name>" if a new repository is needed`,
+    )
   }
 
   if (data.story_points === undefined) {
@@ -203,7 +222,9 @@ function validateRequiredSections(tree, file, ticketType) {
   const headings = getHeadings(tree)
 
   let requiredSections
-  if (ticketType === 'epic') {
+  if (ticketType === 'initiative') {
+    requiredSections = INITIATIVE_SECTIONS
+  } else if (ticketType === 'epic') {
     requiredSections = EPIC_SECTIONS
   } else if (ticketType === 'bug') {
     requiredSections = BUG_SECTIONS
@@ -220,8 +241,8 @@ function validateRequiredSections(tree, file, ticketType) {
 }
 
 function validateGherkin(tree, file, ticketType) {
-  // Epics don't need gherkin
-  if (ticketType === 'epic') {
+  // Epics and initiatives don't need gherkin
+  if (ticketType === 'epic' || ticketType === 'initiative') {
     return
   }
 
@@ -364,7 +385,9 @@ function fixMissingSections(tree, file, ticketType) {
   const headings = getHeadings(tree)
 
   let requiredSections
-  if (ticketType === 'epic') {
+  if (ticketType === 'initiative') {
+    requiredSections = INITIATIVE_SECTIONS
+  } else if (ticketType === 'epic') {
     requiredSections = EPIC_SECTIONS
   } else if (ticketType === 'bug') {
     requiredSections = BUG_SECTIONS
@@ -451,7 +474,7 @@ export default function remarkLintTicket(options = {}) {
     if (fix) {
       fixMissingSections(tree, file, ticketType)
       // Re-validate gherkin after potential fixes (still warn if missing)
-      if (!hasGherkinBlocks(tree) && !hasGherkinPatterns(tree) && ticketType !== 'epic') {
+      if (!hasGherkinBlocks(tree) && !hasGherkinPatterns(tree) && ticketType !== 'epic' && ticketType !== 'initiative') {
         file.message('⚠️ Missing Given/When/Then scenarios (use ```gherkin code blocks)')
       }
     } else {
@@ -467,12 +490,14 @@ export default function remarkLintTicket(options = {}) {
 // Export for testing
 export {
   VALID_REPOS,
+  NEW_REPO_PREFIX,
   VALID_LABELS,
   FIBONACCI_POINTS,
   VALID_SEVERITIES,
   FEATURE_SECTIONS,
   BUG_SECTIONS,
   EPIC_SECTIONS,
+  INITIATIVE_SECTIONS,
   SECTION_TEMPLATES,
   isTicketFile,
   extractYamlFromCodeBlock,

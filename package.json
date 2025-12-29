@@ -50,7 +50,10 @@
     "prepare": "is-ci || husky",
     "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
     "expo:lint": "expo lint",
-    "generate:schema": "npx prisma generate"
+    "generate:schema": "npx prisma generate",
+    "graph": "node scripts/generate-dependency-graph.mjs",
+    "graph:view": "node scripts/generate-dependency-graph.mjs --ascii",
+    "graph:live": "node scripts/generate-dependency-graph.mjs --live"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [

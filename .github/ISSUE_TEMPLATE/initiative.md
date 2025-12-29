@@ -1,8 +1,8 @@
 ---
-name: 🏔️ Epic
-about: Large feature containing multiple stories
-title: '[Epic] '
-labels: epic
+name: 🚀 Initiative
+about: Strategic goal containing multiple epics
+title: '[Initiative] '
+labels: initiative
 assignees: ''
 ---
 
@@ -20,55 +20,51 @@ assignees: ''
 #   - expo-list-installed-apps (https://github.com/amehmeto/expo-list-installed-apps)
 #   - NEW_REPO: <name> (if a new repository is needed)
 repo: TiedSiren51
-story_points: 0    # Fibonacci: 1, 2, 3, 5, 8, 13, 21 (total for epic)
+story_points: 0    # Fibonacci: 1, 2, 3, 5, 8, 13, 21 (total for initiative)
 labels:
-  - epic
+  - initiative
 depends_on: []
 blocks: []
 ```
 
 ---
 
-## 🎯 Goal
+## 🎯 Vision
 
-<!-- One paragraph describing the epic's objective and business value -->
+<!-- One paragraph describing the initiative's strategic objective and why it matters -->
 
 ---
 
-## 📋 Stories / Tasks
+## 📋 Epics
 
-<!-- List all tickets that belong to this epic -->
+<!-- List all epics that belong to this initiative -->
 
-| # | Story | Points | Status | Notes |
-|---|-------|--------|--------|-------|
-| #XX | Story title | 3 | 🔲 Todo | |
-| #XX | Story title | 5 | 🔄 In Progress | |
-| #XX | Story title | 2 | ✅ Done | PR #XX |
-
-**Total Points:** X
-**Completed:** X/X (XX%)
+| # | Epic | Status | Notes |
+|---|------|--------|-------|
+| #XX | Epic title | 🔲 Todo | |
+| #XX | Epic title | 🔄 In Progress | |
+| #XX | Epic title | ✅ Done | |
 
 ---
 
 ## ✅ Success Criteria
 
-<!-- How do we know the epic is complete? -->
+<!-- How do we know the initiative is complete? -->
 - [ ] Criterion 1
 - [ ] Criterion 2
-- [ ] All stories completed
+- [ ] All epics completed
 
 ---
 
 ## 🚫 Out of Scope
 
-<!-- What this epic explicitly does NOT include -->
+<!-- What this initiative explicitly does NOT include -->
 - Out of scope item 1
-- Out of scope item 2 (separate epic: #XX)
+- Out of scope item 2 (separate initiative: #XX)
 
 ---
 
 ## 🔗 Related
 
-- 📌 Parent Initiative: #XX
 - 📚 Design Doc: [link]
 - 🎨 Figma: [link]

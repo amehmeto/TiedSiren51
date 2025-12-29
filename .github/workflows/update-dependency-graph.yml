@@ -1,0 +1,33 @@
+name: Update Dependency Graph
+
+# DISABLED: Workflow disabled to avoid unnecessary CI runs.
+# To re-enable, uncomment the `issues:` trigger below.
+# For now, run `npm run graph` locally instead.
+
+on:
+  # issues:
+  #   types: [opened, edited, closed, reopened, deleted]
+  workflow_dispatch: # Manual trigger only
+
+jobs:
+  update-graph:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+      issues: read
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Generate dependency graph
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: node scripts/generate-dependency-graph.mjs
+
+      # Disabled: Run `npm run graph` locally instead to avoid git history bloat
+      # - name: Commit and push if changed
+      #   run: bash scripts/commit-graph-update.sh

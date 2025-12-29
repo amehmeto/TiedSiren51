@@ -25,8 +25,8 @@ async function lintWithPath(markdown, filePath) {
 describe('remark-lint-ticket', () => {
   describe('Configuration', () => {
     it('should have valid repos list', () => {
-      expect(VALID_REPOS).toContain('TiedSiren51')
-      expect(VALID_REPOS).toContain('expo-accessibility-service')
+      expect(Object.keys(VALID_REPOS)).toContain('TiedSiren51')
+      expect(Object.keys(VALID_REPOS)).toContain('expo-accessibility-service')
     })
 
     it('should have ios and android labels', () => {

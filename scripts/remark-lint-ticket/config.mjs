@@ -5,13 +5,21 @@
  * This file is the single source of truth for valid repos, labels, etc.
  */
 
-export const VALID_REPOS = [
-  'TiedSiren51',
-  'expo-accessibility-service',
-  'expo-foreground-service',
-  'tied-siren-blocking-overlay',
-  'expo-list-installed-apps',
-]
+// GitHub organization for all repos
+export const GITHUB_ORG = 'amehmeto'
+
+// Valid repos with their GitHub URLs
+// Use 'NEW_REPO: <name>' when the ticket requires creating a new repository (e.g., "NEW_REPO: my-new-repo")
+export const VALID_REPOS = {
+  TiedSiren51: `https://github.com/amehmeto/TiedSiren51`,
+  'expo-accessibility-service': `https://github.com/amehmeto/expo-accessibility-service`,
+  'expo-foreground-service': `https://github.com/amehmeto/expo-foreground-service`,
+  'tied-siren-blocking-overlay': `https://github.com/amehmeto/tied-siren-blocking-overlay`,
+  'expo-list-installed-apps': `https://github.com/amehmeto/expo-list-installed-apps`,
+}
+
+// Special prefix for tickets that require creating a new repo
+export const NEW_REPO_PREFIX = 'NEW_REPO:'
 
 export const VALID_LABELS = [
   'enhancement',
@@ -51,6 +59,12 @@ export const EPIC_SECTIONS = [
   { pattern: /✅\s*Success Criteria/i, name: '✅ Success Criteria' },
 ]
 
+export const INITIATIVE_SECTIONS = [
+  { pattern: /🎯\s*Vision/i, name: '🎯 Vision' },
+  { pattern: /📋\s*Epics/i, name: '📋 Epics' },
+  { pattern: /✅\s*Success Criteria/i, name: '✅ Success Criteria' },
+]
+
 // Section templates for --fix mode
 export const SECTION_TEMPLATES = {
   '📝 Summary': '<!-- One paragraph explaining what this feature does and why it matters -->',
@@ -67,4 +81,7 @@ export const SECTION_TEMPLATES = {
     '| # | Story | Points | Status | Notes |\n|---|-------|--------|--------|-------|\n| #XX | Story title | 3 | 🔲 Todo | |',
   '✅ Success Criteria':
     '- [ ] Criterion 1\n- [ ] Criterion 2\n- [ ] All stories completed',
+  '🎯 Vision': "<!-- One paragraph describing the initiative's strategic objective and why it matters -->",
+  '📋 Epics':
+    '| # | Epic | Status | Notes |\n|---|------|--------|-------|\n| #XX | Epic title | 🔲 Todo | |',
 }
