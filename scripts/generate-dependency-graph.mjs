@@ -164,52 +164,82 @@ function generateInventoryTable(tickets, type) {
   return table
 }
 
+function categorizeTicket(t) {
+  const title = t.title.toLowerCase()
+  const labels = t.metadata?.labels || []
+
+  if (t.type === 'initiative') return 'initiative'
+  if (t.type === 'epic') return 'epic'
+  if (t.type === 'bug') return 'bug'
+  if (labels.includes('auth') || title.includes('auth') || title.includes('sign-in') || title.includes('password')) return 'auth'
+  if (labels.includes('blocking') || title.includes('blocking') || title.includes('siren') || title.includes('tier') || title.includes('lookout')) return 'blocking'
+  return 'other'
+}
+
 function generateMermaidDiagram(tickets) {
   const nodes = []
   const edges = []
+  const styles = []
 
-  // Group by type for subgraphs
-  const groups = groupTicketsByType(tickets)
+  // Color classes
+  styles.push('    classDef initiative fill:#9333ea,stroke:#7c3aed,color:#fff')
+  styles.push('    classDef epic fill:#3b82f6,stroke:#2563eb,color:#fff')
+  styles.push('    classDef auth fill:#22c55e,stroke:#16a34a,color:#fff')
+  styles.push('    classDef blocking fill:#f97316,stroke:#ea580c,color:#fff')
+  styles.push('    classDef bug fill:#ef4444,stroke:#dc2626,color:#fff')
+  styles.push('    classDef other fill:#6b7280,stroke:#4b5563,color:#fff')
 
-  // Generate nodes
-  const addNode = (t, prefix) => {
-    const shortTitle = t.title.length > 30 ? t.title.substring(0, 30) + '...' : t.title
-    nodes.push(`    ${prefix}${t.number}["#${t.number} ${shortTitle}"]`)
-  }
+  // Generate nodes with categories
+  const nodesByCategory = {}
 
-  // Initiatives
-  if (groups.initiative.length > 0) {
-    nodes.push('    subgraph Initiatives')
-    groups.initiative.forEach((t) => addNode(t, 'I'))
-    nodes.push('    end')
-  }
-
-  // Epics
-  if (groups.epic.length > 0) {
-    nodes.push('    subgraph Epics')
-    groups.epic.forEach((t) => addNode(t, 'E'))
-    nodes.push('    end')
-  }
-
-  // Generate edges from depends_on
   for (const t of tickets) {
-    const deps = t.metadata?.depends_on || []
-    for (const dep of deps) {
-      const source = tickets.find((x) => x.number === dep)
-      const target = t
-      if (source && target) {
-        const sourcePrefix = source.type === 'initiative' ? 'I' : source.type === 'epic' ? 'E' : 'F'
-        const targetPrefix = target.type === 'initiative' ? 'I' : target.type === 'epic' ? 'E' : 'F'
-        edges.push(`    ${sourcePrefix}${source.number} --> ${targetPrefix}${target.number}`)
+    const category = categorizeTicket(t)
+    if (!nodesByCategory[category]) nodesByCategory[category] = []
+
+    const shortTitle = t.title
+      .replace(/^\[?\w+\]?\s*/i, '') // Remove [Epic], [Initiative], feat(), fix() prefixes
+      .replace(/^feat\([^)]*\):\s*/i, '')
+      .replace(/^fix\([^)]*\):\s*/i, '')
+    const label = shortTitle.length > 35 ? shortTitle.substring(0, 35) + '...' : shortTitle
+
+    nodesByCategory[category].push({ ticket: t, label })
+  }
+
+  // Add subgraphs by category
+  const categoryLabels = {
+    initiative: '🚀 Initiatives',
+    epic: '🏔️ Epics',
+    auth: '🔐 Authentication',
+    blocking: '🛡️ Blocking',
+    bug: '🐛 Bugs',
+    other: '📦 Other',
+  }
+
+  for (const [category, items] of Object.entries(nodesByCategory)) {
+    if (items.length === 0) continue
+
+    nodes.push(`    subgraph ${categoryLabels[category]}`)
+    for (const { ticket: t, label } of items) {
+      nodes.push(`        T${t.number}["#${t.number} ${label}"]:::${category}`)
+    }
+    nodes.push('    end')
+  }
+
+  // Generate edges
+  for (const t of tickets) {
+    for (const dep of t.metadata?.depends_on || []) {
+      if (tickets.find((x) => x.number === dep)) {
+        edges.push(`    T${dep} --> T${t.number}`)
       }
     }
   }
 
   return `\`\`\`mermaid
 flowchart TD
+${styles.join('\n')}
+
 ${nodes.join('\n')}
 
-    %% Dependencies
 ${edges.join('\n')}
 \`\`\``
 }
