@@ -176,18 +176,65 @@ function categorizeTicket(t) {
   return 'other'
 }
 
+function calculateDepths(tickets) {
+  const depths = new Map()
+  const ticketNums = new Set(tickets.map((t) => t.number))
+
+  // Find roots (no dependencies within our set)
+  const roots = tickets.filter((t) => {
+    const deps = t.metadata?.depends_on || []
+    return !deps.some((d) => ticketNums.has(d))
+  })
+
+  // BFS to assign depths
+  const queue = roots.map((t) => [t.number, 0])
+  while (queue.length > 0) {
+    const [num, depth] = queue.shift()
+    if (depths.has(num) && depths.get(num) >= depth) continue
+    depths.set(num, depth)
+
+    const ticket = tickets.find((t) => t.number === num)
+    const blocks = ticket?.metadata?.blocks || []
+    for (const child of blocks) {
+      if (ticketNums.has(child)) {
+        queue.push([child, depth + 1])
+      }
+    }
+  }
+
+  return depths
+}
+
 function generateMermaidDiagram(tickets) {
   const nodes = []
   const edges = []
   const styles = []
 
-  // Color classes
-  styles.push('    classDef initiative fill:#9333ea,stroke:#7c3aed,color:#fff')
-  styles.push('    classDef epic fill:#3b82f6,stroke:#2563eb,color:#fff')
-  styles.push('    classDef auth fill:#22c55e,stroke:#16a34a,color:#fff')
-  styles.push('    classDef blocking fill:#f97316,stroke:#ea580c,color:#fff')
-  styles.push('    classDef bug fill:#ef4444,stroke:#dc2626,color:#fff')
-  styles.push('    classDef other fill:#6b7280,stroke:#4b5563,color:#fff')
+  // Calculate depths for shading
+  const depths = calculateDepths(tickets)
+  const maxDepth = Math.max(...depths.values(), 0)
+
+  // Base colors per category (HSL format for easy shade variation)
+  const baseColors = {
+    initiative: { h: 270, s: 70, l: 55 }, // purple
+    epic: { h: 217, s: 70, l: 55 },       // blue
+    auth: { h: 142, s: 60, l: 45 },       // green
+    blocking: { h: 25, s: 90, l: 52 },    // orange
+    bug: { h: 0, s: 75, l: 55 },          // red
+    other: { h: 220, s: 10, l: 50 },      // gray
+  }
+
+  // Generate color classes for each category + depth
+  for (const [category, color] of Object.entries(baseColors)) {
+    for (let d = 0; d <= maxDepth; d++) {
+      // Lighten as depth increases
+      const lightness = Math.min(color.l + d * 8, 85)
+      const fill = `hsl(${color.h}, ${color.s}%, ${lightness}%)`
+      const stroke = `hsl(${color.h}, ${color.s}%, ${Math.max(lightness - 15, 20)}%)`
+      const textColor = lightness > 60 ? '#000' : '#fff'
+      styles.push(`    classDef ${category}${d} fill:${fill},stroke:${stroke},color:${textColor}`)
+    }
+  }
 
   // Generate nodes with categories
   const nodesByCategory = {}
@@ -197,14 +244,15 @@ function generateMermaidDiagram(tickets) {
     if (!nodesByCategory[category]) nodesByCategory[category] = []
 
     const shortTitle = t.title
-      .replace(/^\[?\w+\]?\s*/i, '') // Remove [Epic], [Initiative] prefixes
+      .replace(/^\[?\w+\]?\s*/i, '')
       .replace(/^feat\([^)]*\):\s*/i, '')
       .replace(/^fix\([^)]*\):\s*/i, '')
-      .replace(/[[\]()]/g, '') // Remove brackets and parens
-      .replace(/"/g, "'") // Replace quotes
+      .replace(/[[\]()]/g, '')
+      .replace(/"/g, "'")
     const label = shortTitle.length > 30 ? shortTitle.substring(0, 30) + '...' : shortTitle
+    const depth = depths.get(t.number) || 0
 
-    nodesByCategory[category].push({ ticket: t, label })
+    nodesByCategory[category].push({ ticket: t, label, depth })
   }
 
   // Add subgraphs by category
@@ -221,9 +269,10 @@ function generateMermaidDiagram(tickets) {
     if (items.length === 0) continue
 
     nodes.push(`    subgraph ${categoryLabels[category]}`)
-    for (const { ticket: t, label } of items) {
+    nodes.push(`        direction TB`)
+    for (const { ticket: t, label, depth } of items) {
       const safeLabel = label.replace(/"/g, "'")
-      nodes.push(`        T${t.number}["#${t.number} ${safeLabel}"]:::${category}`)
+      nodes.push(`        T${t.number}["#${t.number} ${safeLabel}"]:::${category}${depth}`)
     }
     nodes.push('    end')
   }
@@ -238,7 +287,7 @@ function generateMermaidDiagram(tickets) {
   }
 
   return `\`\`\`mermaid
-flowchart TD
+flowchart LR
 ${styles.join('\n')}
 
 ${nodes.join('\n')}
