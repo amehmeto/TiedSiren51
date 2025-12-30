@@ -93,7 +93,7 @@ export const sirensFixture = () => {
 **2. Usage in Tests**
 
 ```typescript
-import { sirensFixture } from '@core/_tests_/data-builders'
+import { sirensFixture } from '@core/siren/usecases/sirens.fixture'
 
 it('blocks twitter during session', () => {
   const fixture = sirensFixture()
@@ -296,7 +296,7 @@ The fixture pattern follows a strict given/when/then DSL that separates concerns
 
 `given` functions configure the initial state before testing. They should:
 - Set up data in repositories/stores
-- Configure authenticaiton state
+- Configure authentication state
 - Prepare any external dependencies
 
 ```typescript
@@ -406,7 +406,8 @@ This pattern:
 ### Example Test
 
 ```typescript
-import { sirensFixture, blocklistFixture } from '@core/_tests_/data-builders'
+import { sirensFixture } from '@core/siren/usecases/sirens.fixture'
+import { blocklistFixture } from '@core/blocklist/usecases/blocklist.fixture'
 
 describe('Blocklist Management', () => {
   it('adds siren to blocklist', () => {

@@ -66,10 +66,14 @@ Dependencies point inward: UI and Infra depend on Core, but Core never depends o
 - `DatabaseService` - Database initialization
 - `DateProvider` - Time/date operations
 - `ForegroundService` - Android foreground service for background persistence
+- `InstalledAppRepository` - Installed apps data access
+- `Logger` - Logging operations
 - `NotificationService` - Push notifications
+- `RemoteDeviceRepository` - Remote device sync persistence
 - `SirenLookout` - App launch detection
 - `SirensRepository` - Siren data access
 - `SirenTier` - Platform-specific blocking behavior
+- `TimerRepository` - Strict mode timer persistence
 
 **Adapters** (implementations in `/infra`):
 - Production: `FirebaseAuthGateway`, `PrismaBlockSessionRepository`, `AndroidSirenTier`, `AndroidForegroundService`, `RealNotificationService`
