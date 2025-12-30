@@ -1,11 +1,64 @@
 appId: com.tiedsiren.tiedsiren
+# Test: Create a complete block session and verify it appears on home screen
 ---
-- launchApp
-- assertVisible: "Let's make it productive"
-- tapOn: 'LOG IN'
-- assertVisible: 'LOG INTO YOUR ACCOUNT'
-- tapOn: '.*CONTINUE WITH GOOGLE'
-# Navigate to block session
+# First create a blocklist (prerequisite)
+- runFlow: create_blocklist_flow.yaml
+
+# Verify we're still in app after blocklist creation, then navigate to Home tab
+- assertVisible: 'My New Blocklist'
+# Tap Home tab using percentage coordinates (first tab in bottom tab bar)
+# This avoids collision with Android system home button which has same accessibility text
+- tapOn:
+    point: '12%,93%'
+- tapOn:
+    text: 'Dismiss'
+    optional: true
+
+# Create block session
 - tapOn: 'CREATE A BLOCK SESSION'
 - assertVisible: 'Name'
+
+# Enter session name - tap the option text to open modal
+- tapOn: 'Choose a name...'
+- assertVisible: 'SAVE'
+- inputText: 'New Block Session'
+# Wait for React to process input before tapping SAVE
+- extendedWaitUntil:
+    visible: 'New Block Session'
+    timeout: 3000
+- tapOn: 'SAVE'
+
+# Select blocklist - tap to open modal, toggle switch
+- tapOn: 'Select blocklists...'
+- assertVisible: 'My New Blocklist'
+# Tap the switch using its accessibility label
+- tapOn: 'Toggle My New Blocklist'
+- tapOn: 'SAVE'
+
+# Select device - current device should be pre-toggled, just save
+- tapOn: 'Select devices...'
+- tapOn: 'SAVE'
+
+# Select start time - accept default (10:00 from stub dateProvider)
+- tapOn: 'Select start time...'
+- tapOn: 'OK'
+
+# Select end time - scroll to change minutes for a different time
+- tapOn: 'Select end time...'
+# Scroll up on the minutes column of the native time picker (percentage-based for device independence)
+- swipe:
+    start: '63%,50%'
+    end: '63%,35%'
+- tapOn: 'OK'
+
+# Select blocking condition - tapping an option auto-selects and closes modal
+- tapOn: 'Select blocking conditions...'
+- tapOn: 'Time'
+
+# Start the session
 - tapOn: 'START'
+
+# Verify session appears on home screen (wait for navigation to complete)
+- extendedWaitUntil:
+    visible: 'New Block Session'
+    timeout: 5000

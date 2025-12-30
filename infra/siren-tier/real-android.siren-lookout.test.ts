@@ -3,6 +3,7 @@ import type {
   AccessibilityEventSubscription,
 } from '@amehmeto/expo-accessibility-service'
 import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
+import { setBlockedApps } from '@amehmeto/tied-siren-blocking-overlay'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { RealAndroidSirenLookout } from './real-android.siren-lookout'
@@ -21,6 +22,12 @@ vi.mock('@amehmeto/expo-accessibility-service', () => ({
   askPermission: vi.fn(),
   addAccessibilityEventListener: mockAddAccessibilityEventListener,
 }))
+
+vi.mock('@amehmeto/tied-siren-blocking-overlay', () => ({
+  setBlockedApps: vi.fn(),
+}))
+
+const mockSetBlockedApps = vi.mocked(setBlockedApps)
 
 const mockIsEnabled = vi.mocked(AccessibilityService.isEnabled)
 const mockAskPermission = vi.mocked(AccessibilityService.askPermission)
@@ -216,6 +223,59 @@ describe('RealAndroidSirenLookout', () => {
       capturedCallback(event)
 
       expect(listener).not.toHaveBeenCalled()
+    })
+  })
+
+  describe('updateBlockedApps', () => {
+    it('calls setBlockedApps with correct package names', async () => {
+      const packageNames = ['com.facebook.katana', 'com.instagram.android']
+      mockSetBlockedApps.mockResolvedValueOnce(undefined)
+
+      await lookout.updateBlockedApps(packageNames)
+
+      expect(mockSetBlockedApps).toHaveBeenCalledTimes(1)
+      expect(mockSetBlockedApps).toHaveBeenCalledWith(packageNames)
+    })
+
+    it('logs success message with package count', async () => {
+      const packageNames = ['com.facebook.katana', 'com.instagram.android']
+      mockSetBlockedApps.mockResolvedValueOnce(undefined)
+      const expectedLogEntry = {
+        level: 'info',
+        message: 'Blocked apps synced to native: count=2',
+      }
+
+      await lookout.updateBlockedApps(packageNames)
+
+      expect(logger.getLogs()).toContainEqual(expectedLogEntry)
+    })
+
+    it('logs error and rethrows when setBlockedApps fails', async () => {
+      const packageNames = ['com.facebook.katana']
+      const error = new Error('Failed to sync blocked apps')
+      mockSetBlockedApps.mockRejectedValueOnce(error)
+      const expectedLogEntry = {
+        level: 'error',
+        message: `[RealAndroidSirenLookout] Failed to sync blocked apps: ${error}`,
+      }
+
+      const updatePromise = lookout.updateBlockedApps(packageNames)
+
+      await expect(updatePromise).rejects.toThrow('Failed to sync blocked apps')
+      expect(logger.getLogs()).toContainEqual(expectedLogEntry)
+    })
+
+    it('handles empty package list', async () => {
+      mockSetBlockedApps.mockResolvedValueOnce(undefined)
+      const expectedLogEntry = {
+        level: 'info',
+        message: 'Blocked apps synced to native: count=0',
+      }
+
+      await lookout.updateBlockedApps([])
+
+      expect(mockSetBlockedApps).toHaveBeenCalledWith([])
+      expect(logger.getLogs()).toContainEqual(expectedLogEntry)
     })
   })
 })

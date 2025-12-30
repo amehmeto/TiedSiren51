@@ -5,7 +5,6 @@ import { useSelector } from 'react-redux'
 import { AppStore } from '@/core/_redux_/createStore'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { loadUser } from '@/core/auth/usecases/load-user.usecase'
-import { targetSirens } from '@/core/siren/usecases/target-sirens.usecase'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { handleUIError } from '@/ui/utils/handleUIError'
@@ -16,13 +15,13 @@ export function useAppInitialization(store: AppStore) {
 
   const initializeServices = async (appStore: AppStore) => {
     try {
-      const { logger } = dependencies
+      const { logger, sirenTier } = dependencies
       logger.initialize()
       await dependencies.databaseService.initialize()
       await dependencies.notificationService.initialize()
       await dependencies.backgroundTaskService.initialize(appStore)
+      await sirenTier.initializeNativeBlocking()
 
-      await appStore.dispatch(targetSirens())
       await appStore.dispatch(loadUser())
 
       if (Platform.OS === 'android') {

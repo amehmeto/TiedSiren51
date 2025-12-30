@@ -15,6 +15,10 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
 
   shouldThrowOnStop = false
 
+  shouldThrowOnSync = false
+
+  lastSyncedApps: string[] = []
+
   startWatching(): void {
     if (this.shouldThrowOnStart) throw new Error('Start watching failed')
     this.isWatching = true
@@ -39,5 +43,10 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
 
   async askPermission(): Promise<void> {
     this._isEnabled = true
+  }
+
+  async updateBlockedApps(packageNames: string[]): Promise<void> {
+    if (this.shouldThrowOnSync) throw new Error('Sync blocked apps failed')
+    this.lastSyncedApps = packageNames
   }
 }

@@ -5,6 +5,7 @@ export interface DateProvider {
   getNow(): Date
   getNowMs(): number
   getISOStringNow(): ISODateString
+  getHHmmNow(): string
   recoverDate(timeInHHmm: string): Date
   recoverYesterdayDate(startedAt: string): Date
   toHHmm(date: Date): string

@@ -166,13 +166,16 @@ module.exports = {
           if (isTestFile) {
             // Listener tests: on-*.listener.test.ts
             if (!basename.match(/^on-[a-z][a-z0-9-]*\.listener\.test\.ts$/)) {
-              context.report({
-                node,
-                messageId: 'coreListenerTestNaming',
-                data: { filename: basename },
-              })
+              // Allow fixture files in listeners folder
+              if (!basename.includes('.fixture.')) {
+                context.report({
+                  node,
+                  messageId: 'coreListenerTestNaming',
+                  data: { filename: basename },
+                })
+              }
             }
-          } else if (isTs) {
+          } else if (isTs && !basename.includes('.fixture.')) {
             // Listener implementation: on-*.listener.ts
             if (!basename.match(/^on-[a-z][a-z0-9-]*\.listener\.ts$/)) {
               context.report({

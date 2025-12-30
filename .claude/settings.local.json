@@ -6,17 +6,21 @@
       "Bash(./scripts/worktree.sh:*)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(base64:*)",
+      "Bash(bash scripts/lint-workflow-scripts.sh:*)",
       "Bash(cat:*)",
       "Bash(cloc:*)",
       "Bash(diff:*)",
+      "Bash(do:*)",
       "Bash(done)",
       "Bash(eas:*)",
       "Bash(echo:*)",
       "Bash(find:*)",
+      "Bash(for:*)",
       "Bash(gh auth status:*)",
       "Bash(gh browse:*)",
       "Bash(gh issue close:*)",
       "Bash(gh issue comment:*)",
+      "Bash(gh issue create:*)",
       "Bash(gh issue edit:*)",
       "Bash(gh issue list:*)",
       "Bash(gh issue status:*)",
@@ -32,11 +36,13 @@
       "Bash(gh pr review:*)",
       "Bash(gh pr status:*)",
       "Bash(gh pr view:*)",
+      "Bash(gh project field-list:*)",
       "Bash(gh project item-add:*)",
       "Bash(gh project item-list:*)",
       "Bash(gh project list:*)",
       "Bash(gh release list:*)",
       "Bash(gh release view:*)",
+      "Bash(gh repo list:*)",
       "Bash(gh repo view:*)",
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
@@ -60,6 +66,7 @@
       "Bash(git stash:*)",
       "Bash(git worktree:*)",
       "Bash(grep:*)",
+      "Bash(jq:*)",
       "Bash(ls:*)",
       "Bash(mkdir:*)",
       "Bash(npm ci:*)",
@@ -92,6 +99,7 @@
       "Bash(pgrep:*)",
       "Bash(pwd:*)",
       "Bash(shellcheck:*)",
+      "Bash(sort:*)",
       "Bash(type:*)",
       "Bash(wc:*)",
       "Bash(which:*)",
@@ -117,6 +125,9 @@
       "mcp__ide__getDiagnostics"
     ],
     "deny": [
+      "Bash(HUSKY=0:*)",
+      "Bash(HUSKY_SKIP_HOOKS=1:*)",
+      "Bash(HUSKY_SKIP_INSTALL=1:*)",
       "Bash(SKIP_E2E_CHECK=1 git push --force-with-lease:*)",
       "Bash(SKIP_E2E_CHECK=1 git push --force:*)",
       "Bash(SKIP_E2E_CHECK=1 git push -f:*)",
@@ -128,6 +139,7 @@
       "Bash(SKIP_E2E_CHECK=true git push -f:*)",
       "Bash(SKIP_E2E_CHECK=true git push origin main:*)",
       "Bash(SKIP_E2E_CHECK=true git push origin master:*)",
+      "Bash(chmod -x .husky:*)",
       "Bash(curl --data:*)",
       "Bash(curl -X POST:*)",
       "Bash(curl -d:*)",
@@ -138,7 +150,11 @@
       "Bash(git -C:*)",
       "Bash(git am --no-verify:*)",
       "Bash(git cherry-pick --no-verify:*)",
+      "Bash(git commit --amend:*)",
       "Bash(git commit --no-verify:*)",
+      "Bash(git config --global core.hooksPath:*)",
+      "Bash(git config --unset core.hooksPath:*)",
+      "Bash(git config core.hooksPath:*)",
       "Bash(git merge --no-verify:*)",
       "Bash(git push --force-with-lease:*)",
       "Bash(git push --force:*)",
@@ -150,8 +166,12 @@
       "Bash(git rebase:*)",
       "Bash(git reset --hard:*)",
       "Bash(git revert --no-verify:*)",
+      "Bash(mv .husky:*)",
       "Bash(npm publish:*)",
+      "Bash(npm_config_ignore_scripts=true:*)",
       "Bash(printenv:*)",
+      "Bash(rm -rf .husky:*)",
+      "Bash(rm .husky:*)",
       "Bash(scp:*)",
       "Bash(ssh:*)",
       "Bash(sudo:*)",
@@ -197,6 +217,17 @@
           {
             "type": "command",
             "command": "afplay /System/Library/Sounds/Purr.aiff"
+          }
+        ]
+      }
+    ],
+    "PreToolUse": [
+      {
+        "matcher": "Bash(gh issue create:*)|Bash(gh issue edit:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/validate-ticket.sh"
           }
         ]
       }

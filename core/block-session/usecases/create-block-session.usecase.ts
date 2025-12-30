@@ -10,16 +10,8 @@ export const createBlockSession = createAppAsyncThunk(
   'blockSession/createBlockSession',
   async (
     payload: CreateBlockSessionPayload,
-    {
-      extra: {
-        blockSessionRepository,
-        notificationService,
-        dateProvider,
-        backgroundTaskService,
-      },
-    },
+    { extra: { blockSessionRepository, notificationService, dateProvider } },
   ) => {
-    await backgroundTaskService.scheduleTask('target-sirens')
     const now = dateProvider.getNow()
     const startedAt = dateProvider.recoverDate(payload.startedAt)
     const endedAt = dateProvider.recoverDate(payload.endedAt)

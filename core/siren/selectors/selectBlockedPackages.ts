@@ -1,18 +1,23 @@
 import { createSelector } from '@reduxjs/toolkit'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectActiveSessions } from '@/core/block-session/selectors/selectActiveSessions'
-import { AndroidSiren } from '../sirens'
 
-export const selectTargetedApps = createSelector(
+export const selectBlockedPackages = createSelector(
   [
     (state: RootState) => state.blockSession,
     (_state: RootState, dateProvider) => dateProvider,
   ],
-  (blockSessionState, dateProvider): AndroidSiren[] => {
+  (blockSessionState, dateProvider): string[] => {
     const activeSessions = selectActiveSessions(dateProvider, blockSessionState)
+    const packages = new Set<string>()
 
-    return activeSessions.flatMap((blockSession) =>
-      blockSession.blocklists.flatMap((blocklist) => blocklist.sirens.android),
-    )
+    for (const session of activeSessions) {
+      for (const blocklist of session.blocklists) {
+        for (const siren of blocklist.sirens.android)
+          packages.add(siren.packageName)
+      }
+    }
+
+    return Array.from(packages)
   },
 )

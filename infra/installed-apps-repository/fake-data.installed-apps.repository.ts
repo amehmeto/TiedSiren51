@@ -8,13 +8,15 @@ import { YouTubeAppIcon } from '@/assets/base64AppIcon/youTubeAppIcon'
 import { InstalledAppRepository } from '@/core/_ports_/installed-app.repository'
 import { InstalledApp } from '@/core/installed-app/installed-app'
 
+const toDataUri = (base64: string) => `data:image/png;base64,${base64}`
+
 export function buildInstalledApp(
   wantedInstalledApp: Partial<InstalledApp>,
 ): InstalledApp {
   const randomIcon = faker.helpers.arrayElement([
-    AmazonPrimeIcon,
-    TikTokAppIcon,
-    YouTubeAppIcon,
+    toDataUri(AmazonPrimeIcon),
+    toDataUri(TikTokAppIcon),
+    toDataUri(YouTubeAppIcon),
   ])
 
   const randomInstalledApp = {
@@ -41,7 +43,7 @@ export class FakeDataInstalledAppsRepository implements InstalledAppRepository {
         firstInstallTime: 1616161616161,
         lastUpdateTime: 1626262626262,
         appName: 'YouTube',
-        icon: YouTubeAppIcon,
+        icon: toDataUri(YouTubeAppIcon),
         apkDir: '/data/app/youtube-1/base.apk',
         size: 52428800,
       },
@@ -55,7 +57,7 @@ export class FakeDataInstalledAppsRepository implements InstalledAppRepository {
         firstInstallTime: 1616161616161,
         lastUpdateTime: 1626262626262,
         appName: 'Amazon Prime',
-        icon: AmazonPrimeIcon,
+        icon: toDataUri(AmazonPrimeIcon),
         apkDir: '/data/app/amazonprime-1/base.apk',
         size: 52428800,
       },
@@ -69,7 +71,7 @@ export class FakeDataInstalledAppsRepository implements InstalledAppRepository {
         firstInstallTime: 1616161616161,
         lastUpdateTime: 1626262626262,
         appName: 'TikTok',
-        icon: TikTokAppIcon,
+        icon: toDataUri(TikTokAppIcon),
         apkDir: '/data/app/tiktok-1/base.apk',
         size: 52428800,
       },
@@ -83,7 +85,7 @@ export class FakeDataInstalledAppsRepository implements InstalledAppRepository {
         firstInstallTime: 1616161616161,
         lastUpdateTime: 1626262626262,
         appName: 'Facebook',
-        icon: FacebookAppIcon,
+        icon: toDataUri(FacebookAppIcon),
         apkDir: '/data/app/facebook/base.apk',
         size: 52428800,
       },
@@ -97,7 +99,7 @@ export class FakeDataInstalledAppsRepository implements InstalledAppRepository {
         firstInstallTime: 1616161616161,
         lastUpdateTime: 1626262626262,
         appName: 'Instagram',
-        icon: InstagramAppIcon,
+        icon: toDataUri(InstagramAppIcon),
         apkDir: '/data/app/instagram-1/base.apk',
         size: 52428800,
       },
@@ -111,7 +113,7 @@ export class FakeDataInstalledAppsRepository implements InstalledAppRepository {
         firstInstallTime: 1616161616161,
         lastUpdateTime: 1626262626262,
         appName: 'WhatsApp',
-        icon: WhatsAppAppIcon,
+        icon: toDataUri(WhatsAppAppIcon),
         apkDir: '/data/app/whatsApp-1/base.apk',
         size: 52428800,
       },

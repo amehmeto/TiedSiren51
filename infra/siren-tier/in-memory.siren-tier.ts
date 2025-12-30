@@ -1,25 +1,12 @@
 import { Logger } from '@/core/_ports_/logger'
 import { SirenTier } from '@core/_ports_/siren.tier'
-import { Sirens } from '@core/siren/sirens'
 
 export class InMemorySirenTier implements SirenTier {
-  sirens?: Sirens = undefined
-
   blockedApps: string[] = []
 
-  constructor(private readonly logger: Logger) {}
+  isNativeBlockingInitialized = false
 
-  async target(sirens: Sirens): Promise<void> {
-    try {
-      this.logger.info(
-        `Targeted sirens: ${sirens.android.map((app) => app.appName).join(', ')}`,
-      )
-      this.sirens = sirens
-    } catch (error) {
-      this.logger.error(`[InMemorySirenTier] Failed to target sirens: ${error}`)
-      throw error
-    }
-  }
+  constructor(private readonly logger: Logger) {}
 
   async block(packageName: string): Promise<void> {
     try {
@@ -31,5 +18,10 @@ export class InMemorySirenTier implements SirenTier {
       )
       throw error
     }
+  }
+
+  async initializeNativeBlocking(): Promise<void> {
+    this.logger.info('Native blocking initialized (in-memory)')
+    this.isNativeBlockingInitialized = true
   }
 }

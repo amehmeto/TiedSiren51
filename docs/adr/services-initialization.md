@@ -39,8 +39,7 @@ const initializeServices = async (appStore: AppStore) => {
   await notificationService.initialize() // 3. Notifications
   await backgroundTaskService.initialize(appStore) // 4. Background tasks
 
-  await appStore.dispatch(targetSirens()) // 5. Load initial data
-  await appStore.dispatch(loadUser())     // 6. Load user state
+  await appStore.dispatch(loadUser())     // 5. Load user state
 }
 ```
 

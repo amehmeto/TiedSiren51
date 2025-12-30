@@ -9,7 +9,8 @@ export const registerListeners = (
   store: AppStore,
   dependencies: Dependencies,
 ) => {
-  const { authGateway, foregroundService, logger, sirenLookout } = dependencies
+  const { authGateway, dateProvider, foregroundService, logger, sirenLookout } =
+    dependencies
 
   onUserLoggedInListener({
     store,
@@ -33,6 +34,7 @@ export const registerListeners = (
     store,
     sirenLookout,
     foregroundService,
+    dateProvider,
     logger,
   })
 }
