@@ -102,6 +102,52 @@ export const onBlockSessionsChangedListener = ({
 | Gateway Listeners | Port callbacks (`gateway.onEvent()`) | External events (auth, native modules) |
 | Store Listeners | `store.subscribe()` | React to Redux state changes |
 
+### Unified Listeners (Multi-Slice)
+
+Some listeners need to react to changes across multiple Redux slices. For example, blocking state depends on both:
+
+- **blockSession slice**: When sessions start/end
+- **blocklist slice**: When blocklists are edited (apps added/removed)
+
+Rather than having separate listeners for each slice, use a **unified listener** that computes derived state:
+
+```typescript
+// Single listener watching multiple slices
+export function createOnBlockingScheduleChangedListener(
+  sirenTier: SirenTier,
+): AppStartListening {
+  return (startListening) => {
+    let lastScheduleHash: string | null = null
+
+    startListening({
+      predicate: (_, currentState, previousState) =>
+        currentState.blockSession !== previousState.blockSession ||
+        currentState.blocklist !== previousState.blocklist,
+      effect: async (_, listenerApi) => {
+        const state = listenerApi.getState()
+
+        // Selector joins data from both slices
+        const schedule = selectBlockingSchedule(state)
+        const hash = hashSchedule(schedule)
+
+        // Only sync if schedule changed
+        if (hash !== lastScheduleHash) {
+          await sirenTier.setBlockingSchedule(schedule)
+          lastScheduleHash = hash
+        }
+      },
+    })
+  }
+}
+```
+
+**Key principles for unified listeners:**
+
+1. **Selector-based**: Use selectors that join data from multiple slices
+2. **Derived state comparison**: Compare computed results (hash), not raw slice state
+3. **Efficient diffing**: Hash comparison for O(1) change detection
+4. **Single responsibility**: One listener per "concern" (e.g., blocking schedule)
+
 ### Listener Examples
 
 **Authentication Flow (Gateway):**

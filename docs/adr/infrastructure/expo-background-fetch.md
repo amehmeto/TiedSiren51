@@ -4,7 +4,9 @@ Date: 2025-11-23
 
 ## Status
 
-Accepted
+Superseded by [Native Blocking Scheduler](native-blocking-scheduler.md)
+
+**Superseded (2025-12-23)**: Background fetch polling cannot guarantee precise session start/end times. iOS throttles to ~15min intervals which is unacceptable for blocking reliability. Native AlarmManager scheduling provides sub-second precision.
 
 ## Context
 
