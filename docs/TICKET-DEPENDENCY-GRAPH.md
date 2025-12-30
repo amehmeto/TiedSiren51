@@ -3,72 +3,66 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2025-12-29
+> Last updated: 2025-12-30
 
 ## Complete Ticket Inventory
 
 ### Initiatives (6)
-| # | Title | Depends On | Blocks |
-|---|-------|------------|--------|
-| #62 | [Initiative] Launch Android App | - | #63, #64, #65, #66, #67 |
-| #63 | [Initiative] Launch iOS App | #62 | #64 |
-| #64 | [Initiative] Multi device sync | #62, #63 | - |
-| #65 | [Initiative] Launch MacOS desktop App | #62 | - |
-| #66 | [Initiative] Launch Windows desktop App | #62 | - |
-| #67 | [Initiative] Goal based locking/unlocking | #62 | - |
+| # | Title | SP | Depends On | Blocks |
+|---|-------|----:|------------|--------|
+| #62 | [Initiative] Launch Android App | - | - | #63, #64, #65, #66, #67 |
+| #63 | [Initiative] Launch iOS App | - | #62 | #64 |
+| #64 | [Initiative] Multi device sync | - | #62, #63 | - |
+| #65 | [Initiative] Launch MacOS desktop App | - | #62 | - |
+| #66 | [Initiative] Launch Windows desktop App | - | #62 | - |
+| #67 | [Initiative] Goal based locking/unlocking | - | #62 | - |
 
 
 ### Epics (7)
-| # | Title | Depends On | Blocks |
-|---|-------|------------|--------|
-| #54 | [Epic] User Authentification | - | - |
-| #55 | [Epic] Blocking Apps on Android | - | #57, #58, #59, #61 |
-| #57 | [Epic] Strict Mode | #55 | - |
-| #58 | [Epic] Block websites on Android | #55 | #59 |
-| #59 | [Epic] Blocking keywords on Android | #55, #58 | - |
-| #60 | [Epic] Polish design | - | - |
-| #61 | [Epic] Schedule recurring block sessions | #55 | - |
+| # | Title | SP | Depends On | Blocks |
+|---|-------|----:|------------|--------|
+| #54 | [Epic] User Authentification | 🔴 21 | - | - |
+| #55 | [Epic] Blocking Apps on Android | 🔴 13 | - | #57, #58, #59, #61 |
+| #57 | [Epic] Strict Mode | 🔴 8 | #55 | - |
+| #58 | [Epic] Block websites on Android | - | #55 | #59 |
+| #59 | [Epic] Blocking keywords on Android | - | #55, #58 | - |
+| #60 | [Epic] Polish design | - | - | - |
+| #61 | [Epic] Schedule recurring block sessions | - | #55 | - |
 
 
 ### Features - Authentication (12)
-| # | Title | Depends On | Blocks |
-|---|-------|------------|--------|
-| #88 | Implement Apple Sign-In with Firebase | - | - |
-| #89 | Add Authentication Error Handling | - | - |
-| #160 | feat(auth): custom in-app password reset confirmation flow | - | #166 |
-| #161 | feat(auth): implement email verification flow | - | - |
-| #162 | feat(auth): change password when logged in | #164 | - |
-| #163 | feat(auth): account deletion (GDPR compliance) | #164 | - |
-| #164 | feat(auth): re-authentication for sensitive operations | - | #162, #163 |
-| #165 | feat(auth): resend password reset email | - | - |
-| #166 | feat(auth): invalidate sessions after password reset | #160 | - |
-| #167 | feat(auth): brute force protection on login | - | - |
-| #168 | feat(auth): security notification emails | - | - |
-| #169 | feat(auth): deep link to email app after signup | - | - |
-
-
-### Features - Other (1)
-| # | Title | Depends On | Blocks |
-|---|-------|------------|--------|
-| #96 | Setup Phase - Guided Permission Setup - 3sp | - | - |
+| # | Title | SP | Depends On | Blocks |
+|---|-------|----:|------------|--------|
+| #88 | Implement Apple Sign-In with Firebase | 🟢 3 | - | - |
+| #89 | Add Authentication Error Handling | 🟢 3 | - | - |
+| #160 | feat(auth): custom in-app password reset confirmation flow | 🟠 5 | - | #166 |
+| #161 | feat(auth): implement email verification flow | 🟢 3 | - | - |
+| #162 | feat(auth): change password when logged in | 🟢 2 | #164 | - |
+| #163 | feat(auth): account deletion (GDPR compliance) | 🟠 5 | #164 | - |
+| #164 | feat(auth): re-authentication for sensitive operations | 🟢 2 | - | #162, #163 |
+| #165 | feat(auth): resend password reset email | 🔵 1 | - | - |
+| #166 | feat(auth): invalidate sessions after password reset | 🟢 3 | #160 | - |
+| #167 | feat(auth): brute force protection on login | 🟢 2 | - | - |
+| #168 | feat(auth): security notification emails | 🟢 3 | - | - |
+| #169 | feat(auth): deep link to email app after signup | 🟢 2 | - | - |
 
 
 ### Features - Blocking Architecture (13)
-| # | Title | Depends On | Blocks |
-|---|-------|------------|--------|
-| #170 | fix(android): Blocking overlay never triggers - JS bridge architecture mismatch | - | - |
-| #171 | feat(expo-accessibility-service): Add multiple listeners support | - | #173 |
-| #172 | feat(expo-foreground-service): Add callback system via reflection | - | #173 |
-| #173 | feat(tied-siren-blocking-overlay): Add BlockingCallback and SharedPreferences support | #171, #172 | - |
-| #177 | Refactor SirenTier port to support sub-dependencies injection | - | #180, #181, #182, #183 |
-| #178 | Refactor SirenLookout port to support sub-dependencies injection | - | #181, #183 |
-| #179 | Create selectBlockingSchedule selector with fresh blocklist join | - | #180 |
-| #180 | Create unified listener for blockSession and blocklist state changes | #177, #179 | #185 |
-| #181 | Create Noop implementations for future tiers and lookouts | #177, #178 | - |
-| #182 | Update AndroidSirenTier to call setBlockingSchedule | #177 | #183, #184, #185 |
-| #183 | Update dependency injection with new architecture | #177, #178, #182 | - |
-| #184 | Deprecate JS detection path (blockLaunchedApp usecase) | #182 | #185 |
-| #185 | Remove legacy updateBlockedApps calls and related code | #180, #182, #184 | - |
+| # | Title | SP | Depends On | Blocks |
+|---|-------|----:|------------|--------|
+| #170 | fix(android): Blocking overlay never triggers - JS bridge architecture mismatch | 🔴 8 | - | - |
+| #171 | feat(expo-accessibility-service): Add multiple listeners support | 🟢 3 | - | #173 |
+| #172 | feat(expo-foreground-service): Add callback system via reflection | 🟢 3 | - | #173 |
+| #173 | feat(tied-siren-blocking-overlay): Add BlockingCallback and SharedPreferences support | 🟠 5 | #171, #172 | - |
+| #177 | Refactor SirenTier port to support sub-dependencies injection | 🟢 3 | - | #180, #181, #182, #183 |
+| #178 | Refactor SirenLookout port to support sub-dependencies injection | 🟢 2 | - | #181, #183 |
+| #179 | Create selectBlockingSchedule selector with fresh blocklist join | 🟠 5 | - | #180 |
+| #180 | Create unified listener for blockSession and blocklist state changes | 🟠 5 | #177, #179 | #185 |
+| #181 | Create Noop implementations for future tiers and lookouts | 🟢 2 | #177, #178 | - |
+| #182 | Update AndroidSirenTier to call setBlockingSchedule | 🟢 3 | #177 | #183, #184, #185 |
+| #183 | Update dependency injection with new architecture | 🟢 2 | #177, #178, #182 | - |
+| #184 | Deprecate JS detection path (blockLaunchedApp usecase) | 🟢 3 | #182 | #185 |
+| #185 | Remove legacy updateBlockedApps calls and related code | 🟢 2 | #180, #182, #184 | - |
 
 
 ---
@@ -117,44 +111,40 @@ flowchart LR
         T60["#60 Polish design"]:::epic0
         T59["#59 Blocking keywords on Android"]:::epic2
         T58["#58 Block websites on Android"]:::epic1
-        T57["#57 Strict Mode"]:::epic1
-        T55["#55 Blocking Apps on Android"]:::epic0
-        T54["#54 User Authentification"]:::epic0
+        T57["#57 Strict Mode <span style='color:#ef4444'>8pts</span>"]:::epic1
+        T55["#55 Blocking Apps on Android <span style='color:#ef4444'>13pts</span>"]:::epic0
+        T54["#54 User Authentification <span style='color:#ef4444'>21pts</span>"]:::epic0
     end
     subgraph Blocking
         direction TB
-        T185["#185 legacy updateBlockedApps calls..."]:::blocking3
-        T184["#184 JS detection path blockLaunche..."]:::blocking2
-        T183["#183 dependency injection with new ..."]:::blocking2
-        T182["#182 AndroidSirenTier to call setBl..."]:::blocking1
-        T181["#181 Noop implementations for futur..."]:::blocking1
-        T180["#180 unified listener for blockSess..."]:::blocking1
-        T179["#179 selectBlockingSchedule selecto..."]:::blocking0
-        T178["#178 SirenLookout port to support s..."]:::blocking0
-        T177["#177 SirenTier port to support sub-..."]:::blocking0
-        T173["#173 tied-siren-blocking-overlay: A..."]:::blocking1
-        T172["#172 expo-foreground-service: Add c..."]:::blocking0
-        T171["#171 expo-accessibility-service: Ad..."]:::blocking0
-        T170["#170 android: Blocking overlay neve..."]:::blocking0
+        T185["#185 legacy updateBlockedApps calls... <span style='color:#22c55e'>2pts</span>"]:::blocking3
+        T184["#184 JS detection path blockLaunche... <span style='color:#22c55e'>3pts</span>"]:::blocking2
+        T183["#183 dependency injection with new ... <span style='color:#22c55e'>2pts</span>"]:::blocking2
+        T182["#182 AndroidSirenTier to call setBl... <span style='color:#22c55e'>3pts</span>"]:::blocking1
+        T181["#181 Noop implementations for futur... <span style='color:#22c55e'>2pts</span>"]:::blocking1
+        T180["#180 unified listener for blockSess... <span style='color:#f97316'>5pts</span>"]:::blocking1
+        T179["#179 selectBlockingSchedule selecto... <span style='color:#f97316'>5pts</span>"]:::blocking0
+        T178["#178 SirenLookout port to support s... <span style='color:#22c55e'>2pts</span>"]:::blocking0
+        T177["#177 SirenTier port to support sub-... <span style='color:#22c55e'>3pts</span>"]:::blocking0
+        T173["#173 tied-siren-blocking-overlay: A... <span style='color:#f97316'>5pts</span>"]:::blocking1
+        T172["#172 expo-foreground-service: Add c... <span style='color:#22c55e'>3pts</span>"]:::blocking0
+        T171["#171 expo-accessibility-service: Ad... <span style='color:#22c55e'>3pts</span>"]:::blocking0
+        T170["#170 android: Blocking overlay neve... <span style='color:#ef4444'>8pts</span>"]:::blocking0
     end
     subgraph Authentication
         direction TB
-        T169["#169 auth: deep link to email app a..."]:::auth0
-        T168["#168 auth: security notification em..."]:::auth0
-        T167["#167 auth: brute force protection o..."]:::auth0
-        T166["#166 auth: invalidate sessions afte..."]:::auth1
-        T165["#165 auth: resend password reset em..."]:::auth0
-        T164["#164 auth: re-authentication for se..."]:::auth0
-        T163["#163 auth: account deletion GDPR co..."]:::auth1
-        T162["#162 auth: change password when log..."]:::auth1
-        T161["#161 auth: implement email verifica..."]:::auth0
-        T160["#160 auth: custom in-app password r..."]:::auth0
-        T89["#89 Authentication Error Handling"]:::auth0
-        T88["#88 Apple Sign-In with Firebase"]:::auth0
-    end
-    subgraph Other
-        direction TB
-        T96["#96 Phase - Guided Permission Setu..."]:::other0
+        T169["#169 auth: deep link to email app a... <span style='color:#22c55e'>2pts</span>"]:::auth0
+        T168["#168 auth: security notification em... <span style='color:#22c55e'>3pts</span>"]:::auth0
+        T167["#167 auth: brute force protection o... <span style='color:#22c55e'>2pts</span>"]:::auth0
+        T166["#166 auth: invalidate sessions afte... <span style='color:#22c55e'>3pts</span>"]:::auth1
+        T165["#165 auth: resend password reset em... <span style='color:#3b82f6'>1pt</span>"]:::auth0
+        T164["#164 auth: re-authentication for se... <span style='color:#22c55e'>2pts</span>"]:::auth0
+        T163["#163 auth: account deletion GDPR co... <span style='color:#f97316'>5pts</span>"]:::auth1
+        T162["#162 auth: change password when log... <span style='color:#22c55e'>2pts</span>"]:::auth1
+        T161["#161 auth: implement email verifica... <span style='color:#22c55e'>3pts</span>"]:::auth0
+        T160["#160 auth: custom in-app password r... <span style='color:#f97316'>5pts</span>"]:::auth0
+        T89["#89 Authentication Error Handling <span style='color:#22c55e'>3pts</span>"]:::auth0
+        T88["#88 Apple Sign-In with Firebase <span style='color:#22c55e'>3pts</span>"]:::auth0
     end
 
     T180 --> T185
@@ -192,18 +182,18 @@ flowchart LR
 
 ```mermaid
 flowchart TD
-    F88["#88 Implement Apple Sign-In w..."]
-    F89["#89 Add Authentication Error ..."]
-    F160["#160 feat(auth): custom in-app..."]
-    F161["#161 feat(auth): implement ema..."]
-    F162["#162 feat(auth): change passwo..."]
-    F163["#163 feat(auth): account delet..."]
-    F164["#164 feat(auth): re-authentica..."]
-    F165["#165 feat(auth): resend passwo..."]
-    F166["#166 feat(auth): invalidate se..."]
-    F167["#167 feat(auth): brute force p..."]
-    F168["#168 feat(auth): security noti..."]
-    F169["#169 feat(auth): deep link to ..."]
+    F88["#88 Implement Apple Sign-In w... <span style='color:#22c55e'>3pts</span>"]
+    F89["#89 Add Authentication Error ... <span style='color:#22c55e'>3pts</span>"]
+    F160["#160 feat(auth): custom in-app... <span style='color:#f97316'>5pts</span>"]
+    F161["#161 feat(auth): implement ema... <span style='color:#22c55e'>3pts</span>"]
+    F162["#162 feat(auth): change passwo... <span style='color:#22c55e'>2pts</span>"]
+    F163["#163 feat(auth): account delet... <span style='color:#f97316'>5pts</span>"]
+    F164["#164 feat(auth): re-authentica... <span style='color:#22c55e'>2pts</span>"]
+    F165["#165 feat(auth): resend passwo... <span style='color:#3b82f6'>1pt</span>"]
+    F166["#166 feat(auth): invalidate se... <span style='color:#22c55e'>3pts</span>"]
+    F167["#167 feat(auth): brute force p... <span style='color:#22c55e'>2pts</span>"]
+    F168["#168 feat(auth): security noti... <span style='color:#22c55e'>3pts</span>"]
+    F169["#169 feat(auth): deep link to ... <span style='color:#22c55e'>2pts</span>"]
 
     F164 --> F162
     F164 --> F163
@@ -215,19 +205,19 @@ flowchart TD
 
 ```mermaid
 flowchart TD
-    F170["#170 fix(android): Blocking ov..."]
-    F171["#171 feat(expo-accessibility-s..."]
-    F172["#172 feat(expo-foreground-serv..."]
-    F173["#173 feat(tied-siren-blocking-..."]
-    F177["#177 Refactor SirenTier port t..."]
-    F178["#178 Refactor SirenLookout por..."]
-    F179["#179 Create selectBlockingSche..."]
-    F180["#180 Create unified listener f..."]
-    F181["#181 Create Noop implementatio..."]
-    F182["#182 Update AndroidSirenTier t..."]
-    F183["#183 Update dependency injecti..."]
-    F184["#184 Deprecate JS detection pa..."]
-    F185["#185 Remove legacy updateBlock..."]
+    F170["#170 fix(android): Blocking ov... <span style='color:#ef4444'>8pts</span>"]
+    F171["#171 feat(expo-accessibility-s... <span style='color:#22c55e'>3pts</span>"]
+    F172["#172 feat(expo-foreground-serv... <span style='color:#22c55e'>3pts</span>"]
+    F173["#173 feat(tied-siren-blocking-... <span style='color:#f97316'>5pts</span>"]
+    F177["#177 Refactor SirenTier port t... <span style='color:#22c55e'>3pts</span>"]
+    F178["#178 Refactor SirenLookout por... <span style='color:#22c55e'>2pts</span>"]
+    F179["#179 Create selectBlockingSche... <span style='color:#f97316'>5pts</span>"]
+    F180["#180 Create unified listener f... <span style='color:#f97316'>5pts</span>"]
+    F181["#181 Create Noop implementatio... <span style='color:#22c55e'>2pts</span>"]
+    F182["#182 Update AndroidSirenTier t... <span style='color:#22c55e'>3pts</span>"]
+    F183["#183 Update dependency injecti... <span style='color:#22c55e'>2pts</span>"]
+    F184["#184 Deprecate JS detection pa... <span style='color:#22c55e'>3pts</span>"]
+    F185["#185 Remove legacy updateBlock... <span style='color:#22c55e'>2pts</span>"]
 
     F171 --> F173
     F172 --> F173
@@ -291,6 +281,15 @@ Quick reference showing what blocks what:
 - **Features (F)**: Individual stories/tasks
 - **Subgraphs**: Logical groupings
 
+### Story Points
+
+| Points | Color |
+|-------:|-------|
+| 1 | 🔵 Blue |
+| 2-3 | 🟢 Green |
+| 5 | 🟠 Orange |
+| 8+ | 🔴 Red |
+
 ---
 
-*Auto-generated on 2025-12-29 from GitHub issue metadata*
+*Auto-generated on 2025-12-30 from GitHub issue metadata*
