@@ -241,7 +241,7 @@ export interface BlockSessionRepository {
 - [Hexagonal Architecture](../hexagonal-architecture.md)
 - [Port Naming Convention](port-naming-convention.md) - No I-prefix for port interfaces
 - [Dependency Injection Pattern](dependency-injection-pattern.md)
-- [Prisma ORM with SQLite](../data-persistence/prisma-orm-sqlite.md)
+- [Prisma ORM with SQLite](../infrastructure/prisma-orm-sqlite.md)
 
 ## References
 

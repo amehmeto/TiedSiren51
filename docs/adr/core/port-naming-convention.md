@@ -244,15 +244,20 @@ No migration needed - this ADR documents the **actual current convention** used 
 
 Current ports following this convention:
 - `AuthGateway` - Authentication operations
+- `BackgroundTaskService` - Background task scheduling
 - `BlockSessionRepository` - Block session persistence
 - `BlocklistRepository` - Blocklist persistence
-- `SirensRepository` - Siren data access
-- `SirenTier` - Platform-specific blocking behavior
-- `SirenLookout` - App launch detection
-- `NotificationService` - Push notifications
 - `DatabaseService` - Database initialization
 - `DateProvider` - Time/date operations
-- `BackgroundTaskService` - Background task scheduling
+- `ForegroundService` - Android foreground service for background persistence
+- `InstalledAppRepository` - Installed apps data access
+- `Logger` - Logging operations
+- `NotificationService` - Push notifications
+- `RemoteDeviceRepository` - Remote device sync persistence
+- `SirenLookout` - App launch detection
+- `SirensRepository` - Siren data access
+- `SirenTier` - Platform-specific blocking behavior
+- `TimerRepository` - Strict mode timer persistence
 
 ### Related ADRs
 
