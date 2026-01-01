@@ -186,7 +186,13 @@ describe('RealAndroidSirenLookout', () => {
         mockAddAccessibilityEventListener.mock.calls[0][0]
       capturedCallback(event)
 
-      expect(listener).toHaveBeenCalledWith(packageName)
+      expect(listener).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: 'app',
+          identifier: packageName,
+          timestamp: expect.any(Number),
+        }),
+      )
     })
 
     it('logs warning when overwriting existing listener', () => {
@@ -195,7 +201,7 @@ describe('RealAndroidSirenLookout', () => {
       const expectedLogEntry = {
         level: 'warn',
         message:
-          '[RealAndroidSirenLookout] Overwriting existing siren detection listener. Previous listener will be discarded.',
+          '[RealAndroidSirenLookout] Overwriting existing siren detection callback. Previous callback will be discarded.',
       }
 
       lookout.onSirenDetected(listener1)

@@ -2,10 +2,7 @@ import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import type { AccessibilityEventSubscription } from '@amehmeto/expo-accessibility-service'
 import { setBlockedApps } from '@amehmeto/tied-siren-blocking-overlay'
 import { Logger } from '@/core/_ports_/logger'
-import {
-  AndroidSirenLookout,
-  DetectedSiren,
-} from '@core/_ports_/siren.lookout'
+import { AndroidSirenLookout, DetectedSiren } from '@core/_ports_/siren.lookout'
 
 export class RealAndroidSirenLookout implements AndroidSirenLookout {
   private callback?: (siren: DetectedSiren) => void
@@ -15,9 +12,16 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
   constructor(private readonly logger: Logger) {}
 
   async initialize(): Promise<void> {
-    this.logger.info('[RealAndroidSirenLookout] Initialized')
-    // Actual initialization happens in startWatching for backwards compatibility
-    // In the future, this will set up the native listeners via reflection
+    try {
+      this.logger.info('[RealAndroidSirenLookout] Initialized')
+      // Actual initialization happens in startWatching for backwards compatibility
+      // In the future, this will set up the native listeners via reflection
+    } catch (error) {
+      this.logger.error(
+        `[RealAndroidSirenLookout] Failed to initialize: ${error}`,
+      )
+      throw error
+    }
   }
 
   onSirenDetected(callback: (siren: DetectedSiren) => void): void {

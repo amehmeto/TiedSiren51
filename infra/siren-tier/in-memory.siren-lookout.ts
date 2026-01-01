@@ -1,7 +1,4 @@
-import {
-  AndroidSirenLookout,
-  DetectedSiren,
-} from '@core/_ports_/siren.lookout'
+import { AndroidSirenLookout, DetectedSiren } from '@core/_ports_/siren.lookout'
 
 /**
  * In-memory implementation of SirenLookout for testing purposes.

@@ -16,9 +16,8 @@ export const onSirenDetectedListener = ({
     try {
       // Currently only handling app type sirens
       // Website and keyword detection will be added in future tickets
-      if (siren.type === 'app') {
+      if (siren.type === 'app')
         store.dispatch(blockLaunchedApp({ packageName: siren.identifier }))
-      }
     } catch (error) {
       logger.error(`Error in onSirenDetected listener: ${error}`)
     }

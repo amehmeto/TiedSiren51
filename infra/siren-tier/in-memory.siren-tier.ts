@@ -1,8 +1,5 @@
 import { Logger } from '@/core/_ports_/logger'
-import {
-  BlockingSchedule,
-  SirenTier,
-} from '@core/_ports_/siren.tier'
+import { BlockingSchedule, SirenTier } from '@core/_ports_/siren.tier'
 
 export class InMemorySirenTier implements SirenTier {
   blockedApps: string[] = []
