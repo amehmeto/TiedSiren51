@@ -2,35 +2,46 @@ import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import type { AccessibilityEventSubscription } from '@amehmeto/expo-accessibility-service'
 import { setBlockedApps } from '@amehmeto/tied-siren-blocking-overlay'
 import { Logger } from '@/core/_ports_/logger'
-import { AndroidSirenLookout } from '@core/_ports_/siren.lookout'
+import {
+  AndroidSirenLookout,
+  DetectedSiren,
+} from '@core/_ports_/siren.lookout'
 
 export class RealAndroidSirenLookout implements AndroidSirenLookout {
-  private listener?: (packageName: string) => void
+  private callback?: (siren: DetectedSiren) => void
 
   private subscription?: AccessibilityEventSubscription
 
   constructor(private readonly logger: Logger) {}
 
+  async initialize(): Promise<void> {
+    this.logger.info('[RealAndroidSirenLookout] Initialized')
+    // Actual initialization happens in startWatching for backwards compatibility
+    // In the future, this will set up the native listeners via reflection
+  }
+
+  onSirenDetected(callback: (siren: DetectedSiren) => void): void {
+    if (this.callback) {
+      this.logger.warn(
+        '[RealAndroidSirenLookout] Overwriting existing siren detection callback. Previous callback will be discarded.',
+      )
+    }
+    this.callback = callback
+  }
+
+  /** @deprecated Use initialize for setup. Will be removed in native-to-native blocking migration. */
   startWatching(): void {
     // Start subscription if not already active
     if (!this.subscription) this.startAccessibilitySubscription()
   }
 
+  /** @deprecated Will be removed in native-to-native blocking migration. */
   stopWatching(): void {
     if (this.subscription) {
       this.subscription.remove()
       this.subscription = undefined
       this.logger.info('Stopped watching for sirens')
     }
-  }
-
-  onSirenDetected(listener: (packageName: string) => void): void {
-    if (this.listener) {
-      this.logger.warn(
-        '[RealAndroidSirenLookout] Overwriting existing siren detection listener. Previous listener will be discarded.',
-      )
-    }
-    this.listener = listener
   }
 
   async isEnabled(): Promise<boolean> {
@@ -55,6 +66,7 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     }
   }
 
+  /** @deprecated Will be removed in native-to-native blocking migration. */
   async updateBlockedApps(packageNames: string[]): Promise<void> {
     try {
       await setBlockedApps(packageNames)
@@ -78,9 +90,14 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
 
           this.logger.info(`Detected app launch: ${packageName}`)
 
-          // Notify the listener regardless of whether it's a siren
-          // The business logic (blockLaunchedApp usecase) will decide if blocking is needed
-          if (this.listener) this.listener(packageName)
+          // Notify the callback with DetectedSiren format
+          if (this.callback) {
+            this.callback({
+              type: 'app',
+              identifier: packageName,
+              timestamp: Date.now(),
+            })
+          }
         },
       )
 

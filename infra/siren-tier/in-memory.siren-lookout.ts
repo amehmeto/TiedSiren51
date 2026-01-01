@@ -1,11 +1,14 @@
-import { AndroidSirenLookout } from '@core/_ports_/siren.lookout'
+import {
+  AndroidSirenLookout,
+  DetectedSiren,
+} from '@core/_ports_/siren.lookout'
 
 /**
  * In-memory implementation of SirenLookout for testing purposes.
  * Does not connect to the real AccessibilityService.
  */
 export class InMemorySirenLookout implements AndroidSirenLookout {
-  private listener?: (packageName: string) => void
+  private callback?: (siren: DetectedSiren) => void
 
   _isEnabled = true
 
@@ -19,22 +22,34 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
 
   lastSyncedApps: string[] = []
 
+  async initialize(): Promise<void> {
+    // No-op for in-memory implementation
+  }
+
+  onSirenDetected(callback: (siren: DetectedSiren) => void): void {
+    this.callback = callback
+  }
+
+  /** @deprecated Use initialize for setup. Will be removed in native-to-native blocking migration. */
   startWatching(): void {
     if (this.shouldThrowOnStart) throw new Error('Start watching failed')
     this.isWatching = true
   }
 
+  /** @deprecated Will be removed in native-to-native blocking migration. */
   stopWatching(): void {
     if (this.shouldThrowOnStop) throw new Error('Stop watching failed')
     this.isWatching = false
   }
 
-  onSirenDetected(listener: (packageName: string) => void): void {
-    this.listener = listener
-  }
-
   simulateDetection(packageName: string): void {
-    if (this.listener) this.listener(packageName)
+    if (this.callback) {
+      this.callback({
+        type: 'app',
+        identifier: packageName,
+        timestamp: Date.now(),
+      })
+    }
   }
 
   async isEnabled(): Promise<boolean> {
@@ -45,6 +60,7 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
     this._isEnabled = true
   }
 
+  /** @deprecated Will be removed in native-to-native blocking migration. */
   async updateBlockedApps(packageNames: string[]): Promise<void> {
     if (this.shouldThrowOnSync) throw new Error('Sync blocked apps failed')
     this.lastSyncedApps = packageNames

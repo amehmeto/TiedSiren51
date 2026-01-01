@@ -1,7 +1,17 @@
+export interface DetectedSiren {
+  type: 'app' | 'website' | 'keyword'
+  identifier: string
+  timestamp: number
+}
+
 export interface SirenLookout {
+  initialize(): Promise<void>
+  onSirenDetected(callback: (siren: DetectedSiren) => void): void
+  /** @deprecated Use initialize for setup. Will be removed in native-to-native blocking migration. */
   startWatching(): void
+  /** @deprecated Will be removed in native-to-native blocking migration. */
   stopWatching(): void
-  onSirenDetected(listener: (packageName: string) => void): void
+  /** @deprecated Will be removed in native-to-native blocking migration. */
   updateBlockedApps(packageNames: string[]): Promise<void>
 }
 
