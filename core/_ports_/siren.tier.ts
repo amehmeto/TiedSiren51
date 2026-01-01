@@ -15,7 +15,5 @@ export type BlockingSchedule = BlockingWindow[]
 
 export interface SirenTier {
   initializeNativeBlocking(): Promise<void>
-  setBlockingSchedule(schedule: BlockingSchedule): Promise<void>
-  /** @deprecated Use setBlockingSchedule instead. Will be removed in native-to-native blocking migration. */
   block(packageName: string): Promise<void>
 }

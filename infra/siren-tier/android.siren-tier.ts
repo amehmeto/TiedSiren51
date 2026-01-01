@@ -4,7 +4,7 @@ import {
   showOverlay,
 } from '@amehmeto/tied-siren-blocking-overlay'
 import { Logger } from '@/core/_ports_/logger'
-import { BlockingSchedule, SirenTier } from '@core/_ports_/siren.tier'
+import { SirenTier } from '@core/_ports_/siren.tier'
 
 export class AndroidSirenTier implements SirenTier {
   constructor(private readonly logger: Logger) {}
@@ -21,28 +21,6 @@ export class AndroidSirenTier implements SirenTier {
     }
   }
 
-  async setBlockingSchedule(schedule: BlockingSchedule): Promise<void> {
-    try {
-      this.logger.info(
-        `[AndroidSirenTier] Received blocking schedule with ${schedule.length} windows`,
-      )
-      // TODO: Implement native scheduling via AlarmManager and SharedPreferences
-      // This will be implemented in issue #182
-      // For now, log the schedule for debugging
-      schedule.forEach((window) => {
-        this.logger.info(
-          `  Window ${window.id}: ${window.startTime}-${window.endTime}, apps: ${window.sirens.apps.length}, websites: ${window.sirens.websites.length}, keywords: ${window.sirens.keywords.length}`,
-        )
-      })
-    } catch (error) {
-      this.logger.error(
-        `[AndroidSirenTier] Failed to set blocking schedule: ${error}`,
-      )
-      throw error
-    }
-  }
-
-  /** @deprecated Use setBlockingSchedule instead. Will be removed in native-to-native blocking migration. */
   async block(packageName: string): Promise<void> {
     try {
       await showOverlay(packageName)

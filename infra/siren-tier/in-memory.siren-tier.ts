@@ -1,10 +1,8 @@
 import { Logger } from '@/core/_ports_/logger'
-import { BlockingSchedule, SirenTier } from '@core/_ports_/siren.tier'
+import { SirenTier } from '@core/_ports_/siren.tier'
 
 export class InMemorySirenTier implements SirenTier {
   blockedApps: string[] = []
-
-  blockingSchedule: BlockingSchedule | null = null
 
   isNativeBlockingInitialized = false
 
@@ -15,14 +13,6 @@ export class InMemorySirenTier implements SirenTier {
     this.isNativeBlockingInitialized = true
   }
 
-  async setBlockingSchedule(schedule: BlockingSchedule): Promise<void> {
-    this.logger.info(
-      `[InMemorySirenTier] Set blocking schedule with ${schedule.length} windows`,
-    )
-    this.blockingSchedule = schedule
-  }
-
-  /** @deprecated Use setBlockingSchedule instead. Will be removed in native-to-native blocking migration. */
   async block(packageName: string): Promise<void> {
     try {
       this.logger.info(`Blocking app: ${packageName}`)
