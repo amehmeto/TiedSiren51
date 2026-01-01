@@ -1,6 +1,6 @@
 import { ISODateString } from './date-provider'
 
-export interface BlockingWindow {
+export type BlockingWindow = {
   id: string
   startTime: ISODateString
   endTime: ISODateString
@@ -11,9 +11,7 @@ export interface BlockingWindow {
   }
 }
 
-export interface BlockingSchedule {
-  windows: BlockingWindow[]
-}
+export type BlockingSchedule = BlockingWindow[]
 
 export interface SirenTier {
   initializeNativeBlocking(): Promise<void>

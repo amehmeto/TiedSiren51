@@ -24,12 +24,12 @@ export class AndroidSirenTier implements SirenTier {
   async setBlockingSchedule(schedule: BlockingSchedule): Promise<void> {
     try {
       this.logger.info(
-        `[AndroidSirenTier] Received blocking schedule with ${schedule.windows.length} windows`,
+        `[AndroidSirenTier] Received blocking schedule with ${schedule.length} windows`,
       )
       // TODO: Implement native scheduling via AlarmManager and SharedPreferences
       // This will be implemented in issue #182
       // For now, log the schedule for debugging
-      schedule.windows.forEach((window) => {
+      schedule.forEach((window) => {
         this.logger.info(
           `  Window ${window.id}: ${window.startTime}-${window.endTime}, apps: ${window.sirens.apps.length}, websites: ${window.sirens.websites.length}, keywords: ${window.sirens.keywords.length}`,
         )

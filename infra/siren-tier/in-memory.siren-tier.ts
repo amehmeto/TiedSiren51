@@ -17,7 +17,7 @@ export class InMemorySirenTier implements SirenTier {
 
   async setBlockingSchedule(schedule: BlockingSchedule): Promise<void> {
     this.logger.info(
-      `[InMemorySirenTier] Set blocking schedule with ${schedule.windows.length} windows`,
+      `[InMemorySirenTier] Set blocking schedule with ${schedule.length} windows`,
     )
     this.blockingSchedule = schedule
   }
