@@ -166,21 +166,33 @@ function groupFeaturesByCategory(features) {
   return categories
 }
 
+function formatStoryPointsMarkdown(points) {
+  if (!points) return '-'
+  const colorMap = {
+    1: '🔵', // blue
+    2: '🟢', // green
+    3: '🟢', // green
+    5: '🟠', // orange
+  }
+  const emoji = colorMap[points] || '🔴' // red for anything else
+  return `${emoji} ${points}`
+}
+
 function generateInventoryTable(tickets, type) {
   if (tickets.length === 0) return ''
 
   const headers = {
-    initiative: '| # | Title | Depends On | Blocks |',
-    epic: '| # | Title | Depends On | Blocks |',
-    bug: '| # | Title | Severity | Related |',
-    feature: '| # | Title | Depends On | Blocks |',
+    initiative: '| # | Title | SP | Depends On | Blocks |',
+    epic: '| # | Title | SP | Depends On | Blocks |',
+    bug: '| # | Title | SP | Severity | Related |',
+    feature: '| # | Title | SP | Depends On | Blocks |',
   }
 
   const separator = {
-    initiative: '|---|-------|------------|--------|',
-    epic: '|---|-------|------------|--------|',
-    bug: '|---|-------|----------|---------| ',
-    feature: '|---|-------|------------|--------|',
+    initiative: '|---|-------|----:|------------|--------|',
+    epic: '|---|-------|----:|------------|--------|',
+    bug: '|---|-------|----:|----------|---------| ',
+    feature: '|---|-------|----:|------------|--------|',
   }
 
   let table = `${headers[type]}\n${separator[type]}\n`
@@ -189,11 +201,12 @@ function generateInventoryTable(tickets, type) {
     const deps = t.metadata?.depends_on?.map((n) => `#${n}`).join(', ') || '-'
     const blocks = t.metadata?.blocks?.map((n) => `#${n}`).join(', ') || '-'
     const severity = t.metadata?.severity || 'medium'
+    const sp = formatStoryPointsMarkdown(t.metadata?.story_points)
 
     if (type === 'bug') {
-      table += `| #${t.number} | ${t.title} | ${severity} | ${deps} |\n`
+      table += `| #${t.number} | ${t.title} | ${sp} | ${severity} | ${deps} |\n`
     } else {
-      table += `| #${t.number} | ${t.title} | ${deps} | ${blocks} |\n`
+      table += `| #${t.number} | ${t.title} | ${sp} | ${deps} | ${blocks} |\n`
     }
   }
 
@@ -210,6 +223,19 @@ function categorizeTicket(t) {
   if (labels.includes('auth') || title.includes('auth') || title.includes('sign-in') || title.includes('password')) return 'auth'
   if (labels.includes('blocking') || title.includes('blocking') || title.includes('siren') || title.includes('tier') || title.includes('lookout')) return 'blocking'
   return 'other'
+}
+
+function getStoryPointsColor(points) {
+  if (points === 1) return '#3b82f6' // blue
+  if (points === 2 || points === 3) return '#22c55e' // green
+  if (points === 5) return '#f97316' // orange
+  return '#ef4444' // red
+}
+
+function formatStoryPoints(points) {
+  if (!points) return ''
+  const color = getStoryPointsColor(points)
+  return ` <span style='color:${color}'>${points}pt${points > 1 ? 's' : ''}</span>`
 }
 
 function calculateDepths(tickets) {
@@ -345,7 +371,8 @@ function generateMermaidDiagram(tickets) {
         }
       }
 
-      nodes.push(`        T${t.number}["#${t.number} ${safeLabel}"]:::${category}${depth}`)
+      const storyPoints = formatStoryPoints(t.metadata?.story_points)
+      nodes.push(`        T${t.number}["#${t.number} ${safeLabel}${storyPoints}"]:::${category}${depth}`)
     }
     nodes.push('    end')
   }
@@ -377,7 +404,8 @@ function generateFeaturesDiagram(features, title) {
 
   for (const f of features) {
     const shortTitle = f.title.length > 25 ? f.title.substring(0, 25) + '...' : f.title
-    nodes.push(`    F${f.number}["#${f.number} ${shortTitle}"]`)
+    const storyPoints = formatStoryPoints(f.metadata?.story_points)
+    nodes.push(`    F${f.number}["#${f.number} ${shortTitle}${storyPoints}"]`)
 
     const deps = f.metadata?.depends_on || []
     for (const dep of deps) {
@@ -626,6 +654,15 @@ ${Object.entries(VALID_REPOS)
 - **Epics (E)**: Large features with multiple stories
 - **Features (F)**: Individual stories/tasks
 - **Subgraphs**: Logical groupings
+
+### Story Points
+
+| Points | Color |
+|-------:|-------|
+| 1 | 🔵 Blue |
+| 2-3 | 🟢 Green |
+| 5 | 🟠 Orange |
+| 8+ | 🔴 Red |
 
 ---
 
