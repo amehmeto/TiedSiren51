@@ -33,13 +33,11 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     this.listener = listener
   }
 
-  /** @deprecated Use initialize for setup. Will be removed in native-to-native blocking migration. */
   startWatching(): void {
     // Start subscription if not already active
     if (!this.subscription) this.startAccessibilitySubscription()
   }
 
-  /** @deprecated Will be removed in native-to-native blocking migration. */
   stopWatching(): void {
     if (this.subscription) {
       this.subscription.remove()
@@ -70,7 +68,6 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     }
   }
 
-  /** @deprecated Will be removed in native-to-native blocking migration. */
   async updateBlockedApps(packageNames: string[]): Promise<void> {
     try {
       await setBlockedApps(packageNames)

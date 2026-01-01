@@ -7,11 +7,8 @@ export interface DetectedSiren {
 export interface SirenLookout {
   initialize(): Promise<void>
   onSirenDetected(listener: (siren: DetectedSiren) => void): void
-  /** @deprecated Use initialize for setup. Will be removed in native-to-native blocking migration. */
   startWatching(): void
-  /** @deprecated Will be removed in native-to-native blocking migration. */
   stopWatching(): void
-  /** @deprecated Will be removed in native-to-native blocking migration. */
   updateBlockedApps(packageNames: string[]): Promise<void>
 }
 

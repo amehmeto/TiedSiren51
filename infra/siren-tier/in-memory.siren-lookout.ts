@@ -27,13 +27,11 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
     this.listener = listener
   }
 
-  /** @deprecated Use initialize for setup. Will be removed in native-to-native blocking migration. */
   startWatching(): void {
     if (this.shouldThrowOnStart) throw new Error('Start watching failed')
     this.isWatching = true
   }
 
-  /** @deprecated Will be removed in native-to-native blocking migration. */
   stopWatching(): void {
     if (this.shouldThrowOnStop) throw new Error('Stop watching failed')
     this.isWatching = false
@@ -57,7 +55,6 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
     this._isEnabled = true
   }
 
-  /** @deprecated Will be removed in native-to-native blocking migration. */
   async updateBlockedApps(packageNames: string[]): Promise<void> {
     if (this.shouldThrowOnSync) throw new Error('Sync blocked apps failed')
     this.lastSyncedApps = packageNames
