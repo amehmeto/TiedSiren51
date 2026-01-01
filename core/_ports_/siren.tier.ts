@@ -1,7 +1,9 @@
+import { ISODateString } from './date-provider'
+
 export interface BlockingWindow {
   id: string
-  startTime: string // "14:00"
-  endTime: string // "15:00"
+  startTime: ISODateString
+  endTime: ISODateString
   sirens: {
     apps: string[]
     websites: string[]

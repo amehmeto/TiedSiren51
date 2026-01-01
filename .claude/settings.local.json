@@ -104,6 +104,7 @@
       "Bash(wc:*)",
       "Bash(which:*)",
       "Bash(xargs cloc:*)",
+      "Skill(worktree)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
