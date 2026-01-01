@@ -5,7 +5,7 @@ import { AndroidSirenLookout, DetectedSiren } from '@core/_ports_/siren.lookout'
  * Does not connect to the real AccessibilityService.
  */
 export class InMemorySirenLookout implements AndroidSirenLookout {
-  private callback?: (siren: DetectedSiren) => void
+  private listener?: (siren: DetectedSiren) => void
 
   _isEnabled = true
 
@@ -23,8 +23,8 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
     // No-op for in-memory implementation
   }
 
-  onSirenDetected(callback: (siren: DetectedSiren) => void): void {
-    this.callback = callback
+  onSirenDetected(listener: (siren: DetectedSiren) => void): void {
+    this.listener = listener
   }
 
   /** @deprecated Use initialize for setup. Will be removed in native-to-native blocking migration. */
@@ -40,8 +40,8 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
   }
 
   simulateDetection(packageName: string): void {
-    if (this.callback) {
-      this.callback({
+    if (this.listener) {
+      this.listener({
         type: 'app',
         identifier: packageName,
         timestamp: Date.now(),

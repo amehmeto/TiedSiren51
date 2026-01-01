@@ -5,7 +5,7 @@ import { Logger } from '@/core/_ports_/logger'
 import { AndroidSirenLookout, DetectedSiren } from '@core/_ports_/siren.lookout'
 
 export class RealAndroidSirenLookout implements AndroidSirenLookout {
-  private callback?: (siren: DetectedSiren) => void
+  private listener?: (siren: DetectedSiren) => void
 
   private subscription?: AccessibilityEventSubscription
 
@@ -24,13 +24,13 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     }
   }
 
-  onSirenDetected(callback: (siren: DetectedSiren) => void): void {
-    if (this.callback) {
+  onSirenDetected(listener: (siren: DetectedSiren) => void): void {
+    if (this.listener) {
       this.logger.warn(
-        '[RealAndroidSirenLookout] Overwriting existing siren detection callback. Previous callback will be discarded.',
+        '[RealAndroidSirenLookout] Overwriting existing siren detection listener. Previous listener will be discarded.',
       )
     }
-    this.callback = callback
+    this.listener = listener
   }
 
   /** @deprecated Use initialize for setup. Will be removed in native-to-native blocking migration. */
@@ -94,9 +94,9 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
 
           this.logger.info(`Detected app launch: ${packageName}`)
 
-          // Notify the callback with DetectedSiren format
-          if (this.callback) {
-            this.callback({
+          // Notify the listener with DetectedSiren format
+          if (this.listener) {
+            this.listener({
               type: 'app',
               identifier: packageName,
               timestamp: Date.now(),
