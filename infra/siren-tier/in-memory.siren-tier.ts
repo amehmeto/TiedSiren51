@@ -10,7 +10,7 @@ export class InMemorySirenTier implements SirenTier {
 
   constructor(private readonly logger: Logger) {}
 
-  async initialize(): Promise<void> {
+  async initializeNativeBlocking(): Promise<void> {
     this.logger.info('Native blocking initialized (in-memory)')
     this.isNativeBlockingInitialized = true
   }
@@ -33,10 +33,5 @@ export class InMemorySirenTier implements SirenTier {
       )
       throw error
     }
-  }
-
-  /** @deprecated Use initialize instead */
-  async initializeNativeBlocking(): Promise<void> {
-    await this.initialize()
   }
 }

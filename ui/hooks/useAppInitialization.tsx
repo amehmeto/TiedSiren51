@@ -20,7 +20,7 @@ export function useAppInitialization(store: AppStore) {
       await dependencies.databaseService.initialize()
       await dependencies.notificationService.initialize()
       await dependencies.backgroundTaskService.initialize(appStore)
-      await sirenTier.initialize()
+      await sirenTier.initializeNativeBlocking()
 
       await appStore.dispatch(loadUser())
 

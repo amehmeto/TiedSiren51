@@ -9,7 +9,7 @@ import { BlockingSchedule, SirenTier } from '@core/_ports_/siren.tier'
 export class AndroidSirenTier implements SirenTier {
   constructor(private readonly logger: Logger) {}
 
-  async initialize(): Promise<void> {
+  async initializeNativeBlocking(): Promise<void> {
     try {
       await setCallbackClass(BLOCKING_CALLBACK_CLASS)
       this.logger.info('[AndroidSirenTier] Native blocking initialized')
@@ -50,18 +50,6 @@ export class AndroidSirenTier implements SirenTier {
     } catch (error) {
       this.logger.error(
         `[AndroidSirenTier] Failed to show blocking overlay for ${packageName}: ${error}`,
-      )
-      throw error
-    }
-  }
-
-  /** @deprecated Use initialize instead */
-  async initializeNativeBlocking(): Promise<void> {
-    try {
-      await this.initialize()
-    } catch (error) {
-      this.logger.error(
-        `[AndroidSirenTier] Failed to initialize native blocking: ${error}`,
       )
       throw error
     }
