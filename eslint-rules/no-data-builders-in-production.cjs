@@ -70,11 +70,17 @@ module.exports = {
       ImportDeclaration(node) {
         const source = node.source.value
 
-        // If importing from data-builders directory
-        if (
-          source.includes('data-builders') ||
-          source.includes('.builder')
-        ) {
+        // Check if importing from data-builders directory or .builder files
+        // Use stricter matching to avoid false positives:
+        // - data-builders must be a path segment (preceded by / or start of string)
+        // - .builder must be at end of import path (the file extension prefix)
+        const isDataBuildersImport =
+          source.includes('/data-builders/') ||
+          source.startsWith('data-builders/') ||
+          source === 'data-builders'
+        const isBuilderFileImport = source.endsWith('.builder')
+
+        if (isDataBuildersImport || isBuilderFileImport) {
           // Check each imported specifier
           node.specifiers.forEach((specifier) => {
             if (specifier.type === 'ImportSpecifier') {
