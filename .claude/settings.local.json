@@ -205,6 +205,7 @@
       "Bash(python3:*)",
       "Bash(python:*)",
       "Bash(rm:*)",
+      "Bash(sed:*)",
       "Bash(xargs:*)",
       "Edit(**/.claude/settings.local.json)",
       "Edit(/**/.claude/**)",
