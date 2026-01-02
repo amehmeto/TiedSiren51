@@ -26,6 +26,7 @@ npm test              # Run tests (watch mode)
 npm run lint          # TypeScript + ESLint + Prettier
 npm run lint:fix      # Auto-fix lint issues
 npx prisma generate   # Regenerate Prisma client after schema changes
+SKIP_E2E_CHECK=true git push  # Push without interactive e2e test prompt
 ```
 
 ## IMPORTANT: Anti-patterns
