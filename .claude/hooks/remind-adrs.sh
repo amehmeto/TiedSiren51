@@ -29,11 +29,6 @@ if [[ "$FILE_PATH" =~ ^ui/ ]] || [[ "$FILE_PATH" =~ /ui/ ]]; then
   ADR_DIRS+=("docs/adr/ui")
 fi
 
-# TypeScript files → conventions ADRs
-if [[ "$FILE_PATH" =~ \.(ts|tsx)$ ]]; then
-  ADR_DIRS+=("docs/adr/conventions")
-fi
-
 # Exit if no relevant ADRs
 [[ ${#ADR_DIRS[@]} -eq 0 ]] && exit 0
 
@@ -79,7 +74,6 @@ for dir in "${ADR_DIRS[@]}"; do
     *core*) show_adrs "$dir" "CORE LAYER ADRs" ;;
     *infrastructure*) show_adrs "$dir" "INFRASTRUCTURE ADRs" ;;
     *ui*) show_adrs "$dir" "UI LAYER ADRs" ;;
-    *conventions*) show_adrs "$dir" "CONVENTIONS ADRs" ;;
   esac
 done
 
