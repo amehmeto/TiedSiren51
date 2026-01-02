@@ -17,7 +17,7 @@ export class FakeNotificationService implements NotificationService {
   constructor(private readonly logger: Logger) {}
 
   async sendPushNotification(message: string): Promise<void> {
-    this.logger.info(`Fake notification: ${message}`)
+    this.logger.info(`[FakeNotificationService] Fake notification: ${message}`)
   }
 
   scheduleLocalNotification(

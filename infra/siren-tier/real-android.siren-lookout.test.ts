@@ -117,7 +117,8 @@ describe('RealAndroidSirenLookout', () => {
       })
       const expectedLogEntry = {
         level: 'info',
-        message: 'Started accessibility event subscription',
+        message:
+          '[RealAndroidSirenLookout] Started accessibility event subscription',
       }
 
       lookout.startWatching()
@@ -144,7 +145,7 @@ describe('RealAndroidSirenLookout', () => {
       })
       const expectedLogEntry = {
         level: 'info',
-        message: 'Stopped watching for sirens',
+        message: '[RealAndroidSirenLookout] Stopped watching for sirens',
       }
 
       lookout.startWatching()
@@ -157,7 +158,7 @@ describe('RealAndroidSirenLookout', () => {
     it('does nothing if not watching', () => {
       const unexpectedLogEntry = {
         level: 'info',
-        message: 'Stopped watching for sirens',
+        message: '[RealAndroidSirenLookout] Stopped watching for sirens',
       }
 
       lookout.stopWatching()
@@ -248,7 +249,8 @@ describe('RealAndroidSirenLookout', () => {
       mockSetBlockedApps.mockResolvedValueOnce(undefined)
       const expectedLogEntry = {
         level: 'info',
-        message: 'Blocked apps synced to native: count=2',
+        message:
+          '[RealAndroidSirenLookout] Blocked apps synced to native: count=2',
       }
 
       await lookout.updateBlockedApps(packageNames)
@@ -275,7 +277,8 @@ describe('RealAndroidSirenLookout', () => {
       mockSetBlockedApps.mockResolvedValueOnce(undefined)
       const expectedLogEntry = {
         level: 'info',
-        message: 'Blocked apps synced to native: count=0',
+        message:
+          '[RealAndroidSirenLookout] Blocked apps synced to native: count=0',
       }
 
       await lookout.updateBlockedApps([])

@@ -61,7 +61,7 @@ describe('AndroidSirenTier', () => {
       const schedule = [createBlockingWindow('window-1')]
       const expectedLog = {
         level: 'info',
-        message: `  Window window-1: ${startTime}-${endTime}`,
+        message: `[AndroidSirenTier]   Window window-1: ${startTime}-${endTime}`,
       }
 
       await androidSirenTier.block(schedule)

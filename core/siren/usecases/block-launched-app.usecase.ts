@@ -15,7 +15,9 @@ export const blockLaunchedApp = createAppAsyncThunk(
     )
 
     if (targetedApp) {
-      logger.info(`Siren detected: ${packageName} - blocking`)
+      logger.info(
+        `[blockLaunchedApp] Siren detected: ${packageName} - blocking`,
+      )
       const now = dateProvider.getISOStringNow()
       const window: BlockingWindow = {
         id: `immediate-${packageName}`,
@@ -32,6 +34,10 @@ export const blockLaunchedApp = createAppAsyncThunk(
         },
       }
       await sirenTier.block([window])
-    } else logger.info(`App launched: ${packageName} - not a siren, ignoring`)
+    } else {
+      logger.info(
+        `[blockLaunchedApp] App launched: ${packageName} - not a siren`,
+      )
+    }
   },
 )

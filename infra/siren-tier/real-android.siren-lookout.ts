@@ -42,7 +42,7 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     if (this.subscription) {
       this.subscription.remove()
       this.subscription = undefined
-      this.logger.info('Stopped watching for sirens')
+      this.logger.info('[RealAndroidSirenLookout] Stopped watching for sirens')
     }
   }
 
@@ -72,7 +72,7 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     try {
       await setBlockedApps(packageNames)
       this.logger.info(
-        `Blocked apps synced to native: count=${packageNames.length}`,
+        `[RealAndroidSirenLookout] Blocked apps synced to native: count=${packageNames.length}`,
       )
     } catch (error) {
       this.logger.error(
@@ -89,7 +89,9 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
           const packageName = event.packageName
           if (!packageName) return
 
-          this.logger.info(`Detected app launch: ${packageName}`)
+          this.logger.info(
+            `[RealAndroidSirenLookout] Detected app launch: ${packageName}`,
+          )
 
           // Notify the listener with DetectedSiren format
           if (this.listener) {
@@ -102,7 +104,9 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
         },
       )
 
-      this.logger.info('Started accessibility event subscription')
+      this.logger.info(
+        '[RealAndroidSirenLookout] Started accessibility event subscription',
+      )
     } catch (error) {
       this.logger.error(
         `[RealAndroidSirenLookout] Failed to start accessibility subscription: ${error}`,

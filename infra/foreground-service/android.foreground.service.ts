@@ -23,12 +23,16 @@ export class AndroidForegroundService implements ForegroundService {
   async start(config?: Partial<ForegroundServiceConfig>): Promise<void> {
     try {
       if (Platform.OS !== 'android') {
-        this.logger.info('Foreground service only available on Android')
+        this.logger.info(
+          '[AndroidForegroundService] Foreground service only available on Android',
+        )
         return
       }
 
       if (this.isServiceRunning) {
-        this.logger.info('Foreground service already running')
+        this.logger.info(
+          '[AndroidForegroundService] Foreground service already running',
+        )
         return
       }
 
@@ -40,7 +44,7 @@ export class AndroidForegroundService implements ForegroundService {
       await this.requestNotificationPermission()
       await this.startService(mergedConfig)
       this.isServiceRunning = true
-      this.logger.info('Foreground service started')
+      this.logger.info('[AndroidForegroundService] Foreground service started')
     } catch (error) {
       this.logger.error(`[AndroidForegroundService] Failed to start: ${error}`)
       throw error
@@ -52,13 +56,15 @@ export class AndroidForegroundService implements ForegroundService {
       if (Platform.OS !== 'android') return
 
       if (!this.isServiceRunning) {
-        this.logger.info('Foreground service not running')
+        this.logger.info(
+          '[AndroidForegroundService] Foreground service not running',
+        )
         return
       }
 
       await this.stopService()
       this.isServiceRunning = false
-      this.logger.info('Foreground service stopped')
+      this.logger.info('[AndroidForegroundService] Foreground service stopped')
     } catch (error) {
       this.logger.error(`[AndroidForegroundService] Failed to stop: ${error}`)
       throw error

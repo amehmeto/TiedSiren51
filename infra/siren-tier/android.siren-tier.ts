@@ -25,7 +25,7 @@ export class AndroidSirenTier implements SirenTier {
       )
       schedule.forEach((window) => {
         this.logger.info(
-          `  Window ${window.id}: ${window.startTime}-${window.endTime}`,
+          `[AndroidSirenTier]   Window ${window.id}: ${window.startTime}-${window.endTime}`,
         )
       })
     } catch (error) {

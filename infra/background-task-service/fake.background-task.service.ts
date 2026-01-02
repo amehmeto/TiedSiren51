@@ -14,7 +14,9 @@ export class FakeBackgroundTaskService implements BackgroundTaskService {
   }
 
   async cancelTask(taskId: string): Promise<void> {
-    this.logger.info(`FakeBackgroundTaskService.cancelTask ${taskId}`)
+    this.logger.info(
+      `[FakeBackgroundTaskService] FakeBackgroundTaskService.cancelTask ${taskId}`,
+    )
   }
 
   defineTask(
