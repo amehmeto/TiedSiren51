@@ -12,8 +12,7 @@ TiedSiren51 has cross-domain side effects that need to be triggered by external 
 
 **Examples:**
 - **User logs in** (Firebase event) → Load user data + Target sirens
-- **Siren detected** (AccessibilityService event) → Block launched app
-- **Block sessions change** (Redux state) → Start/stop siren lookout
+- **Block sessions change** (Redux state) → Start/stop siren lookout + sync schedule to native
 
 Challenges:
 - Events originate from infrastructure layer (Firebase, native modules)
@@ -35,12 +34,11 @@ export const registerListeners = (
   store: AppStore,
   dependencies: Dependencies,
 ) => {
-  const { authGateway, logger, sirenLookout } = dependencies
+  const { authGateway, logger, sirenLookout, sirenTier } = dependencies
 
   onUserLoggedInListener({ store, authGateway, logger })
   onUserLoggedOutListener({ store, authGateway, logger })
-  onSirenDetectedListener({ store, sirenLookout, logger })
-  onBlockSessionsChangedListener({ store, sirenLookout, logger })
+  onBlockSessionsChangedListener({ store, sirenLookout, sirenTier, logger })
 }
 ```
 
@@ -156,12 +154,6 @@ export function createOnBlockingScheduleChangedListener(
 authGateway.onUserLoggedIn(user) → dispatch(userAuthenticated(user))
 ```
 
-**Siren Detection (Gateway):**
-```typescript
-// AccessibilityService detects app → Block it
-sirenLookout.onSirenDetected(pkg) → dispatch(blockLaunchedApp({ packageName: pkg }))
-```
-
 **Session Management (Store Subscription):**
 ```typescript
 // Block session added/removed → Start/stop native monitoring
@@ -225,7 +217,6 @@ store.subscribe() → sirenLookout.startWatching() or stopWatching()
 - `/core/_redux_/registerListeners.ts` - Central registration
 - `/core/auth/listeners/on-user-logged-in.listener.ts` - Auth events
 - `/core/auth/listeners/on-user-logged-out.listener.ts` - Logout events
-- `/core/siren/listeners/on-siren-detected.listener.ts` - App detection
 - `/core/siren/listeners/on-block-sessions-changed.listener.ts` - Session state changes
 
 ### Listener Structure

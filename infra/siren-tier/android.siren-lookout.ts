@@ -1,15 +1,36 @@
 import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import type { AccessibilityEventSubscription } from '@amehmeto/expo-accessibility-service'
-import { setBlockedApps } from '@amehmeto/tied-siren-blocking-overlay'
 import { Logger } from '@/core/_ports_/logger'
-import { AndroidSirenLookout } from '@core/_ports_/siren.lookout'
+import { AndroidSirenLookout, DetectedSiren } from '@core/_ports_/siren.lookout'
 
 export class RealAndroidSirenLookout implements AndroidSirenLookout {
-  private listener?: (packageName: string) => void
+  private listener?: (siren: DetectedSiren) => void
 
   private subscription?: AccessibilityEventSubscription
 
   constructor(private readonly logger: Logger) {}
+
+  async initialize(): Promise<void> {
+    try {
+      this.logger.info('[RealAndroidSirenLookout] Initialized')
+      // Actual initialization happens in startWatching for backwards compatibility
+      // In the future, this will set up the native listeners via reflection
+    } catch (error) {
+      this.logger.error(
+        `[RealAndroidSirenLookout] Failed to initialize: ${error}`,
+      )
+      throw error
+    }
+  }
+
+  onSirenDetected(listener: (siren: DetectedSiren) => void): void {
+    if (this.listener) {
+      this.logger.warn(
+        '[RealAndroidSirenLookout] Overwriting existing siren detection listener. Previous listener will be discarded.',
+      )
+    }
+    this.listener = listener
+  }
 
   startWatching(): void {
     // Start subscription if not already active
@@ -20,17 +41,8 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     if (this.subscription) {
       this.subscription.remove()
       this.subscription = undefined
-      this.logger.info('Stopped watching for sirens')
+      this.logger.info('[RealAndroidSirenLookout] Stopped watching for sirens')
     }
-  }
-
-  onSirenDetected(listener: (packageName: string) => void): void {
-    if (this.listener) {
-      this.logger.warn(
-        '[RealAndroidSirenLookout] Overwriting existing siren detection listener. Previous listener will be discarded.',
-      )
-    }
-    this.listener = listener
   }
 
   async isEnabled(): Promise<boolean> {
@@ -55,20 +67,6 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     }
   }
 
-  async updateBlockedApps(packageNames: string[]): Promise<void> {
-    try {
-      await setBlockedApps(packageNames)
-      this.logger.info(
-        `Blocked apps synced to native: count=${packageNames.length}`,
-      )
-    } catch (error) {
-      this.logger.error(
-        `[RealAndroidSirenLookout] Failed to sync blocked apps: ${error}`,
-      )
-      throw error
-    }
-  }
-
   private startAccessibilitySubscription(): void {
     try {
       this.subscription = AccessibilityService.addAccessibilityEventListener(
@@ -76,15 +74,24 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
           const packageName = event.packageName
           if (!packageName) return
 
-          this.logger.info(`Detected app launch: ${packageName}`)
+          this.logger.info(
+            `[RealAndroidSirenLookout] Detected app launch: ${packageName}`,
+          )
 
-          // Notify the listener regardless of whether it's a siren
-          // The business logic (blockLaunchedApp usecase) will decide if blocking is needed
-          if (this.listener) this.listener(packageName)
+          // Notify the listener with DetectedSiren format
+          if (this.listener) {
+            this.listener({
+              type: 'app',
+              identifier: packageName,
+              timestamp: Date.now(),
+            })
+          }
         },
       )
 
-      this.logger.info('Started accessibility event subscription')
+      this.logger.info(
+        '[RealAndroidSirenLookout] Started accessibility event subscription',
+      )
     } catch (error) {
       this.logger.error(
         `[RealAndroidSirenLookout] Failed to start accessibility subscription: ${error}`,

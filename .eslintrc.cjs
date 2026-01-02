@@ -115,6 +115,8 @@ module.exports = {
     'local-rules/schema-matches-filename': 'error',
     'local-rules/one-view-model-per-file': 'error',
     'local-rules/reducer-in-domain-folder': 'error',
+    'local-rules/no-module-level-constants': 'error',
+    'local-rules/require-named-regex': 'error',
   },
   overrides: [
     {
@@ -198,6 +200,26 @@ module.exports = {
         // Test structure rules
         'local-rules/no-new-in-test-body': 'error',
         'local-rules/use-data-builders': 'error',
+      },
+    },
+    // No data builders in production code
+    {
+      files: ['**/*.ts', '**/*.tsx'],
+      excludedFiles: [
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/*.spec.ts',
+        '**/*.spec.tsx',
+        '**/*.fixture.ts',
+        '**/*.fixture.tsx',
+        '**/*.builder.ts',
+        '**/*.builder.tsx',
+        '**/core/_tests_/**',
+        '**/fake-data.*.ts', // Fake repositories for development/testing
+        '**/preloadedStateForManualTesting.ts', // Manual testing utilities
+      ],
+      rules: {
+        'local-rules/no-data-builders-in-production': 'error',
       },
     },
     // No non-deterministic values in core (use injected dependencies)

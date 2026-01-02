@@ -1,19 +1,14 @@
-export interface BlockingWindow {
-  id: string
-  startTime: string // "14:00"
-  endTime: string // "15:00"
-  sirens: {
-    apps: string[]
-    websites: string[]
-    keywords: string[]
-  }
-}
+import { Sirens } from '../siren/sirens'
+import { ISODateString } from './date-provider'
 
-export interface BlockingSchedule {
-  windows: BlockingWindow[]
+export type BlockingSchedule = {
+  id: string
+  startTime: ISODateString
+  endTime: ISODateString
+  sirens: Sirens
 }
 
 export interface SirenTier {
-  block(packageName: string): Promise<void>
   initializeNativeBlocking(): Promise<void>
+  updateBlockingSchedule(schedule: BlockingSchedule[]): Promise<void>
 }

@@ -1,4 +1,5 @@
 import { createEntityAdapter } from '@reduxjs/toolkit'
+import { HHmmString } from '@/core/_ports_/date-provider'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '../device/device'
 
@@ -15,8 +16,8 @@ export type BlockSession = {
   name: string
   blocklists: Blocklist[]
   devices: Device[]
-  startedAt: string
-  endedAt: string
+  startedAt: HHmmString
+  endedAt: HHmmString
   startNotificationId: string
   endNotificationId: string
   blockingConditions: BlockingConditions[]

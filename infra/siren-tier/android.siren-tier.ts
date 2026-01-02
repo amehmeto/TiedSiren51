@@ -1,25 +1,13 @@
 import { setCallbackClass } from '@amehmeto/expo-foreground-service'
 import {
   BLOCKING_CALLBACK_CLASS,
-  showOverlay,
+  setBlockedApps,
 } from '@amehmeto/tied-siren-blocking-overlay'
 import { Logger } from '@/core/_ports_/logger'
-import { SirenTier } from '@core/_ports_/siren.tier'
+import { BlockingSchedule, SirenTier } from '@core/_ports_/siren.tier'
 
 export class AndroidSirenTier implements SirenTier {
   constructor(private readonly logger: Logger) {}
-
-  async block(packageName: string): Promise<void> {
-    try {
-      await showOverlay(packageName)
-      this.logger.info(`Blocking overlay shown for: ${packageName}`)
-    } catch (error) {
-      this.logger.error(
-        `[AndroidSirenTier] Failed to show blocking overlay for ${packageName}: ${error}`,
-      )
-      throw error
-    }
-  }
 
   async initializeNativeBlocking(): Promise<void> {
     try {
@@ -30,6 +18,23 @@ export class AndroidSirenTier implements SirenTier {
         `[AndroidSirenTier] Failed to initialize native blocking: ${error}`,
       )
       return // Graceful degradation: app continues without native blocking
+    }
+  }
+
+  async updateBlockingSchedule(schedule: BlockingSchedule[]): Promise<void> {
+    try {
+      const packageNames = schedule.flatMap((s) =>
+        s.sirens.android.map((app) => app.packageName),
+      )
+      await setBlockedApps(packageNames)
+      this.logger.info(
+        `[AndroidSirenTier] Blocking schedule updated: ${schedule.length} schedules, ${packageNames.length} apps`,
+      )
+    } catch (error) {
+      this.logger.error(
+        `[AndroidSirenTier] Failed to update blocking schedule: ${error}`,
+      )
+      throw error
     }
   }
 }

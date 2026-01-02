@@ -1,8 +1,14 @@
+export interface DetectedSiren {
+  type: 'app' | 'website' | 'keyword'
+  identifier: string
+  timestamp: number
+}
+
 export interface SirenLookout {
+  initialize(): Promise<void>
+  onSirenDetected(listener: (siren: DetectedSiren) => void): void
   startWatching(): void
   stopWatching(): void
-  onSirenDetected(listener: (packageName: string) => void): void
-  updateBlockedApps(packageNames: string[]): Promise<void>
 }
 
 export interface AndroidSirenLookout extends SirenLookout {

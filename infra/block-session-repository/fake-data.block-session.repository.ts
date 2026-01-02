@@ -1,6 +1,7 @@
 import uuid from 'react-native-uuid'
 
 import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
+import { HHmmString } from '@/core/_ports_/date-provider'
 import {
   facebookAndroidSiren,
   instagramAndroidSiren,
@@ -16,6 +17,10 @@ export class FakeDataBlockSessionRepository
   extends InMemoryRepository<BlockSession>
   implements BlockSessionRepository
 {
+  private static readonly startedAt: HHmmString = '10:48'
+
+  private static readonly endedAt: HHmmString = '13:58'
+
   entities: Map<string, BlockSession> = new Map(
     [
       buildBlockSession({
@@ -61,15 +66,14 @@ export class FakeDataBlockSessionRepository
             name: 'Google Pixel 3a',
           },
         ],
-        startedAt: '10:48',
-        endedAt: '13:58',
+        startedAt: FakeDataBlockSessionRepository.startedAt,
+        endedAt: FakeDataBlockSessionRepository.endedAt,
         startNotificationId: 'start-notification-id',
         endNotificationId: 'end-notification-id',
       }),
-      {
+      buildBlockSession({
         id: String(uuid.v4()),
         name: 'Playing time',
-        minutesLeft: 'Ends in about 1 hour',
         blocklists: [
           {
             id: 'blocklist-id',
@@ -110,16 +114,15 @@ export class FakeDataBlockSessionRepository
             name: 'Google Pixel 3a',
           },
         ],
-        startedAt: '10:48',
-        endedAt: '13:58',
+        startedAt: FakeDataBlockSessionRepository.startedAt,
+        endedAt: FakeDataBlockSessionRepository.endedAt,
         startNotificationId: 'start-notification-id',
         endNotificationId: 'end-notification-id',
         blockingConditions: [BlockingConditions.TIME],
-      },
-      {
+      }),
+      buildBlockSession({
         id: String(uuid.v4()),
         name: 'Sleeping time',
-        minutesLeft: 'Ends in about 1 hour',
         blocklists: [
           {
             id: 'blocklist-id',
@@ -160,12 +163,12 @@ export class FakeDataBlockSessionRepository
             name: 'Google Pixel 3a',
           },
         ],
-        startedAt: '10:48',
-        endedAt: '13:58',
+        startedAt: FakeDataBlockSessionRepository.startedAt,
+        endedAt: FakeDataBlockSessionRepository.endedAt,
         startNotificationId: 'start-notification-id',
         endNotificationId: 'end-notification-id',
         blockingConditions: [BlockingConditions.TIME],
-      },
+      }),
     ].map((blockSession) => [blockSession.id, blockSession]),
   )
 

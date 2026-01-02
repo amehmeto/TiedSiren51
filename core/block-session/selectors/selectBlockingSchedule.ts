@@ -1,60 +1,73 @@
-import { createSelector } from '@reduxjs/toolkit'
+import { EntityState } from '@reduxjs/toolkit'
 import { DateProvider } from '@/core/_ports_/date-provider'
 import { BlockingSchedule } from '@/core/_ports_/siren.tier'
-import { RootState } from '@/core/_redux_/createStore'
-import { blocklistAdapter } from '@/core/blocklist/blocklist'
-import { selectActiveSessions } from './selectActiveSessions'
+import {
+  BlockSession,
+  blockSessionAdapter,
+} from '@/core/block-session/block-session'
+import { Sirens } from '@/core/siren/sirens'
+import { isActive } from './isActive'
 
-/**
- * Selects the blocking schedule by joining active sessions with fresh blocklist data.
- *
- * This selector:
- * 1. Gets all active block sessions
- * 2. Joins embedded blocklist IDs with current blocklist state (fresh data)
- * 3. Creates BlockingWindow objects with time ranges and deduplicated sirens
- * 4. Deduplicates packages across multiple blocklists in the same time window
- *
- * @returns BlockingSchedule with windows containing startTime, endTime, and sirens
- */
-export const selectBlockingSchedule = createSelector(
-  [
-    (state: RootState) => state.blockSession,
-    (state: RootState) => state.blocklist,
-    (_state: RootState, dateProvider: DateProvider) => dateProvider,
-  ],
-  (blockSessionState, blocklistState, dateProvider): BlockingSchedule => {
-    const activeSessions = selectActiveSessions(dateProvider, blockSessionState)
-    const blocklistSelectors = blocklistAdapter.getSelectors()
+const uniqueBy = <T, K>(array: T[], keyExtractor: (item: T) => K): T[] => {
+  return [...new Map(array.map((item) => [keyExtractor(item), item])).values()]
+}
 
-    const windows = activeSessions.map((session) => {
-      const apps = new Set<string>()
-      const websites = new Set<string>()
-      const keywords = new Set<string>()
+const mergeSirens = (sirensArray: Sirens[]): Sirens => {
+  const merge = <T, K>(extract: (s: Sirens) => T[], key: (item: T) => K) =>
+    uniqueBy(sirensArray.flatMap(extract), key)
 
-      const freshBlocklists = session.blocklists
-        .map((embedded) =>
-          blocklistSelectors.selectById(blocklistState, embedded.id),
-        )
-        .filter(Boolean)
+  return {
+    android: merge(
+      (s) => s.android,
+      (app) => app.packageName,
+    ),
+    windows: merge(
+      (s) => s.windows,
+      (s) => s,
+    ),
+    macos: merge(
+      (s) => s.macos,
+      (s) => s,
+    ),
+    ios: merge(
+      (s) => s.ios,
+      (s) => s,
+    ),
+    linux: merge(
+      (s) => s.linux,
+      (s) => s,
+    ),
+    websites: merge(
+      (s) => s.websites,
+      (s) => s,
+    ),
+    keywords: merge(
+      (s) => s.keywords,
+      (s) => s,
+    ),
+  }
+}
 
-      freshBlocklists.forEach((blocklist) => {
-        blocklist.sirens.android.forEach((siren) => apps.add(siren.packageName))
-        blocklist.sirens.websites.forEach((website) => websites.add(website))
-        blocklist.sirens.keywords.forEach((keyword) => keywords.add(keyword))
-      })
+export const selectBlockingSchedule = (
+  dateProvider: DateProvider,
+  blockSession: EntityState<BlockSession, string>,
+): BlockingSchedule[] => {
+  const activeSessions = blockSessionAdapter
+    .getSelectors()
+    .selectAll(blockSession)
+    .filter((session) => isActive(dateProvider, session))
 
-      return {
-        id: session.id,
-        startTime: session.startedAt,
-        endTime: session.endedAt,
-        sirens: {
-          apps: Array.from(apps),
-          websites: Array.from(websites),
-          keywords: Array.from(keywords),
-        },
-      }
-    })
-
-    return { windows }
-  },
-)
+  return activeSessions.map((session) => {
+    const schedule: BlockingSchedule = {
+      id: session.id,
+      startTime: dateProvider.toISOString(
+        dateProvider.recoverDate(session.startedAt),
+      ),
+      endTime: dateProvider.toISOString(
+        dateProvider.recoverDate(session.endedAt),
+      ),
+      sirens: mergeSirens(session.blocklists.map((bl) => bl.sirens)),
+    }
+    return schedule
+  })
+}

@@ -1,5 +1,11 @@
 import { DAY, MINUTE } from '@/core/__constants__/time'
-import { DateProvider, ISODateString } from '@/core/_ports_/date-provider'
+import {
+  assertHHmmString,
+  assertISODateString,
+  DateProvider,
+  HHmmString,
+  ISODateString,
+} from '@/core/_ports_/date-provider'
 
 export class StubDateProvider implements DateProvider {
   now = new Date()
@@ -13,15 +19,16 @@ export class StubDateProvider implements DateProvider {
   }
 
   getISOStringNow(): ISODateString {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
-    return this.now.toISOString() as ISODateString
+    const result = this.now.toISOString()
+    assertISODateString(result)
+    return result
   }
 
-  getHHmmNow(): string {
+  getHHmmNow(): HHmmString {
     return this.toHHmm(this.now)
   }
 
-  recoverDate(timeInHHmm: string): Date {
+  recoverDate(timeInHHmm: HHmmString): Date {
     const [hours, minutes] = timeInHHmm.split(':').map(Number)
 
     const todayWithNewTime = new Date(this.now.getTime())
@@ -30,13 +37,15 @@ export class StubDateProvider implements DateProvider {
     return todayWithNewTime
   }
 
-  toHHmm(date: Date): string {
+  toHHmm(date: Date): HHmmString {
     const hours = String(date.getHours()).padStart(2, '0')
     const minutes = String(date.getMinutes()).padStart(2, '0')
-    return `${hours}:${minutes}`
+    const result = `${hours}:${minutes}`
+    assertHHmmString(result)
+    return result
   }
 
-  recoverYesterdayDate(timeInHHmm: string): Date {
+  recoverYesterdayDate(timeInHHmm: HHmmString): Date {
     const [hours, minutes] = timeInHHmm.split(':').map(Number)
 
     const todayWithNewTime = new Date(this.now.getTime() - 1 * DAY)
@@ -45,7 +54,7 @@ export class StubDateProvider implements DateProvider {
     return todayWithNewTime
   }
 
-  getHHmmMinutesFromNow(minutes: number): string {
+  getHHmmMinutesFromNow(minutes: number): HHmmString {
     return this.toHHmm(this.getMinutesFromNow(minutes))
   }
 
@@ -58,12 +67,14 @@ export class StubDateProvider implements DateProvider {
   }
 
   toISOString(date: Date): ISODateString {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
-    return date.toISOString() as ISODateString
+    const result = date.toISOString()
+    assertISODateString(result)
+    return result
   }
 
   msToISOString(ms: number): ISODateString {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
-    return new Date(ms).toISOString() as ISODateString
+    const result = new Date(ms).toISOString()
+    assertISODateString(result)
+    return result
   }
 }

@@ -2,9 +2,10 @@ import { DateProvider } from '@/core/_ports_/date-provider'
 import { ForegroundService } from '@/core/_ports_/foreground.service'
 import { Logger } from '@/core/_ports_/logger'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
+import { BlockingSchedule, SirenTier } from '@/core/_ports_/siren.tier'
 import { AppStore } from '@/core/_redux_/createStore'
 import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAllBlockSessions'
-import { selectBlockedPackages } from '@/core/siren/selectors/selectBlockedPackages'
+import { selectBlockingSchedule } from '@/core/block-session/selectors/selectBlockingSchedule'
 
 /**
  * Listens to block session changes and starts/stops the siren lookout accordingly.
@@ -12,29 +13,28 @@ import { selectBlockedPackages } from '@/core/siren/selectors/selectBlockedPacka
  * - When there are block sessions (active or scheduled): starts foreground service then watching
  * - When there are no block sessions: stops watching then foreground service
  *
- * Also syncs blocked apps to native SharedPreferences for native-to-native blocking:
- * - On protection start: syncs package names from active sessions
- * - On protection stop: clears blocked apps
+ * Also syncs blocking schedule to native layer for native-to-native blocking:
+ * - On protection start: syncs blocking schedule from active sessions
+ * - On protection stop: clears blocking schedule
  * - On blocklist changes during active session: re-syncs
  *
  * The foreground service keeps the app alive in the background via a persistent notification.
  * This ensures the AccessibilityService subscription receives events even when app is backgrounded.
  *
- * Note: The lookout only detects app launches. The actual filtering of which apps
- * to block happens in the blockLaunchedApp usecase via selectTargetedApps selector.
- *
- * Note: Async operations (foreground service, blocked apps sync) are fire-and-forget
+ * Note: Async operations (foreground service, blocking schedule sync) are fire-and-forget
  * with errors caught and logged in their respective safe* wrapper functions.
  */
 export const onBlockSessionsChangedListener = ({
   store,
   sirenLookout,
+  sirenTier,
   foregroundService,
   dateProvider,
   logger,
 }: {
   store: AppStore
   sirenLookout: SirenLookout
+  sirenTier: SirenTier
   foregroundService: ForegroundService
   dateProvider: DateProvider
   logger: Logger
@@ -71,36 +71,49 @@ export const onBlockSessionsChangedListener = ({
     }
   }
 
-  const safeSyncBlockedApps = async (packageNames: string[]) => {
+  const safeUpdateBlockingSchedule = async (schedule: BlockingSchedule[]) => {
     try {
-      await sirenLookout.updateBlockedApps(packageNames)
+      await sirenTier.updateBlockingSchedule(schedule)
     } catch (error) {
-      logger.error(`Failed to sync blocked apps: ${error}`)
+      logger.error(`Failed to update blocking schedule: ${error}`)
     }
   }
 
-  const startProtection = async (blockedPackages: string[]) => {
-    await safeSyncBlockedApps(blockedPackages)
+  const startProtection = async (schedule: BlockingSchedule[]) => {
+    await safeUpdateBlockingSchedule(schedule)
     void safeStartForegroundService()
     safeStartWatching()
   }
 
   const stopProtection = async () => {
-    await safeSyncBlockedApps([])
+    await safeUpdateBlockingSchedule([])
     safeStopWatching()
     void safeStopForegroundService()
+  }
+
+  const getScheduleKey = (schedule: BlockingSchedule[]): string => {
+    return schedule
+      .map(
+        (s) =>
+          `${s.id}:${s.sirens.android.map((a) => a.packageName).join(',')}`,
+      )
+      .sort()
+      .join('|')
   }
 
   // Check initial state
   const initialState = store.getState()
   const initialSessions = selectAllBlockSessions(initialState.blockSession)
   let didHaveSessions = initialSessions.length > 0
-  let lastSyncedPackages: string[] = []
+  let lastScheduleKey = ''
 
   if (didHaveSessions) {
-    const blockedPackages = selectBlockedPackages(initialState, dateProvider)
-    lastSyncedPackages = blockedPackages
-    void startProtection(blockedPackages)
+    const schedule = selectBlockingSchedule(
+      dateProvider,
+      initialState.blockSession,
+    )
+    lastScheduleKey = getScheduleKey(schedule)
+    void startProtection(schedule)
   }
 
   // Subscribe to store changes
@@ -111,22 +124,19 @@ export const onBlockSessionsChangedListener = ({
 
     if (didHaveSessions && !hasSessions) {
       void stopProtection()
-      lastSyncedPackages = []
+      lastScheduleKey = ''
     } else if (!didHaveSessions && hasSessions) {
-      const blockedPackages = selectBlockedPackages(state, dateProvider)
-      lastSyncedPackages = blockedPackages
-      void startProtection(blockedPackages)
+      const schedule = selectBlockingSchedule(dateProvider, state.blockSession)
+      lastScheduleKey = getScheduleKey(schedule)
+      void startProtection(schedule)
     } else if (hasSessions) {
-      // Sessions still exist - check if blocked apps changed (O(n) with Set)
-      const blockedPackages = selectBlockedPackages(state, dateProvider)
-      const lastSyncedSet = new Set(lastSyncedPackages)
-      const hasPackagesChanged =
-        blockedPackages.length !== lastSyncedPackages.length ||
-        blockedPackages.some((pkg) => !lastSyncedSet.has(pkg))
+      // Sessions still exist - check if schedule changed
+      const schedule = selectBlockingSchedule(dateProvider, state.blockSession)
+      const scheduleKey = getScheduleKey(schedule)
 
-      if (hasPackagesChanged) {
-        lastSyncedPackages = blockedPackages
-        void safeSyncBlockedApps(blockedPackages)
+      if (scheduleKey !== lastScheduleKey) {
+        lastScheduleKey = scheduleKey
+        void safeUpdateBlockingSchedule(schedule)
       }
     }
 

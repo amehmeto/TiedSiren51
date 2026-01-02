@@ -21,6 +21,7 @@ const noTryCatchInCore = require('../eslint-rules/no-try-catch-in-core.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
 const requireColocatedTest = require('../eslint-rules/require-colocated-test.cjs')
 const useDataBuilders = require('../eslint-rules/use-data-builders.cjs')
+const noDataBuildersInProduction = require('../eslint-rules/no-data-builders-in-production.cjs')
 const fileNamingConvention = require('../eslint-rules/file-naming-convention.cjs')
 const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
 const selectorMatchesFilename = require('../eslint-rules/selector-matches-filename.cjs')
@@ -37,6 +38,8 @@ const gatewayImplementationNaming = require('../eslint-rules/gateway-implementat
 const schemaMatchesFilename = require('../eslint-rules/schema-matches-filename.cjs')
 const oneViewModelPerFile = require('../eslint-rules/one-view-model-per-file.cjs')
 const reducerInDomainFolder = require('../eslint-rules/reducer-in-domain-folder.cjs')
+const noModuleLevelConstants = require('../eslint-rules/no-module-level-constants.cjs')
+const requireNamedRegex = require('../eslint-rules/require-named-regex.cjs')
 
 module.exports = {
   rules: {
@@ -62,6 +65,7 @@ module.exports = {
     'no-new-in-test-body': noNewInTestBody,
     'require-colocated-test': requireColocatedTest,
     'use-data-builders': useDataBuilders,
+    'no-data-builders-in-production': noDataBuildersInProduction,
     'usecase-matches-filename': usecaseMatchesFilename,
     'no-cross-layer-imports': noCrossLayerImports,
     'listener-matches-filename': listenerMatchesFilename,
@@ -75,5 +79,7 @@ module.exports = {
     'schema-matches-filename': schemaMatchesFilename,
     'one-view-model-per-file': oneViewModelPerFile,
     'reducer-in-domain-folder': reducerInDomainFolder,
+    'no-module-level-constants': noModuleLevelConstants,
+    'require-named-regex': requireNamedRegex,
   },
 }
