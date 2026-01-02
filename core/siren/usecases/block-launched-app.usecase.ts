@@ -1,4 +1,4 @@
-import { BlockingWindow } from '@/core/_ports_/siren.tier'
+import { BlockingSchedule } from '@/core/_ports_/siren.tier'
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
 import { selectTargetedApps } from '../selectors/selectTargetedApps'
 
@@ -19,7 +19,7 @@ export const blockLaunchedApp = createAppAsyncThunk(
         `[blockLaunchedApp] Siren detected: ${packageName} - blocking`,
       )
       const now = dateProvider.getISOStringNow()
-      const window: BlockingWindow = {
+      const blockingSchedule: BlockingSchedule = {
         id: `immediate-${packageName}`,
         startTime: now,
         endTime: now,
@@ -33,7 +33,7 @@ export const blockLaunchedApp = createAppAsyncThunk(
           keywords: [],
         },
       }
-      await sirenTier.block([window])
+      await sirenTier.block([blockingSchedule])
     } else {
       logger.info(
         `[blockLaunchedApp] App launched: ${packageName} - not a siren`,

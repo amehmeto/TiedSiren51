@@ -38,19 +38,23 @@ export function blockLaunchedAppFixture(
     },
     then: {
       appShouldBeBlocked(packageName: string) {
-        const hasApp = sirenTier.schedule.some((window) =>
-          window.sirens.android.some((app) => app.packageName === packageName),
+        const hasApp = sirenTier.schedules.some((schedule) =>
+          schedule.sirens.android.some(
+            (app) => app.packageName === packageName,
+          ),
         )
         expect(hasApp).toBe(true)
       },
       appShouldNotBeBlocked(packageName: string) {
-        const hasApp = sirenTier.schedule.some((window) =>
-          window.sirens.android.some((app) => app.packageName === packageName),
+        const hasApp = sirenTier.schedules.some((schedule) =>
+          schedule.sirens.android.some(
+            (app) => app.packageName === packageName,
+          ),
         )
         expect(hasApp).toBe(false)
       },
       noAppShouldBeBlocked() {
-        expect(sirenTier.schedule).toHaveLength(0)
+        expect(sirenTier.schedules).toHaveLength(0)
       },
     },
   }

@@ -2,7 +2,7 @@ import { setCallbackClass } from '@amehmeto/expo-foreground-service'
 import { BLOCKING_CALLBACK_CLASS } from '@amehmeto/tied-siren-blocking-overlay'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ISODateString } from '@/core/_ports_/date-provider'
-import { BlockingWindow } from '@/core/_ports_/siren.tier'
+import { BlockingSchedule } from '@/core/_ports_/siren.tier'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { AndroidSirenTier } from './android.siren-tier'
 
@@ -23,7 +23,7 @@ describe('AndroidSirenTier', () => {
   const startTime: ISODateString = '2024-01-01T10:00:00.000Z'
   const endTime: ISODateString = '2024-01-01T11:00:00.000Z'
 
-  const createBlockingWindow = (id: string): BlockingWindow => ({
+  const createBlockingSchedule = (id: string): BlockingSchedule => ({
     id,
     startTime,
     endTime,
@@ -45,34 +45,34 @@ describe('AndroidSirenTier', () => {
   })
 
   describe('block', () => {
-    it('logs received schedule with window count', async () => {
-      const schedule = [createBlockingWindow('window-1')]
+    it('logs received schedule count', async () => {
+      const schedules = [createBlockingSchedule('schedule-1')]
       const expectedLog = {
         level: 'info',
-        message: '[AndroidSirenTier] Received blocking schedule with 1 windows',
+        message: '[AndroidSirenTier] Received 1 blocking schedules',
       }
 
-      await androidSirenTier.block(schedule)
+      await androidSirenTier.block(schedules)
 
       expect(logger.getLogs()).toContainEqual(expectedLog)
     })
 
-    it('logs each window details', async () => {
-      const schedule = [createBlockingWindow('window-1')]
+    it('logs each schedule details', async () => {
+      const schedules = [createBlockingSchedule('schedule-1')]
       const expectedLog = {
         level: 'info',
-        message: `[AndroidSirenTier]   Window window-1: ${startTime}-${endTime}`,
+        message: `[AndroidSirenTier]   Schedule schedule-1: ${startTime}-${endTime}`,
       }
 
-      await androidSirenTier.block(schedule)
+      await androidSirenTier.block(schedules)
 
       expect(logger.getLogs()).toContainEqual(expectedLog)
     })
 
-    it('handles empty schedule', async () => {
+    it('handles empty schedule list', async () => {
       const expectedLog = {
         level: 'info',
-        message: '[AndroidSirenTier] Received blocking schedule with 0 windows',
+        message: '[AndroidSirenTier] Received 0 blocking schedules',
       }
 
       await androidSirenTier.block([])

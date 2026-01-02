@@ -1,8 +1,8 @@
 import { Logger } from '@/core/_ports_/logger'
-import { BlockingWindow, SirenTier } from '@core/_ports_/siren.tier'
+import { BlockingSchedule, SirenTier } from '@core/_ports_/siren.tier'
 
 export class InMemorySirenTier implements SirenTier {
-  schedule: BlockingWindow[] = []
+  schedules: BlockingSchedule[] = []
 
   isNativeBlockingInitialized = false
 
@@ -15,12 +15,12 @@ export class InMemorySirenTier implements SirenTier {
     this.isNativeBlockingInitialized = true
   }
 
-  async block(schedule: BlockingWindow[]): Promise<void> {
+  async block(schedules: BlockingSchedule[]): Promise<void> {
     try {
       this.logger.info(
-        `[InMemorySirenTier] Set blocking schedule with ${schedule.length} windows`,
+        `[InMemorySirenTier] Set ${schedules.length} blocking schedules`,
       )
-      this.schedule = schedule
+      this.schedules = schedules
     } catch (error) {
       this.logger.error(
         `[InMemorySirenTier] Failed to set blocking schedule: ${error}`,

@@ -1,7 +1,7 @@
 import { setCallbackClass } from '@amehmeto/expo-foreground-service'
 import { BLOCKING_CALLBACK_CLASS } from '@amehmeto/tied-siren-blocking-overlay'
 import { Logger } from '@/core/_ports_/logger'
-import { BlockingWindow, SirenTier } from '@core/_ports_/siren.tier'
+import { BlockingSchedule, SirenTier } from '@core/_ports_/siren.tier'
 
 export class AndroidSirenTier implements SirenTier {
   constructor(private readonly logger: Logger) {}
@@ -18,14 +18,14 @@ export class AndroidSirenTier implements SirenTier {
     }
   }
 
-  async block(schedule: BlockingWindow[]): Promise<void> {
+  async block(schedules: BlockingSchedule[]): Promise<void> {
     try {
       this.logger.info(
-        `[AndroidSirenTier] Received blocking schedule with ${schedule.length} windows`,
+        `[AndroidSirenTier] Received ${schedules.length} blocking schedules`,
       )
-      schedule.forEach((window) => {
+      schedules.forEach((schedule) => {
         this.logger.info(
-          `[AndroidSirenTier]   Window ${window.id}: ${window.startTime}-${window.endTime}`,
+          `[AndroidSirenTier]   Schedule ${schedule.id}: ${schedule.startTime}-${schedule.endTime}`,
         )
       })
     } catch (error) {

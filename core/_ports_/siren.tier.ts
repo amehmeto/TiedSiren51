@@ -1,7 +1,7 @@
 import { Sirens } from '../siren/sirens'
 import { ISODateString } from './date-provider'
 
-export type BlockingWindow = {
+export type BlockingSchedule = {
   id: string
   startTime: ISODateString
   endTime: ISODateString
@@ -10,5 +10,5 @@ export type BlockingWindow = {
 
 export interface SirenTier {
   initializeNativeBlocking(): Promise<void>
-  block(schedule: BlockingWindow[]): Promise<void>
+  block(schedule: BlockingSchedule[]): Promise<void>
 }
