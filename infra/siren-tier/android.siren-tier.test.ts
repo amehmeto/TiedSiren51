@@ -2,7 +2,7 @@ import { setCallbackClass } from '@amehmeto/expo-foreground-service'
 import { BLOCKING_CALLBACK_CLASS } from '@amehmeto/tied-siren-blocking-overlay'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { ISODateString } from '@/core/_ports_/date-provider'
-import { BlockingSchedule } from '@/core/_ports_/siren.tier'
+import { buildBlockingSchedule } from '@/core/_tests_/data-builders/blocking-schedule.builder'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { AndroidSirenTier } from './android.siren-tier'
 
@@ -23,21 +23,6 @@ describe('AndroidSirenTier', () => {
   const startTime: ISODateString = '2024-01-01T10:00:00.000Z'
   const endTime: ISODateString = '2024-01-01T11:00:00.000Z'
 
-  const createBlockingSchedule = (id: string): BlockingSchedule => ({
-    id,
-    startTime,
-    endTime,
-    sirens: {
-      android: [],
-      windows: [],
-      macos: [],
-      ios: [],
-      linux: [],
-      websites: [],
-      keywords: [],
-    },
-  })
-
   beforeEach(() => {
     vi.clearAllMocks()
     logger = new InMemoryLogger()
@@ -46,7 +31,7 @@ describe('AndroidSirenTier', () => {
 
   describe('block', () => {
     it('logs received schedule count', async () => {
-      const schedules = [createBlockingSchedule('schedule-1')]
+      const schedules = [buildBlockingSchedule({ id: 'schedule-1' })]
       const expectedLog = {
         level: 'info',
         message: '[AndroidSirenTier] Received 1 blocking schedules',
@@ -58,7 +43,9 @@ describe('AndroidSirenTier', () => {
     })
 
     it('logs each schedule details', async () => {
-      const schedules = [createBlockingSchedule('schedule-1')]
+      const schedules = [
+        buildBlockingSchedule({ id: 'schedule-1', startTime, endTime }),
+      ]
       const expectedLog = {
         level: 'info',
         message: `[AndroidSirenTier]   Schedule schedule-1: ${startTime}-${endTime}`,
