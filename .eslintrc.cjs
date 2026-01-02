@@ -115,6 +115,7 @@ module.exports = {
     'local-rules/schema-matches-filename': 'error',
     'local-rules/one-view-model-per-file': 'error',
     'local-rules/reducer-in-domain-folder': 'error',
+    'local-rules/no-module-level-constants': 'error',
   },
   overrides: [
     {

@@ -38,6 +38,7 @@ const gatewayImplementationNaming = require('../eslint-rules/gateway-implementat
 const schemaMatchesFilename = require('../eslint-rules/schema-matches-filename.cjs')
 const oneViewModelPerFile = require('../eslint-rules/one-view-model-per-file.cjs')
 const reducerInDomainFolder = require('../eslint-rules/reducer-in-domain-folder.cjs')
+const noModuleLevelConstants = require('../eslint-rules/no-module-level-constants.cjs')
 
 module.exports = {
   rules: {
@@ -77,5 +78,6 @@ module.exports = {
     'schema-matches-filename': schemaMatchesFilename,
     'one-view-model-per-file': oneViewModelPerFile,
     'reducer-in-domain-folder': reducerInDomainFolder,
+    'no-module-level-constants': noModuleLevelConstants,
   },
 }
