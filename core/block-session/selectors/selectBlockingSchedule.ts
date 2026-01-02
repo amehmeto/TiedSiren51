@@ -5,6 +5,7 @@ import {
   BlockSession,
   blockSessionAdapter,
 } from '@/core/block-session/block-session'
+import { Blocklist, blocklistAdapter } from '@/core/blocklist/blocklist'
 import { Sirens } from '@/core/siren/sirens'
 import { isActive } from './isActive'
 
@@ -48,16 +49,42 @@ const mergeSirens = (sirensArray: Sirens[]): Sirens => {
   }
 }
 
+/**
+ * Selects the blocking schedule by joining active sessions with fresh blocklist data.
+ *
+ * This selector:
+ * 1. Gets all active block sessions
+ * 2. Joins embedded blocklist IDs with current blocklist state (fresh data)
+ * 3. Creates BlockingSchedule objects with time ranges and deduplicated sirens
+ * 4. Falls back to embedded blocklist data if blocklist was deleted
+ *
+ * @param dateProvider - Provider for current date/time
+ * @param blockSessionState - Block session entity state
+ * @param blocklistState - Blocklist entity state for fresh data lookup
+ * @returns BlockingSchedule[] with each schedule containing id, startTime, endTime, and sirens
+ */
 export const selectBlockingSchedule = (
   dateProvider: DateProvider,
-  blockSession: EntityState<BlockSession, string>,
+  blockSessionState: EntityState<BlockSession, string>,
+  blocklistState: EntityState<Blocklist, string>,
 ): BlockingSchedule[] => {
   const activeSessions = blockSessionAdapter
     .getSelectors()
-    .selectAll(blockSession)
+    .selectAll(blockSessionState)
     .filter((session) => isActive(dateProvider, session))
 
+  const blocklistSelectors = blocklistAdapter.getSelectors()
+
   return activeSessions.map((session) => {
+    // Join with fresh blocklist data from state (not stale embedded copies)
+    // Falls back to embedded data if blocklist was deleted
+    const blocklistIds = blocklistSelectors.selectIds(blocklistState)
+    const freshBlocklists = session.blocklists.map((embedded) => {
+      const isInState = blocklistIds.includes(embedded.id)
+      if (!isInState) return embedded
+      return blocklistSelectors.selectById(blocklistState, embedded.id)
+    })
+
     const schedule: BlockingSchedule = {
       id: session.id,
       startTime: dateProvider.toISOString(
@@ -66,7 +93,7 @@ export const selectBlockingSchedule = (
       endTime: dateProvider.toISOString(
         dateProvider.recoverDate(session.endedAt),
       ),
-      sirens: mergeSirens(session.blocklists.map((bl) => bl.sirens)),
+      sirens: mergeSirens(freshBlocklists.map((bl) => bl.sirens)),
     }
     return schedule
   })
