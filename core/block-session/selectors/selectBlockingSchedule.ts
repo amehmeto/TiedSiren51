@@ -18,6 +18,23 @@ const emptySirens: Sirens = {
   keywords: [],
 }
 
+const deduplicateSirens = (sirens: Sirens): Sirens => {
+  const uniqueAndroid = sirens.android.filter(
+    (app, index, self) =>
+      self.findIndex((a) => a.packageName === app.packageName) === index,
+  )
+
+  return {
+    android: uniqueAndroid,
+    windows: [...new Set(sirens.windows)],
+    macos: [...new Set(sirens.macos)],
+    ios: [...new Set(sirens.ios)],
+    linux: [...new Set(sirens.linux)],
+    websites: [...new Set(sirens.websites)],
+    keywords: [...new Set(sirens.keywords)],
+  }
+}
+
 const mergeSirens = (sirensArray: Sirens[]): Sirens => {
   const merged = sirensArray.reduce((acc, sirens) => {
     return {
@@ -31,22 +48,7 @@ const mergeSirens = (sirensArray: Sirens[]): Sirens => {
     }
   }, emptySirens)
 
-  // Deduplicate android apps by packageName
-  const uniqueAndroid = merged.android.filter(
-    (app, index, self) =>
-      self.findIndex((a) => a.packageName === app.packageName) === index,
-  )
-
-  return {
-    ...merged,
-    android: uniqueAndroid,
-    windows: [...new Set(merged.windows)],
-    macos: [...new Set(merged.macos)],
-    ios: [...new Set(merged.ios)],
-    linux: [...new Set(merged.linux)],
-    websites: [...new Set(merged.websites)],
-    keywords: [...new Set(merged.keywords)],
-  }
+  return deduplicateSirens(merged)
 }
 
 export const selectBlockingSchedule = (

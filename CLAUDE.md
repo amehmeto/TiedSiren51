@@ -38,6 +38,8 @@ npx prisma generate   # Regenerate Prisma client after schema changes
 
 **NEVER use `switch` statements.** ESLint forbids them - use object maps or if/else chains.
 
+**NEVER use type assertions (`as Type`) for branded types.** Use type guards (`isX()`) or assertion functions (`assertX()`) instead. See `/docs/adr/conventions/type-guards-for-branded-types.md`.
+
 ## Patterns
 
 | Pattern | Location | ADR |

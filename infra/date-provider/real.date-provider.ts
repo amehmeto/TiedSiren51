@@ -1,5 +1,7 @@
 import { DAY, MINUTE } from '@/core/__constants__/time'
 import {
+  assertHHmmString,
+  assertISODateString,
   DateProvider,
   HHmmString,
   ISODateString,
@@ -7,8 +9,9 @@ import {
 
 export class RealDateProvider implements DateProvider {
   getISOStringNow(): ISODateString {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
-    return new Date().toISOString() as ISODateString
+    const result = new Date().toISOString()
+    assertISODateString(result)
+    return result
   }
 
   getNow(): Date {
@@ -53,8 +56,9 @@ export class RealDateProvider implements DateProvider {
   toHHmm(date: Date): HHmmString {
     const hours = String(date.getHours()).padStart(2, '0')
     const minutes = String(date.getMinutes()).padStart(2, '0')
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- padStart guarantees HH:mm format
-    return `${hours}:${minutes}` as HHmmString
+    const result = `${hours}:${minutes}`
+    assertHHmmString(result)
+    return result
   }
 
   parseISOString(isoString: ISODateString): Date {
@@ -62,12 +66,14 @@ export class RealDateProvider implements DateProvider {
   }
 
   toISOString(date: Date): ISODateString {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
-    return date.toISOString() as ISODateString
+    const result = date.toISOString()
+    assertISODateString(result)
+    return result
   }
 
   msToISOString(ms: number): ISODateString {
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Date.toISOString() always returns valid ISO format
-    return new Date(ms).toISOString() as ISODateString
+    const result = new Date(ms).toISOString()
+    assertISODateString(result)
+    return result
   }
 }

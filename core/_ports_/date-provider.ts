@@ -3,6 +3,32 @@ export type ISODateString =
 
 export type HHmmString = `${number}:${number}`
 
+export function isHHmmString(value: string): value is HHmmString {
+  return /^\d{2}:\d{2}$/.test(value)
+}
+
+export function assertHHmmString(value: string): asserts value is HHmmString {
+  if (!isHHmmString(value)) {
+    throw new Error(
+      `Invalid HHmm format: "${value}". Expected "HH:mm" (e.g., "09:30")`,
+    )
+  }
+}
+
+export function isISODateString(value: string): value is ISODateString {
+  return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
+}
+
+export function assertISODateString(
+  value: string,
+): asserts value is ISODateString {
+  if (!isISODateString(value)) {
+    throw new Error(
+      `Invalid ISO date format: "${value}". Expected ISO 8601 (e.g., "2024-01-15T09:30:00.000Z")`,
+    )
+  }
+}
+
 export interface DateProvider {
   getNow(): Date
   getNowMs(): number
