@@ -1,9 +1,8 @@
 import { setCallbackClass } from '@amehmeto/expo-foreground-service'
-import {
-  BLOCKING_CALLBACK_CLASS,
-  showOverlay,
-} from '@amehmeto/tied-siren-blocking-overlay'
+import { BLOCKING_CALLBACK_CLASS } from '@amehmeto/tied-siren-blocking-overlay'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { ISODateString } from '@/core/_ports_/date-provider'
+import { BlockingWindow } from '@/core/_ports_/siren.tier'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { AndroidSirenTier } from './android.siren-tier'
 
@@ -12,16 +11,32 @@ vi.mock('@amehmeto/expo-foreground-service', () => ({
 }))
 
 vi.mock('@amehmeto/tied-siren-blocking-overlay', () => ({
-  showOverlay: vi.fn(),
   BLOCKING_CALLBACK_CLASS: 'com.blocking.CallbackClass',
 }))
 
-const mockShowOverlay = vi.mocked(showOverlay)
 const mockSetCallbackClass = vi.mocked(setCallbackClass)
 
 describe('AndroidSirenTier', () => {
   let androidSirenTier: AndroidSirenTier
   let logger: InMemoryLogger
+
+  const startTime: ISODateString = '2024-01-01T10:00:00.000Z'
+  const endTime: ISODateString = '2024-01-01T11:00:00.000Z'
+
+  const createBlockingWindow = (id: string): BlockingWindow => ({
+    id,
+    startTime,
+    endTime,
+    sirens: {
+      android: [],
+      windows: [],
+      macos: [],
+      ios: [],
+      linux: [],
+      websites: [],
+      keywords: [],
+    },
+  })
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -30,63 +45,39 @@ describe('AndroidSirenTier', () => {
   })
 
   describe('block', () => {
-    it('calls showOverlay with correct packageName', async () => {
-      const packageName = 'com.facebook.katana'
-      mockShowOverlay.mockResolvedValueOnce(undefined)
-
-      await androidSirenTier.block(packageName)
-
-      expect(mockShowOverlay).toHaveBeenCalledTimes(1)
-      expect(mockShowOverlay).toHaveBeenCalledWith(packageName)
-    })
-
-    it('logs success message when overlay is shown', async () => {
-      const packageName = 'com.facebook.katana'
-      mockShowOverlay.mockResolvedValueOnce(undefined)
-      const expectedLogEntry = {
+    it('logs received schedule with window count', async () => {
+      const schedule = [createBlockingWindow('window-1')]
+      const expectedLog = {
         level: 'info',
-        message: `Blocking overlay shown for: ${packageName}`,
+        message: '[AndroidSirenTier] Received blocking schedule with 1 windows',
       }
 
-      await androidSirenTier.block(packageName)
+      await androidSirenTier.block(schedule)
 
-      expect(logger.getLogs()).toContainEqual(expectedLogEntry)
+      expect(logger.getLogs()).toContainEqual(expectedLog)
     })
 
-    it('handles ERR_INVALID_PACKAGE error gracefully', async () => {
-      const error = Object.assign(new Error('Package name cannot be empty'), {
-        code: 'ERR_INVALID_PACKAGE',
-      })
-      mockShowOverlay.mockRejectedValueOnce(error)
-
-      const blockPromise = androidSirenTier.block('')
-
-      await expect(blockPromise).rejects.toThrow('Package name cannot be empty')
-    })
-
-    it('handles ERR_OVERLAY_LAUNCH error gracefully', async () => {
-      const error = Object.assign(new Error('Failed to launch overlay'), {
-        code: 'ERR_OVERLAY_LAUNCH',
-      })
-      mockShowOverlay.mockRejectedValueOnce(error)
-
-      const blockPromise = androidSirenTier.block('com.example.app')
-
-      await expect(blockPromise).rejects.toThrow('Failed to launch overlay')
-    })
-
-    it('logs error message when overlay fails to show', async () => {
-      const packageName = 'com.example.app'
-      const error = new Error('Failed to launch overlay')
-      mockShowOverlay.mockRejectedValueOnce(error)
-      const expectedLogEntry = {
-        level: 'error',
-        message: `[AndroidSirenTier] Failed to show blocking overlay for ${packageName}: ${error}`,
+    it('logs each window details', async () => {
+      const schedule = [createBlockingWindow('window-1')]
+      const expectedLog = {
+        level: 'info',
+        message: `  Window window-1: ${startTime}-${endTime}`,
       }
 
-      await androidSirenTier.block(packageName).catch(() => {})
+      await androidSirenTier.block(schedule)
 
-      expect(logger.getLogs()).toContainEqual(expectedLogEntry)
+      expect(logger.getLogs()).toContainEqual(expectedLog)
+    })
+
+    it('handles empty schedule', async () => {
+      const expectedLog = {
+        level: 'info',
+        message: '[AndroidSirenTier] Received blocking schedule with 0 windows',
+      }
+
+      await androidSirenTier.block([])
+
+      expect(logger.getLogs()).toContainEqual(expectedLog)
     })
   })
 

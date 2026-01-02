@@ -1,10 +1,7 @@
 import { setCallbackClass } from '@amehmeto/expo-foreground-service'
-import {
-  BLOCKING_CALLBACK_CLASS,
-  showOverlay,
-} from '@amehmeto/tied-siren-blocking-overlay'
+import { BLOCKING_CALLBACK_CLASS } from '@amehmeto/tied-siren-blocking-overlay'
 import { Logger } from '@/core/_ports_/logger'
-import { SirenTier } from '@core/_ports_/siren.tier'
+import { BlockingWindow, SirenTier } from '@core/_ports_/siren.tier'
 
 export class AndroidSirenTier implements SirenTier {
   constructor(private readonly logger: Logger) {}
@@ -21,13 +18,19 @@ export class AndroidSirenTier implements SirenTier {
     }
   }
 
-  async block(packageName: string): Promise<void> {
+  async block(schedule: BlockingWindow[]): Promise<void> {
     try {
-      await showOverlay(packageName)
-      this.logger.info(`Blocking overlay shown for: ${packageName}`)
+      this.logger.info(
+        `[AndroidSirenTier] Received blocking schedule with ${schedule.length} windows`,
+      )
+      schedule.forEach((window) => {
+        this.logger.info(
+          `  Window ${window.id}: ${window.startTime}-${window.endTime}`,
+        )
+      })
     } catch (error) {
       this.logger.error(
-        `[AndroidSirenTier] Failed to show blocking overlay for ${packageName}: ${error}`,
+        `[AndroidSirenTier] Failed to set blocking schedule: ${error}`,
       )
       throw error
     }
