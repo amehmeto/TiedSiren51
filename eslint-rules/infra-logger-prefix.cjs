@@ -1,6 +1,6 @@
 /**
- * @fileoverview Enforce that logger.error and logger.warn calls use class name prefix.
- * Format: [ClassName] Error message
+ * @fileoverview Enforce that all logger calls use class name prefix.
+ * Format: [ClassName] Log message
  * This makes logs easier to filter and trace in production.
  * @author TiedSiren
  */
@@ -10,7 +10,7 @@ module.exports = {
     type: 'suggestion',
     docs: {
       description:
-        'Enforce that logger.error/warn calls use [ClassName] prefix',
+        'Enforce that all logger calls (info/warn/error/debug) use [ClassName] prefix',
       category: 'Best Practices',
       recommended: true,
     },
@@ -56,11 +56,12 @@ module.exports = {
       CallExpression(node) {
         if (!currentClassName) return
 
-        // Check for this.logger.error() or this.logger.warn()
+        // Check for this.logger.<method>() calls
         if (!isLoggerCall(node)) return
 
         const methodName = node.callee.property.name
-        if (methodName !== 'error' && methodName !== 'warn') return
+        const logMethods = ['info', 'warn', 'error', 'debug']
+        if (!logMethods.includes(methodName)) return
 
         // Get the first argument (the message)
         const firstArg = node.arguments[0]
@@ -86,7 +87,7 @@ module.exports = {
     }
 
     function isLoggerCall(node) {
-      // Match: this.logger.error() or this.logger.warn()
+      // Match: this.logger.<method>() calls
       if (node.callee.type !== 'MemberExpression') return false
 
       const object = node.callee.object

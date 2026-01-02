@@ -26,6 +26,7 @@ npm test              # Run tests (watch mode)
 npm run lint          # TypeScript + ESLint + Prettier
 npm run lint:fix      # Auto-fix lint issues
 npx prisma generate   # Regenerate Prisma client after schema changes
+SKIP_E2E_CHECK=true git push  # Push without interactive e2e test prompt
 ```
 
 ## IMPORTANT: Anti-patterns
@@ -37,6 +38,8 @@ npx prisma generate   # Regenerate Prisma client after schema changes
 **NEVER put business logic in React components.** Logic belongs in Redux slices, use cases, or listeners. Components consume view models.
 
 **NEVER use `switch` statements.** ESLint forbids them - use object maps or if/else chains.
+
+**NEVER use type assertions (`as Type`) for branded types.** Use type guards (`isX()`) or assertion functions (`assertX()`) instead. See `/docs/adr/conventions/type-guards-for-branded-types.md`.
 
 ## Patterns
 

@@ -14,8 +14,8 @@ import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-reposito
 import { SentryLogger } from '@/infra/logger/sentry.logger'
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
 import { PrismaSirensRepository } from '@/infra/siren-repository/prisma.sirens-repository'
+import { RealAndroidSirenLookout } from '@/infra/siren-tier/android.siren-lookout'
 import { AndroidSirenTier } from '@/infra/siren-tier/android.siren-tier'
-import { RealAndroidSirenLookout } from '@/infra/siren-tier/real-android.siren-lookout'
 import { PrismaTimerRepository } from '@/infra/timer-repository/prisma.timer.repository'
 
 const logger = new SentryLogger()

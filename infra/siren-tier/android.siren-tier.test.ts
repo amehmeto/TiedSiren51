@@ -1,9 +1,14 @@
 import { setCallbackClass } from '@amehmeto/expo-foreground-service'
 import {
   BLOCKING_CALLBACK_CLASS,
-  showOverlay,
+  setBlockedApps,
 } from '@amehmeto/tied-siren-blocking-overlay'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import {
+  facebookAndroidSiren,
+  instagramAndroidSiren,
+} from '@/core/_tests_/data-builders/android-siren.builder'
+import { buildBlockingSchedule } from '@/core/_tests_/data-builders/blocking-schedule.builder'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { AndroidSirenTier } from './android.siren-tier'
 
@@ -12,12 +17,12 @@ vi.mock('@amehmeto/expo-foreground-service', () => ({
 }))
 
 vi.mock('@amehmeto/tied-siren-blocking-overlay', () => ({
-  showOverlay: vi.fn(),
   BLOCKING_CALLBACK_CLASS: 'com.blocking.CallbackClass',
+  setBlockedApps: vi.fn(),
 }))
 
-const mockShowOverlay = vi.mocked(showOverlay)
 const mockSetCallbackClass = vi.mocked(setCallbackClass)
+const mockSetBlockedApps = vi.mocked(setBlockedApps)
 
 describe('AndroidSirenTier', () => {
   let androidSirenTier: AndroidSirenTier
@@ -29,64 +34,69 @@ describe('AndroidSirenTier', () => {
     androidSirenTier = new AndroidSirenTier(logger)
   })
 
-  describe('block', () => {
-    it('calls showOverlay with correct packageName', async () => {
-      const packageName = 'com.facebook.katana'
-      mockShowOverlay.mockResolvedValueOnce(undefined)
+  describe('updateBlockingSchedule', () => {
+    it('calls setBlockedApps with package names from schedule', async () => {
+      mockSetBlockedApps.mockResolvedValueOnce(undefined)
+      const schedules = [
+        buildBlockingSchedule({
+          sirens: {
+            android: [facebookAndroidSiren],
+          },
+        }),
+      ]
 
-      await androidSirenTier.block(packageName)
+      await androidSirenTier.updateBlockingSchedule(schedules)
 
-      expect(mockShowOverlay).toHaveBeenCalledTimes(1)
-      expect(mockShowOverlay).toHaveBeenCalledWith(packageName)
+      expect(mockSetBlockedApps).toHaveBeenCalledWith(['com.facebook.katana'])
     })
 
-    it('logs success message when overlay is shown', async () => {
-      const packageName = 'com.facebook.katana'
-      mockShowOverlay.mockResolvedValueOnce(undefined)
-      const expectedLogEntry = {
+    it('logs schedule count and app count', async () => {
+      mockSetBlockedApps.mockResolvedValueOnce(undefined)
+      const schedules = [
+        buildBlockingSchedule({
+          sirens: {
+            android: [facebookAndroidSiren, instagramAndroidSiren],
+          },
+        }),
+      ]
+      const expectedLog = {
         level: 'info',
-        message: `Blocking overlay shown for: ${packageName}`,
+        message:
+          '[AndroidSirenTier] Blocking schedule updated: 1 schedules, 2 apps',
       }
 
-      await androidSirenTier.block(packageName)
+      await androidSirenTier.updateBlockingSchedule(schedules)
 
-      expect(logger.getLogs()).toContainEqual(expectedLogEntry)
+      expect(logger.getLogs()).toContainEqual(expectedLog)
     })
 
-    it('handles ERR_INVALID_PACKAGE error gracefully', async () => {
-      const error = Object.assign(new Error('Package name cannot be empty'), {
-        code: 'ERR_INVALID_PACKAGE',
-      })
-      mockShowOverlay.mockRejectedValueOnce(error)
+    it('handles empty schedule list', async () => {
+      mockSetBlockedApps.mockResolvedValueOnce(undefined)
+      const expectedLog = {
+        level: 'info',
+        message:
+          '[AndroidSirenTier] Blocking schedule updated: 0 schedules, 0 apps',
+      }
 
-      const blockPromise = androidSirenTier.block('')
+      await androidSirenTier.updateBlockingSchedule([])
 
-      await expect(blockPromise).rejects.toThrow('Package name cannot be empty')
+      expect(mockSetBlockedApps).toHaveBeenCalledWith([])
+      expect(logger.getLogs()).toContainEqual(expectedLog)
     })
 
-    it('handles ERR_OVERLAY_LAUNCH error gracefully', async () => {
-      const error = Object.assign(new Error('Failed to launch overlay'), {
-        code: 'ERR_OVERLAY_LAUNCH',
-      })
-      mockShowOverlay.mockRejectedValueOnce(error)
-
-      const blockPromise = androidSirenTier.block('com.example.app')
-
-      await expect(blockPromise).rejects.toThrow('Failed to launch overlay')
-    })
-
-    it('logs error message when overlay fails to show', async () => {
-      const packageName = 'com.example.app'
-      const error = new Error('Failed to launch overlay')
-      mockShowOverlay.mockRejectedValueOnce(error)
-      const expectedLogEntry = {
+    it('logs error and rethrows when setBlockedApps fails', async () => {
+      const error = new Error('Native module error')
+      mockSetBlockedApps.mockRejectedValueOnce(error)
+      const schedules = [buildBlockingSchedule()]
+      const expectedLog = {
         level: 'error',
-        message: `[AndroidSirenTier] Failed to show blocking overlay for ${packageName}: ${error}`,
+        message: `[AndroidSirenTier] Failed to update blocking schedule: ${error}`,
       }
 
-      await androidSirenTier.block(packageName).catch(() => {})
+      const updatePromise = androidSirenTier.updateBlockingSchedule(schedules)
 
-      expect(logger.getLogs()).toContainEqual(expectedLogEntry)
+      await expect(updatePromise).rejects.toThrow('Native module error')
+      expect(logger.getLogs()).toContainEqual(expectedLog)
     })
   })
 

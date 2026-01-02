@@ -179,7 +179,9 @@ export abstract class PrismaRepository {
         await this.baseClient.$executeRaw`
           ALTER TABLE "Timer" RENAME COLUMN "endAt" TO "endedAt";
         `
-        this.logger.info('Migrated Timer table: renamed endAt to endedAt')
+        this.logger.info(
+          '[PrismaRepository] Migrated Timer table: renamed endAt to endedAt',
+        )
       }
     } catch (error) {
       this.logger.error(

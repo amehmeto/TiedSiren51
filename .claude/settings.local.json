@@ -104,6 +104,7 @@
       "Bash(wc:*)",
       "Bash(which:*)",
       "Bash(xargs cloc:*)",
+      "Skill(worktree)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
@@ -204,6 +205,7 @@
       "Bash(python3:*)",
       "Bash(python:*)",
       "Bash(rm:*)",
+      "Bash(sed:*)",
       "Bash(xargs:*)",
       "Edit(**/.claude/settings.local.json)",
       "Edit(/**/.claude/**)",
@@ -228,6 +230,15 @@
           {
             "type": "command",
             "command": ".claude/hooks/validate-ticket.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/remind-adrs.sh"
           }
         ]
       }

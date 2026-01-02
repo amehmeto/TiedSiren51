@@ -32,7 +32,7 @@ describe('Feature: Block sessions changed listener', () => {
         }),
       ])
 
-      fixture.then.blockedAppsShouldBeSyncedTo(['com.facebook.katana'])
+      fixture.then.blockingScheduleShouldContainApps(['com.facebook.katana'])
     })
 
     it('should clear blocked apps when session ends', async () => {
@@ -53,7 +53,7 @@ describe('Feature: Block sessions changed listener', () => {
 
       await fixture.when.blockSessionsChange([])
 
-      fixture.then.blockedAppsShouldBeEmpty()
+      fixture.then.blockingScheduleShouldBeEmpty()
     })
 
     it('should sync combined apps from multiple active sessions', async () => {
@@ -83,7 +83,7 @@ describe('Feature: Block sessions changed listener', () => {
         }),
       ])
 
-      fixture.then.blockedAppsShouldBeSyncedTo([
+      fixture.then.blockingScheduleShouldContainApps([
         'com.facebook.katana',
         'com.example.instagram',
       ])
@@ -118,7 +118,7 @@ describe('Feature: Block sessions changed listener', () => {
         }),
       ])
 
-      fixture.then.blockedAppsShouldBeSyncedTo([
+      fixture.then.blockingScheduleShouldContainApps([
         'com.facebook.katana',
         'com.example.tiktok',
       ])
@@ -146,7 +146,7 @@ describe('Feature: Block sessions changed listener', () => {
         }),
       ])
 
-      fixture.then.blockedAppsShouldBeSyncedTo([
+      fixture.then.blockingScheduleShouldContainApps([
         'com.facebook.katana',
         'com.example.instagram',
       ])
@@ -214,7 +214,7 @@ describe('Feature: Block sessions changed listener', () => {
         }),
       ])
 
-      fixture.then.blockedAppsShouldBeEmpty()
+      fixture.then.blockingScheduleShouldBeEmpty()
     })
   })
 
@@ -263,7 +263,7 @@ describe('Feature: Block sessions changed listener', () => {
 
     it('should log error when syncBlockedApps throws but continue protection', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
-      fixture.given.syncBlockedAppsWillThrow()
+      fixture.given.updateBlockingScheduleWillThrow()
       fixture.given.storeIsCreated()
 
       await fixture.when.blockSessionsChange([
@@ -278,7 +278,7 @@ describe('Feature: Block sessions changed listener', () => {
         }),
       ])
 
-      fixture.then.errorShouldBeLogged('Failed to sync blocked apps')
+      fixture.then.errorShouldBeLogged('Failed to update blocking schedule')
       fixture.then.watchingShouldBeStarted()
       fixture.then.foregroundServiceShouldBeStarted()
     })
