@@ -13,13 +13,14 @@ import {
 } from '@/core/block-session/block-session'
 import { InMemoryRepository } from '../__abstract__/in-memory.repository'
 
-const startedAt: HHmmString = '10:48'
-const endedAt: HHmmString = '13:58'
-
 export class FakeDataBlockSessionRepository
   extends InMemoryRepository<BlockSession>
   implements BlockSessionRepository
 {
+  private static readonly startedAt: HHmmString = '10:48'
+
+  private static readonly endedAt: HHmmString = '13:58'
+
   entities: Map<string, BlockSession> = new Map(
     [
       buildBlockSession({
@@ -65,8 +66,8 @@ export class FakeDataBlockSessionRepository
             name: 'Google Pixel 3a',
           },
         ],
-        startedAt,
-        endedAt,
+        startedAt: FakeDataBlockSessionRepository.startedAt,
+        endedAt: FakeDataBlockSessionRepository.endedAt,
         startNotificationId: 'start-notification-id',
         endNotificationId: 'end-notification-id',
       }),
@@ -113,8 +114,8 @@ export class FakeDataBlockSessionRepository
             name: 'Google Pixel 3a',
           },
         ],
-        startedAt,
-        endedAt,
+        startedAt: FakeDataBlockSessionRepository.startedAt,
+        endedAt: FakeDataBlockSessionRepository.endedAt,
         startNotificationId: 'start-notification-id',
         endNotificationId: 'end-notification-id',
         blockingConditions: [BlockingConditions.TIME],
@@ -162,8 +163,8 @@ export class FakeDataBlockSessionRepository
             name: 'Google Pixel 3a',
           },
         ],
-        startedAt,
-        endedAt,
+        startedAt: FakeDataBlockSessionRepository.startedAt,
+        endedAt: FakeDataBlockSessionRepository.endedAt,
         startNotificationId: 'start-notification-id',
         endNotificationId: 'end-notification-id',
         blockingConditions: [BlockingConditions.TIME],
