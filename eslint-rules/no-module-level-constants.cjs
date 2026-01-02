@@ -70,11 +70,6 @@ module.exports = {
       return {}
     }
 
-    // Allow in fake-data files - test infrastructure
-    if (filename.includes('fake-data.')) {
-      return {}
-    }
-
     // Allow in _tests_ directory - test utilities
     if (filename.includes('/_tests_/') || filename.includes('\\_tests_\\')) {
       return {}
