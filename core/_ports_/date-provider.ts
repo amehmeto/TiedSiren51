@@ -3,8 +3,10 @@ export type ISODateString =
 
 export type HHmmString = `${number}:${number}`
 
+const HHMM_PATTERN = /^\d{2}:\d{2}$/
+
 export function isHHmmString(value: string): value is HHmmString {
-  return /^\d{2}:\d{2}$/.test(value)
+  return HHMM_PATTERN.test(value)
 }
 
 export function assertHHmmString(value: string): asserts value is HHmmString {
@@ -15,8 +17,10 @@ export function assertHHmmString(value: string): asserts value is HHmmString {
   }
 }
 
+const ISO_DATE_PATTERN = /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/
+
 export function isISODateString(value: string): value is ISODateString {
-  return /^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}\.\d{3}Z$/.test(value)
+  return ISO_DATE_PATTERN.test(value)
 }
 
 export function assertISODateString(

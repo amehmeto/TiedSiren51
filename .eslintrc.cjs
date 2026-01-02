@@ -116,6 +116,7 @@ module.exports = {
     'local-rules/one-view-model-per-file': 'error',
     'local-rules/reducer-in-domain-folder': 'error',
     'local-rules/no-module-level-constants': 'error',
+    'local-rules/require-named-regex': 'error',
   },
   overrides: [
     {

@@ -145,6 +145,11 @@ module.exports = {
               return
             }
 
+            // Allow regex pattern constants (e.g., HHMM_PATTERN, EMAIL_REGEX)
+            if (name.endsWith('_PATTERN') || name.endsWith('_REGEX')) {
+              return
+            }
+
             context.report({
               node: declaration,
               messageId: 'noModuleLevelConstant',
