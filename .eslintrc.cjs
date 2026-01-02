@@ -200,6 +200,26 @@ module.exports = {
         'local-rules/use-data-builders': 'error',
       },
     },
+    // No data builders in production code
+    {
+      files: ['**/*.ts', '**/*.tsx'],
+      excludedFiles: [
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/*.spec.ts',
+        '**/*.spec.tsx',
+        '**/*.fixture.ts',
+        '**/*.fixture.tsx',
+        '**/*.builder.ts',
+        '**/*.builder.tsx',
+        '**/core/_tests_/**',
+        '**/fake-data.*.ts', // Fake repositories for development/testing
+        '**/preloadedStateForManualTesting.ts', // Manual testing utilities
+      ],
+      rules: {
+        'local-rules/no-data-builders-in-production': 'error',
+      },
+    },
     // No non-deterministic values in core (use injected dependencies)
     {
       files: ['core/**/*.ts'],

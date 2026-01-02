@@ -21,6 +21,7 @@ const noTryCatchInCore = require('../eslint-rules/no-try-catch-in-core.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
 const requireColocatedTest = require('../eslint-rules/require-colocated-test.cjs')
 const useDataBuilders = require('../eslint-rules/use-data-builders.cjs')
+const noDataBuildersInProduction = require('../eslint-rules/no-data-builders-in-production.cjs')
 const fileNamingConvention = require('../eslint-rules/file-naming-convention.cjs')
 const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
 const selectorMatchesFilename = require('../eslint-rules/selector-matches-filename.cjs')
@@ -62,6 +63,7 @@ module.exports = {
     'no-new-in-test-body': noNewInTestBody,
     'require-colocated-test': requireColocatedTest,
     'use-data-builders': useDataBuilders,
+    'no-data-builders-in-production': noDataBuildersInProduction,
     'usecase-matches-filename': usecaseMatchesFilename,
     'no-cross-layer-imports': noCrossLayerImports,
     'listener-matches-filename': listenerMatchesFilename,
