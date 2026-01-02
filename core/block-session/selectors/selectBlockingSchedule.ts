@@ -74,11 +74,11 @@ export const selectBlockingSchedule = (
     .filter((session) => isActive(dateProvider, session))
 
   const blocklistSelectors = blocklistAdapter.getSelectors()
+  const blocklistIds = blocklistSelectors.selectIds(blocklistState)
 
   return activeSessions.map((session) => {
     // Join with fresh blocklist data from state (not stale embedded copies)
     // Falls back to embedded data if blocklist was deleted
-    const blocklistIds = blocklistSelectors.selectIds(blocklistState)
     const freshBlocklists = session.blocklists.map((embedded) => {
       const isInState = blocklistIds.includes(embedded.id)
       if (!isInState) return embedded
