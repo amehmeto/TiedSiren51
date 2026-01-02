@@ -237,7 +237,7 @@
         "hooks": [
           {
             "type": "command",
-            "command": ".claude/hooks/remind-testing-adrs.sh"
+            "command": ".claude/hooks/remind-adrs.sh"
           }
         ]
       }
