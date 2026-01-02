@@ -1,11 +1,19 @@
 import { faker } from '@faker-js/faker'
 import type { PartialDeep } from 'type-fest'
-import { ISODateString } from '@/core/_ports_/date-provider'
+import {
+  assertISODateString,
+  ISODateString,
+} from '@/core/_ports_/date-provider'
 import { BlockingSchedule } from '@/core/_ports_/siren.tier'
 import { buildSirens } from './sirens.builder'
 
-const defaultStartTime: ISODateString = '2024-01-01T10:00:00.000Z'
-const defaultEndTime: ISODateString = '2024-01-01T11:00:00.000Z'
+const defaultStartTimeValue = '2024-01-01T10:00:00.000Z'
+assertISODateString(defaultStartTimeValue)
+const defaultStartTime: ISODateString = defaultStartTimeValue
+
+const defaultEndTimeValue = '2024-01-01T11:00:00.000Z'
+assertISODateString(defaultEndTimeValue)
+const defaultEndTime: ISODateString = defaultEndTimeValue
 
 export function buildBlockingSchedule(
   wantedSchedule: PartialDeep<BlockingSchedule> = {},

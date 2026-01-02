@@ -19,10 +19,9 @@ const emptySirens: Sirens = {
 }
 
 const deduplicateSirens = (sirens: Sirens): Sirens => {
-  const uniqueAndroid = sirens.android.filter(
-    (app, index, self) =>
-      self.findIndex((a) => a.packageName === app.packageName) === index,
-  )
+  const uniqueAndroid = [
+    ...new Map(sirens.android.map((app) => [app.packageName, app])).values(),
+  ]
 
   return {
     android: uniqueAndroid,
