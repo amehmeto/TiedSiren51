@@ -1,5 +1,9 @@
 import { DAY, MINUTE } from '@/core/__constants__/time'
-import { DateProvider, ISODateString } from '@/core/_ports_/date-provider'
+import {
+  DateProvider,
+  HHmmString,
+  ISODateString,
+} from '@/core/_ports_/date-provider'
 
 export class RealDateProvider implements DateProvider {
   getISOStringNow(): ISODateString {
@@ -15,7 +19,7 @@ export class RealDateProvider implements DateProvider {
     return Date.now()
   }
 
-  getHHmmNow(): string {
+  getHHmmNow(): HHmmString {
     return this.toHHmm(this.getNow())
   }
 
@@ -23,11 +27,11 @@ export class RealDateProvider implements DateProvider {
     return new Date(new Date().getTime() + minutes * MINUTE)
   }
 
-  getHHmmMinutesFromNow(minutes: number): string {
+  getHHmmMinutesFromNow(minutes: number): HHmmString {
     return this.toHHmm(this.getMinutesFromNow(minutes))
   }
 
-  recoverDate(timeInHHmm: string): Date {
+  recoverDate(timeInHHmm: HHmmString): Date {
     const [hours, minutes] = timeInHHmm.split(':').map(Number)
 
     const todayWithNewTime = new Date()
@@ -36,7 +40,7 @@ export class RealDateProvider implements DateProvider {
     return todayWithNewTime
   }
 
-  recoverYesterdayDate(timeInHHmm: string): Date {
+  recoverYesterdayDate(timeInHHmm: HHmmString): Date {
     const [hours, minutes] = timeInHHmm.split(':').map(Number)
 
     const today = new Date().getTime()
@@ -46,10 +50,11 @@ export class RealDateProvider implements DateProvider {
     return yesterdayWithNewTime
   }
 
-  toHHmm(date: Date): string {
+  toHHmm(date: Date): HHmmString {
     const hours = String(date.getHours()).padStart(2, '0')
     const minutes = String(date.getMinutes()).padStart(2, '0')
-    return `${hours}:${minutes}`
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- padStart guarantees HH:mm format
+    return `${hours}:${minutes}` as HHmmString
   }
 
   parseISOString(isoString: ISODateString): Date {

@@ -1,4 +1,5 @@
 import { faker } from '@faker-js/faker'
+import { HHmmString } from '@/core/_ports_/date-provider'
 import {
   BlockingConditions,
   BlockSession,
@@ -15,11 +16,14 @@ export const buildBlockSession = (
     'Meditation time',
   ]
 
-  const defaultBlockSession = {
+  const startedAt: HHmmString = '03:48'
+  const endedAt: HHmmString = '13:58'
+
+  const defaultBlockSession: BlockSession = {
     id: faker.string.uuid(),
     name: faker.helpers.arrayElement(sessionNameExamples),
-    startedAt: '03:48',
-    endedAt: '13:58',
+    startedAt,
+    endedAt,
     startNotificationId: 'start-notification-id',
     endNotificationId: 'end-notification-id',
     blocklists: [buildBlocklist()],

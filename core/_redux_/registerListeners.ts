@@ -9,8 +9,14 @@ export const registerListeners = (
   store: AppStore,
   dependencies: Dependencies,
 ) => {
-  const { authGateway, dateProvider, foregroundService, logger, sirenLookout } =
-    dependencies
+  const {
+    authGateway,
+    dateProvider,
+    foregroundService,
+    logger,
+    sirenLookout,
+    sirenTier,
+  } = dependencies
 
   onUserLoggedInListener({
     store,
@@ -25,7 +31,6 @@ export const registerListeners = (
   })
 
   onSirenDetectedListener({
-    store,
     sirenLookout,
     logger,
   })
@@ -33,6 +38,7 @@ export const registerListeners = (
   onBlockSessionsChangedListener({
     store,
     sirenLookout,
+    sirenTier,
     foregroundService,
     dateProvider,
     logger,

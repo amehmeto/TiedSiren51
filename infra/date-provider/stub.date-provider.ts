@@ -1,5 +1,9 @@
 import { DAY, MINUTE } from '@/core/__constants__/time'
-import { DateProvider, ISODateString } from '@/core/_ports_/date-provider'
+import {
+  DateProvider,
+  HHmmString,
+  ISODateString,
+} from '@/core/_ports_/date-provider'
 
 export class StubDateProvider implements DateProvider {
   now = new Date()
@@ -17,11 +21,11 @@ export class StubDateProvider implements DateProvider {
     return this.now.toISOString() as ISODateString
   }
 
-  getHHmmNow(): string {
+  getHHmmNow(): HHmmString {
     return this.toHHmm(this.now)
   }
 
-  recoverDate(timeInHHmm: string): Date {
+  recoverDate(timeInHHmm: HHmmString): Date {
     const [hours, minutes] = timeInHHmm.split(':').map(Number)
 
     const todayWithNewTime = new Date(this.now.getTime())
@@ -30,13 +34,14 @@ export class StubDateProvider implements DateProvider {
     return todayWithNewTime
   }
 
-  toHHmm(date: Date): string {
+  toHHmm(date: Date): HHmmString {
     const hours = String(date.getHours()).padStart(2, '0')
     const minutes = String(date.getMinutes()).padStart(2, '0')
-    return `${hours}:${minutes}`
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- padStart guarantees HH:mm format
+    return `${hours}:${minutes}` as HHmmString
   }
 
-  recoverYesterdayDate(timeInHHmm: string): Date {
+  recoverYesterdayDate(timeInHHmm: HHmmString): Date {
     const [hours, minutes] = timeInHHmm.split(':').map(Number)
 
     const todayWithNewTime = new Date(this.now.getTime() - 1 * DAY)
@@ -45,7 +50,7 @@ export class StubDateProvider implements DateProvider {
     return todayWithNewTime
   }
 
-  getHHmmMinutesFromNow(minutes: number): string {
+  getHHmmMinutesFromNow(minutes: number): HHmmString {
     return this.toHHmm(this.getMinutesFromNow(minutes))
   }
 

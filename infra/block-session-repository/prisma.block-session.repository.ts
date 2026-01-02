@@ -1,6 +1,7 @@
 import uuid from 'react-native-uuid'
 import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
 import { CreatePayload } from '@/core/_ports_/create.payload'
+import { HHmmString } from '@/core/_ports_/date-provider'
 import { Logger } from '@/core/_ports_/logger'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { BlockSession } from '@/core/block-session/block-session'
@@ -90,8 +91,10 @@ export class PrismaBlockSessionRepository
     return {
       id: dbSession.id,
       name: dbSession.name,
-      startedAt: dbSession.startedAt,
-      endedAt: dbSession.endedAt,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- DB stores HH:mm format strings
+      startedAt: dbSession.startedAt as HHmmString,
+      // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- DB stores HH:mm format strings
+      endedAt: dbSession.endedAt as HHmmString,
       startNotificationId: dbSession.startNotificationId,
       endNotificationId: dbSession.endNotificationId,
       blockingConditions: JSON.parse(dbSession.blockingConditions),

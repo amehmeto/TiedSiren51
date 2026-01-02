@@ -1,5 +1,8 @@
 import { setCallbackClass } from '@amehmeto/expo-foreground-service'
-import { BLOCKING_CALLBACK_CLASS } from '@amehmeto/tied-siren-blocking-overlay'
+import {
+  BLOCKING_CALLBACK_CLASS,
+  setBlockedApps,
+} from '@amehmeto/tied-siren-blocking-overlay'
 import { Logger } from '@/core/_ports_/logger'
 import { BlockingSchedule, SirenTier } from '@core/_ports_/siren.tier'
 
@@ -18,19 +21,18 @@ export class AndroidSirenTier implements SirenTier {
     }
   }
 
-  async block(schedules: BlockingSchedule[]): Promise<void> {
+  async updateBlockingSchedule(schedule: BlockingSchedule[]): Promise<void> {
     try {
-      this.logger.info(
-        `[AndroidSirenTier] Received ${schedules.length} blocking schedules`,
+      const packageNames = schedule.flatMap((s) =>
+        s.sirens.android.map((app) => app.packageName),
       )
-      schedules.forEach((schedule) => {
-        this.logger.info(
-          `[AndroidSirenTier]   Schedule ${schedule.id}: ${schedule.startTime}-${schedule.endTime}`,
-        )
-      })
+      await setBlockedApps(packageNames)
+      this.logger.info(
+        `[AndroidSirenTier] Blocking schedule updated: ${schedule.length} schedules, ${packageNames.length} apps`,
+      )
     } catch (error) {
       this.logger.error(
-        `[AndroidSirenTier] Failed to set blocking schedule: ${error}`,
+        `[AndroidSirenTier] Failed to update blocking schedule: ${error}`,
       )
       throw error
     }

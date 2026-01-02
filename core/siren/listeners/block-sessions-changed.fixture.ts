@@ -7,6 +7,7 @@ import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemoryForegroundService } from '@/infra/foreground-service/in-memory.foreground.service'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
+import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0))
 
@@ -15,14 +16,15 @@ export function onBlockSessionsChangedFixture(
 ) {
   const dateProvider = new StubDateProvider()
   const sirenLookout = new InMemorySirenLookout()
-  const foregroundService = new InMemoryForegroundService()
   const logger = new InMemoryLogger()
+  const sirenTier = new InMemorySirenTier(logger)
+  const foregroundService = new InMemoryForegroundService()
 
   let store: ReturnType<typeof createTestStore> | undefined
 
   const createStoreWithState = () => {
     store = createTestStore(
-      { sirenLookout, foregroundService, dateProvider, logger },
+      { sirenLookout, sirenTier, foregroundService, dateProvider, logger },
       testStateBuilderProvider.getState(),
     )
     return store
@@ -49,8 +51,8 @@ export function onBlockSessionsChangedFixture(
       stopWatchingWillThrow() {
         sirenLookout.shouldThrowOnStop = true
       },
-      syncBlockedAppsWillThrow() {
-        sirenLookout.shouldThrowOnSync = true
+      updateBlockingScheduleWillThrow() {
+        sirenTier.shouldThrowOnSync = true
       },
       startForegroundServiceWillThrow() {
         foregroundService.shouldThrowOnStart = true
@@ -67,13 +69,14 @@ export function onBlockSessionsChangedFixture(
       },
     },
     then: {
-      blockedAppsShouldBeSyncedTo(expectedPackageNames: string[]) {
-        expect(sirenLookout.lastSyncedApps.sort()).toEqual(
-          expectedPackageNames.sort(),
+      blockingScheduleShouldContainApps(expectedPackageNames: string[]) {
+        const syncedPackages = sirenTier.schedules.flatMap((s) =>
+          s.sirens.android.map((app) => app.packageName),
         )
+        expect(syncedPackages.sort()).toEqual(expectedPackageNames.sort())
       },
-      blockedAppsShouldBeEmpty() {
-        expect(sirenLookout.lastSyncedApps).toEqual([])
+      blockingScheduleShouldBeEmpty() {
+        expect(sirenTier.schedules).toEqual([])
       },
       watchingShouldBeStarted() {
         expect(sirenLookout.isWatching).toBe(true)

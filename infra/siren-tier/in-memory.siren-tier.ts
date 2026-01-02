@@ -6,6 +6,8 @@ export class InMemorySirenTier implements SirenTier {
 
   isNativeBlockingInitialized = false
 
+  shouldThrowOnSync = false
+
   constructor(private readonly logger: Logger) {}
 
   async initializeNativeBlocking(): Promise<void> {
@@ -15,17 +17,12 @@ export class InMemorySirenTier implements SirenTier {
     this.isNativeBlockingInitialized = true
   }
 
-  async block(schedules: BlockingSchedule[]): Promise<void> {
-    try {
-      this.logger.info(
-        `[InMemorySirenTier] Set ${schedules.length} blocking schedules`,
-      )
-      this.schedules = schedules
-    } catch (error) {
-      this.logger.error(
-        `[InMemorySirenTier] Failed to set blocking schedule: ${error}`,
-      )
-      throw error
-    }
+  async updateBlockingSchedule(schedule: BlockingSchedule[]): Promise<void> {
+    if (this.shouldThrowOnSync)
+      throw new Error('Update blocking schedule failed')
+    this.logger.info(
+      `[InMemorySirenTier] Updated blocking schedule: ${schedule.length} schedules`,
+    )
+    this.schedules = schedule
   }
 }

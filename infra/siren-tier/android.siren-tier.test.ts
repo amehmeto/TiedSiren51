@@ -1,7 +1,13 @@
 import { setCallbackClass } from '@amehmeto/expo-foreground-service'
-import { BLOCKING_CALLBACK_CLASS } from '@amehmeto/tied-siren-blocking-overlay'
+import {
+  BLOCKING_CALLBACK_CLASS,
+  setBlockedApps,
+} from '@amehmeto/tied-siren-blocking-overlay'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { ISODateString } from '@/core/_ports_/date-provider'
+import {
+  facebookAndroidSiren,
+  instagramAndroidSiren,
+} from '@/core/_tests_/data-builders/android-siren.builder'
 import { buildBlockingSchedule } from '@/core/_tests_/data-builders/blocking-schedule.builder'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { AndroidSirenTier } from './android.siren-tier'
@@ -12,16 +18,15 @@ vi.mock('@amehmeto/expo-foreground-service', () => ({
 
 vi.mock('@amehmeto/tied-siren-blocking-overlay', () => ({
   BLOCKING_CALLBACK_CLASS: 'com.blocking.CallbackClass',
+  setBlockedApps: vi.fn(),
 }))
 
 const mockSetCallbackClass = vi.mocked(setCallbackClass)
+const mockSetBlockedApps = vi.mocked(setBlockedApps)
 
 describe('AndroidSirenTier', () => {
   let androidSirenTier: AndroidSirenTier
   let logger: InMemoryLogger
-
-  const startTime: ISODateString = '2024-01-01T10:00:00.000Z'
-  const endTime: ISODateString = '2024-01-01T11:00:00.000Z'
 
   beforeEach(() => {
     vi.clearAllMocks()
@@ -29,41 +34,68 @@ describe('AndroidSirenTier', () => {
     androidSirenTier = new AndroidSirenTier(logger)
   })
 
-  describe('block', () => {
-    it('logs received schedule count', async () => {
-      const schedules = [buildBlockingSchedule({ id: 'schedule-1' })]
-      const expectedLog = {
-        level: 'info',
-        message: '[AndroidSirenTier] Received 1 blocking schedules',
-      }
+  describe('updateBlockingSchedule', () => {
+    it('calls setBlockedApps with package names from schedule', async () => {
+      mockSetBlockedApps.mockResolvedValueOnce(undefined)
+      const schedules = [
+        buildBlockingSchedule({
+          sirens: {
+            android: [facebookAndroidSiren],
+          },
+        }),
+      ]
 
-      await androidSirenTier.block(schedules)
+      await androidSirenTier.updateBlockingSchedule(schedules)
 
-      expect(logger.getLogs()).toContainEqual(expectedLog)
+      expect(mockSetBlockedApps).toHaveBeenCalledWith(['com.facebook.katana'])
     })
 
-    it('logs each schedule details', async () => {
+    it('logs schedule count and app count', async () => {
+      mockSetBlockedApps.mockResolvedValueOnce(undefined)
       const schedules = [
-        buildBlockingSchedule({ id: 'schedule-1', startTime, endTime }),
+        buildBlockingSchedule({
+          sirens: {
+            android: [facebookAndroidSiren, instagramAndroidSiren],
+          },
+        }),
       ]
       const expectedLog = {
         level: 'info',
-        message: `[AndroidSirenTier]   Schedule schedule-1: ${startTime}-${endTime}`,
+        message:
+          '[AndroidSirenTier] Blocking schedule updated: 1 schedules, 2 apps',
       }
 
-      await androidSirenTier.block(schedules)
+      await androidSirenTier.updateBlockingSchedule(schedules)
 
       expect(logger.getLogs()).toContainEqual(expectedLog)
     })
 
     it('handles empty schedule list', async () => {
+      mockSetBlockedApps.mockResolvedValueOnce(undefined)
       const expectedLog = {
         level: 'info',
-        message: '[AndroidSirenTier] Received 0 blocking schedules',
+        message:
+          '[AndroidSirenTier] Blocking schedule updated: 0 schedules, 0 apps',
       }
 
-      await androidSirenTier.block([])
+      await androidSirenTier.updateBlockingSchedule([])
 
+      expect(mockSetBlockedApps).toHaveBeenCalledWith([])
+      expect(logger.getLogs()).toContainEqual(expectedLog)
+    })
+
+    it('logs error and rethrows when setBlockedApps fails', async () => {
+      const error = new Error('Native module error')
+      mockSetBlockedApps.mockRejectedValueOnce(error)
+      const schedules = [buildBlockingSchedule()]
+      const expectedLog = {
+        level: 'error',
+        message: `[AndroidSirenTier] Failed to update blocking schedule: ${error}`,
+      }
+
+      const updatePromise = androidSirenTier.updateBlockingSchedule(schedules)
+
+      await expect(updatePromise).rejects.toThrow('Native module error')
       expect(logger.getLogs()).toContainEqual(expectedLog)
     })
   })

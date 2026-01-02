@@ -10,5 +10,5 @@ export type BlockingSchedule = {
 
 export interface SirenTier {
   initializeNativeBlocking(): Promise<void>
-  block(schedule: BlockingSchedule[]): Promise<void>
+  updateBlockingSchedule(schedule: BlockingSchedule[]): Promise<void>
 }
