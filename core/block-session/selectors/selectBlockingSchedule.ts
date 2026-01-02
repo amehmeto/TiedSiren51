@@ -8,46 +8,44 @@ import {
 import { Sirens } from '@/core/siren/sirens'
 import { isActive } from './isActive'
 
-const emptySirens: Sirens = {
-  android: [],
-  windows: [],
-  macos: [],
-  ios: [],
-  linux: [],
-  websites: [],
-  keywords: [],
-}
-
-const deduplicateSirens = (sirens: Sirens): Sirens => {
-  const uniqueAndroid = [
-    ...new Map(sirens.android.map((app) => [app.packageName, app])).values(),
-  ]
-
-  return {
-    android: uniqueAndroid,
-    windows: [...new Set(sirens.windows)],
-    macos: [...new Set(sirens.macos)],
-    ios: [...new Set(sirens.ios)],
-    linux: [...new Set(sirens.linux)],
-    websites: [...new Set(sirens.websites)],
-    keywords: [...new Set(sirens.keywords)],
-  }
+const uniqueBy = <T, K>(array: T[], keyExtractor: (item: T) => K): T[] => {
+  return [...new Map(array.map((item) => [keyExtractor(item), item])).values()]
 }
 
 const mergeSirens = (sirensArray: Sirens[]): Sirens => {
-  const merged = sirensArray.reduce((acc, sirens) => {
-    return {
-      android: [...acc.android, ...sirens.android],
-      windows: [...acc.windows, ...sirens.windows],
-      macos: [...acc.macos, ...sirens.macos],
-      ios: [...acc.ios, ...sirens.ios],
-      linux: [...acc.linux, ...sirens.linux],
-      websites: [...acc.websites, ...sirens.websites],
-      keywords: [...acc.keywords, ...sirens.keywords],
-    }
-  }, emptySirens)
+  const merge = <T, K>(extract: (s: Sirens) => T[], key: (item: T) => K) =>
+    uniqueBy(sirensArray.flatMap(extract), key)
 
-  return deduplicateSirens(merged)
+  return {
+    android: merge(
+      (s) => s.android,
+      (app) => app.packageName,
+    ),
+    windows: merge(
+      (s) => s.windows,
+      (s) => s,
+    ),
+    macos: merge(
+      (s) => s.macos,
+      (s) => s,
+    ),
+    ios: merge(
+      (s) => s.ios,
+      (s) => s,
+    ),
+    linux: merge(
+      (s) => s.linux,
+      (s) => s,
+    ),
+    websites: merge(
+      (s) => s.websites,
+      (s) => s,
+    ),
+    keywords: merge(
+      (s) => s.keywords,
+      (s) => s,
+    ),
+  }
 }
 
 export const selectBlockingSchedule = (
