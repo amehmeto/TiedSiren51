@@ -9,11 +9,8 @@ import { Blocklist, blocklistAdapter } from '@/core/blocklist/blocklist'
 import { Sirens } from '@/core/siren/sirens'
 import { isActive } from './isActive'
 
-type SelectBlockingScheduleArgs = [
-  DateProvider,
-  EntityState<BlockSession, string>,
-  EntityState<Blocklist, string>,
-]
+type BlockSessionState = EntityState<BlockSession, string>
+type BlocklistState = EntityState<Blocklist, string>
 
 const uniqueBy = <T, K>(array: T[], keyExtractor: (item: T) => K): T[] => {
   return [...new Map(array.map((item) => [keyExtractor(item), item])).values()]
@@ -74,9 +71,11 @@ const mergeSirens = (sirensArray: Sirens[]): Sirens => {
  */
 export const selectBlockingSchedule = createSelector(
   [
-    (...args: SelectBlockingScheduleArgs) => args[0],
-    (...args: SelectBlockingScheduleArgs) => args[1],
-    (...args: SelectBlockingScheduleArgs) => args[2],
+    (dateProvider: DateProvider) => dateProvider,
+    (_: DateProvider, blockSessionState: BlockSessionState) =>
+      blockSessionState,
+    (_: DateProvider, __: BlockSessionState, blocklistState: BlocklistState) =>
+      blocklistState,
   ],
   (dateProvider, blockSessionState, blocklistState): BlockingSchedule[] => {
     const activeSessions = blockSessionAdapter
