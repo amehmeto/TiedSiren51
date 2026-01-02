@@ -231,6 +231,15 @@
             "command": ".claude/hooks/validate-ticket.sh"
           }
         ]
+      },
+      {
+        "matcher": "Edit",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/remind-testing-adrs.sh"
+          }
+        ]
       }
     ],
     "PostToolUse": [
