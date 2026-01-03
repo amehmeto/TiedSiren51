@@ -61,9 +61,7 @@ describe('selectBlockingSchedule', () => {
       .withBlocklists([blocklist1, blocklist2])
       .build()
 
-    const schedule = selectBlockingSchedule(dateProvider, state)
-
-    const [firstSchedule] = schedule
+    const [firstSchedule] = selectBlockingSchedule(dateProvider, state)
     const androidSirens = firstSchedule.sirens.android
     expect(androidSirens).toHaveLength(2)
     expect(androidSirens).toContainEqual(facebookAndroidSiren)
@@ -111,9 +109,7 @@ describe('selectBlockingSchedule', () => {
       .withBlocklists([currentBlocklist])
       .build()
 
-    const schedule = selectBlockingSchedule(dateProvider, state)
-
-    const [firstSchedule] = schedule
+    const [firstSchedule] = selectBlockingSchedule(dateProvider, state)
     const androidSirens = firstSchedule.sirens.android
     expect(androidSirens).toContainEqual(tikTokAndroidSiren)
     expect(androidSirens).not.toContainEqual(facebookAndroidSiren)
@@ -135,9 +131,7 @@ describe('selectBlockingSchedule', () => {
       .withBlocklists([])
       .build()
 
-    const schedule = selectBlockingSchedule(dateProvider, state)
-
-    const [firstSchedule] = schedule
+    const [firstSchedule] = selectBlockingSchedule(dateProvider, state)
     const androidSirens = firstSchedule.sirens.android
     expect(androidSirens).toHaveLength(0)
   })

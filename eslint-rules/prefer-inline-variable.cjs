@@ -1,0 +1,290 @@
+/**
+ * @fileoverview Prefer inlining variables that are only used once immediately after declaration
+ * Similar to JetBrains "Inline variable" inspection
+ *
+ * Does NOT suggest inlining when it would create:
+ * - A nested method call (e.g., foo(bar()))
+ * - A chained method call (e.g., foo().bar())
+ * - A complex operator expression (more than 3 terms)
+ *
+ * @author TiedSiren
+ * @see https://intellij-support.jetbrains.com/hc/en-us/community/posts/206942015
+ */
+
+module.exports = {
+  meta: {
+    type: 'suggestion',
+    docs: {
+      description:
+        'Prefer inlining variables that are only used once immediately after declaration',
+      category: 'Best Practices',
+      recommended: false,
+    },
+    fixable: 'code',
+    messages: {
+      preferInline:
+        'Variable `{{name}}` is only used once. Inline it directly.',
+    },
+    schema: [],
+  },
+
+  create(context) {
+    const sourceCode = context.getSourceCode()
+
+    function isImmediatelyFollowingStatement(declNode, usageNode) {
+      const parent = declNode.parent
+      if (parent.type !== 'BlockStatement' && parent.type !== 'Program')
+        return false
+
+      const statements = parent.body
+      const declIndex = statements.indexOf(declNode)
+      if (declIndex === -1) return false
+
+      for (let i = declIndex + 1; i < statements.length; i++) {
+        const stmt = statements[i]
+        if (isNodeContainedIn(usageNode, stmt)) return i === declIndex + 1
+      }
+      return false
+    }
+
+    function isNodeContainedIn(node, container) {
+      let current = node
+      while (current) {
+        if (current === container) return true
+        current = current.parent
+      }
+      return false
+    }
+
+    function getReferences(decl) {
+      // Use sourceCode.getDeclaredVariables to get references across the entire scope
+      const variables = sourceCode.getDeclaredVariables
+        ? sourceCode.getDeclaredVariables(decl)
+        : context.getDeclaredVariables(decl)
+      if (variables.length === 0) return []
+      const variable = variables[0]
+      return variable.references.filter((ref) => !ref.init)
+    }
+
+    function hasTypeAnnotation(node) {
+      return node.id && node.id.typeAnnotation
+    }
+
+    function isSimpleInit(node) {
+      if (!node.init) return false
+      const type = node.init.type
+      return [
+        'CallExpression',
+        'Identifier',
+        'MemberExpression',
+        'ArrayExpression',
+        'ObjectExpression',
+        'Literal',
+        'TemplateLiteral',
+      ].includes(type)
+    }
+
+    /**
+     * Check if inlining would create a nested method call
+     * e.g., foo(bar()) or arr.push(getValue())
+     * Also catches: foo({ prop: [bar()] })
+     */
+    function wouldCreateNestedCall(usageNode, initNode) {
+      if (initNode.type !== 'CallExpression') return false
+
+      // Walk up the tree to see if we're ultimately inside a CallExpression argument
+      let current = usageNode.parent
+      while (current) {
+        // Direct argument to a call
+        if (current.type === 'CallExpression' && current.callee !== usageNode) {
+          return true
+        }
+
+        // Stop at statement level
+        if (
+          current.type === 'ExpressionStatement' ||
+          current.type === 'VariableDeclaration' ||
+          current.type === 'ReturnStatement'
+        ) {
+          // Check if this statement is a call expression or contains one at root
+          if (current.type === 'ExpressionStatement') {
+            if (current.expression.type === 'CallExpression') {
+              return true
+            }
+          }
+          if (current.type === 'VariableDeclaration') {
+            const decl = current.declarations[0]
+            if (decl && decl.init && decl.init.type === 'CallExpression') {
+              return true
+            }
+          }
+          break
+        }
+
+        current = current.parent
+      }
+
+      return false
+    }
+
+    /**
+     * Check if inlining would create a chained method call
+     * e.g., getValue().toString()
+     */
+    function wouldCreateChainedCall(usageNode, initNode) {
+      if (initNode.type !== 'CallExpression') return false
+
+      const parent = usageNode.parent
+      if (!parent) return false
+
+      // Usage is the object of a member expression that's then called
+      if (parent.type === 'MemberExpression' && parent.object === usageNode) {
+        const grandparent = parent.parent
+        if (grandparent && grandparent.type === 'CallExpression') {
+          return true
+        }
+      }
+
+      return false
+    }
+
+    /**
+     * Check if inlining would create a complex expression (>3 terms)
+     */
+    function wouldCreateComplexExpression(usageNode, initNode) {
+      if (
+        initNode.type !== 'BinaryExpression' &&
+        initNode.type !== 'LogicalExpression'
+      ) {
+        return false
+      }
+
+      const parent = usageNode.parent
+      if (
+        parent &&
+        (parent.type === 'BinaryExpression' ||
+          parent.type === 'LogicalExpression')
+      ) {
+        // Already in an expression, adding more terms would be complex
+        return true
+      }
+
+      return false
+    }
+
+    return {
+      VariableDeclaration(node) {
+        if (node.declarations.length !== 1) return
+
+        const decl = node.declarations[0]
+
+        if (decl.id.type !== 'Identifier') return
+        if (!decl.init) return
+        if (hasTypeAnnotation(decl)) return
+        if (!isSimpleInit(decl)) return
+
+        const varName = decl.id.name
+        const references = getReferences(node)
+
+        if (references.length !== 1) return
+
+        const usage = references[0]
+
+        if (!isImmediatelyFollowingStatement(node, usage.identifier)) return
+
+        if (isInLoop(usage.identifier, node)) return
+
+        // JetBrains-style heuristics: don't inline if it would create complexity
+        if (wouldCreateNestedCall(usage.identifier, decl.init)) return
+        if (wouldCreateChainedCall(usage.identifier, decl.init)) return
+        if (wouldCreateComplexExpression(usage.identifier, decl.init)) return
+
+        // Don't inline into expect() calls - conflicts with expect-separate-act-assert
+        if (isInsideExpectCall(usage.identifier)) return
+
+        context.report({
+          node: decl,
+          messageId: 'preferInline',
+          data: { name: varName },
+          fix(fixer) {
+            const initText = sourceCode.getText(decl.init)
+            const fixes = []
+
+            const needsParens = mightNeedParentheses(usage.identifier, decl.init)
+            const replacement = needsParens ? `(${initText})` : initText
+
+            fixes.push(fixer.replaceText(usage.identifier, replacement))
+            fixes.push(fixer.remove(node))
+
+            return fixes
+          },
+        })
+      },
+    }
+
+    function isInsideExpectCall(node) {
+      let current = node.parent
+      while (current) {
+        if (
+          current.type === 'CallExpression' &&
+          current.callee.type === 'Identifier' &&
+          current.callee.name === 'expect'
+        ) {
+          return true
+        }
+        if (
+          current.type === 'ExpressionStatement' ||
+          current.type === 'VariableDeclaration'
+        ) {
+          break
+        }
+        current = current.parent
+      }
+      return false
+    }
+
+    function isInLoop(node, declNode) {
+      let current = node.parent
+      while (current) {
+        if (current === declNode.parent) return false
+
+        if (
+          [
+            'ForStatement',
+            'ForInStatement',
+            'ForOfStatement',
+            'WhileStatement',
+            'DoWhileStatement',
+          ].includes(current.type)
+        ) {
+          return true
+        }
+        current = current.parent
+      }
+      return false
+    }
+
+    function mightNeedParentheses(usageNode, initNode) {
+      const parent = usageNode.parent
+      if (!parent) return false
+
+      if (
+        ['Identifier', 'Literal', 'CallExpression', 'MemberExpression'].includes(
+          initNode.type,
+        )
+      ) {
+        return false
+      }
+
+      if (
+        ['BinaryExpression', 'LogicalExpression', 'ConditionalExpression'].includes(
+          initNode.type,
+        )
+      ) {
+        return true
+      }
+
+      return false
+    }
+  },
+}

@@ -120,6 +120,8 @@ module.exports = {
     // Disabled globally - too many valid patterns. Enable per-file as needed.
     'local-rules/no-nested-call-expressions': 'off',
     'local-rules/prefer-array-destructuring': 'error',
+    // Warn-only: many valid patterns use named variables for self-documentation
+    'local-rules/prefer-inline-variable': 'warn',
   },
   overrides: [
     {

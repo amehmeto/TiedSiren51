@@ -42,6 +42,7 @@ const noModuleLevelConstants = require('../eslint-rules/no-module-level-constant
 const requireNamedRegex = require('../eslint-rules/require-named-regex.cjs')
 const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressions.cjs')
 const preferArrayDestructuring = require('../eslint-rules/prefer-array-destructuring.cjs')
+const preferInlineVariable = require('../eslint-rules/prefer-inline-variable.cjs')
 
 module.exports = {
   rules: {
@@ -85,5 +86,6 @@ module.exports = {
     'require-named-regex': requireNamedRegex,
     'no-nested-call-expressions': noNestedCallExpressions,
     'prefer-array-destructuring': preferArrayDestructuring,
+    'prefer-inline-variable': preferInlineVariable,
   },
 }
