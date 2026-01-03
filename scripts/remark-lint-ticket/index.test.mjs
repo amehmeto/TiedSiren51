@@ -4,7 +4,11 @@
 
 import { describe, it, expect } from 'vitest'
 import { remark } from 'remark'
-import remarkLintTicket, { parseYaml, detectTicketType, isTicketFile } from './index.mjs'
+import remarkLintTicket, {
+  parseYaml,
+  detectTicketType,
+  isTicketFile,
+} from './index.mjs'
 import { VALID_REPOS, VALID_LABELS, FIBONACCI_POINTS } from './config.mjs'
 import { fromMarkdown } from 'mdast-util-from-markdown'
 
@@ -79,8 +83,13 @@ describe('remark-lint-ticket', () => {
 
   describe('validateMetadata', () => {
     it('should fail when metadata block is missing', async () => {
-      const messages = await lintWithPath('# Just a heading\n\nSome content', '.github/ISSUE_TEMPLATE/test.md')
-      expect(messages).toContain('❌ Missing YAML metadata block with `# 📦 METADATA` comment')
+      const messages = await lintWithPath(
+        '# Just a heading\n\nSome content',
+        '.github/ISSUE_TEMPLATE/test.md',
+      )
+      expect(messages).toContain(
+        '❌ Missing YAML metadata block with `# 📦 METADATA` comment',
+      )
     })
 
     it('should fail when repo is missing', async () => {
@@ -90,6 +99,8 @@ describe('remark-lint-ticket', () => {
 story_points: 3
 labels:
   - enhancement
+depends_on: []
+blocks: []
 \`\`\`
 `
       const messages = await lint(markdown)
@@ -104,6 +115,8 @@ repo: InvalidRepo
 story_points: 3
 labels:
   - enhancement
+depends_on: []
+blocks: []
 \`\`\`
 `
       const messages = await lint(markdown)
@@ -118,6 +131,8 @@ repo: TiedSiren51
 story_points: 4
 labels:
   - enhancement
+depends_on: []
+blocks: []
 \`\`\`
 `
       const messages = await lint(markdown)
@@ -132,10 +147,46 @@ repo: TiedSiren51
 story_points: 3
 labels:
   - unknown-label
+depends_on: []
+blocks: []
 \`\`\`
 `
       const messages = await lint(markdown)
       expect(messages.some((m) => m.includes('Unknown labels'))).toBe(true)
+    })
+
+    it('should fail when depends_on is missing', async () => {
+      const markdown = `
+\`\`\`yaml
+# 📦 METADATA
+repo: TiedSiren51
+story_points: 3
+labels:
+  - enhancement
+blocks: []
+\`\`\`
+`
+      const messages = await lint(markdown)
+      expect(messages).toContain(
+        '❌ Missing `depends_on` field in metadata (use `depends_on: []` if no dependencies)',
+      )
+    })
+
+    it('should fail when blocks is missing', async () => {
+      const markdown = `
+\`\`\`yaml
+# 📦 METADATA
+repo: TiedSiren51
+story_points: 3
+labels:
+  - enhancement
+depends_on: []
+\`\`\`
+`
+      const messages = await lint(markdown)
+      expect(messages).toContain(
+        '❌ Missing `blocks` field in metadata (use `blocks: []` if this issue blocks nothing)',
+      )
     })
 
     it('should pass with valid metadata', async () => {
@@ -180,6 +231,8 @@ repo: TiedSiren51
 story_points: 3
 labels:
   - enhancement
+depends_on: []
+blocks: []
 \`\`\`
 `
 
@@ -210,6 +263,8 @@ repo: TiedSiren51
 story_points: 3
 labels:
   - enhancement
+depends_on: []
+blocks: []
 \`\`\`
 
 ## 📝 Summary
@@ -250,6 +305,8 @@ repo: TiedSiren51
 story_points: 13
 labels:
   - epic
+depends_on: []
+blocks: []
 \`\`\`
 
 ## 🎯 Goal
@@ -276,12 +333,16 @@ repo: TiedSiren51
 story_points: 3
 labels:
   - enhancement
+depends_on: []
+blocks: []
 \`\`\`
 
 ## Feature - 3 sp
 `
       const messages = await lint(markdown)
-      expect(messages.some((m) => m.includes('Story points should be in metadata'))).toBe(true)
+      expect(
+        messages.some((m) => m.includes('Story points should be in metadata')),
+      ).toBe(true)
     })
   })
 
@@ -299,7 +360,9 @@ labels:
     })
 
     it('should identify files with METADATA block', () => {
-      const tree = fromMarkdown('```yaml\n# 📦 METADATA\nrepo: TiedSiren51\n```')
+      const tree = fromMarkdown(
+        '```yaml\n# 📦 METADATA\nrepo: TiedSiren51\n```',
+      )
       const file = { path: 'random/path.md' }
       expect(isTicketFile(file, tree)).toBe(true)
     })
@@ -327,8 +390,13 @@ Some context here.
 
     it('should still validate files in ISSUE_TEMPLATE even without metadata', async () => {
       const markdown = '# Incomplete template'
-      const messages = await lintWithPath(markdown, '.github/ISSUE_TEMPLATE/test.md')
-      expect(messages.some((m) => m.includes('Missing YAML metadata block'))).toBe(true)
+      const messages = await lintWithPath(
+        markdown,
+        '.github/ISSUE_TEMPLATE/test.md',
+      )
+      expect(
+        messages.some((m) => m.includes('Missing YAML metadata block')),
+      ).toBe(true)
     })
   })
 
@@ -351,19 +419,30 @@ repo: TiedSiren51
 story_points: 3
 labels:
   - enhancement
+depends_on: []
+blocks: []
 \`\`\`
 
 ## 📝 Summary
 
 This is the summary.
 `
-      const { messages, output } = await lintWithFix(markdown, '.github/ISSUE_TEMPLATE/test.md')
+      const { messages, output } = await lintWithFix(
+        markdown,
+        '.github/ISSUE_TEMPLATE/test.md',
+      )
 
       // Should have added missing sections
-      expect(messages.some((m) => m.includes('🔧 Added missing section: 🎯 Context'))).toBe(true)
-      expect(messages.some((m) => m.includes('🔧 Added missing section: ✅ Acceptance Criteria'))).toBe(
-        true
-      )
+      expect(
+        messages.some((m) =>
+          m.includes('🔧 Added missing section: 🎯 Context'),
+        ),
+      ).toBe(true)
+      expect(
+        messages.some((m) =>
+          m.includes('🔧 Added missing section: ✅ Acceptance Criteria'),
+        ),
+      ).toBe(true)
 
       // Output should contain the new sections
       expect(output).toContain('## 🎯 Context')
@@ -377,6 +456,8 @@ repo: TiedSiren51
 story_points: 3
 labels:
   - enhancement
+depends_on: []
+blocks: []
 \`\`\`
 
 ## 📝 Summary
@@ -399,7 +480,10 @@ When action
 Then result
 \`\`\`
 `
-      const { messages, output } = await lintWithFix(markdown, '.github/ISSUE_TEMPLATE/test.md')
+      const { messages, output } = await lintWithFix(
+        markdown,
+        '.github/ISSUE_TEMPLATE/test.md',
+      )
 
       // Should not have added any sections
       const addedSections = messages.filter((m) => m.includes('🔧 Added'))
@@ -417,6 +501,8 @@ repo: TiedSiren51
 story_points: 3
 labels:
   - enhancement
+depends_on: []
+blocks: []
 \`\`\`
 
 ## 📝 Summary
@@ -427,7 +513,10 @@ Summary here.
 
 - Link to something
 `
-      const { output } = await lintWithFix(markdown, '.github/ISSUE_TEMPLATE/test.md')
+      const { output } = await lintWithFix(
+        markdown,
+        '.github/ISSUE_TEMPLATE/test.md',
+      )
 
       // Context should appear before Related
       const contextIndex = output.indexOf('## 🎯 Context')
@@ -444,16 +533,25 @@ repo: TiedSiren51
 story_points: 2
 labels:
   - bug
+depends_on: []
+blocks: []
 \`\`\`
 
 ## 🐛 Bug Summary
 
 Bug description.
 `
-      const { messages, output } = await lintWithFix(markdown, '.github/ISSUE_TEMPLATE/test.md')
+      const { messages, output } = await lintWithFix(
+        markdown,
+        '.github/ISSUE_TEMPLATE/test.md',
+      )
 
       // Should add bug-specific sections
-      expect(messages.some((m) => m.includes('🔧 Added missing section: 🔄 Reproduction'))).toBe(true)
+      expect(
+        messages.some((m) =>
+          m.includes('🔧 Added missing section: 🔄 Reproduction'),
+        ),
+      ).toBe(true)
       expect(output).toContain('## 🔄 Reproduction')
       expect(output).toContain('Steps to Reproduce')
     })
@@ -465,18 +563,25 @@ repo: TiedSiren51
 story_points: 21
 labels:
   - epic
+depends_on: []
+blocks: []
 \`\`\`
 
 ## 🎯 Goal
 
 Epic goal here.
 `
-      const { messages, output } = await lintWithFix(markdown, '.github/ISSUE_TEMPLATE/test.md')
+      const { messages, output } = await lintWithFix(
+        markdown,
+        '.github/ISSUE_TEMPLATE/test.md',
+      )
 
       // Should add epic-specific sections
-      expect(messages.some((m) => m.includes('🔧 Added missing section: 📋 Stories / Tasks'))).toBe(
-        true
-      )
+      expect(
+        messages.some((m) =>
+          m.includes('🔧 Added missing section: 📋 Stories / Tasks'),
+        ),
+      ).toBe(true)
       expect(output).toContain('## 📋 Stories / Tasks')
     })
   })
