@@ -104,7 +104,6 @@ export const onBlockSessionsChangedListener = ({
     void safeUpdateBlockingSchedule(schedule)
   }
 
-  // Check initial state
   const initialState = store.getState()
   const initialSessions = selectAllBlockSessions(initialState.blockSession)
   let didHaveSessions = initialSessions.length > 0
@@ -114,7 +113,6 @@ export const onBlockSessionsChangedListener = ({
     onFirstSessionAdded(schedule)
   }
 
-  // Subscribe to store changes
   return store.subscribe(() => {
     const state = store.getState()
     const sessions = selectAllBlockSessions(state.blockSession)
