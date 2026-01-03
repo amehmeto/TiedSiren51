@@ -117,6 +117,7 @@ module.exports = {
     'local-rules/reducer-in-domain-folder': 'error',
     'local-rules/no-module-level-constants': 'error',
     'local-rules/require-named-regex': 'error',
+    'local-rules/prefer-array-destructuring': 'error',
     // Disabled globally - too many valid patterns. Enable per-file as needed.
     // See: docs/adr/conventions/no-nested-call-expressions.md
     'local-rules/no-nested-call-expressions': 'off',

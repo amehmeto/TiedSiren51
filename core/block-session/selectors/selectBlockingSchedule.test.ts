@@ -30,7 +30,7 @@ describe('selectBlockingSchedule', () => {
 
     const schedule = selectBlockingSchedule(dateProvider, state.blockSession)
 
-    const firstSchedule = schedule[0]
+    const [firstSchedule] = schedule
     const firstScheduleId = firstSchedule.id
     const androidSirens = firstSchedule.sirens.android
     expect(schedule).toHaveLength(1)
