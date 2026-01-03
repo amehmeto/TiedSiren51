@@ -3,6 +3,7 @@ import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { BlockSession } from '@/core/block-session/block-session'
 import { setBlockSessions } from '@/core/block-session/block-session.slice'
+import { setBlocklists } from '@/core/blocklist/blocklist.slice'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemoryForegroundService } from '@/infra/foreground-service/in-memory.foreground.service'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
@@ -34,7 +35,9 @@ export function onBlockSessionsChangedFixture(
     given: {
       initialBlockSessions(sessions: BlockSession[]) {
         testStateBuilderProvider.setState((builder) =>
-          builder.withBlockSessions(sessions),
+          builder
+            .withBlockSessions(sessions)
+            .withBlocklists(sessions.flatMap((s) => s.blocklists)),
         )
       },
       storeIsCreated() {
@@ -64,6 +67,9 @@ export function onBlockSessionsChangedFixture(
     when: {
       async blockSessionsChange(sessions: BlockSession[]) {
         const activeStore = store ?? createStoreWithState()
+        activeStore.dispatch(
+          setBlocklists(sessions.flatMap((s) => s.blocklists)),
+        )
         activeStore.dispatch(setBlockSessions(sessions))
         await flushPromises()
       },

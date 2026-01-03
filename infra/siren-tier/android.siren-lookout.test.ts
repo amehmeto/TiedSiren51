@@ -176,7 +176,7 @@ describe('RealAndroidSirenLookout', () => {
 
       lookout.onSirenDetected(listener)
       lookout.startWatching()
-      const [capturedCallback] = mockAddAccessibilityEventListener.mock.calls[0]
+      const [[capturedCallback]] = mockAddAccessibilityEventListener.mock.calls
       capturedCallback(event)
 
       expect(listener).toHaveBeenCalledWith(
@@ -217,7 +217,7 @@ describe('RealAndroidSirenLookout', () => {
 
       lookout.onSirenDetected(listener)
       lookout.startWatching()
-      const [capturedCallback] = mockAddAccessibilityEventListener.mock.calls[0]
+      const [[capturedCallback]] = mockAddAccessibilityEventListener.mock.calls
       capturedCallback(event)
 
       expect(listener).not.toHaveBeenCalled()
