@@ -47,22 +47,6 @@ const mergeSirens = (sirensArray: Sirens[]): Sirens => {
   }
 }
 
-/**
- * Selects the blocking schedule by joining active sessions with fresh blocklist data.
- *
- * This selector is memoized with createSelector for performance optimization.
- * It will only recompute when dateProvider or state change.
- *
- * This selector:
- * 1. Gets all active block sessions
- * 2. Joins embedded blocklist IDs with current blocklist state (fresh data)
- * 3. Creates BlockingSchedule objects with time ranges and deduplicated sirens
- * 4. Skips deleted blocklists (they no longer contribute sirens)
- *
- * @param dateProvider - Provider for current date/time
- * @param state - Root state
- * @returns BlockingSchedule[] with each schedule containing id, startTime, endTime, and sirens
- */
 export const selectBlockingSchedule = createSelector(
   [
     (dateProvider: DateProvider) => dateProvider,
@@ -75,19 +59,18 @@ export const selectBlockingSchedule = createSelector(
       .selectAll(blockSessionState)
       .filter((session) => isActive(dateProvider, session))
 
-    const blocklistEntities = blocklistAdapter
+    const blocklists = blocklistAdapter
       .getSelectors()
       .selectEntities(blocklistState)
 
     return activeSessions.map((session) => {
-      // Join with fresh blocklist data, skip deleted blocklists
-      const freshBlocklists = session.blocklists.flatMap((embedded) =>
-        embedded.id in blocklistEntities
-          ? [blocklistEntities[embedded.id]]
-          : [],
+      const sirens = mergeSirens(
+        session.blocklists
+          .flatMap(({ id }) => (id in blocklists ? [blocklists[id]] : []))
+          .map((bl) => bl.sirens),
       )
 
-      const schedule: BlockingSchedule = {
+      return {
         id: session.id,
         startTime: dateProvider.toISOString(
           dateProvider.recoverDate(session.startedAt),
@@ -95,9 +78,8 @@ export const selectBlockingSchedule = createSelector(
         endTime: dateProvider.toISOString(
           dateProvider.recoverDate(session.endedAt),
         ),
-        sirens: mergeSirens(freshBlocklists.map((bl) => bl.sirens)),
+        sirens,
       }
-      return schedule
     })
   },
 )
