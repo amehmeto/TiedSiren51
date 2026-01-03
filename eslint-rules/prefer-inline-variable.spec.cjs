@@ -88,6 +88,24 @@ ruleTester.run('prefer-inline-variable', rule, {
         result.toString()
       `,
     },
+    // Multi-line initialization - should NOT report (hurts readability)
+    {
+      code: `
+        const sirens = mergeSirens(
+          session.blocklists.map((bl) => bl.sirens),
+        )
+        console.log(sirens)
+      `,
+    },
+    // Multi-line call chain - should NOT report
+    {
+      code: `
+        const result = items
+          .filter((x) => x.active)
+          .map((x) => x.id)
+        console.log(result)
+      `,
+    },
   ],
 
   invalid: [

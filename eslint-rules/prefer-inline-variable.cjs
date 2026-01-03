@@ -6,6 +6,7 @@
  * - A nested method call (e.g., foo(bar()))
  * - A chained method call (e.g., foo().bar())
  * - A complex operator expression (more than 3 terms)
+ * - A multi-line initialization (hurts readability)
  *
  * @author TiedSiren
  * @see https://intellij-support.jetbrains.com/hc/en-us/community/posts/206942015
@@ -68,6 +69,17 @@ module.exports = {
 
     function hasTypeAnnotation(node) {
       return node.id && node.id.typeAnnotation
+    }
+
+    /**
+     * Check if the initialization spans multiple lines
+     * Multi-line inits should not be inlined as it hurts readability
+     */
+    function isMultiLineInit(node) {
+      if (!node.init) return false
+      const startLine = node.init.loc.start.line
+      const endLine = node.init.loc.end.line
+      return endLine > startLine
     }
 
     function isSimpleInit(node) {
@@ -181,6 +193,7 @@ module.exports = {
         if (decl.id.type !== 'Identifier') return
         if (!decl.init) return
         if (hasTypeAnnotation(decl)) return
+        if (isMultiLineInit(decl)) return
         if (!isSimpleInit(decl)) return
 
         const varName = decl.id.name
