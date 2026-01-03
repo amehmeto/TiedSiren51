@@ -70,6 +70,8 @@
       "Bash(jq:*)",
       "Bash(ls:*)",
       "Bash(mkdir:*)",
+      "Bash(node eslint-rules/*.cjs:*)",
+      "Bash(node eslint-rules/*.spec.cjs:*)",
       "Bash(npm ci:*)",
       "Bash(npm install:*)",
       "Bash(npm ls:*)",
