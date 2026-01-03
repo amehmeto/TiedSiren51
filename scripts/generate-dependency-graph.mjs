@@ -15,7 +15,7 @@ import { join } from 'node:path'
 import { VALID_REPOS } from './remark-lint-ticket/config.mjs'
 
 const REPO = 'amehmeto/TiedSiren51'
-const OUTPUT_FILE = 'docs/TICKET-DEPENDENCY-GRAPH.md'
+const OUTPUT_FILE = 'docs/dependency-graph.md'
 
 // ============================================================================
 // Mermaid Validation
