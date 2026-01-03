@@ -12,9 +12,6 @@ import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 
 const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0))
 
-const extractBlocklists = (sessions: BlockSession[]) =>
-  sessions.flatMap((s) => s.blocklists)
-
 export function onBlockSessionsChangedFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ) {
@@ -40,7 +37,7 @@ export function onBlockSessionsChangedFixture(
         testStateBuilderProvider.setState((builder) =>
           builder
             .withBlockSessions(sessions)
-            .withBlocklists(extractBlocklists(sessions)),
+            .withBlocklists(sessions.flatMap((s) => s.blocklists)),
         )
       },
       storeIsCreated() {
@@ -70,7 +67,9 @@ export function onBlockSessionsChangedFixture(
     when: {
       async blockSessionsChange(sessions: BlockSession[]) {
         const activeStore = store ?? createStoreWithState()
-        activeStore.dispatch(setBlocklists(extractBlocklists(sessions)))
+        activeStore.dispatch(
+          setBlocklists(sessions.flatMap((s) => s.blocklists)),
+        )
         activeStore.dispatch(setBlockSessions(sessions))
         await flushPromises()
       },
