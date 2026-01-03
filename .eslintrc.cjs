@@ -119,6 +119,7 @@ module.exports = {
     'local-rules/require-named-regex': 'error',
     // Disabled globally - too many valid patterns. Enable per-file as needed.
     'local-rules/no-nested-call-expressions': 'off',
+    'local-rules/prefer-array-destructuring': 'error',
   },
   overrides: [
     {

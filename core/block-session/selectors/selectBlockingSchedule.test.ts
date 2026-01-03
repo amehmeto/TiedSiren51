@@ -35,7 +35,7 @@ describe('selectBlockingSchedule', () => {
 
     const schedule = selectBlockingSchedule(dateProvider, state)
 
-    const firstSchedule = schedule[0]
+    const [firstSchedule] = schedule
     const firstScheduleId = firstSchedule.id
     const androidSirens = firstSchedule.sirens.android
     expect(schedule).toHaveLength(1)
@@ -63,7 +63,8 @@ describe('selectBlockingSchedule', () => {
 
     const schedule = selectBlockingSchedule(dateProvider, state)
 
-    const androidSirens = schedule[0].sirens.android
+    const [firstSchedule] = schedule
+    const androidSirens = firstSchedule.sirens.android
     expect(androidSirens).toHaveLength(2)
     expect(androidSirens).toContainEqual(facebookAndroidSiren)
     expect(androidSirens).toContainEqual(instagramAndroidSiren)
@@ -112,7 +113,8 @@ describe('selectBlockingSchedule', () => {
 
     const schedule = selectBlockingSchedule(dateProvider, state)
 
-    const androidSirens = schedule[0].sirens.android
+    const [firstSchedule] = schedule
+    const androidSirens = firstSchedule.sirens.android
     expect(androidSirens).toContainEqual(tikTokAndroidSiren)
     expect(androidSirens).not.toContainEqual(facebookAndroidSiren)
   })
@@ -135,7 +137,8 @@ describe('selectBlockingSchedule', () => {
 
     const schedule = selectBlockingSchedule(dateProvider, state)
 
-    const androidSirens = schedule[0].sirens.android
+    const [firstSchedule] = schedule
+    const androidSirens = firstSchedule.sirens.android
     expect(androidSirens).toHaveLength(0)
   })
 })

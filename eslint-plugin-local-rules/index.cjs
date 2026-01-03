@@ -41,6 +41,7 @@ const reducerInDomainFolder = require('../eslint-rules/reducer-in-domain-folder.
 const noModuleLevelConstants = require('../eslint-rules/no-module-level-constants.cjs')
 const requireNamedRegex = require('../eslint-rules/require-named-regex.cjs')
 const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressions.cjs')
+const preferArrayDestructuring = require('../eslint-rules/prefer-array-destructuring.cjs')
 
 module.exports = {
   rules: {
@@ -83,5 +84,6 @@ module.exports = {
     'no-module-level-constants': noModuleLevelConstants,
     'require-named-regex': requireNamedRegex,
     'no-nested-call-expressions': noNestedCallExpressions,
+    'prefer-array-destructuring': preferArrayDestructuring,
   },
 }
