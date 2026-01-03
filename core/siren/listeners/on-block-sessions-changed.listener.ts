@@ -139,8 +139,8 @@ export const onBlockSessionsChangedListener = ({
     const schedule = selectBlockingSchedule(dateProvider, state)
 
     if (didHaveSessions && !hasSessions) onAllSessionsRemoved()
-    else if (!didHaveSessions && hasSessions) onFirstSessionAdded(schedule)
-    else if (hasSessions) onScheduleMayHaveChanged(schedule)
+    if (!didHaveSessions && hasSessions) onFirstSessionAdded(schedule)
+    if (didHaveSessions && hasSessions) onScheduleMayHaveChanged(schedule)
 
     didHaveSessions = hasSessions
   })
