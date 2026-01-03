@@ -14,8 +14,13 @@ import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { VALID_REPOS } from './remark-lint-ticket/config.mjs'
 
-const REPO = 'amehmeto/TiedSiren51'
 const OUTPUT_FILE = 'docs/dependency-graph.md'
+
+// Build repo list from config
+const REPOS = Object.entries(VALID_REPOS).map(([name, url]) => ({
+  name,
+  fullName: url.replace('https://github.com/', ''),
+}))
 
 // ============================================================================
 // Mermaid Validation
@@ -56,11 +61,25 @@ function validateMermaid(code) {
 // ============================================================================
 
 function fetchOpenIssues() {
-  const result = execSync(
-    `gh issue list --repo ${REPO} --state open --limit 100 --json number,title,body,labels`,
-    { encoding: 'utf-8' },
-  )
-  return JSON.parse(result)
+  const allIssues = []
+
+  for (const repo of REPOS) {
+    try {
+      const result = execSync(
+        `gh issue list --repo ${repo.fullName} --state open --limit 100 --json number,title,body,labels`,
+        { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] },
+      )
+      const issues = JSON.parse(result)
+      for (const issue of issues) {
+        issue.repo = repo.name
+      }
+      allIssues.push(...issues)
+    } catch {
+      // Repo might not exist or have no issues
+    }
+  }
+
+  return allIssues
 }
 
 // ============================================================================
@@ -372,7 +391,8 @@ function generateMermaidDiagram(tickets) {
       }
 
       const storyPoints = formatStoryPoints(t.metadata?.story_points)
-      nodes.push(`        T${t.number}["#${t.number} ${safeLabel}${storyPoints}"]:::${category}${depth}`)
+      const repoLabel = t.repo !== 'TiedSiren51' ? `<br/>📦 ${t.repo}` : ''
+      nodes.push(`        T${t.number}["#${t.number} ${safeLabel}${storyPoints}${repoLabel}"]:::${category}${depth}`)
     }
     nodes.push('    end')
   }
@@ -676,12 +696,19 @@ ${Object.entries(VALID_REPOS)
 const asciiMode = process.argv.includes('--ascii')
 
 if (!asciiMode) {
-  console.log('Fetching open issues from GitHub...')
+  console.log(`Fetching open issues from ${REPOS.length} repos...`)
 }
 const issues = fetchOpenIssues()
 
 if (!asciiMode) {
-  console.log(`Found ${issues.length} open issues`)
+  const repoCounts = {}
+  for (const issue of issues) {
+    repoCounts[issue.repo] = (repoCounts[issue.repo] || 0) + 1
+  }
+  console.log(`Found ${issues.length} open issues:`)
+  for (const [repo, count] of Object.entries(repoCounts)) {
+    console.log(`  - ${repo}: ${count}`)
+  }
 }
 
 const tickets = issues.map((issue) => {
@@ -690,6 +717,7 @@ const tickets = issues.map((issue) => {
     number: issue.number,
     title: issue.title,
     labels: issue.labels,
+    repo: issue.repo || 'TiedSiren51',
     metadata,
     type: detectTicketType(issue, metadata),
   }
