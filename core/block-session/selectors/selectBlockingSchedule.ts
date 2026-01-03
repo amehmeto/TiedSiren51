@@ -57,7 +57,7 @@ const mergeSirens = (sirensArray: Sirens[]): Sirens => {
  * 1. Gets all active block sessions
  * 2. Joins embedded blocklist IDs with current blocklist state (fresh data)
  * 3. Creates BlockingSchedule objects with time ranges and deduplicated sirens
- * 4. Falls back to embedded blocklist data if blocklist was deleted
+ * 4. Skips deleted blocklists (they no longer contribute sirens)
  *
  * @param dateProvider - Provider for current date/time
  * @param state - Root state
@@ -80,9 +80,11 @@ export const selectBlockingSchedule = createSelector(
       .selectEntities(blocklistState)
 
     return activeSessions.map((session) => {
-      // Join with fresh blocklist data, fallback to embedded if deleted
-      const freshBlocklists = session.blocklists.map(
-        (embedded) => blocklistEntities[embedded.id] ?? embedded,
+      // Join with fresh blocklist data, skip deleted blocklists
+      const freshBlocklists = session.blocklists.flatMap((embedded) =>
+        embedded.id in blocklistEntities
+          ? [blocklistEntities[embedded.id]]
+          : [],
       )
 
       const schedule: BlockingSchedule = {

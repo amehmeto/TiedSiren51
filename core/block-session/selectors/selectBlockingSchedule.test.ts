@@ -124,7 +124,7 @@ describe('selectBlockingSchedule', () => {
     expect(androidSirens).not.toContainEqual(facebookAndroidSiren)
   })
 
-  test('should fall back to embedded data when blocklist is deleted', () => {
+  test('should skip deleted blocklists', () => {
     dateProvider.now.setHours(10, 0, 0, 0)
 
     const blocklist = buildBlocklist({
@@ -146,8 +146,8 @@ describe('selectBlockingSchedule', () => {
 
     const schedule = selectBlockingSchedule(dateProvider, state)
 
-    // Should fall back to embedded blocklist data
+    // Deleted blocklist should not contribute sirens
     const androidSirens = schedule[0].sirens.android
-    expect(androidSirens).toContainEqual(facebookAndroidSiren)
+    expect(androidSirens).toHaveLength(0)
   })
 })
