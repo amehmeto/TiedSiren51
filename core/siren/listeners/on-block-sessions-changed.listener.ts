@@ -108,11 +108,7 @@ export const onBlockSessionsChangedListener = ({
   let lastScheduleKey = ''
 
   if (didHaveSessions) {
-    const schedule = selectBlockingSchedule(
-      dateProvider,
-      initialState.blockSession,
-      initialState.blocklist,
-    )
+    const schedule = selectBlockingSchedule(dateProvider, initialState)
     lastScheduleKey = getScheduleKey(schedule)
     void startProtection(schedule)
   }
@@ -127,20 +123,12 @@ export const onBlockSessionsChangedListener = ({
       void stopProtection()
       lastScheduleKey = ''
     } else if (!didHaveSessions && hasSessions) {
-      const schedule = selectBlockingSchedule(
-        dateProvider,
-        state.blockSession,
-        state.blocklist,
-      )
+      const schedule = selectBlockingSchedule(dateProvider, state)
       lastScheduleKey = getScheduleKey(schedule)
       void startProtection(schedule)
     } else if (hasSessions) {
       // Sessions still exist - check if schedule changed (including blocklist edits)
-      const schedule = selectBlockingSchedule(
-        dateProvider,
-        state.blockSession,
-        state.blocklist,
-      )
+      const schedule = selectBlockingSchedule(dateProvider, state)
       const scheduleKey = getScheduleKey(schedule)
 
       if (scheduleKey !== lastScheduleKey) {

@@ -33,11 +33,7 @@ describe('selectBlockingSchedule', () => {
       .withBlocklists([blocklist])
       .build()
 
-    const schedule = selectBlockingSchedule(
-      dateProvider,
-      state.blockSession,
-      state.blocklist,
-    )
+    const schedule = selectBlockingSchedule(dateProvider, state)
 
     const firstSchedule = schedule[0]
     const firstScheduleId = firstSchedule.id
@@ -65,11 +61,7 @@ describe('selectBlockingSchedule', () => {
       .withBlocklists([blocklist1, blocklist2])
       .build()
 
-    const schedule = selectBlockingSchedule(
-      dateProvider,
-      state.blockSession,
-      state.blocklist,
-    )
+    const schedule = selectBlockingSchedule(dateProvider, state)
 
     const androidSirens = schedule[0].sirens.android
     expect(androidSirens).toHaveLength(2)
@@ -85,11 +77,7 @@ describe('selectBlockingSchedule', () => {
     })
     const state = stateBuilder().withBlockSessions([session]).build()
 
-    const schedule = selectBlockingSchedule(
-      dateProvider,
-      state.blockSession,
-      state.blocklist,
-    )
+    const schedule = selectBlockingSchedule(dateProvider, state)
 
     expect(schedule).toHaveLength(0)
   })
@@ -97,11 +85,7 @@ describe('selectBlockingSchedule', () => {
   test('should return empty array when no sessions exist', () => {
     const state = stateBuilder().build()
 
-    const schedule = selectBlockingSchedule(
-      dateProvider,
-      state.blockSession,
-      state.blocklist,
-    )
+    const schedule = selectBlockingSchedule(dateProvider, state)
 
     expect(schedule).toHaveLength(0)
   })
@@ -133,11 +117,7 @@ describe('selectBlockingSchedule', () => {
       .withBlocklists([freshBlocklist])
       .build()
 
-    const schedule = selectBlockingSchedule(
-      dateProvider,
-      state.blockSession,
-      state.blocklist,
-    )
+    const schedule = selectBlockingSchedule(dateProvider, state)
 
     const androidSirens = schedule[0].sirens.android
     expect(androidSirens).toContainEqual(tikTokAndroidSiren)
@@ -164,11 +144,7 @@ describe('selectBlockingSchedule', () => {
       .withBlocklists([]) // No blocklists in state
       .build()
 
-    const schedule = selectBlockingSchedule(
-      dateProvider,
-      state.blockSession,
-      state.blocklist,
-    )
+    const schedule = selectBlockingSchedule(dateProvider, state)
 
     // Should fall back to embedded blocklist data
     const androidSirens = schedule[0].sirens.android

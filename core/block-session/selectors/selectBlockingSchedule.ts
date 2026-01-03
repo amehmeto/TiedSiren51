@@ -1,16 +1,11 @@
-import { createSelector, EntityState } from '@reduxjs/toolkit'
+import { createSelector } from '@reduxjs/toolkit'
 import { DateProvider } from '@/core/_ports_/date-provider'
 import { BlockingSchedule } from '@/core/_ports_/siren.tier'
-import {
-  BlockSession,
-  blockSessionAdapter,
-} from '@/core/block-session/block-session'
-import { Blocklist, blocklistAdapter } from '@/core/blocklist/blocklist'
+import { RootState } from '@/core/_redux_/createStore'
+import { blockSessionAdapter } from '@/core/block-session/block-session'
+import { blocklistAdapter } from '@/core/blocklist/blocklist'
 import { Sirens } from '@/core/siren/sirens'
 import { isActive } from './isActive'
-
-type BlockSessionState = EntityState<BlockSession, string>
-type BlocklistState = EntityState<Blocklist, string>
 
 const uniqueBy = <T, K>(array: T[], keyExtractor: (item: T) => K): T[] => {
   return [...new Map(array.map((item) => [keyExtractor(item), item])).values()]
@@ -56,7 +51,7 @@ const mergeSirens = (sirensArray: Sirens[]): Sirens => {
  * Selects the blocking schedule by joining active sessions with fresh blocklist data.
  *
  * This selector is memoized with createSelector for performance optimization.
- * It will only recompute when dateProvider, blockSessionState, or blocklistState change.
+ * It will only recompute when dateProvider or state change.
  *
  * This selector:
  * 1. Gets all active block sessions
@@ -65,17 +60,14 @@ const mergeSirens = (sirensArray: Sirens[]): Sirens => {
  * 4. Falls back to embedded blocklist data if blocklist was deleted
  *
  * @param dateProvider - Provider for current date/time
- * @param blockSessionState - Block session entity state
- * @param blocklistState - Blocklist entity state for fresh data lookup
+ * @param state - Root state
  * @returns BlockingSchedule[] with each schedule containing id, startTime, endTime, and sirens
  */
 export const selectBlockingSchedule = createSelector(
   [
     (dateProvider: DateProvider) => dateProvider,
-    (_: DateProvider, blockSessionState: BlockSessionState) =>
-      blockSessionState,
-    (_: DateProvider, __: BlockSessionState, blocklistState: BlocklistState) =>
-      blocklistState,
+    (_: DateProvider, state: RootState) => state.blockSession,
+    (_: DateProvider, state: RootState) => state.blocklist,
   ],
   (dateProvider, blockSessionState, blocklistState): BlockingSchedule[] => {
     const activeSessions = blockSessionAdapter
@@ -83,17 +75,15 @@ export const selectBlockingSchedule = createSelector(
       .selectAll(blockSessionState)
       .filter((session) => isActive(dateProvider, session))
 
-    const blocklistSelectors = blocklistAdapter.getSelectors()
-    const blocklistIds = blocklistSelectors.selectIds(blocklistState)
+    const blocklistEntities = blocklistAdapter
+      .getSelectors()
+      .selectEntities(blocklistState)
 
     return activeSessions.map((session) => {
-      // Join with fresh blocklist data from state (not stale embedded copies)
-      // Falls back to embedded data if blocklist was deleted
-      const freshBlocklists = session.blocklists.map((embedded) => {
-        const isInState = blocklistIds.includes(embedded.id)
-        if (!isInState) return embedded
-        return blocklistSelectors.selectById(blocklistState, embedded.id)
-      })
+      // Join with fresh blocklist data, fallback to embedded if deleted
+      const freshBlocklists = session.blocklists.map(
+        (embedded) => blocklistEntities[embedded.id] ?? embedded,
+      )
 
       const schedule: BlockingSchedule = {
         id: session.id,
