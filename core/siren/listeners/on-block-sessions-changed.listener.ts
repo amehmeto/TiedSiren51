@@ -7,23 +7,6 @@ import { AppStore } from '@/core/_redux_/createStore'
 import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAllBlockSessions'
 import { selectBlockingSchedule } from '@/core/block-session/selectors/selectBlockingSchedule'
 
-/**
- * Listens to block session changes and starts/stops the siren lookout accordingly.
- *
- * - When there are block sessions (active or scheduled): starts foreground service then watching
- * - When there are no block sessions: stops watching then foreground service
- *
- * Also syncs blocking schedule to native layer for native-to-native blocking:
- * - On protection start: syncs blocking schedule from active sessions
- * - On protection stop: clears blocking schedule
- * - On blocklist changes during active session: re-syncs
- *
- * The foreground service keeps the app alive in the background via a persistent notification.
- * This ensures the AccessibilityService subscription receives events even when app is backgrounded.
- *
- * Note: Async operations (foreground service, blocking schedule sync) are fire-and-forget
- * with errors caught and logged in their respective safe* wrapper functions.
- */
 export const onBlockSessionsChangedListener = ({
   store,
   sirenLookout,
