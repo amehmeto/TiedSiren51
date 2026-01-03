@@ -118,7 +118,6 @@ module.exports = {
     'local-rules/no-module-level-constants': 'error',
     'local-rules/require-named-regex': 'error',
     // Disabled globally - too many valid patterns. Enable per-file as needed.
-    // See: docs/adr/conventions/no-nested-call-expressions.md
     'local-rules/no-nested-call-expressions': 'off',
   },
   overrides: [

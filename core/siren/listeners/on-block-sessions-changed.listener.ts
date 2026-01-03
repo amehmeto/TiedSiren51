@@ -117,11 +117,13 @@ export const onBlockSessionsChangedListener = ({
     const state = store.getState()
     const sessions = selectAllBlockSessions(state.blockSession)
     const hasSessions = sessions.length > 0
-    const schedule = selectBlockingSchedule(dateProvider, state)
 
     if (didHaveSessions && !hasSessions) onAllSessionsRemoved()
-    if (!didHaveSessions && hasSessions) onFirstSessionAdded(schedule)
-    if (didHaveSessions && hasSessions) onScheduleMayHaveChanged(schedule)
+    else if (hasSessions) {
+      const schedule = selectBlockingSchedule(dateProvider, state)
+      if (!didHaveSessions) onFirstSessionAdded(schedule)
+      else onScheduleMayHaveChanged(schedule)
+    }
 
     didHaveSessions = hasSessions
   })
