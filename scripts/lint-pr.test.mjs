@@ -92,6 +92,33 @@ describe('PR Linter', () => {
 
       expect(result.title.warnings.some((w) => w.includes('chars'))).toBe(true)
     })
+
+    it('should fail when title is empty', () => {
+      const { success, result } = lintPR('', '## Summary\nTest')
+
+      expect(success).toBe(false)
+      expect(result.valid).toBe(false)
+      expect(result.title.errors).toContain('Title is empty')
+    })
+
+    it('should detect WIP in title', () => {
+      const { result } = lintPR('WIP: feat: add login #123', '## Summary\nTest')
+
+      expect(
+        result.title.info.some((i) => i.includes('Work In Progress')),
+      ).toBe(true)
+    })
+
+    it('should detect [WIP] in title', () => {
+      const { result } = lintPR(
+        '[WIP] feat: add login #123',
+        '## Summary\nTest',
+      )
+
+      expect(
+        result.title.info.some((i) => i.includes('Work In Progress')),
+      ).toBe(true)
+    })
   })
 
   describe('📄 Body Validation', () => {
@@ -192,6 +219,19 @@ describe('PR Linter', () => {
         expect.objectContaining({
           repo: 'expo-accessibility-service',
           number: 10,
+        }),
+      )
+    })
+
+    it('should extract PR URL references (pull/ URLs also close issues)', () => {
+      const body =
+        '## Summary\n\nRelated to https://github.com/amehmeto/tied-siren-blocking-overlay/pull/42'
+      const { result } = lintPR('feat: test #123', body)
+
+      expect(result.linkedTickets).toContainEqual(
+        expect.objectContaining({
+          repo: 'tied-siren-blocking-overlay',
+          number: 42,
         }),
       )
     })

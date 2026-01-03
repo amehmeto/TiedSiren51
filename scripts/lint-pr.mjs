@@ -14,15 +14,21 @@
  *   gh pr view --json title,body | node scripts/lint-pr.mjs --stdin
  */
 
-import { VALID_REPOS } from './remark-lint-ticket/config.mjs'
+import { VALID_REPOS, GITHUB_ORG } from './remark-lint-ticket/config.mjs'
 
 // ============================================================================
 // 📋 CONFIGURATION
 // ============================================================================
 
 const ISSUE_PATTERN = /#(\d+)/g
-const CROSS_REPO_ISSUE_PATTERN =
-  /(?:amehmeto\/)?([a-zA-Z0-9_-]+)#(\d+)|https:\/\/github\.com\/amehmeto\/([a-zA-Z0-9_-]+)\/issues\/(\d+)/g
+
+// Build cross-repo pattern dynamically from config
+// Matches: repo#123, org/repo#123, https://github.com/org/repo/issues/123, https://github.com/org/repo/pull/123
+const CROSS_REPO_ISSUE_PATTERN = new RegExp(
+  `(?:${GITHUB_ORG}\\/)?([a-zA-Z0-9_-]+)#(\\d+)|` +
+    `https:\\/\\/github\\.com\\/${GITHUB_ORG}\\/([a-zA-Z0-9_-]+)\\/(?:issues|pull)\\/(\\d+)`,
+  'g',
+)
 
 const VALID_REPO_NAMES = Object.keys(VALID_REPOS)
 
@@ -399,11 +405,13 @@ function printJsonResults(results) {
     title: {
       errors: results.title.errors,
       warnings: results.title.warnings,
+      info: results.title.info,
       issues: results.title.issues,
     },
     body: {
       errors: results.body.errors,
       warnings: results.body.warnings,
+      info: results.body.info,
       issues: results.body.issues,
     },
     linkedTickets: results.allIssues,

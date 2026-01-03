@@ -91,8 +91,13 @@ extract_body() {
 title=$(extract_title "$command" 2>/dev/null || echo "")
 body=$(extract_body "$command" 2>/dev/null || echo "")
 
-# If no title found, skip validation (might be interactive)
+# If no title found, warn and skip validation (might be interactive)
 if [ -z "$title" ]; then
+  # Output a warning so it's visible in logs
+  jq -n '{
+    "decision": "allow",
+    "message": "⚠️ Could not extract PR title from command - skipping validation. Run `node scripts/lint-pr.mjs --help` for manual validation."
+  }'
   exit 0
 fi
 
@@ -134,7 +139,7 @@ if [ "$exit_code" -ne 0 ]; then
     --arg errors "$errors" \
     --arg warnings "$warnings" \
     --arg tickets "$linked_tickets" \
-    --arg hint "💡 Tip: Title must include ticket reference (e.g., feat: add feature #123)" \
+    --arg hint "💡 Tip: Title must include ticket reference (e.g., feat: add feature #123). Run \`node scripts/lint-pr.mjs --help\` for full validation rules." \
     '{
       "decision": "block",
       "reason": $reason,
