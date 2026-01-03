@@ -60,10 +60,11 @@ function viewHistory() {
     console.log(`Total entries: ${history.length}`)
 
     if (history.length > 1) {
-      const first = history[0]
-      const last = history[history.length - 1]
+      const [first] = history
+
       const totalChange = (
-        parseFloat(last.statements) - parseFloat(first.statements)
+        parseFloat(history[history.length - 1].statements) -
+        parseFloat(first.statements)
       ).toFixed(2)
       console.log(
         `Overall change: ${totalChange > 0 ? '+' : ''}${totalChange}% statements`,

@@ -117,6 +117,11 @@ module.exports = {
     'local-rules/reducer-in-domain-folder': 'error',
     'local-rules/no-module-level-constants': 'error',
     'local-rules/require-named-regex': 'error',
+    // Disabled globally - too many valid patterns. Enable per-file as needed.
+    'local-rules/no-nested-call-expressions': 'off',
+    'local-rules/prefer-array-destructuring': 'error',
+    // Warn-only: many valid patterns use named variables for self-documentation
+    'local-rules/prefer-inline-variable': 'warn',
   },
   overrides: [
     {
@@ -486,6 +491,33 @@ module.exports = {
           {
             pathPattern: '^permissions\\.(allow|deny|ask)$',
             order: { type: 'asc' },
+          },
+        ],
+      },
+    },
+    // Selectors - enforce no nested calls for readability
+    {
+      files: ['core/**/selectors/*.ts'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
+        'local-rules/no-nested-call-expressions': [
+          'error',
+          {
+            allowedPatterns: [
+              // Array methods
+              '^map$',
+              '^filter$',
+              '^flatMap$',
+              '^find$',
+              '^some$',
+              '^every$',
+              // Entity adapter
+              '^selectAll$',
+              '^selectById$',
+              '^selectIds$',
+              '^selectEntities$',
+              '^getSelectors$',
+            ],
           },
         ],
       },
