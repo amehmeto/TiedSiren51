@@ -105,6 +105,15 @@ fi
 project_dir="$(dirname "$0")/../.."
 cd "$project_dir" || exit 0
 
+# Check if linter script exists
+if [ ! -f "scripts/lint-pr.mjs" ]; then
+  jq -n '{
+    "decision": "allow",
+    "message": "⚠️ PR linter not found (scripts/lint-pr.mjs) - skipping validation."
+  }'
+  exit 0
+fi
+
 # Run the PR linter
 pr_json=$(jq -n --arg title "$title" --arg body "$body" '{"title": $title, "body": $body}')
 output=$(printf '%s' "$pr_json" | node scripts/lint-pr.mjs --stdin --json 2>&1) || exit_code=$?
