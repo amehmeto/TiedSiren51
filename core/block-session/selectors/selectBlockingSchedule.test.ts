@@ -43,7 +43,7 @@ describe('selectBlockingSchedule', () => {
     expect(androidSirens).toContainEqual(facebookAndroidSiren)
   })
 
-  test('should deduplicate apps across blocklists', () => {
+  test('should deduplicate sirens across blocklists', () => {
     dateProvider.now.setHours(10, 0, 0, 0)
     const blocklist1 = buildBlocklist({
       sirens: { android: [facebookAndroidSiren] },
@@ -90,31 +90,24 @@ describe('selectBlockingSchedule', () => {
     expect(schedule).toHaveLength(0)
   })
 
-  test('should use fresh blocklist data instead of stale embedded copies', () => {
+  test('should use current blocklist state, not session snapshot', () => {
     dateProvider.now.setHours(10, 0, 0, 0)
-
-    // Stale blocklist embedded in session (old data)
-    const staleBlocklist = buildBlocklist({
+    const snapshotBlocklist = buildBlocklist({
       id: 'bl-1',
       sirens: { android: [facebookAndroidSiren] },
     })
-
-    // Fresh blocklist in state (updated data)
-    const freshBlocklist = buildBlocklist({
+    const currentBlocklist = buildBlocklist({
       id: 'bl-1',
       sirens: { android: [tikTokAndroidSiren] },
     })
-
     const session = buildBlockSession({
       startedAt: '09:00',
       endedAt: '11:00',
-      blocklists: [staleBlocklist],
+      blocklists: [snapshotBlocklist],
     })
-
-    // State has fresh blocklist, session has stale embedded copy
     const state = stateBuilder()
       .withBlockSessions([session])
-      .withBlocklists([freshBlocklist])
+      .withBlocklists([currentBlocklist])
       .build()
 
     const schedule = selectBlockingSchedule(dateProvider, state)
@@ -126,27 +119,22 @@ describe('selectBlockingSchedule', () => {
 
   test('should skip deleted blocklists', () => {
     dateProvider.now.setHours(10, 0, 0, 0)
-
     const blocklist = buildBlocklist({
       id: 'bl-deleted',
       sirens: { android: [facebookAndroidSiren] },
     })
-
     const session = buildBlockSession({
       startedAt: '09:00',
       endedAt: '11:00',
       blocklists: [blocklist],
     })
-
-    // Session references blocklist but it's not in state (deleted)
     const state = stateBuilder()
       .withBlockSessions([session])
-      .withBlocklists([]) // No blocklists in state
+      .withBlocklists([])
       .build()
 
     const schedule = selectBlockingSchedule(dateProvider, state)
 
-    // Deleted blocklist should not contribute sirens
     const androidSirens = schedule[0].sirens.android
     expect(androidSirens).toHaveLength(0)
   })
