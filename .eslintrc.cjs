@@ -117,30 +117,9 @@ module.exports = {
     'local-rules/reducer-in-domain-folder': 'error',
     'local-rules/no-module-level-constants': 'error',
     'local-rules/require-named-regex': 'error',
-    'local-rules/no-nested-call-expressions': [
-      'error',
-      {
-        allowedPatterns: [
-          // Array methods chaining
-          '^map$',
-          '^filter$',
-          '^reduce$',
-          '^flatMap$',
-          '^find$',
-          '^some$',
-          '^every$',
-          // Common utilities
-          '^String$',
-          '^Number$',
-          '^Boolean$',
-          '^Object\\.keys$',
-          '^Object\\.values$',
-          '^Object\\.entries$',
-          '^JSON\\.parse$',
-          '^JSON\\.stringify$',
-        ],
-      },
-    ],
+    // Disabled globally - too many valid patterns. Enable per-file as needed.
+    // See: docs/adr/conventions/no-nested-call-expressions.md
+    'local-rules/no-nested-call-expressions': 'off',
   },
   overrides: [
     {
@@ -510,6 +489,33 @@ module.exports = {
           {
             pathPattern: '^permissions\\.(allow|deny|ask)$',
             order: { type: 'asc' },
+          },
+        ],
+      },
+    },
+    // Selectors - enforce no nested calls for readability
+    {
+      files: ['core/**/selectors/*.ts'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
+        'local-rules/no-nested-call-expressions': [
+          'error',
+          {
+            allowedPatterns: [
+              // Array methods
+              '^map$',
+              '^filter$',
+              '^flatMap$',
+              '^find$',
+              '^some$',
+              '^every$',
+              // Entity adapter
+              '^selectAll$',
+              '^selectById$',
+              '^selectIds$',
+              '^selectEntities$',
+              '^getSelectors$',
+            ],
           },
         ],
       },
