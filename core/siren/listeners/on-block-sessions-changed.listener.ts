@@ -101,16 +101,34 @@ export const onBlockSessionsChangedListener = ({
       .join('|')
   }
 
+  let lastScheduleKey = ''
+
+  const onAllSessionsRemoved = () => {
+    void stopProtection()
+    lastScheduleKey = ''
+  }
+
+  const onFirstSessionAdded = (schedule: BlockingSchedule[]) => {
+    lastScheduleKey = getScheduleKey(schedule)
+    void startProtection(schedule)
+  }
+
+  const onScheduleMayHaveChanged = (schedule: BlockingSchedule[]) => {
+    const scheduleKey = getScheduleKey(schedule)
+    if (scheduleKey === lastScheduleKey) return
+
+    lastScheduleKey = scheduleKey
+    void safeUpdateBlockingSchedule(schedule)
+  }
+
   // Check initial state
   const initialState = store.getState()
   const initialSessions = selectAllBlockSessions(initialState.blockSession)
   let didHaveSessions = initialSessions.length > 0
-  let lastScheduleKey = ''
 
   if (didHaveSessions) {
     const schedule = selectBlockingSchedule(dateProvider, initialState)
-    lastScheduleKey = getScheduleKey(schedule)
-    void startProtection(schedule)
+    onFirstSessionAdded(schedule)
   }
 
   // Subscribe to store changes
@@ -118,24 +136,11 @@ export const onBlockSessionsChangedListener = ({
     const state = store.getState()
     const sessions = selectAllBlockSessions(state.blockSession)
     const hasSessions = sessions.length > 0
+    const schedule = selectBlockingSchedule(dateProvider, state)
 
-    if (didHaveSessions && !hasSessions) {
-      void stopProtection()
-      lastScheduleKey = ''
-    } else if (!didHaveSessions && hasSessions) {
-      const schedule = selectBlockingSchedule(dateProvider, state)
-      lastScheduleKey = getScheduleKey(schedule)
-      void startProtection(schedule)
-    } else if (hasSessions) {
-      // Sessions still exist - check if schedule changed (including blocklist edits)
-      const schedule = selectBlockingSchedule(dateProvider, state)
-      const scheduleKey = getScheduleKey(schedule)
-
-      if (scheduleKey !== lastScheduleKey) {
-        lastScheduleKey = scheduleKey
-        void safeUpdateBlockingSchedule(schedule)
-      }
-    }
+    if (didHaveSessions && !hasSessions) onAllSessionsRemoved()
+    else if (!didHaveSessions && hasSessions) onFirstSessionAdded(schedule)
+    else if (hasSessions) onScheduleMayHaveChanged(schedule)
 
     didHaveSessions = hasSessions
   })
