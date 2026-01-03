@@ -4,7 +4,7 @@
  *
  * Does NOT suggest inlining when it would create:
  * - A nested method call (e.g., foo(bar()))
- * - A chained method call (e.g., foo().bar())
+ * - A chained access pattern (e.g., foo().bar() or foo().length)
  * - A complex operator expression (more than 3 terms)
  * - A multi-line initialization (hurts readability)
  *
@@ -140,21 +140,19 @@ module.exports = {
     }
 
     /**
-     * Check if inlining would create a chained method call
-     * e.g., getValue().toString()
+     * Check if inlining would create a chained access pattern
+     * e.g., getValue().toString() or getValue().length
+     * Property access after a call (foo().prop) is as hard to read as chained calls
      */
-    function wouldCreateChainedCall(usageNode, initNode) {
+    function wouldCreateChainedAccess(usageNode, initNode) {
       if (initNode.type !== 'CallExpression') return false
 
       const parent = usageNode.parent
       if (!parent) return false
 
-      // Usage is the object of a member expression that's then called
+      // Usage is the object of a member expression (property or method access)
       if (parent.type === 'MemberExpression' && parent.object === usageNode) {
-        const grandparent = parent.parent
-        if (grandparent && grandparent.type === 'CallExpression') {
-          return true
-        }
+        return true
       }
 
       return false
@@ -209,7 +207,7 @@ module.exports = {
 
         // JetBrains-style heuristics: don't inline if it would create complexity
         if (wouldCreateNestedCall(usage.identifier, decl.init)) return
-        if (wouldCreateChainedCall(usage.identifier, decl.init)) return
+        if (wouldCreateChainedAccess(usage.identifier, decl.init)) return
         if (wouldCreateComplexExpression(usage.identifier, decl.init)) return
 
         // Don't inline into expect() calls - conflicts with expect-separate-act-assert

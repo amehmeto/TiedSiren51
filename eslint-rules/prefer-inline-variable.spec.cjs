@@ -81,11 +81,18 @@ ruleTester.run('prefer-inline-variable', rule, {
         const result = process({ items: [item] })
       `,
     },
-    // Would create chained call - should NOT report (JetBrains heuristic)
+    // Would create chained method call - should NOT report (JetBrains heuristic)
     {
       code: `
         const result = getData()
         result.toString()
+      `,
+    },
+    // Would create chained property access - should NOT report
+    {
+      code: `
+        const sessions = getSessions()
+        const hasSessions = sessions.length > 0
       `,
     },
     // Multi-line initialization - should NOT report (hurts readability)
