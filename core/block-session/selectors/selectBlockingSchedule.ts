@@ -54,10 +54,14 @@ export const selectBlockingSchedule = createSelector(
     (_: DateProvider, state: RootState) => state.blocklist,
   ],
   (dateProvider, blockSessionState, blocklistState): BlockingSchedule[] => {
+    if (blockSessionState.ids.length === 0) return []
+
     const activeSessions = blockSessionAdapter
       .getSelectors()
       .selectAll(blockSessionState)
       .filter((session) => isActive(dateProvider, session))
+
+    if (activeSessions.length === 0) return []
 
     const blocklists = blocklistAdapter
       .getSelectors()
