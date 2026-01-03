@@ -117,6 +117,30 @@ module.exports = {
     'local-rules/reducer-in-domain-folder': 'error',
     'local-rules/no-module-level-constants': 'error',
     'local-rules/require-named-regex': 'error',
+    'local-rules/no-nested-call-expressions': [
+      'error',
+      {
+        allowedPatterns: [
+          // Array methods chaining
+          '^map$',
+          '^filter$',
+          '^reduce$',
+          '^flatMap$',
+          '^find$',
+          '^some$',
+          '^every$',
+          // Common utilities
+          '^String$',
+          '^Number$',
+          '^Boolean$',
+          '^Object\\.keys$',
+          '^Object\\.values$',
+          '^Object\\.entries$',
+          '^JSON\\.parse$',
+          '^JSON\\.stringify$',
+        ],
+      },
+    ],
   },
   overrides: [
     {
