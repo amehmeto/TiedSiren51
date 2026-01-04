@@ -4,6 +4,7 @@
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
       "Bash(./scripts/worktree.sh:*)",
+      "Bash(.claude/hooks/validate-pr.sh)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(base64:*)",
       "Bash(bash scripts/lint-workflow-scripts.sh:*)",
@@ -230,6 +231,15 @@
           {
             "type": "command",
             "command": ".claude/hooks/validate-ticket.sh"
+          }
+        ]
+      },
+      {
+        "matcher": "Bash(gh pr create:*)|Bash(gh pr edit:*)",
+        "hooks": [
+          {
+            "type": "command",
+            "command": ".claude/hooks/validate-pr.sh"
           }
         ]
       },
