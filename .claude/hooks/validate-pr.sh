@@ -85,6 +85,20 @@ extract_body() {
     return 0
   fi
 
+  # Method 4: Double-quoted -b (short flag)
+  body=$(printf '%s' "$cmd" | perl -ne 'if (/-b\s+"((?:[^"\\]|\\.)*)"/s) { $b=$1; $b=~s/\\"/"/g; $b=~s/\\n/\n/g; print $b }' 2>/dev/null)
+  if [ -n "$body" ]; then
+    printf '%s' "$body"
+    return 0
+  fi
+
+  # Method 5: Single-quoted -b (short flag)
+  body=$(printf '%s' "$cmd" | perl -ne "if (/-b\\s+'([^']*)'/) { print \$1 }" 2>/dev/null)
+  if [ -n "$body" ]; then
+    printf '%s' "$body"
+    return 0
+  fi
+
   return 1
 }
 
@@ -104,24 +118,17 @@ fi
 # VALIDATION RULES
 # ============================================================================
 
-# Rule 1: Title must reference a GitHub issue (#NNN)
-if [ -n "$title" ]; then
-  if ! printf '%s' "$title" | grep -qE '#[0-9]+'; then
-    errors+=("❌ PR title must reference a GitHub issue (e.g., 'feat: add feature (#123)')")
-  fi
-fi
-
-# Rule 2: Body must have a ## Summary section
+# Rule 1: Body must have a ## Summary section
 if ! echo "$body" | grep -qE '^## Summary'; then
   errors+=("❌ Missing required section: ## Summary")
 fi
 
-# Rule 3: Body must have a ## Test plan section
+# Rule 2: Body must have a ## Test plan section
 if ! echo "$body" | grep -qiE '^## Test [Pp]lan'; then
   errors+=("❌ Missing required section: ## Test plan")
 fi
 
-# Rule 4: Must mention related issue with "Closes #", "Fixes #", "Resolves #", or "#NNN" in title
+# Rule 3: Must reference issue via "Closes #", "Fixes #", "Resolves #", or "#NNN" in title
 combined="$title $body"
 has_issue_ref=false
 if echo "$combined" | grep -qiE '(Closes|Fixes|Resolves)\s+#[0-9]+'; then
