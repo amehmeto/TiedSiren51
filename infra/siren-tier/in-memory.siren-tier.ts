@@ -8,6 +8,8 @@ export class InMemorySirenTier implements SirenTier {
 
   shouldThrowOnSync = false
 
+  updateCallCount = 0
+
   constructor(private readonly logger: Logger) {}
 
   async initializeNativeBlocking(): Promise<void> {
@@ -18,6 +20,7 @@ export class InMemorySirenTier implements SirenTier {
   }
 
   async updateBlockingSchedule(schedule: BlockingSchedule[]): Promise<void> {
+    this.updateCallCount++
     if (this.shouldThrowOnSync)
       throw new Error('Update blocking schedule failed')
     this.logger.info(
