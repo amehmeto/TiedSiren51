@@ -49,44 +49,46 @@ export const onBlockingScheduleChangedListener = ({
   const initialSessions = selectAllBlockSessions(initialState.blockSession)
   let didHaveSessions = initialSessions.length > 0
 
-  const processChange = async (state: ReturnType<typeof store.getState>) => {
-    if (
-      state.blockSession === lastBlockSessionState &&
-      state.blocklist === lastBlocklistState
-    )
-      return
-
-    lastBlockSessionState = state.blockSession
-    lastBlocklistState = state.blocklist
-
-    const sessions = selectAllBlockSessions(state.blockSession)
-    const hasSessions = sessions.length > 0
-
-    if (didHaveSessions && !hasSessions) {
-      await stopProtection()
-      lastScheduleKey = ''
-    } else if (hasSessions) {
-      const schedule = selectBlockingSchedule(dateProvider, state)
-      if (!didHaveSessions) {
-        lastScheduleKey = getScheduleKey(schedule)
-        await startProtection(schedule)
-      } else {
-        const scheduleKey = getScheduleKey(schedule)
-        if (scheduleKey !== lastScheduleKey) {
-          lastScheduleKey = scheduleKey
-          await sirenTier.updateBlockingSchedule(schedule)
-        }
-      }
-    }
-
-    didHaveSessions = hasSessions
-  }
-
   if (didHaveSessions) {
     const schedule = selectBlockingSchedule(dateProvider, initialState)
     lastScheduleKey = getScheduleKey(schedule)
     void startProtection(schedule)
   }
 
-  return store.subscribe(() => void processChange(store.getState()))
+  return store.subscribe(() => {
+    void (async () => {
+      const state = store.getState()
+
+      if (
+        state.blockSession === lastBlockSessionState &&
+        state.blocklist === lastBlocklistState
+      )
+        return
+
+      lastBlockSessionState = state.blockSession
+      lastBlocklistState = state.blocklist
+
+      const sessions = selectAllBlockSessions(state.blockSession)
+      const hasSessions = sessions.length > 0
+
+      if (didHaveSessions && !hasSessions) {
+        await stopProtection()
+        lastScheduleKey = ''
+      } else if (hasSessions) {
+        const schedule = selectBlockingSchedule(dateProvider, state)
+        if (!didHaveSessions) {
+          lastScheduleKey = getScheduleKey(schedule)
+          await startProtection(schedule)
+        } else {
+          const scheduleKey = getScheduleKey(schedule)
+          if (scheduleKey !== lastScheduleKey) {
+            lastScheduleKey = scheduleKey
+            await sirenTier.updateBlockingSchedule(schedule)
+          }
+        }
+      }
+
+      didHaveSessions = hasSessions
+    })()
+  })
 }
