@@ -24,12 +24,6 @@ export function blockingScheduleChangedFixture(
   const foregroundService = new InMemoryForegroundService()
 
   let store: ReturnType<typeof createTestStore> | undefined
-  let updateCallCount = 0
-
-  sirenTier.updateBlockingSchedule = async (schedule) => {
-    updateCallCount++
-    return sirenTier.updateBlockingSchedule.bind(sirenTier)(schedule)
-  }
 
   const createStoreWithState = () => {
     store = createTestStore(
@@ -146,7 +140,7 @@ export function blockingScheduleChangedFixture(
         ).toBe(true)
       },
       updateBlockingScheduleCallCount() {
-        return updateCallCount
+        return sirenTier.updateCallCount
       },
     },
   }
