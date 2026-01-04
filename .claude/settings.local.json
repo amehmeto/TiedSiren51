@@ -7,6 +7,7 @@
       "Bash(.claude/hooks/validate-ticket.sh:*)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(base64:*)",
+      "Bash(bash scripts/*.sh:*)",
       "Bash(bash scripts/lint-workflow-scripts.sh:*)",
       "Bash(cat:*)",
       "Bash(cloc:*)",
