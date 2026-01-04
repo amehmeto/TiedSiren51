@@ -46,43 +46,59 @@ export const onBlockingScheduleChangedListener = ({
   let lastBlockSessionState = store.getState().blockSession
   let lastBlocklistState = store.getState().blocklist
 
-  return store.subscribe(() => {
-    void (async () => {
-      try {
-        const state = store.getState()
+  const syncSchedule = async (
+    schedule: BlockingSchedule[],
+    wasActive: boolean,
+    isActive: boolean,
+  ) => {
+    try {
+      await sirenTier.updateBlockingSchedule(schedule)
 
-        if (
-          state.blockSession === lastBlockSessionState &&
-          state.blocklist === lastBlocklistState
-        )
-          return
-
-        lastBlockSessionState = state.blockSession
-        lastBlocklistState = state.blocklist
-
-        const schedule = selectBlockingSchedule(dateProvider, state)
-        const scheduleKey = getScheduleKey(schedule)
-
-        if (scheduleKey === lastScheduleKey) return
-
-        const wasActive = lastScheduleKey !== ''
-        const isActive = scheduleKey !== ''
-        lastScheduleKey = scheduleKey
-
-        await sirenTier.updateBlockingSchedule(schedule)
-
-        if (!wasActive && isActive) {
-          sirenLookout.startWatching()
-          await foregroundService.start()
-        }
-
-        if (wasActive && !isActive) {
-          sirenLookout.stopWatching()
-          await foregroundService.stop()
-        }
-      } catch (error) {
-        logger.error(`[BlockingScheduleListener] ${error}`)
+      if (!wasActive && isActive) {
+        sirenLookout.startWatching()
+        await foregroundService.start()
       }
-    })()
+
+      if (wasActive && !isActive) {
+        sirenLookout.stopWatching()
+        await foregroundService.stop()
+      }
+    } catch (error) {
+      logger.error(`[BlockingScheduleListener] ${error}`)
+    }
+  }
+
+  // Sync initial state on app restart with active session
+  const initialState = store.getState()
+  const initialSchedule = selectBlockingSchedule(dateProvider, initialState)
+  if (initialSchedule.length > 0) {
+    lastScheduleKey = getScheduleKey(initialSchedule)
+    void syncSchedule(initialSchedule, false, true)
+  }
+
+  return store.subscribe(() => {
+    const state = store.getState()
+
+    if (
+      state.blockSession === lastBlockSessionState &&
+      state.blocklist === lastBlocklistState
+    )
+      return
+
+    lastBlockSessionState = state.blockSession
+    lastBlocklistState = state.blocklist
+
+    const schedule = selectBlockingSchedule(dateProvider, state)
+    const scheduleKey = getScheduleKey(schedule)
+
+    if (scheduleKey === lastScheduleKey) return
+
+    const wasActive = lastScheduleKey !== ''
+    const isActive = scheduleKey !== ''
+
+    // Update state synchronously BEFORE async operations to prevent race conditions
+    lastScheduleKey = scheduleKey
+
+    void syncSchedule(schedule, wasActive, isActive)
   })
 }

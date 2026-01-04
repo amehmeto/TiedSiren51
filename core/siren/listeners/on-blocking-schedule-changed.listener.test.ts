@@ -283,6 +283,38 @@ describe('Feature: Blocking schedule changed listener', () => {
     })
   })
 
+  describe('Scenario 4: App restart with active session', () => {
+    it('should sync blocking schedule on initialization when active session exists', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.initialBlockSessions([
+        buildBlockSession({
+          id: 'session-1',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+
+      await fixture.given.storeIsCreatedAndInitialized()
+
+      fixture.then.blockingScheduleShouldContainApps(['com.facebook.katana'])
+      fixture.then.foregroundServiceShouldBeStarted()
+      fixture.then.watchingShouldBeStarted()
+    })
+
+    it('should NOT sync on initialization when no active sessions', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.storeIsCreated()
+
+      const callCount = fixture.then.updateBlockingScheduleCallCount()
+      expect(callCount).toBe(0)
+    })
+  })
+
   describe('Foreground service and watching lifecycle', () => {
     it('should start foreground service and watching when session starts', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })

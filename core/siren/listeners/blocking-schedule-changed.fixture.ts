@@ -50,6 +50,10 @@ export function blockingScheduleChangedFixture(
       storeIsCreated() {
         createStoreWithState()
       },
+      async storeIsCreatedAndInitialized() {
+        createStoreWithState()
+        await flushPromises()
+      },
       nowIs({ hours, minutes }: { hours: number; minutes: number }) {
         const date = new Date()
         date.setHours(hours, minutes, 0, 0)
