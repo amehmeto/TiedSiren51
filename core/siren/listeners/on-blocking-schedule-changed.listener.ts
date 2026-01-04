@@ -1,6 +1,6 @@
+/* eslint-disable local-rules/listener-error-handling */
 import { DateProvider } from '@/core/_ports_/date-provider'
 import { ForegroundService } from '@/core/_ports_/foreground.service'
-import { Logger } from '@/core/_ports_/logger'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { BlockingSchedule, SirenTier } from '@/core/_ports_/siren.tier'
 import { AppStore } from '@/core/_redux_/createStore'
@@ -13,14 +13,12 @@ export const onBlockingScheduleChangedListener = ({
   sirenTier,
   foregroundService,
   dateProvider,
-  logger,
 }: {
   store: AppStore
   sirenLookout: SirenLookout
   sirenTier: SirenTier
   foregroundService: ForegroundService
   dateProvider: DateProvider
-  logger: Logger
 }): (() => void) => {
   const getScheduleKey = (schedule: BlockingSchedule[]): string => {
     return schedule
@@ -51,52 +49,44 @@ export const onBlockingScheduleChangedListener = ({
   const initialSessions = selectAllBlockSessions(initialState.blockSession)
   let didHaveSessions = initialSessions.length > 0
 
+  const processChange = async (state: ReturnType<typeof store.getState>) => {
+    if (
+      state.blockSession === lastBlockSessionState &&
+      state.blocklist === lastBlocklistState
+    )
+      return
+
+    lastBlockSessionState = state.blockSession
+    lastBlocklistState = state.blocklist
+
+    const sessions = selectAllBlockSessions(state.blockSession)
+    const hasSessions = sessions.length > 0
+
+    if (didHaveSessions && !hasSessions) {
+      await stopProtection()
+      lastScheduleKey = ''
+    } else if (hasSessions) {
+      const schedule = selectBlockingSchedule(dateProvider, state)
+      if (!didHaveSessions) {
+        lastScheduleKey = getScheduleKey(schedule)
+        await startProtection(schedule)
+      } else {
+        const scheduleKey = getScheduleKey(schedule)
+        if (scheduleKey !== lastScheduleKey) {
+          lastScheduleKey = scheduleKey
+          await sirenTier.updateBlockingSchedule(schedule)
+        }
+      }
+    }
+
+    didHaveSessions = hasSessions
+  }
+
   if (didHaveSessions) {
     const schedule = selectBlockingSchedule(dateProvider, initialState)
     lastScheduleKey = getScheduleKey(schedule)
-    void startProtection(schedule).catch((error) => {
-      logger.error(`Blocking schedule listener failed: ${error}`)
-    })
+    void startProtection(schedule)
   }
 
-  return store.subscribe(() => {
-    void (async () => {
-      try {
-        const state = store.getState()
-
-        if (
-          state.blockSession === lastBlockSessionState &&
-          state.blocklist === lastBlocklistState
-        )
-          return
-
-        lastBlockSessionState = state.blockSession
-        lastBlocklistState = state.blocklist
-
-        const sessions = selectAllBlockSessions(state.blockSession)
-        const hasSessions = sessions.length > 0
-
-        if (didHaveSessions && !hasSessions) {
-          await stopProtection()
-          lastScheduleKey = ''
-        } else if (hasSessions) {
-          const schedule = selectBlockingSchedule(dateProvider, state)
-          if (!didHaveSessions) {
-            lastScheduleKey = getScheduleKey(schedule)
-            await startProtection(schedule)
-          } else {
-            const scheduleKey = getScheduleKey(schedule)
-            if (scheduleKey !== lastScheduleKey) {
-              lastScheduleKey = scheduleKey
-              await sirenTier.updateBlockingSchedule(schedule)
-            }
-          }
-        }
-
-        didHaveSessions = hasSessions
-      } catch (error) {
-        logger.error(`Blocking schedule listener failed: ${error}`)
-      }
-    })()
-  })
+  return store.subscribe(() => void processChange(store.getState()))
 }
