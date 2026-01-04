@@ -4,10 +4,9 @@
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
       "Bash(./scripts/worktree.sh:*)",
-      "Bash(.claude/hooks/validate-ticket.sh:*)",
+      "Bash(.claude/hooks/validate-pr.sh)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(base64:*)",
-      "Bash(bash scripts/*.sh:*)",
       "Bash(bash scripts/lint-workflow-scripts.sh:*)",
       "Bash(cat:*)",
       "Bash(cloc:*)",
@@ -71,13 +70,10 @@
       "Bash(jq:*)",
       "Bash(ls:*)",
       "Bash(mkdir:*)",
-      "Bash(node eslint-rules/*.cjs:*)",
-      "Bash(node eslint-rules/*.spec.cjs:*)",
       "Bash(npm ci:*)",
       "Bash(npm install:*)",
       "Bash(npm ls:*)",
       "Bash(npm pack:*)",
-      "Bash(npm pkg:*)",
       "Bash(npm run generate:schema:*)",
       "Bash(npm run lint:*)",
       "Bash(npm run lint:fix:*)",
@@ -230,7 +226,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash(gh issue create:*)",
+        "matcher": "Bash(gh issue create:*)|Bash(gh issue edit:*)",
         "hooks": [
           {
             "type": "command",
@@ -239,16 +235,7 @@
         ]
       },
       {
-        "matcher": "Bash(gh issue edit:*)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/validate-ticket.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash(gh pr create:*)",
+        "matcher": "Bash(gh pr create:*)|Bash(gh pr edit:*)",
         "hooks": [
           {
             "type": "command",
