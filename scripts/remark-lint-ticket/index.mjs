@@ -37,7 +37,10 @@ function isTicketFile(file, tree) {
   const filePath = file.path || file.history?.[0] || ''
 
   // Always validate files in ISSUE_TEMPLATE or temp ticket files
-  if (filePath.includes('.github/ISSUE_TEMPLATE/') || filePath.includes('/tmp/ticket-')) {
+  if (
+    filePath.includes('.github/ISSUE_TEMPLATE/') ||
+    filePath.includes('/tmp/ticket-')
+  ) {
     return true
   }
 
@@ -114,7 +117,8 @@ function hasGherkinBlocks(tree) {
  */
 function hasGherkinPatterns(tree) {
   let found = false
-  const gherkinPattern = /\b(Given|When|Then|And|But)\b.*\b(Given|When|Then|And|But)\b/is
+  const gherkinPattern =
+    /\b(Given|When|Then|And|But)\b.*\b(Given|When|Then|And|But)\b/is
 
   visit(tree, 'code', (node) => {
     if (gherkinPattern.test(node.value)) {
@@ -138,11 +142,17 @@ function detectTicketType(headings, metadata) {
     return 'initiative'
   }
 
-  if (metadata?.labels?.includes('epic') || headingTexts.some((h) => h.includes('goal') && h.includes('🎯'))) {
+  if (
+    metadata?.labels?.includes('epic') ||
+    headingTexts.some((h) => h.includes('goal') && h.includes('🎯'))
+  ) {
     return 'epic'
   }
 
-  if (metadata?.labels?.includes('bug') || headingTexts.some((h) => h.includes('bug'))) {
+  if (
+    metadata?.labels?.includes('bug') ||
+    headingTexts.some((h) => h.includes('bug'))
+  ) {
     return 'bug'
   }
 
@@ -176,10 +186,14 @@ function validateMetadata(tree, file) {
     // Valid: ticket requires creating a new repo
     const newRepoName = data.repo.slice(NEW_REPO_PREFIX.length).trim()
     if (!newRepoName) {
-      file.message(`❌ NEW_REPO: must be followed by the proposed repo name (e.g., "NEW_REPO: my-new-repo")`)
+      file.message(
+        `❌ NEW_REPO: must be followed by the proposed repo name (e.g., "NEW_REPO: my-new-repo")`,
+      )
     }
   } else if (!validRepoNames.includes(data.repo)) {
-    const repoList = validRepoNames.map((name) => `  - ${name}: ${VALID_REPOS[name]}`).join('\n')
+    const repoList = validRepoNames
+      .map((name) => `  - ${name}: ${VALID_REPOS[name]}`)
+      .join('\n')
     file.message(
       `❌ Invalid repo "${data.repo}". Must be one of:\n${repoList}\n  Or use "NEW_REPO: <name>" if a new repository is needed`,
     )
@@ -188,7 +202,9 @@ function validateMetadata(tree, file) {
   if (data.story_points === undefined) {
     file.message('❌ Missing `story_points` field in metadata')
   } else if (!FIBONACCI_POINTS.includes(data.story_points)) {
-    file.message(`❌ story_points must be Fibonacci: ${FIBONACCI_POINTS.join(', ')}`)
+    file.message(
+      `❌ story_points must be Fibonacci: ${FIBONACCI_POINTS.join(', ')}`,
+    )
   }
 
   if (!data.labels || !Array.isArray(data.labels)) {
@@ -200,18 +216,30 @@ function validateMetadata(tree, file) {
     }
   }
 
-  if (data.depends_on && !Array.isArray(data.depends_on)) {
+  // Validate depends_on (mandatory)
+  if (data.depends_on === undefined) {
+    file.message(
+      '❌ Missing `depends_on` field in metadata (use `depends_on: []` if no dependencies)',
+    )
+  } else if (!Array.isArray(data.depends_on)) {
     file.message('❌ `depends_on` must be an array')
   }
 
-  if (data.blocks && !Array.isArray(data.blocks)) {
+  // Validate blocks (mandatory)
+  if (data.blocks === undefined) {
+    file.message(
+      '❌ Missing `blocks` field in metadata (use `blocks: []` if this issue blocks nothing)',
+    )
+  } else if (!Array.isArray(data.blocks)) {
     file.message('❌ `blocks` must be an array')
   }
 
   // Bug-specific validation
   if (data.labels?.includes('bug') && data.severity) {
     if (!VALID_SEVERITIES.includes(data.severity)) {
-      file.message(`❌ Invalid severity "${data.severity}". Valid: ${VALID_SEVERITIES.join(', ')}`)
+      file.message(
+        `❌ Invalid severity "${data.severity}". Valid: ${VALID_SEVERITIES.join(', ')}`,
+      )
     }
   }
 
@@ -247,7 +275,9 @@ function validateGherkin(tree, file, ticketType) {
   }
 
   if (!hasGherkinBlocks(tree) && !hasGherkinPatterns(tree)) {
-    file.message('⚠️ Missing Given/When/Then scenarios (use ```gherkin code blocks)')
+    file.message(
+      '⚠️ Missing Given/When/Then scenarios (use ```gherkin code blocks)',
+    )
   }
 }
 
@@ -256,7 +286,9 @@ function validateStoryPointsNotInTitle(tree, file) {
 
   for (const heading of headings) {
     if (/\d+\s*sp\b/i.test(heading.text) || /\bsp\s*\d+/i.test(heading.text)) {
-      file.message('⚠️ Story points should be in metadata, not in title/heading')
+      file.message(
+        '⚠️ Story points should be in metadata, not in title/heading',
+      )
     }
   }
 }
@@ -365,7 +397,12 @@ function createContentNodes(template) {
         children: [
           {
             type: 'paragraph',
-            children: [{ type: 'text', value: line.replace(/^- \[[ x]\] /, '').replace(/^- /, '') }],
+            children: [
+              {
+                type: 'text',
+                value: line.replace(/^- \[[ x]\] /, '').replace(/^- /, ''),
+              },
+            ],
           },
         ],
       })),
@@ -474,8 +511,15 @@ export default function remarkLintTicket(options = {}) {
     if (fix) {
       fixMissingSections(tree, file, ticketType)
       // Re-validate gherkin after potential fixes (still warn if missing)
-      if (!hasGherkinBlocks(tree) && !hasGherkinPatterns(tree) && ticketType !== 'epic' && ticketType !== 'initiative') {
-        file.message('⚠️ Missing Given/When/Then scenarios (use ```gherkin code blocks)')
+      if (
+        !hasGherkinBlocks(tree) &&
+        !hasGherkinPatterns(tree) &&
+        ticketType !== 'epic' &&
+        ticketType !== 'initiative'
+      ) {
+        file.message(
+          '⚠️ Missing Given/When/Then scenarios (use ```gherkin code blocks)',
+        )
       }
     } else {
       // Run validation rules (report mode)

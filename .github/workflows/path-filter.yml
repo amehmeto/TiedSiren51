@@ -24,11 +24,11 @@ jobs:
   check-paths:
     runs-on: ubuntu-latest
     outputs:
-      # app-changed: src OR config changed (tests run for any code change)
-      app-changed: ${{ steps.filter.outputs.src == 'true' || steps.filter.outputs.config == 'true' }}
-      # app-changed-this-push: src OR config changed (test-only changes don't trigger)
-      app-changed-this-push: ${{ steps.filter-push.outputs.src == 'true' || steps.filter-push.outputs.config == 'true' }}
-      shell-only: ${{ steps.filter.outputs.shell == 'true' && steps.filter.outputs.src != 'true' && steps.filter.outputs.config != 'true' }}
+      # app-changed: src OR config OR package.json deps changed
+      app-changed: ${{ steps.filter.outputs.src == 'true' || steps.filter.outputs.config == 'true' || steps.pkg-check.outputs.build-impact == 'true' }}
+      # app-changed-this-push: same but for latest push only
+      app-changed-this-push: ${{ steps.filter-push.outputs.src == 'true' || steps.filter-push.outputs.config == 'true' || steps.pkg-check-push.outputs.build-impact == 'true' }}
+      shell-only: ${{ steps.filter.outputs.shell == 'true' && steps.filter.outputs.src != 'true' && steps.filter.outputs.config != 'true' && steps.pkg-check.outputs.build-impact != 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -50,3 +50,12 @@ jobs:
         with:
           base: ${{ github.event.before }}
           filters: .github/path-filters.yml
+
+      # Smart package.json check - only trigger if dependencies changed, not just scripts
+      - name: Check package.json build impact (entire PR)
+        id: pkg-check
+        run: bash scripts/check-package-json-build-impact.sh "origin/${{ github.base_ref }}" >> "$GITHUB_OUTPUT"
+
+      - name: Check package.json build impact (this push)
+        id: pkg-check-push
+        run: bash scripts/check-package-json-build-impact.sh "${{ github.event.before }}" >> "$GITHUB_OUTPUT"

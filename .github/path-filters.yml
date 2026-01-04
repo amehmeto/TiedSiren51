@@ -30,9 +30,10 @@ tests:
   - 'vitest.config.js'
 
 # Config files that affect the build
+# NOTE: package.json is handled separately by check-package-json-build-impact.sh
+# to distinguish dependency changes from script-only changes
 config:
   - 'app.config.js'
-  - 'package.json'
   - 'package-lock.json'
   - 'tsconfig.json'
   - 'babel.config.cjs'
