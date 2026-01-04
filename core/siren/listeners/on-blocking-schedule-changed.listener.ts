@@ -19,10 +19,22 @@ export const onBlockingScheduleChangedListener = ({
   foregroundService: ForegroundService
   dateProvider: DateProvider
 }): (() => void) => {
+  // Creates a hash key from schedule to detect changes via string comparison
   const getScheduleKey = (schedule: BlockingSchedule[]): string => {
     return schedule
       .map((s) => {
-        return `${s.id}:${s.startTime}:${s.endTime}:${s.sirens.android.map((a) => a.packageName).join(',')}:${s.sirens.ios.join(',')}:${s.sirens.macos.join(',')}:${s.sirens.windows.join(',')}:${s.sirens.linux.join(',')}:${s.sirens.websites.join(',')}:${s.sirens.keywords.join(',')}`
+        return [
+          s.id,
+          s.startTime,
+          s.endTime,
+          s.sirens.android.map((a) => a.packageName).join(','),
+          s.sirens.ios.join(','),
+          s.sirens.macos.join(','),
+          s.sirens.windows.join(','),
+          s.sirens.linux.join(','),
+          s.sirens.websites.join(','),
+          s.sirens.keywords.join(','),
+        ].join(':')
       })
       .sort()
       .join('|')
