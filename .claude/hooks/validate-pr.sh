@@ -1,8 +1,8 @@
 #!/usr/bin/env bash
 
-# 🔍 PreToolUse hook for validating GitHub PR titles and descriptions
-# Intercepts `gh pr create` commands and validates against PR template rules
-# Outputs JSON with decision: "block" to prevent creating malformed PRs
+# 🔀 PreToolUse hook for validating GitHub Pull Requests
+# Intercepts `gh pr create` and `gh pr edit` commands and validates against PR template rules
+# Outputs JSON with decision: "block" to prevent creating/editing malformed PRs
 
 set -euo pipefail
 
@@ -11,22 +11,23 @@ input=$(cat)
 tool_name=$(printf '%s' "$input" | jq -r '.tool_name // empty')
 command=$(printf '%s' "$input" | jq -r '.tool_input.command // empty')
 
-# Only process Bash tool with gh pr create commands
+# Only process Bash tool with gh pr create/edit commands
 if [ "$tool_name" != "Bash" ]; then
   exit 0
 fi
 
-# Match gh pr create at start of command or after && ; ||
-if [[ ! "$command" =~ ^gh\ pr\ create ]] && \
-   [[ ! "$command" =~ (\&\&|;|\|\|)[[:space:]]*gh\ pr\ create ]]; then
+# Match gh pr create/edit at start of command or after && ; ||
+if [[ ! "$command" =~ ^gh\ pr\ (create|edit) ]] && \
+   [[ ! "$command" =~ (\&\&|;|\|\|)[[:space:]]*gh\ pr\ (create|edit) ]]; then
   exit 0
 fi
 
-# Extract title from the command
+# Extract the title from the command
 extract_title() {
   local cmd="$1"
+  local title=""
 
-  # Try --title "..."
+  # Try --title "..." (with escaped quote support)
   title=$(printf '%s' "$cmd" | perl -ne 'if (/--title\s+"((?:[^"\\]|\\.)*)"/s) { $t=$1; $t=~s/\\"/"/g; print $t }' 2>/dev/null)
   if [ -n "$title" ]; then
     printf '%s' "$title"
@@ -40,8 +41,15 @@ extract_title() {
     return 0
   fi
 
-  # Try -t "..."
+  # Try -t "..." (short flag with escaped quote support)
   title=$(printf '%s' "$cmd" | perl -ne 'if (/-t\s+"((?:[^"\\]|\\.)*)"/s) { $t=$1; $t=~s/\\"/"/g; print $t }' 2>/dev/null)
+  if [ -n "$title" ]; then
+    printf '%s' "$title"
+    return 0
+  fi
+
+  # Try -t '...'
+  title=$(printf '%s' "$cmd" | perl -ne "if (/-t\\s+'([^']*)'/) { print \$1 }" 2>/dev/null)
   if [ -n "$title" ]; then
     printf '%s' "$title"
     return 0
@@ -50,11 +58,11 @@ extract_title() {
   return 1
 }
 
-# Extract body from the command
+# Extract the body content from the command
 extract_body() {
   local cmd="$1"
 
-  # Method 1: HEREDOC pattern
+  # Method 1: HEREDOC pattern (most common for multi-line)
   if [[ "$cmd" =~ \<\<[\'\"]?EOF ]]; then
     body=$(printf '%s' "$cmd" | perl -0777 -pe "s/.*<<'?\"?EOF'?\"?\n?(.*?)\nEOF.*/\$1/s" 2>/dev/null)
     if [ -n "$body" ]; then
@@ -77,8 +85,15 @@ extract_body() {
     return 0
   fi
 
-  # Method 4: -b flag
+  # Method 4: Double-quoted -b (short flag)
   body=$(printf '%s' "$cmd" | perl -ne 'if (/-b\s+"((?:[^"\\]|\\.)*)"/s) { $b=$1; $b=~s/\\"/"/g; $b=~s/\\n/\n/g; print $b }' 2>/dev/null)
+  if [ -n "$body" ]; then
+    printf '%s' "$body"
+    return 0
+  fi
+
+  # Method 5: Single-quoted -b (short flag)
+  body=$(printf '%s' "$cmd" | perl -ne "if (/-b\\s+'([^']*)'/) { print \$1 }" 2>/dev/null)
   if [ -n "$body" ]; then
     printf '%s' "$body"
     return 0
@@ -87,86 +102,81 @@ extract_body() {
   return 1
 }
 
+# Validation errors array
+errors=()
+
 # Extract title and body
 title=$(extract_title "$command" 2>/dev/null || echo "")
 body=$(extract_body "$command" 2>/dev/null || echo "")
 
-# If no title found, warn and skip validation (might be interactive)
-if [ -z "$title" ]; then
-  # Output a warning so it's visible in logs
-  jq -n '{
-    "decision": "allow",
-    "message": "⚠️ Could not extract PR title from command - skipping validation. Run `node scripts/lint-pr.mjs --help` for manual validation."
-  }'
+# Skip validation if no body (might be interactive)
+if [ -z "$body" ]; then
   exit 0
 fi
 
-# Navigate to project directory
-project_dir="$(dirname "$0")/../.."
-cd "$project_dir" || exit 0
+# ============================================================================
+# VALIDATION RULES
+# ============================================================================
 
-# Check if linter script exists
-if [ ! -f "scripts/lint-pr.mjs" ]; then
-  jq -n '{
-    "decision": "allow",
-    "message": "⚠️ PR linter not found (scripts/lint-pr.mjs) - skipping validation."
-  }'
-  exit 0
+# Rule 1: Body must have a ## Summary section
+if ! echo "$body" | grep -qE '^## Summary'; then
+  errors+=("❌ Missing required section: ## Summary")
 fi
 
-# Run the PR linter
-pr_json=$(jq -n --arg title "$title" --arg body "$body" '{"title": $title, "body": $body}')
-output=$(printf '%s' "$pr_json" | node scripts/lint-pr.mjs --stdin --json 2>&1) || exit_code=$?
-exit_code=${exit_code:-0}
+# Rule 2: Body must have a ## Test plan section
+if ! echo "$body" | grep -qiE '^## Test [Pp]lan'; then
+  errors+=("❌ Missing required section: ## Test plan")
+fi
 
-if [ "$exit_code" -ne 0 ]; then
-  # Parse the JSON output to get errors
-  errors=$(printf '%s' "$output" | jq -r '
-    [
-      (.title.errors[]? | "📋 Title: " + .),
-      (.body.errors[]? | "📄 Body: " + .)
-    ] | join("\n")
-  ' 2>/dev/null || echo "Validation failed")
+# Rule 3: Must reference issue via "Closes #", "Fixes #", "Resolves #", or "#NNN" in title
+combined="$title $body"
+has_issue_ref=false
+if echo "$combined" | grep -qiE '(Closes|Fixes|Resolves)\s+#[0-9]+'; then
+  has_issue_ref=true
+elif echo "$title" | grep -qE '#[0-9]+'; then
+  has_issue_ref=true
+fi
+if [ "$has_issue_ref" = false ]; then
+  errors+=("❌ PR must reference the related GitHub issue (use 'Closes #NNN', 'Fixes #NNN', or '(#NNN)' in title)")
+fi
 
-  warnings=$(printf '%s' "$output" | jq -r '
-    [
-      (.title.warnings[]? | "📋 " + .),
-      (.body.warnings[]? | "📄 " + .)
-    ] | join("\n")
-  ' 2>/dev/null || echo "")
+# ============================================================================
+# OUTPUT RESULT
+# ============================================================================
 
-  linked_tickets=$(printf '%s' "$output" | jq -r '
-    if .linkedTickets | length > 0 then
-      "🎫 Linked: " + ([.linkedTickets[] | "#" + (.number | tostring)] | join(", "))
-    else
-      "🎫 No tickets linked!"
-    end
-  ' 2>/dev/null || echo "")
+if [ ${#errors[@]} -gt 0 ]; then
+  # Build error message
+  error_msg=$(printf '%s\n' "${errors[@]}")
+
+  # Build hint with expected format
+  hint="Expected PR format:
+
+Title: feat(scope): description (#ISSUE_NUMBER)
+
+Body:
+## Summary
+- Brief description of changes
+
+## Test plan
+- [x] Tests pass
+- [x] Lint passes
+
+Closes #ISSUE_NUMBER (optional, for auto-closing)
+
+🤖 Generated with [Claude Code](https://claude.com/claude-code)"
 
   jq -n \
-    --arg reason "🔍 PR validation failed - please fix the following:" \
-    --arg errors "$errors" \
-    --arg warnings "$warnings" \
-    --arg tickets "$linked_tickets" \
-    --arg hint "💡 Tip: Title must include ticket reference (e.g., feat: add feature #123). Run \`node scripts/lint-pr.mjs --help\` for full validation rules." \
+    --arg reason "🔀 PR validation failed - please fix the following issues:" \
+    --arg errors "$error_msg" \
+    --arg hint "$hint" \
     '{
       "decision": "block",
       "reason": $reason,
       "errors": $errors,
-      "warnings": $warnings,
-      "linked_tickets": $tickets,
       "hint": $hint
     }'
   exit 2
 fi
 
-# Validation passed - show summary
-linked=$(printf '%s' "$output" | jq -r '[.linkedTickets[] | "#" + (.number | tostring)] | join(", ")' 2>/dev/null || echo "")
-if [ -n "$linked" ]; then
-  jq -n --arg tickets "$linked" '{
-    "decision": "allow",
-    "message": ("✅ PR links to tickets: " + $tickets)
-  }'
-fi
-
+# Validation passed
 exit 0
