@@ -22,58 +22,6 @@ export const onBlockingScheduleChangedListener = ({
   dateProvider: DateProvider
   logger: Logger
 }): (() => void) => {
-  const safeStartForegroundService = async () => {
-    try {
-      await foregroundService.start()
-    } catch (error) {
-      logger.error(`Failed to start foreground service: ${error}`)
-    }
-  }
-
-  const safeStopForegroundService = async () => {
-    try {
-      await foregroundService.stop()
-    } catch (error) {
-      logger.error(`Failed to stop foreground service: ${error}`)
-    }
-  }
-
-  const safeStartWatching = () => {
-    try {
-      sirenLookout.startWatching()
-    } catch (error) {
-      logger.error(`Failed to start watching: ${error}`)
-    }
-  }
-
-  const safeStopWatching = () => {
-    try {
-      sirenLookout.stopWatching()
-    } catch (error) {
-      logger.error(`Failed to stop watching: ${error}`)
-    }
-  }
-
-  const safeUpdateBlockingSchedule = async (schedule: BlockingSchedule[]) => {
-    try {
-      await sirenTier.updateBlockingSchedule(schedule)
-    } catch (error) {
-      logger.error(`Failed to update blocking schedule: ${error}`)
-    }
-  }
-
-  const startProtection = async (schedule: BlockingSchedule[]) => {
-    await safeUpdateBlockingSchedule(schedule)
-    void safeStartForegroundService()
-    safeStartWatching()
-  }
-
-  const stopProtection = async () => {
-    await safeUpdateBlockingSchedule([])
-    safeStopWatching()
-    void safeStopForegroundService()
-  }
-
   const getScheduleKey = (schedule: BlockingSchedule[]): string => {
     return schedule
       .map((s) => {
@@ -83,27 +31,21 @@ export const onBlockingScheduleChangedListener = ({
       .join('|')
   }
 
+  const startProtection = async (schedule: BlockingSchedule[]) => {
+    await sirenTier.updateBlockingSchedule(schedule)
+    sirenLookout.startWatching()
+    await foregroundService.start()
+  }
+
+  const stopProtection = async () => {
+    await sirenTier.updateBlockingSchedule([])
+    sirenLookout.stopWatching()
+    await foregroundService.stop()
+  }
+
   let lastScheduleKey = ''
   let lastBlockSessionState = store.getState().blockSession
   let lastBlocklistState = store.getState().blocklist
-
-  const onAllSessionsRemoved = () => {
-    void stopProtection()
-    lastScheduleKey = ''
-  }
-
-  const onFirstSessionAdded = (schedule: BlockingSchedule[]) => {
-    lastScheduleKey = getScheduleKey(schedule)
-    void startProtection(schedule)
-  }
-
-  const onScheduleMayHaveChanged = (schedule: BlockingSchedule[]) => {
-    const scheduleKey = getScheduleKey(schedule)
-    if (scheduleKey === lastScheduleKey) return
-
-    lastScheduleKey = scheduleKey
-    void safeUpdateBlockingSchedule(schedule)
-  }
 
   const initialState = store.getState()
   const initialSessions = selectAllBlockSessions(initialState.blockSession)
@@ -111,31 +53,50 @@ export const onBlockingScheduleChangedListener = ({
 
   if (didHaveSessions) {
     const schedule = selectBlockingSchedule(dateProvider, initialState)
-    onFirstSessionAdded(schedule)
+    lastScheduleKey = getScheduleKey(schedule)
+    void startProtection(schedule).catch((error) => {
+      logger.error(`Blocking schedule listener failed: ${error}`)
+    })
   }
 
   return store.subscribe(() => {
-    const state = store.getState()
+    void (async () => {
+      try {
+        const state = store.getState()
 
-    if (
-      state.blockSession === lastBlockSessionState &&
-      state.blocklist === lastBlocklistState
-    )
-      return
+        if (
+          state.blockSession === lastBlockSessionState &&
+          state.blocklist === lastBlocklistState
+        )
+          return
 
-    lastBlockSessionState = state.blockSession
-    lastBlocklistState = state.blocklist
+        lastBlockSessionState = state.blockSession
+        lastBlocklistState = state.blocklist
 
-    const sessions = selectAllBlockSessions(state.blockSession)
-    const hasSessions = sessions.length > 0
+        const sessions = selectAllBlockSessions(state.blockSession)
+        const hasSessions = sessions.length > 0
 
-    if (didHaveSessions && !hasSessions) onAllSessionsRemoved()
-    else if (hasSessions) {
-      const schedule = selectBlockingSchedule(dateProvider, state)
-      if (!didHaveSessions) onFirstSessionAdded(schedule)
-      else onScheduleMayHaveChanged(schedule)
-    }
+        if (didHaveSessions && !hasSessions) {
+          await stopProtection()
+          lastScheduleKey = ''
+        } else if (hasSessions) {
+          const schedule = selectBlockingSchedule(dateProvider, state)
+          if (!didHaveSessions) {
+            lastScheduleKey = getScheduleKey(schedule)
+            await startProtection(schedule)
+          } else {
+            const scheduleKey = getScheduleKey(schedule)
+            if (scheduleKey !== lastScheduleKey) {
+              lastScheduleKey = scheduleKey
+              await sirenTier.updateBlockingSchedule(schedule)
+            }
+          }
+        }
 
-    didHaveSessions = hasSessions
+        didHaveSessions = hasSessions
+      } catch (error) {
+        logger.error(`Blocking schedule listener failed: ${error}`)
+      }
+    })()
   })
 }
