@@ -2,8 +2,6 @@
 description: Unified project sync - fetches issues, parses dependencies from bodies, syncs board status, updates dependency graph, shows Kanban.
 ---
 
-# Sync Project
-
 Unified command that:
 1. Fetches all issues and PRs
 2. **Automatically parses dependencies** from issue bodies (no hardcoding!)
@@ -47,6 +45,8 @@ gh issue list --repo amehmeto/expo-foreground-service --state all --json number,
 # expo-accessibility-service
 gh issue list --repo amehmeto/expo-accessibility-service --state all --json number,title,body,state --limit 20
 ```
+
+> **Fallback handling**: If a repository is inaccessible (permissions, network, deleted), log a warning and continue with available repos. Cross-repo dependencies pointing to inaccessible repos should be marked as "unknown" rather than causing sync failure.
 
 ---
 

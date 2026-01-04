@@ -12,7 +12,8 @@ tool_name=$(printf '%s' "$input" | jq -r '.tool_name // empty')
 command=$(printf '%s' "$input" | jq -r '.tool_input.command // empty')
 
 # Convert escaped newlines to actual newlines (Claude Code escapes them in JSON)
-command=$(printf '%s' "$command" | sed 's/\\n/\n/g')
+# Use bash parameter expansion for BSD/GNU sed compatibility
+command="${command//\\n/$'\n'}"
 
 # Only process Bash tool with gh issue create/edit commands
 if [ "$tool_name" != "Bash" ]; then
