@@ -4,7 +4,6 @@ import { ForegroundService } from '@/core/_ports_/foreground.service'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { BlockingSchedule, SirenTier } from '@/core/_ports_/siren.tier'
 import { AppStore } from '@/core/_redux_/createStore'
-import { selectAllBlockSessions } from '@/core/block-session/selectors/selectAllBlockSessions'
 import { selectBlockingSchedule } from '@/core/block-session/selectors/selectBlockingSchedule'
 
 export const onBlockingScheduleChangedListener = ({
@@ -29,31 +28,9 @@ export const onBlockingScheduleChangedListener = ({
       .join('|')
   }
 
-  const startProtection = async (schedule: BlockingSchedule[]) => {
-    await sirenTier.updateBlockingSchedule(schedule)
-    sirenLookout.startWatching()
-    await foregroundService.start()
-  }
-
-  const stopProtection = async () => {
-    await sirenTier.updateBlockingSchedule([])
-    sirenLookout.stopWatching()
-    await foregroundService.stop()
-  }
-
   let lastScheduleKey = ''
   let lastBlockSessionState = store.getState().blockSession
   let lastBlocklistState = store.getState().blocklist
-
-  const initialState = store.getState()
-  const initialSessions = selectAllBlockSessions(initialState.blockSession)
-  let didHaveSessions = initialSessions.length > 0
-
-  if (didHaveSessions) {
-    const schedule = selectBlockingSchedule(dateProvider, initialState)
-    lastScheduleKey = getScheduleKey(schedule)
-    void startProtection(schedule)
-  }
 
   return store.subscribe(() => {
     void (async () => {
@@ -68,27 +45,24 @@ export const onBlockingScheduleChangedListener = ({
       lastBlockSessionState = state.blockSession
       lastBlocklistState = state.blocklist
 
-      const sessions = selectAllBlockSessions(state.blockSession)
-      const hasSessions = sessions.length > 0
+      const schedule = selectBlockingSchedule(dateProvider, state)
+      const scheduleKey = getScheduleKey(schedule)
 
-      if (didHaveSessions && !hasSessions) {
-        await stopProtection()
-        lastScheduleKey = ''
-      } else if (hasSessions) {
-        const schedule = selectBlockingSchedule(dateProvider, state)
-        if (!didHaveSessions) {
-          lastScheduleKey = getScheduleKey(schedule)
-          await startProtection(schedule)
-        } else {
-          const scheduleKey = getScheduleKey(schedule)
-          if (scheduleKey !== lastScheduleKey) {
-            lastScheduleKey = scheduleKey
-            await sirenTier.updateBlockingSchedule(schedule)
-          }
-        }
+      if (scheduleKey === lastScheduleKey) return
+
+      const wasActive = lastScheduleKey !== ''
+      const isActive = scheduleKey !== ''
+      lastScheduleKey = scheduleKey
+
+      await sirenTier.updateBlockingSchedule(schedule)
+
+      if (!wasActive && isActive) {
+        sirenLookout.startWatching()
+        await foregroundService.start()
+      } else if (wasActive && !isActive) {
+        sirenLookout.stopWatching()
+        await foregroundService.stop()
       }
-
-      didHaveSessions = hasSessions
     })()
   })
 }
