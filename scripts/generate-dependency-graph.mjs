@@ -12,7 +12,83 @@ import { execSync } from 'node:child_process'
 import { writeFileSync, unlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
-import { VALID_REPOS } from './remark-lint-ticket/config.mjs'
+import { VALID_REPOS, REPO_ABBREVIATIONS, REPO_DISPLAY_ABBREV } from './remark-lint-ticket/config.mjs'
+
+// ============================================================================
+// Cross-Repo Dependency Types
+// ============================================================================
+
+/**
+ * A dependency reference that can be local (just #123) or cross-repo (TSBO#9)
+ * @typedef {Object} DependencyRef
+ * @property {string} repo - Repository name (full name, e.g., 'tied-siren-blocking-overlay')
+ * @property {number} number - Issue number
+ */
+
+/**
+ * Parse a dependency reference string into a DependencyRef object.
+ * Supports formats:
+ * - "123" or "#123" → local repo ref
+ * - "repo#123" → cross-repo ref (full name)
+ * - "ABBREV#123" → cross-repo ref (abbreviation)
+ *
+ * @param {string} ref - The reference string
+ * @param {string} currentRepo - The current repo context for local refs
+ * @returns {DependencyRef|null} Parsed reference or null if invalid
+ */
+function parseDependencyRef(ref, currentRepo) {
+  const trimmed = ref.trim()
+  if (!trimmed) return null
+
+  // Check for cross-repo format: "repo#123" or "ABBREV#123"
+  const crossRepoMatch = trimmed.match(/^([^#]+)#(\d+)$/)
+  if (crossRepoMatch) {
+    const [, repoOrAbbrev, numStr] = crossRepoMatch
+    const num = parseInt(numStr, 10)
+    if (isNaN(num)) return null
+
+    // Resolve abbreviation to full repo name
+    const fullRepo = REPO_ABBREVIATIONS[repoOrAbbrev] || repoOrAbbrev
+    if (!VALID_REPOS[fullRepo]) {
+      console.warn(`  ⚠️  Unknown repo in dependency ref: ${repoOrAbbrev}`)
+      return null
+    }
+    return { repo: fullRepo, number: num }
+  }
+
+  // Local ref: just a number (possibly with #)
+  const localMatch = trimmed.match(/^#?(\d+)$/)
+  if (localMatch) {
+    const num = parseInt(localMatch[1], 10)
+    if (isNaN(num)) return null
+    return { repo: currentRepo, number: num }
+  }
+
+  return null
+}
+
+/**
+ * Create a unique key for a dependency ref (for use in Maps/Sets)
+ * @param {DependencyRef} ref
+ * @returns {string}
+ */
+function depRefKey(ref) {
+  return `${ref.repo}#${ref.number}`
+}
+
+/**
+ * Format a dependency ref for display
+ * @param {DependencyRef} ref
+ * @param {string} currentRepo - Current context repo (for omitting repo prefix on local refs)
+ * @returns {string}
+ */
+function formatDepRef(ref, currentRepo) {
+  if (ref.repo === currentRepo) {
+    return `#${ref.number}`
+  }
+  const abbrev = REPO_DISPLAY_ABBREV[ref.repo] || ref.repo
+  return `${abbrev}#${ref.number}`
+}
 
 const OUTPUT_FILE = 'docs/dependency-graph.md'
 
@@ -86,6 +162,11 @@ function fetchOpenIssues() {
 // YAML Parsing
 // ============================================================================
 
+/**
+ * Extract metadata from issue body YAML block.
+ * Note: depends_on and blocks are stored as raw strings here,
+ * then parsed into DependencyRef objects by parseTicketDependencies().
+ */
 function extractMetadata(body) {
   const yamlMatch = body?.match(/```yaml\s*\n([\s\S]*?)```/)
   if (!yamlMatch) return null
@@ -113,18 +194,40 @@ function extractMetadata(body) {
   if (pointsMatch) metadata.story_points = parseInt(pointsMatch[1], 10)
   if (severityMatch) metadata.severity = severityMatch[1].trim()
 
-  // Parse number arrays
+  // Store raw dependency strings for later parsing with repo context
   if (dependsMatch) {
-    metadata.depends_on = dependsMatch[1]
-      .split(',')
-      .map((n) => parseInt(n.trim(), 10))
-      .filter((n) => !isNaN(n))
+    metadata.depends_on_raw = dependsMatch[1].split(',').map((s) => s.trim()).filter(Boolean)
   }
   if (blocksMatch) {
-    metadata.blocks = blocksMatch[1]
-      .split(',')
-      .map((n) => parseInt(n.trim(), 10))
-      .filter((n) => !isNaN(n))
+    metadata.blocks_raw = blocksMatch[1].split(',').map((s) => s.trim()).filter(Boolean)
+  }
+
+  return metadata
+}
+
+/**
+ * Parse raw dependency strings into DependencyRef objects.
+ * Called after we know the ticket's repo context.
+ *
+ * @param {Object} metadata - The metadata object from extractMetadata
+ * @param {string} ticketRepo - The repository this ticket belongs to
+ * @returns {Object} metadata with depends_on and blocks as DependencyRef[]
+ */
+function parseTicketDependencies(metadata, ticketRepo) {
+  if (!metadata) return metadata
+
+  if (metadata.depends_on_raw) {
+    metadata.depends_on = metadata.depends_on_raw
+      .map((ref) => parseDependencyRef(ref, ticketRepo))
+      .filter(Boolean)
+    delete metadata.depends_on_raw
+  }
+
+  if (metadata.blocks_raw) {
+    metadata.blocks = metadata.blocks_raw
+      .map((ref) => parseDependencyRef(ref, ticketRepo))
+      .filter(Boolean)
+    delete metadata.blocks_raw
   }
 
   return metadata
@@ -217,8 +320,8 @@ function generateInventoryTable(tickets, type) {
   let table = `${headers[type]}\n${separator[type]}\n`
 
   for (const t of tickets) {
-    const deps = t.metadata?.depends_on?.map((n) => `#${n}`).join(', ') || '-'
-    const blocks = t.metadata?.blocks?.map((n) => `#${n}`).join(', ') || '-'
+    const deps = t.metadata?.depends_on?.map((ref) => formatDepRef(ref, t.repo)).join(', ') || '-'
+    const blocks = t.metadata?.blocks?.map((ref) => formatDepRef(ref, t.repo)).join(', ') || '-'
     const severity = t.metadata?.severity || 'medium'
     const sp = formatStoryPointsMarkdown(t.metadata?.story_points)
 
@@ -259,26 +362,29 @@ function formatStoryPoints(points) {
 
 function calculateDepths(tickets) {
   const depths = new Map()
-  const ticketNums = new Set(tickets.map((t) => t.number))
+  // Use composite keys for cross-repo support
+  const ticketKeys = new Set(tickets.map((t) => depRefKey({ repo: t.repo, number: t.number })))
+  const ticketByKey = new Map(tickets.map((t) => [depRefKey({ repo: t.repo, number: t.number }), t]))
 
   // Find roots (no dependencies within our set)
   const roots = tickets.filter((t) => {
     const deps = t.metadata?.depends_on || []
-    return !deps.some((d) => ticketNums.has(d))
+    return !deps.some((ref) => ticketKeys.has(depRefKey(ref)))
   })
 
   // BFS to assign depths
-  const queue = roots.map((t) => [t.number, 0])
+  const queue = roots.map((t) => [depRefKey({ repo: t.repo, number: t.number }), 0])
   while (queue.length > 0) {
-    const [num, depth] = queue.shift()
-    if (depths.has(num) && depths.get(num) >= depth) continue
-    depths.set(num, depth)
+    const [key, depth] = queue.shift()
+    if (depths.has(key) && depths.get(key) >= depth) continue
+    depths.set(key, depth)
 
-    const ticket = tickets.find((t) => t.number === num)
+    const ticket = ticketByKey.get(key)
     const blocks = ticket?.metadata?.blocks || []
-    for (const child of blocks) {
-      if (ticketNums.has(child)) {
-        queue.push([child, depth + 1])
+    for (const childRef of blocks) {
+      const childKey = depRefKey(childRef)
+      if (ticketKeys.has(childKey)) {
+        queue.push([childKey, depth + 1])
       }
     }
   }
@@ -330,7 +436,8 @@ function generateMermaidDiagram(tickets) {
       .replace(/[[\]()]/g, '')
       .replace(/"/g, "'")
     const label = shortTitle.length > 30 ? shortTitle.substring(0, 30) + '...' : shortTitle
-    const depth = depths.get(t.number) || 0
+    const ticketKey = depRefKey({ repo: t.repo, number: t.number })
+    const depth = depths.get(ticketKey) || 0
 
     nodesByCategory[category].push({ ticket: t, label, depth })
   }
@@ -341,19 +448,25 @@ function generateMermaidDiagram(tickets) {
 
   // Find which initiative each epic belongs to (via initiative's blocks or epic's depends_on)
   for (const epic of tickets.filter((t) => t.type === 'epic')) {
+    const epicKey = depRefKey({ repo: epic.repo, number: epic.number })
     // Check if any initiative blocks this epic
     for (const init of initiatives) {
-      if (init.metadata?.blocks?.includes(epic.number)) {
-        epicToInitiative.set(epic.number, init)
+      const blocksEpic = init.metadata?.blocks?.some(
+        (ref) => ref.repo === epic.repo && ref.number === epic.number
+      )
+      if (blocksEpic) {
+        epicToInitiative.set(epicKey, init)
         break
       }
     }
     // Or check if epic depends on an initiative
-    if (!epicToInitiative.has(epic.number)) {
-      for (const dep of epic.metadata?.depends_on || []) {
-        const parent = initiatives.find((i) => i.number === dep)
+    if (!epicToInitiative.has(epicKey)) {
+      for (const depRef of epic.metadata?.depends_on || []) {
+        const parent = initiatives.find(
+          (i) => i.repo === depRef.repo && i.number === depRef.number
+        )
         if (parent) {
-          epicToInitiative.set(epic.number, parent)
+          epicToInitiative.set(epicKey, parent)
           break
         }
       }
@@ -372,6 +485,18 @@ function generateMermaidDiagram(tickets) {
 
   const categoryOrder = ['initiative', 'epic', 'blocking', 'auth', 'bug', 'other']
 
+  // Helper to create unique node ID (repo abbreviation + number)
+  const nodeId = (t) => {
+    const abbrev = REPO_DISPLAY_ABBREV[t.repo] || t.repo.replace(/-/g, '')
+    return `T_${abbrev}_${t.number}`
+  }
+
+  // Helper to create node ID from ref
+  const nodeIdFromRef = (ref) => {
+    const abbrev = REPO_DISPLAY_ABBREV[ref.repo] || ref.repo.replace(/-/g, '')
+    return `T_${abbrev}_${ref.number}`
+  }
+
   for (const category of categoryOrder) {
     const items = nodesByCategory[category]
     if (!items || items.length === 0) continue
@@ -383,7 +508,8 @@ function generateMermaidDiagram(tickets) {
 
       // For epics, show parent initiative
       if (category === 'epic') {
-        const parentInit = epicToInitiative.get(t.number)
+        const epicKey = depRefKey({ repo: t.repo, number: t.number })
+        const parentInit = epicToInitiative.get(epicKey)
         if (parentInit) {
           const initName = parentInit.title.replace(/^\[Initiative\]\s*/i, '').substring(0, 15)
           safeLabel = `${safeLabel} [${initName}]`
@@ -391,17 +517,34 @@ function generateMermaidDiagram(tickets) {
       }
 
       const storyPoints = formatStoryPoints(t.metadata?.story_points)
-      const repoLabel = t.repo !== 'TiedSiren51' ? `<br/>📦 ${t.repo}` : ''
-      nodes.push(`        T${t.number}["#${t.number} ${safeLabel}${storyPoints}${repoLabel}"]:::${category}${depth}`)
+      const repoAbbrev = REPO_DISPLAY_ABBREV[t.repo] || t.repo
+      const displayNum = t.repo !== 'TiedSiren51' ? `${repoAbbrev}#${t.number}` : `#${t.number}`
+      const repoLabel = t.repo !== 'TiedSiren51' ? `<br/>📦 ${repoAbbrev}` : ''
+      nodes.push(`        ${nodeId(t)}["${displayNum} ${safeLabel}${storyPoints}${repoLabel}"]:::${category}${depth}`)
     }
     nodes.push('    end')
   }
 
-  // Generate edges
+  // Build ticket lookup by key for edge validation
+  const ticketByKey = new Map(tickets.map((t) => [depRefKey({ repo: t.repo, number: t.number }), t]))
+
+  // Generate edges (including cross-repo edges)
   for (const t of tickets) {
-    for (const dep of t.metadata?.depends_on || []) {
-      if (tickets.find((x) => x.number === dep)) {
-        edges.push(`    T${dep} --> T${t.number}`)
+    for (const depRef of t.metadata?.depends_on || []) {
+      const depKey = depRefKey(depRef)
+      const depTicket = ticketByKey.get(depKey)
+      if (depTicket) {
+        // Both tickets exist in our set - create edge
+        edges.push(`    ${nodeIdFromRef(depRef)} --> ${nodeId(t)}`)
+      } else if (VALID_REPOS[depRef.repo]) {
+        // Cross-repo dependency to a ticket not in our set - show as external
+        const abbrev = REPO_DISPLAY_ABBREV[depRef.repo] || depRef.repo
+        const externalNodeId = nodeIdFromRef(depRef)
+        // Add external node if not already added
+        if (!nodes.some((n) => n.includes(externalNodeId))) {
+          nodes.push(`    ${externalNodeId}["${abbrev}#${depRef.number}<br/>📦 ${abbrev}"]:::other0`)
+        }
+        edges.push(`    ${externalNodeId} -.-> ${nodeId(t)}`)
       }
     }
   }
@@ -422,15 +565,28 @@ function generateFeaturesDiagram(features, title) {
   const nodes = []
   const edges = []
 
+  // Helper to create unique node ID
+  const featureNodeId = (f) => {
+    const abbrev = REPO_DISPLAY_ABBREV[f.repo] || f.repo.replace(/-/g, '')
+    return `F_${abbrev}_${f.number}`
+  }
+
+  // Build lookup map
+  const featureByKey = new Map(features.map((f) => [depRefKey({ repo: f.repo, number: f.number }), f]))
+
   for (const f of features) {
     const shortTitle = f.title.length > 25 ? f.title.substring(0, 25) + '...' : f.title
     const storyPoints = formatStoryPoints(f.metadata?.story_points)
-    nodes.push(`    F${f.number}["#${f.number} ${shortTitle}${storyPoints}"]`)
+    const repoAbbrev = REPO_DISPLAY_ABBREV[f.repo] || f.repo
+    const displayNum = f.repo !== 'TiedSiren51' ? `${repoAbbrev}#${f.number}` : `#${f.number}`
+    nodes.push(`    ${featureNodeId(f)}["${displayNum} ${shortTitle}${storyPoints}"]`)
 
     const deps = f.metadata?.depends_on || []
-    for (const dep of deps) {
-      if (features.find((x) => x.number === dep)) {
-        edges.push(`    F${dep} --> F${f.number}`)
+    for (const depRef of deps) {
+      const depKey = depRefKey(depRef)
+      if (featureByKey.has(depKey)) {
+        const depFeature = featureByKey.get(depKey)
+        edges.push(`    ${featureNodeId(depFeature)} --> ${featureNodeId(f)}`)
       }
     }
   }
@@ -446,20 +602,32 @@ ${edges.join('\n')}
 }
 
 function generateDependencyMatrix(tickets) {
-  const blockers = {}
+  const blockers = []
 
   for (const t of tickets) {
     const blocks = t.metadata?.blocks || []
     if (blocks.length > 0) {
-      blockers[t.number] = blocks
+      blockers.push({
+        ticket: t,
+        blocks: blocks,
+      })
     }
   }
 
-  if (Object.keys(blockers).length === 0) return ''
+  if (blockers.length === 0) return ''
+
+  // Sort by repo then number
+  blockers.sort((a, b) => {
+    const repoCompare = a.ticket.repo.localeCompare(b.ticket.repo)
+    if (repoCompare !== 0) return repoCompare
+    return a.ticket.number - b.ticket.number
+  })
 
   let table = '| Blocker | Blocks These Issues |\n|---------|---------------------|\n'
-  for (const [blocker, blocked] of Object.entries(blockers).sort((a, b) => parseInt(a[0]) - parseInt(b[0]))) {
-    table += `| #${blocker} | ${blocked.map((n) => `#${n}`).join(', ')} |\n`
+  for (const { ticket, blocks } of blockers) {
+    const blockerLabel = formatDepRef({ repo: ticket.repo, number: ticket.number }, 'TiedSiren51')
+    const blockedLabels = blocks.map((ref) => formatDepRef(ref, ticket.repo)).join(', ')
+    table += `| ${blockerLabel} | ${blockedLabels} |\n`
   }
 
   return table
@@ -468,23 +636,42 @@ function generateDependencyMatrix(tickets) {
 function validateBidirectional(tickets) {
   const issues = []
 
+  // Build lookup by key
+  const ticketByKey = new Map(tickets.map((t) => [depRefKey({ repo: t.repo, number: t.number }), t]))
+
   for (const t of tickets) {
+    const tRef = { repo: t.repo, number: t.number }
+    const tLabel = formatDepRef(tRef, 'TiedSiren51')
     const deps = t.metadata?.depends_on || []
     const blocks = t.metadata?.blocks || []
 
     // Check: if A depends_on B, then B should block A
-    for (const dep of deps) {
-      const parent = tickets.find((x) => x.number === dep)
-      if (parent && !parent.metadata?.blocks?.includes(t.number)) {
-        issues.push(`#${dep} should have blocks: [${t.number}] (because #${t.number} depends on it)`)
+    for (const depRef of deps) {
+      const depKey = depRefKey(depRef)
+      const parent = ticketByKey.get(depKey)
+      if (parent) {
+        const parentBlocksT = parent.metadata?.blocks?.some(
+          (ref) => ref.repo === t.repo && ref.number === t.number
+        )
+        if (!parentBlocksT) {
+          const depLabel = formatDepRef(depRef, 'TiedSiren51')
+          issues.push(`${depLabel} should have blocks: [${t.number}] (because ${tLabel} depends on it)`)
+        }
       }
     }
 
     // Check: if A blocks B, then B should depend_on A
-    for (const blocked of blocks) {
-      const child = tickets.find((x) => x.number === blocked)
-      if (child && !child.metadata?.depends_on?.includes(t.number)) {
-        issues.push(`#${blocked} should have depends_on: [${t.number}] (because #${t.number} blocks it)`)
+    for (const blockedRef of blocks) {
+      const blockedKey = depRefKey(blockedRef)
+      const child = ticketByKey.get(blockedKey)
+      if (child) {
+        const childDependsOnT = child.metadata?.depends_on?.some(
+          (ref) => ref.repo === t.repo && ref.number === t.number
+        )
+        if (!childDependsOnT) {
+          const blockedLabel = formatDepRef(blockedRef, 'TiedSiren51')
+          issues.push(`${blockedLabel} should have depends_on: [${t.number}] (because ${tLabel} blocks it)`)
+        }
       }
     }
   }
@@ -503,39 +690,61 @@ function generateAsciiGraph(tickets) {
 
   if (withDeps.length === 0) return 'No dependencies found.'
 
+  // Use composite keys for cross-repo support
+  const ticketByKey = new Map(withDeps.map((t) => [depRefKey({ repo: t.repo, number: t.number }), t]))
+  const ticketKeys = new Set(ticketByKey.keys())
+
   const children = new Map()
   for (const t of withDeps) {
-    children.set(t.number, t.metadata?.blocks || [])
+    const key = depRefKey({ repo: t.repo, number: t.number })
+    children.set(key, t.metadata?.blocks || [])
   }
 
   // Find roots
   const hasParent = new Set()
   for (const t of withDeps) {
-    for (const b of t.metadata?.blocks || []) hasParent.add(b)
+    for (const blockRef of t.metadata?.blocks || []) {
+      hasParent.add(depRefKey(blockRef))
+    }
   }
-  const roots = withDeps.filter((t) => !hasParent.has(t.number)).map((t) => t.number)
+  const roots = withDeps
+    .filter((t) => !hasParent.has(depRefKey({ repo: t.repo, number: t.number })))
+    .map((t) => depRefKey({ repo: t.repo, number: t.number }))
 
   const printed = new Set()
   const lines = []
 
-  const renderTree = (num, indent = '') => {
-    if (printed.has(num)) {
-      lines.push(`${indent}└─▶ #${num} (↑)`)
+  const formatLabel = (key) => {
+    const ticket = ticketByKey.get(key)
+    if (ticket) {
+      return formatDepRef({ repo: ticket.repo, number: ticket.number }, 'TiedSiren51')
+    }
+    return key
+  }
+
+  const renderTree = (key, indent = '') => {
+    if (printed.has(key)) {
+      lines.push(`${indent}└─▶ ${formatLabel(key)} (↑)`)
       return
     }
-    printed.add(num)
+    printed.add(key)
 
-    const kids = (children.get(num) || []).filter((k) => withDeps.some((t) => t.number === k))
-    const box = `┌──────┐\n${indent}│ #${String(num).padStart(3)} │\n${indent}└──┬───┘`
+    const blockRefs = children.get(key) || []
+    const kids = blockRefs
+      .map((ref) => depRefKey(ref))
+      .filter((k) => ticketKeys.has(k))
+
+    const label = formatLabel(key)
+    const labelPad = label.length > 5 ? label : label.padStart(5)
 
     if (kids.length === 0) {
-      lines.push(`${indent}┌──────┐`)
-      lines.push(`${indent}│ #${String(num).padStart(3)} │`)
-      lines.push(`${indent}└──────┘`)
+      lines.push(`${indent}┌${'─'.repeat(labelPad.length + 2)}┐`)
+      lines.push(`${indent}│ ${labelPad} │`)
+      lines.push(`${indent}└${'─'.repeat(labelPad.length + 2)}┘`)
     } else {
-      lines.push(`${indent}┌──────┐`)
-      lines.push(`${indent}│ #${String(num).padStart(3)} │`)
-      lines.push(`${indent}└──┬───┘`)
+      lines.push(`${indent}┌${'─'.repeat(labelPad.length + 2)}┐`)
+      lines.push(`${indent}│ ${labelPad} │`)
+      lines.push(`${indent}└──┬${'─'.repeat(labelPad.length - 1)}┘`)
       lines.push(`${indent}   │`)
 
       kids.forEach((kid, i) => {
@@ -544,7 +753,7 @@ function generateAsciiGraph(tickets) {
         const childIndent = indent + (isLast ? '    ' : '│   ')
 
         if (printed.has(kid)) {
-          lines.push(`${indent}   ${connector}#${kid} (↑)`)
+          lines.push(`${indent}   ${connector}${formatLabel(kid)} (↑)`)
         } else {
           lines.push(`${indent}   ${connector}`)
           renderTree(kid, childIndent)
@@ -712,12 +921,13 @@ if (!asciiMode) {
 }
 
 const tickets = issues.map((issue) => {
-  const metadata = extractMetadata(issue.body)
+  const ticketRepo = issue.repo || 'TiedSiren51'
+  const metadata = parseTicketDependencies(extractMetadata(issue.body), ticketRepo)
   return {
     number: issue.number,
     title: issue.title,
     labels: issue.labels,
-    repo: issue.repo || 'TiedSiren51',
+    repo: ticketRepo,
     metadata,
     type: detectTicketType(issue, metadata),
   }
