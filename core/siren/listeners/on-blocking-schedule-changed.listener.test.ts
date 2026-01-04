@@ -347,4 +347,26 @@ describe('Feature: Blocking schedule changed listener', () => {
       fixture.then.blockingScheduleShouldBeEmpty()
     })
   })
+
+  describe('Error handling', () => {
+    it('should log error when updateBlockingSchedule fails', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.updateBlockingScheduleWillThrow()
+      fixture.given.storeIsCreated()
+
+      await fixture.when.blockSessionsChange([
+        buildBlockSession({
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [
+            buildBlocklist({
+              sirens: { android: [facebookAndroidSiren] },
+            }),
+          ],
+        }),
+      ])
+
+      fixture.then.errorShouldBeLogged('BlockingScheduleListener')
+    })
+  })
 })
