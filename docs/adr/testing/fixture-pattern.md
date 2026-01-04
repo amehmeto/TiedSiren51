@@ -287,6 +287,64 @@ const store = createTestStore(state)
 3. **Minimal overrides**: Only override what's relevant to test
 4. **Immutability**: Fixtures shouldn't modify shared state
 5. **Type safety**: Use `Partial<T>` for overrides
+6. **Hide implementation details**: Don't expose infrastructure like store creation
+7. **Don't abstract one-liners**: Inline simple operations instead of creating helper functions
+
+### Hide Implementation Details
+
+Fixtures should only expose **meaningful business actions**, not infrastructure setup. Store creation, listener initialization, and other infrastructure are implementation details that should be hidden inside `when` methods.
+
+**Bad - Exposing infrastructure**:
+```typescript
+// DON'T: Exposes store creation as a "given"
+fixture.given.storeIsCreated()
+await fixture.when.blockSessionsChange([...])
+
+// DON'T: Creates unnecessary helper function
+const getStore = () => {
+  if (!store) store = createTestStore(...)
+  return store
+}
+```
+
+**Good - Infrastructure is implicit**:
+```typescript
+// DO: Store creation happens inside the when method
+async blockSessionsChange(sessions: BlockSession[]) {
+  store ??= createTestStore(dependencies, stateBuilder.getState())
+  store.dispatch(setBlockSessions(sessions))
+  await flushPromises()
+}
+
+// Test reads naturally - no infrastructure noise
+fixture.given.initialBlockSessions([...])
+await fixture.when.blockSessionsChange([])
+fixture.then.blockingScheduleShouldBeEmpty()
+```
+
+**Why inline `store ??= createTestStore(...)` instead of a helper?**
+
+The nullish coalescing assignment is:
+- **One line** - no value in wrapping it
+- **Self-explanatory** - the `??=` pattern is idiomatic
+- **Local to where it's used** - easy to understand in context
+
+Don't abstract one-liners. Simple repetition of a clear pattern is better than premature abstraction.
+
+**Testing initialization behavior**:
+
+To test behavior that happens on initialization (e.g., listener syncs on startup), use a real `when` action and verify the combined result:
+
+```typescript
+// DON'T: Expose initialization as a separate action
+await fixture.when.listenerInitializes()
+fixture.then.blockingScheduleShouldContainApps([...])
+
+// DO: Trigger any action and verify initialization happened
+fixture.given.initialBlockSessions([activeSession])
+await fixture.when.unrelatedStateChanges()
+fixture.then.blockingScheduleShouldContainApps([...]) // Synced during init
+```
 
 ### DSL Conventions
 
