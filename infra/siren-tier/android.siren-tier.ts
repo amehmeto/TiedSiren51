@@ -2,9 +2,55 @@ import { setCallbackClass } from '@amehmeto/expo-foreground-service'
 import {
   BLOCKING_CALLBACK_CLASS,
   setBlockedApps,
+  setBlockingSchedule,
 } from '@amehmeto/tied-siren-blocking-overlay'
 import { Logger } from '@/core/_ports_/logger'
 import { BlockingSchedule, SirenTier } from '@core/_ports_/siren.tier'
+
+/**
+ * Native blocking window format expected by the Kotlin module.
+ * Time format is HH:mm (e.g., "14:00", "23:30").
+ */
+export type NativeBlockingWindow = {
+  id: string
+  startTime: string
+  endTime: string
+  sirens: {
+    apps: string[]
+    websites: string[]
+    keywords: string[]
+  }
+}
+
+/**
+ * Converts BlockingSchedule array to native format.
+ * Extracts HH:mm time from ISO timestamps and maps Android sirens to package names.
+ */
+export function toNativeBlockingWindows(
+  schedules: BlockingSchedule[],
+): NativeBlockingWindow[] {
+  return schedules.map((schedule) => ({
+    id: schedule.id,
+    startTime: extractTimeFromISO(schedule.startTime),
+    endTime: extractTimeFromISO(schedule.endTime),
+    sirens: {
+      apps: schedule.sirens.android.map((app) => app.packageName),
+      websites: schedule.sirens.websites,
+      keywords: schedule.sirens.keywords,
+    },
+  }))
+}
+
+/**
+ * Extracts HH:mm time from an ISO timestamp.
+ * Example: "2024-01-15T14:30:00.000Z" -> "14:30"
+ */
+function extractTimeFromISO(isoString: string): string {
+  const date = new Date(isoString)
+  const hours = date.getHours().toString().padStart(2, '0')
+  const minutes = date.getMinutes().toString().padStart(2, '0')
+  return `${hours}:${minutes}`
+}
 
 export class AndroidSirenTier implements SirenTier {
   constructor(private readonly logger: Logger) {}
@@ -23,10 +69,14 @@ export class AndroidSirenTier implements SirenTier {
 
   async updateBlockingSchedule(schedule: BlockingSchedule[]): Promise<void> {
     try {
+      const nativeWindows = toNativeBlockingWindows(schedule)
+      await setBlockingSchedule(nativeWindows)
+
       const packageNames = schedule.flatMap((s) =>
         s.sirens.android.map((app) => app.packageName),
       )
       await setBlockedApps(packageNames)
+
       this.logger.info(
         `[AndroidSirenTier] Blocking schedule updated: ${schedule.length} schedules, ${packageNames.length} apps`,
       )
