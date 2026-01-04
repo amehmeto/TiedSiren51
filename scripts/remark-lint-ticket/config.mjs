@@ -18,6 +18,32 @@ export const VALID_REPOS = {
   'expo-list-installed-apps': `https://github.com/amehmeto/expo-list-installed-apps`,
 }
 
+// Short abbreviations for repos (used in dependency references and graph display)
+// Format: repo#N or abbrev#N (e.g., tied-siren-blocking-overlay#9 or TSBO#9)
+export const REPO_ABBREVIATIONS = {
+  // Full names map to themselves
+  TiedSiren51: 'TiedSiren51',
+  'expo-accessibility-service': 'expo-accessibility-service',
+  'expo-foreground-service': 'expo-foreground-service',
+  'tied-siren-blocking-overlay': 'tied-siren-blocking-overlay',
+  'expo-list-installed-apps': 'expo-list-installed-apps',
+  // Short abbreviations
+  TS: 'TiedSiren51',
+  EAS: 'expo-accessibility-service',
+  EFS: 'expo-foreground-service',
+  TSBO: 'tied-siren-blocking-overlay',
+  ELA: 'expo-list-installed-apps',
+}
+
+// Reverse mapping: full repo name -> abbreviation for display
+export const REPO_DISPLAY_ABBREV = {
+  TiedSiren51: 'TS',
+  'expo-accessibility-service': 'EAS',
+  'expo-foreground-service': 'EFS',
+  'tied-siren-blocking-overlay': 'TSBO',
+  'expo-list-installed-apps': 'ELA',
+}
+
 // Special prefix for tickets that require creating a new repo
 export const NEW_REPO_PREFIX = 'NEW_REPO:'
 
