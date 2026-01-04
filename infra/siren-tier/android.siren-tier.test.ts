@@ -2,6 +2,7 @@ import { setCallbackClass } from '@amehmeto/expo-foreground-service'
 import {
   BLOCKING_CALLBACK_CLASS,
   setBlockedApps,
+  setBlockingSchedule,
 } from '@amehmeto/tied-siren-blocking-overlay'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import {
@@ -10,7 +11,7 @@ import {
 } from '@/core/_tests_/data-builders/android-siren.builder'
 import { buildBlockingSchedule } from '@/core/_tests_/data-builders/blocking-schedule.builder'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
-import { AndroidSirenTier } from './android.siren-tier'
+import { AndroidSirenTier, toNativeBlockingWindows } from './android.siren-tier'
 
 vi.mock('@amehmeto/expo-foreground-service', () => ({
   setCallbackClass: vi.fn(),
@@ -19,10 +20,12 @@ vi.mock('@amehmeto/expo-foreground-service', () => ({
 vi.mock('@amehmeto/tied-siren-blocking-overlay', () => ({
   BLOCKING_CALLBACK_CLASS: 'com.blocking.CallbackClass',
   setBlockedApps: vi.fn(),
+  setBlockingSchedule: vi.fn(),
 }))
 
 const mockSetCallbackClass = vi.mocked(setCallbackClass)
 const mockSetBlockedApps = vi.mocked(setBlockedApps)
+const mockSetBlockingSchedule = vi.mocked(setBlockingSchedule)
 
 describe('AndroidSirenTier', () => {
   let androidSirenTier: AndroidSirenTier
@@ -35,7 +38,26 @@ describe('AndroidSirenTier', () => {
   })
 
   describe('updateBlockingSchedule', () => {
+    it('calls setBlockingSchedule with native format windows', async () => {
+      mockSetBlockingSchedule.mockResolvedValueOnce(undefined)
+      mockSetBlockedApps.mockResolvedValueOnce(undefined)
+      const schedules = [
+        buildBlockingSchedule({
+          sirens: {
+            android: [facebookAndroidSiren],
+          },
+        }),
+      ]
+
+      await androidSirenTier.updateBlockingSchedule(schedules)
+
+      expect(mockSetBlockingSchedule).toHaveBeenCalledWith(
+        toNativeBlockingWindows(schedules),
+      )
+    })
+
     it('calls setBlockedApps with package names from schedule', async () => {
+      mockSetBlockingSchedule.mockResolvedValueOnce(undefined)
       mockSetBlockedApps.mockResolvedValueOnce(undefined)
       const schedules = [
         buildBlockingSchedule({
@@ -51,6 +73,7 @@ describe('AndroidSirenTier', () => {
     })
 
     it('logs schedule count and app count', async () => {
+      mockSetBlockingSchedule.mockResolvedValueOnce(undefined)
       mockSetBlockedApps.mockResolvedValueOnce(undefined)
       const schedules = [
         buildBlockingSchedule({
@@ -71,6 +94,7 @@ describe('AndroidSirenTier', () => {
     })
 
     it('handles empty schedule list', async () => {
+      mockSetBlockingSchedule.mockResolvedValueOnce(undefined)
       mockSetBlockedApps.mockResolvedValueOnce(undefined)
       const expectedLog = {
         level: 'info',
@@ -80,12 +104,29 @@ describe('AndroidSirenTier', () => {
 
       await androidSirenTier.updateBlockingSchedule([])
 
+      expect(mockSetBlockingSchedule).toHaveBeenCalledWith([])
       expect(mockSetBlockedApps).toHaveBeenCalledWith([])
+      expect(logger.getLogs()).toContainEqual(expectedLog)
+    })
+
+    it('logs error and rethrows when setBlockingSchedule fails', async () => {
+      const error = new Error('Native module error')
+      mockSetBlockingSchedule.mockRejectedValueOnce(error)
+      const schedules = [buildBlockingSchedule()]
+      const expectedLog = {
+        level: 'error',
+        message: `[AndroidSirenTier] Failed to update blocking schedule: ${error}`,
+      }
+
+      const updatePromise = androidSirenTier.updateBlockingSchedule(schedules)
+
+      await expect(updatePromise).rejects.toThrow('Native module error')
       expect(logger.getLogs()).toContainEqual(expectedLog)
     })
 
     it('logs error and rethrows when setBlockedApps fails', async () => {
       const error = new Error('Native module error')
+      mockSetBlockingSchedule.mockResolvedValueOnce(undefined)
       mockSetBlockedApps.mockRejectedValueOnce(error)
       const schedules = [buildBlockingSchedule()]
       const expectedLog = {
@@ -143,5 +184,79 @@ describe('AndroidSirenTier', () => {
 
       expect(logger.getLogs()).toContainEqual(expectedLogEntry)
     })
+  })
+})
+
+describe('toNativeBlockingWindows', () => {
+  it('converts BlockingSchedule array to native format', () => {
+    const schedules = [
+      buildBlockingSchedule({
+        id: 'schedule-1',
+        startTime: '2024-01-15T14:30:00.000Z',
+        endTime: '2024-01-15T15:45:00.000Z',
+        sirens: {
+          android: [facebookAndroidSiren],
+          websites: ['facebook.com'],
+          keywords: ['social'],
+        },
+      }),
+    ]
+
+    const result = toNativeBlockingWindows(schedules)
+    const firstWindow = result[0]
+    const apps = firstWindow.sirens.apps
+    const websites = firstWindow.sirens.websites
+    const keywords = firstWindow.sirens.keywords
+
+    expect(result).toHaveLength(1)
+    expect(firstWindow.id).toBe('schedule-1')
+    expect(firstWindow.startTime).toMatch(/^\d{2}:\d{2}$/)
+    expect(firstWindow.endTime).toMatch(/^\d{2}:\d{2}$/)
+    expect(apps).toStrictEqual(['com.facebook.katana'])
+    expect(websites).toStrictEqual(['facebook.com'])
+    expect(keywords).toStrictEqual(['social'])
+  })
+
+  it('extracts package names from Android sirens', () => {
+    const schedules = [
+      buildBlockingSchedule({
+        sirens: {
+          android: [facebookAndroidSiren, instagramAndroidSiren],
+        },
+      }),
+    ]
+    const expectedApps = ['com.facebook.katana', 'com.example.instagram']
+
+    const result = toNativeBlockingWindows(schedules)
+    const apps = result[0].sirens.apps
+
+    expect(apps).toStrictEqual(expectedApps)
+  })
+
+  it('handles empty schedule list', () => {
+    const result = toNativeBlockingWindows([])
+
+    expect(result).toStrictEqual([])
+  })
+
+  it('handles schedule with no Android apps', () => {
+    const schedules = [
+      buildBlockingSchedule({
+        sirens: {
+          android: [],
+          websites: ['example.com'],
+          keywords: [],
+        },
+      }),
+    ]
+    const expectedApps: string[] = []
+    const expectedWebsites = ['example.com']
+
+    const result = toNativeBlockingWindows(schedules)
+    const apps = result[0].sirens.apps
+    const websites = result[0].sirens.websites
+
+    expect(apps).toStrictEqual(expectedApps)
+    expect(websites).toStrictEqual(expectedWebsites)
   })
 })
