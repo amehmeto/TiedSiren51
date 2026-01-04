@@ -71,7 +71,9 @@ export const onBlockingScheduleChangedListener = ({
       if (!wasActive && isActive) {
         sirenLookout.startWatching()
         await foregroundService.start()
-      } else if (wasActive && !isActive) {
+      }
+
+      if (wasActive && !isActive) {
         sirenLookout.stopWatching()
         await foregroundService.stop()
       }
