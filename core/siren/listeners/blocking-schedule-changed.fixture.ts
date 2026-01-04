@@ -41,7 +41,7 @@ export function blockingScheduleChangedFixture(
             .withBlocklists(sessions.flatMap((s) => s.blocklists)),
         )
       },
-      initialBlocklists(blocklists: Blocklist[]) {
+      existingBlocklists(blocklists: Blocklist[]) {
         testStateBuilderProvider.setState((builder) =>
           builder.withBlocklists(blocklists),
         )
@@ -51,25 +51,13 @@ export function blockingScheduleChangedFixture(
         date.setHours(hours, minutes, 0, 0)
         dateProvider.now = date
       },
-      startWatchingWillThrow() {
-        sirenLookout.shouldThrowOnStart = true
-      },
-      stopWatchingWillThrow() {
-        sirenLookout.shouldThrowOnStop = true
-      },
       updateBlockingScheduleWillThrow() {
         sirenTier.shouldThrowOnSync = true
-      },
-      startForegroundServiceWillThrow() {
-        foregroundService.shouldThrowOnStart = true
-      },
-      stopForegroundServiceWillThrow() {
-        foregroundService.shouldThrowOnStop = true
       },
     },
     when: {
       async blockSessionsChange(sessions: BlockSession[]) {
-        store ??= createTestStore(
+        store = createTestStore(
           dependencies,
           testStateBuilderProvider.getState(),
         )
@@ -78,7 +66,7 @@ export function blockingScheduleChangedFixture(
         await flushPromises()
       },
       async blocklistIsUpdated(blocklist: Blocklist) {
-        store ??= createTestStore(
+        store = createTestStore(
           dependencies,
           testStateBuilderProvider.getState(),
         )
@@ -92,7 +80,7 @@ export function blockingScheduleChangedFixture(
         await flushPromises()
       },
       async unrelatedStateChanges() {
-        store ??= createTestStore(
+        store = createTestStore(
           dependencies,
           testStateBuilderProvider.getState(),
         )

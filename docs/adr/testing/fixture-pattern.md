@@ -311,7 +311,7 @@ const getStore = () => {
 ```typescript
 // DO: Store creation happens inside the when method
 async blockSessionsChange(sessions: BlockSession[]) {
-  store ??= createTestStore(dependencies, stateBuilder.getState())
+  store = createTestStore(dependencies, stateBuilder.getState())
   store.dispatch(setBlockSessions(sessions))
   await flushPromises()
 }
@@ -322,12 +322,14 @@ await fixture.when.blockSessionsChange([])
 fixture.then.blockingScheduleShouldBeEmpty()
 ```
 
-**Why inline `store ??= createTestStore(...)` instead of a helper?**
+**Why inline `store = createTestStore(...)` instead of a helper?**
 
-The nullish coalescing assignment is:
+The direct assignment is:
 - **One line** - no value in wrapping it
-- **Self-explanatory** - the `??=` pattern is idiomatic
+- **Self-explanatory** - clearly creates a fresh store
 - **Local to where it's used** - easy to understand in context
+
+Each test gets a fresh store - don't use `??=` which would reuse a stale store.
 
 Don't abstract one-liners. Simple repetition of a clear pattern is better than premature abstraction.
 

@@ -254,7 +254,7 @@ describe('Feature: Blocking schedule changed listener', () => {
         sirens: { android: [facebookAndroidSiren] },
       })
       fixture.given.nowIs({ hours: 14, minutes: 30 })
-      fixture.given.initialBlocklists([blocklist])
+      fixture.given.existingBlocklists([blocklist])
 
       await fixture.when.blocklistIsUpdated({
         ...blocklist,
