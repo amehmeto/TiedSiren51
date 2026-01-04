@@ -35,5 +35,6 @@ export const registerListeners = (
     sirenTier,
     foregroundService,
     dateProvider,
+    logger,
   })
 }

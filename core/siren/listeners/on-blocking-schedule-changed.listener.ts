@@ -1,6 +1,6 @@
-/* eslint-disable local-rules/listener-error-handling */
 import { DateProvider } from '@/core/_ports_/date-provider'
 import { ForegroundService } from '@/core/_ports_/foreground.service'
+import { Logger } from '@/core/_ports_/logger'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { BlockingSchedule, SirenTier } from '@/core/_ports_/siren.tier'
 import { AppStore } from '@/core/_redux_/createStore'
@@ -12,12 +12,14 @@ export const onBlockingScheduleChangedListener = ({
   sirenTier,
   foregroundService,
   dateProvider,
+  logger,
 }: {
   store: AppStore
   sirenLookout: SirenLookout
   sirenTier: SirenTier
   foregroundService: ForegroundService
   dateProvider: DateProvider
+  logger: Logger
 }): (() => void) => {
   // Creates a hash key from schedule to detect changes via string comparison
   const getScheduleKey = (schedule: BlockingSchedule[]): string => {
@@ -46,36 +48,40 @@ export const onBlockingScheduleChangedListener = ({
 
   return store.subscribe(() => {
     void (async () => {
-      const state = store.getState()
+      try {
+        const state = store.getState()
 
-      if (
-        state.blockSession === lastBlockSessionState &&
-        state.blocklist === lastBlocklistState
-      )
-        return
+        if (
+          state.blockSession === lastBlockSessionState &&
+          state.blocklist === lastBlocklistState
+        )
+          return
 
-      lastBlockSessionState = state.blockSession
-      lastBlocklistState = state.blocklist
+        lastBlockSessionState = state.blockSession
+        lastBlocklistState = state.blocklist
 
-      const schedule = selectBlockingSchedule(dateProvider, state)
-      const scheduleKey = getScheduleKey(schedule)
+        const schedule = selectBlockingSchedule(dateProvider, state)
+        const scheduleKey = getScheduleKey(schedule)
 
-      if (scheduleKey === lastScheduleKey) return
+        if (scheduleKey === lastScheduleKey) return
 
-      const wasActive = lastScheduleKey !== ''
-      const isActive = scheduleKey !== ''
-      lastScheduleKey = scheduleKey
+        const wasActive = lastScheduleKey !== ''
+        const isActive = scheduleKey !== ''
+        lastScheduleKey = scheduleKey
 
-      await sirenTier.updateBlockingSchedule(schedule)
+        await sirenTier.updateBlockingSchedule(schedule)
 
-      if (!wasActive && isActive) {
-        sirenLookout.startWatching()
-        await foregroundService.start()
-      }
+        if (!wasActive && isActive) {
+          sirenLookout.startWatching()
+          await foregroundService.start()
+        }
 
-      if (wasActive && !isActive) {
-        sirenLookout.stopWatching()
-        await foregroundService.stop()
+        if (wasActive && !isActive) {
+          sirenLookout.stopWatching()
+          await foregroundService.stop()
+        }
+      } catch (error) {
+        logger.error(`[BlockingScheduleListener] ${error}`)
       }
     })()
   })
