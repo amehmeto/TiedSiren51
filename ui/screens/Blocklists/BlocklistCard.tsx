@@ -1,14 +1,18 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { BlockSession } from '@/core/block-session/block-session'
+import { selectActiveSessionsUsingBlocklist } from '@/core/block-session/selectors/selectActiveSessionsUsingBlocklist'
 import { deleteBlocklist } from '@/core/blocklist/usecases/delete-blocklist.usecase'
 import { duplicateBlocklist } from '@/core/blocklist/usecases/duplicate-blocklist.usecase'
 import { renameBlocklist } from '@/core/blocklist/usecases/rename-blocklist.usecase'
+import { dependencies } from '@/ui/dependencies'
 import { ThreeDotMenu } from '@/ui/design-system/components/shared/ThreeDotMenu'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
+import { BlocklistDeletionConfirmationModal } from '@/ui/screens/Blocklists/BlocklistDeletionConfirmationModal'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 
 export function BlocklistCard(
@@ -25,6 +29,15 @@ export function BlocklistCard(
 
   const [isRenameModalVisible, setRenameModalVisible] = useState(false)
   const [isDuplicateModalVisible, setIsDuplicateModalVisible] = useState(false)
+  const [isDeleteConfirmationVisible, setIsDeleteConfirmationVisible] =
+    useState(false)
+  const [activeSessionsForDeletion, setActiveSessionsForDeletion] = useState<
+    BlockSession[]
+  >([])
+
+  const blockSessionState = useSelector(
+    (state: RootState) => state.blockSession,
+  )
 
   const blocklistCardMenu = [
     {
@@ -55,7 +68,15 @@ export function BlocklistCard(
       name: 'Delete',
       iconName: 'trash-outline' as const,
       action: () => {
-        dispatch(deleteBlocklist(props.blocklist.id))
+        const activeSessions = selectActiveSessionsUsingBlocklist(
+          dependencies.dateProvider,
+          blockSessionState,
+          props.blocklist.id,
+        )
+        if (activeSessions.length > 0) {
+          setActiveSessionsForDeletion(activeSessions)
+          setIsDeleteConfirmationVisible(true)
+        } else dispatch(deleteBlocklist(props.blocklist.id))
       },
     },
   ]
@@ -111,6 +132,21 @@ export function BlocklistCard(
             duplicateBlocklist({ id: props.blocklist.id, name: inputText }),
           )
           setIsDuplicateModalVisible(false)
+        }}
+      />
+      <BlocklistDeletionConfirmationModal
+        visible={isDeleteConfirmationVisible}
+        blocklistName={props.blocklist.name}
+        activeSessions={activeSessionsForDeletion}
+        onRequestClose={() => {
+          setIsDeleteConfirmationVisible(false)
+        }}
+        onCancel={() => {
+          setIsDeleteConfirmationVisible(false)
+        }}
+        onConfirm={() => {
+          dispatch(deleteBlocklist(props.blocklist.id))
+          setIsDeleteConfirmationVisible(false)
         }}
       />
     </>
