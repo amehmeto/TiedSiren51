@@ -25,10 +25,37 @@ fi
 # Extract the title from the command
 extract_title() {
   local cmd="$1"
+  local title=""
 
-  # Match --title "..." or --title '...'
-  title=$(printf '%s' "$cmd" | perl -ne 'if (/--title\s+"([^"]*)"/) { print $1 } elsif (/--title\s+'\''([^'\'']*)'\''/){ print $1 }' 2>/dev/null)
-  printf '%s' "$title"
+  # Try --title "..." (with escaped quote support)
+  title=$(printf '%s' "$cmd" | perl -ne 'if (/--title\s+"((?:[^"\\]|\\.)*)"/s) { $t=$1; $t=~s/\\"/"/g; print $t }' 2>/dev/null)
+  if [ -n "$title" ]; then
+    printf '%s' "$title"
+    return 0
+  fi
+
+  # Try --title '...'
+  title=$(printf '%s' "$cmd" | perl -ne "if (/--title\\s+'([^']*)'/) { print \$1 }" 2>/dev/null)
+  if [ -n "$title" ]; then
+    printf '%s' "$title"
+    return 0
+  fi
+
+  # Try -t "..." (short flag with escaped quote support)
+  title=$(printf '%s' "$cmd" | perl -ne 'if (/-t\s+"((?:[^"\\]|\\.)*)"/s) { $t=$1; $t=~s/\\"/"/g; print $t }' 2>/dev/null)
+  if [ -n "$title" ]; then
+    printf '%s' "$title"
+    return 0
+  fi
+
+  # Try -t '...'
+  title=$(printf '%s' "$cmd" | perl -ne "if (/-t\\s+'([^']*)'/) { print \$1 }" 2>/dev/null)
+  if [ -n "$title" ]; then
+    printf '%s' "$title"
+    return 0
+  fi
+
+  return 1
 }
 
 # Extract the body content from the command
@@ -85,23 +112,21 @@ if [ -n "$title" ]; then
 fi
 
 # Rule 2: Body must have a ## Summary section
-if ! printf '%s' "$body" | grep -qE '^## Summary'; then
+if ! echo "$body" | grep -qE '^## Summary'; then
   errors+=("❌ Missing required section: ## Summary")
 fi
 
 # Rule 3: Body must have a ## Test plan section
-if ! printf '%s' "$body" | grep -qiE '^## Test [Pp]lan'; then
+if ! echo "$body" | grep -qiE '^## Test [Pp]lan'; then
   errors+=("❌ Missing required section: ## Test plan")
 fi
 
-# Rule 4: Must mention related issue with "Closes #", "Fixes #", "Resolves #", or "(#NNN)" in title
+# Rule 4: Must mention related issue with "Closes #", "Fixes #", "Resolves #", or "#NNN" in title
 combined="$title $body"
 has_issue_ref=false
-if printf '%s' "$combined" | grep -qiE '(Closes|Fixes|Resolves)\s+#[0-9]+'; then
+if echo "$combined" | grep -qiE '(Closes|Fixes|Resolves)\s+#[0-9]+'; then
   has_issue_ref=true
-elif printf '%s' "$title" | grep -qE '\(#[0-9]+\)'; then
-  has_issue_ref=true
-elif printf '%s' "$title" | grep -qE '#[0-9]+'; then
+elif echo "$title" | grep -qE '#[0-9]+'; then
   has_issue_ref=true
 fi
 if [ "$has_issue_ref" = false ]; then
