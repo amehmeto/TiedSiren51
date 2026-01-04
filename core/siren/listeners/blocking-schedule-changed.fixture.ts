@@ -23,15 +23,14 @@ export function blockingScheduleChangedFixture(
   const sirenTier = new InMemorySirenTier(logger)
   const foregroundService = new InMemoryForegroundService()
 
-  let store: ReturnType<typeof createTestStore> | undefined
-
-  const createStoreWithState = () => {
-    store = createTestStore(
-      { sirenLookout, sirenTier, foregroundService, dateProvider, logger },
-      testStateBuilderProvider.getState(),
-    )
-    return store
+  const dependencies = {
+    sirenLookout,
+    sirenTier,
+    foregroundService,
+    dateProvider,
+    logger,
   }
+  let store: ReturnType<typeof createTestStore> | undefined
 
   return {
     given: {
@@ -46,13 +45,6 @@ export function blockingScheduleChangedFixture(
         testStateBuilderProvider.setState((builder) =>
           builder.withBlocklists(blocklists),
         )
-      },
-      storeIsCreated() {
-        createStoreWithState()
-      },
-      async storeIsCreatedAndInitialized() {
-        createStoreWithState()
-        await flushPromises()
       },
       nowIs({ hours, minutes }: { hours: number; minutes: number }) {
         const date = new Date()
@@ -77,27 +69,34 @@ export function blockingScheduleChangedFixture(
     },
     when: {
       async blockSessionsChange(sessions: BlockSession[]) {
-        const activeStore = store ?? createStoreWithState()
-        activeStore.dispatch(
-          setBlocklists(sessions.flatMap((s) => s.blocklists)),
+        store ??= createTestStore(
+          dependencies,
+          testStateBuilderProvider.getState(),
         )
-        activeStore.dispatch(setBlockSessions(sessions))
+        store.dispatch(setBlocklists(sessions.flatMap((s) => s.blocklists)))
+        store.dispatch(setBlockSessions(sessions))
         await flushPromises()
       },
       async blocklistIsUpdated(blocklist: Blocklist) {
-        const activeStore = store ?? createStoreWithState()
-        const state = activeStore.getState().blocklist
+        store ??= createTestStore(
+          dependencies,
+          testStateBuilderProvider.getState(),
+        )
+        const state = store.getState().blocklist
         const currentBlocklists = state.ids.map((id) => state.entities[id])
 
         const updatedBlocklists = currentBlocklists.map((b) =>
           b.id === blocklist.id ? blocklist : b,
         )
-        activeStore.dispatch(setBlocklists(updatedBlocklists))
+        store.dispatch(setBlocklists(updatedBlocklists))
         await flushPromises()
       },
       async unrelatedStateChanges() {
-        const activeStore = store ?? createStoreWithState()
-        activeStore.dispatch(setEndedAt('2024-01-01T12:00:00.000Z'))
+        store ??= createTestStore(
+          dependencies,
+          testStateBuilderProvider.getState(),
+        )
+        store.dispatch(setEndedAt('2024-01-01T12:00:00.000Z'))
         await flushPromises()
       },
     },

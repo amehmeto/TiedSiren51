@@ -18,7 +18,6 @@ describe('Feature: Blocking schedule changed listener', () => {
   describe('Scenario 1: Session created', () => {
     it('should sync blocked apps when new block session is created', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
-      fixture.given.storeIsCreated()
 
       await fixture.when.blockSessionsChange([
         buildBlockSession({
@@ -49,7 +48,6 @@ describe('Feature: Blocking schedule changed listener', () => {
           ],
         }),
       ])
-      fixture.given.storeIsCreated()
 
       await fixture.when.blockSessionsChange([])
 
@@ -58,7 +56,6 @@ describe('Feature: Blocking schedule changed listener', () => {
 
     it('should sync combined apps from multiple active sessions', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
-      fixture.given.storeIsCreated()
 
       await fixture.when.blockSessionsChange([
         buildBlockSession({
@@ -91,7 +88,6 @@ describe('Feature: Blocking schedule changed listener', () => {
 
     it('should deduplicate apps across multiple blocklists', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
-      fixture.given.storeIsCreated()
 
       await fixture.when.blockSessionsChange([
         buildBlockSession({
@@ -133,7 +129,6 @@ describe('Feature: Blocking schedule changed listener', () => {
           blocklists: [blocklist],
         }),
       ])
-      fixture.given.storeIsCreated()
 
       await fixture.when.blocklistIsUpdated({
         ...blocklist,
@@ -163,7 +158,6 @@ describe('Feature: Blocking schedule changed listener', () => {
           blocklists: [blocklist],
         }),
       ])
-      fixture.given.storeIsCreated()
 
       await fixture.when.blocklistIsUpdated({
         ...blocklist,
@@ -193,7 +187,6 @@ describe('Feature: Blocking schedule changed listener', () => {
           blocklists: [blocklist],
         }),
       ])
-      fixture.given.storeIsCreated()
 
       await fixture.when.blocklistIsUpdated({
         ...blocklist,
@@ -220,7 +213,6 @@ describe('Feature: Blocking schedule changed listener', () => {
           blocklists: [blocklist],
         }),
       ])
-      fixture.given.storeIsCreated()
 
       await fixture.when.blocklistIsUpdated({
         ...blocklist,
@@ -249,14 +241,11 @@ describe('Feature: Blocking schedule changed listener', () => {
           ],
         }),
       ])
-      fixture.given.storeIsCreated()
-
-      const initialCallCount = fixture.then.updateBlockingScheduleCallCount()
 
       await fixture.when.unrelatedStateChanges()
 
-      const finalCallCount = fixture.then.updateBlockingScheduleCallCount()
-      expect(finalCallCount).toBe(initialCallCount)
+      const callCount = fixture.then.updateBlockingScheduleCallCount()
+      expect(callCount).toBe(1) // Only initialization sync, not from unrelated change
     })
 
     it('should NOT sync when blocklist edited but no active session', async () => {
@@ -266,9 +255,6 @@ describe('Feature: Blocking schedule changed listener', () => {
       })
       fixture.given.nowIs({ hours: 14, minutes: 30 })
       fixture.given.initialBlocklists([blocklist])
-      fixture.given.storeIsCreated()
-
-      const initialCallCount = fixture.then.updateBlockingScheduleCallCount()
 
       await fixture.when.blocklistIsUpdated({
         ...blocklist,
@@ -278,8 +264,8 @@ describe('Feature: Blocking schedule changed listener', () => {
         },
       })
 
-      const finalCallCount = fixture.then.updateBlockingScheduleCallCount()
-      expect(finalCallCount).toBe(initialCallCount)
+      const callCount = fixture.then.updateBlockingScheduleCallCount()
+      expect(callCount).toBe(0) // No active session, no sync
     })
   })
 
@@ -299,7 +285,7 @@ describe('Feature: Blocking schedule changed listener', () => {
         }),
       ])
 
-      await fixture.given.storeIsCreatedAndInitialized()
+      await fixture.when.unrelatedStateChanges()
 
       fixture.then.blockingScheduleShouldContainApps(['com.facebook.katana'])
       fixture.then.foregroundServiceShouldBeStarted()
@@ -308,7 +294,8 @@ describe('Feature: Blocking schedule changed listener', () => {
 
     it('should NOT sync on initialization when no active sessions', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
-      fixture.given.storeIsCreated()
+
+      await fixture.when.unrelatedStateChanges()
 
       const callCount = fixture.then.updateBlockingScheduleCallCount()
       expect(callCount).toBe(0)
@@ -318,7 +305,6 @@ describe('Feature: Blocking schedule changed listener', () => {
   describe('Foreground service and watching lifecycle', () => {
     it('should start foreground service and watching when session starts', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
-      fixture.given.storeIsCreated()
 
       await fixture.when.blockSessionsChange([
         buildBlockSession({
@@ -350,7 +336,6 @@ describe('Feature: Blocking schedule changed listener', () => {
           ],
         }),
       ])
-      fixture.given.storeIsCreated()
 
       await fixture.when.blockSessionsChange([])
 
@@ -362,7 +347,6 @@ describe('Feature: Blocking schedule changed listener', () => {
   describe('Sessions outside active time window', () => {
     it('should not sync blocked apps for sessions outside active time', async () => {
       fixture.given.nowIs({ hours: 16, minutes: 30 })
-      fixture.given.storeIsCreated()
 
       await fixture.when.blockSessionsChange([
         buildBlockSession({
@@ -384,7 +368,6 @@ describe('Feature: Blocking schedule changed listener', () => {
     it('should log error when updateBlockingSchedule fails', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
       fixture.given.updateBlockingScheduleWillThrow()
-      fixture.given.storeIsCreated()
 
       await fixture.when.blockSessionsChange([
         buildBlockSession({

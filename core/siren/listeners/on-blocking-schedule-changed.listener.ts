@@ -22,7 +22,7 @@ export const onBlockingScheduleChangedListener = ({
   logger: Logger
 }): (() => void) => {
   // Creates a hash key from schedule to detect changes via string comparison
-  const getScheduleKey = (schedule: BlockingSchedule[]): string => {
+  const getScheduleHashKey = (schedule: BlockingSchedule[]): string => {
     return schedule
       .map((s) => {
         return [
@@ -68,11 +68,10 @@ export const onBlockingScheduleChangedListener = ({
     }
   }
 
-  // Sync initial state on app restart with active session
   const initialState = store.getState()
   const initialSchedule = selectBlockingSchedule(dateProvider, initialState)
   if (initialSchedule.length > 0) {
-    lastScheduleKey = getScheduleKey(initialSchedule)
+    lastScheduleKey = getScheduleHashKey(initialSchedule)
     void syncSchedule(initialSchedule, false, true)
   }
 
@@ -89,7 +88,7 @@ export const onBlockingScheduleChangedListener = ({
     lastBlocklistState = state.blocklist
 
     const schedule = selectBlockingSchedule(dateProvider, state)
-    const scheduleKey = getScheduleKey(schedule)
+    const scheduleKey = getScheduleHashKey(schedule)
 
     if (scheduleKey === lastScheduleKey) return
 
