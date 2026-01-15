@@ -224,6 +224,36 @@ describe('Feature: Blocking schedule changed listener', () => {
 
       fixture.then.blockingScheduleShouldContainApps(['com.facebook.katana'])
     })
+
+    it('should update schedule without toggling blocking lifecycle', async () => {
+      const blocklist = buildBlocklist({
+        id: 'blocklist-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.existingBlockSessions([
+        buildBlockSession({
+          id: 'session-1',
+          startedAt: '14:00',
+          endedAt: '15:00',
+          blocklists: [blocklist],
+        }),
+      ])
+
+      await fixture.when.updatingBlocklist({
+        ...blocklist,
+        sirens: {
+          ...blocklist.sirens,
+          android: [facebookAndroidSiren, tikTokAndroidSiren],
+        },
+      })
+
+      fixture.then.blockingScheduleShouldContainApps([
+        'com.facebook.katana',
+        'com.example.tiktok',
+      ])
+      fixture.then.blockingShouldRemainActiveWithoutToggling()
+    })
   })
 
   describe('Scenario 3: Blocklist edited without active session', () => {

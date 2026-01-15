@@ -106,6 +106,14 @@ export function blockingScheduleChangedFixture(
         expect(sirenLookout.isWatching).toBe(false)
         expect(foregroundService.isRunning()).toBe(false)
       },
+      blockingShouldRemainActiveWithoutToggling() {
+        expect(sirenLookout.isWatching).toBe(true)
+        expect(foregroundService.isRunning()).toBe(true)
+        expect(sirenLookout.startWatchingCallCount).toBe(1)
+        expect(foregroundService.startCallCount).toBe(1)
+        expect(sirenLookout.stopWatchingCallCount).toBe(0)
+        expect(foregroundService.stopCallCount).toBe(0)
+      },
       errorShouldBeLogged(expectedMessage: string) {
         const errorLogs = logger
           .getLogs()
