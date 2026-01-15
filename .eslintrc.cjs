@@ -523,6 +523,50 @@ module.exports = {
         ],
       },
     },
+    // Progressive enablement of no-nested-call-expressions rule
+    // Uncomment each block as violations are fixed
+    // See: docs/adr/conventions/no-nested-call-expressions.md
+    //
+    // {
+    //   files: ['**/*.fixture.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['core/**/listeners/*.ts'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['core/**/usecases/*.ts'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['infra/**/*.ts'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['ui/**/*.ts', 'ui/**/*.tsx'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['app/**/*.ts', 'app/**/*.tsx'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
     // JSONC files (tsconfig allows comments)
     {
       files: ['tsconfig.json', 'tsconfig.*.json'],
