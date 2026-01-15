@@ -26,6 +26,7 @@ function generateDeviceName() {
 type SelectListModalProps = Readonly<{
   isVisible: boolean
   listType: 'blocklists' | 'devices'
+  currentSelections: (Blocklist | Device)[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: (Blocklist | Device)[]) => void
   items: (Blocklist | Device)[]
@@ -34,6 +35,7 @@ type SelectListModalProps = Readonly<{
 export function SelectListModal({
   isVisible,
   listType,
+  currentSelections,
   onRequestClose,
   setFieldValue,
   items,
@@ -49,15 +51,14 @@ export function SelectListModal({
         ]
       : items
 
-  const [prevListType, setPrevListType] = useState(listType)
-  const [selectedItems, setSelectedItems] = useState<(Blocklist | Device)[]>(
-    listType === 'devices' ? [currentDevice] : [],
-  )
+  const [wasVisible, setWasVisible] = useState(isVisible)
+  const [selectedItems, setSelectedItems] =
+    useState<(Blocklist | Device)[]>(currentSelections)
 
-  if (listType !== prevListType) {
-    setPrevListType(listType)
-    setSelectedItems(listType === 'devices' ? [currentDevice] : [])
-  }
+  if (isVisible && !wasVisible) {
+    setWasVisible(true)
+    setSelectedItems(currentSelections)
+  } else if (!isVisible && wasVisible) setWasVisible(false)
 
   const saveList = () => {
     setFieldValue(listType, selectedItems)

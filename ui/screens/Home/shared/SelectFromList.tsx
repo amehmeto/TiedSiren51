@@ -50,6 +50,7 @@ export function SelectFromList({
       </View>
       <SelectListModal
         isVisible={isListModelOpened}
+        currentSelections={values[listType]}
         onRequestClose={() => setIsListModelOpened(!isListModelOpened)}
         setFieldValue={setFieldValue}
         listType={listType}
