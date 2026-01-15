@@ -21,10 +21,10 @@ type SelectTimeProps = Readonly<{
 }>
 
 export function SelectTime({
-  timeField = 'startedAt', // Default to 'startedAt'
+  timeField = 'startedAt',
   setIsTimePickerVisible,
   values,
-  isTimePickerVisible = false, // Default to false
+  isTimePickerVisible = false,
   setFieldValue,
   handleChange,
 }: SelectTimeProps) {
