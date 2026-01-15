@@ -134,6 +134,20 @@ ruleTester.run('prefer-inline-variable', rule, {
         setTimeout(fn, timeout)
       `,
     },
+    // Descriptive name for call result - should NOT report (semantic labeling)
+    {
+      code: `
+        const field = error.path.join('.')
+        validationErrors[field] = error.message
+      `,
+    },
+    // Descriptive name for call result - should NOT report
+    {
+      code: `
+        const userId = getUserId()
+        console.log(userId)
+      `,
+    },
   ],
 
   invalid: [

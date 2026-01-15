@@ -72,15 +72,11 @@ module.exports = {
     }
 
     /**
-     * Check if the variable name provides semantic meaning for a literal value
-     * e.g., `const minWidth = 160` - "minWidth" explains what 160 means
-     * JetBrains doesn't inline these because the name adds value
+     * Check if a variable name is descriptive (provides semantic meaning)
+     * Returns true for names like: field, minWidth, errorMessage, userId
+     * Returns false for: val, tmp, res, x, y
      */
-    function isDescriptiveNameForLiteral(varName, initNode) {
-      // Only applies to primitive literals
-      if (initNode.type !== 'Literal') return false
-      if (initNode.value === null) return false
-
+    function isDescriptiveName(varName) {
       // Short names (1-2 chars) like x, y, i, n are not descriptive
       if (varName.length <= 2) return false
 
@@ -99,11 +95,68 @@ module.exports = {
         'obj',
         'idx',
         'len',
+        'item',
+        'data',
+        'el',
+        'elem',
+        'element',
       ])
       if (nonDescriptiveNames.has(varName.toLowerCase())) return false
 
-      // If the name is descriptive (camelCase, contains meaningful words), don't inline
-      // This preserves semantic meaning for magic numbers/strings
+      return true
+    }
+
+    /**
+     * Check if the variable name provides semantic meaning for a literal value
+     * e.g., `const minWidth = 160` - "minWidth" explains what 160 means
+     * JetBrains doesn't inline these because the name adds value
+     */
+    function isDescriptiveNameForLiteral(varName, initNode) {
+      // Only applies to primitive literals
+      if (initNode.type !== 'Literal') return false
+      if (initNode.value === null) return false
+
+      return isDescriptiveName(varName)
+    }
+
+    /**
+     * Check if a descriptive variable name labels a method call result with DIFFERENT semantics
+     * e.g., `const field = error.path.join('.')` - "field" explains what the join produces
+     * But `const schedule = getSchedule()` - "schedule" is redundant with function name
+     *
+     * Only skip inlining when variable name differs from the function/method name
+     */
+    function isDescriptiveNameForCallResult(varName, initNode) {
+      if (initNode.type !== 'CallExpression') return false
+      if (!isDescriptiveName(varName)) return false
+
+      // Extract the function/method name from the call
+      let funcName = null
+      if (initNode.callee.type === 'Identifier') {
+        funcName = initNode.callee.name
+      } else if (initNode.callee.type === 'MemberExpression') {
+        if (initNode.callee.property.type === 'Identifier') {
+          funcName = initNode.callee.property.name
+        }
+      }
+
+      if (!funcName) return true // Can't determine, be conservative
+
+      // Normalize: remove common prefixes (get, set, create, build, fetch, load)
+      const prefixes = ['get', 'set', 'create', 'build', 'fetch', 'load', 'find', 'select']
+      let normalizedFunc = funcName
+      for (const prefix of prefixes) {
+        if (funcName.toLowerCase().startsWith(prefix)) {
+          normalizedFunc = funcName.slice(prefix.length)
+          break
+        }
+      }
+
+      // If variable name matches the (normalized) function name, it's redundant - allow inlining
+      if (varName.toLowerCase() === normalizedFunc.toLowerCase()) return false
+      if (varName.toLowerCase() === funcName.toLowerCase()) return false
+
+      // Variable name differs from function name - it adds semantic value, don't inline
       return true
     }
 
@@ -237,6 +290,9 @@ module.exports = {
 
         // Don't inline descriptive names for literals (magic numbers/strings)
         if (isDescriptiveNameForLiteral(varName, decl.init)) return
+
+        // Don't inline descriptive names for call results (semantic labeling)
+        if (isDescriptiveNameForCallResult(varName, decl.init)) return
 
         const usage = references[0]
 

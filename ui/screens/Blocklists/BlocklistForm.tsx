@@ -144,7 +144,7 @@ export function BlocklistForm({
       const scenes: Record<BlocklistTabKey, () => React.JSX.Element> = {
         apps: () => (
           <AppsSelectionScene
-            data={selectableSirens.android}
+            androidApps={selectableSirens.android}
             toggleAppSiren={toggleAppSiren}
             isSirenSelected={isSirenSelected}
           />
@@ -196,7 +196,8 @@ export function BlocklistForm({
         if (e instanceof z.ZodError) {
           const validationErrors: ErrorMessages = {}
           e.errors.forEach((error) => {
-            validationErrors[error.path.join('.')] = error.message
+            const field = error.path.join('.')
+            validationErrors[field] = error.message
           })
           setErrors(validationErrors)
         }
