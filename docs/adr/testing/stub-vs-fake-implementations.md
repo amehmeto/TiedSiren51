@@ -350,6 +350,44 @@ export const createTestStore = (
 }
 ```
 
+### Async Behavior and flushPromises()
+
+When testing listeners that call async methods on test doubles, you might think you need `flushPromises()` to wait for async operations. However, this is often unnecessary.
+
+**Key insight**: Async functions run synchronously until their first `await`. If your test double's async method has no internal `await` statements, its synchronous code runs immediately.
+
+**Example - No flushPromises needed**:
+```typescript
+// In-memory implementation with async signature but synchronous body
+export class InMemorySirenTier implements SirenTier {
+  schedules: BlockingSchedule[] = []
+
+  async updateBlockingSchedule(schedule: BlockingSchedule[]): Promise<void> {
+    this.schedules = schedule  // ← Runs synchronously!
+  }
+}
+
+// Listener calls it with void (fire-and-forget)
+void sirenTier.updateBlockingSchedule(schedule)
+
+// Test assertion works immediately - no flushPromises needed!
+expect(sirenTier.schedules).toEqual(expectedSchedule)
+```
+
+**Why it works**: Even though `updateBlockingSchedule` is `async`, it has no `await` statements inside. The body runs synchronously before returning a resolved Promise. By the time assertions run, `this.schedules` is already set.
+
+**When flushPromises IS needed**:
+```typescript
+async updateBlockingSchedule(schedule: BlockingSchedule[]): Promise<void> {
+  await this.httpClient.post('/api/schedule', schedule)  // ← Real async operation
+  this.schedules = schedule
+}
+```
+
+Here, `this.schedules` is set AFTER the await, so tests need `flushPromises()` to let the microtask queue drain.
+
+**Rule of thumb**: Only use `flushPromises()` when your test double has real async operations (network, timers, file I/O). In-memory implementations with synchronous bodies don't need it.
+
 ### Related ADRs
 - [Dependency Injection Pattern](../core/dependency-injection-pattern.md)
 - [Test Store Factory](test-store-factory.md)

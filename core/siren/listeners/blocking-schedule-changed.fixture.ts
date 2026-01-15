@@ -11,8 +11,6 @@ import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
 import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 
-const flushPromises = () => new Promise((resolve) => setTimeout(resolve, 0))
-
 export function blockingScheduleChangedFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ) {
@@ -62,7 +60,6 @@ export function blockingScheduleChangedFixture(
         )
         store.dispatch(setBlocklists(sessions.flatMap((s) => s.blocklists)))
         store.dispatch(setBlockSessions(sessions))
-        await flushPromises()
       },
       async updatingBlocklist(blocklist: Blocklist) {
         store = createTestStore(
@@ -76,7 +73,6 @@ export function blockingScheduleChangedFixture(
           b.id === blocklist.id ? blocklist : b,
         )
         store.dispatch(setBlocklists(updatedBlocklists))
-        await flushPromises()
       },
     },
     then: {
