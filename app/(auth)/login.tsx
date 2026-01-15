@@ -126,7 +126,7 @@ export default function LoginScreen() {
           onPress={handleSignIn}
           text={isLoading ? 'LOGGING IN...' : 'LOG IN'}
           style={styles.button}
-          disabled={isLoading}
+          isDisabled={isLoading}
         />
         {error && (
           <Text

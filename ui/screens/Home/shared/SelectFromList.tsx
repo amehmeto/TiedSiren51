@@ -7,12 +7,7 @@ import { T } from '@/ui/design-system/theme'
 import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { SelectListModal } from '@/ui/screens/Home/shared/SelectListModal'
 
-export function SelectFromList({
-  values,
-  setFieldValue,
-  listType,
-  items,
-}: Readonly<{
+type SelectFromListProps = Readonly<{
   listType: 'blocklists' | 'devices'
   values: Session
   setFieldValue: (
@@ -21,7 +16,14 @@ export function SelectFromList({
     shouldValidate?: boolean,
   ) => Promise<void | FormikErrors<Session>>
   items: (Blocklist | Device)[]
-}>) {
+}>
+
+export function SelectFromList({
+  values,
+  setFieldValue,
+  listType,
+  items,
+}: SelectFromListProps) {
   const [isListModelOpened, setIsListModelOpened] = useState<boolean>(false)
 
   function selectItemsFrom(
@@ -35,18 +37,19 @@ export function SelectFromList({
 
   const capitalizedListParam =
     listType.charAt(0).toUpperCase() + listType.slice(1)
-  const selectedItems = selectItemsFrom(values[listType], listType)
 
   return (
     <>
       <View style={styles.param}>
         <Text style={styles.label}>{capitalizedListParam}</Text>
         <Pressable onPress={() => setIsListModelOpened(true)}>
-          <Text style={styles.option}>{selectedItems}</Text>
+          <Text style={styles.option}>
+            {selectItemsFrom(values[listType], listType)}
+          </Text>
         </Pressable>
       </View>
       <SelectListModal
-        visible={isListModelOpened}
+        isVisible={isListModelOpened}
         list={values[listType]}
         onRequestClose={() => setIsListModelOpened(!isListModelOpened)}
         setFieldValue={setFieldValue}

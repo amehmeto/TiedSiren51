@@ -28,15 +28,17 @@ type TiedSMenu = {
   action: () => void
 }
 
-function TiedSMenuOption(props: {
+type TiedSMenuOptionProps = {
   optionName: TiedSMenu['name']
   iconName: TiedSMenu['iconName']
-}) {
+}
+
+function TiedSMenuOption({ optionName, iconName }: TiedSMenuOptionProps) {
   return (
-    <MenuOption value={props.optionName} style={styles.menuOption}>
-      <Text style={styles.menuOptionText}>{props.optionName}</Text>
+    <MenuOption value={optionName} style={styles.menuOption}>
+      <Text style={styles.menuOptionText}>{optionName}</Text>
       <Ionicons
-        name={props.iconName}
+        name={iconName}
         size={T.icon.size.large}
         color={T.color.white}
       />
@@ -44,23 +46,24 @@ function TiedSMenuOption(props: {
   )
 }
 
-export function ThreeDotMenu(props: {
+type ThreeDotMenuProps = {
   menuOptions: TiedSMenu[]
   style?: StyleProp<ViewStyle>
-}) {
+}
+
+export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
   const { width: windowWidth } = useWindowDimensions()
 
   const menuWidth = useMemo(() => {
     const fortyPercent = windowWidth * 0.4
     const seventyPercent = windowWidth * 0.7
-    const minWidth = 160
 
-    const lowerBound = Math.max(fortyPercent, minWidth)
+    const lowerBound = Math.max(fortyPercent, 160)
     return Math.min(lowerBound, seventyPercent)
   }, [windowWidth])
 
   const selectMenuOption = (optionName: TiedSMenu['name']) => {
-    const selectedOption = props.menuOptions.find(
+    const selectedOption = menuOptions.find(
       (option) => option.name === optionName,
     )
     if (!selectedOption) throw new Error('Invalid menu option')
@@ -91,7 +94,7 @@ export function ThreeDotMenu(props: {
   )
 
   return (
-    <Menu onSelect={selectMenuOption} style={props.style}>
+    <Menu onSelect={selectMenuOption} style={style}>
       <MenuTrigger>
         <Ionicons
           name={'ellipsis-horizontal'}
@@ -105,7 +108,7 @@ export function ThreeDotMenu(props: {
         }}
       >
         <TiedSCard style={styles.menuOptions}>
-          {props.menuOptions.map((option) => (
+          {menuOptions.map((option) => (
             <TiedSMenuOption
               key={option.name}
               optionName={option.name}

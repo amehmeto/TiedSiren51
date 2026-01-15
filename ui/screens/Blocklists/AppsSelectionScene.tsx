@@ -4,24 +4,27 @@ import { FlatList } from 'react-native'
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
 
-export function AppsSelectionScene(props: {
+type AppsSelectionSceneProps = {
   data: AndroidSiren[]
   toggleAppSiren: (sirenType: SirenType.ANDROID, app: AndroidSiren) => void
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
-}) {
+}
+
+export function AppsSelectionScene({
+  data,
+  toggleAppSiren,
+  isSirenSelected,
+}: AppsSelectionSceneProps) {
   return (
     <FlatList
-      data={props.data}
+      data={data}
       keyExtractor={(item) => item.packageName}
       renderItem={({ item }) => (
         <SelectableSirenCard
           sirenType={SirenType.ANDROID}
           siren={item}
-          onPress={() => props.toggleAppSiren(SirenType.ANDROID, item)}
-          isSelected={props.isSirenSelected(
-            SirenType.ANDROID,
-            item.packageName,
-          )}
+          onPress={() => toggleAppSiren(SirenType.ANDROID, item)}
+          isSelected={isSirenSelected(SirenType.ANDROID, item.packageName)}
         />
       )}
     />

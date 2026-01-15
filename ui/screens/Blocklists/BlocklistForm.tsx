@@ -196,8 +196,7 @@ export function BlocklistForm({
         if (e instanceof z.ZodError) {
           const validationErrors: ErrorMessages = {}
           e.errors.forEach((error) => {
-            const field = error.path.join('.')
-            validationErrors[field] = error.message
+            validationErrors[error.path.join('.')] = error.message
           })
           setErrors(validationErrors)
         }

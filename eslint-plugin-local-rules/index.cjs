@@ -43,6 +43,7 @@ const requireNamedRegex = require('../eslint-rules/require-named-regex.cjs')
 const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressions.cjs')
 const preferArrayDestructuring = require('../eslint-rules/prefer-array-destructuring.cjs')
 const preferInlineVariable = require('../eslint-rules/prefer-inline-variable.cjs')
+const reactPropsDestructuring = require('../eslint-rules/react-props-destructuring.cjs')
 
 module.exports = {
   rules: {
@@ -87,5 +88,6 @@ module.exports = {
     'no-nested-call-expressions': noNestedCallExpressions,
     'prefer-array-destructuring': preferArrayDestructuring,
     'prefer-inline-variable': preferInlineVariable,
+    'react-props-destructuring': reactPropsDestructuring,
   },
 }

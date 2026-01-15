@@ -14,18 +14,18 @@ import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 import { RoundBlueDot } from '@/ui/screens/Home/HomeScreen/RoundBlueDot'
 import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 
-export function SessionCard(
-  props: Readonly<{
-    session: {
-      id: string
-      name: string
-      minutesLeft: string
-      blocklists: number
-      devices: number
-    }
-    type: SessionType
-  }>,
-) {
+type SessionCardProps = Readonly<{
+  session: {
+    id: string
+    name: string
+    minutesLeft: string
+    blocklists: number
+    devices: number
+  }
+  type: SessionType
+}>
+
+export function SessionCard({ session, type }: SessionCardProps) {
   const dispatch = useDispatch<AppDispatch>()
 
   const router = useRouter()
@@ -47,7 +47,7 @@ export function SessionCard(
       action: () => {
         router.push({
           pathname: '/(tabs)/home/edit-block-session/[sessionId]',
-          params: { sessionId: props.session.id },
+          params: { sessionId: session.id },
         })
       },
     },
@@ -62,7 +62,7 @@ export function SessionCard(
       name: 'Delete',
       iconName: 'trash-outline' as const,
       action: () => {
-        dispatch(deleteBlockSession(props.session.id))
+        dispatch(deleteBlockSession(session.id))
       },
     },
   ]
@@ -73,12 +73,12 @@ export function SessionCard(
         onPress={() => {
           router.push({
             pathname: '/(tabs)/home/edit-block-session/[sessionId]',
-            params: { sessionId: props.session.id },
+            params: { sessionId: session.id },
           })
         }}
       >
         <TiedSCard>
-          {props.type === SessionType.ACTIVE ? (
+          {type === SessionType.ACTIVE ? (
             <RoundBlueDot />
           ) : (
             <MaterialCommunityIcons
@@ -92,11 +92,10 @@ export function SessionCard(
             />
           )}
           <View>
-            <Text style={styles.sessionName}>{props.session.name}</Text>
-            <Text style={styles.minutesLeft}>{props.session.minutesLeft}</Text>
+            <Text style={styles.sessionName}>{session.name}</Text>
+            <Text style={styles.minutesLeft}>{session.minutesLeft}</Text>
             <Text style={styles.devices}>
-              {props.session.devices} device, {props.session.blocklists}{' '}
-              blocklist
+              {session.devices} device, {session.blocklists} blocklist
             </Text>
           </View>
           <ThreeDotMenu menuOptions={sessionCardMenu} style={styles.menu} />
@@ -104,9 +103,9 @@ export function SessionCard(
       </Pressable>
 
       <TextInputModal
-        visible={isRenameModalVisible}
+        isVisible={isRenameModalVisible}
         label={'Rename block session'}
-        initialText={props.session.name}
+        initialText={session.name}
         onRequestClose={() => {
           setIsRenameModalVisible(false)
         }}
@@ -114,16 +113,14 @@ export function SessionCard(
           setIsRenameModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(
-            renameBlockSession({ id: props.session.id, name: inputText }),
-          )
+          dispatch(renameBlockSession({ id: session.id, name: inputText }))
           setIsRenameModalVisible(false)
         }}
       />
       <TextInputModal
-        visible={isDuplicateModalVisible}
+        isVisible={isDuplicateModalVisible}
         label={'Choose the name of the duplicated block session'}
-        initialText={'Copy of "' + props.session.name + '"'}
+        initialText={'Copy of "' + session.name + '"'}
         onRequestClose={() => {
           setIsDuplicateModalVisible(false)
         }}
@@ -131,9 +128,7 @@ export function SessionCard(
           setIsDuplicateModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(
-            duplicateBlockSession({ id: props.session.id, name: inputText }),
-          )
+          dispatch(duplicateBlockSession({ id: session.id, name: inputText }))
           setIsDuplicateModalVisible(false)
         }}
       />

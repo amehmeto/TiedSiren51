@@ -32,13 +32,15 @@ const defaultSession: Session = {
   blockingConditions: [],
 }
 
+type BlockSessionFormProps = Readonly<{
+  mode: 'create' | 'edit'
+  session?: Session
+}>
+
 export function BlockSessionForm({
   session = defaultSession,
   mode,
-}: Readonly<{
-  mode: 'create' | 'edit'
-  session?: Session
-}>) {
+}: BlockSessionFormProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 

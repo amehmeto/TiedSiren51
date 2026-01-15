@@ -1,18 +1,23 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
 
-export function WebTimePicker(
-  props: Readonly<{
-    chosenTime: string
-    setTime: (chosenTime: string) => void
-    handleChange: (field: string) => void
-    setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
-  }>,
-) {
+type WebTimePickerProps = Readonly<{
+  chosenTime: string
+  setTime: (chosenTime: string) => void
+  handleChange: (field: string) => void
+  setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
+}>
+
+export function WebTimePicker({
+  chosenTime,
+  setTime,
+  handleChange,
+  setIsTimePickerVisible,
+}: WebTimePickerProps) {
   const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const time = event.target.value
-    props.handleChange(time)
-    props.setTime(time)
+    handleChange(time)
+    setTime(time)
   }
 
   return (
@@ -20,7 +25,7 @@ export function WebTimePicker(
       <input
         aria-label={'Time'}
         type={'time'}
-        value={props.chosenTime}
+        value={chosenTime}
         onChange={handleTimeChange}
         required
         pattern="[0-2][0-9]:[0-5][0-9]"
@@ -28,8 +33,8 @@ export function WebTimePicker(
       <button
         type={'button'}
         onClick={() => {
-          props.setTime(props.chosenTime)
-          props.setIsTimePickerVisible(false)
+          setTime(chosenTime)
+          setIsTimePickerVisible(false)
         }}
       >
         {/* eslint-disable-next-line react-native/no-raw-text -- Web-only component using HTML button */}

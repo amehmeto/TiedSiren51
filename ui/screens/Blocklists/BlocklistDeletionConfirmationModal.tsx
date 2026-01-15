@@ -4,27 +4,36 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
 
-export function BlocklistDeletionConfirmationModal(props: {
-  visible: boolean
+type BlocklistDeletionConfirmationModalProps = Readonly<{
+  isVisible: boolean
   blocklistName: string
   activeSessions: BlockSession[]
   onRequestClose: () => void
   onCancel: () => void
   onConfirm: () => void
-}) {
+}>
+
+export function BlocklistDeletionConfirmationModal({
+  isVisible,
+  blocklistName,
+  activeSessions,
+  onRequestClose,
+  onCancel,
+  onConfirm,
+}: BlocklistDeletionConfirmationModalProps) {
   return (
     <TiedSModal
       style={styles.modal}
-      isVisible={props.visible}
-      onRequestClose={props.onRequestClose}
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
     >
       <Text style={styles.title}>Delete Blocklist?</Text>
       <Text style={styles.warningText}>
-        The blocklist "{props.blocklistName}" is currently used by the following
+        The blocklist "{blocklistName}" is currently used by the following
         active sessions:
       </Text>
       <View style={styles.sessionList}>
-        {props.activeSessions.map((session) => (
+        {activeSessions.map((session) => (
           <Text key={session.id} style={styles.sessionItem}>
             • {session.name}
           </Text>
@@ -37,12 +46,12 @@ export function BlocklistDeletionConfirmationModal(props: {
       <View style={styles.buttonContainer}>
         <TiedSButton
           style={styles.cancelButton}
-          onPress={props.onCancel}
+          onPress={onCancel}
           text={'Cancel'}
         />
         <TiedSButton
           style={styles.confirmButton}
-          onPress={props.onConfirm}
+          onPress={onConfirm}
           text={'Delete'}
         />
       </View>

@@ -4,29 +4,35 @@ import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 
-export function BlocksPreviewCard(
-  props: Readonly<{
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-ignore
-    IconTag: React.ComponentType<IconProps<any>> // eslint-disable-line @typescript-eslint/no-explicit-any
-    iconName: string
-    platform: 'Android' | 'iOS' | 'web' | 'macOS' | 'Windows' | 'Linux'
-    blocksNumber: number
-    onPress: () => void
-  }>,
-) {
+type BlocksPreviewCardProps = Readonly<{
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore
+  IconTag: React.ComponentType<IconProps<any>> // eslint-disable-line @typescript-eslint/no-explicit-any
+  iconName: string
+  platform: 'Android' | 'iOS' | 'web' | 'macOS' | 'Windows' | 'Linux'
+  blocksNumber: number
+  onPress: () => void
+}>
+
+export function BlocksPreviewCard({
+  IconTag,
+  iconName,
+  platform,
+  blocksNumber,
+  onPress,
+}: BlocksPreviewCardProps) {
   return (
-    <Pressable onPress={props.onPress}>
+    <Pressable onPress={onPress}>
       <TiedSCard>
-        <props.IconTag
-          name={props.iconName}
+        <IconTag
+          name={iconName}
           color={T.color.text}
           size={T.component.menuIcon}
           style={styles.icon}
         />
         <View style={styles.container}>
-          <Text style={styles.blocksNumber}>{props.blocksNumber} blocks</Text>
-          <Text style={styles.platform}>{props.platform}</Text>
+          <Text style={styles.blocksNumber}>{blocksNumber} blocks</Text>
+          <Text style={styles.platform}>{platform}</Text>
         </View>
       </TiedSCard>
     </Pressable>

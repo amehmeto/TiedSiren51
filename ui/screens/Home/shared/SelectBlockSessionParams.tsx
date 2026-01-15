@@ -16,11 +16,13 @@ import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlocking
 import { SelectFromList } from '@/ui/screens/Home/shared/SelectFromList'
 import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
 
+type SelectBlockSessionParamsProps = {
+  form: FormikProps<Session>
+}
+
 export function SelectBlockSessionParams({
   form,
-}: {
-  form: FormikProps<Session>
-}) {
+}: SelectBlockSessionParamsProps) {
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
