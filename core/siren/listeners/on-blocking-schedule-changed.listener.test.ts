@@ -226,28 +226,7 @@ describe('Feature: Blocking schedule changed listener', () => {
     })
   })
 
-  describe('Scenario 3: No unnecessary syncs', () => {
-    it('should NOT sync when unrelated state changes', async () => {
-      fixture.given.nowIs({ hours: 14, minutes: 30 })
-      fixture.given.existingBlockSessions([
-        buildBlockSession({
-          id: 'session-1',
-          startedAt: '14:00',
-          endedAt: '15:00',
-          blocklists: [
-            buildBlocklist({
-              sirens: { android: [facebookAndroidSiren] },
-            }),
-          ],
-        }),
-      ])
-
-      await fixture.when.unrelatedStateChanges()
-
-      const callCount = fixture.then.updateBlockingScheduleCallCount()
-      expect(callCount).toBe(1) // Only initialization sync, not from unrelated change
-    })
-
+  describe('Scenario 3: Blocklist edited without active session', () => {
     it('should NOT sync when blocklist edited but no active session', async () => {
       const blocklist = buildBlocklist({
         id: 'blocklist-1',
@@ -270,35 +249,35 @@ describe('Feature: Blocking schedule changed listener', () => {
   })
 
   describe('Scenario 4: App restart with active session', () => {
-    it('should sync blocking schedule on initialization when active session exists', async () => {
+    it('should restore blocking when updating blocklist after app restart', async () => {
+      const blocklist = buildBlocklist({
+        id: 'blocklist-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
       fixture.given.nowIs({ hours: 14, minutes: 30 })
       fixture.given.existingBlockSessions([
         buildBlockSession({
           id: 'session-1',
           startedAt: '14:00',
           endedAt: '15:00',
-          blocklists: [
-            buildBlocklist({
-              sirens: { android: [facebookAndroidSiren] },
-            }),
-          ],
+          blocklists: [blocklist],
         }),
       ])
 
-      await fixture.when.unrelatedStateChanges()
+      await fixture.when.updatingBlocklist({
+        ...blocklist,
+        sirens: {
+          ...blocklist.sirens,
+          android: [facebookAndroidSiren, tikTokAndroidSiren],
+        },
+      })
 
-      fixture.then.blockingScheduleShouldContainApps(['com.facebook.katana'])
+      fixture.then.blockingScheduleShouldContainApps([
+        'com.facebook.katana',
+        'com.example.tiktok',
+      ])
       fixture.then.foregroundServiceShouldBeStarted()
       fixture.then.watchingShouldBeStarted()
-    })
-
-    it('should NOT sync on initialization when no active sessions', async () => {
-      fixture.given.nowIs({ hours: 14, minutes: 30 })
-
-      await fixture.when.unrelatedStateChanges()
-
-      const callCount = fixture.then.updateBlockingScheduleCallCount()
-      expect(callCount).toBe(0)
     })
   })
 

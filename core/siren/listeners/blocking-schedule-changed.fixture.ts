@@ -5,7 +5,6 @@ import { BlockSession } from '@/core/block-session/block-session'
 import { setBlockSessions } from '@/core/block-session/block-session.slice'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { setBlocklists } from '@/core/blocklist/blocklist.slice'
-import { setEndedAt } from '@/core/strict-mode/strict-mode.slice'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemoryForegroundService } from '@/infra/foreground-service/in-memory.foreground.service'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
@@ -77,14 +76,6 @@ export function blockingScheduleChangedFixture(
           b.id === blocklist.id ? blocklist : b,
         )
         store.dispatch(setBlocklists(updatedBlocklists))
-        await flushPromises()
-      },
-      async unrelatedStateChanges() {
-        store = createTestStore(
-          dependencies,
-          testStateBuilderProvider.getState(),
-        )
-        store.dispatch(setEndedAt('2024-01-01T12:00:00.000Z'))
         await flushPromises()
       },
     },

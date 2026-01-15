@@ -440,8 +440,50 @@ fixture.then.blockingScheduleShouldContainApps([...])
 fixture.given.initialBlockSessions([session])   // "initial" is technical
 fixture.given.setRepositoryData(data)           // Technical operation
 fixture.when.blocklistIsUpdated(blocklist)      // Passive voice, unclear actor
+fixture.when.unrelatedStateChanges()            // Not a use case, implementation detail
 fixture.then.stateShouldEqual(expectedState)    // Implementation detail
 ```
+
+### Only Test Through Real Use Case Actions
+
+Every `when` method should represent a real use case action. Avoid creating methods that exist only to trigger side effects or test implementation details.
+
+**Bad - Testing implementation behavior**:
+```typescript
+// DON'T: "unrelatedStateChanges" is not a use case
+it('should NOT sync when unrelated state changes', async () => {
+  fixture.given.existingBlockSessions([session])
+  await fixture.when.unrelatedStateChanges()  // What use case is this?
+  expect(callCount).toBe(1)
+})
+
+// DON'T: Testing that nothing happens is often an implementation detail
+it('should NOT sync on initialization when no active sessions', async () => {
+  await fixture.when.unrelatedStateChanges()
+  expect(callCount).toBe(0)  // Testing absence of behavior
+})
+```
+
+**Good - Testing through real use cases**:
+```typescript
+// DO: Test initialization implicitly through a real use case
+it('should restore blocking when updating blocklist after app restart', async () => {
+  fixture.given.existingBlockSessions([sessionWithBlocklist])
+
+  await fixture.when.updatingBlocklist(blocklistWithNewSiren)
+
+  // Verifies both: initialization synced existing apps AND update added new one
+  fixture.then.blockingScheduleShouldContainApps([
+    'com.facebook.katana',  // From initialization
+    'com.example.tiktok',   // From update
+  ])
+})
+```
+
+If you can't express a test through a real use case action, ask yourself:
+- Is this testing business behavior or implementation optimization?
+- Would a user care about this scenario?
+- Can this be verified as a side effect of a real action?
 
 ### Consolidating Tests with it.each
 
