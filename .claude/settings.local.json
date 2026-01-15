@@ -132,6 +132,7 @@
       "mcp__sentry__find_organizations",
       "mcp__sentry__get_issue_details",
       "mcp__sentry__search_events",
+      "mcp__sentry__search_issue_events",
       "mcp__sentry__search_issues"
     ],
     "deny": [
