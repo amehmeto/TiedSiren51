@@ -72,6 +72,42 @@ module.exports = {
     }
 
     /**
+     * Check if the variable name provides semantic meaning for a literal value
+     * e.g., `const minWidth = 160` - "minWidth" explains what 160 means
+     * JetBrains doesn't inline these because the name adds value
+     */
+    function isDescriptiveNameForLiteral(varName, initNode) {
+      // Only applies to primitive literals
+      if (initNode.type !== 'Literal') return false
+      if (initNode.value === null) return false
+
+      // Short names (1-2 chars) like x, y, i, n are not descriptive
+      if (varName.length <= 2) return false
+
+      // Common non-descriptive names that can be inlined
+      const nonDescriptiveNames = new Set([
+        'val',
+        'value',
+        'tmp',
+        'temp',
+        'num',
+        'str',
+        'res',
+        'ret',
+        'result',
+        'arr',
+        'obj',
+        'idx',
+        'len',
+      ])
+      if (nonDescriptiveNames.has(varName.toLowerCase())) return false
+
+      // If the name is descriptive (camelCase, contains meaningful words), don't inline
+      // This preserves semantic meaning for magic numbers/strings
+      return true
+    }
+
+    /**
      * Check if the initialization spans multiple lines
      * Multi-line inits should not be inlined as it hurts readability
      */
@@ -198,6 +234,9 @@ module.exports = {
         const references = getReferences(node)
 
         if (references.length !== 1) return
+
+        // Don't inline descriptive names for literals (magic numbers/strings)
+        if (isDescriptiveNameForLiteral(varName, decl.init)) return
 
         const usage = references[0]
 

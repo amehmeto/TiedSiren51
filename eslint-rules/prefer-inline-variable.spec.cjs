@@ -113,6 +113,27 @@ ruleTester.run('prefer-inline-variable', rule, {
         console.log(result)
       `,
     },
+    // Descriptive name for numeric literal - should NOT report (JetBrains heuristic)
+    {
+      code: `
+        const minWidth = 160
+        const bound = Math.max(other, minWidth)
+      `,
+    },
+    // Descriptive name for string literal - should NOT report
+    {
+      code: `
+        const errorMessage = 'Something went wrong'
+        throw new Error(errorMessage)
+      `,
+    },
+    // Descriptive name for timeout - should NOT report
+    {
+      code: `
+        const timeout = 5000
+        setTimeout(fn, timeout)
+      `,
+    },
   ],
 
   invalid: [
@@ -139,6 +160,22 @@ console.log(arr)`,
       errors: [{ messageId: 'preferInline', data: { name: 'arr' } }],
       output: `
 console.log([1, 2, 3])`,
+    },
+    // Short name (2 chars) for literal - SHOULD inline
+    {
+      code: `const ms = 1000
+setTimeout(fn, ms)`,
+      errors: [{ messageId: 'preferInline', data: { name: 'ms' } }],
+      output: `
+setTimeout(fn, 1000)`,
+    },
+    // Non-descriptive name for literal - SHOULD inline
+    {
+      code: `const val = 42
+console.log(val)`,
+      errors: [{ messageId: 'preferInline', data: { name: 'val' } }],
+      output: `
+console.log(42)`,
     },
   ],
 })

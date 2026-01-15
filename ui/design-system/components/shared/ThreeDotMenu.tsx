@@ -57,7 +57,6 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
   const menuWidth = useMemo(() => {
     const fortyPercent = windowWidth * 0.4
     const seventyPercent = windowWidth * 0.7
-    // eslint-disable-next-line local-rules/prefer-inline-variable -- keep for readability
     const minWidth = 160
 
     const lowerBound = Math.max(fortyPercent, minWidth)
