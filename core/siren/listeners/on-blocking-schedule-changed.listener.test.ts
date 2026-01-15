@@ -19,7 +19,7 @@ describe('Feature: Blocking schedule changed listener', () => {
     it('should sync blocked apps when new block session is created', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
 
-      await fixture.when.creatingBlockSessions([
+      await fixture.when.creatingBlockSession([
         buildBlockSession({
           startedAt: '14:00',
           endedAt: '15:00',
@@ -49,7 +49,7 @@ describe('Feature: Blocking schedule changed listener', () => {
         }),
       ])
 
-      await fixture.when.creatingBlockSessions([])
+      await fixture.when.creatingBlockSession([])
 
       fixture.then.blockingScheduleShouldBeEmpty()
     })
@@ -57,7 +57,7 @@ describe('Feature: Blocking schedule changed listener', () => {
     it('should sync combined apps from multiple active sessions', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
 
-      await fixture.when.creatingBlockSessions([
+      await fixture.when.creatingBlockSession([
         buildBlockSession({
           id: 'session-1',
           startedAt: '14:00',
@@ -89,7 +89,7 @@ describe('Feature: Blocking schedule changed listener', () => {
     it('should deduplicate apps across multiple blocklists', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
 
-      await fixture.when.creatingBlockSessions([
+      await fixture.when.creatingBlockSession([
         buildBlockSession({
           id: 'session-1',
           startedAt: '14:00',
@@ -115,7 +115,7 @@ describe('Feature: Blocking schedule changed listener', () => {
   })
 
   describe('Scenario 2: Blocklist edited while session active', () => {
-    it('should re-sync when android app added to blocklist during active session', async () => {
+    it('should sync when android app added to blocklist during active session', async () => {
       const blocklist = buildBlocklist({
         id: 'blocklist-1',
         sirens: { android: [facebookAndroidSiren] },
@@ -144,7 +144,7 @@ describe('Feature: Blocking schedule changed listener', () => {
       ])
     })
 
-    it('should re-sync when website added to blocklist during active session', async () => {
+    it('should sync when website added to blocklist during active session', async () => {
       const blocklist = buildBlocklist({
         id: 'blocklist-1',
         sirens: { websites: ['facebook.com'] },
@@ -173,7 +173,7 @@ describe('Feature: Blocking schedule changed listener', () => {
       ])
     })
 
-    it('should re-sync when keyword added to blocklist during active session', async () => {
+    it('should sync when keyword added to blocklist during active session', async () => {
       const blocklist = buildBlocklist({
         id: 'blocklist-1',
         sirens: { keywords: ['gaming'] },
@@ -199,7 +199,7 @@ describe('Feature: Blocking schedule changed listener', () => {
       fixture.then.blockingScheduleShouldContainKeywords(['gaming', 'social'])
     })
 
-    it('should re-sync when siren removed from blocklist during active session', async () => {
+    it('should sync when siren removed from blocklist during active session', async () => {
       const blocklist = buildBlocklist({
         id: 'blocklist-1',
         sirens: { android: [facebookAndroidSiren, tikTokAndroidSiren] },
@@ -283,7 +283,7 @@ describe('Feature: Blocking schedule changed listener', () => {
     it('should activate blocking when session starts', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
 
-      await fixture.when.creatingBlockSessions([
+      await fixture.when.creatingBlockSession([
         buildBlockSession({
           startedAt: '14:00',
           endedAt: '15:00',
@@ -313,7 +313,7 @@ describe('Feature: Blocking schedule changed listener', () => {
         }),
       ])
 
-      await fixture.when.creatingBlockSessions([])
+      await fixture.when.creatingBlockSession([])
 
       fixture.then.blockingShouldBeInactive()
     })
@@ -323,7 +323,7 @@ describe('Feature: Blocking schedule changed listener', () => {
     it('should not sync blocked apps for sessions outside active time', async () => {
       fixture.given.nowIs({ hours: 16, minutes: 30 })
 
-      await fixture.when.creatingBlockSessions([
+      await fixture.when.creatingBlockSession([
         buildBlockSession({
           startedAt: '14:00',
           endedAt: '15:00',
@@ -344,7 +344,7 @@ describe('Feature: Blocking schedule changed listener', () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
       fixture.given.updateBlockingScheduleWillThrow()
 
-      await fixture.when.creatingBlockSessions([
+      await fixture.when.creatingBlockSession([
         buildBlockSession({
           startedAt: '14:00',
           endedAt: '15:00',

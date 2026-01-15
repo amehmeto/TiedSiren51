@@ -52,7 +52,7 @@ export function blockingScheduleChangedFixture(
       },
     },
     when: {
-      async creatingBlockSessions(sessions: BlockSession[]) {
+      async creatingBlockSession(sessions: BlockSession[]) {
         store = createTestStore(
           dependencies,
           testStateBuilderProvider.getState(),
