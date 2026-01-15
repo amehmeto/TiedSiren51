@@ -3,8 +3,7 @@ import { Pressable, StyleSheet, Text } from 'react-native'
 import { SceneRendererProps, TabBar } from 'react-native-tab-view'
 import { T } from '@/ui/design-system/theme'
 
-// eslint-disable-next-line local-rules/react-props-destructuring -- spread pattern required for TabBar
-export function ChooseBlockTabBar(props: SceneRendererProps) {
+export function ChooseBlockTabBar({ ...props }: SceneRendererProps) {
   return (
     <TabBar
       navigationState={{
