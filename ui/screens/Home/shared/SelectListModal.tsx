@@ -1,6 +1,6 @@
 import * as ExpoDevice from 'expo-device'
 import { useRouter } from 'expo-router'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
@@ -51,21 +51,15 @@ export function SelectListModal({
         ]
       : items
 
-  const [selectedItems, setSelectedItems] = useState<(Blocklist | Device)[]>([])
+  const [prevListType, setPrevListType] = useState(listType)
+  const [selectedItems, setSelectedItems] = useState<(Blocklist | Device)[]>(
+    listType === 'devices' ? [currentDevice] : [],
+  )
 
-  useEffect(() => {
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    setSelectedItems((currentItems) => {
-      if (listType === 'devices') {
-        const uniqueSelections = new Map(
-          [...currentItems, currentDevice].map((item) => [item.id, item]),
-        )
-        return Array.from(uniqueSelections.values())
-      }
-
-      return []
-    })
-  }, [listType])
+  if (listType !== prevListType) {
+    setPrevListType(listType)
+    setSelectedItems(listType === 'devices' ? [currentDevice] : [])
+  }
 
   const saveList = () => {
     setFieldValue(listType, selectedItems)
