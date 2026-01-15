@@ -65,7 +65,7 @@ const styles = StyleSheet.create({
     padding: T.spacing.large,
   },
   title: {
-    color: T.color.textSecondary,
+    color: T.color.text,
     fontSize: T.font.size.large,
     fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.primary,
@@ -73,7 +73,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
   },
   warningText: {
-    color: T.color.textSecondary,
+    color: T.color.text,
     fontSize: T.font.size.base,
     fontFamily: T.font.family.primary,
     marginBottom: T.spacing.small,
@@ -84,14 +84,13 @@ const styles = StyleSheet.create({
     paddingLeft: T.spacing.small,
   },
   sessionItem: {
-    color: T.color.textSecondary,
+    color: T.color.lightBlue,
     fontSize: T.font.size.base,
     fontFamily: T.font.family.primary,
     fontWeight: T.font.weight.semibold,
     marginBottom: T.spacing.extraSmall,
   },
   buttonContainer: {
-    display: 'flex',
     flexDirection: 'row',
     justifyContent: 'flex-end',
     width: T.layout.width.full,
