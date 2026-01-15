@@ -248,6 +248,63 @@ module.exports = {
     }
 
     /**
+     * Check if the usage is deeply nested in JSX (more than 1 level from return)
+     * with sibling elements before it at any level. In such cases, the variable
+     * serves as documentation for what the expression represents.
+     *
+     * e.g., Don't inline:
+     *   const selectedItems = selectItemsFrom(...)
+     *   return (
+     *     <>
+     *       <Text>{label}</Text>
+     *       <Text>{selectedItems}</Text>  // nested with siblings before
+     *     </>
+     *   )
+     *
+     * But DO inline:
+     *   const items = getItems()
+     *   return <List data={items} />  // direct prop, no nesting
+     */
+    function isDeeplyNestedInJsxWithSiblings(usageNode) {
+      let current = usageNode.parent
+      let jsxDepth = 0
+      let hasSiblingsBefore = false
+
+      while (current) {
+        // Check for sibling JSXElements at each level
+        if (current.type === 'JSXElement' || current.type === 'JSXFragment') {
+          jsxDepth++
+
+          // Check if this element has sibling elements before it
+          const parent = current.parent
+          if (parent && (parent.type === 'JSXElement' || parent.type === 'JSXFragment')) {
+            const children = parent.children || []
+            const currentIndex = children.indexOf(current)
+            // Check for meaningful siblings before this element
+            const meaningfulSiblingsBefore = children
+              .slice(0, currentIndex)
+              .some(
+                (child) =>
+                  child.type === 'JSXElement' ||
+                  (child.type === 'JSXExpressionContainer' &&
+                    child.expression.type !== 'JSXEmptyExpression'),
+              )
+            if (meaningfulSiblingsBefore) hasSiblingsBefore = true
+          }
+        }
+
+        if (current.type === 'ReturnStatement') {
+          // If we're nested 2+ levels deep in JSX AND have siblings before, don't inline
+          return jsxDepth >= 2 && hasSiblingsBefore
+        }
+
+        current = current.parent
+      }
+
+      return false
+    }
+
+    /**
      * Check if inlining would create a complex expression (>3 terms)
      */
     function wouldCreateComplexExpression(usageNode, initNode) {
@@ -307,6 +364,9 @@ module.exports = {
 
         // Don't inline into expect() calls - conflicts with expect-separate-act-assert
         if (isInsideExpectCall(usage.identifier)) return
+
+        // Don't inline when deeply nested in JSX with siblings - variable documents the value
+        if (isDeeplyNestedInJsxWithSiblings(usage.identifier)) return
 
         context.report({
           node: decl,

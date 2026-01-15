@@ -9,6 +9,7 @@ const ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
+    ecmaFeatures: { jsx: true },
   },
 })
 
@@ -148,6 +149,34 @@ ruleTester.run('prefer-inline-variable', rule, {
         console.log(userId)
       `,
     },
+    // Deeply nested in JSX with siblings before - should NOT report
+    {
+      code: `
+        function Component() {
+          const selectedItems = selectItemsFrom(list)
+          return (
+            <>
+              <Text>Label</Text>
+              <Text>{selectedItems}</Text>
+            </>
+          )
+        }
+      `,
+    },
+    // Nested in JSX element with sibling before - should NOT report
+    {
+      code: `
+        function Component() {
+          const count = getCount()
+          return (
+            <View>
+              <Text>Items:</Text>
+              <Text>{count}</Text>
+            </View>
+          )
+        }
+      `,
+    },
   ],
 
   invalid: [
@@ -190,6 +219,18 @@ console.log(val)`,
       errors: [{ messageId: 'preferInline', data: { name: 'val' } }],
       output: `
 console.log(42)`,
+    },
+    // Direct JSX prop (not deeply nested, no siblings) - SHOULD inline
+    {
+      code: `function Component() {
+  const items = getItems()
+  return <List data={items} />
+}`,
+      errors: [{ messageId: 'preferInline', data: { name: 'items' } }],
+      output: `function Component() {
+  
+  return <List data={getItems()} />
+}`,
     },
   ],
 })

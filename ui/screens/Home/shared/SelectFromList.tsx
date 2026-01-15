@@ -37,15 +37,14 @@ export function SelectFromList({
 
   const capitalizedListParam =
     listType.charAt(0).toUpperCase() + listType.slice(1)
+  const selectedItems = selectItemsFrom(values[listType], listType)
 
   return (
     <>
       <View style={styles.param}>
         <Text style={styles.label}>{capitalizedListParam}</Text>
         <Pressable onPress={() => setIsListModelOpened(true)}>
-          <Text style={styles.option}>
-            {selectItemsFrom(values[listType], listType)}
-          </Text>
+          <Text style={styles.option}>{selectedItems}</Text>
         </Pressable>
       </View>
       <SelectListModal
