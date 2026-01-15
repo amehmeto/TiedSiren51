@@ -343,7 +343,7 @@ await fixture.when.listenerInitializes()
 fixture.then.blockingScheduleShouldContainApps([...])
 
 // DO: Trigger any action and verify initialization happened
-fixture.given.initialBlockSessions([activeSession])
+fixture.given.existingBlockSessions([activeSession])
 await fixture.when.unrelatedStateChanges()
 fixture.then.blockingScheduleShouldContainApps([...]) // Synced during init
 ```
@@ -397,21 +397,50 @@ fixture.then.actionShouldBeRejectedWith(action, 'No active timer')
 
 ### Domain Language
 
-Use domain-specific language in fixture methods, not technical terms:
+Fixture methods should express **business behavior**, not technical operations. Tests should read like specifications that describe what the user does, not how the code works.
+
+**Tests should read like specifications**:
+```typescript
+// The test reads as a business requirement:
+// "Given existing block sessions with a blocklist,
+//  when the user updates the blocklist,
+//  then the blocking schedule reflects the change"
+
+fixture.given.existingBlockSessions([sessionWithBlocklist])
+await fixture.when.updatingBlocklist(modifiedBlocklist)
+fixture.then.blockingScheduleShouldContainApps(['com.facebook.katana'])
+```
+
+**Name methods after use case actions, not code operations**:
+
+The `when` methods should reflect domain use cases, not technical operations. Use cases are decoupled from the UI - they express what business action is being performed:
+
+```typescript
+// Good: Named after use case / business actions
+fixture.when.creatingBlockSession(session)   // Use case: create a session
+fixture.when.updatingBlocklist(blocklist)    // Use case: update a blocklist
+fixture.when.startingTimer({ minutes: 30 })  // Use case: start a timer
+
+// Bad: Named after code operations
+fixture.when.dispatchingSetBlockSessions(sessions)  // Technical operation
+fixture.when.blockSessionsChange(sessions)          // Generic, unclear intent
+fixture.when.storeIsCreated()                       // Implementation detail
+```
 
 **Good (Domain Language)**:
 ```typescript
-fixture.then.timerShouldBePersisted(expectedEndAt)
-fixture.then.timerShouldBeStoredAs(expectedEndAt)
-fixture.given.existingTimer(endAt)
-fixture.given.noTimer()
+fixture.given.existingBlockSessions([session])  // Sessions exist
+fixture.given.existingBlocklists([blocklist])   // Blocklists exist
+fixture.when.updatingBlocklist(blocklist)       // User edits blocklist
+fixture.then.blockingScheduleShouldContainApps([...])
 ```
 
 **Avoid (Technical Terms)**:
 ```typescript
-fixture.then.timerShouldBeSavedInRepositoryAs(expectedEndAt)  // Too technical
-fixture.then.stateShouldEqual(expectedState)  // Implementation detail
-fixture.given.setRepositoryData(data)  // Technical operation
+fixture.given.initialBlockSessions([session])   // "initial" is technical
+fixture.given.setRepositoryData(data)           // Technical operation
+fixture.when.blocklistIsUpdated(blocklist)      // Passive voice, unclear actor
+fixture.then.stateShouldEqual(expectedState)    // Implementation detail
 ```
 
 ### Consolidating Tests with it.each

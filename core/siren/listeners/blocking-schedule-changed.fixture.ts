@@ -34,7 +34,7 @@ export function blockingScheduleChangedFixture(
 
   return {
     given: {
-      initialBlockSessions(sessions: BlockSession[]) {
+      existingBlockSessions(sessions: BlockSession[]) {
         testStateBuilderProvider.setState((builder) =>
           builder
             .withBlockSessions(sessions)
@@ -56,7 +56,7 @@ export function blockingScheduleChangedFixture(
       },
     },
     when: {
-      async blockSessionsChange(sessions: BlockSession[]) {
+      async creatingBlockSessions(sessions: BlockSession[]) {
         store = createTestStore(
           dependencies,
           testStateBuilderProvider.getState(),
@@ -65,7 +65,7 @@ export function blockingScheduleChangedFixture(
         store.dispatch(setBlockSessions(sessions))
         await flushPromises()
       },
-      async blocklistIsUpdated(blocklist: Blocklist) {
+      async updatingBlocklist(blocklist: Blocklist) {
         store = createTestStore(
           dependencies,
           testStateBuilderProvider.getState(),
