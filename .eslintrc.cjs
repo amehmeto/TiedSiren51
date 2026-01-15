@@ -126,6 +126,8 @@ module.exports = {
     'local-rules/react-props-destructuring': 'error',
     // Extract call expressions from JSX props into variables for readability
     'local-rules/no-call-expression-in-jsx-props': 'warn',
+    // Enforce one React component per file
+    'local-rules/one-component-per-file': 'error',
   },
   overrides: [
     {

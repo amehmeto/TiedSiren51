@@ -45,6 +45,7 @@ const preferArrayDestructuring = require('../eslint-rules/prefer-array-destructu
 const preferInlineVariable = require('../eslint-rules/prefer-inline-variable.cjs')
 const reactPropsDestructuring = require('../eslint-rules/react-props-destructuring.cjs')
 const noCallExpressionInJsxProps = require('../eslint-rules/no-call-expression-in-jsx-props.cjs')
+const oneComponentPerFile = require('../eslint-rules/one-component-per-file.cjs')
 
 module.exports = {
   rules: {
@@ -91,5 +92,6 @@ module.exports = {
     'prefer-inline-variable': preferInlineVariable,
     'react-props-destructuring': reactPropsDestructuring,
     'no-call-expression-in-jsx-props': noCallExpressionInJsxProps,
+    'one-component-per-file': oneComponentPerFile,
   },
 }
