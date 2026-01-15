@@ -58,7 +58,8 @@ export function SelectListModal({
   if (isVisible && !wasVisible) {
     setWasVisible(true)
     setSelectedItems(currentSelections)
-  } else if (!isVisible && wasVisible) setWasVisible(false)
+  }
+  if (!isVisible && wasVisible) setWasVisible(false)
 
   const saveList = () => {
     setFieldValue(listType, selectedItems)
