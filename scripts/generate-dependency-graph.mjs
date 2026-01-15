@@ -340,7 +340,8 @@ function generateInventoryTable(tickets, type) {
 
 function categorizeTicket(t) {
   const title = t.title.toLowerCase()
-  const labels = t.metadata?.labels || []
+  // Check GitHub API labels first, then fall back to YAML metadata labels
+  const labels = t.labels?.map((l) => l.name) || t.metadata?.labels || []
 
   if (t.type === 'initiative') return 'initiative'
   if (t.type === 'epic') return 'epic'
