@@ -65,8 +65,7 @@ export function useAppInitialization(store: AppStore) {
     return () => {
       isMounted = false
     }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [])
+  }, [dispatch, store])
 
   const isAuthenticated = useSelector(selectIsUserAuthenticated)
 
