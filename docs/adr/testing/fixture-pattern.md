@@ -332,6 +332,45 @@ then: {
 - Implementation changes (e.g., tracking mechanism) only update the fixture
 - Tests remain readable business specifications
 
+#### Abstract Mechanisms into Business Concepts
+
+`then` methods should express business outcomes, not implementation mechanisms. Users think in terms of "blocking is active", not "foreground service is running and watching is started".
+
+**Bad - Exposing mechanisms**:
+```typescript
+// DON'T: Separate assertions for each mechanism
+fixture.then.foregroundServiceShouldBeStarted()
+fixture.then.watchingShouldBeStarted()
+
+// Tests now know about implementation details:
+// - What if we add a third mechanism? Update every test.
+// - What if we replace foreground service? Update every test.
+```
+
+**Good - Business-level abstraction**:
+```typescript
+// DO: Single assertion expressing business outcome
+fixture.then.blockingShouldBeActive()
+
+// Implementation hides the mechanisms:
+then: {
+  blockingShouldBeActive() {
+    expect(sirenLookout.isWatching).toBe(true)
+    expect(foregroundService.isRunning()).toBe(true)
+  },
+  blockingShouldBeInactive() {
+    expect(sirenLookout.isWatching).toBe(false)
+    expect(foregroundService.isRunning()).toBe(false)
+  },
+}
+```
+
+**Why this matters**:
+- Tests express user-visible outcomes ("blocking is active")
+- Implementation can change without updating tests
+- Adding new mechanisms only updates the fixture
+- Test names become clearer: "should activate blocking" vs "should start foreground service and watching"
+
 **Bad - Exposing infrastructure**:
 ```typescript
 // DON'T: Exposes store creation as a "given"
