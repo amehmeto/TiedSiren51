@@ -19,14 +19,17 @@ export function AppsSelectionScene({
     <FlatList
       data={androidApps}
       keyExtractor={(item) => item.packageName}
-      renderItem={({ item }) => (
-        <SelectableSirenCard
-          sirenType={SirenType.ANDROID}
-          siren={item}
-          onPress={() => toggleAppSiren(SirenType.ANDROID, item)}
-          isSelected={isSirenSelected(SirenType.ANDROID, item.packageName)}
-        />
-      )}
+      renderItem={({ item }) => {
+        const isSelected = isSirenSelected(SirenType.ANDROID, item.packageName)
+        return (
+          <SelectableSirenCard
+            sirenType={SirenType.ANDROID}
+            siren={item}
+            onPress={() => toggleAppSiren(SirenType.ANDROID, item)}
+            isSelected={isSelected}
+          />
+        )
+      }}
     />
   )
 }
