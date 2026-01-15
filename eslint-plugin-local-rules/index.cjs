@@ -44,6 +44,7 @@ const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressi
 const preferArrayDestructuring = require('../eslint-rules/prefer-array-destructuring.cjs')
 const preferInlineVariable = require('../eslint-rules/prefer-inline-variable.cjs')
 const reactPropsDestructuring = require('../eslint-rules/react-props-destructuring.cjs')
+const noCallExpressionInJsxProps = require('../eslint-rules/no-call-expression-in-jsx-props.cjs')
 
 module.exports = {
   rules: {
@@ -89,5 +90,6 @@ module.exports = {
     'prefer-array-destructuring': preferArrayDestructuring,
     'prefer-inline-variable': preferInlineVariable,
     'react-props-destructuring': reactPropsDestructuring,
+    'no-call-expression-in-jsx-props': noCallExpressionInJsxProps,
   },
 }

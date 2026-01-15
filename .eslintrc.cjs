@@ -124,6 +124,8 @@ module.exports = {
     // Warn-only: many valid patterns use named variables for self-documentation
     'local-rules/prefer-inline-variable': 'warn',
     'local-rules/react-props-destructuring': 'error',
+    // Extract call expressions from JSX props into variables for readability
+    'local-rules/no-call-expression-in-jsx-props': 'warn',
   },
   overrides: [
     {
