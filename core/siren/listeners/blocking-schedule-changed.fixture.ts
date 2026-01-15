@@ -97,16 +97,12 @@ export function blockingScheduleChangedFixture(
       blockingScheduleShouldBeEmpty() {
         expect(sirenTier.schedules).toEqual([])
       },
-      watchingShouldBeStarted() {
+      blockingShouldBeActive() {
         expect(sirenLookout.isWatching).toBe(true)
-      },
-      watchingShouldBeStopped() {
-        expect(sirenLookout.isWatching).toBe(false)
-      },
-      foregroundServiceShouldBeStarted() {
         expect(foregroundService.isRunning()).toBe(true)
       },
-      foregroundServiceShouldBeStopped() {
+      blockingShouldBeInactive() {
+        expect(sirenLookout.isWatching).toBe(false)
         expect(foregroundService.isRunning()).toBe(false)
       },
       errorShouldBeLogged(expectedMessage: string) {

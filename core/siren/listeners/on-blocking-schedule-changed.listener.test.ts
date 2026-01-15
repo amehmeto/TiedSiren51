@@ -275,13 +275,12 @@ describe('Feature: Blocking schedule changed listener', () => {
         'com.facebook.katana',
         'com.example.tiktok',
       ])
-      fixture.then.foregroundServiceShouldBeStarted()
-      fixture.then.watchingShouldBeStarted()
+      fixture.then.blockingShouldBeActive()
     })
   })
 
-  describe('Foreground service and watching lifecycle', () => {
-    it('should start foreground service and watching when session starts', async () => {
+  describe('Blocking lifecycle', () => {
+    it('should activate blocking when session starts', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
 
       await fixture.when.creatingBlockSessions([
@@ -296,11 +295,10 @@ describe('Feature: Blocking schedule changed listener', () => {
         }),
       ])
 
-      fixture.then.foregroundServiceShouldBeStarted()
-      fixture.then.watchingShouldBeStarted()
+      fixture.then.blockingShouldBeActive()
     })
 
-    it('should stop foreground service and watching when all sessions end', async () => {
+    it('should deactivate blocking when all sessions end', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
       fixture.given.existingBlockSessions([
         buildBlockSession({
@@ -317,8 +315,7 @@ describe('Feature: Blocking schedule changed listener', () => {
 
       await fixture.when.creatingBlockSessions([])
 
-      fixture.then.foregroundServiceShouldBeStopped()
-      fixture.then.watchingShouldBeStopped()
+      fixture.then.blockingShouldBeInactive()
     })
   })
 
