@@ -1,4 +1,5 @@
 import { expect } from 'vitest'
+import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { BlockSession } from '@/core/block-session/block-session'
@@ -27,7 +28,7 @@ export function blockingScheduleChangedFixture(
     dateProvider,
     logger,
   }
-  let store: ReturnType<typeof createTestStore> | undefined
+  let store: AppStore
 
   return {
     given: {
