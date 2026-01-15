@@ -3,18 +3,13 @@ import { useMemo } from 'react'
 import {
   StyleProp,
   StyleSheet,
-  Text,
   useWindowDimensions,
   ViewStyle,
 } from 'react-native'
-import {
-  Menu,
-  MenuOption,
-  MenuOptions,
-  MenuTrigger,
-} from 'react-native-popup-menu'
+import { Menu, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
 import { T } from '@/ui/design-system/theme'
 import { TiedSCard } from './TiedSCard'
+import { TiedSMenuOption } from './TiedSMenuOption'
 
 type IconName =
   | 'text-outline'
@@ -28,28 +23,10 @@ type TiedSMenu = {
   action: () => void
 }
 
-type TiedSMenuOptionProps = {
-  optionName: TiedSMenu['name']
-  iconName: TiedSMenu['iconName']
-}
-
-function TiedSMenuOption({ optionName, iconName }: TiedSMenuOptionProps) {
-  return (
-    <MenuOption value={optionName} style={styles.menuOption}>
-      <Text style={styles.menuOptionText}>{optionName}</Text>
-      <Ionicons
-        name={iconName}
-        size={T.icon.size.large}
-        color={T.color.white}
-      />
-    </MenuOption>
-  )
-}
-
-type ThreeDotMenuProps = {
+type ThreeDotMenuProps = Readonly<{
   menuOptions: TiedSMenu[]
   style?: StyleProp<ViewStyle>
-}
+}>
 
 export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
   const { width: windowWidth } = useWindowDimensions()
@@ -123,24 +100,11 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
 }
 
 const styles = StyleSheet.create({
-  menuOptionText: {
-    color: T.color.white,
-    fontSize: T.font.size.small,
-    flex: 1,
-  },
   menuOptions: {
     flexDirection: 'column',
     alignItems: 'flex-start',
     margin: T.spacing.none,
     marginTop: T.spacing.none,
     marginBottom: T.spacing.none,
-  },
-  menuOption: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: T.spacing.small,
-    backgroundColor: T.color.transparent,
   },
 })
