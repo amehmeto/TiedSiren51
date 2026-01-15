@@ -120,7 +120,7 @@ export function SessionCard({ session, type }: SessionCardProps) {
       <TextInputModal
         isVisible={isDuplicateModalVisible}
         label={'Choose the name of the duplicated block session'}
-        initialText={'Copy of "' + session.name + '"'}
+        initialText={`Copy of "${session.name}"`}
         onRequestClose={() => {
           setIsDuplicateModalVisible(false)
         }}

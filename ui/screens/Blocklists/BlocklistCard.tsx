@@ -118,7 +118,7 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
       <TextInputModal
         isVisible={isDuplicateModalVisible}
         label={'Choose the name of the duplicated blocklist'}
-        initialText={'Copy of "' + blocklist.name + '"'}
+        initialText={`Copy of "${blocklist.name}"`}
         onRequestClose={() => {
           setIsDuplicateModalVisible(false)
         }}
