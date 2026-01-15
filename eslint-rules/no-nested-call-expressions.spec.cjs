@@ -50,6 +50,20 @@ ruleTester.run('no-nested-call-expressions', rule, {
       code: `transform(items.flatMap(fn))`,
       options: [{ allowedPatterns: ['^map$', '^flatMap$', '^filter$'] }],
     },
+    // allowNoArguments: nested call with no args - should NOT report
+    {
+      code: `selectUser(store.getState())`,
+      options: [{ allowNoArguments: true }],
+    },
+    // allowNoArguments: chained no-arg calls - should NOT report
+    {
+      code: `process(obj.getValue())`,
+      options: [{ allowNoArguments: true }],
+    },
+    // dispatch is always allowed (idiomatic Redux)
+    {
+      code: `store.dispatch(createAction(payload))`,
+    },
     // Literal arguments - should NOT report
     {
       code: `foo(42, "string", true)`,
@@ -94,6 +108,14 @@ ruleTester.run('no-nested-call-expressions', rule, {
       options: [{ allowedPatterns: ['^allowed$'] }],
       errors: [
         { messageId: 'noNestedCalls', data: { innerCall: 'inner(...)' } },
+      ],
+    },
+    // allowNoArguments: still reports when inner call HAS arguments (non-dispatch)
+    {
+      code: `process(createAction(payload))`,
+      options: [{ allowNoArguments: true }],
+      errors: [
+        { messageId: 'noNestedCalls', data: { innerCall: 'createAction(...)' } },
       ],
     },
   ],

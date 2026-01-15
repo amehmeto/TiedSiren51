@@ -19,6 +19,18 @@ tests/        → Test utilities, fixtures, builders
 
 Read `/docs/adr/README.md` before structural changes - it indexes all architectural decisions by layer.
 
+## Before Writing Code
+
+**Read relevant ADRs before implementing.** ADRs contain naming conventions, patterns, and examples that must be followed:
+
+| When writing... | Read first |
+|-----------------|------------|
+| Listeners | `/docs/adr/core/listener-pattern.md` |
+| Tests & Fixtures | `/docs/adr/testing/fixture-pattern.md` |
+| Test doubles (stubs/fakes) | `/docs/adr/testing/stub-vs-fake-implementations.md` |
+| Repositories | `/docs/adr/core/repository-pattern.md` |
+| View models | `/docs/adr/ui/view-model-pattern.md` |
+
 ## Commands
 
 ```bash

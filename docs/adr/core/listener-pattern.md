@@ -107,43 +107,61 @@ Some listeners need to react to changes across multiple Redux slices. For exampl
 - **blockSession slice**: When sessions start/end
 - **blocklist slice**: When blocklists are edited (apps added/removed)
 
-Rather than having separate listeners for each slice, use a **unified listener** that computes derived state:
+Rather than having separate listeners for each slice, use a **unified listener** with slice reference tracking:
 
 ```typescript
-// Single listener watching multiple slices
-export function createOnBlockingScheduleChangedListener(
-  sirenTier: SirenTier,
-): AppStartListening {
-  return (startListening) => {
-    let lastScheduleHash: string | null = null
+// Single listener watching multiple slices via store.subscribe()
+export const onBlockingScheduleChangedListener = ({
+  store,
+  sirenTier,
+  dateProvider,
+  logger,
+}: {
+  store: AppStore
+  sirenTier: SirenTier
+  dateProvider: DateProvider
+  logger: Logger
+}): (() => void) => {
+  // Track slice references for efficient early exit
+  let lastBlockSessionState = store.getState().blockSession
+  let lastBlocklistState = store.getState().blocklist
+  let lastScheduleKey = ''
 
-    startListening({
-      predicate: (_, currentState, previousState) =>
-        currentState.blockSession !== previousState.blockSession ||
-        currentState.blocklist !== previousState.blocklist,
-      effect: async (_, listenerApi) => {
-        const state = listenerApi.getState()
-
-        // Selector joins data from both slices
-        const schedule = selectBlockingSchedule(state)
-        const hash = hashSchedule(schedule)
-
-        // Only sync if schedule changed
-        if (hash !== lastScheduleHash) {
-          await sirenTier.setBlockingSchedule(schedule)
-          lastScheduleHash = hash
-        }
-      },
-    })
+  const getScheduleHashKey = (schedule: BlockingSchedule[]): string => {
+    return schedule.map((s) => `${s.id}:${s.sirens...}`).sort().join('|')
   }
+
+  return store.subscribe(() => {
+    const state = store.getState()
+
+    // Early exit: skip if neither slice changed (reference equality)
+    if (
+      state.blockSession === lastBlockSessionState &&
+      state.blocklist === lastBlocklistState
+    )
+      return
+
+    lastBlockSessionState = state.blockSession
+    lastBlocklistState = state.blocklist
+
+    // Compute derived state from both slices
+    const schedule = selectBlockingSchedule(dateProvider, state)
+    const scheduleKey = getScheduleHashKey(schedule)
+
+    // Only sync if computed schedule actually changed
+    if (scheduleKey === lastScheduleKey) return
+    lastScheduleKey = scheduleKey
+
+    void sirenTier.updateBlockingSchedule(schedule)
+  })
 }
 ```
 
 **Key principles for unified listeners:**
 
-1. **Selector-based**: Use selectors that join data from multiple slices
-2. **Derived state comparison**: Compare computed results (hash), not raw slice state
-3. **Efficient diffing**: Hash comparison for O(1) change detection
+1. **Slice reference tracking**: Compare slice references first for O(1) early exit
+2. **Selector-based**: Use selectors that join data from multiple slices
+3. **Derived state comparison**: Compare computed results (hash), not raw slice state
 4. **Single responsibility**: One listener per "concern" (e.g., blocking schedule)
 
 ### Listener Examples

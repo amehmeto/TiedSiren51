@@ -39,15 +39,37 @@ The rule is **disabled globally** because many valid patterns use nesting (e.g.,
 'local-rules/no-nested-call-expressions': 'off',
 ```
 
-### Allowed Patterns
+### Options
 
-When enabled, configure `allowedPatterns` for idiomatic nesting:
+#### `allowNoArguments`
+
+Allow nested calls when the inner call has no arguments. Parameterless calls like `getState()` act as simple accessors and don't add cognitive load.
+
+```javascript
+'local-rules/no-nested-call-expressions': ['error', {
+  allowNoArguments: true
+}]
+
+// With this option:
+selectUser(store.getState())     // ✅ Allowed - getState() has no params
+process(createAction(x))         // ❌ Error - createAction has params
+```
+
+#### `allowedPatterns`
+
+Configure patterns for idiomatic nesting (array methods, etc.):
 
 ```javascript
 'local-rules/no-nested-call-expressions': ['error', {
   allowedPatterns: ['^map$', '^filter$', '^flatMap$', '^reduce$']
 }]
 ```
+
+### Built-in Exceptions
+
+The rule has built-in exceptions for idiomatic patterns that are always allowed:
+
+- **`dispatch`**: Redux's `store.dispatch(action(...))` is idiomatic and always allowed
 
 ### Examples
 

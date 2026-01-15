@@ -11,6 +11,10 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
 
   isWatching = false
 
+  startWatchingCallCount = 0
+
+  stopWatchingCallCount = 0
+
   shouldThrowOnStart = false
 
   shouldThrowOnStop = false
@@ -24,11 +28,13 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
   }
 
   startWatching(): void {
+    this.startWatchingCallCount++
     if (this.shouldThrowOnStart) throw new Error('Start watching failed')
     this.isWatching = true
   }
 
   stopWatching(): void {
+    this.stopWatchingCallCount++
     if (this.shouldThrowOnStop) throw new Error('Stop watching failed')
     this.isWatching = false
   }

@@ -3,12 +3,11 @@
     "allow": [
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
-      "Bash(./scripts/worktree.sh:*)",
-      "Bash(.claude/hooks/validate-ticket.sh:*)",
+      "Bash(./scripts/*.sh:*)",
+      "Bash(.claude/hooks/*.sh:*)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(base64:*)",
       "Bash(bash scripts/*.sh:*)",
-      "Bash(bash scripts/lint-workflow-scripts.sh:*)",
       "Bash(cat:*)",
       "Bash(cloc:*)",
       "Bash(diff:*)",
@@ -20,7 +19,6 @@
       "Bash(for:*)",
       "Bash(gh auth status:*)",
       "Bash(gh browse:*)",
-      "Bash(gh issue close:*)",
       "Bash(gh issue comment:*)",
       "Bash(gh issue create:*)",
       "Bash(gh issue edit:*)",
@@ -72,19 +70,11 @@
       "Bash(ls:*)",
       "Bash(mkdir:*)",
       "Bash(node eslint-rules/*.cjs:*)",
-      "Bash(node eslint-rules/*.spec.cjs:*)",
       "Bash(npm ci:*)",
       "Bash(npm install:*)",
       "Bash(npm ls:*)",
       "Bash(npm pack:*)",
       "Bash(npm pkg:*)",
-      "Bash(npm run generate:schema:*)",
-      "Bash(npm run lint:*)",
-      "Bash(npm run lint:fix:*)",
-      "Bash(npm run lint:sh:*)",
-      "Bash(npm run test:*)",
-      "Bash(npm run test:cov:*)",
-      "Bash(npm run test:prepush:*)",
       "Bash(npm run:*)",
       "Bash(npm test:*)",
       "Bash(npm view:*)",
@@ -100,7 +90,6 @@
       "Bash(npx shellcheck:*)",
       "Bash(npx tsc:*)",
       "Bash(npx vitest:*)",
-      "Bash(npx:*)",
       "Bash(pgrep:*)",
       "Bash(pwd:*)",
       "Bash(shellcheck:*)",
@@ -109,6 +98,8 @@
       "Bash(wc:*)",
       "Bash(which:*)",
       "Bash(xargs cloc:*)",
+      "Edit",
+      "Read",
       "Skill(worktree)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:github.com)",
@@ -116,6 +107,7 @@
       "WebFetch(domain:stackoverflow.com)",
       "WebFetch(domain:www.npmjs.com)",
       "WebSearch",
+      "Write",
       "mcp__github__add_issue_comment",
       "mcp__github__create_pull_request",
       "mcp__github__get_commit",
@@ -128,7 +120,12 @@
       "mcp__github__pull_request_review_write",
       "mcp__github__search_code",
       "mcp__github__search_pull_requests",
-      "mcp__ide__getDiagnostics"
+      "mcp__ide__getDiagnostics",
+      "mcp__sentry__find_organizations",
+      "mcp__sentry__get_issue_details",
+      "mcp__sentry__search_events",
+      "mcp__sentry__search_issue_events",
+      "mcp__sentry__search_issues"
     ],
     "deny": [
       "Bash(HUSKY=0:*)",
@@ -151,8 +148,11 @@
       "Bash(curl -d:*)",
       "Bash(env:*)",
       "Bash(eval:*)",
+      "Bash(gh issue delete:*)",
       "Bash(gh pr close:*)",
       "Bash(gh pr merge:*)",
+      "Bash(gh release delete:*)",
+      "Bash(gh repo delete:*)",
       "Bash(git -C:*)",
       "Bash(git am --no-verify:*)",
       "Bash(git cherry-pick --no-verify:*)",
@@ -162,16 +162,20 @@
       "Bash(git config --unset core.hooksPath:*)",
       "Bash(git config core.hooksPath:*)",
       "Bash(git merge --no-verify:*)",
+      "Bash(git push --delete:*)",
+      "Bash(git push --force-if-includes:*)",
       "Bash(git push --force-with-lease:*)",
       "Bash(git push --force:*)",
       "Bash(git push --no-verify:*)",
       "Bash(git push -f:*)",
+      "Bash(git push origin :*)",
       "Bash(git push origin main:*)",
       "Bash(git push origin master:*)",
       "Bash(git rebase --no-verify:*)",
       "Bash(git rebase:*)",
       "Bash(git reset --hard:*)",
       "Bash(git revert --no-verify:*)",
+      "Bash(git tag -d:*)",
       "Bash(mv .husky:*)",
       "Bash(npm publish:*)",
       "Bash(npm_config_ignore_scripts=true:*)",
@@ -186,13 +190,11 @@
       "mcp__github__merge_pull_request"
     ],
     "ask": [
-      "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(chmod:*)",
       "Bash(curl:*)",
-      "Bash(do:*)",
       "Bash(docker:*)",
-      "Bash(for:*)",
       "Bash(gh api:*)",
+      "Bash(gh issue close:*)",
       "Bash(gh run rerun:*)",
       "Bash(gh secret:*)",
       "Bash(gh workflow run:*)",
@@ -230,7 +232,7 @@
     ],
     "PreToolUse": [
       {
-        "matcher": "Bash(gh issue create:*)",
+        "matcher": "Bash(gh issue create:*)|Bash(gh issue edit:*)",
         "hooks": [
           {
             "type": "command",
@@ -239,16 +241,7 @@
         ]
       },
       {
-        "matcher": "Bash(gh issue edit:*)",
-        "hooks": [
-          {
-            "type": "command",
-            "command": ".claude/hooks/validate-ticket.sh"
-          }
-        ]
-      },
-      {
-        "matcher": "Bash(gh pr create:*)",
+        "matcher": "Bash(gh pr create:*)|Bash(gh pr edit:*)",
         "hooks": [
           {
             "type": "command",
