@@ -1,7 +1,7 @@
-import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
-import { View, Text, Pressable, StyleSheet, ScrollView } from 'react-native'
+import { View, Text, StyleSheet, ScrollView } from 'react-native'
 import { T } from '@/ui/design-system/theme'
+import { BlockingConditionItem } from './BlockingConditionItem'
 import { TiedSCloseButton } from './TiedSCloseButton'
 import { TiedSModal } from './TiedSModal'
 
@@ -22,13 +22,6 @@ type BlockingConditionModalProps = {
   visible: boolean
   onClose: () => void
   onSelectCondition: (condition: string) => void
-}
-
-type BlockingConditionProps = {
-  iconName: IconName
-  title: string
-  subtitle: string
-  onSelect: () => void
 }
 
 const TEXTS = {
@@ -77,7 +70,7 @@ export default function BlockingConditionModal({
         <Text style={styles.modalSubtitle}>{TEXTS.MODAL_SUBTITLE}</Text>
         <ScrollView contentContainerStyle={styles.scrollViewContent}>
           {CONDITIONS.map((condition) => (
-            <BlockingConditionComponent
+            <BlockingConditionItem
               key={condition.title}
               iconName={condition.iconName}
               title={condition.title}
@@ -88,34 +81,6 @@ export default function BlockingConditionModal({
         </ScrollView>
       </View>
     </TiedSModal>
-  )
-}
-
-function BlockingConditionComponent({
-  iconName,
-  title,
-  subtitle,
-  onSelect,
-}: BlockingConditionProps) {
-  return (
-    <Pressable
-      style={({ pressed: isPressed }) => [
-        styles.conditionContainer,
-        { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
-      ]}
-      onPress={onSelect}
-    >
-      <Ionicons
-        name={iconName}
-        size={T.icon.size.large}
-        color={T.color.lightBlue}
-        style={styles.conditionIcon}
-      />
-      <View>
-        <Text style={styles.conditionTitle}>{title}</Text>
-        <Text style={styles.conditionSubtitle}>{subtitle}</Text>
-      </View>
-    </Pressable>
   )
 }
 
@@ -138,27 +103,5 @@ const styles = StyleSheet.create({
   },
   scrollViewContent: {
     paddingBottom: T.spacing.medium,
-  },
-  conditionContainer: {
-    backgroundColor: T.color.darkBlueGray,
-    borderRadius: T.border.radius.roundedMedium,
-    padding: T.spacing.medium,
-    marginBottom: T.spacing.small,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  conditionIcon: {
-    marginRight: T.spacing.medium,
-  },
-  conditionTitle: {
-    fontSize: T.font.size.regular,
-    fontWeight: T.font.weight.bold,
-    fontFamily: T.font.family.primary,
-    color: T.color.white,
-  },
-  conditionSubtitle: {
-    fontSize: T.font.size.small,
-    fontFamily: T.font.family.primary,
-    color: T.color.grey,
   },
 })
