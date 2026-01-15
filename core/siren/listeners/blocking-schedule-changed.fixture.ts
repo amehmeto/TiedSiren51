@@ -32,10 +32,9 @@ export function blockingScheduleChangedFixture(
   return {
     given: {
       existingBlockSessions(sessions: BlockSession[]) {
+        const blocklists = sessions.flatMap((s) => s.blocklists)
         testStateBuilderProvider.setState((builder) =>
-          builder
-            .withBlockSessions(sessions)
-            .withBlocklists(sessions.flatMap((s) => s.blocklists)),
+          builder.withBlockSessions(sessions).withBlocklists(blocklists),
         )
       },
       existingBlocklists(blocklists: Blocklist[]) {
@@ -58,7 +57,8 @@ export function blockingScheduleChangedFixture(
           dependencies,
           testStateBuilderProvider.getState(),
         )
-        store.dispatch(setBlocklists(sessions.flatMap((s) => s.blocklists)))
+        const blocklists = sessions.flatMap((s) => s.blocklists)
+        store.dispatch(setBlocklists(blocklists))
         store.dispatch(setBlockSessions(sessions))
       },
       async updatingBlocklist(blocklist: Blocklist) {
@@ -113,9 +113,10 @@ export function blockingScheduleChangedFixture(
         const errorLogs = logger
           .getLogs()
           .filter((log) => log.level === 'error')
-        expect(
-          errorLogs.some((log) => log.message.includes(expectedMessage)),
-        ).toBe(true)
+        const hasExpectedError = errorLogs.some((log) =>
+          log.message.includes(expectedMessage),
+        )
+        expect(hasExpectedError).toBe(true)
       },
       updateBlockingScheduleCallCount() {
         return sirenTier.updateCallCount
