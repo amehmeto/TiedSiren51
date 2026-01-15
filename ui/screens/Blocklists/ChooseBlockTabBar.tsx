@@ -8,8 +8,10 @@ export function ChooseBlockTabBar({ ...props }: SceneRendererProps) {
     <TabBar
       navigationState={{
         index: 0,
-        // @ts-ignore
-        routes: [{ title: 'Websites' }, { title: 'Keywords' }],
+        routes: [
+          { key: 'websites', title: 'Websites' },
+          { key: 'keywords', title: 'Keywords' },
+        ],
       }}
       {...props}
       indicatorStyle={styles.indicator}
