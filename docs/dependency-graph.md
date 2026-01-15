@@ -3,7 +3,7 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2026-01-04
+> Last updated: 2026-01-15
 
 ## Complete Ticket Inventory
 
@@ -30,10 +30,11 @@ This document visualizes the dependencies between GitHub issues to help with pla
 | #61 | [Epic] Schedule recurring block sessions | - | #55 | - |
 
 
-### Features - Other (10)
+### Features - Other (11)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #1 | Add ability to filter between system apps and user-installed apps on Android | - | - | - |
+| #4 | Thanks for this module and request for tutorial or guide | - | - | - |
 | #6 | Add AlarmManager integration for start/end times | - | - | - |
 | #8 | Handle overlapping sessions - recalculate on window boundaries | - | - | - |
 | #11 | Extract AppLookout abstraction from AccessibilityService logic | - | - | - |
@@ -53,11 +54,11 @@ This document visualizes the dependencies between GitHub issues to help with pla
 | #9 | Expose setBlockingSchedule() API to JS | - | - | - |
 | #10 | Extract AppTier abstraction from current blocking logic | - | - | - |
 | #170 | fix(android): Blocking overlay never triggers - JS bridge architecture mismatch | 🔴 8 | - | - |
-| #180 | Create unified listener for blockSession and blocklist state changes | 🟠 5 | #177, #179 | #185 |
 | #182 | Update AndroidSirenTier to call setBlockingSchedule | 🟢 3 | #177 | #183, #184, #185 |
 | #183 | Update dependency injection with new architecture | 🟢 2 | #177, #178, #182 | - |
 | #184 | Deprecate JS detection path (blockLaunchedApp usecase) | 🟢 3 | #182 | #185 |
 | #185 | Remove legacy updateBlockedApps calls and related code | 🟢 2 | #180, #182, #184 | - |
+| #208 | feat(listener): Re-evaluate blocking schedule on periodic tick | 🟢 3 | #180 | - |
 
 
 ### Features - Authentication (12)
@@ -123,11 +124,11 @@ flowchart LR
     end
     subgraph Blocking
         direction TB
+        T_TS_208["#208 listener: Re-evaluate blocking... <span style='color:#22c55e'>3pts</span>"]:::blocking0
         T_TS_185["#185 legacy updateBlockedApps calls... <span style='color:#22c55e'>2pts</span>"]:::blocking2
         T_TS_184["#184 JS detection path blockLaunche... <span style='color:#22c55e'>3pts</span>"]:::blocking1
         T_TS_183["#183 dependency injection with new ... <span style='color:#22c55e'>2pts</span>"]:::blocking1
         T_TS_182["#182 AndroidSirenTier to call setBl... <span style='color:#22c55e'>3pts</span>"]:::blocking0
-        T_TS_180["#180 unified listener for blockSess... <span style='color:#f97316'>5pts</span>"]:::blocking0
         T_TS_170["#170 android: Blocking overlay neve... <span style='color:#ef4444'>8pts</span>"]:::blocking0
         T_TSBO_12["TSBO#12 Noop interfaces for WebsiteTie...<br/>📦 TSBO"]:::blocking0
         T_TSBO_11["TSBO#11 AppLookout abstraction from Ac...<br/>📦 TSBO"]:::blocking0
@@ -156,26 +157,18 @@ flowchart LR
         T_TS_201["#201 BlockSession to store blocklis... <span style='color:#f97316'>5pts</span>"]:::other0
         T_TS_200["#200 strict-mode: block blocklist d..."]:::other0
         T_TS_199["#199 blocklist: add confirmation mo..."]:::other0
+        T_EFS_4["EFS#4 for this module and request fo...<br/>📦 EFS"]:::other0
         T_TSBO_14["TSBO#14 weekly recurrence in scheduler<br/>📦 TSBO"]:::other0
         T_TSBO_13["TSBO#13 daily recurrence in scheduler<br/>📦 TSBO"]:::other0
         T_TSBO_8["TSBO#8 overlapping sessions - recalcu...<br/>📦 TSBO"]:::other0
         T_TSBO_6["TSBO#6 AlarmManager integration for s...<br/>📦 TSBO"]:::other0
         T_ELA_1["ELA#1 ability to filter between syst...<br/>📦 ELA"]:::other0
     end
-    T_TS_177["TS#177<br/>📦 TS"]:::other0
-    T_TS_178["TS#178<br/>📦 TS"]:::other0
-    T_TS_179["TS#179<br/>📦 TS"]:::other0
 
-    T_TS_180 --> T_TS_185
     T_TS_182 --> T_TS_185
     T_TS_184 --> T_TS_185
     T_TS_182 --> T_TS_184
-    T_TS_177 -.-> T_TS_183
-    T_TS_178 -.-> T_TS_183
     T_TS_182 --> T_TS_183
-    T_TS_177 -.-> T_TS_182
-    T_TS_177 -.-> T_TS_180
-    T_TS_179 -.-> T_TS_180
     T_TS_160 --> T_TS_166
     T_TS_164 --> T_TS_163
     T_TS_164 --> T_TS_162
@@ -202,15 +195,14 @@ flowchart TD
     F_TSBO_9["TSBO#9 Expose setBlockingSchedul..."]
     F_TSBO_10["TSBO#10 Extract AppTier abstracti..."]
     F_TS_170["#170 fix(android): Blocking ov... <span style='color:#ef4444'>8pts</span>"]
-    F_TS_180["#180 Create unified listener f... <span style='color:#f97316'>5pts</span>"]
     F_TS_182["#182 Update AndroidSirenTier t... <span style='color:#22c55e'>3pts</span>"]
     F_TS_183["#183 Update dependency injecti... <span style='color:#22c55e'>2pts</span>"]
     F_TS_184["#184 Deprecate JS detection pa... <span style='color:#22c55e'>3pts</span>"]
     F_TS_185["#185 Remove legacy updateBlock... <span style='color:#22c55e'>2pts</span>"]
+    F_TS_208["#208 feat(listener): Re-evalua... <span style='color:#22c55e'>3pts</span>"]
 
     F_TS_182 --> F_TS_183
     F_TS_182 --> F_TS_184
-    F_TS_180 --> F_TS_185
     F_TS_182 --> F_TS_185
     F_TS_184 --> F_TS_185
 ```
@@ -252,7 +244,6 @@ Quick reference showing what blocks what:
 | #63 | #64 |
 | #160 | #166 |
 | #164 | #162, #163 |
-| #180 | #185 |
 | #182 | #183, #184, #185 |
 | #184 | #185 |
 
@@ -290,4 +281,4 @@ Quick reference showing what blocks what:
 
 ---
 
-*Auto-generated on 2026-01-04 from GitHub issue metadata*
+*Auto-generated on 2026-01-15 from GitHub issue metadata*
