@@ -1,13 +1,24 @@
-import { IconProps } from '@expo/vector-icons/build/createIconSet'
 import React from 'react'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import {
+  Pressable,
+  StyleSheet,
+  StyleProp,
+  Text,
+  TextStyle,
+  View,
+} from 'react-native'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 
+type IconComponentProps = {
+  name: string
+  color?: string
+  size?: number
+  style?: StyleProp<TextStyle>
+}
+
 type BlocksPreviewCardProps = Readonly<{
-  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-  // @ts-ignore
-  IconTag: React.ComponentType<IconProps<any>> // eslint-disable-line @typescript-eslint/no-explicit-any
+  IconTag: React.ComponentType<IconComponentProps>
   iconName: string
   platform: 'Android' | 'iOS' | 'web' | 'macOS' | 'Windows' | 'Linux'
   blocksNumber: number
