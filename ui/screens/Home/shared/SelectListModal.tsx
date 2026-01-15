@@ -23,33 +23,40 @@ function generateDeviceName() {
   )
 }
 
-export function SelectListModal(
-  props: Readonly<{
-    visible: boolean
-    list: (Blocklist | Device)[]
-    listType: 'blocklists' | 'devices'
-    onRequestClose: () => void
-    setFieldValue: (field: string, value: (Blocklist | Device)[]) => void
-    items: (Blocklist | Device)[]
-  }>,
-) {
+type SelectListModalProps = Readonly<{
+  isVisible: boolean
+  list: (Blocklist | Device)[]
+  listType: 'blocklists' | 'devices'
+  onRequestClose: () => void
+  setFieldValue: (field: string, value: (Blocklist | Device)[]) => void
+  items: (Blocklist | Device)[]
+}>
+
+export function SelectListModal({
+  isVisible,
+  list: _list,
+  listType,
+  onRequestClose,
+  setFieldValue,
+  items,
+}: SelectListModalProps) {
   const router = useRouter()
 
   const availableItems =
-    props.listType === 'devices'
+    listType === 'devices'
       ? [
           ...new Map(
-            [currentDevice, ...props.items].map((item) => [item.id, item]),
+            [currentDevice, ...items].map((item) => [item.id, item]),
           ).values(),
         ]
-      : props.items
+      : items
 
   const [selectedItems, setSelectedItems] = useState<(Blocklist | Device)[]>([])
 
   useEffect(() => {
     // eslint-disable-next-line react-hooks/set-state-in-effect
     setSelectedItems((currentItems) => {
-      if (props.listType === 'devices') {
+      if (listType === 'devices') {
         const uniqueSelections = new Map(
           [...currentItems, currentDevice].map((item) => [item.id, item]),
         )
@@ -58,11 +65,11 @@ export function SelectListModal(
 
       return []
     })
-  }, [props.listType])
+  }, [listType])
 
   const saveList = () => {
-    props.setFieldValue(props.listType, selectedItems)
-    props.onRequestClose()
+    setFieldValue(listType, selectedItems)
+    onRequestClose()
   }
 
   function toggleList(item: Blocklist | Device) {
@@ -79,10 +86,10 @@ export function SelectListModal(
   }
 
   return (
-    <TiedSModal isVisible={props.visible} onRequestClose={props.onRequestClose}>
+    <TiedSModal isVisible={isVisible} onRequestClose={onRequestClose}>
       <View>
-        {props.items.length === 0 && props.listType !== 'devices' && (
-          <Text style={styles.itemText}>No {props.listType} available</Text>
+        {items.length === 0 && listType !== 'devices' && (
+          <Text style={styles.itemText}>No {listType} available</Text>
         )}
 
         <FlatList
@@ -100,12 +107,12 @@ export function SelectListModal(
             </View>
           )}
         />
-        {props.listType === 'blocklists' && props.items.length === 0 ? (
+        {listType === 'blocklists' && items.length === 0 ? (
           <TiedSButton
             style={styles.button}
             onPress={() => {
               router.push('/(tabs)/blocklists/create-blocklist-screen')
-              props.onRequestClose()
+              onRequestClose()
             }}
             text={'CREATE BLOCKLIST'}
           />

@@ -123,6 +123,7 @@ module.exports = {
     'local-rules/prefer-array-destructuring': 'error',
     // Warn-only: many valid patterns use named variables for self-documentation
     'local-rules/prefer-inline-variable': 'warn',
+    'local-rules/react-props-destructuring': 'error',
   },
   overrides: [
     {

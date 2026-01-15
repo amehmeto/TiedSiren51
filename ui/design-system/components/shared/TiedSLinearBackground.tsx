@@ -4,9 +4,11 @@ import { Platform, StatusBar, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { T } from '@/ui/design-system/theme'
 
-export function TiedSLinearBackground(
-  props: Readonly<{ children: React.ReactNode }>,
-) {
+type TiedSLinearBackgroundProps = Readonly<{ children: React.ReactNode }>
+
+export function TiedSLinearBackground({
+  children,
+}: TiedSLinearBackgroundProps) {
   const insets = useSafeAreaInsets()
 
   const statusBarHeight =
@@ -24,7 +26,7 @@ export function TiedSLinearBackground(
         },
       ]}
     >
-      {props.children}
+      {children}
     </LinearGradient>
   )
 }

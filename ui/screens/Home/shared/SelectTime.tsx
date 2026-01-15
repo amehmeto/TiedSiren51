@@ -11,6 +11,15 @@ function formatTimeString(time: string): string {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
 }
 
+type SelectTimeProps = Readonly<{
+  timeField?: 'startedAt' | 'endedAt'
+  setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
+  values: Session
+  isTimePickerVisible?: boolean
+  setFieldValue: (field: string, value: string) => void
+  handleChange: (field: 'startedAt' | 'endedAt') => void
+}>
+
 export function SelectTime({
   timeField = 'startedAt', // Default to 'startedAt'
   setIsTimePickerVisible,
@@ -18,14 +27,7 @@ export function SelectTime({
   isTimePickerVisible = false, // Default to false
   setFieldValue,
   handleChange,
-}: Readonly<{
-  timeField?: 'startedAt' | 'endedAt'
-  setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
-  values: Session
-  isTimePickerVisible?: boolean
-  setFieldValue: (field: string, value: string) => void
-  handleChange: (field: 'startedAt' | 'endedAt') => void
-}>) {
+}: SelectTimeProps) {
   const { dateProvider } = dependencies
   const localeNow = dateProvider.getHHmmNow()
 

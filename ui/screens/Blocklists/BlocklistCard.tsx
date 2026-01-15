@@ -11,15 +11,15 @@ import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 
-export function BlocklistCard(
-  props: Readonly<{
-    blocklist: {
-      id: string
-      name: string
-      totalBlocks: string
-    }
-  }>,
-) {
+type BlocklistCardProps = Readonly<{
+  blocklist: {
+    id: string
+    name: string
+    totalBlocks: string
+  }
+}>
+
+export function BlocklistCard({ blocklist }: BlocklistCardProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
@@ -40,7 +40,7 @@ export function BlocklistCard(
       action: () => {
         router.push({
           pathname: '/(tabs)/blocklists/edit-blocklist-screen/[blocklistId]',
-          params: { blocklistId: props.blocklist.id },
+          params: { blocklistId: blocklist.id },
         })
       },
     },
@@ -55,7 +55,7 @@ export function BlocklistCard(
       name: 'Delete',
       iconName: 'trash-outline' as const,
       action: () => {
-        dispatch(deleteBlocklist(props.blocklist.id))
+        dispatch(deleteBlocklist(blocklist.id))
       },
     },
   ]
@@ -66,25 +66,23 @@ export function BlocklistCard(
         onPress={() =>
           router.push({
             pathname: '/(tabs)/blocklists/edit-blocklist-screen/[blocklistId]',
-            params: { blocklistId: props.blocklist.id },
+            params: { blocklistId: blocklist.id },
           })
         }
       >
         <TiedSCard style={styles.container}>
           <View style={styles.infoContainer}>
-            <Text style={styles.name}>{props.blocklist.name}</Text>
-            <Text style={styles.totalBlocks}>
-              {props.blocklist.totalBlocks}
-            </Text>
+            <Text style={styles.name}>{blocklist.name}</Text>
+            <Text style={styles.totalBlocks}>{blocklist.totalBlocks}</Text>
           </View>
           <ThreeDotMenu menuOptions={blocklistCardMenu} style={styles.menu} />
         </TiedSCard>
       </Pressable>
 
       <TextInputModal
-        visible={isRenameModalVisible}
+        isVisible={isRenameModalVisible}
         label={'Rename blocklist'}
-        initialText={props.blocklist.name}
+        initialText={blocklist.name}
         onRequestClose={() => {
           setRenameModalVisible(false)
         }}
@@ -92,14 +90,14 @@ export function BlocklistCard(
           setRenameModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(renameBlocklist({ id: props.blocklist.id, name: inputText }))
+          dispatch(renameBlocklist({ id: blocklist.id, name: inputText }))
           setRenameModalVisible(false)
         }}
       />
       <TextInputModal
-        visible={isDuplicateModalVisible}
+        isVisible={isDuplicateModalVisible}
         label={'Choose the name of the duplicated blocklist'}
-        initialText={'Copy of "' + props.blocklist.name + '"'}
+        initialText={'Copy of "' + blocklist.name + '"'}
         onRequestClose={() => {
           setIsDuplicateModalVisible(false)
         }}
@@ -107,9 +105,7 @@ export function BlocklistCard(
           setIsDuplicateModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(
-            duplicateBlocklist({ id: props.blocklist.id, name: inputText }),
-          )
+          dispatch(duplicateBlocklist({ id: blocklist.id, name: inputText }))
           setIsDuplicateModalVisible(false)
         }}
       />

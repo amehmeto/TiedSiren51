@@ -2,31 +2,36 @@ import { ReactNode } from 'react'
 import { Pressable, StyleProp, StyleSheet, Text, ViewStyle } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
-export function TiedSButton(
-  props: Readonly<{
-    onPress: () => void
-    text: string | ReactNode
-    style?: StyleProp<ViewStyle>
-    disabled?: boolean
-  }>,
-) {
+type TiedSButtonProps = Readonly<{
+  onPress: () => void
+  text: string | ReactNode
+  style?: StyleProp<ViewStyle>
+  isDisabled?: boolean
+}>
+
+export function TiedSButton({
+  onPress,
+  text,
+  style,
+  isDisabled,
+}: TiedSButtonProps) {
   return (
     <Pressable
       style={({ pressed: isPressed }) => [
         styles.container,
-        props.style,
-        props.disabled && styles.disabled,
+        style,
+        isDisabled && styles.disabled,
         { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
       ]}
-      onPress={props.onPress}
-      disabled={props.disabled}
+      onPress={onPress}
+      disabled={isDisabled}
       accessibilityRole="button"
-      accessibilityState={{ disabled: !!props.disabled }}
+      accessibilityState={{ disabled: !!isDisabled }}
     >
-      {typeof props.text === 'string' ? (
-        <Text style={styles.buttonText}>{props.text}</Text>
+      {typeof text === 'string' ? (
+        <Text style={styles.buttonText}>{text}</Text>
       ) : (
-        props.text
+        text
       )}
     </Pressable>
   )

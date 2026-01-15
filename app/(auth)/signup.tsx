@@ -118,7 +118,7 @@ export default function SignUpScreen() {
         <TiedSButton
           onPress={handleSignUp}
           text={isLoading ? 'CREATING ACCOUNT...' : 'CREATE YOUR ACCOUNT'}
-          disabled={isLoading}
+          isDisabled={isLoading}
         />
         {error && (
           <Text
