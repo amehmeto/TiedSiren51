@@ -294,6 +294,44 @@ const store = createTestStore(state)
 
 Fixtures should only expose **meaningful business actions**, not infrastructure setup. Store creation, listener initialization, and other infrastructure are implementation details that should be hidden inside `when` methods.
 
+#### `then` Methods Must Encapsulate Assertions
+
+`then` methods should contain assertions, not return values for external assertion. Returning implementation details (like call counts) leaks internals and defeats the purpose of the fixture pattern.
+
+**Bad - Leaking implementation details**:
+```typescript
+// DON'T: Return values from then methods
+const callCount = fixture.then.updateBlockingScheduleCallCount()
+expect(callCount).toBe(0) // Assertion outside fixture
+
+// The test now knows about "call counts" - an implementation detail
+// What if we change how we track syncs? Every test breaks.
+```
+
+**Good - Encapsulated assertions**:
+```typescript
+// DO: then methods contain the assertion
+fixture.then.blockingScheduleShouldNotHaveBeenSynced()
+
+// Or if you need to assert a specific count:
+fixture.then.blockingScheduleShouldHaveBeenSyncedTimes(0)
+
+// Implementation in fixture:
+then: {
+  blockingScheduleShouldNotHaveBeenSynced() {
+    expect(sirenTier.updateCallCount).toBe(0)
+  },
+  blockingScheduleShouldHaveBeenSyncedTimes(expected: number) {
+    expect(sirenTier.updateCallCount).toBe(expected)
+  },
+}
+```
+
+**Why this matters**:
+- Tests express **what** should happen, not **how** to verify it
+- Implementation changes (e.g., tracking mechanism) only update the fixture
+- Tests remain readable business specifications
+
 **Bad - Exposing infrastructure**:
 ```typescript
 // DON'T: Exposes store creation as a "given"

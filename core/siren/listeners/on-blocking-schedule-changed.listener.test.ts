@@ -1,4 +1,4 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
 import {
   facebookAndroidSiren,
   instagramAndroidSiren,
@@ -243,8 +243,7 @@ describe('Feature: Blocking schedule changed listener', () => {
         },
       })
 
-      const callCount = fixture.then.updateBlockingScheduleCallCount()
-      expect(callCount).toBe(0) // No active session, no sync
+      fixture.then.blockingScheduleShouldNotHaveBeenSynced()
     })
   })
 

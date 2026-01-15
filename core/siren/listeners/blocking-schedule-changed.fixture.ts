@@ -118,8 +118,8 @@ export function blockingScheduleChangedFixture(
         )
         expect(hasExpectedError).toBe(true)
       },
-      updateBlockingScheduleCallCount() {
-        return sirenTier.updateCallCount
+      blockingScheduleShouldNotHaveBeenSynced() {
+        expect(sirenTier.updateCallCount).toBe(0)
       },
     },
   }
