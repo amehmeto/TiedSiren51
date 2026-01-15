@@ -8,6 +8,9 @@
 // GitHub organization for all repos
 export const GITHUB_ORG = 'amehmeto'
 
+// Main repository name (used as default context for local refs)
+export const MAIN_REPO = 'TiedSiren51'
+
 // Valid repos with their GitHub URLs
 // Use 'NEW_REPO: <name>' when the ticket requires creating a new repository (e.g., "NEW_REPO: my-new-repo")
 export const VALID_REPOS = {
@@ -16,6 +19,32 @@ export const VALID_REPOS = {
   'expo-foreground-service': `https://github.com/amehmeto/expo-foreground-service`,
   'tied-siren-blocking-overlay': `https://github.com/amehmeto/tied-siren-blocking-overlay`,
   'expo-list-installed-apps': `https://github.com/amehmeto/expo-list-installed-apps`,
+}
+
+// Short abbreviations for repos (used in dependency references and graph display)
+// Format: repo#N or abbrev#N (e.g., tied-siren-blocking-overlay#9 or TSBO#9)
+export const REPO_ABBREVIATIONS = {
+  // Full names map to themselves
+  TiedSiren51: 'TiedSiren51',
+  'expo-accessibility-service': 'expo-accessibility-service',
+  'expo-foreground-service': 'expo-foreground-service',
+  'tied-siren-blocking-overlay': 'tied-siren-blocking-overlay',
+  'expo-list-installed-apps': 'expo-list-installed-apps',
+  // Short abbreviations
+  TS: 'TiedSiren51',
+  EAS: 'expo-accessibility-service',
+  EFS: 'expo-foreground-service',
+  TSBO: 'tied-siren-blocking-overlay',
+  ELA: 'expo-list-installed-apps',
+}
+
+// Reverse mapping: full repo name -> abbreviation for display
+export const REPO_DISPLAY_ABBREV = {
+  TiedSiren51: 'TS',
+  'expo-accessibility-service': 'EAS',
+  'expo-foreground-service': 'EFS',
+  'tied-siren-blocking-overlay': 'TSBO',
+  'expo-list-installed-apps': 'ELA',
 }
 
 // Special prefix for tickets that require creating a new repo
@@ -85,3 +114,48 @@ export const SECTION_TEMPLATES = {
   '📋 Epics':
     '| # | Epic | Status | Notes |\n|---|------|--------|-------|\n| #XX | Epic title | 🔲 Todo | |',
 }
+
+// ============================================================================
+// Validation
+// ============================================================================
+
+/**
+ * Validate that REPO_ABBREVIATIONS and REPO_DISPLAY_ABBREV are consistent with VALID_REPOS.
+ * Throws an error if any repo in VALID_REPOS is missing from the abbreviation mappings.
+ */
+export function validateRepoAbbreviations() {
+  const errors = []
+
+  for (const repoName of Object.keys(VALID_REPOS)) {
+    // Check REPO_ABBREVIATIONS has the full name mapping
+    if (REPO_ABBREVIATIONS[repoName] !== repoName) {
+      errors.push(`REPO_ABBREVIATIONS missing self-mapping for: ${repoName}`)
+    }
+
+    // Check REPO_DISPLAY_ABBREV has a display abbreviation
+    if (!REPO_DISPLAY_ABBREV[repoName]) {
+      errors.push(`REPO_DISPLAY_ABBREV missing abbreviation for: ${repoName}`)
+    }
+  }
+
+  // Check that all abbreviations point to valid repos
+  for (const [abbrev, fullName] of Object.entries(REPO_ABBREVIATIONS)) {
+    if (!VALID_REPOS[fullName]) {
+      errors.push(`REPO_ABBREVIATIONS[${abbrev}] points to unknown repo: ${fullName}`)
+    }
+  }
+
+  // Check that all display abbreviations are for valid repos
+  for (const repoName of Object.keys(REPO_DISPLAY_ABBREV)) {
+    if (!VALID_REPOS[repoName]) {
+      errors.push(`REPO_DISPLAY_ABBREV has entry for unknown repo: ${repoName}`)
+    }
+  }
+
+  if (errors.length > 0) {
+    throw new Error(`Repository abbreviation configuration errors:\n  - ${errors.join('\n  - ')}`)
+  }
+}
+
+// Run validation on module load
+validateRepoAbbreviations()
