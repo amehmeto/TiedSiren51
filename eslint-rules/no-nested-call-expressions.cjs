@@ -25,6 +25,12 @@ module.exports = {
             items: { type: 'string' },
             description: 'Patterns of function names to allow nesting',
           },
+          allowNoArguments: {
+            type: 'boolean',
+            description:
+              'Allow nested calls when inner call has no arguments (e.g., getState())',
+            default: false,
+          },
         },
         additionalProperties: false,
       },
@@ -36,6 +42,7 @@ module.exports = {
     const allowedPatterns = (options.allowedPatterns || []).map(
       (p) => new RegExp(p),
     )
+    const allowNoArguments = options.allowNoArguments || false
 
     function getCallName(node) {
       if (node.callee.type === 'Identifier') return node.callee.name
@@ -51,19 +58,29 @@ module.exports = {
       return '...'
     }
 
+    // Idiomatic patterns that are always allowed (outer call)
+    const alwaysAllowedOuter = ['dispatch']
+
     function isAllowed(name) {
       return allowedPatterns.some((pattern) => pattern.test(name))
+    }
+
+    function isAlwaysAllowedOuter(name) {
+      return alwaysAllowedOuter.includes(name)
     }
 
     return {
       CallExpression(node) {
         const outerName = getCallName(node)
-        if (isAllowed(outerName)) return
+        if (isAllowed(outerName) || isAlwaysAllowedOuter(outerName)) return
 
         for (const arg of node.arguments) {
           if (arg.type === 'CallExpression') {
             const innerName = getCallName(arg)
             if (isAllowed(innerName)) continue
+
+            // Allow nested calls with no arguments (e.g., getState())
+            if (allowNoArguments && arg.arguments.length === 0) continue
 
             context.report({
               node: arg,
