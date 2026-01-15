@@ -16,7 +16,6 @@ type ChooseNameProps = Readonly<{
     value: string,
     shouldValidate?: boolean,
   ) => Promise<void | FormikErrors<Session>>
-  testID?: string
 }>
 
 export function ChooseName({
@@ -24,7 +23,6 @@ export function ChooseName({
   onChange,
   onBlur,
   setFieldValue,
-  testID: _testID,
 }: ChooseNameProps) {
   const [isNameModalVisible, setIsNameModalVisible] = useState<boolean>(false)
   const blockSessionName = values.name ?? 'Choose a name...'

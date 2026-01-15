@@ -25,7 +25,6 @@ function generateDeviceName() {
 
 type SelectListModalProps = Readonly<{
   isVisible: boolean
-  list: (Blocklist | Device)[]
   listType: 'blocklists' | 'devices'
   onRequestClose: () => void
   setFieldValue: (field: string, value: (Blocklist | Device)[]) => void
@@ -34,7 +33,6 @@ type SelectListModalProps = Readonly<{
 
 export function SelectListModal({
   isVisible,
-  list: _list,
   listType,
   onRequestClose,
   setFieldValue,
