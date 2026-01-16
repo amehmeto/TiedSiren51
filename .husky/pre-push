@@ -2,11 +2,12 @@ sh .husky/scripts/e2e-test-check.sh
 sh .husky/scripts/no-direct-push-main-demo.sh
 sh .husky/scripts/branch-name-check.sh
 sh .husky/scripts/uncommitted-files-check.sh
-sh .husky/scripts/check-conflicts-with-main.sh
 
 npx expo-doctor
 npm run test:cov
 echo ""
 node scripts/compare-coverage.cjs
+
+sh .husky/scripts/check-conflicts-with-main.sh
 
 printf "✅ Proceeding with push. Remember to run e2e tests before final merge!\n"
