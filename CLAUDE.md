@@ -41,6 +41,48 @@ npx prisma generate   # Regenerate Prisma client after schema changes
 SKIP_E2E_CHECK=true git push  # Push without interactive e2e test prompt
 ```
 
+## Git Hooks Setup
+
+The project uses custom git hooks for CI monitoring. These hooks are not tracked by git and must be set up manually in each clone.
+
+**Required hooks** (create in `.git/hooks/`):
+
+1. **reference-transaction** - Detects when remote refs are updated after push
+2. **post-push** - Triggered by reference-transaction to run CI watch
+
+**Setup commands:**
+
+```bash
+# Create reference-transaction hook
+cat > .git/hooks/reference-transaction << 'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+while read -r oldvalue newvalue refname; do
+  if [[ "$1" == "committed" ]] && [[ "$refname" =~ ^refs/remotes/origin/ ]]; then
+    if [[ -x "$(dirname "$0")/post-push" ]]; then
+      "$(dirname "$0")/post-push"
+    fi
+    break
+  fi
+done
+EOF
+chmod +x .git/hooks/reference-transaction
+
+# Create post-push hook
+cat > .git/hooks/post-push << 'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+echo "Push completed! Now watching CI..."
+REPO_ROOT="$(git rev-parse --show-toplevel)"
+if [[ -x "$REPO_ROOT/scripts/ci-watch.sh" ]]; then
+  "$REPO_ROOT/scripts/ci-watch.sh"
+fi
+EOF
+chmod +x .git/hooks/post-push
+```
+
+The `scripts/ci-watch.sh` script polls GitHub Actions and reports results (excluded jobs: "build").
+
 ## IMPORTANT: Anti-patterns
 
 **NEVER use `I` prefix for interfaces.** Ports use descriptive names: `AuthGateway`, not `IAuthGateway`. ESLint enforces this.
