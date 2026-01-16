@@ -3,13 +3,15 @@ import { Pressable, StyleSheet, Text } from 'react-native'
 import { SceneRendererProps, TabBar } from 'react-native-tab-view'
 import { T } from '@/ui/design-system/theme'
 
-export function ChooseBlockTabBar(props: SceneRendererProps) {
+export function ChooseBlockTabBar({ ...props }: SceneRendererProps) {
   return (
     <TabBar
       navigationState={{
         index: 0,
-        // @ts-ignore
-        routes: [{ title: 'Websites' }, { title: 'Keywords' }],
+        routes: [
+          { key: 'websites', title: 'Websites' },
+          { key: 'keywords', title: 'Keywords' },
+        ],
       }}
       {...props}
       indicatorStyle={styles.indicator}

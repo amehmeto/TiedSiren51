@@ -4,11 +4,11 @@ import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
 import { T } from '@/ui/design-system/theme'
 
-export function FormError({
-  error,
-}: {
+type FormErrorProps = {
   error?: string | FormikErrors<Blocklist> | FormikErrors<Device>
-}) {
+}
+
+export function FormError({ error }: FormErrorProps) {
   const errorText = typeof error === 'string' ? error : JSON.stringify(error)
 
   return <Text style={styles.errorText}>{errorText}</Text>

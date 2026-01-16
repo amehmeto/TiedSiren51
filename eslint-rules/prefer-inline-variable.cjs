@@ -72,6 +72,95 @@ module.exports = {
     }
 
     /**
+     * Check if a variable name is descriptive (provides semantic meaning)
+     * Returns true for names like: field, minWidth, errorMessage, userId
+     * Returns false for: val, tmp, res, x, y
+     */
+    function isDescriptiveName(varName) {
+      // Short names (1-2 chars) like x, y, i, n are not descriptive
+      if (varName.length <= 2) return false
+
+      // Common non-descriptive names that can be inlined
+      const nonDescriptiveNames = new Set([
+        'val',
+        'value',
+        'tmp',
+        'temp',
+        'num',
+        'str',
+        'res',
+        'ret',
+        'result',
+        'arr',
+        'obj',
+        'idx',
+        'len',
+        'item',
+        'data',
+        'el',
+        'elem',
+        'element',
+      ])
+      if (nonDescriptiveNames.has(varName.toLowerCase())) return false
+
+      return true
+    }
+
+    /**
+     * Check if the variable name provides semantic meaning for a literal value
+     * e.g., `const minWidth = 160` - "minWidth" explains what 160 means
+     * JetBrains doesn't inline these because the name adds value
+     */
+    function isDescriptiveNameForLiteral(varName, initNode) {
+      // Only applies to primitive literals
+      if (initNode.type !== 'Literal') return false
+      if (initNode.value === null) return false
+
+      return isDescriptiveName(varName)
+    }
+
+    /**
+     * Check if a descriptive variable name labels a method call result with DIFFERENT semantics
+     * e.g., `const field = error.path.join('.')` - "field" explains what the join produces
+     * But `const schedule = getSchedule()` - "schedule" is redundant with function name
+     *
+     * Only skip inlining when variable name differs from the function/method name
+     */
+    function isDescriptiveNameForCallResult(varName, initNode) {
+      if (initNode.type !== 'CallExpression') return false
+      if (!isDescriptiveName(varName)) return false
+
+      // Extract the function/method name from the call
+      let funcName = null
+      if (initNode.callee.type === 'Identifier') {
+        funcName = initNode.callee.name
+      } else if (initNode.callee.type === 'MemberExpression') {
+        if (initNode.callee.property.type === 'Identifier') {
+          funcName = initNode.callee.property.name
+        }
+      }
+
+      if (!funcName) return true // Can't determine, be conservative
+
+      // Normalize: remove common prefixes (get, set, create, build, fetch, load)
+      const prefixes = ['get', 'set', 'create', 'build', 'fetch', 'load', 'find', 'select']
+      let normalizedFunc = funcName
+      for (const prefix of prefixes) {
+        if (funcName.toLowerCase().startsWith(prefix)) {
+          normalizedFunc = funcName.slice(prefix.length)
+          break
+        }
+      }
+
+      // If variable name matches the (normalized) function name, it's redundant - allow inlining
+      if (varName.toLowerCase() === normalizedFunc.toLowerCase()) return false
+      if (varName.toLowerCase() === funcName.toLowerCase()) return false
+
+      // Variable name differs from function name - it adds semantic value, don't inline
+      return true
+    }
+
+    /**
      * Check if the initialization spans multiple lines
      * Multi-line inits should not be inlined as it hurts readability
      */
@@ -159,6 +248,63 @@ module.exports = {
     }
 
     /**
+     * Check if the usage is deeply nested in JSX (more than 1 level from return)
+     * with sibling elements before it at any level. In such cases, the variable
+     * serves as documentation for what the expression represents.
+     *
+     * e.g., Don't inline:
+     *   const selectedItems = selectItemsFrom(...)
+     *   return (
+     *     <>
+     *       <Text>{label}</Text>
+     *       <Text>{selectedItems}</Text>  // nested with siblings before
+     *     </>
+     *   )
+     *
+     * But DO inline:
+     *   const items = getItems()
+     *   return <List data={items} />  // direct prop, no nesting
+     */
+    function isDeeplyNestedInJsxWithSiblings(usageNode) {
+      let current = usageNode.parent
+      let jsxDepth = 0
+      let hasSiblingsBefore = false
+
+      while (current) {
+        // Check for sibling JSXElements at each level
+        if (current.type === 'JSXElement' || current.type === 'JSXFragment') {
+          jsxDepth++
+
+          // Check if this element has sibling elements before it
+          const parent = current.parent
+          if (parent && (parent.type === 'JSXElement' || parent.type === 'JSXFragment')) {
+            const children = parent.children || []
+            const currentIndex = children.indexOf(current)
+            // Check for meaningful siblings before this element
+            const meaningfulSiblingsBefore = children
+              .slice(0, currentIndex)
+              .some(
+                (child) =>
+                  child.type === 'JSXElement' ||
+                  (child.type === 'JSXExpressionContainer' &&
+                    child.expression.type !== 'JSXEmptyExpression'),
+              )
+            if (meaningfulSiblingsBefore) hasSiblingsBefore = true
+          }
+        }
+
+        if (current.type === 'ReturnStatement') {
+          // If we're nested 2+ levels deep in JSX AND have siblings before, don't inline
+          return jsxDepth >= 2 && hasSiblingsBefore
+        }
+
+        current = current.parent
+      }
+
+      return false
+    }
+
+    /**
      * Check if inlining would create a complex expression (>3 terms)
      */
     function wouldCreateComplexExpression(usageNode, initNode) {
@@ -199,6 +345,12 @@ module.exports = {
 
         if (references.length !== 1) return
 
+        // Don't inline descriptive names for literals (magic numbers/strings)
+        if (isDescriptiveNameForLiteral(varName, decl.init)) return
+
+        // Don't inline descriptive names for call results (semantic labeling)
+        if (isDescriptiveNameForCallResult(varName, decl.init)) return
+
         const usage = references[0]
 
         if (!isImmediatelyFollowingStatement(node, usage.identifier)) return
@@ -212,6 +364,9 @@ module.exports = {
 
         // Don't inline into expect() calls - conflicts with expect-separate-act-assert
         if (isInsideExpectCall(usage.identifier)) return
+
+        // Don't inline when deeply nested in JSX with siblings - variable documents the value
+        if (isDeeplyNestedInJsxWithSiblings(usage.identifier)) return
 
         context.report({
           node: decl,

@@ -1,30 +1,43 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { BlockSession } from '@/core/block-session/block-session'
+import { selectActiveSessionsUsingBlocklist } from '@/core/block-session/selectors/selectActiveSessionsUsingBlocklist'
 import { deleteBlocklist } from '@/core/blocklist/usecases/delete-blocklist.usecase'
 import { duplicateBlocklist } from '@/core/blocklist/usecases/duplicate-blocklist.usecase'
 import { renameBlocklist } from '@/core/blocklist/usecases/rename-blocklist.usecase'
+import { dependencies } from '@/ui/dependencies'
 import { ThreeDotMenu } from '@/ui/design-system/components/shared/ThreeDotMenu'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
+import { BlocklistDeletionConfirmationModal } from '@/ui/screens/Blocklists/BlocklistDeletionConfirmationModal'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 
-export function BlocklistCard(
-  props: Readonly<{
-    blocklist: {
-      id: string
-      name: string
-      totalBlocks: string
-    }
-  }>,
-) {
+type BlocklistCardProps = Readonly<{
+  blocklist: {
+    id: string
+    name: string
+    totalBlocks: string
+  }
+}>
+
+export function BlocklistCard({ blocklist }: BlocklistCardProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
   const [isRenameModalVisible, setRenameModalVisible] = useState(false)
   const [isDuplicateModalVisible, setIsDuplicateModalVisible] = useState(false)
+  const [isDeleteConfirmationVisible, setIsDeleteConfirmationVisible] =
+    useState(false)
+  const [activeSessionsForDeletion, setActiveSessionsForDeletion] = useState<
+    BlockSession[]
+  >([])
+
+  const blockSessionState = useSelector(
+    (state: RootState) => state.blockSession,
+  )
 
   const blocklistCardMenu = [
     {
@@ -40,7 +53,7 @@ export function BlocklistCard(
       action: () => {
         router.push({
           pathname: '/(tabs)/blocklists/edit-blocklist-screen/[blocklistId]',
-          params: { blocklistId: props.blocklist.id },
+          params: { blocklistId: blocklist.id },
         })
       },
     },
@@ -55,7 +68,15 @@ export function BlocklistCard(
       name: 'Delete',
       iconName: 'trash-outline' as const,
       action: () => {
-        dispatch(deleteBlocklist(props.blocklist.id))
+        const activeSessions = selectActiveSessionsUsingBlocklist(
+          dependencies.dateProvider,
+          blockSessionState,
+          blocklist.id,
+        )
+        if (activeSessions.length > 0) {
+          setActiveSessionsForDeletion(activeSessions)
+          setIsDeleteConfirmationVisible(true)
+        } else dispatch(deleteBlocklist(blocklist.id))
       },
     },
   ]
@@ -66,25 +87,23 @@ export function BlocklistCard(
         onPress={() =>
           router.push({
             pathname: '/(tabs)/blocklists/edit-blocklist-screen/[blocklistId]',
-            params: { blocklistId: props.blocklist.id },
+            params: { blocklistId: blocklist.id },
           })
         }
       >
         <TiedSCard style={styles.container}>
           <View style={styles.infoContainer}>
-            <Text style={styles.name}>{props.blocklist.name}</Text>
-            <Text style={styles.totalBlocks}>
-              {props.blocklist.totalBlocks}
-            </Text>
+            <Text style={styles.name}>{blocklist.name}</Text>
+            <Text style={styles.totalBlocks}>{blocklist.totalBlocks}</Text>
           </View>
           <ThreeDotMenu menuOptions={blocklistCardMenu} style={styles.menu} />
         </TiedSCard>
       </Pressable>
 
       <TextInputModal
-        visible={isRenameModalVisible}
+        isVisible={isRenameModalVisible}
         label={'Rename blocklist'}
-        initialText={props.blocklist.name}
+        initialText={blocklist.name}
         onRequestClose={() => {
           setRenameModalVisible(false)
         }}
@@ -92,14 +111,14 @@ export function BlocklistCard(
           setRenameModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(renameBlocklist({ id: props.blocklist.id, name: inputText }))
+          dispatch(renameBlocklist({ id: blocklist.id, name: inputText }))
           setRenameModalVisible(false)
         }}
       />
       <TextInputModal
-        visible={isDuplicateModalVisible}
+        isVisible={isDuplicateModalVisible}
         label={'Choose the name of the duplicated blocklist'}
-        initialText={'Copy of "' + props.blocklist.name + '"'}
+        initialText={`Copy of "${blocklist.name}"`}
         onRequestClose={() => {
           setIsDuplicateModalVisible(false)
         }}
@@ -107,10 +126,23 @@ export function BlocklistCard(
           setIsDuplicateModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(
-            duplicateBlocklist({ id: props.blocklist.id, name: inputText }),
-          )
+          dispatch(duplicateBlocklist({ id: blocklist.id, name: inputText }))
           setIsDuplicateModalVisible(false)
+        }}
+      />
+      <BlocklistDeletionConfirmationModal
+        isVisible={isDeleteConfirmationVisible}
+        blocklistName={blocklist.name}
+        activeSessions={activeSessionsForDeletion}
+        onRequestClose={() => {
+          setIsDeleteConfirmationVisible(false)
+        }}
+        onCancel={() => {
+          setIsDeleteConfirmationVisible(false)
+        }}
+        onConfirm={() => {
+          dispatch(deleteBlocklist(blocklist.id))
+          setIsDeleteConfirmationVisible(false)
         }}
       />
     </>

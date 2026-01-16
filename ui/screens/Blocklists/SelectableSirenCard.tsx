@@ -12,17 +12,19 @@ function isAndroidSiren(
   return sirenType === SirenType.ANDROID && typeof siren === 'object'
 }
 
+type SelectableSirenCardProps = Readonly<{
+  sirenType: SirenType
+  siren: AndroidSiren | string
+  onPress: () => void
+  isSelected: boolean
+}>
+
 export function SelectableSirenCard({
   sirenType,
   siren,
   onPress,
   isSelected,
-}: Readonly<{
-  sirenType: SirenType
-  siren: AndroidSiren | string
-  onPress: () => void
-  isSelected: boolean
-}>) {
+}: SelectableSirenCardProps) {
   const iconElement =
     // eslint-disable-next-line no-nested-ternary
     isAndroidSiren(sirenType, siren) ? (

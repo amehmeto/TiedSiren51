@@ -5,14 +5,17 @@ import BlockingConditionModal from '@/ui/design-system/components/shared/Blockin
 import { T } from '@/ui/design-system/theme'
 import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
 
-export function SelectBlockingCondition(props: { form: FormikProps<Session> }) {
+type SelectBlockingConditionProps = { form: FormikProps<Session> }
+
+export function SelectBlockingCondition({
+  form,
+}: SelectBlockingConditionProps) {
   const selectBlockingCondition = (selectedCondition: string) => {
-    const currentConditions = props.form.values.blockingConditions
-    props.form.setFieldValue('blockingConditions', [
-      ...currentConditions,
+    form.setFieldValue('blockingConditions', [
+      ...form.values.blockingConditions,
       selectedCondition,
     ])
-    props.form.setFieldTouched('blockingCondition', true)
+    form.setFieldTouched('blockingCondition', true)
     setIsBlockingConditionModalVisible(false)
   }
   const [isBlockingConditionModalVisible, setIsBlockingConditionModalVisible] =
@@ -26,8 +29,8 @@ export function SelectBlockingCondition(props: { form: FormikProps<Session> }) {
       >
         <Text style={styles.label}>{'Blocking Conditions'}</Text>
         <Text style={styles.option}>
-          {props.form.values.blockingConditions.length > 0
-            ? props.form.values.blockingConditions.join(', ')
+          {form.values.blockingConditions.length > 0
+            ? form.values.blockingConditions.join(', ')
             : 'Select blocking conditions...'}
         </Text>
       </Pressable>

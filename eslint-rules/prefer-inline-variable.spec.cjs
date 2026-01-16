@@ -9,6 +9,7 @@ const ruleTester = new RuleTester({
   parserOptions: {
     ecmaVersion: 2020,
     sourceType: 'module',
+    ecmaFeatures: { jsx: true },
   },
 })
 
@@ -113,6 +114,69 @@ ruleTester.run('prefer-inline-variable', rule, {
         console.log(result)
       `,
     },
+    // Descriptive name for numeric literal - should NOT report (JetBrains heuristic)
+    {
+      code: `
+        const minWidth = 160
+        const bound = Math.max(other, minWidth)
+      `,
+    },
+    // Descriptive name for string literal - should NOT report
+    {
+      code: `
+        const errorMessage = 'Something went wrong'
+        throw new Error(errorMessage)
+      `,
+    },
+    // Descriptive name for timeout - should NOT report
+    {
+      code: `
+        const timeout = 5000
+        setTimeout(fn, timeout)
+      `,
+    },
+    // Descriptive name for call result - should NOT report (semantic labeling)
+    {
+      code: `
+        const field = error.path.join('.')
+        validationErrors[field] = error.message
+      `,
+    },
+    // Descriptive name for call result - should NOT report
+    {
+      code: `
+        const userId = getUserId()
+        console.log(userId)
+      `,
+    },
+    // Deeply nested in JSX with siblings before - should NOT report
+    {
+      code: `
+        function Component() {
+          const selectedItems = selectItemsFrom(list)
+          return (
+            <>
+              <Text>Label</Text>
+              <Text>{selectedItems}</Text>
+            </>
+          )
+        }
+      `,
+    },
+    // Nested in JSX element with sibling before - should NOT report
+    {
+      code: `
+        function Component() {
+          const count = getCount()
+          return (
+            <View>
+              <Text>Items:</Text>
+              <Text>{count}</Text>
+            </View>
+          )
+        }
+      `,
+    },
   ],
 
   invalid: [
@@ -139,6 +203,34 @@ console.log(arr)`,
       errors: [{ messageId: 'preferInline', data: { name: 'arr' } }],
       output: `
 console.log([1, 2, 3])`,
+    },
+    // Short name (2 chars) for literal - SHOULD inline
+    {
+      code: `const ms = 1000
+setTimeout(fn, ms)`,
+      errors: [{ messageId: 'preferInline', data: { name: 'ms' } }],
+      output: `
+setTimeout(fn, 1000)`,
+    },
+    // Non-descriptive name for literal - SHOULD inline
+    {
+      code: `const val = 42
+console.log(val)`,
+      errors: [{ messageId: 'preferInline', data: { name: 'val' } }],
+      output: `
+console.log(42)`,
+    },
+    // Direct JSX prop (not deeply nested, no siblings) - SHOULD inline
+    {
+      code: `function Component() {
+  const items = getItems()
+  return <List data={items} />
+}`,
+      errors: [{ messageId: 'preferInline', data: { name: 'items' } }],
+      output: `function Component() {
+  
+  return <List data={getItems()} />
+}`,
     },
   ],
 })

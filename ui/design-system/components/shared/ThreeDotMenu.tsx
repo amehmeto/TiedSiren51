@@ -3,18 +3,13 @@ import { useMemo } from 'react'
 import {
   StyleProp,
   StyleSheet,
-  Text,
   useWindowDimensions,
   ViewStyle,
 } from 'react-native'
-import {
-  Menu,
-  MenuOption,
-  MenuOptions,
-  MenuTrigger,
-} from 'react-native-popup-menu'
+import { Menu, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
 import { T } from '@/ui/design-system/theme'
 import { TiedSCard } from './TiedSCard'
+import { TiedSMenuOption } from './TiedSMenuOption'
 
 type IconName =
   | 'text-outline'
@@ -28,26 +23,12 @@ type TiedSMenu = {
   action: () => void
 }
 
-function TiedSMenuOption(props: {
-  optionName: TiedSMenu['name']
-  iconName: TiedSMenu['iconName']
-}) {
-  return (
-    <MenuOption value={props.optionName} style={styles.menuOption}>
-      <Text style={styles.menuOptionText}>{props.optionName}</Text>
-      <Ionicons
-        name={props.iconName}
-        size={T.icon.size.large}
-        color={T.color.white}
-      />
-    </MenuOption>
-  )
-}
-
-export function ThreeDotMenu(props: {
+type ThreeDotMenuProps = Readonly<{
   menuOptions: TiedSMenu[]
   style?: StyleProp<ViewStyle>
-}) {
+}>
+
+export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
   const { width: windowWidth } = useWindowDimensions()
 
   const menuWidth = useMemo(() => {
@@ -60,7 +41,7 @@ export function ThreeDotMenu(props: {
   }, [windowWidth])
 
   const selectMenuOption = (optionName: TiedSMenu['name']) => {
-    const selectedOption = props.menuOptions.find(
+    const selectedOption = menuOptions.find(
       (option) => option.name === optionName,
     )
     if (!selectedOption) throw new Error('Invalid menu option')
@@ -91,7 +72,7 @@ export function ThreeDotMenu(props: {
   )
 
   return (
-    <Menu onSelect={selectMenuOption} style={props.style}>
+    <Menu onSelect={selectMenuOption} style={style}>
       <MenuTrigger>
         <Ionicons
           name={'ellipsis-horizontal'}
@@ -105,7 +86,7 @@ export function ThreeDotMenu(props: {
         }}
       >
         <TiedSCard style={styles.menuOptions}>
-          {props.menuOptions.map((option) => (
+          {menuOptions.map((option) => (
             <TiedSMenuOption
               key={option.name}
               optionName={option.name}
@@ -119,24 +100,11 @@ export function ThreeDotMenu(props: {
 }
 
 const styles = StyleSheet.create({
-  menuOptionText: {
-    color: T.color.white,
-    fontSize: T.font.size.small,
-    flex: 1,
-  },
   menuOptions: {
     flexDirection: 'column',
     alignItems: 'flex-start',
     margin: T.spacing.none,
     marginTop: T.spacing.none,
     marginBottom: T.spacing.none,
-  },
-  menuOption: {
-    display: 'flex',
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: T.spacing.small,
-    backgroundColor: T.color.transparent,
   },
 })

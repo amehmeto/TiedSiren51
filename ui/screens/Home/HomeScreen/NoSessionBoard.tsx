@@ -1,19 +1,19 @@
 import { StyleSheet, Text } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
-export function NoSessionBoard(
-  props: Readonly<{
-    sessions: {
-      title: string
-      message: string
-    }
-  }>,
-) {
+type NoSessionBoardProps = Readonly<{
+  sessions: {
+    title: string
+    message: string
+  }
+}>
+
+export function NoSessionBoard({ sessions }: NoSessionBoardProps) {
   return (
     <>
-      <Text style={styles.title}>{props.sessions.title}</Text>
+      <Text style={styles.title}>{sessions.title}</Text>
       <Text style={[styles.text, { marginBottom: T.spacing.large }]}>
-        {props.sessions.message}
+        {sessions.message}
       </Text>
     </>
   )

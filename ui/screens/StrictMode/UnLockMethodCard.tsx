@@ -4,7 +4,9 @@ import { Text, StyleSheet, View } from 'react-native'
 import { TiedSCard } from '@ui/design-system/components/shared/TiedSCard'
 import { T } from '@ui/design-system/theme'
 
-export function UnLockMethodCard(props: { inlineRemaining: string }) {
+type UnLockMethodCardProps = { inlineRemaining: string }
+
+export function UnLockMethodCard({ inlineRemaining }: UnLockMethodCardProps) {
   return (
     <TiedSCard style={styles.unlockCard}>
       <View style={styles.unlockCardContent}>
@@ -16,7 +18,7 @@ export function UnLockMethodCard(props: { inlineRemaining: string }) {
           />
           <Text style={styles.unlockLabel}>{'Timer'}</Text>
         </View>
-        <Text style={styles.unlockValue}>{props.inlineRemaining}</Text>
+        <Text style={styles.unlockValue}>{inlineRemaining}</Text>
       </View>
     </TiedSCard>
   )

@@ -11,21 +11,23 @@ function formatTimeString(time: string): string {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
 }
 
-export function SelectTime({
-  timeField = 'startedAt', // Default to 'startedAt'
-  setIsTimePickerVisible,
-  values,
-  isTimePickerVisible = false, // Default to false
-  setFieldValue,
-  handleChange,
-}: Readonly<{
+type SelectTimeProps = Readonly<{
   timeField?: 'startedAt' | 'endedAt'
   setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
   values: Session
   isTimePickerVisible?: boolean
   setFieldValue: (field: string, value: string) => void
   handleChange: (field: 'startedAt' | 'endedAt') => void
-}>) {
+}>
+
+export function SelectTime({
+  timeField = 'startedAt',
+  setIsTimePickerVisible,
+  values,
+  isTimePickerVisible = false,
+  setFieldValue,
+  handleChange,
+}: SelectTimeProps) {
   const { dateProvider } = dependencies
   const localeNow = dateProvider.getHHmmNow()
 
