@@ -203,7 +203,7 @@ describe('toNativeBlockingWindows', () => {
     ]
 
     const result = toNativeBlockingWindows(schedules)
-    const firstWindow = result[0]
+    const [firstWindow] = result
     const apps = firstWindow.sirens.apps
     const websites = firstWindow.sirens.websites
     const keywords = firstWindow.sirens.keywords
