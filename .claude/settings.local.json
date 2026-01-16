@@ -127,7 +127,12 @@
       "mcp__sentry__get_issue_details",
       "mcp__sentry__search_events",
       "mcp__sentry__search_issue_events",
-      "mcp__sentry__search_issues"
+      "mcp__sentry__search_issues",
+      "Bash(source ~/.nvm/nvm.sh)",
+      "Bash(PATH=\"/home/ubuntu/.local/share/pnpm:$PATH\" pnpm eslint:*)",
+      "Bash(/home/ubuntu/ethernal-claude-issue-213/node_modules/.bin/eslint:*)",
+      "Bash(./node_modules/.bin/eslint:*)",
+      "Bash(bash:*)"
     ],
     "deny": [
       "Bash(HUSKY=0:*)",
