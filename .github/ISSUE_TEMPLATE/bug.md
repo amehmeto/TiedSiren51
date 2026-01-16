@@ -1,10 +1,22 @@
 ---
 name: 🐛 Bug Report
 about: Something isn't working as expected
-title: 'fix(scope): '
+title: 'TS-XXX: fix(scope): '
 labels: bug
 assignees: ''
 ---
+
+<!--
+⚠️ IMPORTANT: After creating this issue, update the title with the actual issue number!
+Example: TS-123: fix(auth): login button not working
+
+Ticket prefixes by repo:
+- TS = TiedSiren51
+- TSBO = tied-siren-blocking-overlay
+- EAS = expo-accessibility-service
+- EFS = expo-foreground-service
+- ELIA = expo-list-installed-apps
+-->
 
 <!--
 📋 TICKET FRONTMATTER - Fill in these values

@@ -1,10 +1,22 @@
 ---
 name: 🚀 Initiative
 about: Strategic goal containing multiple epics
-title: '[Initiative] '
+title: 'TS-XXX: [Initiative] '
 labels: initiative
 assignees: ''
 ---
+
+<!--
+⚠️ IMPORTANT: After creating this issue, update the title with the actual issue number!
+Example: TS-62: [Initiative] Launch Android App
+
+Ticket prefixes by repo:
+- TS = TiedSiren51
+- TSBO = tied-siren-blocking-overlay
+- EAS = expo-accessibility-service
+- EFS = expo-foreground-service
+- ELIA = expo-list-installed-apps
+-->
 
 <!--
 📋 TICKET FRONTMATTER - Fill in these values

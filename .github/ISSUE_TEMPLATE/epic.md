@@ -1,10 +1,22 @@
 ---
 name: 🏔️ Epic
 about: Large feature containing multiple stories
-title: '[Epic] '
+title: 'TS-XXX: [Epic] '
 labels: epic
 assignees: ''
 ---
+
+<!--
+⚠️ IMPORTANT: After creating this issue, update the title with the actual issue number!
+Example: TS-55: [Epic] Blocking Apps on Android
+
+Ticket prefixes by repo:
+- TS = TiedSiren51
+- TSBO = tied-siren-blocking-overlay
+- EAS = expo-accessibility-service
+- EFS = expo-foreground-service
+- ELIA = expo-list-installed-apps
+-->
 
 <!--
 📋 TICKET FRONTMATTER - Fill in these values

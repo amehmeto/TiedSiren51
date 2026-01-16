@@ -1,10 +1,22 @@
 ---
 name: ✨ Feature / Story
 about: A new feature or user story for development
-title: 'feat(scope): '
+title: 'TS-XXX: feat(scope): '
 labels: enhancement
 assignees: ''
 ---
+
+<!--
+⚠️ IMPORTANT: After creating this issue, update the title with the actual issue number!
+Example: TS-123: feat(auth): add login button
+
+Ticket prefixes by repo:
+- TS = TiedSiren51
+- TSBO = tied-siren-blocking-overlay
+- EAS = expo-accessibility-service
+- EFS = expo-foreground-service
+- ELIA = expo-list-installed-apps
+-->
 
 <!--
 📋 TICKET FRONTMATTER - Fill in these values

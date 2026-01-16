@@ -35,7 +35,7 @@ export const REPO_ABBREVIATIONS = {
   EAS: 'expo-accessibility-service',
   EFS: 'expo-foreground-service',
   TSBO: 'tied-siren-blocking-overlay',
-  ELA: 'expo-list-installed-apps',
+  ELIA: 'expo-list-installed-apps',
 }
 
 // Reverse mapping: full repo name -> abbreviation for display
@@ -44,7 +44,26 @@ export const REPO_DISPLAY_ABBREV = {
   'expo-accessibility-service': 'EAS',
   'expo-foreground-service': 'EFS',
   'tied-siren-blocking-overlay': 'TSBO',
-  'expo-list-installed-apps': 'ELA',
+  'expo-list-installed-apps': 'ELIA',
+}
+
+// Jira-style ticket prefixes for issue/PR titles
+// Format: PREFIX-123: description (e.g., "TS-123: feat(auth): add login")
+export const TICKET_PREFIXES = {
+  TiedSiren51: 'TS',
+  'expo-accessibility-service': 'EAS',
+  'expo-foreground-service': 'EFS',
+  'tied-siren-blocking-overlay': 'TSBO',
+  'expo-list-installed-apps': 'ELIA',
+}
+
+// Reverse mapping: prefix -> repo name
+export const PREFIX_TO_REPO = {
+  TS: 'TiedSiren51',
+  EAS: 'expo-accessibility-service',
+  EFS: 'expo-foreground-service',
+  TSBO: 'tied-siren-blocking-overlay',
+  ELIA: 'expo-list-installed-apps',
 }
 
 // Special prefix for tickets that require creating a new repo
@@ -139,8 +158,9 @@ export const HIERARCHY_TEMPLATES = {
 // ============================================================================
 
 /**
- * Validate that REPO_ABBREVIATIONS and REPO_DISPLAY_ABBREV are consistent with VALID_REPOS.
- * Throws an error if any repo in VALID_REPOS is missing from the abbreviation mappings.
+ * Validate that REPO_ABBREVIATIONS, REPO_DISPLAY_ABBREV, TICKET_PREFIXES, and PREFIX_TO_REPO
+ * are consistent with VALID_REPOS.
+ * Throws an error if any repo in VALID_REPOS is missing from the mappings.
  */
 export function validateRepoAbbreviations() {
   const errors = []
@@ -155,6 +175,11 @@ export function validateRepoAbbreviations() {
     if (!REPO_DISPLAY_ABBREV[repoName]) {
       errors.push(`REPO_DISPLAY_ABBREV missing abbreviation for: ${repoName}`)
     }
+
+    // Check TICKET_PREFIXES has a prefix for this repo
+    if (!TICKET_PREFIXES[repoName]) {
+      errors.push(`TICKET_PREFIXES missing prefix for: ${repoName}`)
+    }
   }
 
   // Check that all abbreviations point to valid repos
@@ -168,6 +193,20 @@ export function validateRepoAbbreviations() {
   for (const repoName of Object.keys(REPO_DISPLAY_ABBREV)) {
     if (!VALID_REPOS[repoName]) {
       errors.push(`REPO_DISPLAY_ABBREV has entry for unknown repo: ${repoName}`)
+    }
+  }
+
+  // Check that PREFIX_TO_REPO is consistent with TICKET_PREFIXES
+  for (const [repoName, prefix] of Object.entries(TICKET_PREFIXES)) {
+    if (PREFIX_TO_REPO[prefix] !== repoName) {
+      errors.push(`PREFIX_TO_REPO[${prefix}] should map to ${repoName}`)
+    }
+  }
+
+  // Check that all prefixes in PREFIX_TO_REPO point to valid repos
+  for (const [prefix, repoName] of Object.entries(PREFIX_TO_REPO)) {
+    if (!VALID_REPOS[repoName]) {
+      errors.push(`PREFIX_TO_REPO[${prefix}] points to unknown repo: ${repoName}`)
     }
   }
 
