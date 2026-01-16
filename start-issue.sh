@@ -26,10 +26,21 @@ fi
 
 echo "Issue fetched: $ISSUE_TITLE"
 
-# Create worktree with a new branch
+# Create worktree with a new branch or reuse existing branch
 echo "Creating worktree at $WORKTREE_DIR..."
 git fetch origin
-git worktree add -b "$BRANCH_NAME" "$WORKTREE_DIR" origin/main
+
+# Check if branch already exists (locally or remotely)
+if git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
+    echo "Branch $BRANCH_NAME already exists locally, reusing it..."
+    git worktree add "$WORKTREE_DIR" "$BRANCH_NAME"
+elif git show-ref --verify --quiet "refs/remotes/origin/$BRANCH_NAME"; then
+    echo "Branch $BRANCH_NAME exists on remote, checking it out..."
+    git worktree add --track -b "$BRANCH_NAME" "$WORKTREE_DIR" "origin/$BRANCH_NAME"
+else
+    echo "Creating new branch $BRANCH_NAME from origin/main..."
+    git worktree add -b "$BRANCH_NAME" "$WORKTREE_DIR" origin/main
+fi
 
 # Write issue content to a temp file for claude prompt
 PROMPT_FILE="$WORKTREE_DIR/.claude-issue-prompt.md"
