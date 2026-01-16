@@ -128,6 +128,8 @@ module.exports = {
     'local-rules/no-call-expression-in-jsx-props': 'warn',
     // Enforce one React component per file
     'local-rules/one-component-per-file': 'error',
+    // Disallow else-if statements - use separate ifs or nested if-else
+    'local-rules/no-else-if': 'error',
   },
   overrides: [
     {
