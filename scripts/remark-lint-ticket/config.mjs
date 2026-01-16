@@ -38,33 +38,27 @@ export const REPO_ABBREVIATIONS = {
   ELIA: 'expo-list-installed-apps',
 }
 
-// Reverse mapping: full repo name -> abbreviation for display
-export const REPO_DISPLAY_ABBREV = {
+// Single source of truth: repo name -> prefix mapping
+// Used for display abbreviations, ticket prefixes, and reverse lookups
+const REPO_PREFIXES = {
   TiedSiren51: 'TS',
   'expo-accessibility-service': 'EAS',
   'expo-foreground-service': 'EFS',
   'tied-siren-blocking-overlay': 'TSBO',
   'expo-list-installed-apps': 'ELIA',
 }
+
+// Reverse mapping: full repo name -> abbreviation for display
+export const REPO_DISPLAY_ABBREV = REPO_PREFIXES
 
 // Jira-style ticket prefixes for issue/PR titles
 // Format: PREFIX-123: description (e.g., "TS-123: feat(auth): add login")
-export const TICKET_PREFIXES = {
-  TiedSiren51: 'TS',
-  'expo-accessibility-service': 'EAS',
-  'expo-foreground-service': 'EFS',
-  'tied-siren-blocking-overlay': 'TSBO',
-  'expo-list-installed-apps': 'ELIA',
-}
+export const TICKET_PREFIXES = REPO_PREFIXES
 
-// Reverse mapping: prefix -> repo name
-export const PREFIX_TO_REPO = {
-  TS: 'TiedSiren51',
-  EAS: 'expo-accessibility-service',
-  EFS: 'expo-foreground-service',
-  TSBO: 'tied-siren-blocking-overlay',
-  ELIA: 'expo-list-installed-apps',
-}
+// Reverse mapping: prefix -> repo name (derived from REPO_PREFIXES)
+export const PREFIX_TO_REPO = Object.fromEntries(
+  Object.entries(REPO_PREFIXES).map(([repo, prefix]) => [prefix, repo]),
+)
 
 // Special prefix for tickets that require creating a new repo
 export const NEW_REPO_PREFIX = 'NEW_REPO:'

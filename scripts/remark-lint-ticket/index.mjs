@@ -11,6 +11,7 @@ import yaml from 'js-yaml'
 // Import configuration from shared config file
 import {
   VALID_REPOS,
+  GITHUB_ORG,
   NEW_REPO_PREFIX,
   VALID_LABELS,
   FIBONACCI_POINTS,
@@ -322,7 +323,7 @@ function validateHierarchyLinks(tree, file, ticketType) {
   // Build valid GitHub URL pattern from config
   const validRepoNames = Object.keys(VALID_REPOS)
   const validUrlPattern = new RegExp(
-    `https://github\\.com/amehmeto/(${validRepoNames.join('|')})/issues/(\\d+)`,
+    `https://github\\.com/${GITHUB_ORG}/(${validRepoNames.join('|')})/issues/(\\d+)`,
     'g',
   )
 
@@ -376,7 +377,7 @@ function validateHierarchyLinks(tree, file, ticketType) {
     if (url.includes('github.com') && url.includes('/issues/')) {
       // Check if it's a valid repo URL
       const isValidRepo = validRepoNames.some((repo) =>
-        url.includes(`github.com/amehmeto/${repo}/issues/`),
+        url.includes(`github.com/${GITHUB_ORG}/${repo}/issues/`),
       )
       if (!isValidRepo) {
         file.message(

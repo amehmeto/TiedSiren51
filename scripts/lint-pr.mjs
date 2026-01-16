@@ -607,6 +607,7 @@ ${colors.bold}Validation Rules:${colors.reset}
 
   ${colors.yellow}Warnings (recommended):${colors.reset}
     • Use conventional commit format after ticket (feat:, fix:, etc.)
+    • Keep title ≤100 chars (accounts for Jira prefix overhead)
     • Add ## Test Plan section
     • Hierarchy should link to Initiative, Epic, and Issue
     • Add screenshots for UI changes
