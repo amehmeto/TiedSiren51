@@ -69,29 +69,34 @@ export const FIBONACCI_POINTS = [0, 1, 2, 3, 5, 8, 13, 21]
 export const VALID_SEVERITIES = ['low', 'medium', 'high', 'critical']
 
 // Required sections for different ticket types
+// Hierarchy: Initiative > Epic > Issue (feature/bug)
 export const FEATURE_SECTIONS = [
   { pattern: /📝\s*Summary/i, name: '📝 Summary' },
   { pattern: /🎯\s*Context/i, name: '🎯 Context' },
   { pattern: /✅\s*Acceptance Criteria/i, name: '✅ Acceptance Criteria' },
   { pattern: /🎭\s*Scenarios|Given.*When.*Then/i, name: '🎭 Scenarios (Given/When/Then)' },
+  { pattern: /🔗\s*Hierarchy/i, name: '🔗 Hierarchy' },
 ]
 
 export const BUG_SECTIONS = [
   { pattern: /🐛\s*Bug Summary/i, name: '🐛 Bug Summary' },
   { pattern: /🔄\s*Reproduction/i, name: '🔄 Reproduction' },
   { pattern: /✅\s*Acceptance Criteria/i, name: '✅ Acceptance Criteria' },
+  { pattern: /🔗\s*Hierarchy/i, name: '🔗 Hierarchy' },
 ]
 
 export const EPIC_SECTIONS = [
   { pattern: /🎯\s*Goal/i, name: '🎯 Goal' },
   { pattern: /📋\s*Stories/i, name: '📋 Stories / Tasks' },
   { pattern: /✅\s*Success Criteria/i, name: '✅ Success Criteria' },
+  { pattern: /🔗\s*Hierarchy/i, name: '🔗 Hierarchy' },
 ]
 
 export const INITIATIVE_SECTIONS = [
   { pattern: /🎯\s*Vision/i, name: '🎯 Vision' },
   { pattern: /📋\s*Epics/i, name: '📋 Epics' },
   { pattern: /✅\s*Success Criteria/i, name: '✅ Success Criteria' },
+  { pattern: /🔗\s*Hierarchy/i, name: '🔗 Hierarchy' },
 ]
 
 // Section templates for --fix mode
@@ -113,6 +118,20 @@ export const SECTION_TEMPLATES = {
   '🎯 Vision': "<!-- One paragraph describing the initiative's strategic objective and why it matters -->",
   '📋 Epics':
     '| # | Epic | Status | Notes |\n|---|------|--------|-------|\n| #XX | Epic title | 🔲 Todo | |',
+  '🔗 Hierarchy':
+    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
+}
+
+// Hierarchy templates per ticket type (used for more specific fix suggestions)
+export const HIERARCHY_TEMPLATES = {
+  feature:
+    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
+  bug:
+    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
+  epic:
+    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
+  initiative:
+    '| Level | Description |\n|-------|-------------|\n| 🚀 **Initiative** | ← You are here |\n| 🏔️ Epics | Listed in table above |\n| 📋 Issues | Inside each Epic |',
 }
 
 // ============================================================================

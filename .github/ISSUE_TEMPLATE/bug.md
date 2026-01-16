@@ -138,6 +138,18 @@ Then [correct expected behavior]
 
 ---
 
+## 🔗 Hierarchy
+
+<!--
+REQUIRED: Link to parent Epic and Initiative for navigation
+Replace XX with actual issue numbers
+-->
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+
 ## 🔗 Related
 
 - 🔥 Sentry Issue: [link]

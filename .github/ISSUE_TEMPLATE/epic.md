@@ -67,8 +67,18 @@ blocks: []
 
 ---
 
+## 🔗 Hierarchy
+
+<!--
+REQUIRED: Link to parent Initiative for navigation
+Replace XX with actual issue number
+-->
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+
 ## 🔗 Related
 
-- 📌 Parent Initiative: #XX
 - 📚 Design Doc: [link]
 - 🎨 Figma: [link]

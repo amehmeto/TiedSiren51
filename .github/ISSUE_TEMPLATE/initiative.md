@@ -64,6 +64,19 @@ blocks: []
 
 ---
 
+## 🔗 Hierarchy
+
+<!--
+This is the TOP level - no parent needed
+Initiatives contain Epics, which contain Issues
+-->
+
+| Level | Description |
+|-------|-------------|
+| 🚀 **Initiative** | ← You are here |
+| 🏔️ Epics | Listed in table above |
+| 📋 Issues | Inside each Epic |
+
 ## 🔗 Related
 
 - 📚 Design Doc: [link]

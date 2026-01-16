@@ -47,7 +47,16 @@ describe('PR Linter', () => {
     it('should pass when title has ticket reference', () => {
       const { success, result } = lintPR(
         'feat: add login #123',
-        '## Summary\nAdds login',
+        `## Summary
+Adds login
+
+## 🔗 Hierarchy
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren51/issues/62) |
+| 🏔️ Epic | [#54 - User Auth](https://github.com/amehmeto/TiedSiren51/issues/54) |
+| 📋 Issue | Closes #123 |`,
       )
 
       expect(success).toBe(true)
@@ -274,13 +283,19 @@ describe('PR Linter', () => {
 
 Implements Google Sign-In using Firebase Authentication.
 
+## 🔗 Hierarchy
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren51/issues/62) |
+| 🏔️ Epic | [#54 - User Auth](https://github.com/amehmeto/TiedSiren51/issues/54) |
+| 📋 Issue | Closes #87 |
+
 ## Test Plan
 
 - [ ] Test on Android device
 - [ ] Test on iOS simulator
-- [ ] Verify token refresh works
-
-Closes #87`
+- [ ] Verify token refresh works`
 
       const { success, result } = lintPR(title, body)
 
@@ -288,7 +303,8 @@ Closes #87`
       expect(result.valid).toBe(true)
       expect(result.title.errors).toHaveLength(0)
       expect(result.body.errors).toHaveLength(0)
-      expect(result.linkedTickets).toHaveLength(1)
+      // 3 tickets: #62 (initiative), #54 (epic), #87 (issue)
+      expect(result.linkedTickets).toHaveLength(3)
     })
 
     it('should report all errors for a poorly formatted PR', () => {

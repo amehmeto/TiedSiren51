@@ -50,12 +50,26 @@ const COMMIT_PREFIXES = [
 // Required sections in PR body
 const REQUIRED_SECTIONS = [
   { pattern: /##\s*Summary/i, name: '## Summary', emoji: '📝' },
+  { pattern: /##\s*🔗\s*Hierarchy|##\s*Hierarchy/i, name: '## 🔗 Hierarchy', emoji: '🔗' },
 ]
 
 // Recommended sections (warnings only)
 const RECOMMENDED_SECTIONS = [
   { pattern: /##\s*Test\s*[Pp]lan/i, name: '## Test Plan', emoji: '🧪' },
 ]
+
+// Hierarchy link patterns
+const HIERARCHY_PATTERNS = {
+  initiative: /Initiative.*\[#(\d+)/i,
+  epic: /Epic.*\[#(\d+)/i,
+  issue: /Issue.*(?:Closes|Fixes|Resolves)?\s*#(\d+)/i,
+}
+
+// Valid GitHub issue URL pattern (must be from configured repos)
+const VALID_GITHUB_ISSUE_URL = new RegExp(
+  `https://github\\.com/${GITHUB_ORG}/(${VALID_REPO_NAMES.join('|')})/issues/(\\d+)`,
+  'g',
+)
 
 // ============================================================================
 // 🎨 OUTPUT HELPERS
@@ -221,6 +235,67 @@ function validateBody(body) {
   for (const section of REQUIRED_SECTIONS) {
     if (!section.pattern.test(body)) {
       errors.push(`Missing required section: ${section.emoji} ${section.name}`)
+    }
+  }
+
+  // Validate hierarchy links if hierarchy section exists
+  const hasHierarchySection = /##\s*🔗\s*Hierarchy|##\s*Hierarchy/i.test(body)
+  if (hasHierarchySection) {
+    // Check for placeholder #XX
+    if (body.includes('/issues/XX') || /\[#XX\s*-/i.test(body)) {
+      warnings.push(
+        'Hierarchy links contain placeholder #XX - replace with actual issue numbers',
+      )
+    }
+
+    // Extract all GitHub issue URLs from body
+    const urlPattern =
+      /https:\/\/github\.com\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)\/issues\/(\d+)/g
+    const foundUrls = [...body.matchAll(urlPattern)]
+
+    // Validate each URL is from a valid repo
+    for (const match of foundUrls) {
+      const [fullUrl, org, repo] = match
+      if (org !== GITHUB_ORG) {
+        warnings.push(
+          `Hierarchy link to wrong org: ${fullUrl} (expected ${GITHUB_ORG})`,
+        )
+      } else if (!VALID_REPO_NAMES.includes(repo)) {
+        warnings.push(
+          `Hierarchy link to unknown repo: ${fullUrl} (valid repos: ${VALID_REPO_NAMES.join(', ')})`,
+        )
+      }
+    }
+
+    // Check for Initiative link with valid GitHub URL
+    const hasInitiativeUrl =
+      HIERARCHY_PATTERNS.initiative.test(body) &&
+      foundUrls.some(
+        ([, org, repo]) => org === GITHUB_ORG && VALID_REPO_NAMES.includes(repo),
+      )
+    if (!hasInitiativeUrl) {
+      warnings.push(
+        'Hierarchy section should link to parent Initiative with a valid GitHub issue URL',
+      )
+    }
+
+    // Check for Epic link with valid GitHub URL
+    const hasEpicUrl =
+      HIERARCHY_PATTERNS.epic.test(body) &&
+      foundUrls.some(
+        ([, org, repo]) => org === GITHUB_ORG && VALID_REPO_NAMES.includes(repo),
+      )
+    if (!hasEpicUrl) {
+      warnings.push(
+        'Hierarchy section should link to parent Epic with a valid GitHub issue URL',
+      )
+    }
+
+    // Check for Issue link (Closes #XX)
+    if (!HIERARCHY_PATTERNS.issue.test(body) && !/Closes\s+#\d+/i.test(body)) {
+      warnings.push(
+        'Hierarchy section should reference the Issue being addressed (e.g., "Closes #123")',
+      )
     }
   }
 
@@ -487,11 +562,12 @@ ${colors.bold}Validation Rules:${colors.reset}
   ${colors.red}Errors (must fix):${colors.reset}
     • Title must reference at least one ticket (#123)
     • Description must have ## Summary section
+    • Description must have ## 🔗 Hierarchy section
 
   ${colors.yellow}Warnings (recommended):${colors.reset}
     • Use conventional commit format (feat:, fix:, etc.)
     • Add ## Test Plan section
-    • Include "Closes #X" to auto-close issues
+    • Hierarchy should link to Initiative, Epic, and Issue
     • Add screenshots for UI changes
 `)
       process.exit(0)

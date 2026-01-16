@@ -20,6 +20,7 @@ import {
   EPIC_SECTIONS,
   INITIATIVE_SECTIONS,
   SECTION_TEMPLATES,
+  HIERARCHY_TEMPLATES,
 } from './config.mjs'
 
 // ============================================================================
@@ -52,6 +53,15 @@ function isTicketFile(file, tree) {
 
   // Not a ticket file - skip validation
   return false
+}
+
+/**
+ * Check if a file is a template file (should skip hierarchy URL validation)
+ * Templates have placeholder #XX values which are intentional
+ */
+function isTemplateFile(file) {
+  const filePath = file.path || file.history?.[0] || ''
+  return filePath.includes('.github/ISSUE_TEMPLATE/')
 }
 
 /**
@@ -293,6 +303,126 @@ function validateStoryPointsNotInTitle(tree, file) {
   }
 }
 
+/**
+ * Validate hierarchy links are filled in (not placeholder #XX)
+ * Ticket hierarchy: Initiative > Epic > Issue
+ * - Issues (feature/bug) must link to Epic AND Initiative
+ * - Epics must link to Initiative
+ * - Initiatives are top-level (no parent required)
+ *
+ * Note: Template files (.github/ISSUE_TEMPLATE/) skip URL validation
+ * since they intentionally contain placeholder #XX values.
+ */
+function validateHierarchyLinks(tree, file, ticketType) {
+  // Skip hierarchy URL validation for template files (they have placeholders)
+  if (isTemplateFile(file)) {
+    return
+  }
+
+  // Build valid GitHub URL pattern from config
+  const validRepoNames = Object.keys(VALID_REPOS)
+  const validUrlPattern = new RegExp(
+    `https://github\\.com/amehmeto/(${validRepoNames.join('|')})/issues/(\\d+)`,
+    'g',
+  )
+
+  // Find the hierarchy section
+  let inHierarchySection = false
+  let hierarchyContent = ''
+  const foundUrls = []
+
+  visit(tree, (node) => {
+    if (node.type === 'heading') {
+      const text = node.children?.map((c) => c.value).join('') || ''
+      inHierarchySection = /🔗\s*Hierarchy/i.test(text)
+    } else if (inHierarchySection) {
+      if (node.type === 'heading') {
+        inHierarchySection = false
+      } else if (node.type === 'table' || node.type === 'tableRow' || node.type === 'tableCell') {
+        // Collect table content
+        if (node.children) {
+          node.children.forEach((child) => {
+            if (child.type === 'text') {
+              hierarchyContent += child.value + ' '
+            } else if (child.type === 'link') {
+              hierarchyContent += child.url + ' '
+              foundUrls.push(child.url)
+            }
+          })
+        }
+      } else if (node.type === 'text') {
+        hierarchyContent += node.value + ' '
+      } else if (node.type === 'link') {
+        hierarchyContent += node.url + ' '
+        foundUrls.push(node.url)
+      }
+    }
+  })
+
+  // Skip validation for initiatives (they're top-level)
+  if (ticketType === 'initiative') {
+    return
+  }
+
+  // Check for placeholder #XX in hierarchy section
+  if (hierarchyContent.includes('/issues/XX') || hierarchyContent.includes('#XX')) {
+    file.message(
+      '⚠️ Hierarchy links contain placeholder #XX - replace with actual issue numbers',
+    )
+  }
+
+  // Validate URLs are proper GitHub issue links to valid repos
+  for (const url of foundUrls) {
+    if (url.includes('github.com') && url.includes('/issues/')) {
+      // Check if it's a valid repo URL
+      const isValidRepo = validRepoNames.some((repo) =>
+        url.includes(`github.com/amehmeto/${repo}/issues/`),
+      )
+      if (!isValidRepo) {
+        file.message(
+          `⚠️ Invalid hierarchy link: ${url} - must link to a valid repo (${validRepoNames.join(', ')})`,
+        )
+      }
+      // Check it has a real issue number (not XX)
+      if (url.includes('/issues/XX')) {
+        file.message(
+          `⚠️ Hierarchy link has placeholder issue number: ${url}`,
+        )
+      }
+    }
+  }
+
+  // Validate that required parent links exist with proper GitHub URLs
+  const hasValidInitiativeLink =
+    /Initiative/i.test(hierarchyContent) &&
+    foundUrls.some((url) => validUrlPattern.test(url) && /Initiative/i.test(hierarchyContent))
+  const hasValidEpicLink =
+    /Epic/i.test(hierarchyContent) &&
+    foundUrls.some((url) => validUrlPattern.test(url) && /Epic/i.test(hierarchyContent))
+
+  // Reset the regex lastIndex
+  validUrlPattern.lastIndex = 0
+
+  if (ticketType === 'epic') {
+    if (!hasValidInitiativeLink) {
+      file.message(
+        '⚠️ Epic must link to parent Initiative with a valid GitHub issue URL',
+      )
+    }
+  } else if (ticketType === 'feature' || ticketType === 'bug') {
+    if (!hasValidInitiativeLink) {
+      file.message(
+        '⚠️ Issue must link to parent Initiative with a valid GitHub issue URL',
+      )
+    }
+    if (!hasValidEpicLink) {
+      file.message(
+        '⚠️ Issue must link to parent Epic with a valid GitHub issue URL',
+      )
+    }
+  }
+}
+
 // ============================================================================
 // 🔧 FIX MODE FUNCTIONS
 // ============================================================================
@@ -528,6 +658,7 @@ export default function remarkLintTicket(options = {}) {
     }
 
     validateStoryPointsNotInTitle(tree, file)
+    validateHierarchyLinks(tree, file, ticketType)
   }
 }
 
@@ -543,7 +674,9 @@ export {
   EPIC_SECTIONS,
   INITIATIVE_SECTIONS,
   SECTION_TEMPLATES,
+  HIERARCHY_TEMPLATES,
   isTicketFile,
+  isTemplateFile,
   extractYamlFromCodeBlock,
   parseYaml,
   getHeadings,
@@ -554,6 +687,7 @@ export {
   validateRequiredSections,
   validateGherkin,
   validateStoryPointsNotInTitle,
+  validateHierarchyLinks,
   createHeading,
   createParagraph,
   createContentNodes,

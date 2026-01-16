@@ -162,9 +162,20 @@ Then [error handling behavior]
 
 ---
 
+## 🔗 Hierarchy
+
+<!--
+REQUIRED: Link to parent Epic and Initiative for navigation
+Replace XX with actual issue numbers
+-->
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+
 ## 🔗 Related
 
-- 📌 Parent Epic: #XX
 - ⬅️ Depends on: #XX
 - ➡️ Blocks: #XX
 - 📚 ADR: `/docs/adr/relevant-decision.md`
