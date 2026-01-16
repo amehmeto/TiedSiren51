@@ -99,3 +99,7 @@ app.db
 # Firebase
 google-services.json
 GoogleService-Info.plist
+
+# Claude Code automation
+.claude-init.sh
+.claude-issue-prompt.md
