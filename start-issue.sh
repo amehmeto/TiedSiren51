@@ -60,6 +60,14 @@ cat > "$PROMPT_FILE" << EOF
 # Issue #$ISSUE_NUMBER: $ISSUE_TITLE
 
 $ISSUE_BODY
+
+---
+
+## Instructions
+
+1. Implement the issue above
+2. When done, run \`/commit-push\` to commit and push your changes
+3. Then open a PR with: \`gh pr create --title "$ISSUE_TITLE" --body "Closes #$ISSUE_NUMBER" --base main\`
 EOF
 
 # Create init script that will run inside tmux
