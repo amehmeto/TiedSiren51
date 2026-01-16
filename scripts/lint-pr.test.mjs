@@ -31,7 +31,7 @@ function lintPR(title, body) {
 
 describe('PR Linter', () => {
   describe('🎫 Title Validation', () => {
-    it('should fail when title has no ticket reference', () => {
+    it('should fail when title has no Jira-style ticket prefix', () => {
       const { success, result } = lintPR(
         'feat: add login feature',
         '## Summary\nAdds login',
@@ -39,15 +39,24 @@ describe('PR Linter', () => {
 
       expect(success).toBe(false)
       expect(result.valid).toBe(false)
-      expect(result.title.errors).toContain(
-        'Title must reference at least one ticket (e.g., "feat: add login #123")',
-      )
+      expect(
+        result.title.errors.some((e) => e.includes('Jira-style ticket prefix')),
+      ).toBe(true)
     })
 
-    it('should pass when title has ticket reference', () => {
+    it('should pass when title has Jira-style ticket prefix', () => {
       const { success, result } = lintPR(
-        'feat: add login #123',
-        '## Summary\nAdds login',
+        'TS-123: feat: add login',
+        `## Summary
+Adds login
+
+## 🔗 Hierarchy
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren51/issues/62) |
+| 🏔️ Epic | [#54 - User Auth](https://github.com/amehmeto/TiedSiren51/issues/54) |
+| 📋 Issue | Closes #123 |`,
       )
 
       expect(success).toBe(true)
@@ -58,28 +67,44 @@ describe('PR Linter', () => {
       )
     })
 
-    it('should extract multiple ticket references from title', () => {
-      const { result } = lintPR('feat: add auth #123 #456', '## Summary\nTest')
+    it('should extract ticket from Jira-style prefix', () => {
+      const { result } = lintPR('TS-456: feat: add auth', '## Summary\nTest')
 
-      expect(result.linkedTickets).toHaveLength(2)
       expect(result.linkedTickets).toContainEqual(
-        expect.objectContaining({ number: 123 }),
-      )
-      expect(result.linkedTickets).toContainEqual(
-        expect.objectContaining({ number: 456 }),
+        expect.objectContaining({ repo: 'TiedSiren51', number: 456 }),
       )
     })
 
-    it('should warn when title does not use conventional commit format', () => {
-      const { result } = lintPR('Add login #123', '## Summary\nTest')
+    it('should support all valid prefixes', () => {
+      const prefixes = [
+        { prefix: 'TS', repo: 'TiedSiren51' },
+        { prefix: 'TSBO', repo: 'tied-siren-blocking-overlay' },
+        { prefix: 'EAS', repo: 'expo-accessibility-service' },
+        { prefix: 'EFS', repo: 'expo-foreground-service' },
+        { prefix: 'ELIA', repo: 'expo-list-installed-apps' },
+      ]
+
+      for (const { prefix, repo } of prefixes) {
+        const { result } = lintPR(
+          `${prefix}-42: feat: test`,
+          '## Summary\nTest',
+        )
+        expect(result.linkedTickets).toContainEqual(
+          expect.objectContaining({ repo, number: 42 }),
+        )
+      }
+    })
+
+    it('should warn when title does not use conventional commit format after prefix', () => {
+      const { result } = lintPR('TS-123: Add login', '## Summary\nTest')
 
       expect(
         result.title.warnings.some((w) => w.includes('conventional commit')),
       ).toBe(true)
     })
 
-    it('should not warn for conventional commit format', () => {
-      const { result } = lintPR('feat: add login #123', '## Summary\nTest')
+    it('should not warn for conventional commit format after prefix', () => {
+      const { result } = lintPR('TS-123: feat: add login', '## Summary\nTest')
 
       expect(
         result.title.warnings.some((w) => w.includes('conventional commit')),
@@ -87,7 +112,7 @@ describe('PR Linter', () => {
     })
 
     it('should warn when title is too long', () => {
-      const longTitle = 'feat: ' + 'a'.repeat(80) + ' #123'
+      const longTitle = 'TS-123: feat: ' + 'a'.repeat(100)
       const { result } = lintPR(longTitle, '## Summary\nTest')
 
       expect(result.title.warnings.some((w) => w.includes('chars'))).toBe(true)
@@ -102,7 +127,10 @@ describe('PR Linter', () => {
     })
 
     it('should detect WIP in title', () => {
-      const { result } = lintPR('WIP: feat: add login #123', '## Summary\nTest')
+      const { result } = lintPR(
+        'TS-123: WIP: feat: add login',
+        '## Summary\nTest',
+      )
 
       expect(
         result.title.info.some((i) => i.includes('Work In Progress')),
@@ -111,7 +139,7 @@ describe('PR Linter', () => {
 
     it('should detect [WIP] in title', () => {
       const { result } = lintPR(
-        '[WIP] feat: add login #123',
+        'TS-123: [WIP] feat: add login',
         '## Summary\nTest',
       )
 
@@ -123,7 +151,7 @@ describe('PR Linter', () => {
 
   describe('📄 Body Validation', () => {
     it('should fail when body is empty', () => {
-      const { success, result } = lintPR('feat: test #123', '')
+      const { success, result } = lintPR('TS-123: feat: test', '')
 
       expect(success).toBe(false)
       expect(result.body.errors).toContain('PR description is empty')
@@ -131,7 +159,7 @@ describe('PR Linter', () => {
 
     it('should fail when Summary section is missing', () => {
       const { success, result } = lintPR(
-        'feat: test #123',
+        'TS-123: feat: test',
         'Just some text without sections',
       )
 
@@ -141,7 +169,7 @@ describe('PR Linter', () => {
 
     it('should pass when Summary section is present', () => {
       const { result } = lintPR(
-        'feat: test #123',
+        'TS-123: feat: test',
         '## Summary\n\nThis is the summary',
       )
 
@@ -151,7 +179,7 @@ describe('PR Linter', () => {
     })
 
     it('should warn when Test Plan section is missing', () => {
-      const { result } = lintPR('feat: test #123', '## Summary\n\nTest')
+      const { result } = lintPR('TS-123: feat: test', '## Summary\n\nTest')
 
       expect(result.body.warnings.some((w) => w.includes('Test Plan'))).toBe(
         true,
@@ -160,7 +188,7 @@ describe('PR Linter', () => {
 
     it('should not warn when Test Plan section is present', () => {
       const body = '## Summary\n\nTest\n\n## Test Plan\n\n- Test manually'
-      const { result } = lintPR('feat: test #123', body)
+      const { result } = lintPR('TS-123: feat: test', body)
 
       expect(result.body.warnings.some((w) => w.includes('Test Plan'))).toBe(
         false,
@@ -168,14 +196,14 @@ describe('PR Linter', () => {
     })
 
     it('should warn when missing Closes/Fixes keyword', () => {
-      const { result } = lintPR('feat: test #123', '## Summary\n\nTest')
+      const { result } = lintPR('TS-123: feat: test', '## Summary\n\nTest')
 
       expect(result.body.warnings.some((w) => w.includes('Closes'))).toBe(true)
     })
 
     it('should not warn when Closes #X is present', () => {
       const { result } = lintPR(
-        'feat: test #123',
+        'TS-123: feat: test',
         '## Summary\n\nTest\n\nCloses #123',
       )
 
@@ -184,7 +212,7 @@ describe('PR Linter', () => {
 
     it('should extract ticket references from body', () => {
       const body = '## Summary\n\nRelated to #456 and #789'
-      const { result } = lintPR('feat: test #123', body)
+      const { result } = lintPR('TS-123: feat: test', body)
 
       expect(result.body.issues).toContainEqual(
         expect.objectContaining({ number: 456 }),
@@ -198,7 +226,7 @@ describe('PR Linter', () => {
   describe('🔗 Cross-repo References', () => {
     it('should extract cross-repo issue reference with repo#number format', () => {
       const { result } = lintPR(
-        'feat: add blocking overlay tied-siren-blocking-overlay#5',
+        'TSBO-5: feat: add blocking overlay',
         '## Summary\nTest',
       )
 
@@ -213,7 +241,7 @@ describe('PR Linter', () => {
     it('should extract full GitHub URL references', () => {
       const body =
         '## Summary\n\nSee https://github.com/amehmeto/expo-accessibility-service/issues/10'
-      const { result } = lintPR('feat: test #123', body)
+      const { result } = lintPR('TS-123: feat: test', body)
 
       expect(result.linkedTickets).toContainEqual(
         expect.objectContaining({
@@ -226,7 +254,7 @@ describe('PR Linter', () => {
     it('should extract PR URL references (pull/ URLs also close issues)', () => {
       const body =
         '## Summary\n\nRelated to https://github.com/amehmeto/tied-siren-blocking-overlay/pull/42'
-      const { result } = lintPR('feat: test #123', body)
+      const { result } = lintPR('TS-123: feat: test', body)
 
       expect(result.linkedTickets).toContainEqual(
         expect.objectContaining({
@@ -236,10 +264,10 @@ describe('PR Linter', () => {
       )
     })
 
-    it('should warn for unknown repo names', () => {
+    it('should warn for unknown repo names in body', () => {
       const { result } = lintPR(
-        'feat: test unknown-repo#42',
-        '## Summary\nTest',
+        'TS-123: feat: test',
+        '## Summary\nRelated to unknown-repo#42',
       )
 
       expect(
@@ -249,7 +277,7 @@ describe('PR Linter', () => {
 
     it('should not warn for known repo names', () => {
       const { result } = lintPR(
-        'feat: test tied-siren-blocking-overlay#5',
+        'TSBO-5: feat: test',
         '## Summary\nTest',
       )
 
@@ -260,7 +288,7 @@ describe('PR Linter', () => {
   describe('📊 Combined Validation', () => {
     it('should deduplicate ticket references', () => {
       const body = '## Summary\n\nRelated to #123\n\nCloses #123'
-      const { result } = lintPR('feat: test #123', body)
+      const { result } = lintPR('TS-123: feat: test', body)
 
       const ticket123Count = result.linkedTickets.filter(
         (t) => t.number === 123,
@@ -269,18 +297,24 @@ describe('PR Linter', () => {
     })
 
     it('should pass a well-formatted PR', () => {
-      const title = 'feat(auth): add Google Sign-In #87'
+      const title = 'TS-87: feat(auth): add Google Sign-In'
       const body = `## Summary
 
 Implements Google Sign-In using Firebase Authentication.
+
+## 🔗 Hierarchy
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren51/issues/62) |
+| 🏔️ Epic | [#54 - User Auth](https://github.com/amehmeto/TiedSiren51/issues/54) |
+| 📋 Issue | Closes #87 |
 
 ## Test Plan
 
 - [ ] Test on Android device
 - [ ] Test on iOS simulator
-- [ ] Verify token refresh works
-
-Closes #87`
+- [ ] Verify token refresh works`
 
       const { success, result } = lintPR(title, body)
 
@@ -288,7 +322,8 @@ Closes #87`
       expect(result.valid).toBe(true)
       expect(result.title.errors).toHaveLength(0)
       expect(result.body.errors).toHaveLength(0)
-      expect(result.linkedTickets).toHaveLength(1)
+      // 3 tickets (deduplicated): TS-87/#87 (merged), #62 (initiative), #54 (epic)
+      expect(result.linkedTickets).toHaveLength(3)
     })
 
     it('should report all errors for a poorly formatted PR', () => {

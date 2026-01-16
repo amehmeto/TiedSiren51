@@ -1,10 +1,22 @@
 ---
 name: 🏔️ Epic
 about: Large feature containing multiple stories
-title: '[Epic] '
+title: 'TS-XXX: [Epic] '
 labels: epic
 assignees: ''
 ---
+
+<!--
+⚠️ IMPORTANT: After creating this issue, update the title with the actual issue number!
+Example: TS-55: [Epic] Blocking Apps on Android
+
+Ticket prefixes by repo:
+- TS = TiedSiren51
+- TSBO = tied-siren-blocking-overlay
+- EAS = expo-accessibility-service
+- EFS = expo-foreground-service
+- ELIA = expo-list-installed-apps
+-->
 
 <!--
 📋 TICKET FRONTMATTER - Fill in these values
@@ -67,8 +79,27 @@ blocks: []
 
 ---
 
+## 🔗 Hierarchy
+
+<!--
+REQUIRED: Link to parent Initiative for navigation
+Replace XX with actual issue number
+-->
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+
 ## 🔗 Related
 
-- 📌 Parent Initiative: #XX
-- 📚 Design Doc: [link]
-- 🎨 Figma: [link]
+<!--
+Link dependencies with full GitHub URLs for cross-repo support
+Remove lines that don't apply
+-->
+
+| Relation | Link |
+|----------|------|
+| ⬅️ Depends on | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| ➡️ Blocks | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 📚 Design Doc | [link] |
+| 🎨 Figma | [link] |

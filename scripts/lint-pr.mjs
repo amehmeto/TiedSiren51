@@ -14,13 +14,25 @@
  *   gh pr view --json title,body | node scripts/lint-pr.mjs --stdin
  */
 
-import { VALID_REPOS, GITHUB_ORG } from './remark-lint-ticket/config.mjs'
+import {
+  VALID_REPOS,
+  GITHUB_ORG,
+  TICKET_PREFIXES,
+  PREFIX_TO_REPO,
+} from './remark-lint-ticket/config.mjs'
 
 // ============================================================================
 // 📋 CONFIGURATION
 // ============================================================================
 
 const ISSUE_PATTERN = /#(\d+)/g
+
+// Jira-style ticket prefix pattern (e.g., TS-123, TSBO-45, EAS-7)
+const VALID_PREFIXES = Object.values(TICKET_PREFIXES)
+const TICKET_PREFIX_PATTERN = new RegExp(
+  `^(${VALID_PREFIXES.join('|')})-(\\d+):\\s*`,
+  'i',
+)
 
 // Build cross-repo pattern dynamically from config
 // Matches: repo#123, org/repo#123, https://github.com/org/repo/issues/123, https://github.com/org/repo/pull/123
@@ -50,12 +62,26 @@ const COMMIT_PREFIXES = [
 // Required sections in PR body
 const REQUIRED_SECTIONS = [
   { pattern: /##\s*Summary/i, name: '## Summary', emoji: '📝' },
+  { pattern: /##\s*🔗\s*Hierarchy|##\s*Hierarchy/i, name: '## 🔗 Hierarchy', emoji: '🔗' },
 ]
 
 // Recommended sections (warnings only)
 const RECOMMENDED_SECTIONS = [
   { pattern: /##\s*Test\s*[Pp]lan/i, name: '## Test Plan', emoji: '🧪' },
 ]
+
+// Hierarchy link patterns
+const HIERARCHY_PATTERNS = {
+  initiative: /Initiative.*\[#(\d+)/i,
+  epic: /Epic.*\[#(\d+)/i,
+  issue: /Issue.*(?:Closes|Fixes|Resolves)?\s*#(\d+)/i,
+}
+
+// Valid GitHub issue URL pattern (must be from configured repos)
+const VALID_GITHUB_ISSUE_URL = new RegExp(
+  `https://github\\.com/${GITHUB_ORG}/(${VALID_REPO_NAMES.join('|')})/issues/(\\d+)`,
+  'g',
+)
 
 // ============================================================================
 // 🎨 OUTPUT HELPERS
@@ -156,35 +182,63 @@ function validateTitle(title) {
     return { errors, warnings, info, issues: [] }
   }
 
-  // Check for issue reference in title
+  // Check for Jira-style ticket prefix (e.g., TS-123: feat: ...)
+  const prefixMatch = title.match(TICKET_PREFIX_PATTERN)
+
+  if (!prefixMatch) {
+    errors.push(
+      `Title must start with a Jira-style ticket prefix (e.g., "TS-123: feat: add login")`,
+    )
+    errors.push(`Valid prefixes: ${VALID_PREFIXES.join(', ')}`)
+  } else {
+    const [, prefix, number] = prefixMatch
+    const upperPrefix = prefix.toUpperCase()
+    const repo = PREFIX_TO_REPO[upperPrefix]
+    info.push(`🎫 Ticket: ${upperPrefix}-${number} (${repo})`)
+  }
+
+  // Check for issue reference in title (in addition to the prefix)
   const issues = extractIssueReferences(title)
+
+  // Also extract from the Jira-style prefix
+  if (prefixMatch) {
+    const [, prefix, number] = prefixMatch
+    const upperPrefix = prefix.toUpperCase()
+    const repo = PREFIX_TO_REPO[upperPrefix]
+    if (repo) {
+      issues.push({
+        repo,
+        number: parseInt(number, 10),
+        raw: `${upperPrefix}-${number}`,
+      })
+    }
+  }
 
   if (issues.length === 0) {
     errors.push(
-      'Title must reference at least one ticket (e.g., "feat: add login #123")',
-    )
-  } else {
-    info.push(
-      `Found ${issues.length} ticket reference(s): ${issues.map((i) => `${i.repo}#${i.number}`).join(', ')}`,
+      'Title must reference at least one ticket (e.g., "TS-123: feat: add login")',
     )
   }
 
-  // Check for conventional commit prefix (warning only)
-  const hasPrefix = COMMIT_PREFIXES.some(
+  // Check for conventional commit prefix after the ticket number
+  const titleAfterTicket = prefixMatch
+    ? title.slice(prefixMatch[0].length)
+    : title
+  const hasConventionalPrefix = COMMIT_PREFIXES.some(
     (prefix) =>
-      title.toLowerCase().startsWith(`${prefix}:`) ||
-      title.toLowerCase().startsWith(`${prefix}(`),
+      titleAfterTicket.toLowerCase().startsWith(`${prefix}:`) ||
+      titleAfterTicket.toLowerCase().startsWith(`${prefix}(`),
   )
 
-  if (!hasPrefix) {
+  if (!hasConventionalPrefix) {
     warnings.push(
-      `Consider using conventional commit format: ${COMMIT_PREFIXES.slice(0, 5).join(', ')}...`,
+      `Consider using conventional commit format after ticket: ${VALID_PREFIXES[0]}-123: ${COMMIT_PREFIXES.slice(0, 3).join('|')}: ...`,
     )
   }
 
   // Check title length
-  if (title.length > 72) {
-    warnings.push(`Title is ${title.length} chars (recommended: ≤72)`)
+  if (title.length > 100) {
+    warnings.push(`Title is ${title.length} chars (recommended: ≤100)`)
   }
 
   // Check for WIP
@@ -221,6 +275,67 @@ function validateBody(body) {
   for (const section of REQUIRED_SECTIONS) {
     if (!section.pattern.test(body)) {
       errors.push(`Missing required section: ${section.emoji} ${section.name}`)
+    }
+  }
+
+  // Validate hierarchy links if hierarchy section exists
+  const hasHierarchySection = /##\s*🔗\s*Hierarchy|##\s*Hierarchy/i.test(body)
+  if (hasHierarchySection) {
+    // Check for placeholder #XX
+    if (body.includes('/issues/XX') || /\[#XX\s*-/i.test(body)) {
+      warnings.push(
+        'Hierarchy links contain placeholder #XX - replace with actual issue numbers',
+      )
+    }
+
+    // Extract all GitHub issue URLs from body
+    const urlPattern =
+      /https:\/\/github\.com\/([a-zA-Z0-9_-]+)\/([a-zA-Z0-9_-]+)\/issues\/(\d+)/g
+    const foundUrls = [...body.matchAll(urlPattern)]
+
+    // Validate each URL is from a valid repo
+    for (const match of foundUrls) {
+      const [fullUrl, org, repo] = match
+      if (org !== GITHUB_ORG) {
+        warnings.push(
+          `Hierarchy link to wrong org: ${fullUrl} (expected ${GITHUB_ORG})`,
+        )
+      } else if (!VALID_REPO_NAMES.includes(repo)) {
+        warnings.push(
+          `Hierarchy link to unknown repo: ${fullUrl} (valid repos: ${VALID_REPO_NAMES.join(', ')})`,
+        )
+      }
+    }
+
+    // Check for Initiative link with valid GitHub URL
+    const hasInitiativeUrl =
+      HIERARCHY_PATTERNS.initiative.test(body) &&
+      foundUrls.some(
+        ([, org, repo]) => org === GITHUB_ORG && VALID_REPO_NAMES.includes(repo),
+      )
+    if (!hasInitiativeUrl) {
+      warnings.push(
+        'Hierarchy section should link to parent Initiative with a valid GitHub issue URL',
+      )
+    }
+
+    // Check for Epic link with valid GitHub URL
+    const hasEpicUrl =
+      HIERARCHY_PATTERNS.epic.test(body) &&
+      foundUrls.some(
+        ([, org, repo]) => org === GITHUB_ORG && VALID_REPO_NAMES.includes(repo),
+      )
+    if (!hasEpicUrl) {
+      warnings.push(
+        'Hierarchy section should link to parent Epic with a valid GitHub issue URL',
+      )
+    }
+
+    // Check for Issue link (Closes #XX)
+    if (!HIERARCHY_PATTERNS.issue.test(body) && !/Closes\s+#\d+/i.test(body)) {
+      warnings.push(
+        'Hierarchy section should reference the Issue being addressed (e.g., "Closes #123")',
+      )
     }
   }
 
@@ -485,14 +600,21 @@ ${colors.bold}Examples:${colors.reset}
 
 ${colors.bold}Validation Rules:${colors.reset}
   ${colors.red}Errors (must fix):${colors.reset}
-    • Title must reference at least one ticket (#123)
+    • Title must start with Jira-style prefix (TS-123: feat: ...)
+    • Valid prefixes: ${VALID_PREFIXES.join(', ')}
     • Description must have ## Summary section
+    • Description must have ## 🔗 Hierarchy section
 
   ${colors.yellow}Warnings (recommended):${colors.reset}
-    • Use conventional commit format (feat:, fix:, etc.)
+    • Use conventional commit format after ticket (feat:, fix:, etc.)
+    • Keep title ≤100 chars (accounts for Jira prefix overhead)
     • Add ## Test Plan section
-    • Include "Closes #X" to auto-close issues
+    • Hierarchy should link to Initiative, Epic, and Issue
     • Add screenshots for UI changes
+
+${colors.bold}Title Format:${colors.reset}
+  PREFIX-NUMBER: type(scope): description
+  Example: TS-123: feat(auth): add Google Sign-In
 `)
       process.exit(0)
     }

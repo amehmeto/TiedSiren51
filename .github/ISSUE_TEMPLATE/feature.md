@@ -1,10 +1,22 @@
 ---
 name: ✨ Feature / Story
 about: A new feature or user story for development
-title: 'feat(scope): '
+title: 'TS-XXX: feat(scope): '
 labels: enhancement
 assignees: ''
 ---
+
+<!--
+⚠️ IMPORTANT: After creating this issue, update the title with the actual issue number!
+Example: TS-123: feat(auth): add login button
+
+Ticket prefixes by repo:
+- TS = TiedSiren51
+- TSBO = tied-siren-blocking-overlay
+- EAS = expo-accessibility-service
+- EFS = expo-foreground-service
+- ELIA = expo-list-installed-apps
+-->
 
 <!--
 📋 TICKET FRONTMATTER - Fill in these values
@@ -162,9 +174,27 @@ Then [error handling behavior]
 
 ---
 
+## 🔗 Hierarchy
+
+<!--
+REQUIRED: Link to parent Epic and Initiative for navigation
+Replace XX with actual issue numbers
+-->
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+
 ## 🔗 Related
 
-- 📌 Parent Epic: #XX
-- ⬅️ Depends on: #XX
-- ➡️ Blocks: #XX
-- 📚 ADR: `/docs/adr/relevant-decision.md`
+<!--
+REQUIRED: Link dependencies with full GitHub URLs for cross-repo support
+Remove lines that don't apply
+-->
+
+| Relation | Link |
+|----------|------|
+| ⬅️ Depends on | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| ➡️ Blocks | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 📚 ADR | `/docs/adr/relevant-decision.md` |

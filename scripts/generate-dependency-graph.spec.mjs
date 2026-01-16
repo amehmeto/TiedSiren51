@@ -54,8 +54,8 @@ describe('parseDependencyRef', () => {
       expect(result).toEqual({ repo: 'expo-foreground-service', number: 7 })
     })
 
-    it('parses ELA#N as expo-list-installed-apps', () => {
-      const result = parseDependencyRef('ELA#1', 'TiedSiren51')
+    it('parses ELIA#N as expo-list-installed-apps', () => {
+      const result = parseDependencyRef('ELIA#1', 'TiedSiren51')
       expect(result).toEqual({ repo: 'expo-list-installed-apps', number: 1 })
     })
 
@@ -140,9 +140,9 @@ describe('formatDepRef', () => {
     expect(label).toBe('EFS#3')
   })
 
-  it('formats ELA repo with correct abbreviation', () => {
+  it('formats ELIA repo with correct abbreviation', () => {
     const label = formatDepRef({ repo: 'expo-list-installed-apps', number: 1 }, 'TiedSiren51')
-    expect(label).toBe('ELA#1')
+    expect(label).toBe('ELIA#1')
   })
 
   it('falls back to full repo name if no abbreviation defined', () => {

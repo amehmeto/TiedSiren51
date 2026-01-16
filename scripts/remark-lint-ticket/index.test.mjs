@@ -216,6 +216,13 @@ Given something
 When something
 Then something
 \`\`\`
+
+## 🔗 Hierarchy
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren51/issues/62) |
+| 🏔️ Epic | [#55 - Blocking Apps on Android](https://github.com/amehmeto/TiedSiren51/issues/55) |
 `
       const messages = await lint(markdown)
       const errors = messages.filter((m) => m.startsWith('❌'))
@@ -479,6 +486,13 @@ Given something
 When action
 Then result
 \`\`\`
+
+## 🔗 Hierarchy
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren51/issues/62) |
+| 🏔️ Epic | [#55 - Blocking Apps on Android](https://github.com/amehmeto/TiedSiren51/issues/55) |
 `
       const { messages, output } = await lintWithFix(
         markdown,
