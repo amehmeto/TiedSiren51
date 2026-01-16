@@ -26,12 +26,24 @@ fi
 
 echo "Issue fetched: $ISSUE_TITLE"
 
+# Update main repo before creating worktree
+echo "Updating main repository..."
+git fetch origin
+git pull --ff-only origin main
+
 # Create worktree with a new branch or reuse existing branch
 echo "Creating worktree at $WORKTREE_DIR..."
-git fetch origin
 
+# Clean up stale worktree entries (directories that no longer exist)
+git worktree prune
+
+# Check if worktree already exists at this path
+if [ -d "$WORKTREE_DIR" ]; then
+    echo "Worktree already exists at $WORKTREE_DIR, reusing it..."
+    cd "$WORKTREE_DIR"
+    git pull --ff-only || true
 # Check if branch already exists (locally or remotely)
-if git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
+elif git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
     echo "Branch $BRANCH_NAME already exists locally, reusing it..."
     git worktree add "$WORKTREE_DIR" "$BRANCH_NAME"
 elif git show-ref --verify --quiet "refs/remotes/origin/$BRANCH_NAME"; then
