@@ -176,6 +176,13 @@ Replace XX with actual issue numbers
 
 ## 🔗 Related
 
-- ⬅️ Depends on: #XX
-- ➡️ Blocks: #XX
-- 📚 ADR: `/docs/adr/relevant-decision.md`
+<!--
+REQUIRED: Link dependencies with full GitHub URLs for cross-repo support
+Remove lines that don't apply
+-->
+
+| Relation | Link |
+|----------|------|
+| ⬅️ Depends on | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| ➡️ Blocks | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 📚 ADR | `/docs/adr/relevant-decision.md` |

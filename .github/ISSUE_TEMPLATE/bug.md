@@ -152,6 +152,14 @@ Replace XX with actual issue numbers
 
 ## 🔗 Related
 
-- 🔥 Sentry Issue: [link]
-- 📌 Related Ticket: #XX
-- 📚 Relevant ADR: `/docs/adr/`
+<!--
+REQUIRED: Link dependencies with full GitHub URLs for cross-repo support
+Remove lines that don't apply
+-->
+
+| Relation | Link |
+|----------|------|
+| ⬅️ Depends on | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| ➡️ Blocks | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 🔥 Sentry Issue | [link] |
+| 📚 ADR | `/docs/adr/relevant-decision.md` |

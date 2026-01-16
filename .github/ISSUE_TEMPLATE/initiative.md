@@ -79,5 +79,14 @@ Initiatives contain Epics, which contain Issues
 
 ## 🔗 Related
 
-- 📚 Design Doc: [link]
-- 🎨 Figma: [link]
+<!--
+Link dependencies with full GitHub URLs for cross-repo support
+Remove lines that don't apply
+-->
+
+| Relation | Link |
+|----------|------|
+| ⬅️ Depends on | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| ➡️ Blocks | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 📚 Design Doc | [link] |
+| 🎨 Figma | [link] |
