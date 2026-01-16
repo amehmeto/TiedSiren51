@@ -17,6 +17,4 @@ jobs:
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
-          script: |
-            cd ${{ vars.REPO_PATH || '~/ethernal-claude' }}
-            ./start-issue.sh ${{ github.event.issue.number }}
+          script: cd ${{ vars.REPO_PATH || '~/ethernal-claude' }} && ./start-issue.sh ${{ github.event.issue.number }}
