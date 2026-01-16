@@ -47,7 +47,7 @@ The project uses custom git hooks for CI monitoring. These hooks are not tracked
 
 **Required hooks** (create in `.git/hooks/`):
 
-1. **reference-transaction** - Detects when remote refs are updated after push
+1. **reference-transaction** - Detects when current branch's remote ref is updated after push
 2. **post-push** - Triggered by reference-transaction to run CI watch
 
 **Setup commands:**
@@ -57,8 +57,12 @@ The project uses custom git hooks for CI monitoring. These hooks are not tracked
 cat > .git/hooks/reference-transaction << 'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
+current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
+if [[ -z "$current_branch" || "$current_branch" == "HEAD" ]]; then
+  exit 0
+fi
 while read -r oldvalue newvalue refname; do
-  if [[ "$1" == "committed" ]] && [[ "$refname" =~ ^refs/remotes/origin/ ]]; then
+  if [[ "$1" == "committed" ]] && [[ "$refname" == "refs/remotes/origin/$current_branch" ]]; then
     if [[ -x "$(dirname "$0")/post-push" ]]; then
       "$(dirname "$0")/post-push"
     fi
@@ -81,7 +85,13 @@ EOF
 chmod +x .git/hooks/post-push
 ```
 
-The `scripts/ci-watch.sh` script polls GitHub Actions and reports results (excluded jobs: "build").
+**Environment variables for `scripts/ci-watch.sh`:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CI_WATCH_EXCLUDED_JOBS` | `build` | Comma-separated list of jobs to exclude from CI status |
+
+The script polls GitHub Actions, verifies the workflow matches the current commit SHA, and reports results.
 
 ## IMPORTANT: Anti-patterns
 

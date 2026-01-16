@@ -2,12 +2,17 @@
 set -euo pipefail
 
 # CI Watch Script
-# Polls GitHub Actions until all jobs (excluding "build") complete
+# Polls GitHub Actions until all jobs (excluding configurable jobs) complete
 # Exits 0 on success, 1 on failure, 2 on timeout
+#
+# Environment variables:
+#   CI_WATCH_EXCLUDED_JOBS - Comma-separated list of jobs to exclude (default: "build")
 
 readonly POLL_INTERVAL=15
 readonly TIMEOUT_SECONDS=600  # 10 minutes
-readonly EXCLUDED_JOBS="build"
+readonly EXCLUDED_JOBS="${CI_WATCH_EXCLUDED_JOBS:-build}"
+readonly MAX_RUN_DETECTION_ATTEMPTS=10
+readonly RUN_DETECTION_INTERVAL=3
 
 # Colors for output
 readonly RED='\033[0;31m'
@@ -26,13 +31,21 @@ get_current_branch() {
   git rev-parse --abbrev-ref HEAD
 }
 
-# Get the latest workflow run ID for the current branch
-get_latest_run_id() {
-  local branch="$1"
-  gh run list --branch "$branch" --limit 1 --json databaseId --jq '.[0].databaseId // empty'
+# Get current commit SHA
+get_current_sha() {
+  git rev-parse HEAD
 }
 
-# Get job statuses for a run, excluding specified jobs
+# Get the latest workflow run for the branch that matches the given SHA
+# Returns: run_id or empty if not found
+get_run_id_for_sha() {
+  local branch="$1"
+  local expected_sha="$2"
+  gh run list --branch "$branch" --limit 5 --json databaseId,headSha \
+    --jq ".[] | select(.headSha == \"$expected_sha\") | .databaseId" | head -1
+}
+
+# Get job statuses for a run
 # Returns: job_name<TAB>status<TAB>conclusion for each job
 get_job_statuses() {
   local run_id="$1"
@@ -52,25 +65,49 @@ is_excluded_job() {
   return 1
 }
 
+# Wait for workflow run to be registered for the current commit
+wait_for_run() {
+  local branch="$1"
+  local expected_sha="$2"
+  local attempt=1
+
+  print_info "Waiting for workflow run for commit ${expected_sha:0:7}..."
+
+  while [[ $attempt -le $MAX_RUN_DETECTION_ATTEMPTS ]]; do
+    local run_id
+    run_id=$(get_run_id_for_sha "$branch" "$expected_sha")
+
+    if [[ -n "$run_id" ]]; then
+      echo "$run_id"
+      return 0
+    fi
+
+    print_info "Attempt $attempt/$MAX_RUN_DETECTION_ATTEMPTS: workflow not found yet..."
+    sleep "$RUN_DETECTION_INTERVAL"
+    ((attempt++))
+  done
+
+  return 1
+}
+
 # Main polling loop
 main() {
-  local branch
+  local branch current_sha
   branch=$(get_current_branch)
-  print_info "Watching CI for branch: $branch"
-
-  # Wait a moment for GitHub to register the push
-  sleep 3
+  current_sha=$(get_current_sha)
+  print_info "Watching CI for branch: $branch (commit: ${current_sha:0:7})"
 
   local run_id
-  run_id=$(get_latest_run_id "$branch")
-
-  if [[ -z "$run_id" ]]; then
-    print_error "No workflow run found for branch '$branch'"
+  if ! run_id=$(wait_for_run "$branch" "$current_sha"); then
+    print_error "No workflow run found for commit ${current_sha:0:7} after $MAX_RUN_DETECTION_ATTEMPTS attempts"
     exit 1
   fi
 
   print_info "Found workflow run: $run_id"
   print_info "Polling every ${POLL_INTERVAL}s (timeout: ${TIMEOUT_SECONDS}s)..."
+  if [[ -n "$EXCLUDED_JOBS" ]]; then
+    print_info "Excluded jobs: $EXCLUDED_JOBS"
+  fi
 
   local start_time
   start_time=$(date +%s)
@@ -81,13 +118,14 @@ main() {
     elapsed=$((current_time - start_time))
 
     if [[ $elapsed -ge $TIMEOUT_SECONDS ]]; then
-      print_error "Timeout after ${TIMEOUT_SECONDS}s"
+      print_warning "Timeout after ${TIMEOUT_SECONDS}s"
       exit 2
     fi
 
     local all_completed=true
     local any_failed=false
     local pending_jobs=()
+    local job_count=0
 
     while IFS=$'\t' read -r job_name status conclusion; do
       # Skip excluded jobs
@@ -95,13 +133,23 @@ main() {
         continue
       fi
 
+      ((job_count++)) || true
+
       if [[ "$status" != "completed" ]]; then
         all_completed=false
         pending_jobs+=("$job_name")
-      elif [[ "$conclusion" == "failure" ]]; then
+      elif [[ "$conclusion" != "success" && "$conclusion" != "skipped" ]]; then
+        # Treat failure, cancelled, and other non-success conclusions as failures
         any_failed=true
       fi
     done < <(get_job_statuses "$run_id")
+
+    # If no jobs found yet, keep waiting
+    if [[ $job_count -eq 0 ]]; then
+      print_info "No jobs found yet, waiting..."
+      sleep "$POLL_INTERVAL"
+      continue
+    fi
 
     if [[ "$all_completed" == true ]]; then
       if [[ "$any_failed" == true ]]; then
@@ -112,7 +160,7 @@ main() {
         gh run view "$run_id" --log-failed
         exit 1
       else
-        print_success "CI passed (excluding build)"
+        print_success "CI passed (excluded: $EXCLUDED_JOBS)"
         exit 0
       fi
     fi
