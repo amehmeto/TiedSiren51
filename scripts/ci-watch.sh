@@ -7,6 +7,7 @@ set -euo pipefail
 #
 # Environment variables:
 #   CI_WATCH_EXCLUDED_JOBS - Comma-separated list of job patterns to exclude (default: "build")
+#   CI_WATCH_WORKFLOW - Workflow name to filter by (default: all workflows)
 #   SKIP_CI_WATCH - Set to any non-empty value to skip CI watching
 
 # Source shared colors
@@ -37,6 +38,7 @@ fi
 readonly POLL_INTERVAL=15
 readonly TIMEOUT_SECONDS=600  # 10 minutes
 readonly EXCLUDED_JOBS="${CI_WATCH_EXCLUDED_JOBS:-build}"
+readonly WORKFLOW_NAME="${CI_WATCH_WORKFLOW:-}"
 readonly MAX_RUN_DETECTION_ATTEMPTS=10
 readonly RUN_DETECTION_INTERVAL=3
 readonly MAX_NO_JOBS_ATTEMPTS=5
@@ -54,9 +56,13 @@ hash_cmd() {
 LOCK_FILE="/tmp/ci-watch-$(git rev-parse --show-toplevel 2>/dev/null | hash_cmd | cut -d' ' -f1).lock"
 readonly LOCK_FILE
 
-# Cleanup function for lock file
+# Global temp file for API error capture (cleaned up by trap on exit/interrupt)
+API_ERROR_TMPFILE=""
+
+# Cleanup function for lock file and temp files
 cleanup() {
   rm -f "$LOCK_FILE"
+  [[ -n "$API_ERROR_TMPFILE" ]] && rm -f "$API_ERROR_TMPFILE"
 }
 
 # Acquire lock to prevent race conditions from multiple pushes
@@ -77,25 +83,27 @@ acquire_lock() {
 
   # Fallback for systems without flock (e.g., macOS)
   # Uses atomic mkdir as a lock mechanism (mkdir is atomic on POSIX)
+  # PID is stored inside the lock directory to avoid TOCTOU race
   local lock_dir="${LOCK_FILE}.d"
+  local pid_file="$lock_dir/pid"
   if ! mkdir "$lock_dir" 2>/dev/null; then
     # Lock exists, check if process is still running
     local pid
-    pid=$(cat "$LOCK_FILE" 2>/dev/null || echo "")
+    pid=$(cat "$pid_file" 2>/dev/null || echo "")
     if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
       print_warning "Another CI watch process is already running (PID: $pid)"
       exit 0
     fi
     # Stale lock, remove and retry
-    rm -rf "$lock_dir" "$LOCK_FILE"
+    rm -rf "$lock_dir"
     if ! mkdir "$lock_dir" 2>/dev/null; then
       print_warning "Failed to acquire lock, another process may have started"
       exit 0
     fi
   fi
-  echo $$ > "$LOCK_FILE"
-  # Cleanup both lock file and directory
-  trap 'rm -rf "$LOCK_FILE" "${LOCK_FILE}.d"' EXIT INT TERM
+  echo $$ > "$pid_file"
+  # Cleanup the lock directory and any temp files
+  trap 'rm -rf "${LOCK_FILE}.d"; [[ -n "$API_ERROR_TMPFILE" ]] && rm -f "$API_ERROR_TMPFILE"' EXIT INT TERM
 }
 
 # Get current branch name
@@ -119,7 +127,11 @@ get_current_sha() {
 get_run_id_for_sha() {
   local branch="$1"
   local expected_sha="$2"
-  gh run list --branch "$branch" --limit 5 --json databaseId,headSha \
+  local workflow_args=()
+  if [[ -n "$WORKFLOW_NAME" ]]; then
+    workflow_args=(--workflow "$WORKFLOW_NAME")
+  fi
+  gh run list --branch "$branch" "${workflow_args[@]}" --limit 5 --json databaseId,headSha \
     --jq "[.[] | select(.headSha == \"$expected_sha\") | .databaseId][0] // empty"
 }
 
@@ -128,20 +140,23 @@ get_run_id_for_sha() {
 # Returns empty string on API errors to avoid script exit due to set -e
 get_job_statuses() {
   local run_id="$1"
-  local output error_output exit_code
-  error_output=$(mktemp)
-  output=$(gh run view "$run_id" --json jobs --jq '.jobs[] | "\(.name)\t\(.status)\t\(.conclusion // "null")"' 2>"$error_output") && exit_code=0 || exit_code=$?
+  local output exit_code
+  # Use global temp file so it gets cleaned up on interrupt via trap
+  API_ERROR_TMPFILE=$(mktemp)
+  output=$(gh run view "$run_id" --json jobs --jq '.jobs[] | "\(.name)\t\(.status)\t\(.conclusion // "null")"' 2>"$API_ERROR_TMPFILE") && exit_code=0 || exit_code=$?
   if [[ $exit_code -ne 0 ]]; then
     local err_msg
-    err_msg=$(cat "$error_output")
-    rm -f "$error_output"
+    err_msg=$(cat "$API_ERROR_TMPFILE")
+    rm -f "$API_ERROR_TMPFILE"
+    API_ERROR_TMPFILE=""
     if [[ -n "$err_msg" ]]; then
       print_warning "GitHub API error (will retry): $err_msg" >&2
     fi
     echo ""
     return 0
   fi
-  rm -f "$error_output"
+  rm -f "$API_ERROR_TMPFILE"
+  API_ERROR_TMPFILE=""
   echo "$output"
 }
 
@@ -203,6 +218,9 @@ main() {
 
   print_info "Found workflow run: $run_id"
   print_info "Polling every ${POLL_INTERVAL}s (timeout: ${TIMEOUT_SECONDS}s)..."
+  if [[ -n "$WORKFLOW_NAME" ]]; then
+    print_info "Workflow filter: $WORKFLOW_NAME"
+  fi
   if [[ -n "$EXCLUDED_JOBS" ]]; then
     print_info "Excluded jobs: $EXCLUDED_JOBS"
   fi

@@ -38,6 +38,7 @@ npm test              # Run tests (watch mode)
 npm run lint          # TypeScript + ESLint + Prettier
 npm run lint:fix      # Auto-fix lint issues
 npx prisma generate   # Regenerate Prisma client after schema changes
+./scripts/setup-hooks.sh  # Set up git hooks for CI monitoring
 SKIP_E2E_CHECK=true git push  # Push without interactive e2e test prompt
 ```
 
@@ -64,6 +65,7 @@ This creates both hooks in `.git/hooks/` with automatic backup of any existing h
 |----------|---------|-------------|
 | `CI_WATCH_EXCLUDED_JOBS` | `build` | Comma-separated list of job patterns to exclude (supports partial matching). The `build` job is excluded by default because it's a prerequisite job that typically just compiles code - the test/lint jobs that depend on it are more informative. |
 | `CI_WATCH_REMOTE` | `origin` | Git remote name to watch for pushes |
+| `CI_WATCH_WORKFLOW` | (all) | Workflow name to filter by. Useful when repo has multiple workflows. |
 | `SKIP_CI_WATCH` | (unset) | Set to any value to skip CI monitoring (e.g., `SKIP_CI_WATCH=1 git push`) |
 
 The script polls GitHub Actions, verifies the workflow matches the current commit SHA, and reports results. Press **Ctrl+C** to cancel watching at any time.

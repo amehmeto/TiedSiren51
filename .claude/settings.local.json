@@ -159,6 +159,8 @@
       "Bash(curl -d:*)",
       "Bash(env:*)",
       "Bash(eval:*)",
+      "Bash(gh api --method DELETE:*)",
+      "Bash(gh api -X DELETE:*)",
       "Bash(gh issue delete:*)",
       "Bash(gh pr close:*)",
       "Bash(gh pr merge:*)",
