@@ -7,11 +7,30 @@ set -euo pipefail
 #
 # Environment variables:
 #   CI_WATCH_EXCLUDED_JOBS - Comma-separated list of job patterns to exclude (default: "build")
+#   SKIP_CI_WATCH - Set to any non-empty value to skip CI watching
+
+# Source shared colors
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+# shellcheck source=/dev/null
+source "$SCRIPT_DIR/lib/colors.sh"
+
+# Allow skipping CI watch (useful for quick pushes)
+if [[ -n "${SKIP_CI_WATCH:-}" ]]; then
+  print_info "SKIP_CI_WATCH is set, skipping CI monitoring"
+  exit 0
+fi
 
 # Check for required dependencies
 if ! command -v gh &>/dev/null; then
-  echo "[ERROR] GitHub CLI (gh) is required but not installed"
+  print_error "GitHub CLI (gh) is required but not installed"
   echo "Install it from: https://cli.github.com/"
+  exit 1
+fi
+
+# Check if gh is authenticated
+if ! gh auth status &>/dev/null; then
+  print_error "GitHub CLI is not authenticated"
+  echo "Run 'gh auth login' to authenticate"
   exit 1
 fi
 
@@ -22,21 +41,41 @@ readonly MAX_RUN_DETECTION_ATTEMPTS=10
 readonly RUN_DETECTION_INTERVAL=3
 readonly MAX_NO_JOBS_ATTEMPTS=5
 
-# Colors for output
-readonly RED='\033[0;31m'
-readonly GREEN='\033[0;32m'
-readonly YELLOW='\033[1;33m'
-readonly BLUE='\033[0;34m'
-readonly NC='\033[0m'
+# Lock file to prevent multiple concurrent CI watch processes
+# Use shasum for portability (works on macOS and Linux)
+LOCK_FILE="/tmp/ci-watch-$(git rev-parse --show-toplevel 2>/dev/null | shasum | cut -d' ' -f1).lock"
+readonly LOCK_FILE
 
-print_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
-print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
-print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
-print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+# Cleanup function for lock file
+cleanup() {
+  rm -f "$LOCK_FILE"
+}
+
+# Acquire lock to prevent race conditions from multiple pushes
+acquire_lock() {
+  if [[ -f "$LOCK_FILE" ]]; then
+    local pid
+    pid=$(cat "$LOCK_FILE" 2>/dev/null || echo "")
+    if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
+      print_warning "Another CI watch process is already running (PID: $pid)"
+      exit 0
+    fi
+    # Stale lock file, remove it
+    rm -f "$LOCK_FILE"
+  fi
+  echo $$ > "$LOCK_FILE"
+  trap cleanup EXIT
+}
 
 # Get current branch name
 get_current_branch() {
-  git rev-parse --abbrev-ref HEAD
+  local branch
+  branch=$(git rev-parse --abbrev-ref HEAD)
+  if [[ "$branch" == "HEAD" ]]; then
+    print_error "Cannot watch CI in detached HEAD state"
+    exit 1
+  fi
+  echo "$branch"
 }
 
 # Get current commit SHA
@@ -50,23 +89,24 @@ get_run_id_for_sha() {
   local branch="$1"
   local expected_sha="$2"
   gh run list --branch "$branch" --limit 5 --json databaseId,headSha \
-    --jq ".[] | select(.headSha == \"$expected_sha\") | .databaseId" | head -1
+    --jq "[.[] | select(.headSha == \"$expected_sha\") | .databaseId][0] // empty"
 }
 
 # Get job statuses for a run
 # Returns: job_name<TAB>status<TAB>conclusion for each job
+# Returns empty string on API errors to avoid script exit due to set -e
 get_job_statuses() {
   local run_id="$1"
-  gh run view "$run_id" --json jobs --jq '.jobs[] | "\(.name)\t\(.status)\t\(.conclusion // "null")"'
+  gh run view "$run_id" --json jobs --jq '.jobs[] | "\(.name)\t\(.status)\t\(.conclusion // "null")"' 2>/dev/null || echo ""
 }
 
-# Check if a job name should be excluded (supports glob matching)
+# Check if a job name should be excluded (uses substring matching)
 is_excluded_job() {
   local job_name="$1"
   local excluded
   IFS=',' read -ra excluded <<< "$EXCLUDED_JOBS"
   for pattern in "${excluded[@]}"; do
-    # Use glob matching to support partial matches like "build" matching "build (ubuntu-latest)"
+    # Use substring matching to support partial matches like "build" matching "build (ubuntu-latest)"
     if [[ "$job_name" == *"$pattern"* ]]; then
       return 0
     fi
@@ -101,9 +141,13 @@ wait_for_run() {
 
 # Main polling loop
 main() {
+  # Acquire lock to prevent multiple concurrent CI watch processes
+  acquire_lock
+
   local branch current_sha
-  branch=$(get_current_branch)
-  current_sha=$(get_current_sha)
+  # Use PUSHED_BRANCH/PUSHED_SHA from hook if available, otherwise detect from HEAD
+  branch="${PUSHED_BRANCH:-$(get_current_branch)}"
+  current_sha="${PUSHED_SHA:-$(get_current_sha)}"
   print_info "Watching CI for branch: $branch (commit: ${current_sha:0:7})"
 
   local run_id
@@ -135,6 +179,7 @@ main() {
     local all_completed=true
     local any_failed=false
     local pending_jobs=()
+    local failed_jobs=()
     local job_count=0
 
     while IFS=$'\t' read -r job_name status conclusion; do
@@ -151,6 +196,7 @@ main() {
       elif [[ "$conclusion" != "success" && "$conclusion" != "skipped" ]]; then
         # Treat failure, cancelled, and other non-success conclusions as failures
         any_failed=true
+        failed_jobs+=("$job_name ($conclusion)")
       fi
     done < <(get_job_statuses "$run_id")
 
@@ -173,7 +219,12 @@ main() {
       if [[ "$any_failed" == true ]]; then
         print_error "CI failed!"
         echo ""
-        print_info "Failed job logs:"
+        print_info "Failed jobs:"
+        for job in "${failed_jobs[@]}"; do
+          echo "  - $job"
+        done
+        echo ""
+        print_info "Fetching failed job logs..."
         echo ""
         gh run view "$run_id" --log-failed
         exit 1
@@ -184,7 +235,8 @@ main() {
     fi
 
     local remaining=$((TIMEOUT_SECONDS - elapsed))
-    print_info "Waiting for jobs: ${pending_jobs[*]} (${remaining}s remaining)"
+    local IFS=', '
+    print_info "Waiting for jobs: ${pending_jobs[*]:-none} (${remaining}s remaining)"
     sleep "$POLL_INTERVAL"
   done
 }
