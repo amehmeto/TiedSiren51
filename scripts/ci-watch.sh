@@ -41,9 +41,17 @@ readonly MAX_RUN_DETECTION_ATTEMPTS=10
 readonly RUN_DETECTION_INTERVAL=3
 readonly MAX_NO_JOBS_ATTEMPTS=5
 
+# Hash command for portability (macOS has shasum, Linux may only have sha1sum)
+hash_cmd() {
+  if command -v shasum &>/dev/null; then
+    shasum
+  else
+    sha1sum
+  fi
+}
+
 # Lock file to prevent multiple concurrent CI watch processes
-# Use shasum for portability (works on macOS and Linux)
-LOCK_FILE="/tmp/ci-watch-$(git rev-parse --show-toplevel 2>/dev/null | shasum | cut -d' ' -f1).lock"
+LOCK_FILE="/tmp/ci-watch-$(git rev-parse --show-toplevel 2>/dev/null | hash_cmd | cut -d' ' -f1).lock"
 readonly LOCK_FILE
 
 # Cleanup function for lock file
@@ -52,19 +60,42 @@ cleanup() {
 }
 
 # Acquire lock to prevent race conditions from multiple pushes
+# Uses flock for atomic locking when available, falls back to PID-based locking
 acquire_lock() {
-  if [[ -f "$LOCK_FILE" ]]; then
+  # Try flock-based locking first (atomic, no TOCTOU race)
+  if command -v flock &>/dev/null; then
+    exec 200>"$LOCK_FILE"
+    if ! flock -n 200; then
+      print_warning "Another CI watch process is already running"
+      exit 0
+    fi
+    # Write PID for debugging purposes
+    echo $$ >&200
+    trap cleanup EXIT INT TERM
+    return 0
+  fi
+
+  # Fallback for systems without flock (e.g., macOS)
+  # Uses atomic mkdir as a lock mechanism (mkdir is atomic on POSIX)
+  local lock_dir="${LOCK_FILE}.d"
+  if ! mkdir "$lock_dir" 2>/dev/null; then
+    # Lock exists, check if process is still running
     local pid
     pid=$(cat "$LOCK_FILE" 2>/dev/null || echo "")
     if [[ -n "$pid" ]] && kill -0 "$pid" 2>/dev/null; then
       print_warning "Another CI watch process is already running (PID: $pid)"
       exit 0
     fi
-    # Stale lock file, remove it
-    rm -f "$LOCK_FILE"
+    # Stale lock, remove and retry
+    rm -rf "$lock_dir" "$LOCK_FILE"
+    if ! mkdir "$lock_dir" 2>/dev/null; then
+      print_warning "Failed to acquire lock, another process may have started"
+      exit 0
+    fi
   fi
   echo $$ > "$LOCK_FILE"
-  trap cleanup EXIT
+  # Cleanup both lock file and directory
+  trap 'rm -rf "$LOCK_FILE" "${LOCK_FILE}.d"' EXIT INT TERM
 }
 
 # Get current branch name
@@ -97,7 +128,21 @@ get_run_id_for_sha() {
 # Returns empty string on API errors to avoid script exit due to set -e
 get_job_statuses() {
   local run_id="$1"
-  gh run view "$run_id" --json jobs --jq '.jobs[] | "\(.name)\t\(.status)\t\(.conclusion // "null")"' 2>/dev/null || echo ""
+  local output error_output exit_code
+  error_output=$(mktemp)
+  output=$(gh run view "$run_id" --json jobs --jq '.jobs[] | "\(.name)\t\(.status)\t\(.conclusion // "null")"' 2>"$error_output") && exit_code=0 || exit_code=$?
+  if [[ $exit_code -ne 0 ]]; then
+    local err_msg
+    err_msg=$(cat "$error_output")
+    rm -f "$error_output"
+    if [[ -n "$err_msg" ]]; then
+      print_warning "GitHub API error (will retry): $err_msg" >&2
+    fi
+    echo ""
+    return 0
+  fi
+  rm -f "$error_output"
+  echo "$output"
 }
 
 # Check if a job name should be excluded (uses substring matching)

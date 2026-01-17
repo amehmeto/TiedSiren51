@@ -51,8 +51,9 @@ while read -r oldvalue newvalue refname; do
     # Extract branch name from refs/remotes/<remote>/<branch>
     pushed_branch="${refname#refs/remotes/$remote/}"
     if [[ -x "$(dirname "$0")/post-push" ]]; then
-      # Run in background to avoid blocking subsequent git operations
+      # Run in background and detach from terminal to survive session close
       PUSHED_BRANCH="$pushed_branch" PUSHED_SHA="$newvalue" "$(dirname "$0")/post-push" &
+      disown
     fi
     break
   fi
