@@ -6,13 +6,21 @@ set -euo pipefail
 # Exits 0 on success, 1 on failure, 2 on timeout
 #
 # Environment variables:
-#   CI_WATCH_EXCLUDED_JOBS - Comma-separated list of jobs to exclude (default: "build")
+#   CI_WATCH_EXCLUDED_JOBS - Comma-separated list of job patterns to exclude (default: "build")
+
+# Check for required dependencies
+if ! command -v gh &>/dev/null; then
+  echo "[ERROR] GitHub CLI (gh) is required but not installed"
+  echo "Install it from: https://cli.github.com/"
+  exit 1
+fi
 
 readonly POLL_INTERVAL=15
 readonly TIMEOUT_SECONDS=600  # 10 minutes
 readonly EXCLUDED_JOBS="${CI_WATCH_EXCLUDED_JOBS:-build}"
 readonly MAX_RUN_DETECTION_ATTEMPTS=10
 readonly RUN_DETECTION_INTERVAL=3
+readonly MAX_NO_JOBS_ATTEMPTS=5
 
 # Colors for output
 readonly RED='\033[0;31m'
@@ -52,13 +60,14 @@ get_job_statuses() {
   gh run view "$run_id" --json jobs --jq '.jobs[] | "\(.name)\t\(.status)\t\(.conclusion // "null")"'
 }
 
-# Check if a job name should be excluded
+# Check if a job name should be excluded (supports glob matching)
 is_excluded_job() {
   local job_name="$1"
   local excluded
   IFS=',' read -ra excluded <<< "$EXCLUDED_JOBS"
   for pattern in "${excluded[@]}"; do
-    if [[ "$job_name" == "$pattern" ]]; then
+    # Use glob matching to support partial matches like "build" matching "build (ubuntu-latest)"
+    if [[ "$job_name" == *"$pattern"* ]]; then
       return 0
     fi
   done
@@ -84,7 +93,7 @@ wait_for_run() {
 
     print_info "Attempt $attempt/$MAX_RUN_DETECTION_ATTEMPTS: workflow not found yet..."
     sleep "$RUN_DETECTION_INTERVAL"
-    ((attempt++))
+    attempt=$((attempt + 1))
   done
 
   return 1
@@ -109,8 +118,9 @@ main() {
     print_info "Excluded jobs: $EXCLUDED_JOBS"
   fi
 
-  local start_time
+  local start_time no_jobs_count
   start_time=$(date +%s)
+  no_jobs_count=0
 
   while true; do
     local current_time elapsed
@@ -133,7 +143,7 @@ main() {
         continue
       fi
 
-      ((job_count++)) || true
+      job_count=$((job_count + 1))
 
       if [[ "$status" != "completed" ]]; then
         all_completed=false
@@ -144,12 +154,20 @@ main() {
       fi
     done < <(get_job_statuses "$run_id")
 
-    # If no jobs found yet, keep waiting
+    # If no jobs found yet, keep waiting but track attempts to avoid infinite loop
     if [[ $job_count -eq 0 ]]; then
-      print_info "No jobs found yet, waiting..."
+      no_jobs_count=$((no_jobs_count + 1))
+      if [[ $no_jobs_count -ge $MAX_NO_JOBS_ATTEMPTS ]]; then
+        print_error "No jobs found after $MAX_NO_JOBS_ATTEMPTS attempts (jobs may all be excluded or workflow has no jobs)"
+        exit 1
+      fi
+      print_info "No jobs found yet (attempt $no_jobs_count/$MAX_NO_JOBS_ATTEMPTS), waiting..."
       sleep "$POLL_INTERVAL"
       continue
     fi
+
+    # Reset counter when jobs are found
+    no_jobs_count=0
 
     if [[ "$all_completed" == true ]]; then
       if [[ "$any_failed" == true ]]; then

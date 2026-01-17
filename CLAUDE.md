@@ -45,51 +45,24 @@ SKIP_E2E_CHECK=true git push  # Push without interactive e2e test prompt
 
 The project uses custom git hooks for CI monitoring. These hooks are not tracked by git and must be set up manually in each clone.
 
-**Required hooks** (create in `.git/hooks/`):
+**Required hooks:**
 
 1. **reference-transaction** - Detects when current branch's remote ref is updated after push
 2. **post-push** - Triggered by reference-transaction to run CI watch
 
-**Setup commands:**
+**Setup:**
 
 ```bash
-# Create reference-transaction hook
-cat > .git/hooks/reference-transaction << 'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-current_branch=$(git rev-parse --abbrev-ref HEAD 2>/dev/null || echo "")
-if [[ -z "$current_branch" || "$current_branch" == "HEAD" ]]; then
-  exit 0
-fi
-while read -r oldvalue newvalue refname; do
-  if [[ "$1" == "committed" ]] && [[ "$refname" == "refs/remotes/origin/$current_branch" ]]; then
-    if [[ -x "$(dirname "$0")/post-push" ]]; then
-      "$(dirname "$0")/post-push"
-    fi
-    break
-  fi
-done
-EOF
-chmod +x .git/hooks/reference-transaction
-
-# Create post-push hook
-cat > .git/hooks/post-push << 'EOF'
-#!/usr/bin/env bash
-set -euo pipefail
-echo "Push completed! Now watching CI..."
-REPO_ROOT="$(git rev-parse --show-toplevel)"
-if [[ -x "$REPO_ROOT/scripts/ci-watch.sh" ]]; then
-  "$REPO_ROOT/scripts/ci-watch.sh"
-fi
-EOF
-chmod +x .git/hooks/post-push
+./scripts/setup-hooks.sh
 ```
+
+This creates both hooks in `.git/hooks/` with automatic backup of any existing hooks.
 
 **Environment variables for `scripts/ci-watch.sh`:**
 
 | Variable | Default | Description |
 |----------|---------|-------------|
-| `CI_WATCH_EXCLUDED_JOBS` | `build` | Comma-separated list of jobs to exclude from CI status |
+| `CI_WATCH_EXCLUDED_JOBS` | `build` | Comma-separated list of job patterns to exclude (supports partial matching) |
 
 The script polls GitHub Actions, verifies the workflow matches the current commit SHA, and reports results.
 
