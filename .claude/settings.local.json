@@ -133,6 +133,8 @@
       "Bash(HUSKY=0:*)",
       "Bash(HUSKY_SKIP_HOOKS=1:*)",
       "Bash(HUSKY_SKIP_INSTALL=1:*)",
+      "Bash(SKIP_CI_WATCH=1:*)",
+      "Bash(SKIP_CI_WATCH=true:*)",
       "Bash(SKIP_E2E_CHECK=1 git push --force-with-lease:*)",
       "Bash(SKIP_E2E_CHECK=1 git push --force:*)",
       "Bash(SKIP_E2E_CHECK=1 git push -f:*)",
