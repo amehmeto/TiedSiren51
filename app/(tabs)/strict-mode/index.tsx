@@ -23,6 +23,7 @@ import {
   selectStrictModeViewModel,
   StrictModeViewState,
 } from '@ui/screens/StrictMode/strict-mode.view-model'
+import { StrictModeConfirmationModal } from '@ui/screens/StrictMode/StrictModeConfirmationModal'
 import { UnLockMethodCard } from '@ui/screens/StrictMode/UnLockMethodCard'
 
 const DEFAULT_DURATION: TimerDuration = { days: 0, hours: 0, minutes: 20 }
@@ -30,6 +31,7 @@ const DEFAULT_DURATION: TimerDuration = { days: 0, hours: 0, minutes: 20 }
 export default function StrictModeScreen() {
   const [isShowingTimerPicker, setIsShowingTimerPicker] = useState(false)
   const [isShowingExtendPicker, setIsShowingExtendPicker] = useState(false)
+  const [isShowingConfirmation, setIsShowingConfirmation] = useState(false)
   const [timerDuration, setTimerDuration] =
     useState<TimerDuration>(DEFAULT_DURATION)
   const [extendDuration, setExtendDuration] =
@@ -49,6 +51,42 @@ export default function StrictModeScreen() {
   useAppForeground(() => {
     dispatch(loadTimer())
   })
+
+  const formatDuration = (duration: TimerDuration): string => {
+    const parts: string[] = []
+    if (duration.days > 0)
+      parts.push(`${duration.days} ${duration.days === 1 ? 'day' : 'days'}`)
+
+    if (duration.hours > 0)
+      parts.push(`${duration.hours} ${duration.hours === 1 ? 'hour' : 'hours'}`)
+
+    if (duration.minutes > 0)
+      parts.push(
+        `${duration.minutes} ${duration.minutes === 1 ? 'minute' : 'minutes'}`,
+      )
+
+    return parts.join(', ') || '0 minutes'
+  }
+
+  const handleTimerPickerSave = () => {
+    setIsShowingTimerPicker(false)
+    setIsShowingConfirmation(true)
+  }
+
+  const handleConfirmStrictMode = () => {
+    dispatch(
+      startTimer({
+        days: timerDuration.days,
+        hours: timerDuration.hours,
+        minutes: timerDuration.minutes,
+      }),
+    )
+    setIsShowingConfirmation(false)
+  }
+
+  const handleCancelConfirmation = () => {
+    setIsShowingConfirmation(false)
+  }
 
   if (isLoading) return <LoadingScreen />
 
@@ -85,15 +123,7 @@ export default function StrictModeScreen() {
       <TimerPickerModal
         visible={isShowingTimerPicker}
         onClose={() => setIsShowingTimerPicker(false)}
-        onSave={() =>
-          dispatch(
-            startTimer({
-              days: timerDuration.days,
-              hours: timerDuration.hours,
-              minutes: timerDuration.minutes,
-            }),
-          )
-        }
+        onSave={handleTimerPickerSave}
         duration={timerDuration}
         onDurationChange={setTimerDuration}
         title={'Set the timer'}
@@ -114,6 +144,14 @@ export default function StrictModeScreen() {
         duration={extendDuration}
         onDurationChange={setExtendDuration}
         title={'Extend timer by'}
+      />
+
+      <StrictModeConfirmationModal
+        isVisible={isShowingConfirmation}
+        formattedDuration={formatDuration(timerDuration)}
+        onRequestClose={handleCancelConfirmation}
+        onCancel={handleCancelConfirmation}
+        onConfirm={handleConfirmStrictMode}
       />
     </View>
   )
