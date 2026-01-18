@@ -158,31 +158,93 @@ const STATUS_EMOJI = {
 }
 
 /**
- * Detect ticket status from GitHub state and labels
- * @param {Object} issue - GitHub issue object with state and labels
+ * Fetch all PRs from all repos and build a map of issue number -> PR state
+ * @returns {Map<string, 'merged' | 'open' | 'closed'>} Map of "repo#number" -> PR state
+ */
+function fetchPullRequestStates() {
+  const prStateByIssue = new Map()
+
+  for (const repo of REPOS) {
+    try {
+      // Fetch all PRs (open, closed, merged) with their linked issues
+      const result = execSync(
+        `gh pr list --repo ${repo.fullName} --state all --limit 200 --json number,state,mergedAt,closingIssuesReferences`,
+        { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] },
+      )
+      const prs = JSON.parse(result)
+
+      for (const pr of prs) {
+        // Determine PR state: merged > open > closed (without merge)
+        let prState = 'closed'
+        if (pr.mergedAt) {
+          prState = 'merged'
+        } else if (pr.state === 'OPEN' || pr.state === 'open') {
+          prState = 'open'
+        }
+
+        // Map each linked issue to this PR's state
+        // closingIssuesReferences contains issues that will be closed by this PR
+        const linkedIssues = pr.closingIssuesReferences || []
+        for (const linkedIssue of linkedIssues) {
+          const issueNum = linkedIssue.number
+          const issueKey = `${repo.name}#${issueNum}`
+
+          // Keep the "best" state: merged > open > closed
+          const existingState = prStateByIssue.get(issueKey)
+          if (!existingState ||
+              (prState === 'merged') ||
+              (prState === 'open' && existingState !== 'merged')) {
+            prStateByIssue.set(issueKey, prState)
+          }
+        }
+      }
+    } catch {
+      // Repo might not exist or have no PRs
+    }
+  }
+
+  return prStateByIssue
+}
+
+/**
+ * Detect ticket status based on PR state (preferred) or issue state
+ *
+ * Status logic:
+ * - done: Issue closed OR has a merged PR
+ * - in_progress: Has an open PR
+ * - todo: No PR yet (ticket just written)
+ *
+ * @param {Object} issue - GitHub issue object with state
+ * @param {Map<string, string>} prStateByIssue - Map of "repo#number" -> PR state
  * @returns {'done' | 'in_progress' | 'todo'}
  */
-function detectTicketStatus(issue) {
+function detectTicketStatus(issue, prStateByIssue) {
   // Closed issues are done
   if (issue.state === 'CLOSED' || issue.state === 'closed') {
     return 'done'
   }
 
-  // Check for in-progress indicators in labels (exact match to avoid false positives like "not-started")
-  const labelNames = (issue.labels || []).map((l) =>
-    (typeof l === 'string' ? l : l.name)?.toLowerCase() || ''
-  )
+  // Check PR state for this issue
+  const issueKey = `${issue.repo}#${issue.number}`
+  const prState = prStateByIssue.get(issueKey)
 
-  const inProgressLabels = ['in progress', 'in-progress', 'wip', 'doing', 'started']
-  if (labelNames.some((name) => inProgressLabels.includes(name))) {
+  if (prState === 'merged') {
+    return 'done'
+  }
+
+  if (prState === 'open') {
     return 'in_progress'
   }
 
+  // No PR or PR closed without merge = todo
   return 'todo'
 }
 
 function fetchOpenIssues() {
   const allIssues = []
+
+  // First, fetch PR states for all repos (to determine in_progress status)
+  const prStateByIssue = fetchPullRequestStates()
 
   for (const repo of REPOS) {
     try {
@@ -194,7 +256,7 @@ function fetchOpenIssues() {
       const issues = JSON.parse(result)
       for (const issue of issues) {
         issue.repo = repo.name
-        issue.status = detectTicketStatus(issue)
+        issue.status = detectTicketStatus(issue, prStateByIssue)
       }
       allIssues.push(...issues)
     } catch {
