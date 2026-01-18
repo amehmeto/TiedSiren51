@@ -134,10 +134,11 @@ jobs:
       - name: Install rollup platform binary
         run: npm install --no-save @rollup/rollup-linux-x64-gnu
 
-      - name: Trigger Preview Build
-        run: eas build -p android --profile preview --non-interactive
-        env:
-          EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
+      # TODO: Uncomment when merge pace slows down to avoid burning EAS credits
+      # - name: Trigger Preview Build
+      #   run: eas build -p android --profile preview --non-interactive
+      #   env:
+      #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
   release:
     needs: [path-filter, build-preview]
