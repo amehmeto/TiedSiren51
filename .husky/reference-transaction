@@ -6,7 +6,6 @@ set +e
 # This correctly handles: git push origin feature-x (while on main)
 # CI_WATCH_REMOTE: configurable remote name (default: origin)
 remote="${CI_WATCH_REMOTE:-origin}"
-ci_exit_code=0
 
 while read -r oldvalue newvalue refname; do
   if [ "$1" = "committed" ] && echo "$refname" | grep -q "^refs/remotes/$remote/"; then
@@ -20,4 +19,4 @@ while read -r oldvalue newvalue refname; do
 done
 
 # Propagate CI watch exit code (0=success, 1=failure, 2=timeout)
-exit $ci_exit_code
+exit ${ci_exit_code:-0}

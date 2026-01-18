@@ -53,7 +53,7 @@ hash_cmd() {
 }
 
 # Lock file to prevent multiple concurrent CI watch processes
-LOCK_FILE="/tmp/ci-watch-$(git rev-parse --show-toplevel 2>/dev/null | hash_cmd | cut -d' ' -f1).lock"
+LOCK_FILE="${TMPDIR:-/tmp}/ci-watch-$(git rev-parse --show-toplevel 2>/dev/null | hash_cmd | cut -d' ' -f1).lock"
 readonly LOCK_FILE
 
 # Global temp file for API error capture (cleaned up by trap on exit/interrupt)
