@@ -220,6 +220,71 @@ Output the parsed YAML for verification:
 
 ---
 
+## Phase 5.5: Categorize Orphan Tickets
+
+Before generating the final graph, identify tickets that are not assigned to any Epic.
+
+### 5.5.1 Detect Orphan Tickets
+
+An orphan ticket is one that:
+- Is NOT an initiative or epic (type is feature, bug, or task)
+- Does NOT have a parent epic in its hierarchy section (`🏔️ Epic | [#XX`)
+- Is still OPEN (closed tickets can be ignored)
+
+### 5.5.2 For Each Orphan Ticket
+
+1. **Analyze the ticket title and body** to determine which Epic it likely belongs to:
+
+   | Epic | Keywords/Patterns |
+   |------|-------------------|
+   | #54 User Authentication | auth, sign-in, password, login, firebase, session |
+   | #55 Blocking Apps on Android | android, blocking, overlay, accessibility |
+   | #57 Strict Mode | strict, tier, lookout, enforcement |
+   | #58 Block Websites | website, browser, url, domain |
+   | #59 Blocking Keywords | keyword, filter, content |
+   | #60 Polish Design | ui, design, style, theme, animation |
+   | #61 Recurring Sessions | schedule, recurring, repeat, cron |
+   | #219 Native Blocking Layer | native, jni, kotlin, foreground service |
+
+2. **If a match is found with high confidence**, update the ticket's body to add the hierarchy section:
+
+   ```markdown
+   ## Hierarchy
+   | Level | Link |
+   |-------|------|
+   | 🏔️ Epic | [#XX - Epic Name](url) |
+   ```
+
+3. **If no clear match**, ask the user which Epic the ticket should belong to using `AskUserQuestion`.
+
+### 5.5.3 Report Orphan Tickets
+
+Display a summary:
+
+```markdown
+## Orphan Tickets Report
+
+### Auto-Categorized
+| Ticket | Assigned To | Reason |
+|--------|-------------|--------|
+| #XXX | Epic #YY | Contains "auth" keyword |
+
+### Needs Manual Assignment
+| Ticket | Title | Suggested Epic |
+|--------|-------|----------------|
+| #XXX | Some title | #YY (60% confidence) |
+```
+
+### 5.5.4 Update Tickets
+
+For auto-categorized tickets with high confidence, update the issue body:
+
+```bash
+gh issue edit <number> --body "$(updated_body_with_hierarchy)"
+```
+
+---
+
 ## Phase 6: Display Results
 
 ### 6.1 Kanban Board
