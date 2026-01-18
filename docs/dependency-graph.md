@@ -7,13 +7,32 @@ This document visualizes the dependencies between GitHub issues to help with pla
 
 ## Validation Warnings
 
-The following bidirectional reference issues were detected:
+The following issues were detected in the dependency graph:
 
-- #180 should have blocks: [208] (because #208 depends on it)
-- TSBO#5 should have blocks: [9] (because TSBO#9 depends on it)
-- TSBO#5 should have blocks: [8] (because TSBO#8 depends on it)
-- TSBO#5 should have blocks: [7] (because TSBO#7 depends on it)
-- TSBO#5 should have blocks: [6] (because TSBO#6 depends on it)
+- **bidirectional_mismatch**: TiedSiren51#180 should have blocks: [208] (because TiedSiren51#208 depends on it)
+- **bidirectional_mismatch**: tied-siren-blocking-overlay#5 should have blocks: [9] (because tied-siren-blocking-overlay#9 depends on it)
+- **bidirectional_mismatch**: tied-siren-blocking-overlay#5 should have blocks: [8] (because tied-siren-blocking-overlay#8 depends on it)
+- **bidirectional_mismatch**: tied-siren-blocking-overlay#5 should have blocks: [7] (because tied-siren-blocking-overlay#7 depends on it)
+- **bidirectional_mismatch**: tied-siren-blocking-overlay#5 should have blocks: [6] (because tied-siren-blocking-overlay#6 depends on it)
+
+---
+
+## Graph Statistics
+
+| Metric | Value |
+|--------|-------|
+| Total Nodes | 71 |
+| Total Edges | 43 |
+| Root Nodes (no dependencies) | 43 |
+| Leaf Nodes (nothing depends on them) | 50 |
+| Orphan Nodes (isolated) | 31 |
+| Critical Path Length | 5 |
+
+### Critical Path
+
+The longest dependency chain in the graph:
+
+`tied-siren-blocking-overlay#5 → tied-siren-blocking-overlay#6 → tied-siren-blocking-overlay#7 → tied-siren-blocking-overlay#8 → tied-siren-blocking-overlay#13 → tied-siren-blocking-overlay#14`
 
 ---
 
@@ -204,7 +223,7 @@ flowchart LR
         T_TS_67["⏳ TS#67 Goal based locking/unlocking"]:::initiative1_todo
         T_TS_66["⏳ TS#66 Launch Windows desktop App"]:::initiative1_todo
         T_TS_65["⏳ TS#65 Launch MacOS desktop App"]:::initiative1_todo
-        T_TS_64["⏳ TS#64 Multi device sync"]:::initiative2_todo
+        T_TS_64["⏳ TS#64 Multi device sync"]:::initiative1_todo
         T_TS_63["⏳ TS#63 Launch iOS App"]:::initiative1_todo
         T_TS_62["⏳ TS#62 Launch Android App"]:::initiative0_todo
     end
@@ -213,7 +232,7 @@ flowchart LR
         T_TS_219["⏳ TS#219 Native Blocking Layer [13sp]"]:::epic1_todo
         T_TS_61["⏳ TS#61 Schedule recurring block<br/>sessions"]:::epic1_todo
         T_TS_60["⏳ TS#60 Polish design"]:::epic0_todo
-        T_TS_59["⏳ TS#59 Blocking keywords on Android"]:::epic2_todo
+        T_TS_59["⏳ TS#59 Blocking keywords on Android"]:::epic1_todo
         T_TS_58["⏳ TS#58 Block websites on Android"]:::epic1_todo
         T_TS_57["⏳ TS#57 Strict Mode [8sp]"]:::epic1_todo
         T_TS_55["⏳ TS#55 Blocking Apps on Android [13sp]"]:::epic0_todo
@@ -224,15 +243,15 @@ flowchart LR
         T_TSBO_12["⏳ TSBO#12 Noop interfaces for<br/>WebsiteTier, KeywordTier,<br/>WebsiteLookout, KeywordLookout [2sp]"]:::blocking1_todo
         T_TSBO_11["⏳ TSBO#11 AppLookout abstraction from<br/>AccessibilityService logic [3sp]"]:::blocking0_todo
         T_TSBO_10["⏳ TSBO#10 AppTier abstraction from<br/>current blocking logic [5sp]"]:::blocking0_todo
-        T_TSBO_9["⏳ TSBO#9 setBlockingSchedule API to JS [3sp]"]:::blocking0_todo
-        T_TSBO_8["⏳ TSBO#8 overlapping sessions -<br/>recalculate on window<br/>boundaries [5sp]"]:::blocking0_todo
-        T_TSBO_7["⏳ TSBO#7 overnight sessions in<br/>BlockingScheduler [3sp]"]:::blocking0_todo
-        T_TSBO_6["🔄 TSBO#6 AlarmManager integration for<br/>start/end times [5sp]"]:::blocking0_in_progress
+        T_TSBO_9["⏳ TSBO#9 setBlockingSchedule API to JS [3sp]"]:::blocking1_todo
+        T_TSBO_8["⏳ TSBO#8 overlapping sessions -<br/>recalculate on window<br/>boundaries [5sp]"]:::blocking1_todo
+        T_TSBO_7["⏳ TSBO#7 overnight sessions in<br/>BlockingScheduler [3sp]"]:::blocking1_todo
+        T_TSBO_6["🔄 TSBO#6 AlarmManager integration for<br/>start/end times [5sp]"]:::blocking1_in_progress
     end
     subgraph Epic_61["TS#61 Schedule recurring blo..."]
         direction TB
-        T_TSBO_14["⏳ TSBO#14 weekly recurrence in scheduler [5sp]"]:::blocking0_todo
-        T_TSBO_13["⏳ TSBO#13 daily recurrence in scheduler [3sp]"]:::blocking0_todo
+        T_TSBO_14["⏳ TSBO#14 weekly recurrence in scheduler [5sp]"]:::blocking3_todo
+        T_TSBO_13["⏳ TSBO#13 daily recurrence in scheduler [3sp]"]:::blocking2_todo
     end
     subgraph Epic_57["TS#57 Strict Mode"]
         direction TB
@@ -241,11 +260,11 @@ flowchart LR
     end
     subgraph Epic_55["TS#55 Blocking Apps on Android"]
         direction TB
-        T_TS_208["⏳ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [3sp]"]:::blocking0_todo
+        T_TS_208["⏳ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [3sp]"]:::blocking2_todo
         T_TS_201["⏳ TS#201 BlockSession to store<br/>blocklist IDs instead of<br/>embedded blocklists [5sp]"]:::blocking0_todo
-        T_TS_185["⏳ TS#185 legacy updateBlockedApps calls<br/>and related code [2sp]"]:::blocking3_todo
+        T_TS_185["⏳ TS#185 legacy updateBlockedApps calls<br/>and related code [2sp]"]:::blocking2_todo
         T_TS_184["⏳ TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_todo
-        T_TS_183["⏳ TS#183 dependency injection with new<br/>architecture [2sp]"]:::blocking2_todo
+        T_TS_183["⏳ TS#183 dependency injection with new<br/>architecture [2sp]"]:::blocking1_todo
         T_TS_182["🔄 TS#182 AndroidSirenTier to call<br/>setBlockingSchedule [3sp]"]:::blocking1_in_progress
         T_TS_170["⏳ TS#170 android: Blocking overlay<br/>never triggers - JS bridge<br/>architecture mismatch [8sp]"]:::blocking0_todo
     end
@@ -267,7 +286,7 @@ flowchart LR
     subgraph Ungrouped
         direction TB
         T_TS_202["✅ TS#202 "]:::other0_done
-        T_TS_199["✅ TS#199 blocklist: add confirmation<br/>modal when deleting blocklist<br/>used in active sessions"]:::other0_done
+        T_TS_199["✅ TS#199 blocklist: add confirmation<br/>modal when deleting blocklist<br/>used in active sessions"]:::blocking0_done
         T_TS_181["✅ TS#181 Noop implementations for<br/>future tiers and lookouts [2sp]"]:::blocking1_done
         T_TS_180["✅ TS#180 unified listener for<br/>blockSession and blocklist<br/>state changes [5sp]"]:::blocking1_done
         T_TS_179["✅ TS#179 selectBlockingSchedule<br/>selector with fresh blocklist<br/>join [5sp]"]:::blocking0_done
@@ -277,10 +296,10 @@ flowchart LR
         T_TS_173["✅ TS#173 tied-siren-blocking-overlay:<br/>Add BlockingCallback and<br/>SharedPreferences support [5sp]"]:::blocking1_done
         T_TS_172["✅ TS#172 expo-foreground-service: Add<br/>callback system via reflection [3sp]"]:::blocking0_done
         T_TS_171["✅ TS#171 expo-accessibility-service:<br/>Add multiple listeners support [3sp]"]:::blocking0_done
-        T_TS_103["✅ TS#103 Accessibility Permission on<br/>App Start - 3 sp"]:::other0_done
+        T_TS_103["✅ TS#103 Accessibility Permission on<br/>App Start - 3 sp"]:::blocking0_done
         T_TS_102["✅ TS#102 Expo Module: Android Blocking<br/>Overlay Launcher - 1 sp"]:::blocking0_done
         T_TS_101["✅ TS#101 Decision Logic - 2 sp"]:::blocking0_done
-        T_TS_97["✅ TS#97 Launch Monitoring via<br/>AccessibilityService - 2 sp"]:::other0_done
+        T_TS_97["✅ TS#97 Launch Monitoring via<br/>AccessibilityService - 2 sp"]:::blocking0_done
         T_TS_96["✅ TS#96 Phase - Guided Permission<br/>Setup - 3sp [3sp]"]:::other0_done
         T_TS_95["✅ TS#95 expo-accessibility-service<br/>Module with isEnabled and<br/>askPermission - 3 sp"]:::other0_done
         T_TS_93["✅ TS#93 env vars"]:::other0_done

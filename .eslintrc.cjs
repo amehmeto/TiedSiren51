@@ -190,9 +190,15 @@ module.exports = {
       },
     },
     {
-      files: ['scripts/**/*.{js,cjs}', 'electron.js'],
+      files: ['scripts/**/*.{js,cjs,mjs}', 'electron.js'],
       env: {
         node: true,
+      },
+      rules: {
+        'no-unused-vars': [
+          'error',
+          { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        ],
       },
     },
     {
