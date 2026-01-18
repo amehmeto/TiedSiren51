@@ -139,7 +139,8 @@ get_run_id_for_sha() {
   if [[ -n "$WORKFLOW_NAME" ]]; then
     workflow_args=(--workflow "$WORKFLOW_NAME")
   fi
-  gh run list --branch "$branch" "${workflow_args[@]}" --limit 5 --json databaseId,headSha \
+  # Use ${arr[@]+"${arr[@]}"} idiom to handle empty arrays with set -u
+  gh run list --branch "$branch" ${workflow_args[@]+"${workflow_args[@]}"} --limit 5 --json databaseId,headSha \
     --jq "[.[] | select(.headSha == \"$expected_sha\") | .databaseId][0] // empty"
 }
 
