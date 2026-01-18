@@ -231,56 +231,88 @@ An orphan ticket is one that:
 - Does NOT have a parent epic in its hierarchy section (`🏔️ Epic | [#XX`)
 - Is still OPEN (closed tickets can be ignored)
 
-### 5.5.2 For Each Orphan Ticket
+### 5.5.2 Fetch Open Epics Dynamically
 
-1. **Analyze the ticket title and body** to determine which Epic it likely belongs to:
+First, fetch the current list of open epics:
 
-   > **⚠️ Maintenance Note:** Update this table when Epics are added, renamed, or closed.
-   > Run `gh issue list --label epic --state open` to see current Epics.
+```bash
+gh issue list --label epic --state open --json number,title,url --limit 50
+```
 
-   | Epic | Keywords/Patterns |
-   |------|-------------------|
-   | #54 User Authentication | auth, sign-in, password, login, firebase, session |
-   | #55 Blocking Apps on Android | android, blocking, overlay, accessibility |
-   | #57 Strict Mode | strict, tier, lookout, enforcement |
-   | #58 Block Websites | website, browser, url, domain |
-   | #59 Blocking Keywords | keyword, filter, content |
-   | #60 Polish Design | ui, design, style, theme, animation |
-   | #61 Recurring Sessions | schedule, recurring, repeat, cron |
-   | #219 Native Blocking Layer | native, jni, kotlin, foreground service |
+For each epic, extract keywords from its title by:
+1. Removing common prefixes like `[Epic]`, `Epic:`, etc.
+2. Splitting the remaining title into significant words (ignore articles, prepositions)
+3. Including any domain-specific terms (e.g., "auth", "blocking", "android")
 
-2. **If a match is found with high confidence**, update the ticket's body to add the hierarchy section:
+Example keyword extraction:
+- `[Epic] User Authentication` → keywords: `auth, authentication, user, sign-in, password, login`
+- `[Epic] Blocking Apps on Android` → keywords: `blocking, apps, android, block`
 
-   ```markdown
-   ## Hierarchy
-   | Level | Link |
-   |-------|------|
-   | 🏔️ Epic | [#XX - Epic Name](url) |
+### 5.5.3 Match Orphan Tickets to Epics
+
+For each orphan ticket, analyze its title and body against the dynamically-fetched epic keywords:
+
+1. **Score each epic** based on keyword matches in the ticket title/body
+2. **High confidence (≥2 keyword matches)**: Auto-assign to that epic
+3. **Low confidence (1 match or tie)**: Ask user to confirm
+
+If a match is found, update the ticket's body to add the hierarchy section:
+
+```markdown
+## Hierarchy
+| Level | Link |
+|-------|------|
+| 🏔️ Epic | [#XX - Epic Name](url) |
+```
+
+### 5.5.4 Handle Tickets That Don't Match Any Epic
+
+If an orphan ticket doesn't match any existing epic, use `AskUserQuestion` to ask the user:
+
+```
+Ticket #XXX "Some ticket title" doesn't match any existing Epic.
+
+Options:
+1. Assign to existing Epic: [list epics as options]
+2. Create new Epic for this ticket
+3. Leave as orphan (no parent Epic)
+```
+
+If the user chooses to create a new Epic:
+1. Ask for the new Epic's title (suggest based on ticket keywords)
+2. Create the Epic issue with the `epic` label:
+   ```bash
+   gh issue create --title "[Epic] New Epic Name" --label epic --body "Epic description..."
    ```
+3. Assign the orphan ticket to the newly created Epic
 
-3. **If no clear match**, ask the user which Epic the ticket should belong to using `AskUserQuestion`.
+### 5.5.5 Report Orphan Tickets
 
-### 5.5.3 Report Orphan Tickets
-
-Display a summary:
+Display a summary of actions taken:
 
 ```markdown
 ## Orphan Tickets Report
 
-### Auto-Categorized
-| Ticket | Assigned To | Reason |
-|--------|-------------|--------|
-| #XXX | Epic #YY | Contains "auth" keyword |
+### Auto-Categorized (High Confidence)
+| Ticket | Assigned To | Matched Keywords |
+|--------|-------------|------------------|
+| #XXX | Epic #YY | auth, login |
 
-### Needs Manual Assignment
-| Ticket | Title | Suggested Epic |
-|--------|-------|----------------|
-| #XXX | Some title | #YY (60% confidence) |
+### User-Assigned
+| Ticket | Assigned To | Action |
+|--------|-------------|--------|
+| #XXX | Epic #YY | User selected |
+| #ZZZ | Epic #NEW | Created new Epic |
+
+### Left as Orphan
+| Ticket | Title | Reason |
+|--------|-------|--------|
+| #XXX | Some title | User chose to skip |
 ```
 
-### 5.5.4 Update Tickets
+### 5.5.6 Update Tickets
 
-For auto-categorized tickets with high confidence, update the issue body:
+For categorized tickets, update the issue body to add the hierarchy section:
 
 ```bash
 gh issue edit <number> --body "$(updated_body_with_hierarchy)"

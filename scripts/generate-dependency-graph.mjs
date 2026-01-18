@@ -254,14 +254,16 @@ function extractMetadata(body) {
   }
 
   // Parse hierarchy section to find parent epic
-  // Format: | 🏔️ Epic | [#XX - Epic Name](url) | (emoji optional)
-  const epicMatch = body.match(/(?:🏔️\s*)?Epic[^|]*\|\s*\[#(\d+)/i)
+  // Format: | 🏔️ Epic | [#XX - Epic Name](url) |
+  // The regex requires a table row context (starts with |) to avoid false matches
+  const epicMatch = body.match(/\|\s*(?:🏔️\s*)?Epic\s*\|\s*\[#(\d+)/i)
   if (epicMatch) {
     metadata.parentEpic = parseInt(epicMatch[1], 10)
   }
 
-  // Also check for parent initiative (emoji optional)
-  const initMatch = body.match(/(?:🚀\s*)?Initiative[^|]*\|\s*\[#(\d+)/i)
+  // Also check for parent initiative
+  // Format: | 🚀 Initiative | [#XX - Initiative Name](url) |
+  const initMatch = body.match(/\|\s*(?:🚀\s*)?Initiative\s*\|\s*\[#(\d+)/i)
   if (initMatch) {
     metadata.parentInitiative = parseInt(initMatch[1], 10)
   }
@@ -448,22 +450,13 @@ function buildEpicCategoryMap(tickets) {
   return epicCategories
 }
 
-// Module-level cache for epic categories (populated on first use)
-let epicCategoryCache = null
-
 /**
- * Get or build the epic category map
- * @param {Object[]} tickets - All tickets (only needed on first call)
- * @returns {Map<number, string>}
+ * Categorize a ticket by its type, repo, parent epic, or labels/title
+ * @param {Object} t - The ticket to categorize
+ * @param {Map<number, string>} epicCategoryMap - Map of epic number to category (optional)
+ * @returns {string} - Category name
  */
-function getEpicCategories(tickets) {
-  if (!epicCategoryCache && tickets) {
-    epicCategoryCache = buildEpicCategoryMap(tickets)
-  }
-  return epicCategoryCache || new Map()
-}
-
-function categorizeTicket(t, allTickets = null) {
+function categorizeTicket(t, epicCategoryMap = new Map()) {
   const title = t.title.toLowerCase()
   const labels = t.metadata?.labels || []
 
@@ -474,13 +467,10 @@ function categorizeTicket(t, allTickets = null) {
   // Check if ticket belongs to a blocking-related repo
   if (BLOCKING_REPOS.includes(t.repo)) return 'blocking'
 
-  // Check parent epic category (dynamically derived)
+  // Check parent epic category (from pre-built map)
   const parentEpic = t.metadata?.parentEpic
-  if (parentEpic) {
-    const epicCategories = getEpicCategories(allTickets)
-    if (epicCategories.has(parentEpic)) {
-      return epicCategories.get(parentEpic)
-    }
+  if (parentEpic && epicCategoryMap.has(parentEpic)) {
+    return epicCategoryMap.get(parentEpic)
   }
 
   // Fallback to label/title matching
@@ -816,13 +806,14 @@ function sanitizeTicketTitle(title, lineLength = 30, maxLines = 3) {
  * Group tickets by category with computed labels and depths
  * @param {Object[]} tickets
  * @param {Map<string, number>} depths
+ * @param {Map<number, string>} epicCategoryMap - Map of epic number to category
  * @returns {Object}
  */
-function groupTicketsByCategory(tickets, depths) {
+function groupTicketsByCategory(tickets, depths, epicCategoryMap) {
   const nodesByCategory = {}
 
   for (const t of tickets) {
-    const category = categorizeTicket(t, tickets)
+    const category = categorizeTicket(t, epicCategoryMap)
     if (!nodesByCategory[category]) nodesByCategory[category] = []
 
     const label = sanitizeTicketTitle(t.title)
@@ -915,15 +906,15 @@ function generateMermaidDiagram(tickets) {
     }
   }
 
-  // Initialize epic category cache with all tickets
-  getEpicCategories(tickets)
+  // Build epic category map once for efficient lookups
+  const epicCategoryMap = buildEpicCategoryMap(tickets)
 
   // Helper to build a node line
   const buildNode = (ticket) => {
     const label = sanitizeTicketTitle(ticket.title)
     const ticketKey = depRefKey({ repo: ticket.repo, number: ticket.number })
     const depth = depths.get(ticketKey) || 0
-    const category = categorizeTicket(ticket, tickets)
+    const category = categorizeTicket(ticket, epicCategoryMap)
     const storyPoints = formatStoryPoints(ticket.metadata?.story_points)
     const repoAbbrev = REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
     const status = ticket.status || 'todo'
@@ -1010,51 +1001,6 @@ function generateMermaidDiagram(tickets) {
 flowchart LR
 ${styles.join('\n')}
 
-${nodes.join('\n')}
-
-${edges.join('\n')}
-\`\`\``
-}
-
-function generateFeaturesDiagram(features, title) {
-  if (features.length === 0) return ''
-
-  const nodes = []
-  const edges = []
-
-  // Helper to create unique node ID
-  const featureNodeId = (f) => {
-    const abbrev = REPO_DISPLAY_ABBREV[f.repo] || f.repo.replace(/-/g, '')
-    return `F_${abbrev}_${f.number}`
-  }
-
-  // Build lookup map
-  const featureByKey = new Map(features.map((f) => [depRefKey({ repo: f.repo, number: f.number }), f]))
-
-  for (const f of features) {
-    const shortTitle = sanitizeTicketTitle(f.title)
-    const storyPoints = formatStoryPoints(f.metadata?.story_points)
-    const repoAbbrev = REPO_DISPLAY_ABBREV[f.repo] || f.repo
-    const status = f.status || 'todo'
-    const statusEmoji = STATUS_EMOJI[status] || ''
-    // Always show prefix for all repos with status emoji
-    const displayNum = `${statusEmoji} ${repoAbbrev}#${f.number}`
-    nodes.push(`    ${featureNodeId(f)}["${displayNum} ${shortTitle}${storyPoints}"]`)
-
-    const deps = f.metadata?.depends_on || []
-    for (const depRef of deps) {
-      const depKey = depRefKey(depRef)
-      if (featureByKey.has(depKey)) {
-        const depFeature = featureByKey.get(depKey)
-        edges.push(`    ${featureNodeId(depFeature)} --> ${featureNodeId(f)}`)
-      }
-    }
-  }
-
-  return `### ${title}
-
-\`\`\`mermaid
-flowchart TD
 ${nodes.join('\n')}
 
 ${edges.join('\n')}
@@ -1347,16 +1293,6 @@ ${generateInventoryTable(features, 'feature')}
 ${generateMermaidDiagram(tickets)}
 
 `
-
-  // Feature diagrams by category
-  for (const [category, features] of Object.entries(featureCategories)) {
-    if (features.length > 1 && features.some((f) => f.metadata?.depends_on?.length > 0)) {
-      md += `
-${generateFeaturesDiagram(features, `Features: ${category}`)}
-
-`
-    }
-  }
 
   // Dependency matrix
   md += `---
