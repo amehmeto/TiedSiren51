@@ -189,7 +189,8 @@ wait_for_run() {
   local expected_sha="$2"
   local attempt=1
 
-  print_info "Waiting for workflow run for commit ${expected_sha:0:7}..."
+  # Send info messages to stderr so they don't pollute the run_id output
+  print_info "Waiting for workflow run for commit ${expected_sha:0:7}..." >&2
 
   while [[ $attempt -le $MAX_RUN_DETECTION_ATTEMPTS ]]; do
     local run_id
@@ -200,7 +201,7 @@ wait_for_run() {
       return 0
     fi
 
-    print_info "Attempt $attempt/$MAX_RUN_DETECTION_ATTEMPTS: workflow not found yet..."
+    print_info "Attempt $attempt/$MAX_RUN_DETECTION_ATTEMPTS: workflow not found yet..." >&2
     sleep "$RUN_DETECTION_INTERVAL"
     attempt=$((attempt + 1))
   done
