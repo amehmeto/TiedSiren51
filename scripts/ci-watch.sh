@@ -59,9 +59,16 @@ readonly LOCK_FILE
 # Global temp file for API error capture (cleaned up by trap on exit/interrupt)
 API_ERROR_TMPFILE=""
 
-# Cleanup function for lock file and temp files
+# Track which lock type is in use (flock or mkdir)
+LOCK_TYPE=""
+
+# Cleanup function for lock file and temp files (handles both lock types)
 cleanup() {
-  rm -f "$LOCK_FILE"
+  if [[ "$LOCK_TYPE" == "mkdir" ]]; then
+    rm -rf "${LOCK_FILE}.d"
+  else
+    rm -f "$LOCK_FILE"
+  fi
   [[ -n "$API_ERROR_TMPFILE" ]] && rm -f "$API_ERROR_TMPFILE"
 }
 
@@ -77,6 +84,7 @@ acquire_lock() {
     fi
     # Write PID for debugging purposes
     echo $$ >&200
+    LOCK_TYPE="flock"
     trap cleanup EXIT INT TERM
     return 0
   fi
@@ -102,8 +110,8 @@ acquire_lock() {
     fi
   fi
   echo $$ > "$pid_file"
-  # Cleanup the lock directory and any temp files
-  trap 'rm -rf "${LOCK_FILE}.d"; [[ -n "$API_ERROR_TMPFILE" ]] && rm -f "$API_ERROR_TMPFILE"' EXIT INT TERM
+  LOCK_TYPE="mkdir"
+  trap cleanup EXIT INT TERM
 }
 
 # Get current branch name
@@ -208,11 +216,22 @@ main() {
   # Use PUSHED_BRANCH/PUSHED_SHA from hook if available, otherwise detect from HEAD
   branch="${PUSHED_BRANCH:-$(get_current_branch)}"
   current_sha="${PUSHED_SHA:-$(get_current_sha)}"
+
+  # Validate SHA format (must be 40 hex characters)
+  if [[ ! "$current_sha" =~ ^[0-9a-f]{40}$ ]]; then
+    print_error "Invalid commit SHA format: $current_sha"
+    print_info "Expected 40 hexadecimal characters"
+    exit 1
+  fi
+
   print_info "Watching CI for branch: $branch (commit: ${current_sha:0:7})"
 
   local run_id
   if ! run_id=$(wait_for_run "$branch" "$current_sha"); then
     print_error "No workflow run found for commit ${current_sha:0:7} after $MAX_RUN_DETECTION_ATTEMPTS attempts"
+    print_info "Tip: Check if GitHub Actions workflow was triggered for this commit"
+    print_info "     - Verify .github/workflows/ contains a workflow for this branch"
+    print_info "     - Check https://github.com/$(gh repo view --json nameWithOwner -q .nameWithOwner)/actions"
     exit 1
   fi
 

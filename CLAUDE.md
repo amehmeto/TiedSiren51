@@ -70,6 +70,14 @@ This creates both hooks in `.git/hooks/` with automatic backup of any existing h
 
 The script polls GitHub Actions, verifies the workflow matches the current commit SHA, and reports results. Press **Ctrl+C** to cancel watching at any time.
 
+**Exit codes:**
+
+| Code | Meaning |
+|------|---------|
+| `0` | CI passed successfully |
+| `1` | CI failed or error occurred |
+| `2` | Timeout waiting for CI to complete |
+
 **Remove hooks:**
 
 ```bash

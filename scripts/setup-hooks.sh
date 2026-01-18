@@ -87,7 +87,18 @@ REPO_ROOT="$(git rev-parse --show-toplevel)"
 if [[ -x "$REPO_ROOT/scripts/ci-watch.sh" ]]; then
   "$REPO_ROOT/scripts/ci-watch.sh"
 else
-  echo "[WARNING] ci-watch.sh not found at $REPO_ROOT/scripts/"
+  echo ""
+  echo "=========================================="
+  echo "[ERROR] ci-watch.sh not found or not executable!"
+  echo "=========================================="
+  echo "Expected location: $REPO_ROOT/scripts/ci-watch.sh"
+  echo ""
+  echo "To fix this, either:"
+  echo "  1. Ensure scripts/ci-watch.sh exists and is executable"
+  echo "  2. Run: chmod +x $REPO_ROOT/scripts/ci-watch.sh"
+  echo "  3. Or remove hooks: rm .git/hooks/reference-transaction .git/hooks/post-push"
+  echo ""
+  exit 1
 fi
 EOF
   chmod +x "$hook_path"
