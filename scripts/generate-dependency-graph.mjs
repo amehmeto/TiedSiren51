@@ -23,7 +23,6 @@ import { writeFileSync } from 'node:fs'
 
 import { VALID_REPOS, REPO_ABBREVIATIONS, REPO_DISPLAY_ABBREV, MAIN_REPO } from './remark-lint-ticket/config.mjs'
 import {
-  TicketGraph,
   buildGraphFromTickets,
   fetchAllIssues,
   transformIssuesToTickets,
