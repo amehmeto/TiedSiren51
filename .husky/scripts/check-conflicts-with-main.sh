@@ -8,9 +8,9 @@ if ! git fetch origin main --quiet 2>/dev/null; then
   exit 0
 fi
 
-merge_tree_output=$(git merge-tree "$(git merge-base HEAD origin/main)" HEAD origin/main)
-
-if echo "$merge_tree_output" | grep -qE '<<<<<<<|=======|>>>>>>>'; then
+# Use new git merge-tree syntax (Git 2.38+)
+# Exit code 0 = no conflicts, non-zero = conflicts
+if ! git merge-tree --write-tree HEAD origin/main >/dev/null 2>&1; then
   printf "❌ Conflicts with main detected. Run: git merge origin/main\n"
   exit 1
 fi
