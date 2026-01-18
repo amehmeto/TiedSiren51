@@ -168,13 +168,13 @@ function detectTicketStatus(issue) {
     return 'done'
   }
 
-  // Check for in-progress indicators in labels
+  // Check for in-progress indicators in labels (exact match to avoid false positives like "not-started")
   const labelNames = (issue.labels || []).map((l) =>
     (typeof l === 'string' ? l : l.name)?.toLowerCase() || ''
   )
 
   const inProgressLabels = ['in progress', 'in-progress', 'wip', 'doing', 'started']
-  if (labelNames.some((name) => inProgressLabels.some((ip) => name.includes(ip)))) {
+  if (labelNames.some((name) => inProgressLabels.includes(name))) {
     return 'in_progress'
   }
 
@@ -461,13 +461,6 @@ function getEpicCategories(tickets) {
     epicCategoryCache = buildEpicCategoryMap(tickets)
   }
   return epicCategoryCache || new Map()
-}
-
-/**
- * Reset the epic category cache (useful for testing or re-fetching)
- */
-function resetEpicCategoryCache() {
-  epicCategoryCache = null
 }
 
 function categorizeTicket(t, allTickets = null) {
@@ -790,7 +783,11 @@ function sanitizeTicketTitle(title, lineLength = 30, maxLines = 3) {
   let currentLine = ''
 
   for (let i = 0; i < words.length; i++) {
-    const word = words[i]
+    let word = words[i]
+    // Truncate individual words that exceed line length
+    if (word.length > lineLength) {
+      word = word.substring(0, lineLength - 3) + '...'
+    }
     if (currentLine.length + word.length + 1 <= lineLength) {
       currentLine += (currentLine ? ' ' : '') + word
     } else {

@@ -235,6 +235,9 @@ An orphan ticket is one that:
 
 1. **Analyze the ticket title and body** to determine which Epic it likely belongs to:
 
+   > **⚠️ Maintenance Note:** Update this table when Epics are added, renamed, or closed.
+   > Run `gh issue list --label epic --state open` to see current Epics.
+
    | Epic | Keywords/Patterns |
    |------|-------------------|
    | #54 User Authentication | auth, sign-in, password, login, firebase, session |
