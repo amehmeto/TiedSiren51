@@ -10,6 +10,7 @@ echo "Push completed! Now watching CI... (Ctrl+C to cancel)"
 
 if [ -x "scripts/ci-watch.sh" ]; then
   scripts/ci-watch.sh
+  exit $?
 else
   echo ""
   echo "=========================================="
