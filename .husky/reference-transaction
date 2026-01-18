@@ -3,14 +3,17 @@
 # This correctly handles: git push origin feature-x (while on main)
 # CI_WATCH_REMOTE: configurable remote name (default: origin)
 remote="${CI_WATCH_REMOTE:-origin}"
+ci_exit_code=0
+# Use || true to prevent sh -e from exiting on while-read EOF
 while read -r oldvalue newvalue refname; do
   if [ "$1" = "committed" ] && echo "$refname" | grep -q "^refs/remotes/$remote/"; then
     # Extract branch name from refs/remotes/<remote>/<branch>
     pushed_branch="${refname#refs/remotes/$remote/}"
     # Run synchronously - blocks until CI completes (Ctrl+C to cancel)
     PUSHED_BRANCH="$pushed_branch" PUSHED_SHA="$newvalue" sh .husky/post-push
+    ci_exit_code=$?
     break
   fi
-done
-# Ensure clean exit (while read returns non-zero on EOF which triggers sh -e)
-exit 0
+done || true
+# Propagate CI watch exit code (0=success, 1=failure, 2=timeout)
+exit $ci_exit_code
