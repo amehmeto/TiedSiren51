@@ -45,13 +45,14 @@ if [ -d "$WORKTREE_DIR" ]; then
 # Check if branch already exists (locally or remotely)
 elif git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
     echo "Branch $BRANCH_NAME already exists locally, reusing it..."
-    git worktree add "$WORKTREE_DIR" "$BRANCH_NAME"
+    # Use -f to override orphaned worktree registrations (dir deleted but git still tracks it)
+    git worktree add -f "$WORKTREE_DIR" "$BRANCH_NAME"
 elif git show-ref --verify --quiet "refs/remotes/origin/$BRANCH_NAME"; then
     echo "Branch $BRANCH_NAME exists on remote, checking it out..."
-    git worktree add --track -b "$BRANCH_NAME" "$WORKTREE_DIR" "origin/$BRANCH_NAME"
+    git worktree add -f --track -b "$BRANCH_NAME" "$WORKTREE_DIR" "origin/$BRANCH_NAME"
 else
     echo "Creating new branch $BRANCH_NAME from origin/main..."
-    git worktree add -b "$BRANCH_NAME" "$WORKTREE_DIR" origin/main
+    git worktree add -f -b "$BRANCH_NAME" "$WORKTREE_DIR" origin/main
 fi
 
 # Write issue content to a temp file for claude prompt

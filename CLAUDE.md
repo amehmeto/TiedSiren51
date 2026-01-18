@@ -41,6 +41,11 @@ npx prisma generate   # Regenerate Prisma client after schema changes
 SKIP_E2E_CHECK=true git push  # Push without interactive e2e test prompt
 ```
 
+## Workflow
+
+1. **When you believe you're done with a task, run `/commit-push`** to commit all changes and push to remote.
+2. **After CI passes, update the PR description** to accurately reflect all changes made.
+
 ## CI Watch (Post-Push)
 
 After each push, CI status is automatically monitored via Husky hooks. The script polls GitHub Actions and reports results. Press **Ctrl+C** to cancel.
