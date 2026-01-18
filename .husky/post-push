@@ -1,3 +1,4 @@
+#!/bin/sh
 # PUSHED_BRANCH and PUSHED_SHA are set by reference-transaction hook
 # SKIP_CI_WATCH: set to skip CI monitoring
 

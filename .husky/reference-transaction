@@ -1,3 +1,4 @@
+#!/bin/sh
 # Detect pushed branch from the ref being updated, not from current HEAD
 # This correctly handles: git push origin feature-x (while on main)
 # CI_WATCH_REMOTE: configurable remote name (default: origin)
