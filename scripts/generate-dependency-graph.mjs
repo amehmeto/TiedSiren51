@@ -147,18 +147,54 @@ function validateMermaid(code) {
 // GitHub API
 // ============================================================================
 
+// ============================================================================
+// Status Constants
+// ============================================================================
+
+const STATUS_EMOJI = {
+  done: '✅',
+  in_progress: '🔄',
+  todo: '⏳',
+}
+
+/**
+ * Detect ticket status from GitHub state and labels
+ * @param {Object} issue - GitHub issue object with state and labels
+ * @returns {'done' | 'in_progress' | 'todo'}
+ */
+function detectTicketStatus(issue) {
+  // Closed issues are done
+  if (issue.state === 'CLOSED' || issue.state === 'closed') {
+    return 'done'
+  }
+
+  // Check for in-progress indicators in labels
+  const labelNames = (issue.labels || []).map((l) =>
+    (typeof l === 'string' ? l : l.name)?.toLowerCase() || ''
+  )
+
+  const inProgressLabels = ['in progress', 'in-progress', 'wip', 'doing', 'started']
+  if (labelNames.some((name) => inProgressLabels.some((ip) => name.includes(ip)))) {
+    return 'in_progress'
+  }
+
+  return 'todo'
+}
+
 function fetchOpenIssues() {
   const allIssues = []
 
   for (const repo of REPOS) {
     try {
+      // Fetch all issues (open and closed) to get proper status
       const result = execSync(
-        `gh issue list --repo ${repo.fullName} --state open --limit 100 --json number,title,body,labels`,
+        `gh issue list --repo ${repo.fullName} --state all --limit 100 --json number,title,body,labels,state`,
         { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] },
       )
       const issues = JSON.parse(result)
       for (const issue of issues) {
         issue.repo = repo.name
+        issue.status = detectTicketStatus(issue)
       }
       allIssues.push(...issues)
     } catch {
@@ -492,19 +528,69 @@ function createNodeIdFromRef(ref) {
 }
 
 /**
- * Generate Mermaid class definitions for category + depth styling
+ * Convert hex color to grayscale
+ * @param {string} hex - Hex color like '#7c3aed'
+ * @returns {string} - Grayscale hex color
+ */
+function hexToGrayscale(hex) {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  // Luminance formula
+  const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b)
+  const grayHex = gray.toString(16).padStart(2, '0')
+  return `#${grayHex}${grayHex}${grayHex}`
+}
+
+/**
+ * Make a color brighter/more saturated
+ * @param {string} hex - Hex color
+ * @returns {string} - Brighter hex color
+ */
+function brightenColor(hex) {
+  const r = Math.min(255, Math.round(parseInt(hex.slice(1, 3), 16) * 1.2))
+  const g = Math.min(255, Math.round(parseInt(hex.slice(3, 5), 16) * 1.2))
+  const b = Math.min(255, Math.round(parseInt(hex.slice(5, 7), 16) * 1.2))
+  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+}
+
+/**
+ * Generate Mermaid class definitions for category + depth + status styling
  * @param {number} maxDepth
  * @returns {string[]}
  */
 function generateMermaidStyles(maxDepth) {
   const styles = []
+  const statuses = ['todo', 'in_progress', 'done']
+
   for (const [category, shades] of Object.entries(CATEGORY_COLOR_SHADES)) {
     for (let d = 0; d <= maxDepth; d++) {
       const idx = Math.min(d, shades.length - 1)
-      const fill = shades[idx]
-      const stroke = shades[Math.max(0, idx - 1)]
+      const baseFill = shades[idx]
+      const baseStroke = shades[Math.max(0, idx - 1)]
       const textColor = d < 2 ? '#fff' : '#000'
-      styles.push(`    classDef ${category}${d} fill:${fill},stroke:${stroke},color:${textColor}`)
+
+      for (const status of statuses) {
+        let fill = baseFill
+        let stroke = baseStroke
+        let text = textColor
+        let extraStyle = ''
+
+        if (status === 'done') {
+          // Grayscale for done tickets
+          fill = hexToGrayscale(baseFill)
+          stroke = hexToGrayscale(baseStroke)
+          text = '#666'
+          extraStyle = ',stroke-dasharray:3'
+        } else if (status === 'in_progress') {
+          // Brighter with thick border for in-progress
+          fill = brightenColor(baseFill)
+          stroke = '#000'
+          extraStyle = ',stroke-width:3px'
+        }
+
+        styles.push(`    classDef ${category}${d}_${status} fill:${fill},stroke:${stroke},color:${text}${extraStyle}`)
+      }
     }
   }
   return styles
@@ -646,10 +732,12 @@ function buildTicketNode(ticket, label, depth, category, epicToInitiative) {
 
   const storyPoints = formatStoryPoints(ticket.metadata?.story_points)
   const repoAbbrev = REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
-  // Always show prefix for all repos
-  const displayNum = `${repoAbbrev}#${ticket.number}`
+  const status = ticket.status || 'todo'
+  const statusEmoji = STATUS_EMOJI[status] || ''
+  // Always show prefix for all repos with status emoji
+  const displayNum = `${statusEmoji} ${repoAbbrev}#${ticket.number}`
 
-  return `        ${createNodeId(ticket)}["${displayNum} ${safeLabel}${storyPoints}"]:::${category}${depth}`
+  return `        ${createNodeId(ticket)}["${displayNum} ${safeLabel}${storyPoints}"]:::${category}${depth}_${status}`
 }
 
 /**
@@ -659,7 +747,7 @@ function buildTicketNode(ticket, label, depth, category, epicToInitiative) {
  */
 function buildExternalNode(ref) {
   const abbrev = REPO_DISPLAY_ABBREV[ref.repo] || ref.repo
-  return `    ${createNodeIdFromRef(ref)}["${abbrev}#${ref.number}<br/>📦 ${abbrev}"]:::other0`
+  return `    ${createNodeIdFromRef(ref)}["${abbrev}#${ref.number}<br/>📦 ${abbrev}"]:::other0_todo`
 }
 
 function generateMermaidDiagram(tickets) {
@@ -711,8 +799,10 @@ function generateMermaidDiagram(tickets) {
     const category = categorizeTicket(ticket)
     const storyPoints = formatStoryPoints(ticket.metadata?.story_points)
     const repoAbbrev = REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
-    const displayNum = `${repoAbbrev}#${ticket.number}`
-    return `        ${createNodeId(ticket)}["${displayNum} ${label}${storyPoints}"]:::${category}${depth}`
+    const status = ticket.status || 'todo'
+    const statusEmoji = STATUS_EMOJI[status] || ''
+    const displayNum = `${statusEmoji} ${repoAbbrev}#${ticket.number}`
+    return `        ${createNodeId(ticket)}["${displayNum} ${label}${storyPoints}"]:::${category}${depth}_${status}`
   }
 
   // 1. Initiatives subgraph
@@ -818,8 +908,10 @@ function generateFeaturesDiagram(features, title) {
     const shortTitle = sanitizeTicketTitle(f.title)
     const storyPoints = formatStoryPoints(f.metadata?.story_points)
     const repoAbbrev = REPO_DISPLAY_ABBREV[f.repo] || f.repo
-    // Always show prefix for all repos
-    const displayNum = `${repoAbbrev}#${f.number}`
+    const status = f.status || 'todo'
+    const statusEmoji = STATUS_EMOJI[status] || ''
+    // Always show prefix for all repos with status emoji
+    const displayNum = `${statusEmoji} ${repoAbbrev}#${f.number}`
     nodes.push(`    ${featureNodeId(f)}["${displayNum} ${shortTitle}${storyPoints}"]`)
 
     const deps = f.metadata?.depends_on || []
@@ -1168,6 +1260,14 @@ ${Object.entries(VALID_REPOS)
 - **Features (F)**: Individual stories/tasks
 - **Subgraphs**: Logical groupings
 
+### Status
+
+| Emoji | Status | Style |
+|-------|--------|-------|
+| ✅ | Done | Grayscale, dashed border |
+| 🔄 | In Progress | Bright, thick border |
+| ⏳ | To Do | Normal colors |
+
 ### Story Points
 
 | Points | Color |
@@ -1197,19 +1297,22 @@ function main() {
   const liveMode = process.argv.includes('--live')
 
   if (!asciiMode) {
-    console.log(`Fetching open issues from ${REPOS.length} repos...`)
+    console.log(`Fetching issues from ${REPOS.length} repos...`)
   }
   const issues = fetchOpenIssues()
 
   if (!asciiMode) {
     const repoCounts = {}
+    const statusCounts = { done: 0, in_progress: 0, todo: 0 }
     for (const issue of issues) {
       repoCounts[issue.repo] = (repoCounts[issue.repo] || 0) + 1
+      statusCounts[issue.status] = (statusCounts[issue.status] || 0) + 1
     }
-    console.log(`Found ${issues.length} open issues:`)
+    console.log(`Found ${issues.length} issues:`)
     for (const [repo, count] of Object.entries(repoCounts)) {
       console.log(`  - ${repo}: ${count}`)
     }
+    console.log(`Status breakdown: ✅ ${statusCounts.done} done, 🔄 ${statusCounts.in_progress} in progress, ⏳ ${statusCounts.todo} todo`)
   }
 
   const tickets = issues.map((issue) => {
@@ -1222,6 +1325,7 @@ function main() {
       repo: ticketRepo,
       metadata,
       type: detectTicketType(issue, metadata),
+      status: issue.status || 'todo',
     }
   })
 
