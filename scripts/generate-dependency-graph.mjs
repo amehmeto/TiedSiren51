@@ -8,11 +8,15 @@
  * Usage: node scripts/generate-dependency-graph.mjs
  */
 
-import { execSync } from 'node:child_process'
+import { execSync, exec } from 'node:child_process'
 import { writeFileSync, unlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { promisify } from 'node:util'
+
 import { VALID_REPOS, REPO_ABBREVIATIONS, REPO_DISPLAY_ABBREV, MAIN_REPO } from './remark-lint-ticket/config.mjs'
+
+const execAsync = promisify(exec)
 
 // ============================================================================
 // Cross-Repo Dependency Types
@@ -111,7 +115,7 @@ function validateMermaid(code) {
 
   try {
     writeFileSync(tmpFile, code)
-    execSync(`npx --yes @mermaid-js/mermaid-cli -i "${tmpFile}" -o "${outFile}" 2>&1`, {
+    execSync(`npx --yes @mermaid-js/mermaid-cli@10 -i "${tmpFile}" -o "${outFile}"`, {
       encoding: 'utf-8',
       stdio: 'pipe',
       timeout: 60000, // 60s timeout for npx download
@@ -119,7 +123,15 @@ function validateMermaid(code) {
     return { valid: true }
   } catch (error) {
     const errorMsg = error.stdout || error.stderr || error.message
-    // Check for common failure modes
+    // Ignore warnings and progress messages - only report actual parse errors
+    const isRealError = errorMsg.includes('Parse error') ||
+                        errorMsg.includes('Syntax error') ||
+                        errorMsg.includes('Error:') ||
+                        errorMsg.includes('EBADENGINE')
+    if (!isRealError) {
+      // Warnings like "deprecated puppeteer" or progress messages are not real errors
+      return { valid: true }
+    }
     if (errorMsg.includes('ENOENT') || errorMsg.includes('not found')) {
       return {
         valid: false,
@@ -139,26 +151,173 @@ function validateMermaid(code) {
 // GitHub API
 // ============================================================================
 
-function fetchOpenIssues() {
-  const allIssues = []
+// ============================================================================
+// Status Constants
+// ============================================================================
 
-  for (const repo of REPOS) {
-    try {
-      const result = execSync(
-        `gh issue list --repo ${repo.fullName} --state open --limit 100 --json number,title,body,labels`,
-        { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] },
-      )
-      const issues = JSON.parse(result)
-      for (const issue of issues) {
-        issue.repo = repo.name
+const STATUS_EMOJI = {
+  done: '✅',
+  in_progress: '🔄',
+  todo: '⏳',
+}
+
+// API limits for GitHub CLI queries
+// Note: If a repo has more issues/PRs than these limits, older items will be truncated.
+// Increase these values if needed, but be aware of GitHub API rate limits.
+const ISSUE_FETCH_LIMIT = 100
+const PR_FETCH_LIMIT = 200
+
+// Color manipulation constants for in-progress highlighting
+const LIGHTNESS_BOOST = 0.15
+const MAX_LIGHTNESS = 0.85
+const SATURATION_MULTIPLIER = 1.1
+
+/**
+ * Fetch PRs for a single repo and extract issue -> PR state mappings
+ * @param {Object} repo - Repository info with name and fullName
+ * @returns {Promise<Array<{issueKey: string, prState: string}>>} Array of issue-state mappings
+ */
+async function fetchRepoPullRequestStates(repo) {
+  const mappings = []
+
+  try {
+    const { stdout } = await execAsync(
+      `gh pr list --repo ${repo.fullName} --state all --limit ${PR_FETCH_LIMIT} --json number,state,mergedAt,closingIssuesReferences`,
+    )
+    const prs = JSON.parse(stdout)
+
+    for (const pr of prs) {
+      // Normalize state to uppercase for consistent comparison
+      const normalizedState = (pr.state || '').toUpperCase()
+      let prState = 'closed'
+      if (pr.mergedAt) {
+        prState = 'merged'
+      } else if (normalizedState === 'OPEN') {
+        prState = 'open'
       }
-      allIssues.push(...issues)
-    } catch {
-      // Repo might not exist or have no issues
+
+      // Map each linked issue to this PR's state
+      const linkedIssues = pr.closingIssuesReferences || []
+      for (const linkedIssue of linkedIssues) {
+        mappings.push({
+          issueKey: `${repo.name}#${linkedIssue.number}`,
+          prState,
+        })
+      }
+    }
+  } catch (error) {
+    // Expected: repo might not exist, have no PRs, or gh CLI not authenticated
+    const errorMsg = error.message || ''
+    if (!errorMsg.includes('404') && !errorMsg.includes('no pull requests')) {
+      console.warn(`  ⚠️  Could not fetch PRs from ${repo.name}: ${errorMsg.slice(0, 100)}`)
     }
   }
 
-  return allIssues
+  return mappings
+}
+
+/**
+ * Fetch all PRs from all repos in parallel and build a map of issue number -> PR state
+ * @returns {Promise<Map<string, 'merged' | 'open' | 'closed'>>} Map of "repo#number" -> PR state
+ */
+async function fetchPullRequestStates() {
+  // Fetch all repos in parallel
+  const results = await Promise.all(REPOS.map((repo) => fetchRepoPullRequestStates(repo)))
+
+  // Merge results into a single map
+  const prStateByIssue = new Map()
+  for (const mappings of results) {
+    for (const { issueKey, prState } of mappings) {
+      // Keep the "best" state: merged > open > closed
+      const existingState = prStateByIssue.get(issueKey)
+      if (!existingState ||
+          (prState === 'merged') ||
+          (prState === 'open' && existingState !== 'merged')) {
+        prStateByIssue.set(issueKey, prState)
+      }
+    }
+  }
+
+  return prStateByIssue
+}
+
+/**
+ * Detect ticket status based on PR state (preferred) or issue state
+ *
+ * Status logic:
+ * - done: Issue closed OR has a merged PR
+ * - in_progress: Has an open PR
+ * - todo: No PR yet (ticket just written)
+ *
+ * @param {Object} issue - GitHub issue object with state
+ * @param {Map<string, string>} prStateByIssue - Map of "repo#number" -> PR state
+ * @returns {'done' | 'in_progress' | 'todo'}
+ */
+function detectTicketStatus(issue, prStateByIssue) {
+  // Normalize state to uppercase for consistent comparison
+  const normalizedState = (issue.state || '').toUpperCase()
+
+  // Closed issues are done
+  if (normalizedState === 'CLOSED') {
+    return 'done'
+  }
+
+  // Check PR state for this issue
+  const issueKey = `${issue.repo}#${issue.number}`
+  const prState = prStateByIssue.get(issueKey)
+
+  if (prState === 'merged') {
+    return 'done'
+  }
+
+  if (prState === 'open') {
+    return 'in_progress'
+  }
+
+  // No PR or PR closed without merge = todo
+  return 'todo'
+}
+
+/**
+ * Fetch issues for a single repo
+ * @param {Object} repo - Repository info with name and fullName
+ * @param {Map<string, string>} prStateByIssue - PR state map for status detection
+ * @returns {Promise<Object[]>} Array of issues with repo and status added
+ */
+async function fetchRepoIssues(repo, prStateByIssue) {
+  try {
+    const { stdout } = await execAsync(
+      `gh issue list --repo ${repo.fullName} --state all --limit ${ISSUE_FETCH_LIMIT} --json number,title,body,labels,state`,
+    )
+    const issues = JSON.parse(stdout)
+    for (const issue of issues) {
+      issue.repo = repo.name
+      issue.status = detectTicketStatus(issue, prStateByIssue)
+    }
+    return issues
+  } catch (error) {
+    // Expected: repo might not exist or gh CLI not authenticated
+    const errorMsg = error.message || ''
+    if (!errorMsg.includes('404')) {
+      console.warn(`  ⚠️  Could not fetch issues from ${repo.name}: ${errorMsg.slice(0, 100)}`)
+    }
+    return []
+  }
+}
+
+/**
+ * Fetch all issues from all repos in parallel
+ * @returns {Promise<Object[]>} All issues from all repos
+ */
+async function fetchOpenIssues() {
+  // First, fetch PR states for all repos in parallel
+  const prStateByIssue = await fetchPullRequestStates()
+
+  // Then fetch all issues in parallel
+  const results = await Promise.all(REPOS.map((repo) => fetchRepoIssues(repo, prStateByIssue)))
+
+  // Flatten results
+  return results.flat()
 }
 
 // ============================================================================
@@ -166,43 +325,62 @@ function fetchOpenIssues() {
 // ============================================================================
 
 /**
- * Extract metadata from issue body YAML block.
+ * Extract metadata from issue body YAML block and hierarchy section.
  * Note: depends_on and blocks are stored as raw strings here,
  * then parsed into DependencyRef objects by parseTicketDependencies().
  */
 function extractMetadata(body) {
-  const yamlMatch = body?.match(/```yaml\s*\n([\s\S]*?)```/)
-  if (!yamlMatch) return null
+  if (!body) return null
 
-  const yamlContent = yamlMatch[1]
   const metadata = {}
 
-  // Parse simple yaml fields
-  const repoMatch = yamlContent.match(/^repo:\s*(.+)$/m)
-  const pointsMatch = yamlContent.match(/^story_points:\s*(\d+)/m)
-  const dependsMatch = yamlContent.match(/^depends_on:\s*\[([^\]]*)\]/m)
-  const blocksMatch = yamlContent.match(/^blocks:\s*\[([^\]]*)\]/m)
-  const severityMatch = yamlContent.match(/^severity:\s*(\w+)/m)
+  // Parse YAML block if present
+  const yamlMatch = body.match(/```yaml\s*\n([\s\S]*?)```/)
+  if (yamlMatch) {
+    const yamlContent = yamlMatch[1]
 
-  // Parse labels array
-  const labelsMatch = yamlContent.match(/^labels:\s*\n((?:\s+-\s+.+\n?)+)/m)
-  if (labelsMatch) {
-    metadata.labels = labelsMatch[1]
-      .split('\n')
-      .map((l) => l.replace(/^\s+-\s+/, '').trim())
-      .filter(Boolean)
+    // Parse simple yaml fields
+    const repoMatch = yamlContent.match(/^repo:\s*(.+)$/m)
+    const pointsMatch = yamlContent.match(/^story_points:\s*(\d+)/m)
+    const dependsMatch = yamlContent.match(/^depends_on:\s*\[([^\]]*)\]/m)
+    const blocksMatch = yamlContent.match(/^blocks:\s*\[([^\]]*)\]/m)
+    const severityMatch = yamlContent.match(/^severity:\s*(\w+)/m)
+
+    // Parse labels array
+    const labelsMatch = yamlContent.match(/^labels:\s*\n((?:\s+-\s+.+\n?)+)/m)
+    if (labelsMatch) {
+      metadata.labels = labelsMatch[1]
+        .split('\n')
+        .map((l) => l.replace(/^\s+-\s+/, '').trim())
+        .filter(Boolean)
+    }
+
+    if (repoMatch) metadata.repo = repoMatch[1].trim()
+    if (pointsMatch) metadata.story_points = parseInt(pointsMatch[1], 10)
+    if (severityMatch) metadata.severity = severityMatch[1].trim()
+
+    // Store raw dependency strings for later parsing with repo context
+    if (dependsMatch) {
+      metadata.depends_on_raw = dependsMatch[1].split(',').map((s) => s.trim()).filter(Boolean)
+    }
+    if (blocksMatch) {
+      metadata.blocks_raw = blocksMatch[1].split(',').map((s) => s.trim()).filter(Boolean)
+    }
   }
 
-  if (repoMatch) metadata.repo = repoMatch[1].trim()
-  if (pointsMatch) metadata.story_points = parseInt(pointsMatch[1], 10)
-  if (severityMatch) metadata.severity = severityMatch[1].trim()
-
-  // Store raw dependency strings for later parsing with repo context
-  if (dependsMatch) {
-    metadata.depends_on_raw = dependsMatch[1].split(',').map((s) => s.trim()).filter(Boolean)
+  // Parse hierarchy section to find parent epic
+  // Format: | 🏔️ Epic | [#XX - Epic Name](url) |
+  // The regex requires a table row context (starts with |) to avoid false matches
+  const epicMatch = body.match(/\|\s*(?:🏔️\s*)?Epic\s*\|\s*\[#(\d+)/i)
+  if (epicMatch) {
+    metadata.parentEpic = parseInt(epicMatch[1], 10)
   }
-  if (blocksMatch) {
-    metadata.blocks_raw = blocksMatch[1].split(',').map((s) => s.trim()).filter(Boolean)
+
+  // Also check for parent initiative
+  // Format: | 🚀 Initiative | [#XX - Initiative Name](url) |
+  const initMatch = body.match(/\|\s*(?:🚀\s*)?Initiative\s*\|\s*\[#(\d+)/i)
+  if (initMatch) {
+    metadata.parentInitiative = parseInt(initMatch[1], 10)
   }
 
   return metadata
@@ -338,15 +516,81 @@ function generateInventoryTable(tickets, type) {
   return table
 }
 
-function categorizeTicket(t) {
+// Repos that are automatically categorized as blocking
+const BLOCKING_REPOS = ['tied-siren-blocking-overlay', 'expo-accessibility-service', 'expo-foreground-service']
+
+// Category keywords for matching epic titles/labels
+const CATEGORY_KEYWORDS = {
+  auth: ['auth', 'sign-in', 'password', 'login', 'firebase', 'session'],
+  blocking: ['blocking', 'siren', 'tier', 'lookout', 'strict', 'overlay', 'schedule', 'native'],
+}
+
+/**
+ * Build a dynamic map of epic numbers to their categories based on labels/title
+ * @param {Object[]} tickets - All tickets including epics
+ * @returns {Map<number, string>} - Map of epic number to category
+ */
+function buildEpicCategoryMap(tickets) {
+  const epicCategories = new Map()
+  const epics = tickets.filter((t) => t.type === 'epic')
+
+  for (const epic of epics) {
+    const title = epic.title.toLowerCase()
+    const labels = (epic.labels || []).map((l) => (typeof l === 'string' ? l : l.name)?.toLowerCase() || '')
+
+    // Check labels first
+    for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+      if (labels.some((label) => keywords.some((kw) => label.includes(kw)))) {
+        epicCategories.set(epic.number, category)
+        break
+      }
+    }
+
+    // If no label match, check title
+    if (!epicCategories.has(epic.number)) {
+      for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+        if (keywords.some((kw) => title.includes(kw))) {
+          epicCategories.set(epic.number, category)
+          break
+        }
+      }
+    }
+
+    // Default to 'other' if no match
+    if (!epicCategories.has(epic.number)) {
+      epicCategories.set(epic.number, 'other')
+    }
+  }
+
+  return epicCategories
+}
+
+/**
+ * Categorize a ticket by its type, repo, parent epic, or labels/title
+ * @param {Object} t - The ticket to categorize
+ * @param {Map<number, string>} epicCategoryMap - Map of epic number to category (optional)
+ * @returns {string} - Category name
+ */
+function categorizeTicket(t, epicCategoryMap = new Map()) {
   const title = t.title.toLowerCase()
   const labels = t.metadata?.labels || []
 
   if (t.type === 'initiative') return 'initiative'
   if (t.type === 'epic') return 'epic'
   if (t.type === 'bug') return 'bug'
+
+  // Check if ticket belongs to a blocking-related repo
+  if (BLOCKING_REPOS.includes(t.repo)) return 'blocking'
+
+  // Check parent epic category (from pre-built map)
+  const parentEpic = t.metadata?.parentEpic
+  if (parentEpic && epicCategoryMap.has(parentEpic)) {
+    return epicCategoryMap.get(parentEpic)
+  }
+
+  // Fallback to label/title matching
   if (labels.includes('auth') || title.includes('auth') || title.includes('sign-in') || title.includes('password')) return 'auth'
-  if (labels.includes('blocking') || title.includes('blocking') || title.includes('siren') || title.includes('tier') || title.includes('lookout')) return 'blocking'
+  if (labels.includes('blocking') || title.includes('blocking') || title.includes('siren') || title.includes('tier') || title.includes('lookout') || title.includes('strict')) return 'blocking'
   return 'other'
 }
 
@@ -359,8 +603,8 @@ function getStoryPointsColor(points) {
 
 function formatStoryPoints(points) {
   if (!points) return ''
-  const color = getStoryPointsColor(points)
-  return ` <span style='color:${color}'>${points}pt${points > 1 ? 's' : ''}</span>`
+  // Use simple text - Mermaid doesn't support inline HTML styles
+  return ` [${points}sp]`
 }
 
 function calculateDepths(tickets) {
@@ -409,17 +653,6 @@ const CATEGORY_COLOR_SHADES = {
   other: ['#4b5563', '#6b7280', '#9ca3af', '#d1d5db', '#e5e7eb'],      // gray
 }
 
-const CATEGORY_LABELS = {
-  initiative: 'Initiatives',
-  epic: 'Epics',
-  auth: 'Authentication',
-  blocking: 'Blocking',
-  bug: 'Bugs',
-  other: 'Other',
-}
-
-const CATEGORY_ORDER = ['initiative', 'epic', 'blocking', 'auth', 'bug', 'other']
-
 /**
  * Create a unique Mermaid node ID for a ticket
  * @param {{ repo: string, number: number }} ticket
@@ -441,131 +674,200 @@ function createNodeIdFromRef(ref) {
 }
 
 /**
- * Generate Mermaid class definitions for category + depth styling
+ * Convert hex color to grayscale
+ * @param {string} hex - Hex color like '#7c3aed'
+ * @returns {string} - Grayscale hex color
+ */
+function hexToGrayscale(hex) {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+  // Luminance formula
+  const gray = Math.round(0.299 * r + 0.587 * g + 0.114 * b)
+  const grayHex = gray.toString(16).padStart(2, '0')
+  return `#${grayHex}${grayHex}${grayHex}`
+}
+
+/**
+ * Convert RGB to HSL
+ * @param {number} r - Red (0-255)
+ * @param {number} g - Green (0-255)
+ * @param {number} b - Blue (0-255)
+ * @returns {[number, number, number]} - [h (0-360), s (0-1), l (0-1)]
+ */
+function rgbToHsl(r, g, b) {
+  r /= 255
+  g /= 255
+  b /= 255
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  let h = 0
+  let s = 0
+  const l = (max + min) / 2
+
+  if (max !== min) {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6
+    else if (max === g) h = ((b - r) / d + 2) / 6
+    else h = ((r - g) / d + 4) / 6
+  }
+
+  return [h * 360, s, l]
+}
+
+/**
+ * Convert HSL to RGB
+ * @param {number} h - Hue (0-360)
+ * @param {number} s - Saturation (0-1)
+ * @param {number} l - Lightness (0-1)
+ * @returns {[number, number, number]} - [r, g, b] (0-255)
+ */
+function hslToRgb(h, s, l) {
+  h /= 360
+  let r, g, b
+
+  if (s === 0) {
+    r = g = b = l
+  } else {
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1
+      if (t > 1) t -= 1
+      if (t < 1/6) return p + (q - p) * 6 * t
+      if (t < 1/2) return q
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6
+      return p
+    }
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+    const p = 2 * l - q
+    r = hue2rgb(p, q, h + 1/3)
+    g = hue2rgb(p, q, h)
+    b = hue2rgb(p, q, h - 1/3)
+  }
+
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)]
+}
+
+/**
+ * Make a color brighter using HSL manipulation
+ * Increases lightness and saturation for a vibrant highlight effect
+ * @param {string} hex - Hex color
+ * @returns {string} - Brighter hex color
+ */
+function brightenColor(hex) {
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+
+  let [h, s, l] = rgbToHsl(r, g, b)
+
+  // Increase lightness (but cap to avoid white-out)
+  l = Math.min(MAX_LIGHTNESS, l + LIGHTNESS_BOOST)
+  // Boost saturation slightly for vibrancy
+  s = Math.min(1, s * SATURATION_MULTIPLIER)
+
+  const [nr, ng, nb] = hslToRgb(h, s, l)
+  return `#${nr.toString(16).padStart(2, '0')}${ng.toString(16).padStart(2, '0')}${nb.toString(16).padStart(2, '0')}`
+}
+
+/**
+ * Generate Mermaid class definitions for category + depth + status styling
  * @param {number} maxDepth
  * @returns {string[]}
  */
 function generateMermaidStyles(maxDepth) {
   const styles = []
+  const statuses = ['todo', 'in_progress', 'done']
+
   for (const [category, shades] of Object.entries(CATEGORY_COLOR_SHADES)) {
     for (let d = 0; d <= maxDepth; d++) {
       const idx = Math.min(d, shades.length - 1)
-      const fill = shades[idx]
-      const stroke = shades[Math.max(0, idx - 1)]
+      const baseFill = shades[idx]
+      const baseStroke = shades[Math.max(0, idx - 1)]
       const textColor = d < 2 ? '#fff' : '#000'
-      styles.push(`    classDef ${category}${d} fill:${fill},stroke:${stroke},color:${textColor}`)
+
+      for (const status of statuses) {
+        let fill = baseFill
+        let stroke = baseStroke
+        let text = textColor
+        let extraStyle = ''
+
+        if (status === 'done') {
+          // Grayscale for done tickets
+          fill = hexToGrayscale(baseFill)
+          stroke = hexToGrayscale(baseStroke)
+          text = '#666'
+          extraStyle = ',stroke-dasharray:3'
+        } else if (status === 'in_progress') {
+          // Brighter with thick border for in-progress
+          fill = brightenColor(baseFill)
+          stroke = '#000'
+          extraStyle = ',stroke-width:3px'
+        }
+
+        styles.push(`    classDef ${category}${d}_${status} fill:${fill},stroke:${stroke},color:${text}${extraStyle}`)
+      }
     }
   }
   return styles
 }
 
 /**
- * Build a mapping of epic keys to their parent initiatives
- * @param {Object[]} tickets
- * @returns {Map<string, Object>}
- */
-function buildEpicToInitiativeMap(tickets) {
-  const initiatives = tickets.filter((t) => t.type === 'initiative')
-  const epicToInitiative = new Map()
-
-  for (const epic of tickets.filter((t) => t.type === 'epic')) {
-    const epicKey = depRefKey({ repo: epic.repo, number: epic.number })
-
-    // Check if any initiative blocks this epic
-    for (const init of initiatives) {
-      const blocksEpic = init.metadata?.blocks?.some(
-        (ref) => ref.repo === epic.repo && ref.number === epic.number
-      )
-      if (blocksEpic) {
-        epicToInitiative.set(epicKey, init)
-        break
-      }
-    }
-
-    // Or check if epic depends on an initiative
-    if (!epicToInitiative.has(epicKey)) {
-      for (const depRef of epic.metadata?.depends_on || []) {
-        const parent = initiatives.find(
-          (i) => i.repo === depRef.repo && i.number === depRef.number
-        )
-        if (parent) {
-          epicToInitiative.set(epicKey, parent)
-          break
-        }
-      }
-    }
-  }
-
-  return epicToInitiative
-}
-
-/**
  * Sanitize a ticket title for display in Mermaid diagrams
+ * Supports multi-line output with <br/> breaks
  * @param {string} title
- * @param {number} maxLength
+ * @param {number} lineLength - Max characters per line
+ * @param {number} maxLines - Max number of lines
  * @returns {string}
  */
-function sanitizeTicketTitle(title, maxLength = 30) {
+function sanitizeTicketTitle(title, lineLength = 30, maxLines = 3) {
   const cleaned = title
     .replace(/^\[?\w+\]?\s*/i, '')
     .replace(/^feat\([^)]*\):\s*/i, '')
     .replace(/^fix\([^)]*\):\s*/i, '')
     .replace(/[[\]()]/g, '')
     .replace(/"/g, "'")
-  return cleaned.length > maxLength ? cleaned.substring(0, maxLength) + '...' : cleaned
-}
 
-/**
- * Group tickets by category with computed labels and depths
- * @param {Object[]} tickets
- * @param {Map<string, number>} depths
- * @returns {Object}
- */
-function groupTicketsByCategory(tickets, depths) {
-  const nodesByCategory = {}
+  const maxLength = lineLength * maxLines
+  const truncated = cleaned.length > maxLength ? cleaned.substring(0, maxLength - 3) + '...' : cleaned
 
-  for (const t of tickets) {
-    const category = categorizeTicket(t)
-    if (!nodesByCategory[category]) nodesByCategory[category] = []
+  // Split into lines of ~lineLength characters, breaking at word boundaries
+  const words = truncated.split(/\s+/).filter(Boolean)
 
-    const label = sanitizeTicketTitle(t.title)
-    const ticketKey = depRefKey({ repo: t.repo, number: t.number })
-    const depth = depths.get(ticketKey) || 0
+  // Guard for empty titles (all whitespace or cleaned to nothing)
+  if (words.length === 0) return ''
 
-    nodesByCategory[category].push({ ticket: t, label, depth })
-  }
+  const lines = []
+  let currentLine = ''
 
-  return nodesByCategory
-}
-
-/**
- * Build Mermaid node definition for a ticket
- * @param {Object} ticket
- * @param {string} label
- * @param {number} depth
- * @param {string} category
- * @param {Map<string, Object>} epicToInitiative
- * @returns {string}
- */
-function buildTicketNode(ticket, label, depth, category, epicToInitiative) {
-  let safeLabel = label.replace(/"/g, "'")
-
-  // For epics, show parent initiative
-  if (category === 'epic') {
-    const epicKey = depRefKey({ repo: ticket.repo, number: ticket.number })
-    const parentInit = epicToInitiative.get(epicKey)
-    if (parentInit) {
-      const initName = parentInit.title.replace(/^\[Initiative\]\s*/i, '').substring(0, 15)
-      safeLabel = `${safeLabel} [${initName}]`
+  for (let i = 0; i < words.length; i++) {
+    let word = words[i]
+    // Truncate individual words that exceed line length
+    if (word.length > lineLength) {
+      word = word.substring(0, lineLength - 3) + '...'
+    }
+    if (currentLine.length + word.length + 1 <= lineLength) {
+      currentLine += (currentLine ? ' ' : '') + word
+    } else {
+      if (currentLine) lines.push(currentLine)
+      currentLine = word
+      if (lines.length >= maxLines - 1) {
+        // Last line - add remaining and truncate if needed
+        const remaining = words.slice(i).join(' ')
+        if (remaining.length > lineLength) {
+          lines.push(remaining.substring(0, lineLength - 3) + '...')
+        } else {
+          lines.push(remaining)
+        }
+        break
+      }
     }
   }
+  if (currentLine && lines.length < maxLines) {
+    lines.push(currentLine)
+  }
 
-  const storyPoints = formatStoryPoints(ticket.metadata?.story_points)
-  const repoAbbrev = REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
-  const displayNum = ticket.repo !== MAIN_REPO ? `${repoAbbrev}#${ticket.number}` : `#${ticket.number}`
-  const repoLabel = ticket.repo !== MAIN_REPO ? `<br/>📦 ${repoAbbrev}` : ''
-
-  return `        ${createNodeId(ticket)}["${displayNum} ${safeLabel}${storyPoints}${repoLabel}"]:::${category}${depth}`
+  return lines.join('<br/>')
 }
 
 /**
@@ -575,12 +877,85 @@ function buildTicketNode(ticket, label, depth, category, epicToInitiative) {
  */
 function buildExternalNode(ref) {
   const abbrev = REPO_DISPLAY_ABBREV[ref.repo] || ref.repo
-  return `    ${createNodeIdFromRef(ref)}["${abbrev}#${ref.number}<br/>📦 ${abbrev}"]:::other0`
+  return `    ${createNodeIdFromRef(ref)}["${abbrev}#${ref.number}<br/>📦 ${abbrev}"]:::other0_todo`
+}
+
+/**
+ * Build a Mermaid subgraph for a list of tickets
+ * @param {string} name - Subgraph name/label
+ * @param {Object[]} ticketList - Tickets to include
+ * @param {Function} buildNodeFn - Function to build node line from ticket
+ * @returns {string[]} - Lines for the subgraph
+ */
+function buildSubgraph(name, ticketList, buildNodeFn) {
+  if (ticketList.length === 0) return []
+
+  const lines = []
+  lines.push(`    subgraph ${name}`)
+  lines.push(`        direction TB`)
+  for (const ticket of ticketList) {
+    lines.push(buildNodeFn(ticket))
+  }
+  lines.push('    end')
+  return lines
+}
+
+/**
+ * Build a Mermaid subgraph for an epic's child tickets
+ * @param {Object} epic - The parent epic
+ * @param {Object[]} children - Child tickets
+ * @param {Function} buildNodeFn - Function to build node line from ticket
+ * @returns {string[]} - Lines for the subgraph
+ */
+function buildEpicChildrenSubgraph(epic, children, buildNodeFn) {
+  if (children.length === 0) return []
+
+  const epicLabel = sanitizeTicketTitle(epic.title, 25, 1).replace(/<br\/>/g, ' ')
+  const repoAbbrev = REPO_DISPLAY_ABBREV[epic.repo] || epic.repo
+
+  const lines = []
+  lines.push(`    subgraph Epic_${epic.number}["${repoAbbrev}#${epic.number} ${epicLabel}"]`)
+  lines.push(`        direction TB`)
+  for (const child of children) {
+    lines.push(buildNodeFn(child))
+  }
+  lines.push('    end')
+  return lines
+}
+
+/**
+ * Generate edges between tickets, only within the same group
+ * @param {Object[]} tickets - All tickets
+ * @param {Map<string, Object>} ticketByKey - Lookup map
+ * @param {Function} getTicketGroupFn - Function to determine ticket's group
+ * @returns {string[]} - Edge definition lines
+ */
+function generateEdges(tickets, ticketByKey, getTicketGroupFn) {
+  const edges = []
+
+  for (const t of tickets) {
+    const tGroup = getTicketGroupFn(t)
+
+    for (const depRef of t.metadata?.depends_on || []) {
+      const depKey = depRefKey(depRef)
+      const depTicket = ticketByKey.get(depKey)
+
+      if (depTicket) {
+        const depGroup = getTicketGroupFn(depTicket)
+        // Only draw edge if both tickets are in the same group
+        if (tGroup === depGroup) {
+          edges.push(`    ${createNodeIdFromRef(depRef)} --> ${createNodeId(t)}`)
+        }
+      }
+      // Skip external/cross-repo edges entirely now
+    }
+  }
+
+  return edges
 }
 
 function generateMermaidDiagram(tickets) {
   const nodes = []
-  const edges = []
 
   // Calculate depths for shading
   const depths = calculateDepths(tickets)
@@ -589,101 +964,77 @@ function generateMermaidDiagram(tickets) {
   // Generate styles
   const styles = generateMermaidStyles(maxDepth)
 
-  // Group tickets by category
-  const nodesByCategory = groupTicketsByCategory(tickets, depths)
-
-  // Build initiative lookup for epics
-  const epicToInitiative = buildEpicToInitiativeMap(tickets)
-
   // Build ticket lookup by key for edge validation
   const ticketByKey = new Map(tickets.map((t) => [depRefKey({ repo: t.repo, number: t.number }), t]))
 
-  // Track external nodes already added (Set for O(1) lookup)
-  const addedExternalNodes = new Set()
+  // Separate tickets by type
+  const initiatives = tickets.filter((t) => t.type === 'initiative')
+  const epics = tickets.filter((t) => t.type === 'epic')
+  const otherTickets = tickets.filter((t) => t.type !== 'initiative' && t.type !== 'epic')
 
-  // Generate subgraph nodes by category
-  for (const category of CATEGORY_ORDER) {
-    const items = nodesByCategory[category]
-    if (!items || items.length === 0) continue
+  // Build epic lookup by number
+  const epicByNumber = new Map(epics.map((e) => [e.number, e]))
 
-    nodes.push(`    subgraph ${CATEGORY_LABELS[category]}`)
-    nodes.push(`        direction TB`)
-    for (const { ticket, label, depth } of items) {
-      nodes.push(buildTicketNode(ticket, label, depth, category, epicToInitiative))
-    }
-    nodes.push('    end')
-  }
+  // Group tickets by parent epic
+  const ticketsByEpic = new Map()
+  const orphanTickets = []
 
-  // Generate edges (including cross-repo edges)
-  for (const t of tickets) {
-    for (const depRef of t.metadata?.depends_on || []) {
-      const depKey = depRefKey(depRef)
-      const depTicket = ticketByKey.get(depKey)
-
-      if (depTicket) {
-        // Both tickets exist in our set - create solid edge
-        edges.push(`    ${createNodeIdFromRef(depRef)} --> ${createNodeId(t)}`)
-      } else if (depRef.repo !== t.repo && VALID_REPOS[depRef.repo]) {
-        // External cross-repo dependency (different repo, not just a closed local ticket)
-        // Show as external node with dashed edge
-        const externalNodeId = createNodeIdFromRef(depRef)
-        if (!addedExternalNodes.has(externalNodeId)) {
-          nodes.push(buildExternalNode(depRef))
-          addedExternalNodes.add(externalNodeId)
-        }
-        edges.push(`    ${externalNodeId} -.-> ${createNodeId(t)}`)
+  for (const t of otherTickets) {
+    const parentEpicNum = t.metadata?.parentEpic
+    if (parentEpicNum && epicByNumber.has(parentEpicNum)) {
+      if (!ticketsByEpic.has(parentEpicNum)) {
+        ticketsByEpic.set(parentEpicNum, [])
       }
-      // Note: If depRef.repo === t.repo but ticket not found, it's likely a closed
-      // local ticket - we skip it silently rather than showing as external
+      ticketsByEpic.get(parentEpicNum).push(t)
+    } else {
+      orphanTickets.push(t)
     }
   }
+
+  // Build epic category map once for efficient lookups
+  const epicCategoryMap = buildEpicCategoryMap(tickets)
+
+  // Helper to build a node line (closure over depths and epicCategoryMap)
+  const buildNodeLine = (ticket) => {
+    const label = sanitizeTicketTitle(ticket.title)
+    const ticketKey = depRefKey({ repo: ticket.repo, number: ticket.number })
+    const depth = depths.get(ticketKey) || 0
+    const category = categorizeTicket(ticket, epicCategoryMap)
+    const storyPoints = formatStoryPoints(ticket.metadata?.story_points)
+    const repoAbbrev = REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
+    const status = ticket.status || 'todo'
+    const statusEmoji = STATUS_EMOJI[status] || ''
+    const displayNum = `${statusEmoji} ${repoAbbrev}#${ticket.number}`
+    return `        ${createNodeId(ticket)}["${displayNum} ${label}${storyPoints}"]:::${category}${depth}_${status}`
+  }
+
+  // Build subgraphs using helpers
+  nodes.push(...buildSubgraph('Initiatives', initiatives, buildNodeLine))
+  nodes.push(...buildSubgraph('Epics', epics, buildNodeLine))
+
+  for (const epic of epics) {
+    const epicChildren = ticketsByEpic.get(epic.number) || []
+    nodes.push(...buildEpicChildrenSubgraph(epic, epicChildren, buildNodeLine))
+  }
+
+  nodes.push(...buildSubgraph('Ungrouped', orphanTickets, buildNodeLine))
+
+  // Helper to get a ticket's "group" (epic number, or 'initiative', 'epic', 'ungrouped')
+  const getTicketGroup = (ticket) => {
+    if (ticket.type === 'initiative') return 'initiative'
+    if (ticket.type === 'epic') return 'epic'
+    const parentEpic = ticket.metadata?.parentEpic
+    if (parentEpic && epicByNumber.has(parentEpic)) return `epic_${parentEpic}`
+    return 'ungrouped'
+  }
+
+  // Generate edges using helper
+  const edges = generateEdges(tickets, ticketByKey, getTicketGroup)
 
   return `\`\`\`mermaid
 flowchart LR
 ${styles.join('\n')}
 
-${nodes.join('\n')}
-
-${edges.join('\n')}
-\`\`\``
-}
-
-function generateFeaturesDiagram(features, title) {
-  if (features.length === 0) return ''
-
-  const nodes = []
-  const edges = []
-
-  // Helper to create unique node ID
-  const featureNodeId = (f) => {
-    const abbrev = REPO_DISPLAY_ABBREV[f.repo] || f.repo.replace(/-/g, '')
-    return `F_${abbrev}_${f.number}`
-  }
-
-  // Build lookup map
-  const featureByKey = new Map(features.map((f) => [depRefKey({ repo: f.repo, number: f.number }), f]))
-
-  for (const f of features) {
-    const shortTitle = f.title.length > 25 ? f.title.substring(0, 25) + '...' : f.title
-    const storyPoints = formatStoryPoints(f.metadata?.story_points)
-    const repoAbbrev = REPO_DISPLAY_ABBREV[f.repo] || f.repo
-    const displayNum = f.repo !== MAIN_REPO ? `${repoAbbrev}#${f.number}` : `#${f.number}`
-    nodes.push(`    ${featureNodeId(f)}["${displayNum} ${shortTitle}${storyPoints}"]`)
-
-    const deps = f.metadata?.depends_on || []
-    for (const depRef of deps) {
-      const depKey = depRefKey(depRef)
-      if (featureByKey.has(depKey)) {
-        const depFeature = featureByKey.get(depKey)
-        edges.push(`    ${featureNodeId(depFeature)} --> ${featureNodeId(f)}`)
-      }
-    }
-  }
-
-  return `### ${title}
-
-\`\`\`mermaid
-flowchart TD
 ${nodes.join('\n')}
 
 ${edges.join('\n')}
@@ -977,16 +1328,6 @@ ${generateMermaidDiagram(tickets)}
 
 `
 
-  // Feature diagrams by category
-  for (const [category, features] of Object.entries(featureCategories)) {
-    if (features.length > 1 && features.some((f) => f.metadata?.depends_on?.length > 0)) {
-      md += `
-${generateFeaturesDiagram(features, `Features: ${category}`)}
-
-`
-    }
-  }
-
   // Dependency matrix
   md += `---
 
@@ -1016,6 +1357,14 @@ ${Object.entries(VALID_REPOS)
 - **Features (F)**: Individual stories/tasks
 - **Subgraphs**: Logical groupings
 
+### Status
+
+| Emoji | Status | Style |
+|-------|--------|-------|
+| ✅ | Done | Grayscale, dashed border |
+| 🔄 | In Progress | Bright, thick border |
+| ⏳ | To Do | Normal colors |
+
 ### Story Points
 
 | Points | Color |
@@ -1040,24 +1389,27 @@ ${Object.entries(VALID_REPOS)
 /**
  * Main function to run the dependency graph generator
  */
-function main() {
+async function main() {
   const asciiMode = process.argv.includes('--ascii')
   const liveMode = process.argv.includes('--live')
 
   if (!asciiMode) {
-    console.log(`Fetching open issues from ${REPOS.length} repos...`)
+    console.log(`Fetching issues from ${REPOS.length} repos in parallel...`)
   }
-  const issues = fetchOpenIssues()
+  const issues = await fetchOpenIssues()
 
   if (!asciiMode) {
     const repoCounts = {}
+    const statusCounts = { done: 0, in_progress: 0, todo: 0 }
     for (const issue of issues) {
       repoCounts[issue.repo] = (repoCounts[issue.repo] || 0) + 1
+      statusCounts[issue.status] = (statusCounts[issue.status] || 0) + 1
     }
-    console.log(`Found ${issues.length} open issues:`)
+    console.log(`Found ${issues.length} issues:`)
     for (const [repo, count] of Object.entries(repoCounts)) {
       console.log(`  - ${repo}: ${count}`)
     }
+    console.log(`Status breakdown: ✅ ${statusCounts.done} done, 🔄 ${statusCounts.in_progress} in progress, ⏳ ${statusCounts.todo} todo`)
   }
 
   const tickets = issues.map((issue) => {
@@ -1070,6 +1422,7 @@ function main() {
       repo: ticketRepo,
       metadata,
       type: detectTicketType(issue, metadata),
+      status: issue.status || 'todo',
     }
   })
 
@@ -1116,5 +1469,8 @@ function main() {
 // Only run main when executed directly (not when imported for testing)
 const isMainModule = process.argv[1]?.endsWith('generate-dependency-graph.mjs')
 if (isMainModule) {
-  main()
+  main().catch((error) => {
+    console.error('Error:', error.message)
+    process.exit(1)
+  })
 }
