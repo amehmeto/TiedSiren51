@@ -10,7 +10,6 @@ fi
 
 ISSUE_NUMBER="$1"
 REPO_ROOT=$(git rev-parse --show-toplevel)
-WORKTREE_DIR="$REPO_ROOT/../ethernal-claude-issue-$ISSUE_NUMBER"
 BRANCH_NAME="issue-$ISSUE_NUMBER"
 SESSION_NAME="issue-$ISSUE_NUMBER"
 
@@ -26,33 +25,41 @@ fi
 
 echo "Issue fetched: $ISSUE_TITLE"
 
-# Update main repo before creating worktree
-echo "Updating main repository..."
-git fetch origin
-git pull --ff-only origin main
+# Create worktree using scripts/worktree.sh (handles branch creation, PR, npm ci)
+echo "Creating worktree for branch $BRANCH_NAME..."
+set +e
+WORKTREE_OUTPUT=$("$REPO_ROOT/scripts/worktree.sh" "$BRANCH_NAME" 2>&1)
+EXIT_CODE=$?
+set -e
 
-# Create worktree with a new branch or reuse existing branch
-echo "Creating worktree at $WORKTREE_DIR..."
+if [ $EXIT_CODE -eq 0 ]; then
+    # Success - parse WORKTREE_PATH from output
+    WORKTREE_DIR=$(echo "$WORKTREE_OUTPUT" | grep "^WORKTREE_PATH=" | cut -d= -f2)
+    echo "$WORKTREE_OUTPUT"
+elif [ $EXIT_CODE -eq 2 ]; then
+    # Worktree already exists - find it via git worktree list
+    echo "Worktree already exists, finding path..."
+    while IFS= read -r line; do
+        if [[ "$line" =~ ^worktree\ (.+)$ ]]; then
+            wt_path="${BASH_REMATCH[1]}"
+        elif [[ "$line" =~ ^branch\ refs/heads/(.+)$ ]] && [[ "${BASH_REMATCH[1]}" == "$BRANCH_NAME" ]]; then
+            WORKTREE_DIR="$wt_path"
+            break
+        fi
+    done < <(git worktree list --porcelain)
 
-# Clean up stale worktree entries (directories that no longer exist)
-git worktree prune
-
-# Check if worktree already exists at this path
-if [ -d "$WORKTREE_DIR" ]; then
-    echo "Worktree already exists at $WORKTREE_DIR, reusing it..."
-    cd "$WORKTREE_DIR"
-    git pull --ff-only || true
-# Check if branch already exists (locally or remotely)
-elif git show-ref --verify --quiet "refs/heads/$BRANCH_NAME"; then
-    echo "Branch $BRANCH_NAME already exists locally, reusing it..."
-    # Use -f to override orphaned worktree registrations (dir deleted but git still tracks it)
-    git worktree add -f "$WORKTREE_DIR" "$BRANCH_NAME"
-elif git show-ref --verify --quiet "refs/remotes/origin/$BRANCH_NAME"; then
-    echo "Branch $BRANCH_NAME exists on remote, checking it out..."
-    git worktree add -f --track -b "$BRANCH_NAME" "$WORKTREE_DIR" "origin/$BRANCH_NAME"
+    if [ -n "$WORKTREE_DIR" ]; then
+        echo "Found existing worktree at: $WORKTREE_DIR"
+        (cd "$WORKTREE_DIR" && git pull --ff-only || true)
+    fi
 else
-    echo "Creating new branch $BRANCH_NAME from origin/main..."
-    git worktree add -f -b "$BRANCH_NAME" "$WORKTREE_DIR" origin/main
+    echo "$WORKTREE_OUTPUT"
+    exit $EXIT_CODE
+fi
+
+if [ -z "$WORKTREE_DIR" ]; then
+    echo "Error: Could not determine worktree path"
+    exit 1
 fi
 
 # Write issue content to a temp file for claude prompt
@@ -76,8 +83,6 @@ INIT_SCRIPT="$WORKTREE_DIR/.claude-init.sh"
 cat > "$INIT_SCRIPT" << EOF
 #!/bin/bash
 cd "$WORKTREE_DIR"
-echo "Installing dependencies..."
-npm install
 echo "Starting Claude Code with issue #$ISSUE_NUMBER..."
 claude "\$(cat '$PROMPT_FILE')"
 EOF
