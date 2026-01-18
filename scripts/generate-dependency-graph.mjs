@@ -399,22 +399,78 @@ function generateInventoryTable(tickets, type) {
   return table
 }
 
-// Map of known epic numbers to their categories
-const EPIC_CATEGORIES = {
-  54: 'auth',      // User Authentification
-  55: 'blocking',  // Blocking Apps on Android
-  57: 'blocking',  // Strict Mode
-  58: 'blocking',  // Block websites on Android
-  59: 'blocking',  // Blocking keywords on Android
-  60: 'other',     // Polish design
-  61: 'blocking',  // Schedule recurring block sessions
-  219: 'blocking', // Native Blocking Layer
-}
-
 // Repos that are automatically categorized as blocking
 const BLOCKING_REPOS = ['tied-siren-blocking-overlay', 'expo-accessibility-service', 'expo-foreground-service']
 
-function categorizeTicket(t) {
+// Category keywords for matching epic titles/labels
+const CATEGORY_KEYWORDS = {
+  auth: ['auth', 'sign-in', 'password', 'login', 'firebase', 'session'],
+  blocking: ['blocking', 'siren', 'tier', 'lookout', 'strict', 'overlay', 'schedule', 'native'],
+}
+
+/**
+ * Build a dynamic map of epic numbers to their categories based on labels/title
+ * @param {Object[]} tickets - All tickets including epics
+ * @returns {Map<number, string>} - Map of epic number to category
+ */
+function buildEpicCategoryMap(tickets) {
+  const epicCategories = new Map()
+  const epics = tickets.filter((t) => t.type === 'epic')
+
+  for (const epic of epics) {
+    const title = epic.title.toLowerCase()
+    const labels = (epic.labels || []).map((l) => (typeof l === 'string' ? l : l.name)?.toLowerCase() || '')
+
+    // Check labels first
+    for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+      if (labels.some((label) => keywords.some((kw) => label.includes(kw)))) {
+        epicCategories.set(epic.number, category)
+        break
+      }
+    }
+
+    // If no label match, check title
+    if (!epicCategories.has(epic.number)) {
+      for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+        if (keywords.some((kw) => title.includes(kw))) {
+          epicCategories.set(epic.number, category)
+          break
+        }
+      }
+    }
+
+    // Default to 'other' if no match
+    if (!epicCategories.has(epic.number)) {
+      epicCategories.set(epic.number, 'other')
+    }
+  }
+
+  return epicCategories
+}
+
+// Module-level cache for epic categories (populated on first use)
+let epicCategoryCache = null
+
+/**
+ * Get or build the epic category map
+ * @param {Object[]} tickets - All tickets (only needed on first call)
+ * @returns {Map<number, string>}
+ */
+function getEpicCategories(tickets) {
+  if (!epicCategoryCache && tickets) {
+    epicCategoryCache = buildEpicCategoryMap(tickets)
+  }
+  return epicCategoryCache || new Map()
+}
+
+/**
+ * Reset the epic category cache (useful for testing or re-fetching)
+ */
+function resetEpicCategoryCache() {
+  epicCategoryCache = null
+}
+
+function categorizeTicket(t, allTickets = null) {
   const title = t.title.toLowerCase()
   const labels = t.metadata?.labels || []
 
@@ -425,10 +481,13 @@ function categorizeTicket(t) {
   // Check if ticket belongs to a blocking-related repo
   if (BLOCKING_REPOS.includes(t.repo)) return 'blocking'
 
-  // Check parent epic category
+  // Check parent epic category (dynamically derived)
   const parentEpic = t.metadata?.parentEpic
-  if (parentEpic && EPIC_CATEGORIES[parentEpic]) {
-    return EPIC_CATEGORIES[parentEpic]
+  if (parentEpic) {
+    const epicCategories = getEpicCategories(allTickets)
+    if (epicCategories.has(parentEpic)) {
+      return epicCategories.get(parentEpic)
+    }
   }
 
   // Fallback to label/title matching
@@ -543,15 +602,85 @@ function hexToGrayscale(hex) {
 }
 
 /**
- * Make a color brighter/more saturated
+ * Convert RGB to HSL
+ * @param {number} r - Red (0-255)
+ * @param {number} g - Green (0-255)
+ * @param {number} b - Blue (0-255)
+ * @returns {[number, number, number]} - [h (0-360), s (0-1), l (0-1)]
+ */
+function rgbToHsl(r, g, b) {
+  r /= 255
+  g /= 255
+  b /= 255
+  const max = Math.max(r, g, b)
+  const min = Math.min(r, g, b)
+  let h = 0
+  let s = 0
+  const l = (max + min) / 2
+
+  if (max !== min) {
+    const d = max - min
+    s = l > 0.5 ? d / (2 - max - min) : d / (max + min)
+    if (max === r) h = ((g - b) / d + (g < b ? 6 : 0)) / 6
+    else if (max === g) h = ((b - r) / d + 2) / 6
+    else h = ((r - g) / d + 4) / 6
+  }
+
+  return [h * 360, s, l]
+}
+
+/**
+ * Convert HSL to RGB
+ * @param {number} h - Hue (0-360)
+ * @param {number} s - Saturation (0-1)
+ * @param {number} l - Lightness (0-1)
+ * @returns {[number, number, number]} - [r, g, b] (0-255)
+ */
+function hslToRgb(h, s, l) {
+  h /= 360
+  let r, g, b
+
+  if (s === 0) {
+    r = g = b = l
+  } else {
+    const hue2rgb = (p, q, t) => {
+      if (t < 0) t += 1
+      if (t > 1) t -= 1
+      if (t < 1/6) return p + (q - p) * 6 * t
+      if (t < 1/2) return q
+      if (t < 2/3) return p + (q - p) * (2/3 - t) * 6
+      return p
+    }
+    const q = l < 0.5 ? l * (1 + s) : l + s - l * s
+    const p = 2 * l - q
+    r = hue2rgb(p, q, h + 1/3)
+    g = hue2rgb(p, q, h)
+    b = hue2rgb(p, q, h - 1/3)
+  }
+
+  return [Math.round(r * 255), Math.round(g * 255), Math.round(b * 255)]
+}
+
+/**
+ * Make a color brighter using HSL manipulation
+ * Increases lightness and saturation for a vibrant highlight effect
  * @param {string} hex - Hex color
  * @returns {string} - Brighter hex color
  */
 function brightenColor(hex) {
-  const r = Math.min(255, Math.round(parseInt(hex.slice(1, 3), 16) * 1.2))
-  const g = Math.min(255, Math.round(parseInt(hex.slice(3, 5), 16) * 1.2))
-  const b = Math.min(255, Math.round(parseInt(hex.slice(5, 7), 16) * 1.2))
-  return `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`
+  const r = parseInt(hex.slice(1, 3), 16)
+  const g = parseInt(hex.slice(3, 5), 16)
+  const b = parseInt(hex.slice(5, 7), 16)
+
+  let [h, s, l] = rgbToHsl(r, g, b)
+
+  // Increase lightness (but cap at 0.85 to avoid white-out)
+  l = Math.min(0.85, l + 0.15)
+  // Boost saturation slightly for vibrancy
+  s = Math.min(1, s * 1.1)
+
+  const [nr, ng, nb] = hslToRgb(h, s, l)
+  return `#${nr.toString(16).padStart(2, '0')}${ng.toString(16).padStart(2, '0')}${nb.toString(16).padStart(2, '0')}`
 }
 
 /**
@@ -660,7 +789,8 @@ function sanitizeTicketTitle(title, lineLength = 30, maxLines = 3) {
   const lines = []
   let currentLine = ''
 
-  for (const word of words) {
+  for (let i = 0; i < words.length; i++) {
+    const word = words[i]
     if (currentLine.length + word.length + 1 <= lineLength) {
       currentLine += (currentLine ? ' ' : '') + word
     } else {
@@ -668,7 +798,7 @@ function sanitizeTicketTitle(title, lineLength = 30, maxLines = 3) {
       currentLine = word
       if (lines.length >= maxLines - 1) {
         // Last line - add remaining and truncate if needed
-        const remaining = words.slice(words.indexOf(word)).join(' ')
+        const remaining = words.slice(i).join(' ')
         if (remaining.length > lineLength) {
           lines.push(remaining.substring(0, lineLength - 3) + '...')
         } else {
@@ -695,7 +825,7 @@ function groupTicketsByCategory(tickets, depths) {
   const nodesByCategory = {}
 
   for (const t of tickets) {
-    const category = categorizeTicket(t)
+    const category = categorizeTicket(t, tickets)
     if (!nodesByCategory[category]) nodesByCategory[category] = []
 
     const label = sanitizeTicketTitle(t.title)
@@ -788,15 +918,15 @@ function generateMermaidDiagram(tickets) {
     }
   }
 
-  // Track external nodes already added
-  const addedExternalNodes = new Set()
+  // Initialize epic category cache with all tickets
+  getEpicCategories(tickets)
 
   // Helper to build a node line
   const buildNode = (ticket) => {
     const label = sanitizeTicketTitle(ticket.title)
     const ticketKey = depRefKey({ repo: ticket.repo, number: ticket.number })
     const depth = depths.get(ticketKey) || 0
-    const category = categorizeTicket(ticket)
+    const category = categorizeTicket(ticket, tickets)
     const storyPoints = formatStoryPoints(ticket.metadata?.story_points)
     const repoAbbrev = REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
     const status = ticket.status || 'todo'
