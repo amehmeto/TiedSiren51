@@ -101,9 +101,9 @@ cleanup_merged_worktrees() {
       continue
     fi
 
-    # Check if there's a PR for this branch
+    # Check if there's a PR for this branch (must use --state all to find merged/closed PRs)
     local pr_info
-    pr_info=$(gh pr list --head "$branch" --json number,state --jq '.[0] // empty' 2>/dev/null || true)
+    pr_info=$(gh pr list --head "$branch" --state all --json number,state --jq '.[0] // empty' 2>/dev/null || true)
 
     if [ -n "$pr_info" ]; then
       local pr_state pr_number
