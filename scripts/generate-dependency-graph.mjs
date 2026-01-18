@@ -27,8 +27,8 @@ import {
   fetchAllIssues,
   transformIssuesToTickets,
   parseDependencyRef as parseDependencyRefBase,
-} from './lib/index.mjs'
-import { renderMermaidDiagram, validateMermaid } from './lib/mermaid-renderer.mjs'
+} from './ticket-graph/index.mjs'
+import { renderMermaidDiagram, validateMermaid } from './ticket-graph/mermaid-renderer.mjs'
 
 // Re-export parsing functions with config bound (for backward compatibility)
 export function parseDependencyRef(ref, currentRepo) {
