@@ -111,7 +111,7 @@ function validateMermaid(code) {
 
   try {
     writeFileSync(tmpFile, code)
-    execSync(`npx --yes @mermaid-js/mermaid-cli -i "${tmpFile}" -o "${outFile}" 2>&1`, {
+    execSync(`npx --yes @mermaid-js/mermaid-cli@10 -i "${tmpFile}" -o "${outFile}"`, {
       encoding: 'utf-8',
       stdio: 'pipe',
       timeout: 60000, // 60s timeout for npx download
@@ -119,7 +119,15 @@ function validateMermaid(code) {
     return { valid: true }
   } catch (error) {
     const errorMsg = error.stdout || error.stderr || error.message
-    // Check for common failure modes
+    // Ignore warnings and progress messages - only report actual parse errors
+    const isRealError = errorMsg.includes('Parse error') ||
+                        errorMsg.includes('Syntax error') ||
+                        errorMsg.includes('Error:') ||
+                        errorMsg.includes('EBADENGINE')
+    if (!isRealError) {
+      // Warnings like "deprecated puppeteer" or progress messages are not real errors
+      return { valid: true }
+    }
     if (errorMsg.includes('ENOENT') || errorMsg.includes('not found')) {
       return {
         valid: false,
@@ -166,43 +174,60 @@ function fetchOpenIssues() {
 // ============================================================================
 
 /**
- * Extract metadata from issue body YAML block.
+ * Extract metadata from issue body YAML block and hierarchy section.
  * Note: depends_on and blocks are stored as raw strings here,
  * then parsed into DependencyRef objects by parseTicketDependencies().
  */
 function extractMetadata(body) {
-  const yamlMatch = body?.match(/```yaml\s*\n([\s\S]*?)```/)
-  if (!yamlMatch) return null
+  if (!body) return null
 
-  const yamlContent = yamlMatch[1]
   const metadata = {}
 
-  // Parse simple yaml fields
-  const repoMatch = yamlContent.match(/^repo:\s*(.+)$/m)
-  const pointsMatch = yamlContent.match(/^story_points:\s*(\d+)/m)
-  const dependsMatch = yamlContent.match(/^depends_on:\s*\[([^\]]*)\]/m)
-  const blocksMatch = yamlContent.match(/^blocks:\s*\[([^\]]*)\]/m)
-  const severityMatch = yamlContent.match(/^severity:\s*(\w+)/m)
+  // Parse YAML block if present
+  const yamlMatch = body.match(/```yaml\s*\n([\s\S]*?)```/)
+  if (yamlMatch) {
+    const yamlContent = yamlMatch[1]
 
-  // Parse labels array
-  const labelsMatch = yamlContent.match(/^labels:\s*\n((?:\s+-\s+.+\n?)+)/m)
-  if (labelsMatch) {
-    metadata.labels = labelsMatch[1]
-      .split('\n')
-      .map((l) => l.replace(/^\s+-\s+/, '').trim())
-      .filter(Boolean)
+    // Parse simple yaml fields
+    const repoMatch = yamlContent.match(/^repo:\s*(.+)$/m)
+    const pointsMatch = yamlContent.match(/^story_points:\s*(\d+)/m)
+    const dependsMatch = yamlContent.match(/^depends_on:\s*\[([^\]]*)\]/m)
+    const blocksMatch = yamlContent.match(/^blocks:\s*\[([^\]]*)\]/m)
+    const severityMatch = yamlContent.match(/^severity:\s*(\w+)/m)
+
+    // Parse labels array
+    const labelsMatch = yamlContent.match(/^labels:\s*\n((?:\s+-\s+.+\n?)+)/m)
+    if (labelsMatch) {
+      metadata.labels = labelsMatch[1]
+        .split('\n')
+        .map((l) => l.replace(/^\s+-\s+/, '').trim())
+        .filter(Boolean)
+    }
+
+    if (repoMatch) metadata.repo = repoMatch[1].trim()
+    if (pointsMatch) metadata.story_points = parseInt(pointsMatch[1], 10)
+    if (severityMatch) metadata.severity = severityMatch[1].trim()
+
+    // Store raw dependency strings for later parsing with repo context
+    if (dependsMatch) {
+      metadata.depends_on_raw = dependsMatch[1].split(',').map((s) => s.trim()).filter(Boolean)
+    }
+    if (blocksMatch) {
+      metadata.blocks_raw = blocksMatch[1].split(',').map((s) => s.trim()).filter(Boolean)
+    }
   }
 
-  if (repoMatch) metadata.repo = repoMatch[1].trim()
-  if (pointsMatch) metadata.story_points = parseInt(pointsMatch[1], 10)
-  if (severityMatch) metadata.severity = severityMatch[1].trim()
-
-  // Store raw dependency strings for later parsing with repo context
-  if (dependsMatch) {
-    metadata.depends_on_raw = dependsMatch[1].split(',').map((s) => s.trim()).filter(Boolean)
+  // Parse hierarchy section to find parent epic
+  // Format: | 🏔️ Epic | [#XX - Epic Name](url) |
+  const epicMatch = body.match(/🏔️\s*Epic[^|]*\|\s*\[#(\d+)/i)
+  if (epicMatch) {
+    metadata.parentEpic = parseInt(epicMatch[1], 10)
   }
-  if (blocksMatch) {
-    metadata.blocks_raw = blocksMatch[1].split(',').map((s) => s.trim()).filter(Boolean)
+
+  // Also check for parent initiative
+  const initMatch = body.match(/🚀\s*Initiative[^|]*\|\s*\[#(\d+)/i)
+  if (initMatch) {
+    metadata.parentInitiative = parseInt(initMatch[1], 10)
   }
 
   return metadata
@@ -338,6 +363,21 @@ function generateInventoryTable(tickets, type) {
   return table
 }
 
+// Map of known epic numbers to their categories
+const EPIC_CATEGORIES = {
+  54: 'auth',      // User Authentification
+  55: 'blocking',  // Blocking Apps on Android
+  57: 'blocking',  // Strict Mode
+  58: 'blocking',  // Block websites on Android
+  59: 'blocking',  // Blocking keywords on Android
+  60: 'other',     // Polish design
+  61: 'blocking',  // Schedule recurring block sessions
+  219: 'blocking', // Native Blocking Layer
+}
+
+// Repos that are automatically categorized as blocking
+const BLOCKING_REPOS = ['tied-siren-blocking-overlay', 'expo-accessibility-service', 'expo-foreground-service']
+
 function categorizeTicket(t) {
   const title = t.title.toLowerCase()
   const labels = t.metadata?.labels || []
@@ -345,8 +385,19 @@ function categorizeTicket(t) {
   if (t.type === 'initiative') return 'initiative'
   if (t.type === 'epic') return 'epic'
   if (t.type === 'bug') return 'bug'
+
+  // Check if ticket belongs to a blocking-related repo
+  if (BLOCKING_REPOS.includes(t.repo)) return 'blocking'
+
+  // Check parent epic category
+  const parentEpic = t.metadata?.parentEpic
+  if (parentEpic && EPIC_CATEGORIES[parentEpic]) {
+    return EPIC_CATEGORIES[parentEpic]
+  }
+
+  // Fallback to label/title matching
   if (labels.includes('auth') || title.includes('auth') || title.includes('sign-in') || title.includes('password')) return 'auth'
-  if (labels.includes('blocking') || title.includes('blocking') || title.includes('siren') || title.includes('tier') || title.includes('lookout')) return 'blocking'
+  if (labels.includes('blocking') || title.includes('blocking') || title.includes('siren') || title.includes('tier') || title.includes('lookout') || title.includes('strict')) return 'blocking'
   return 'other'
 }
 
@@ -359,8 +410,8 @@ function getStoryPointsColor(points) {
 
 function formatStoryPoints(points) {
   if (!points) return ''
-  const color = getStoryPointsColor(points)
-  return ` <span style='color:${color}'>${points}pt${points > 1 ? 's' : ''}</span>`
+  // Use simple text - Mermaid doesn't support inline HTML styles
+  return ` [${points}sp]`
 }
 
 function calculateDepths(tickets) {
@@ -501,18 +552,51 @@ function buildEpicToInitiativeMap(tickets) {
 
 /**
  * Sanitize a ticket title for display in Mermaid diagrams
+ * Supports multi-line output with <br/> breaks
  * @param {string} title
- * @param {number} maxLength
+ * @param {number} lineLength - Max characters per line
+ * @param {number} maxLines - Max number of lines
  * @returns {string}
  */
-function sanitizeTicketTitle(title, maxLength = 30) {
+function sanitizeTicketTitle(title, lineLength = 30, maxLines = 3) {
   const cleaned = title
     .replace(/^\[?\w+\]?\s*/i, '')
     .replace(/^feat\([^)]*\):\s*/i, '')
     .replace(/^fix\([^)]*\):\s*/i, '')
     .replace(/[[\]()]/g, '')
     .replace(/"/g, "'")
-  return cleaned.length > maxLength ? cleaned.substring(0, maxLength) + '...' : cleaned
+
+  const maxLength = lineLength * maxLines
+  const truncated = cleaned.length > maxLength ? cleaned.substring(0, maxLength - 3) + '...' : cleaned
+
+  // Split into lines of ~lineLength characters, breaking at word boundaries
+  const words = truncated.split(/\s+/)
+  const lines = []
+  let currentLine = ''
+
+  for (const word of words) {
+    if (currentLine.length + word.length + 1 <= lineLength) {
+      currentLine += (currentLine ? ' ' : '') + word
+    } else {
+      if (currentLine) lines.push(currentLine)
+      currentLine = word
+      if (lines.length >= maxLines - 1) {
+        // Last line - add remaining and truncate if needed
+        const remaining = words.slice(words.indexOf(word)).join(' ')
+        if (remaining.length > lineLength) {
+          lines.push(remaining.substring(0, lineLength - 3) + '...')
+        } else {
+          lines.push(remaining)
+        }
+        break
+      }
+    }
+  }
+  if (currentLine && lines.length < maxLines) {
+    lines.push(currentLine)
+  }
+
+  return lines.join('<br/>')
 }
 
 /**
@@ -562,10 +646,10 @@ function buildTicketNode(ticket, label, depth, category, epicToInitiative) {
 
   const storyPoints = formatStoryPoints(ticket.metadata?.story_points)
   const repoAbbrev = REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
-  const displayNum = ticket.repo !== MAIN_REPO ? `${repoAbbrev}#${ticket.number}` : `#${ticket.number}`
-  const repoLabel = ticket.repo !== MAIN_REPO ? `<br/>📦 ${repoAbbrev}` : ''
+  // Always show prefix for all repos
+  const displayNum = `${repoAbbrev}#${ticket.number}`
 
-  return `        ${createNodeId(ticket)}["${displayNum} ${safeLabel}${storyPoints}${repoLabel}"]:::${category}${depth}`
+  return `        ${createNodeId(ticket)}["${displayNum} ${safeLabel}${storyPoints}"]:::${category}${depth}`
 }
 
 /**
@@ -589,52 +673,119 @@ function generateMermaidDiagram(tickets) {
   // Generate styles
   const styles = generateMermaidStyles(maxDepth)
 
-  // Group tickets by category
-  const nodesByCategory = groupTicketsByCategory(tickets, depths)
-
-  // Build initiative lookup for epics
-  const epicToInitiative = buildEpicToInitiativeMap(tickets)
-
   // Build ticket lookup by key for edge validation
   const ticketByKey = new Map(tickets.map((t) => [depRefKey({ repo: t.repo, number: t.number }), t]))
 
-  // Track external nodes already added (Set for O(1) lookup)
+  // Separate tickets by type
+  const initiatives = tickets.filter((t) => t.type === 'initiative')
+  const epics = tickets.filter((t) => t.type === 'epic')
+  const otherTickets = tickets.filter((t) => t.type !== 'initiative' && t.type !== 'epic')
+
+  // Build epic lookup by number
+  const epicByNumber = new Map(epics.map((e) => [e.number, e]))
+
+  // Group tickets by parent epic
+  const ticketsByEpic = new Map()
+  const orphanTickets = []
+
+  for (const t of otherTickets) {
+    const parentEpicNum = t.metadata?.parentEpic
+    if (parentEpicNum && epicByNumber.has(parentEpicNum)) {
+      if (!ticketsByEpic.has(parentEpicNum)) {
+        ticketsByEpic.set(parentEpicNum, [])
+      }
+      ticketsByEpic.get(parentEpicNum).push(t)
+    } else {
+      orphanTickets.push(t)
+    }
+  }
+
+  // Track external nodes already added
   const addedExternalNodes = new Set()
 
-  // Generate subgraph nodes by category
-  for (const category of CATEGORY_ORDER) {
-    const items = nodesByCategory[category]
-    if (!items || items.length === 0) continue
+  // Helper to build a node line
+  const buildNode = (ticket) => {
+    const label = sanitizeTicketTitle(ticket.title)
+    const ticketKey = depRefKey({ repo: ticket.repo, number: ticket.number })
+    const depth = depths.get(ticketKey) || 0
+    const category = categorizeTicket(ticket)
+    const storyPoints = formatStoryPoints(ticket.metadata?.story_points)
+    const repoAbbrev = REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
+    const displayNum = `${repoAbbrev}#${ticket.number}`
+    return `        ${createNodeId(ticket)}["${displayNum} ${label}${storyPoints}"]:::${category}${depth}`
+  }
 
-    nodes.push(`    subgraph ${CATEGORY_LABELS[category]}`)
+  // 1. Initiatives subgraph
+  if (initiatives.length > 0) {
+    nodes.push(`    subgraph Initiatives`)
     nodes.push(`        direction TB`)
-    for (const { ticket, label, depth } of items) {
-      nodes.push(buildTicketNode(ticket, label, depth, category, epicToInitiative))
+    for (const t of initiatives) {
+      nodes.push(buildNode(t))
     }
     nodes.push('    end')
   }
 
-  // Generate edges (including cross-repo edges)
+  // 2. Epics subgraph (all epics together)
+  if (epics.length > 0) {
+    nodes.push(`    subgraph Epics`)
+    nodes.push(`        direction TB`)
+    for (const epic of epics) {
+      nodes.push(buildNode(epic))
+    }
+    nodes.push('    end')
+  }
+
+  // 3. Each Epic's children get their own subgraph
+  for (const epic of epics) {
+    const epicChildren = ticketsByEpic.get(epic.number) || []
+    if (epicChildren.length === 0) continue
+
+    const epicLabel = sanitizeTicketTitle(epic.title, 25, 1).replace(/<br\/>/g, ' ')
+    const repoAbbrev = REPO_DISPLAY_ABBREV[epic.repo] || epic.repo
+
+    nodes.push(`    subgraph Epic_${epic.number}["${repoAbbrev}#${epic.number} ${epicLabel}"]`)
+    nodes.push(`        direction TB`)
+    for (const child of epicChildren) {
+      nodes.push(buildNode(child))
+    }
+    nodes.push('    end')
+  }
+
+  // 4. Orphan tickets (no parent epic)
+  if (orphanTickets.length > 0) {
+    nodes.push(`    subgraph Ungrouped`)
+    nodes.push(`        direction TB`)
+    for (const t of orphanTickets) {
+      nodes.push(buildNode(t))
+    }
+    nodes.push('    end')
+  }
+
+  // Helper to get a ticket's "group" (epic number, or 'initiative', 'epic', 'ungrouped')
+  const getTicketGroup = (ticket) => {
+    if (ticket.type === 'initiative') return 'initiative'
+    if (ticket.type === 'epic') return 'epic'
+    const parentEpic = ticket.metadata?.parentEpic
+    if (parentEpic && epicByNumber.has(parentEpic)) return `epic_${parentEpic}`
+    return 'ungrouped'
+  }
+
+  // Generate edges - only between tickets in the same group
   for (const t of tickets) {
+    const tGroup = getTicketGroup(t)
+
     for (const depRef of t.metadata?.depends_on || []) {
       const depKey = depRefKey(depRef)
       const depTicket = ticketByKey.get(depKey)
 
       if (depTicket) {
-        // Both tickets exist in our set - create solid edge
-        edges.push(`    ${createNodeIdFromRef(depRef)} --> ${createNodeId(t)}`)
-      } else if (depRef.repo !== t.repo && VALID_REPOS[depRef.repo]) {
-        // External cross-repo dependency (different repo, not just a closed local ticket)
-        // Show as external node with dashed edge
-        const externalNodeId = createNodeIdFromRef(depRef)
-        if (!addedExternalNodes.has(externalNodeId)) {
-          nodes.push(buildExternalNode(depRef))
-          addedExternalNodes.add(externalNodeId)
+        const depGroup = getTicketGroup(depTicket)
+        // Only draw edge if both tickets are in the same group
+        if (tGroup === depGroup) {
+          edges.push(`    ${createNodeIdFromRef(depRef)} --> ${createNodeId(t)}`)
         }
-        edges.push(`    ${externalNodeId} -.-> ${createNodeId(t)}`)
       }
-      // Note: If depRef.repo === t.repo but ticket not found, it's likely a closed
-      // local ticket - we skip it silently rather than showing as external
+      // Skip external/cross-repo edges entirely now
     }
   }
 
@@ -664,10 +815,11 @@ function generateFeaturesDiagram(features, title) {
   const featureByKey = new Map(features.map((f) => [depRefKey({ repo: f.repo, number: f.number }), f]))
 
   for (const f of features) {
-    const shortTitle = f.title.length > 25 ? f.title.substring(0, 25) + '...' : f.title
+    const shortTitle = sanitizeTicketTitle(f.title)
     const storyPoints = formatStoryPoints(f.metadata?.story_points)
     const repoAbbrev = REPO_DISPLAY_ABBREV[f.repo] || f.repo
-    const displayNum = f.repo !== MAIN_REPO ? `${repoAbbrev}#${f.number}` : `#${f.number}`
+    // Always show prefix for all repos
+    const displayNum = `${repoAbbrev}#${f.number}`
     nodes.push(`    ${featureNodeId(f)}["${displayNum} ${shortTitle}${storyPoints}"]`)
 
     const deps = f.metadata?.depends_on || []
