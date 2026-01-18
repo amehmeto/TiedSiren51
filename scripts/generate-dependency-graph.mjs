@@ -8,11 +8,15 @@
  * Usage: node scripts/generate-dependency-graph.mjs
  */
 
-import { execSync } from 'node:child_process'
+import { execSync, exec } from 'node:child_process'
 import { writeFileSync, unlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
+import { promisify } from 'node:util'
+
 import { VALID_REPOS, REPO_ABBREVIATIONS, REPO_DISPLAY_ABBREV, MAIN_REPO } from './remark-lint-ticket/config.mjs'
+
+const execAsync = promisify(exec)
 
 // ============================================================================
 // Cross-Repo Dependency Types
@@ -157,60 +161,79 @@ const STATUS_EMOJI = {
   todo: '⏳',
 }
 
+// API limits for GitHub CLI queries
+// Note: If a repo has more issues/PRs than these limits, older items will be truncated.
+// Increase these values if needed, but be aware of GitHub API rate limits.
+const ISSUE_FETCH_LIMIT = 100
+const PR_FETCH_LIMIT = 200
+
 // Color manipulation constants for in-progress highlighting
 const LIGHTNESS_BOOST = 0.15
 const MAX_LIGHTNESS = 0.85
 const SATURATION_MULTIPLIER = 1.1
 
 /**
- * Fetch all PRs from all repos and build a map of issue number -> PR state
- * @returns {Map<string, 'merged' | 'open' | 'closed'>} Map of "repo#number" -> PR state
+ * Fetch PRs for a single repo and extract issue -> PR state mappings
+ * @param {Object} repo - Repository info with name and fullName
+ * @returns {Promise<Array<{issueKey: string, prState: string}>>} Array of issue-state mappings
  */
-function fetchPullRequestStates() {
-  const prStateByIssue = new Map()
+async function fetchRepoPullRequestStates(repo) {
+  const mappings = []
 
-  for (const repo of REPOS) {
-    try {
-      // Fetch all PRs (open, closed, merged) with their linked issues
-      const result = execSync(
-        `gh pr list --repo ${repo.fullName} --state all --limit 200 --json number,state,mergedAt,closingIssuesReferences`,
-        { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] },
-      )
-      const prs = JSON.parse(result)
+  try {
+    const { stdout } = await execAsync(
+      `gh pr list --repo ${repo.fullName} --state all --limit ${PR_FETCH_LIMIT} --json number,state,mergedAt,closingIssuesReferences`,
+    )
+    const prs = JSON.parse(stdout)
 
-      for (const pr of prs) {
-        // Determine PR state: merged > open > closed (without merge)
-        // Normalize state to uppercase for consistent comparison
-        const normalizedState = (pr.state || '').toUpperCase()
-        let prState = 'closed'
-        if (pr.mergedAt) {
-          prState = 'merged'
-        } else if (normalizedState === 'OPEN') {
-          prState = 'open'
-        }
-
-        // Map each linked issue to this PR's state
-        // closingIssuesReferences contains issues that will be closed by this PR
-        const linkedIssues = pr.closingIssuesReferences || []
-        for (const linkedIssue of linkedIssues) {
-          const issueNum = linkedIssue.number
-          const issueKey = `${repo.name}#${issueNum}`
-
-          // Keep the "best" state: merged > open > closed
-          const existingState = prStateByIssue.get(issueKey)
-          if (!existingState ||
-              (prState === 'merged') ||
-              (prState === 'open' && existingState !== 'merged')) {
-            prStateByIssue.set(issueKey, prState)
-          }
-        }
+    for (const pr of prs) {
+      // Normalize state to uppercase for consistent comparison
+      const normalizedState = (pr.state || '').toUpperCase()
+      let prState = 'closed'
+      if (pr.mergedAt) {
+        prState = 'merged'
+      } else if (normalizedState === 'OPEN') {
+        prState = 'open'
       }
-    } catch (error) {
-      // Expected: repo might not exist, have no PRs, or gh CLI not authenticated
-      // Only log unexpected errors (not 404s or empty results)
-      const errorMsg = error.message || ''
-      if (!errorMsg.includes('404') && !errorMsg.includes('no pull requests')) {
-        console.warn(`  ⚠️  Could not fetch PRs from ${repo.name}: ${errorMsg.slice(0, 100)}`)
+
+      // Map each linked issue to this PR's state
+      const linkedIssues = pr.closingIssuesReferences || []
+      for (const linkedIssue of linkedIssues) {
+        mappings.push({
+          issueKey: `${repo.name}#${linkedIssue.number}`,
+          prState,
+        })
+      }
+    }
+  } catch (error) {
+    // Expected: repo might not exist, have no PRs, or gh CLI not authenticated
+    const errorMsg = error.message || ''
+    if (!errorMsg.includes('404') && !errorMsg.includes('no pull requests')) {
+      console.warn(`  ⚠️  Could not fetch PRs from ${repo.name}: ${errorMsg.slice(0, 100)}`)
+    }
+  }
+
+  return mappings
+}
+
+/**
+ * Fetch all PRs from all repos in parallel and build a map of issue number -> PR state
+ * @returns {Promise<Map<string, 'merged' | 'open' | 'closed'>>} Map of "repo#number" -> PR state
+ */
+async function fetchPullRequestStates() {
+  // Fetch all repos in parallel
+  const results = await Promise.all(REPOS.map((repo) => fetchRepoPullRequestStates(repo)))
+
+  // Merge results into a single map
+  const prStateByIssue = new Map()
+  for (const mappings of results) {
+    for (const { issueKey, prState } of mappings) {
+      // Keep the "best" state: merged > open > closed
+      const existingState = prStateByIssue.get(issueKey)
+      if (!existingState ||
+          (prState === 'merged') ||
+          (prState === 'open' && existingState !== 'merged')) {
+        prStateByIssue.set(issueKey, prState)
       }
     }
   }
@@ -255,35 +278,46 @@ function detectTicketStatus(issue, prStateByIssue) {
   return 'todo'
 }
 
-function fetchOpenIssues() {
-  const allIssues = []
-
-  // First, fetch PR states for all repos (to determine in_progress status)
-  const prStateByIssue = fetchPullRequestStates()
-
-  for (const repo of REPOS) {
-    try {
-      // Fetch all issues (open and closed) to get proper status
-      const result = execSync(
-        `gh issue list --repo ${repo.fullName} --state all --limit 100 --json number,title,body,labels,state`,
-        { encoding: 'utf-8', stdio: ['pipe', 'pipe', 'pipe'] },
-      )
-      const issues = JSON.parse(result)
-      for (const issue of issues) {
-        issue.repo = repo.name
-        issue.status = detectTicketStatus(issue, prStateByIssue)
-      }
-      allIssues.push(...issues)
-    } catch (error) {
-      // Expected: repo might not exist or gh CLI not authenticated
-      const errorMsg = error.message || ''
-      if (!errorMsg.includes('404')) {
-        console.warn(`  ⚠️  Could not fetch issues from ${repo.name}: ${errorMsg.slice(0, 100)}`)
-      }
+/**
+ * Fetch issues for a single repo
+ * @param {Object} repo - Repository info with name and fullName
+ * @param {Map<string, string>} prStateByIssue - PR state map for status detection
+ * @returns {Promise<Object[]>} Array of issues with repo and status added
+ */
+async function fetchRepoIssues(repo, prStateByIssue) {
+  try {
+    const { stdout } = await execAsync(
+      `gh issue list --repo ${repo.fullName} --state all --limit ${ISSUE_FETCH_LIMIT} --json number,title,body,labels,state`,
+    )
+    const issues = JSON.parse(stdout)
+    for (const issue of issues) {
+      issue.repo = repo.name
+      issue.status = detectTicketStatus(issue, prStateByIssue)
     }
+    return issues
+  } catch (error) {
+    // Expected: repo might not exist or gh CLI not authenticated
+    const errorMsg = error.message || ''
+    if (!errorMsg.includes('404')) {
+      console.warn(`  ⚠️  Could not fetch issues from ${repo.name}: ${errorMsg.slice(0, 100)}`)
+    }
+    return []
   }
+}
 
-  return allIssues
+/**
+ * Fetch all issues from all repos in parallel
+ * @returns {Promise<Object[]>} All issues from all repos
+ */
+async function fetchOpenIssues() {
+  // First, fetch PR states for all repos in parallel
+  const prStateByIssue = await fetchPullRequestStates()
+
+  // Then fetch all issues in parallel
+  const results = await Promise.all(REPOS.map((repo) => fetchRepoIssues(repo, prStateByIssue)))
+
+  // Flatten results
+  return results.flat()
 }
 
 // ============================================================================
@@ -618,17 +652,6 @@ const CATEGORY_COLOR_SHADES = {
   bug: ['#dc2626', '#ef4444', '#f87171', '#fca5a5', '#fecaca'],        // red
   other: ['#4b5563', '#6b7280', '#9ca3af', '#d1d5db', '#e5e7eb'],      // gray
 }
-
-const CATEGORY_LABELS = {
-  initiative: 'Initiatives',
-  epic: 'Epics',
-  auth: 'Authentication',
-  blocking: 'Blocking',
-  bug: 'Bugs',
-  other: 'Other',
-}
-
-const CATEGORY_ORDER = ['initiative', 'epic', 'blocking', 'auth', 'bug', 'other']
 
 /**
  * Create a unique Mermaid node ID for a ticket
@@ -1366,14 +1389,14 @@ ${Object.entries(VALID_REPOS)
 /**
  * Main function to run the dependency graph generator
  */
-function main() {
+async function main() {
   const asciiMode = process.argv.includes('--ascii')
   const liveMode = process.argv.includes('--live')
 
   if (!asciiMode) {
-    console.log(`Fetching issues from ${REPOS.length} repos...`)
+    console.log(`Fetching issues from ${REPOS.length} repos in parallel...`)
   }
-  const issues = fetchOpenIssues()
+  const issues = await fetchOpenIssues()
 
   if (!asciiMode) {
     const repoCounts = {}
@@ -1446,5 +1469,8 @@ function main() {
 // Only run main when executed directly (not when imported for testing)
 const isMainModule = process.argv[1]?.endsWith('generate-dependency-graph.mjs')
 if (isMainModule) {
-  main()
+  main().catch((error) => {
+    console.error('Error:', error.message)
+    process.exit(1)
+  })
 }
