@@ -1,4 +1,6 @@
-# Cerberus Workflow
+# Cerberus (Κέρβερος) - Three-headed guardian of the underworld
+# https://www.wikiwand.com/en/articles/Cerberus
+#
 # Named after the three-headed hound guarding the gates of the underworld.
 # Like its mythological counterpart, this workflow acts as a guardian,
 # ensuring code quality through multiple checks (tests, builds, lint)
