@@ -12,3 +12,5 @@ while read -r oldvalue newvalue refname; do
     break
   fi
 done
+# Ensure clean exit (while read returns non-zero on EOF which triggers sh -e)
+exit 0
