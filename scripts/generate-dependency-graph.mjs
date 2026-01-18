@@ -157,6 +157,11 @@ const STATUS_EMOJI = {
   todo: '⏳',
 }
 
+// Color manipulation constants for in-progress highlighting
+const LIGHTNESS_BOOST = 0.15
+const MAX_LIGHTNESS = 0.85
+const SATURATION_MULTIPLIER = 1.1
+
 /**
  * Fetch all PRs from all repos and build a map of issue number -> PR state
  * @returns {Map<string, 'merged' | 'open' | 'closed'>} Map of "repo#number" -> PR state
@@ -175,10 +180,12 @@ function fetchPullRequestStates() {
 
       for (const pr of prs) {
         // Determine PR state: merged > open > closed (without merge)
+        // Normalize state to uppercase for consistent comparison
+        const normalizedState = (pr.state || '').toUpperCase()
         let prState = 'closed'
         if (pr.mergedAt) {
           prState = 'merged'
-        } else if (pr.state === 'OPEN' || pr.state === 'open') {
+        } else if (normalizedState === 'OPEN') {
           prState = 'open'
         }
 
@@ -198,8 +205,13 @@ function fetchPullRequestStates() {
           }
         }
       }
-    } catch {
-      // Repo might not exist or have no PRs
+    } catch (error) {
+      // Expected: repo might not exist, have no PRs, or gh CLI not authenticated
+      // Only log unexpected errors (not 404s or empty results)
+      const errorMsg = error.message || ''
+      if (!errorMsg.includes('404') && !errorMsg.includes('no pull requests')) {
+        console.warn(`  ⚠️  Could not fetch PRs from ${repo.name}: ${errorMsg.slice(0, 100)}`)
+      }
     }
   }
 
@@ -219,8 +231,11 @@ function fetchPullRequestStates() {
  * @returns {'done' | 'in_progress' | 'todo'}
  */
 function detectTicketStatus(issue, prStateByIssue) {
+  // Normalize state to uppercase for consistent comparison
+  const normalizedState = (issue.state || '').toUpperCase()
+
   // Closed issues are done
-  if (issue.state === 'CLOSED' || issue.state === 'closed') {
+  if (normalizedState === 'CLOSED') {
     return 'done'
   }
 
@@ -259,8 +274,12 @@ function fetchOpenIssues() {
         issue.status = detectTicketStatus(issue, prStateByIssue)
       }
       allIssues.push(...issues)
-    } catch {
-      // Repo might not exist or have no issues
+    } catch (error) {
+      // Expected: repo might not exist or gh CLI not authenticated
+      const errorMsg = error.message || ''
+      if (!errorMsg.includes('404')) {
+        console.warn(`  ⚠️  Could not fetch issues from ${repo.name}: ${errorMsg.slice(0, 100)}`)
+      }
     }
   }
 
@@ -719,10 +738,10 @@ function brightenColor(hex) {
 
   let [h, s, l] = rgbToHsl(r, g, b)
 
-  // Increase lightness (but cap at 0.85 to avoid white-out)
-  l = Math.min(0.85, l + 0.15)
+  // Increase lightness (but cap to avoid white-out)
+  l = Math.min(MAX_LIGHTNESS, l + LIGHTNESS_BOOST)
   // Boost saturation slightly for vibrancy
-  s = Math.min(1, s * 1.1)
+  s = Math.min(1, s * SATURATION_MULTIPLIER)
 
   const [nr, ng, nb] = hslToRgb(h, s, l)
   return `#${nr.toString(16).padStart(2, '0')}${ng.toString(16).padStart(2, '0')}${nb.toString(16).padStart(2, '0')}`
@@ -771,46 +790,6 @@ function generateMermaidStyles(maxDepth) {
 }
 
 /**
- * Build a mapping of epic keys to their parent initiatives
- * @param {Object[]} tickets
- * @returns {Map<string, Object>}
- */
-function buildEpicToInitiativeMap(tickets) {
-  const initiatives = tickets.filter((t) => t.type === 'initiative')
-  const epicToInitiative = new Map()
-
-  for (const epic of tickets.filter((t) => t.type === 'epic')) {
-    const epicKey = depRefKey({ repo: epic.repo, number: epic.number })
-
-    // Check if any initiative blocks this epic
-    for (const init of initiatives) {
-      const blocksEpic = init.metadata?.blocks?.some(
-        (ref) => ref.repo === epic.repo && ref.number === epic.number
-      )
-      if (blocksEpic) {
-        epicToInitiative.set(epicKey, init)
-        break
-      }
-    }
-
-    // Or check if epic depends on an initiative
-    if (!epicToInitiative.has(epicKey)) {
-      for (const depRef of epic.metadata?.depends_on || []) {
-        const parent = initiatives.find(
-          (i) => i.repo === depRef.repo && i.number === depRef.number
-        )
-        if (parent) {
-          epicToInitiative.set(epicKey, parent)
-          break
-        }
-      }
-    }
-  }
-
-  return epicToInitiative
-}
-
-/**
  * Sanitize a ticket title for display in Mermaid diagrams
  * Supports multi-line output with <br/> breaks
  * @param {string} title
@@ -830,7 +809,11 @@ function sanitizeTicketTitle(title, lineLength = 30, maxLines = 3) {
   const truncated = cleaned.length > maxLength ? cleaned.substring(0, maxLength - 3) + '...' : cleaned
 
   // Split into lines of ~lineLength characters, breaking at word boundaries
-  const words = truncated.split(/\s+/)
+  const words = truncated.split(/\s+/).filter(Boolean)
+
+  // Guard for empty titles (all whitespace or cleaned to nothing)
+  if (words.length === 0) return ''
+
   const lines = []
   let currentLine = ''
 
@@ -865,62 +848,6 @@ function sanitizeTicketTitle(title, lineLength = 30, maxLines = 3) {
 }
 
 /**
- * Group tickets by category with computed labels and depths
- * @param {Object[]} tickets
- * @param {Map<string, number>} depths
- * @param {Map<number, string>} epicCategoryMap - Map of epic number to category
- * @returns {Object}
- */
-function groupTicketsByCategory(tickets, depths, epicCategoryMap) {
-  const nodesByCategory = {}
-
-  for (const t of tickets) {
-    const category = categorizeTicket(t, epicCategoryMap)
-    if (!nodesByCategory[category]) nodesByCategory[category] = []
-
-    const label = sanitizeTicketTitle(t.title)
-    const ticketKey = depRefKey({ repo: t.repo, number: t.number })
-    const depth = depths.get(ticketKey) || 0
-
-    nodesByCategory[category].push({ ticket: t, label, depth })
-  }
-
-  return nodesByCategory
-}
-
-/**
- * Build Mermaid node definition for a ticket
- * @param {Object} ticket
- * @param {string} label
- * @param {number} depth
- * @param {string} category
- * @param {Map<string, Object>} epicToInitiative
- * @returns {string}
- */
-function buildTicketNode(ticket, label, depth, category, epicToInitiative) {
-  let safeLabel = label.replace(/"/g, "'")
-
-  // For epics, show parent initiative
-  if (category === 'epic') {
-    const epicKey = depRefKey({ repo: ticket.repo, number: ticket.number })
-    const parentInit = epicToInitiative.get(epicKey)
-    if (parentInit) {
-      const initName = parentInit.title.replace(/^\[Initiative\]\s*/i, '').substring(0, 15)
-      safeLabel = `${safeLabel} [${initName}]`
-    }
-  }
-
-  const storyPoints = formatStoryPoints(ticket.metadata?.story_points)
-  const repoAbbrev = REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
-  const status = ticket.status || 'todo'
-  const statusEmoji = STATUS_EMOJI[status] || ''
-  // Always show prefix for all repos with status emoji
-  const displayNum = `${statusEmoji} ${repoAbbrev}#${ticket.number}`
-
-  return `        ${createNodeId(ticket)}["${displayNum} ${safeLabel}${storyPoints}"]:::${category}${depth}_${status}`
-}
-
-/**
  * Build external node definition for a missing cross-repo dependency
  * @param {DependencyRef} ref
  * @returns {string}
@@ -930,9 +857,82 @@ function buildExternalNode(ref) {
   return `    ${createNodeIdFromRef(ref)}["${abbrev}#${ref.number}<br/>📦 ${abbrev}"]:::other0_todo`
 }
 
+/**
+ * Build a Mermaid subgraph for a list of tickets
+ * @param {string} name - Subgraph name/label
+ * @param {Object[]} ticketList - Tickets to include
+ * @param {Function} buildNodeFn - Function to build node line from ticket
+ * @returns {string[]} - Lines for the subgraph
+ */
+function buildSubgraph(name, ticketList, buildNodeFn) {
+  if (ticketList.length === 0) return []
+
+  const lines = []
+  lines.push(`    subgraph ${name}`)
+  lines.push(`        direction TB`)
+  for (const ticket of ticketList) {
+    lines.push(buildNodeFn(ticket))
+  }
+  lines.push('    end')
+  return lines
+}
+
+/**
+ * Build a Mermaid subgraph for an epic's child tickets
+ * @param {Object} epic - The parent epic
+ * @param {Object[]} children - Child tickets
+ * @param {Function} buildNodeFn - Function to build node line from ticket
+ * @returns {string[]} - Lines for the subgraph
+ */
+function buildEpicChildrenSubgraph(epic, children, buildNodeFn) {
+  if (children.length === 0) return []
+
+  const epicLabel = sanitizeTicketTitle(epic.title, 25, 1).replace(/<br\/>/g, ' ')
+  const repoAbbrev = REPO_DISPLAY_ABBREV[epic.repo] || epic.repo
+
+  const lines = []
+  lines.push(`    subgraph Epic_${epic.number}["${repoAbbrev}#${epic.number} ${epicLabel}"]`)
+  lines.push(`        direction TB`)
+  for (const child of children) {
+    lines.push(buildNodeFn(child))
+  }
+  lines.push('    end')
+  return lines
+}
+
+/**
+ * Generate edges between tickets, only within the same group
+ * @param {Object[]} tickets - All tickets
+ * @param {Map<string, Object>} ticketByKey - Lookup map
+ * @param {Function} getTicketGroupFn - Function to determine ticket's group
+ * @returns {string[]} - Edge definition lines
+ */
+function generateEdges(tickets, ticketByKey, getTicketGroupFn) {
+  const edges = []
+
+  for (const t of tickets) {
+    const tGroup = getTicketGroupFn(t)
+
+    for (const depRef of t.metadata?.depends_on || []) {
+      const depKey = depRefKey(depRef)
+      const depTicket = ticketByKey.get(depKey)
+
+      if (depTicket) {
+        const depGroup = getTicketGroupFn(depTicket)
+        // Only draw edge if both tickets are in the same group
+        if (tGroup === depGroup) {
+          edges.push(`    ${createNodeIdFromRef(depRef)} --> ${createNodeId(t)}`)
+        }
+      }
+      // Skip external/cross-repo edges entirely now
+    }
+  }
+
+  return edges
+}
+
 function generateMermaidDiagram(tickets) {
   const nodes = []
-  const edges = []
 
   // Calculate depths for shading
   const depths = calculateDepths(tickets)
@@ -971,8 +971,8 @@ function generateMermaidDiagram(tickets) {
   // Build epic category map once for efficient lookups
   const epicCategoryMap = buildEpicCategoryMap(tickets)
 
-  // Helper to build a node line
-  const buildNode = (ticket) => {
+  // Helper to build a node line (closure over depths and epicCategoryMap)
+  const buildNodeLine = (ticket) => {
     const label = sanitizeTicketTitle(ticket.title)
     const ticketKey = depRefKey({ repo: ticket.repo, number: ticket.number })
     const depth = depths.get(ticketKey) || 0
@@ -985,51 +985,16 @@ function generateMermaidDiagram(tickets) {
     return `        ${createNodeId(ticket)}["${displayNum} ${label}${storyPoints}"]:::${category}${depth}_${status}`
   }
 
-  // 1. Initiatives subgraph
-  if (initiatives.length > 0) {
-    nodes.push(`    subgraph Initiatives`)
-    nodes.push(`        direction TB`)
-    for (const t of initiatives) {
-      nodes.push(buildNode(t))
-    }
-    nodes.push('    end')
-  }
+  // Build subgraphs using helpers
+  nodes.push(...buildSubgraph('Initiatives', initiatives, buildNodeLine))
+  nodes.push(...buildSubgraph('Epics', epics, buildNodeLine))
 
-  // 2. Epics subgraph (all epics together)
-  if (epics.length > 0) {
-    nodes.push(`    subgraph Epics`)
-    nodes.push(`        direction TB`)
-    for (const epic of epics) {
-      nodes.push(buildNode(epic))
-    }
-    nodes.push('    end')
-  }
-
-  // 3. Each Epic's children get their own subgraph
   for (const epic of epics) {
     const epicChildren = ticketsByEpic.get(epic.number) || []
-    if (epicChildren.length === 0) continue
-
-    const epicLabel = sanitizeTicketTitle(epic.title, 25, 1).replace(/<br\/>/g, ' ')
-    const repoAbbrev = REPO_DISPLAY_ABBREV[epic.repo] || epic.repo
-
-    nodes.push(`    subgraph Epic_${epic.number}["${repoAbbrev}#${epic.number} ${epicLabel}"]`)
-    nodes.push(`        direction TB`)
-    for (const child of epicChildren) {
-      nodes.push(buildNode(child))
-    }
-    nodes.push('    end')
+    nodes.push(...buildEpicChildrenSubgraph(epic, epicChildren, buildNodeLine))
   }
 
-  // 4. Orphan tickets (no parent epic)
-  if (orphanTickets.length > 0) {
-    nodes.push(`    subgraph Ungrouped`)
-    nodes.push(`        direction TB`)
-    for (const t of orphanTickets) {
-      nodes.push(buildNode(t))
-    }
-    nodes.push('    end')
-  }
+  nodes.push(...buildSubgraph('Ungrouped', orphanTickets, buildNodeLine))
 
   // Helper to get a ticket's "group" (epic number, or 'initiative', 'epic', 'ungrouped')
   const getTicketGroup = (ticket) => {
@@ -1040,24 +1005,8 @@ function generateMermaidDiagram(tickets) {
     return 'ungrouped'
   }
 
-  // Generate edges - only between tickets in the same group
-  for (const t of tickets) {
-    const tGroup = getTicketGroup(t)
-
-    for (const depRef of t.metadata?.depends_on || []) {
-      const depKey = depRefKey(depRef)
-      const depTicket = ticketByKey.get(depKey)
-
-      if (depTicket) {
-        const depGroup = getTicketGroup(depTicket)
-        // Only draw edge if both tickets are in the same group
-        if (tGroup === depGroup) {
-          edges.push(`    ${createNodeIdFromRef(depRef)} --> ${createNodeId(t)}`)
-        }
-      }
-      // Skip external/cross-repo edges entirely now
-    }
-  }
+  // Generate edges using helper
+  const edges = generateEdges(tickets, ticketByKey, getTicketGroup)
 
   return `\`\`\`mermaid
 flowchart LR
