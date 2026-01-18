@@ -254,14 +254,14 @@ function extractMetadata(body) {
   }
 
   // Parse hierarchy section to find parent epic
-  // Format: | 🏔️ Epic | [#XX - Epic Name](url) |
-  const epicMatch = body.match(/🏔️\s*Epic[^|]*\|\s*\[#(\d+)/i)
+  // Format: | 🏔️ Epic | [#XX - Epic Name](url) | (emoji optional)
+  const epicMatch = body.match(/(?:🏔️\s*)?Epic[^|]*\|\s*\[#(\d+)/i)
   if (epicMatch) {
     metadata.parentEpic = parseInt(epicMatch[1], 10)
   }
 
-  // Also check for parent initiative
-  const initMatch = body.match(/🚀\s*Initiative[^|]*\|\s*\[#(\d+)/i)
+  // Also check for parent initiative (emoji optional)
+  const initMatch = body.match(/(?:🚀\s*)?Initiative[^|]*\|\s*\[#(\d+)/i)
   if (initMatch) {
     metadata.parentInitiative = parseInt(initMatch[1], 10)
   }
