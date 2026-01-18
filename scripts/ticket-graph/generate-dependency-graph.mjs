@@ -21,14 +21,14 @@
 import { execSync } from 'node:child_process'
 import { writeFileSync } from 'node:fs'
 
-import { VALID_REPOS, REPO_ABBREVIATIONS, REPO_DISPLAY_ABBREV, MAIN_REPO } from './remark-lint-ticket/config.mjs'
+import { VALID_REPOS, REPO_ABBREVIATIONS, REPO_DISPLAY_ABBREV, MAIN_REPO } from '../remark-lint-ticket/config.mjs'
 import {
   buildGraphFromTickets,
   fetchAllIssues,
   transformIssuesToTickets,
   parseDependencyRef as parseDependencyRefBase,
-} from './ticket-graph/index.mjs'
-import { renderMermaidDiagram, validateMermaid } from './ticket-graph/mermaid-renderer.mjs'
+} from './index.mjs'
+import { renderMermaidDiagram, validateMermaid } from './mermaid-renderer.mjs'
 
 // Re-export parsing functions with config bound (for backward compatibility)
 export function parseDependencyRef(ref, currentRepo) {

@@ -6,7 +6,7 @@ Unified command that:
 1. Fetches all issues and PRs
 2. **Automatically parses dependencies** from issue bodies (no hardcoding!)
 3. Syncs GitHub Project board status
-4. Updates the dependency graph via `node scripts/generate-dependency-graph.mjs` (validates cycles, dangling refs, generates Mermaid)
+4. Updates the dependency graph via `node scripts/ticket-graph/generate-dependency-graph.mjs` (validates cycles, dangling refs, generates Mermaid)
 5. Shows Kanban board and ready-to-start issues
 
 ---
@@ -153,7 +153,7 @@ Compare computed status with project board status:
 Run the dependency graph generator script:
 
 ```bash
-node scripts/generate-dependency-graph.mjs
+node scripts/ticket-graph/generate-dependency-graph.mjs
 ```
 
 This script will:
@@ -185,7 +185,7 @@ For bidirectional mismatches, consider updating the blocking ticket's YAML metad
 For debugging or further analysis:
 
 ```bash
-node scripts/generate-dependency-graph.mjs --json > graph.json
+node scripts/ticket-graph/generate-dependency-graph.mjs --json > graph.json
 ```
 
 ### 5.3 Optional: Open in Mermaid Live
@@ -193,7 +193,7 @@ node scripts/generate-dependency-graph.mjs --json > graph.json
 To view and edit the diagram interactively:
 
 ```bash
-node scripts/generate-dependency-graph.mjs --live
+node scripts/ticket-graph/generate-dependency-graph.mjs --live
 ```
 
 ---
@@ -331,7 +331,7 @@ gh issue edit <number> --body "$(updated_body_with_hierarchy)"
 The dependency graph is in `docs/dependency-graph.md`. For interactive viewing:
 
 ```bash
-node scripts/generate-dependency-graph.mjs --live
+node scripts/ticket-graph/generate-dependency-graph.mjs --live
 ```
 
 ### 6.3 Health Metrics
