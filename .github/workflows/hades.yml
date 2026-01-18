@@ -181,4 +181,5 @@ jobs:
       - name: Cleanup PR build releases
         env:
           GH_TOKEN: ${{ github.token }}
-        run: bash scripts/cleanup-pr-releases.sh '${{ toJSON(github) }}'
+          GITHUB_CONTEXT: ${{ toJSON(github) }}
+        run: bash scripts/cleanup-pr-releases.sh "$GITHUB_CONTEXT"
