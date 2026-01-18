@@ -9,9 +9,11 @@ if [ -z "$1" ]; then
 fi
 
 ISSUE_NUMBER="$1"
-REPO_ROOT=$(git rev-parse --show-toplevel)
+SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
+REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
 BRANCH_NAME="issue-$ISSUE_NUMBER"
 SESSION_NAME="issue-$ISSUE_NUMBER"
+WORKTREE_DIR=""
 
 # Fetch issue details from GitHub
 echo "Fetching issue #$ISSUE_NUMBER..."
