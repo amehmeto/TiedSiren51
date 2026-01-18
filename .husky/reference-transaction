@@ -1,10 +1,13 @@
 #!/bin/sh
+# Disable errexit to handle while-read EOF gracefully
+set +e
+
 # Detect pushed branch from the ref being updated, not from current HEAD
 # This correctly handles: git push origin feature-x (while on main)
 # CI_WATCH_REMOTE: configurable remote name (default: origin)
 remote="${CI_WATCH_REMOTE:-origin}"
 ci_exit_code=0
-# Use || true to prevent sh -e from exiting on while-read EOF
+
 while read -r oldvalue newvalue refname; do
   if [ "$1" = "committed" ] && echo "$refname" | grep -q "^refs/remotes/$remote/"; then
     # Extract branch name from refs/remotes/<remote>/<branch>
@@ -14,6 +17,7 @@ while read -r oldvalue newvalue refname; do
     ci_exit_code=$?
     break
   fi
-done || true
+done
+
 # Propagate CI watch exit code (0=success, 1=failure, 2=timeout)
 exit $ci_exit_code
