@@ -22,9 +22,9 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  path-filter:
+  hecate:
     if: github.event_name == 'push'
-    uses: ./.github/workflows/path-filter.yml
+    uses: ./.github/workflows/hecate.yml
 
   # Refresh coverage cache weekly to prevent expiration (only if no recent main activity)
   # Skips if main had commits in last 6 days (cache already fresh)
@@ -62,8 +62,8 @@ jobs:
   # Only runs when app code changes (not for docs-only commits)
   # Note: First PR after this merges will show 0% baseline until main has a cached run
   cache-coverage:
-    needs: path-filter
-    if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'
+    needs: hecate
+    if: github.event_name == 'push' && needs.hecate.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -103,8 +103,8 @@ jobs:
           key: coverage-main-${{ github.sha }}
 
   build-preview:
-    needs: path-filter
-    if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'
+    needs: hecate
+    if: github.event_name == 'push' && needs.hecate.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -141,8 +141,8 @@ jobs:
       #     EXPO_TOKEN: ${{ secrets.EXPO_TOKEN }}
 
   release:
-    needs: [path-filter, build-preview]
-    if: github.event_name == 'push' && needs.path-filter.outputs.app-changed == 'true'
+    needs: [hecate, build-preview]
+    if: github.event_name == 'push' && needs.hecate.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write

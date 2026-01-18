@@ -1,3 +1,12 @@
+# Hecate (Ἑκάτη) - Goddess of crossroads in Greek mythology
+#
+# Depicted with three faces looking in three directions, she presides over
+# choices of paths and guides travelers at intersections.
+#
+# This workflow observes file changes and routes them to the right destination:
+# shell scripts, source code, tests, or config. It stands at the crossroads
+# of the CI pipeline, directing each change to its proper path.
+
 # Shared path filter configuration
 # This reusable workflow checks if app-related files have changed.
 # Used by Cerberus and Hades to avoid redundant builds.
@@ -5,7 +14,7 @@
 # Filters are split (src, tests, config) to avoid dorny/paths-filter
 # negation pattern bug. See: https://github.com/dorny/paths-filter/issues/97
 
-name: Path Filter
+name: Hecate
 
 on:
   workflow_call:
