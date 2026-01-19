@@ -101,9 +101,9 @@ cleanup_merged_worktrees() {
       continue
     fi
 
-    # Check if there's a PR for this branch
+    # Check if there's a PR for this branch (must use --state all to find merged/closed PRs)
     local pr_info
-    pr_info=$(gh pr list --head "$branch" --json number,state --jq '.[0] // empty' 2>/dev/null || true)
+    pr_info=$(gh pr list --head "$branch" --state all --json number,state --jq '.[0] // empty' 2>/dev/null || true)
 
     if [ -n "$pr_info" ]; then
       local pr_state pr_number
@@ -145,7 +145,8 @@ list_worktrees() {
 
     if [ -n "$branch" ] && [ "$branch" != "main" ]; then
       local pr_info
-      pr_info=$(gh pr list --head "$branch" --json number,state,title --jq '.[0] // empty' 2>/dev/null || true)
+      # Use --state all to show merged/closed PRs too
+      pr_info=$(gh pr list --head "$branch" --state all --json number,state,title --jq '.[0] // empty' 2>/dev/null || true)
 
       if [ -n "$pr_info" ]; then
         pr_number=$(echo "$pr_info" | jq -r '.number')
@@ -191,7 +192,8 @@ remove_worktree() {
   # Safety check: only allow removal if PR is merged or closed
   if [ -n "$branch" ] && [ "$branch" != "main" ]; then
     local pr_info
-    pr_info=$(gh pr list --head "$branch" --json number,state --jq '.[0] // empty' 2>/dev/null || true)
+    # Use --state all to find merged/closed PRs too
+    pr_info=$(gh pr list --head "$branch" --state all --json number,state --jq '.[0] // empty' 2>/dev/null || true)
 
     if [ -n "$pr_info" ]; then
       local pr_state pr_number
@@ -202,28 +204,6 @@ remove_worktree() {
         print_error "Cannot remove worktree: PR #$pr_number is still OPEN"
         print_info "Merge or close the PR first, or use 'gh pr close $pr_number' to close it"
         exit "$EXIT_PR_STILL_OPEN"
-      fi
-
-      print_info "PR #$pr_number is $pr_state, safe to remove"
-    else
-      print_warning "No PR found for branch '$branch', allowing removal"
-    fi
-  fi
-
-  # Safety check: only allow removal if PR is merged or closed
-  if [ -n "$branch" ] && [ "$branch" != "detached" ] && [ "$branch" != "main" ]; then
-    local pr_info
-    pr_info=$(gh pr list --head "$branch" --json number,state --jq '.[0] // empty' 2>/dev/null || true)
-
-    if [ -n "$pr_info" ]; then
-      local pr_state pr_number
-      pr_state=$(echo "$pr_info" | jq -r '.state')
-      pr_number=$(echo "$pr_info" | jq -r '.number')
-
-      if [ "$pr_state" = "OPEN" ]; then
-        print_error "Cannot remove worktree: PR #$pr_number is still OPEN"
-        print_info "Merge or close the PR first, or use 'gh pr close $pr_number' to close it"
-        exit 1
       fi
 
       print_info "PR #$pr_number is $pr_state, safe to remove"

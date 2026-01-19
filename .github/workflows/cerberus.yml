@@ -1,4 +1,6 @@
-# Cerberus Workflow
+# Cerberus (Κέρβερος) - Three-headed guardian of the underworld
+# https://www.wikiwand.com/en/articles/Cerberus
+#
 # Named after the three-headed hound guarding the gates of the underworld.
 # Like its mythological counterpart, this workflow acts as a guardian,
 # ensuring code quality through multiple checks (tests, builds, lint)
@@ -14,12 +16,12 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  path-filter:
-    uses: ./.github/workflows/path-filter.yml
+  hecate:
+    uses: ./.github/workflows/hecate.yml
 
   shellcheck-only:
-    needs: path-filter
-    if: needs.path-filter.outputs.shell-only == 'true'
+    needs: hecate
+    if: needs.hecate.outputs.shell-only == 'true'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout code
@@ -37,8 +39,8 @@ jobs:
         run: npm run lint:sh
 
   test:
-    needs: path-filter
-    if: needs.path-filter.outputs.app-changed == 'true'
+    needs: hecate
+    if: needs.hecate.outputs.app-changed == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -102,10 +104,10 @@ jobs:
             await compareAndComment({ github, context });
 
   build:
-    needs: [test, path-filter]
+    needs: [test, hecate]
     # Only build if: not a draft PR AND this push contains app changes
     # This prevents rebuilding when only docs/md files are pushed after earlier code changes
-    if: github.event.pull_request.draft == false && needs.path-filter.outputs.app-changed-this-push == 'true'
+    if: github.event.pull_request.draft == false && needs.hecate.outputs.app-changed-this-push == 'true'
     runs-on: ubuntu-latest
     permissions:
       contents: write

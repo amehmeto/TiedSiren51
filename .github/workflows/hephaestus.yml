@@ -1,0 +1,30 @@
+# Hephaestus (Ἥφαιστος) - God of the forge in Greek mythology
+# https://www.wikiwand.com/en/articles/Hephaestus
+#
+# The divine blacksmith who crafts weapons and tools for the gods.
+# He receives orders and transforms raw material into finished work.
+#
+# This workflow triggers when an issue is labeled 'ready'. It sets up
+# the forge (worktree, branch, prompt) and puts Claude to work,
+# hammering code until the PR is ready.
+
+name: Hephaestus
+
+on:
+  issues:
+    types: [labeled]
+
+jobs:
+  start-claude:
+    if: github.event.label.name == 'ready'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Start issue on VPS
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.VPS_HOST }}
+          username: ${{ secrets.VPS_USERNAME }}
+          key: ${{ secrets.VPS_SSH_KEY }}
+          port: ${{ secrets.VPS_PORT || 22 }}
+          script: cd ${{ vars.REPO_PATH || '~/ethernal-claude' }} && ./.github/scripts/start-issue.sh ${{ github.event.issue.number }}

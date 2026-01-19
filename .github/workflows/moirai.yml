@@ -1,4 +1,13 @@
-name: Update Dependency Graph
+# Moirai (Μοῖραι) - The three Fates of Greek mythology
+# https://www.wikiwand.com/en/articles/Moirai
+#
+# Clotho spins the thread of life, Lachesis measures it, Atropos cuts it.
+# Together they weave the tapestry of destiny, knowing all connections between lives.
+#
+# This workflow maintains the dependency graph - the map of all links between tickets,
+# showing which issues depend on which, and in what order work must proceed.
+
+name: Moirai
 
 # DISABLED: Workflow disabled to avoid unnecessary CI runs.
 # To re-enable, uncomment the `issues:` trigger below.
