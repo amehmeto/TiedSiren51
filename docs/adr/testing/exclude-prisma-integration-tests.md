@@ -239,7 +239,7 @@ smokeTest()
 
 ### Related ADRs
 - [Vitest Over Jest](vitest-over-jest.md)
-- [Prisma ORM with SQLite](../data-persistence/prisma-orm-sqlite.md)
+- [Prisma ORM with SQLite](../infrastructure/prisma-orm-sqlite.md)
 - [Test Store Factory](test-store-factory.md)
 
 ## References
