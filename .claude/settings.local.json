@@ -153,6 +153,7 @@
       "Bash(SKIP_E2E_CHECK=1 git push origin main:*)",
       "Bash(SKIP_E2E_CHECK=1 git push origin master:*)",
       "Bash(SKIP_E2E_CHECK=1 git push:*)",
+      "Bash(SKIP_E2E_CHECK=true SKIP_CI_WATCH=1 git push:*)",
       "Bash(SKIP_E2E_CHECK=true SKIP_CI_WATCH=true git push:*)",
       "Bash(SKIP_E2E_CHECK=true git push --force-with-lease:*)",
       "Bash(SKIP_E2E_CHECK=true git push --force:*)",
