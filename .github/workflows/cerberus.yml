@@ -38,6 +38,27 @@ jobs:
       - name: Run shellcheck
         run: npm run lint:sh
 
+  # Lightweight lint job for docs/config-only changes
+  # Runs full lint but skips tests and build
+  lint-only:
+    needs: hecate
+    if: needs.hecate.outputs.docs-only == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Lint
+        run: npm run lint
+
   test:
     needs: hecate
     if: needs.hecate.outputs.app-changed == 'true'

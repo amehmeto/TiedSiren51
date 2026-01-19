@@ -29,6 +29,9 @@ on:
       shell-only:
         description: 'Whether only shell scripts have changed'
         value: ${{ jobs.check-paths.outputs.shell-only }}
+      docs-only:
+        description: 'Whether only docs/lint config files have changed (no src, config, shell)'
+        value: ${{ jobs.check-paths.outputs.docs-only }}
 
 jobs:
   check-paths:
@@ -39,6 +42,8 @@ jobs:
       # app-changed-this-push: same but for latest push only
       app-changed-this-push: ${{ steps.filter-push.outputs.src == 'true' || steps.filter-push.outputs.config == 'true' || steps.pkg-check-push.outputs.build-impact == 'true' }}
       shell-only: ${{ steps.filter.outputs.shell == 'true' && steps.filter.outputs.src != 'true' && steps.filter.outputs.config != 'true' && steps.pkg-check.outputs.build-impact != 'true' }}
+      # docs-only: docs changed but no src, config, shell, or package.json deps
+      docs-only: ${{ steps.filter.outputs.docs == 'true' && steps.filter.outputs.src != 'true' && steps.filter.outputs.config != 'true' && steps.filter.outputs.shell != 'true' && steps.pkg-check.outputs.build-impact != 'true' }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v4

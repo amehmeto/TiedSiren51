@@ -92,9 +92,9 @@ function updateHistory(newCoverage) {
   console.log(`   Lines:      ${newCoverage.lines}%`)
 
   if (history.length > 1) {
-    const previous = history[history.length - 2]
     const stmtDiff = (
-      parseFloat(newCoverage.statements) - parseFloat(previous.statements)
+      parseFloat(newCoverage.statements) -
+      parseFloat(history[history.length - 2].statements)
     ).toFixed(2)
     console.log(
       `   Change:     ${stmtDiff > 0 ? '+' : ''}${stmtDiff}% statements`,

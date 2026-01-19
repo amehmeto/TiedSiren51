@@ -308,7 +308,7 @@ async getNotificationToken(): Promise<string> {
 
 ## Related ADRs
 
-- [Hexagonal Architecture](../core/hexagonal-architecture.md) - Port/adapter pattern
+- [Hexagonal Architecture](../hexagonal-architecture.md) - Port/adapter pattern
 - [Background Task Service](expo-background-fetch.md) - For background notification triggers
 
 ## References

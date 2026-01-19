@@ -131,7 +131,7 @@ Address when:
 
 ## Related ADRs
 
-- [Hexagonal Architecture](../adr/core/hexagonal-architecture.md) - Error handling at layer boundaries
+- [Hexagonal Architecture](../adr/hexagonal-architecture.md) - Error handling at layer boundaries
 - [Dependency Injection Pattern](../adr/core/dependency-injection-pattern.md) - Injecting error handlers
 
 ## References

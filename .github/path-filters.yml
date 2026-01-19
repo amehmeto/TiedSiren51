@@ -13,6 +13,20 @@ shell:
   - '.husky/**'
   - '.claude/hooks/**'
 
+# Documentation and lint config files (triggers lightweight lint-only job)
+# These don't affect the build but should still be linted
+docs:
+  - '**/*.md'
+  - 'docs/**'
+  - '.github/workflows/**'
+  - '.github/*.md'
+  - 'eslint-rules/**'
+  - '.remarkrc*'
+  - '.prettierrc*'
+  - '.prettierignore'
+  - '.remarkignore'
+  - 'eslint.config.*'
+
 # Source code directories (triggers test job)
 src:
   - 'app/**'

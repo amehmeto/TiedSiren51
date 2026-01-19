@@ -177,6 +177,34 @@ ruleTester.run('prefer-inline-variable', rule, {
         }
       `,
     },
+    // Descriptive name for array literal - should NOT report (semantic labeling)
+    {
+      code: `
+        const deviceTypes = ['android', 'ios', 'web']
+        const type = faker.helpers.arrayElement(deviceTypes)
+      `,
+    },
+    // Descriptive name for array with multiple items - should NOT report
+    {
+      code: `
+        const deviceNames = ['Huawei P30', 'Google Pixel 3a', 'MacBook Pro']
+        const name = faker.helpers.arrayElement(deviceNames)
+      `,
+    },
+    // Descriptive name for object literal - should NOT report
+    {
+      code: `
+        const defaultConfig = { timeout: 5000, retries: 3 }
+        initializeWith(defaultConfig)
+      `,
+    },
+    // Descriptive name for validation rules - should NOT report
+    {
+      code: `
+        const validationRules = ['required', 'email', 'min:3']
+        applyRules(validationRules)
+      `,
+    },
   ],
 
   invalid: [
@@ -196,13 +224,29 @@ console.log(x)`,
       output: `
 console.log(y)`,
     },
-    // Array literal (not a call) - SHOULD report and fix
+    // Non-descriptive array name - SHOULD report and fix
     {
       code: `const arr = [1, 2, 3]
 console.log(arr)`,
       errors: [{ messageId: 'preferInline', data: { name: 'arr' } }],
       output: `
 console.log([1, 2, 3])`,
+    },
+    // Non-descriptive object name - SHOULD report and fix
+    {
+      code: `const obj = { a: 1, b: 2 }
+doSomething(obj)`,
+      errors: [{ messageId: 'preferInline', data: { name: 'obj' } }],
+      output: `
+doSomething({ a: 1, b: 2 })`,
+    },
+    // Generic 'data' name for array - SHOULD report and fix
+    {
+      code: `const data = ['a', 'b', 'c']
+process(data)`,
+      errors: [{ messageId: 'preferInline', data: { name: 'data' } }],
+      output: `
+process(['a', 'b', 'c'])`,
     },
     // Short name (2 chars) for literal - SHOULD inline
     {

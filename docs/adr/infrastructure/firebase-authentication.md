@@ -270,7 +270,7 @@ export const firebaseConfig = {
 
 ## Related ADRs
 
-- [Hexagonal Architecture](../core/hexagonal-architecture.md) - Port/adapter pattern
+- [Hexagonal Architecture](../hexagonal-architecture.md) - Port/adapter pattern
 - [Dependency Injection Pattern](../core/dependency-injection-pattern.md)
 
 ## References
