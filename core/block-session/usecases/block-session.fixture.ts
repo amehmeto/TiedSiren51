@@ -118,9 +118,10 @@ export function blockSessionFixture(
         expect(blockSessionIds).toContain(expectedBlockSession.id)
       },
       blockSessionsFromStoreShouldBe(expectedBlocklists: BlockSession[]) {
+        const state = store.getState()
         const retrievedBlockSessions = blockSessionAdapter
           .getSelectors()
-          .selectAll(store.getState().blockSession)
+          .selectAll(state.blockSession)
         expect(retrievedBlockSessions).toStrictEqual(expectedBlocklists)
       },
       blockSessionShouldNotBeInStore(sessionId: string) {
