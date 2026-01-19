@@ -21,10 +21,28 @@ jobs:
 
     steps:
       - name: Start issue on VPS
-        uses: appleboy/ssh-action@v1.0.3
+        # Pin to SHA for supply chain security (v1.0.3)
+        uses: appleboy/ssh-action@029f5b4aeeeb58fdfe1410a5d17f967dacf36262
         with:
           host: ${{ secrets.VPS_HOST }}
           username: ${{ secrets.VPS_USERNAME }}
           key: ${{ secrets.VPS_SSH_KEY }}
           port: ${{ secrets.VPS_PORT || 22 }}
-          script: cd ${{ vars.REPO_PATH || '~/ethernal-claude' }} && ./.github/scripts/start-issue.sh ${{ github.event.issue.number }}
+          # Use environment variable to safely pass issue number (avoid command injection)
+          envs: ISSUE_NUMBER
+          script: cd ${{ vars.REPO_PATH || '~/ethernal-claude' }} && ./.github/scripts/start-issue.sh "$ISSUE_NUMBER"
+        env:
+          ISSUE_NUMBER: ${{ github.event.issue.number }}
+
+      - name: Report failure
+        if: failure()
+        # Pin to SHA for supply chain security (v7)
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
+        with:
+          script: |
+            await github.rest.issues.createComment({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.payload.issue.number,
+              body: '⚠️ Failed to start Claude Code session. Check the [workflow run](${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}) for details.'
+            });
