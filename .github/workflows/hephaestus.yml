@@ -36,7 +36,8 @@ jobs:
 
       - name: Report failure
         if: failure()
-        uses: actions/github-script@v7
+        # Pin to SHA for supply chain security (v7)
+        uses: actions/github-script@f28e40c7f34bde8b3046d885e986cb6290c5673b
         with:
           script: |
             await github.rest.issues.createComment({

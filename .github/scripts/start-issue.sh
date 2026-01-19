@@ -103,11 +103,9 @@ fi
 # Build file in parts to safely handle special characters in issue body
 PROMPT_FILE="$WORKTREE_DIR/.claude-issue-prompt.md"
 {
-    echo "# Issue #$ISSUE_NUMBER: $ISSUE_TITLE"
-    echo ""
-    # Write issue body as-is without shell interpretation
-    printf '%s\n' "$ISSUE_BODY"
-    echo ""
+    # Use printf to safely handle special characters in title and body
+    printf '# Issue #%s: %s\n\n' "$ISSUE_NUMBER" "$ISSUE_TITLE"
+    printf '%s\n\n' "$ISSUE_BODY"
     printf '%s\n' "$CLAUDE_INSTRUCTIONS"
 } > "$PROMPT_FILE"
 
