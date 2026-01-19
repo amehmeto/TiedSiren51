@@ -15,7 +15,11 @@ run_lint() {
     local script="$1"
     shift
     echo "Running ${script}..."
-    npm run "${script}" -- "$@"
+    if [[ $# -gt 0 ]]; then
+        npm run "${script}" -- "$@"
+    else
+        npm run "${script}"
+    fi
 }
 
 run_lint lint:types
