@@ -36,17 +36,25 @@ fi
 
 echo "Creating worktree for branch $BRANCH_NAME..."
 set +e
-WORKTREE_OUTPUT=$("$WORKTREE_SCRIPT" "$BRANCH_NAME" 2>&1)
+# Capture stdout and stderr separately to avoid parsing error messages
+WORKTREE_STDOUT=$(mktemp)
+WORKTREE_STDERR=$(mktemp)
+"$WORKTREE_SCRIPT" "$BRANCH_NAME" >"$WORKTREE_STDOUT" 2>"$WORKTREE_STDERR"
 EXIT_CODE=$?
+WORKTREE_OUTPUT=$(cat "$WORKTREE_STDOUT")
+WORKTREE_ERRORS=$(cat "$WORKTREE_STDERR")
+rm -f "$WORKTREE_STDOUT" "$WORKTREE_STDERR"
 set -e
 
 if [ $EXIT_CODE -eq 0 ]; then
-    # Success - parse WORKTREE_PATH from output
-    WORKTREE_DIR=$(echo "$WORKTREE_OUTPUT" | grep "^WORKTREE_PATH=" | cut -d= -f2)
+    # Success - parse WORKTREE_PATH from stdout only (grep -m 1 for first match)
+    WORKTREE_DIR=$(echo "$WORKTREE_OUTPUT" | grep -m 1 "^WORKTREE_PATH=" | cut -d= -f2)
     echo "$WORKTREE_OUTPUT"
+    [ -n "$WORKTREE_ERRORS" ] && echo "$WORKTREE_ERRORS" >&2
 elif [ $EXIT_CODE -eq 2 ]; then
     # Worktree already exists - find it via git worktree list
     echo "Worktree already exists, finding path..."
+    [ -n "$WORKTREE_OUTPUT" ] && echo "$WORKTREE_OUTPUT"
     while IFS= read -r line; do
         if [[ "$line" =~ ^worktree\ (.+)$ ]]; then
             wt_path="${BASH_REMATCH[1]}"
@@ -61,7 +69,9 @@ elif [ $EXIT_CODE -eq 2 ]; then
         (cd "$WORKTREE_DIR" && git pull --ff-only || true)
     fi
 else
-    echo "$WORKTREE_OUTPUT"
+    # Non-zero exit code - show output and errors
+    [ -n "$WORKTREE_OUTPUT" ] && echo "$WORKTREE_OUTPUT"
+    [ -n "$WORKTREE_ERRORS" ] && echo "$WORKTREE_ERRORS" >&2
     exit $EXIT_CODE
 fi
 
@@ -71,6 +81,7 @@ if [ -z "$WORKTREE_DIR" ]; then
 fi
 
 # Write issue content to a temp file for claude prompt
+# Use 'EOF' (quoted) to prevent variable expansion in the instructions section
 PROMPT_FILE="$WORKTREE_DIR/.claude-issue-prompt.md"
 cat > "$PROMPT_FILE" << EOF
 # Issue #$ISSUE_NUMBER: $ISSUE_TITLE
@@ -83,7 +94,7 @@ $ISSUE_BODY
 
 1. Implement the issue above
 2. When done, run \`/commit-push\` to commit and push your changes
-3. Then open a PR with: \`gh pr create --title "$ISSUE_TITLE" --body "Closes #$ISSUE_NUMBER" --base main\`
+   (A draft PR was already created by the worktree setup)
 EOF
 
 # Create init script that will run inside tmux

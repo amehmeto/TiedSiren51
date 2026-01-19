@@ -145,7 +145,8 @@ list_worktrees() {
 
     if [ -n "$branch" ] && [ "$branch" != "main" ]; then
       local pr_info
-      pr_info=$(gh pr list --head "$branch" --json number,state,title --jq '.[0] // empty' 2>/dev/null || true)
+      # Use --state all to show merged/closed PRs too
+      pr_info=$(gh pr list --head "$branch" --state all --json number,state,title --jq '.[0] // empty' 2>/dev/null || true)
 
       if [ -n "$pr_info" ]; then
         pr_number=$(echo "$pr_info" | jq -r '.number')
