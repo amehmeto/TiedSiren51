@@ -36,7 +36,7 @@ These scripts are referenced in CI workflows, git hooks, package.json, or other 
 | `lint-workflow-scripts.sh` | `package.json` (`lint:workflow`) | Validates inline bash in GitHub workflow YAML files |
 | `ci-watch.sh` | `.husky/post-push` | Monitors GitHub Actions CI status after push |
 | `compare-coverage.cjs` | `.husky/pre-push` | Compares coverage against baseline, blocks regression |
-| `worktree.sh` | `.github/scripts/start-issue.sh`, `/worktree` skill | Creates git worktrees with branch, PR, and npm ci setup |
+| `start-issue.sh` | `.github/scripts/start-issue.sh`, `/start-issue` skill | Creates git worktrees from GitHub issues with automatic branch naming, PR, and npm ci setup |
 | `check-cache-freshness.sh` | CI (`hephaestus.yml`) | Checks if coverage cache is fresh enough to use |
 | `check-package-json-build-impact.sh` | CI (`hecate.yml`) | Detects if package.json changes affect build (deps vs scripts) |
 | `cleanup-pr-releases.sh` | CI (`hades.yml`) | Cleans up draft releases from closed PRs |
@@ -165,11 +165,11 @@ These scripts exist but are not referenced anywhere in active code paths.
 scripts/lint.sh
 └── lib/colors.sh
 
-scripts/worktree.sh
+scripts/start-issue.sh
 └── (called by .github/scripts/start-issue.sh)
 
 .github/scripts/start-issue.sh
-└── scripts/worktree.sh
+└── scripts/start-issue.sh
 
 .claude/hooks/validate-pr.sh
 └── scripts/lint-pr.mjs
