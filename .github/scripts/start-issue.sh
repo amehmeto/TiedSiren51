@@ -28,9 +28,15 @@ fi
 echo "Issue fetched: $ISSUE_TITLE"
 
 # Create worktree using scripts/worktree.sh (handles branch creation, PR, npm ci)
+WORKTREE_SCRIPT="$REPO_ROOT/scripts/worktree.sh"
+if [ ! -x "$WORKTREE_SCRIPT" ]; then
+    echo "Error: worktree.sh not found or not executable at $WORKTREE_SCRIPT"
+    exit 1
+fi
+
 echo "Creating worktree for branch $BRANCH_NAME..."
 set +e
-WORKTREE_OUTPUT=$("$REPO_ROOT/scripts/worktree.sh" "$BRANCH_NAME" 2>&1)
+WORKTREE_OUTPUT=$("$WORKTREE_SCRIPT" "$BRANCH_NAME" 2>&1)
 EXIT_CODE=$?
 set -e
 
@@ -81,6 +87,7 @@ $ISSUE_BODY
 EOF
 
 # Create init script that will run inside tmux
+# Note: npm ci is already handled by worktree.sh, so we skip it here
 INIT_SCRIPT="$WORKTREE_DIR/.claude-init.sh"
 cat > "$INIT_SCRIPT" << EOF
 #!/bin/bash

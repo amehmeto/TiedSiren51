@@ -6,7 +6,7 @@ echo "Checking for conflicts with main..."
 # Require Git 2.38+ for --write-tree support
 git_version=$(git --version | grep -oE '[0-9]+\.[0-9]+' | head -1)
 if [[ "$(printf '%s\n' "2.38" "$git_version" | sort -V | head -1)" != "2.38" ]]; then
-  printf "❌ Git 2.38+ required for conflict check (found %s). Run: brew upgrade git\n" "$git_version"
+  printf "❌ Git 2.38+ required for conflict check (found %s). Upgrade git via your package manager.\n" "$git_version"
   exit 1
 fi
 
