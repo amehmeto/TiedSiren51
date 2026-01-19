@@ -51,33 +51,66 @@ print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
 
+# Conventional commit type prefixes (used for branch naming and PR title validation)
+# Order matters: longer prefixes first to avoid partial matches
+readonly TYPE_PREFIXES="refactor feat fix docs chore test perf"
+
 # Parse type prefix from issue title
-# Returns: feat, fix, refactor, docs, chore, test (defaults to feat)
+# Returns: feat, fix, refactor, docs, chore, test, perf (defaults to feat)
 parse_type_from_title() {
   local title="$1"
   local lower_title
   lower_title=$(echo "$title" | tr '[:upper:]' '[:lower:]')
 
-  if [[ "$lower_title" =~ ^feat ]]; then echo "feat"
-  elif [[ "$lower_title" =~ ^fix ]]; then echo "fix"
-  elif [[ "$lower_title" =~ ^refactor ]]; then echo "refactor"
-  elif [[ "$lower_title" =~ ^docs ]]; then echo "docs"
-  elif [[ "$lower_title" =~ ^chore ]]; then echo "chore"
-  elif [[ "$lower_title" =~ ^test ]]; then echo "test"
-  else echo "feat"
-  fi
+  local prefix
+  for prefix in $TYPE_PREFIXES; do
+    if [[ "$lower_title" =~ ^$prefix ]]; then
+      echo "$prefix"
+      return
+    fi
+  done
+  echo "feat"
+}
+
+# Check if title has a conventional commit prefix (case-insensitive)
+has_type_prefix() {
+  local title="$1"
+  local lower_title
+  lower_title=$(echo "$title" | tr '[:upper:]' '[:lower:]')
+
+  local prefix pattern
+  for prefix in $TYPE_PREFIXES; do
+    pattern="^${prefix}[:(]"
+    if [[ "$lower_title" =~ $pattern ]]; then
+      return 0
+    fi
+  done
+  return 1
 }
 
 # Slugify title for branch name
 # Removes type prefix, lowercases, replaces special chars with dashes
+# Truncates at word boundary to max 50 chars
 slugify_title() {
   local title="$1"
-  echo "$title" \
+  local slug
+  slug=$(echo "$title" \
     | sed -E 's/^[a-zA-Z]+[(:][^)]*[):]* *//' \
     | tr '[:upper:]' '[:lower:]' \
     | tr -cs 'a-z0-9' '-' \
-    | sed 's/^-//;s/-$//' \
-    | cut -c1-50
+    | sed 's/^-//;s/-$//')
+
+  # Truncate at word boundary (last dash before 50 chars)
+  if [ ${#slug} -gt 50 ]; then
+    slug="${slug:0:50}"
+    # If we're in the middle of a word, cut back to last dash
+    if [[ "$slug" =~ -[^-]+$ ]] && [[ ! "${slug: -1}" == "-" ]]; then
+      slug="${slug%-*}"
+    fi
+    # Remove trailing dash if present
+    slug="${slug%-}"
+  fi
+  echo "$slug"
 }
 
 # Parse git worktree list --porcelain output
@@ -373,18 +406,8 @@ create_from_issue() {
     # Create PR title from issue title (preserve original title format)
     local pr_title="$issue_title"
 
-    # Add type prefix if not already present
-    # Check for conventional commit prefix (e.g., "feat:", "fix(scope):")
-    local has_prefix=false
-    if [[ "$pr_title" =~ ^feat[:\(] ]] || \
-       [[ "$pr_title" =~ ^fix[:\(] ]] || \
-       [[ "$pr_title" =~ ^refactor[:\(] ]] || \
-       [[ "$pr_title" =~ ^docs[:\(] ]] || \
-       [[ "$pr_title" =~ ^chore[:\(] ]] || \
-       [[ "$pr_title" =~ ^test[:\(] ]]; then
-      has_prefix=true
-    fi
-    if [ "$has_prefix" = false ]; then
+    # Add type prefix if not already present (case-insensitive check)
+    if ! has_type_prefix "$pr_title"; then
       pr_title="${type_prefix}: ${pr_title}"
     fi
 

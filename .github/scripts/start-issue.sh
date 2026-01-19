@@ -72,7 +72,7 @@ if [ $EXIT_CODE -eq 0 ]; then
     [ -n "$WORKTREE_ERRORS" ] && echo "$WORKTREE_ERRORS" >&2
 elif [ $EXIT_CODE -eq 2 ]; then
     # Worktree already exists - find it via git worktree list
-    # Look for branches matching the issue number pattern: <type>/<issue_number>-*
+    # Look for branches matching the issue number pattern: <type>/<issue_number>-* or legacy issue-<N>
     echo "Worktree already exists, finding path..."
     [ -n "$WORKTREE_OUTPUT" ] && echo "$WORKTREE_OUTPUT"
     while IFS= read -r line; do
@@ -80,8 +80,10 @@ elif [ $EXIT_CODE -eq 2 ]; then
             wt_path="${BASH_REMATCH[1]}"
         elif [[ "$line" =~ ^branch\ refs/heads/(.+)$ ]]; then
             local_branch="${BASH_REMATCH[1]}"
-            # Match branches like feat/42-* or fix/42-*
-            if [[ "$local_branch" =~ ^[a-z]+/${ISSUE_NUMBER}- ]]; then
+            # Match new format: feat/42-* or fix/42-*
+            # Also match legacy format: issue-42
+            if [[ "$local_branch" =~ ^[a-z]+/${ISSUE_NUMBER}- ]] || \
+               [[ "$local_branch" == "issue-${ISSUE_NUMBER}" ]]; then
                 WORKTREE_DIR="$wt_path"
                 BRANCH_NAME="$local_branch"
                 break
