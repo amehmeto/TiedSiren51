@@ -14,6 +14,7 @@
       "Bash(base64:*)",
       "Bash(bash -n:*)",
       "Bash(bash scripts/*.sh:*)",
+      "Bash(bash:*)",
       "Bash(brew install git)",
       "Bash(brew link:*)",
       "Bash(brew upgrade:*)",
