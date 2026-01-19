@@ -64,6 +64,7 @@
       "Bash(git blame:*)",
       "Bash(git branch:*)",
       "Bash(git check-ignore:*)",
+      "Bash(git checkout -b:*)",
       "Bash(git commit:*)",
       "Bash(git diff:*)",
       "Bash(git fetch:*)",
