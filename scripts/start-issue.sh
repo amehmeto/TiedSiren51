@@ -503,7 +503,7 @@ main() {
     echo "  Branch name is derived from issue title:"
     echo "  - Format: <type>/<issue>-<slugified-title>"
     echo "  - Example: 'feat: Add dark mode' -> feat/42-add-dark-mode"
-    echo "  - Type is parsed from title prefix (feat, fix, refactor, docs, chore, test)"
+    echo "  - Type is parsed from title prefix (feat, fix, refactor, docs, chore, test, perf)"
     echo "  - Defaults to 'feat' if no recognized prefix"
     echo ""
     echo "Exit codes:"
