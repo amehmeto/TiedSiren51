@@ -192,7 +192,8 @@ remove_worktree() {
   # Safety check: only allow removal if PR is merged or closed
   if [ -n "$branch" ] && [ "$branch" != "main" ]; then
     local pr_info
-    pr_info=$(gh pr list --head "$branch" --json number,state --jq '.[0] // empty' 2>/dev/null || true)
+    # Use --state all to find merged/closed PRs too
+    pr_info=$(gh pr list --head "$branch" --state all --json number,state --jq '.[0] // empty' 2>/dev/null || true)
 
     if [ -n "$pr_info" ]; then
       local pr_state pr_number
