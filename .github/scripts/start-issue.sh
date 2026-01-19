@@ -15,6 +15,24 @@ BRANCH_NAME="issue-$ISSUE_NUMBER"
 SESSION_NAME="issue-$ISSUE_NUMBER"
 WORKTREE_DIR=""
 
+# Instructions appended to the Claude prompt
+readonly CLAUDE_INSTRUCTIONS="---
+
+## Instructions
+
+1. Implement the issue above
+2. When done, run \`/commit-push\` to commit and push your changes
+   (A draft PR was already created by the worktree setup)"
+
+# Temp files for capturing output (cleaned up on exit)
+WORKTREE_STDOUT=""
+WORKTREE_STDERR=""
+cleanup_temp_files() {
+    [ -n "$WORKTREE_STDOUT" ] && rm -f "$WORKTREE_STDOUT"
+    [ -n "$WORKTREE_STDERR" ] && rm -f "$WORKTREE_STDERR"
+}
+trap cleanup_temp_files EXIT
+
 # Fetch issue details from GitHub
 echo "Fetching issue #$ISSUE_NUMBER..."
 ISSUE_TITLE=$(gh issue view "$ISSUE_NUMBER" --json title -q '.title')
@@ -43,7 +61,6 @@ WORKTREE_STDERR=$(mktemp)
 EXIT_CODE=$?
 WORKTREE_OUTPUT=$(cat "$WORKTREE_STDOUT")
 WORKTREE_ERRORS=$(cat "$WORKTREE_STDERR")
-rm -f "$WORKTREE_STDOUT" "$WORKTREE_STDERR"
 set -e
 
 if [ $EXIT_CODE -eq 0 ]; then
@@ -66,7 +83,9 @@ elif [ $EXIT_CODE -eq 2 ]; then
 
     if [ -n "$WORKTREE_DIR" ]; then
         echo "Found existing worktree at: $WORKTREE_DIR"
-        (cd "$WORKTREE_DIR" && git pull --ff-only || true)
+        if ! (cd "$WORKTREE_DIR" && git pull --ff-only); then
+            echo "Warning: git pull failed, continuing with existing state"
+        fi
     fi
 else
     # Non-zero exit code - show output and errors
@@ -81,21 +100,16 @@ if [ -z "$WORKTREE_DIR" ]; then
 fi
 
 # Write issue content to a temp file for claude prompt
-# Use 'EOF' (quoted) to prevent variable expansion in the instructions section
+# Build file in parts to safely handle special characters in issue body
 PROMPT_FILE="$WORKTREE_DIR/.claude-issue-prompt.md"
-cat > "$PROMPT_FILE" << EOF
-# Issue #$ISSUE_NUMBER: $ISSUE_TITLE
-
-$ISSUE_BODY
-
----
-
-## Instructions
-
-1. Implement the issue above
-2. When done, run \`/commit-push\` to commit and push your changes
-   (A draft PR was already created by the worktree setup)
-EOF
+{
+    echo "# Issue #$ISSUE_NUMBER: $ISSUE_TITLE"
+    echo ""
+    # Write issue body as-is without shell interpretation
+    printf '%s\n' "$ISSUE_BODY"
+    echo ""
+    printf '%s\n' "$CLAUDE_INSTRUCTIONS"
+} > "$PROMPT_FILE"
 
 # Create init script that will run inside tmux
 # Note: npm ci is already handled by worktree.sh, so we skip it here
@@ -104,7 +118,8 @@ cat > "$INIT_SCRIPT" << EOF
 #!/bin/bash
 cd "$WORKTREE_DIR"
 echo "Starting Claude Code with issue #$ISSUE_NUMBER..."
-claude "\$(cat '$PROMPT_FILE')"
+# Use relative path since we cd'd to worktree dir
+claude "\$(cat .claude-issue-prompt.md)"
 EOF
 chmod +x "$INIT_SCRIPT"
 
