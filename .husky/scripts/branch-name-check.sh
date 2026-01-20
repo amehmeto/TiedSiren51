@@ -2,44 +2,58 @@
 
 # Branch naming convention check
 #
-# Configuration: Set REQUIRE_ISSUE_NUMBER to enforce issue numbers in branch names
-# Set to "true" to require issue numbers: feat/42-description
-# Set to "false" (default) to allow both: feat/42-description OR feat/description
+# ┌─────────────────────────────────────────────────────────────────────────────┐
+# │ CONFIGURATION - Customize these values for your project                     │
+# └─────────────────────────────────────────────────────────────────────────────┘
+#
+# TICKET_PREFIX: Project identifier prepended to issue numbers
+#   Examples: "TS" → feat/TS123-description
+#             "TSBO-" → feat/TSBO-123-description
+#             "EAS-" → feat/EAS-123-description
+#             "" → feat/123-description (no prefix)
+TICKET_PREFIX="TS"
+
+# REQUIRE_ISSUE_NUMBER: Enforce ticket numbers in branch names
+#   "true"  → require: feat/TS123-description
+#   "false" → allow both: feat/TS123-description OR feat/description
 REQUIRE_ISSUE_NUMBER="true"
 
-# Supported formats:
-#   1. Issue-based (recommended): <type>/<issue-number>-<description>
-#      Example: feat/42-add-dark-mode, fix/123-resolve-login-bug
-#   2. Legacy (when REQUIRE_ISSUE_NUMBER=false): <type>/<description>
-#      Example: feat/add-new-feature, fix/bug-description
-#
-# Use /start-issue <number> to automatically create properly named branches
+# ┌─────────────────────────────────────────────────────────────────────────────┐
+# │ END CONFIGURATION                                                           │
+# └─────────────────────────────────────────────────────────────────────────────┘
 
 branch=$(git branch --show-current)
 keywords="feat, fix, refactor, docs, chore, test, perf, build, ci, style, feature"
 
 # Build pattern based on configuration
+# Escape special regex characters in prefix (e.g., hyphens)
+# shellcheck disable=SC2016 # Single quotes intentional - we want literal regex, not expansion
+escaped_prefix=$(printf '%s' "$TICKET_PREFIX" | sed 's/[.[\*^$()+?{|]/\\&/g')
+
 if [ "$REQUIRE_ISSUE_NUMBER" = "true" ]; then
-  # Require issue number: feat/42-description
-  pattern="^(feature|feat|fix|build|chore|ci|docs|style|refactor|perf|test)\/[0-9]+-[a-z0-9][a-z0-9-]*$"
-  example_required="feat/42-add-dark-mode"
+  # Require ticket number: feat/TS123-description
+  pattern="^(feature|feat|fix|build|chore|ci|docs|style|refactor|perf|test)\/${escaped_prefix}[0-9]+-[a-z0-9][a-z0-9-]*$"
+  example_format="<type>/${TICKET_PREFIX}<number>-<description>"
+  example_branch="feat/${TICKET_PREFIX}42-add-dark-mode"
 else
-  # Allow both formats: feat/42-description OR feat/description
-  pattern="^(feature|feat|fix|build|chore|ci|docs|style|refactor|perf|test)\/([0-9]+-)?[a-z0-9][a-z0-9-]*$"
+  # Allow both formats: feat/TS123-description OR feat/description
+  pattern="^(feature|feat|fix|build|chore|ci|docs|style|refactor|perf|test)\/(${escaped_prefix}[0-9]+-)?[a-z0-9][a-z0-9-]*$"
+  example_format="<type>/${TICKET_PREFIX}<number>-<description> or <type>/<description>"
+  example_branch="feat/${TICKET_PREFIX}42-add-dark-mode"
+  example_legacy="feat/add-dark-mode"
 fi
 
 if ! echo "$branch" | grep -Eq "$pattern"; then
   printf "\033[0;35mBranch name '%s' does not follow the required pattern.\033[0m\n\n" "$branch"
   printf "\033[0;35mBranch name must start with a conventional commit keyword (%s),\n" "$keywords"
+  printf "followed by '%s'.\033[0m\n\n" "$example_format"
 
   if [ "$REQUIRE_ISSUE_NUMBER" = "true" ]; then
-    printf "followed by '/<issue-number>-<description>'.\033[0m\n\n"
-    printf "\033[0;35mExample: %s\033[0m\n\n" "$example_required"
+    printf "\033[0;35mExample: %s\033[0m\n\n" "$example_branch"
   else
-    printf "followed by '/<issue-number>-<description>' or '/<description>'.\033[0m\n\n"
     printf "\033[0;35mExamples:\033[0m\n"
-    printf "  \033[0;35m• feat/42-add-dark-mode (issue-based, recommended)\033[0m\n"
-    printf "  \033[0;35m• fix/resolve-login-bug (legacy)\033[0m\n\n"
+    printf "  \033[0;35m• %s (with ticket, recommended)\033[0m\n" "$example_branch"
+    printf "  \033[0;35m• %s (legacy)\033[0m\n\n" "$example_legacy"
   fi
 
   printf "\033[0;35mTip: Use '/start-issue <number>' to automatically create properly named branches.\033[0m\n\n"

@@ -11,6 +11,16 @@ set -e
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKTREES_DIR="$(dirname "$REPO_ROOT")/worktrees"
 
+# ┌─────────────────────────────────────────────────────────────────────────────┐
+# │ CONFIGURATION - Customize for your project                                  │
+# └─────────────────────────────────────────────────────────────────────────────┘
+# TICKET_PREFIX: Project identifier prepended to issue numbers in branch names
+#   Examples: "TS" → feat/TS123-description
+#             "TSBO-" → feat/TSBO-123-description
+#             "" → feat/123-description (no prefix)
+TICKET_PREFIX="TS"
+# └─────────────────────────────────────────────────────────────────────────────┘
+
 # Exit codes
 readonly EXIT_SUCCESS=0
 readonly EXIT_INVALID_ARGS=1
@@ -326,7 +336,7 @@ create_from_issue() {
   local type_prefix slug branch
   type_prefix=$(parse_type_from_title "$issue_title")
   slug=$(slugify_title "$issue_title")
-  branch="${type_prefix}/${issue_number}-${slug}"
+  branch="${type_prefix}/${TICKET_PREFIX}${issue_number}-${slug}"
 
   print_info "Derived branch name: $branch"
 
