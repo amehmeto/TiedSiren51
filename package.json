@@ -70,7 +70,7 @@
       "npm run lint:js:fix --"
     ],
     "*.sh": [
-      "shellcheck"
+      "npm run lint:sh --"
     ],
     "*.{yml,yaml}": [
       "npm run lint:format:fix --",
