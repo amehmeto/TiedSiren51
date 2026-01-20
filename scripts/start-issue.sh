@@ -375,7 +375,8 @@ create_from_issue() {
 
     if [ "$branch_exists" = true ]; then
       print_info "Creating worktree with existing branch '$branch'..."
-      if ! git worktree add "$wt_path" "$branch"; then
+      # Disable husky hooks during worktree creation (path resolution fails in worktree context)
+      if ! HUSKY=0 git worktree add "$wt_path" "$branch"; then
         print_error "Failed to create worktree"
         exit "$EXIT_GIT_FAILED"
       fi
@@ -465,7 +466,8 @@ PREOF
     fi
 
     print_info "Creating worktree with branch '$branch'..."
-    if ! git worktree add "$wt_path" "$branch"; then
+    # Disable husky hooks during worktree creation (path resolution fails in worktree context)
+    if ! HUSKY=0 git worktree add "$wt_path" "$branch"; then
       print_error "Failed to create worktree"
       exit "$EXIT_GIT_FAILED"
     fi
