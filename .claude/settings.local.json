@@ -24,6 +24,7 @@
       "Bash(done)",
       "Bash(eas:*)",
       "Bash(echo:*)",
+      "Bash(export SKIP_E2E_CHECK=true)",
       "Bash(find:*)",
       "Bash(for:*)",
       "Bash(gh auth status:*)",
@@ -217,10 +218,8 @@
       "BashOutput(*)",
       "Edit(.claude/hooks/**)",
       "Edit(.github/workflows/**)",
-      "Edit(.husky/**)",
       "Write(.claude/hooks/**)",
       "Write(.github/workflows/**)",
-      "Write(.husky/**)",
       "mcp__github__merge_pull_request"
     ],
     "ask": [
@@ -247,7 +246,9 @@
       "Bash(sed:*)",
       "Bash(xargs:*)",
       "Edit(**/.claude/settings.local.json)",
+      "Edit(.husky/**)",
       "Edit(/**/.claude/**)",
+      "Write(.husky/**)",
       "Write(/**/.claude/**)"
     ]
   },
