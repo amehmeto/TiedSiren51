@@ -466,8 +466,8 @@ PREOF
     fi
 
     print_info "Creating worktree with branch '$branch'..."
-    # Disable husky hooks during worktree creation (path resolution fails in worktree context)
-    if ! HUSKY=0 git worktree add "$wt_path" "$branch"; then
+    # Disable hooks during worktree creation (husky path resolution fails in worktree context)
+    if ! git -c core.hooksPath=/dev/null worktree add "$wt_path" "$branch"; then
       print_error "Failed to create worktree"
       exit "$EXIT_GIT_FAILED"
     fi
