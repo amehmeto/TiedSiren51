@@ -176,6 +176,8 @@
       "Bash(gh release delete:*)",
       "Bash(gh repo delete:*)",
       "Bash(git -C:*)",
+      "Bash(git -c core.hooksPath:*)",
+      "Bash(git -c core.hookspath:*)",
       "Bash(git am --no-verify:*)",
       "Bash(git branch --delete:*)",
       "Bash(git branch -D:*)",
