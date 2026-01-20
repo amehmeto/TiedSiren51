@@ -1,26 +1,13 @@
 #!/usr/bin/env bash
 
 # Branch naming convention check
-#
-# ┌─────────────────────────────────────────────────────────────────────────────┐
-# │ CONFIGURATION - Customize these values for your project                     │
-# └─────────────────────────────────────────────────────────────────────────────┘
-#
-# TICKET_PREFIX: Project identifier prepended to issue numbers
-#   Examples: "TS" → feat/TS123-description
-#             "TSBO-" → feat/TSBO-123-description
-#             "EAS-" → feat/EAS-123-description
-#             "" → feat/123-description (no prefix)
-TICKET_PREFIX="TS"
+# Configuration is loaded from scripts/lib/branch-config.sh
 
-# REQUIRE_ISSUE_NUMBER: Enforce ticket numbers in branch names
-#   "true"  → require: feat/TS123-description
-#   "false" → allow both: feat/TS123-description OR feat/description
-REQUIRE_ISSUE_NUMBER="true"
+REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/../.." && pwd)"
 
-# ┌─────────────────────────────────────────────────────────────────────────────┐
-# │ END CONFIGURATION                                                           │
-# └─────────────────────────────────────────────────────────────────────────────┘
+# Load shared branch naming configuration
+# shellcheck disable=SC1091 # Path is dynamic but verified at runtime
+source "$REPO_ROOT/scripts/lib/branch-config.sh"
 
 branch=$(git branch --show-current)
 keywords="feat, fix, refactor, docs, chore, test, perf, build, ci, style, feature"

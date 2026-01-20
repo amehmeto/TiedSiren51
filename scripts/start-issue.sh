@@ -11,15 +11,9 @@ set -e
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKTREES_DIR="$(dirname "$REPO_ROOT")/worktrees"
 
-# ┌─────────────────────────────────────────────────────────────────────────────┐
-# │ CONFIGURATION - Customize for your project                                  │
-# └─────────────────────────────────────────────────────────────────────────────┘
-# TICKET_PREFIX: Project identifier prepended to issue numbers in branch names
-#   Examples: "TS" → feat/TS123-description
-#             "TSBO-" → feat/TSBO-123-description
-#             "" → feat/123-description (no prefix)
-TICKET_PREFIX="TS"
-# └─────────────────────────────────────────────────────────────────────────────┘
+# Load shared branch naming configuration
+# shellcheck disable=SC1091 # Path is dynamic but verified at runtime
+source "$(dirname "${BASH_SOURCE[0]}")/lib/branch-config.sh"
 
 # Exit codes
 readonly EXIT_SUCCESS=0
@@ -60,10 +54,6 @@ print_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
-
-# Conventional commit type prefixes (used for branch naming and PR title validation)
-# Order matters: longer prefixes first to avoid partial matches
-readonly TYPE_PREFIXES="refactor feat fix docs chore test perf"
 
 # Parse type prefix from issue title
 # Returns: feat, fix, refactor, docs, chore, test, perf (defaults to feat)
@@ -385,7 +375,10 @@ create_from_issue() {
 
     if [ "$branch_exists" = true ]; then
       print_info "Creating worktree with existing branch '$branch'..."
-      # Disable hooks during worktree creation (husky path resolution fails in worktree context)
+      # NOTE: We disable git hooks during worktree creation because husky's path
+      # resolution fails when git runs hooks from a worktree context. The .husky
+      # directory is resolved relative to the new worktree path before files exist.
+      # This is safe because worktree creation doesn't modify tracked files.
       if ! git -c core.hooksPath=/dev/null worktree add "$wt_path" "$branch"; then
         print_error "Failed to create worktree"
         exit "$EXIT_GIT_FAILED"
@@ -476,7 +469,10 @@ PREOF
     fi
 
     print_info "Creating worktree with branch '$branch'..."
-    # Disable hooks during worktree creation (husky path resolution fails in worktree context)
+    # NOTE: We disable git hooks during worktree creation because husky's path
+    # resolution fails when git runs hooks from a worktree context. The .husky
+    # directory is resolved relative to the new worktree path before files exist.
+    # This is safe because worktree creation doesn't modify tracked files.
     if ! git -c core.hooksPath=/dev/null worktree add "$wt_path" "$branch"; then
       print_error "Failed to create worktree"
       exit "$EXIT_GIT_FAILED"
