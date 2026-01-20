@@ -1,35 +1,30 @@
 #!/usr/bin/env bash
 
-# Configuration: Set TICKET_PREFIX to require ticket numbers in branch names
-# Examples: TICKET_PREFIX="MA2" or TICKET_PREFIX="JIRA"
-# Leave empty ("") to disable ticket prefix requirement
-TICKET_PREFIX=""
+# Branch naming convention check
+# Supports two formats:
+#   1. Issue-based (recommended): <type>/<issue-number>-<description>
+#      Example: feat/42-add-dark-mode, fix/123-resolve-login-bug
+#   2. Legacy: <type>/<description>
+#      Example: feat/add-new-feature, fix/bug-description
+#
+# Use /start-issue <number> to automatically create properly named branches
 
 branch=$(git branch --show-current)
-keywords="feature, feat, fix, build, chore, ci, docs, style, refactor, perf, test"
+keywords="feat, fix, refactor, docs, chore, test, perf, build, ci, style, feature"
 
-# Build pattern and example based on configuration
-if [ -n "$TICKET_PREFIX" ]; then
-  # With ticket prefix: feature/MA2-123-description
-  pattern="^(feature|feat|fix|build|chore|ci|docs|style|refactor|perf|test)\/${TICKET_PREFIX}-[0-9]+-.+$"
-  example="feature/${TICKET_PREFIX}-123-add-new-feature"
-else
-  # Without ticket prefix: feature/description
-  pattern="^(feature|feat|fix|build|chore|ci|docs|style|refactor|perf|test)\/.+$"
-  example="feature/add-new-feature"
-fi
+# Pattern supports both issue-based and legacy formats
+# Issue-based: feat/42-description or fix/123-something
+# Legacy: feat/description or fix/something
+pattern="^(feature|feat|fix|build|chore|ci|docs|style|refactor|perf|test)\/([0-9]+-)?[a-z0-9][a-z0-9-]*$"
 
 if ! echo "$branch" | grep -Eq "$pattern"; then
   printf "\033[0;35mBranch name '%s' does not follow the required pattern.\033[0m\n\n" "$branch"
-
-  # Print error message with keywords listed
-  if [ -n "$TICKET_PREFIX" ]; then
-    printf "\033[0;35mBranch name must start with a conventional commit keyword (%s),\n followed by '/%s-XXX-description'.\033[0m\n\n" "$keywords" "$TICKET_PREFIX"
-  else
-    printf "\033[0;35mBranch name must start with a conventional commit keyword (%s),\n followed by '/description'.\033[0m\n\n" "$keywords"
-  fi
-
-  printf "\033[0;35mExample: '%s'.\033[0m\n\n" "$example"
+  printf "\033[0;35mBranch name must start with a conventional commit keyword (%s),\n" "$keywords"
+  printf "followed by '/<issue-number>-<description>' or '/<description>'.\033[0m\n\n"
+  printf "\033[0;35mExamples:\033[0m\n"
+  printf "  \033[0;35m• feat/42-add-dark-mode (issue-based, recommended)\033[0m\n"
+  printf "  \033[0;35m• fix/resolve-login-bug (legacy)\033[0m\n\n"
+  printf "\033[0;35mTip: Use '/start-issue <number>' to automatically create properly named branches.\033[0m\n\n"
   printf "\033[0;35mTo rename this local branch, try: \`git branch -m <newname>\`\033[0m\n\n"
   exit 1
 fi
