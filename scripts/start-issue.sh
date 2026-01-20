@@ -416,7 +416,8 @@ create_from_issue() {
       pr_title="${type_prefix}: ${pr_title}"
     fi
 
-    pr_url=$(gh pr create --draft --head "$branch" --title "$pr_title" --body "$(cat <<PREOF
+    local pr_create_output
+    pr_create_output=$(gh pr create --draft --head "$branch" --title "$pr_title" --body "$(cat <<PREOF
 ## Summary
 
 Closes #${issue_number}
@@ -438,19 +439,23 @@ Closes #${issue_number}
 ---
 Generated with [Claude Code](https://claude.com/claude-code)
 PREOF
-)")
+)" 2>&1) || true
 
-    if [ -z "$pr_url" ]; then
-      print_error "Failed to create PR"
+    # Check if PR was created or if it failed due to "no commits"
+    if [[ "$pr_create_output" =~ ^https:// ]]; then
+      pr_url="$pr_create_output"
+      print_success "Draft PR created: $pr_url"
+      pr_number=$(gh pr list --head "$branch" --json number --jq '.[0].number' 2>/dev/null)
+      wt_name="${pr_number}-${sanitized_branch}"
+    elif [[ "$pr_create_output" =~ "No commits between" ]]; then
+      print_warning "No commits yet - PR will be created after first commit"
+      print_info "Hint: Make a commit, then run 'gh pr create' to create the PR"
+      wt_name="${issue_number}-${sanitized_branch}"
+    else
+      print_error "Failed to create PR: $pr_create_output"
       exit "$EXIT_PR_CREATE_FAILED"
     fi
 
-    print_success "Draft PR created: $pr_url"
-
-    # Get the PR number from the newly created PR
-    pr_number=$(gh pr list --head "$branch" --json number --jq '.[0].number' 2>/dev/null)
-
-    wt_name="${pr_number}-${sanitized_branch}"
     wt_path="$WORKTREES_DIR/$wt_name"
 
     # Check if worktree already exists
