@@ -26,7 +26,7 @@
     "lint:md": "remark --frail",
     "lint:ticket": "remark --frail .github/ISSUE_TEMPLATE/",
     "lint:ticket:fix": "remark --output --rc-path .remarkrc.fix.mjs .github/ISSUE_TEMPLATE/",
-    "lint:sh": "find scripts .husky/scripts .claude/hooks .github/scripts -name '*.sh' -exec shellcheck {} +",
+    "lint:sh": "bash scripts/lint-sh.sh",
     "lint:workflow": "bash scripts/lint-workflow-scripts.sh",
     "lint:schema": "npx prisma validate",
     "test": "vitest",
