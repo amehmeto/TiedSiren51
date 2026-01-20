@@ -95,10 +95,15 @@ slugify_title() {
   local title="$1"
   local slug
   slug=$(echo "$title" \
-    | sed -E 's/^[a-zA-Z]+[(:][^)]*[):]* *//' \
+    | sed -E 's/^[a-zA-Z]+(\([^)]*\))?[!]?:[ ]*//' \
     | tr '[:upper:]' '[:lower:]' \
     | tr -cs 'a-z0-9' '-' \
     | sed 's/^-//;s/-$//')
+
+  # Fallback for empty slug (e.g., unicode-only titles)
+  if [ -z "$slug" ]; then
+    slug="issue"
+  fi
 
   # Truncate at word boundary (last dash before 50 chars)
   if [ ${#slug} -gt 50 ]; then
