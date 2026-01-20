@@ -1,16 +1,19 @@
 #!/usr/bin/env bash
 set -e
 
-# Script to manage git worktrees with automatic cleanup and PR creation
+# Script to start work on a GitHub issue with automatic worktree, branch, and PR creation
 # Usage:
-#   ./scripts/worktree.sh <branch-name>     Create worktree for new/existing branch
-#   ./scripts/worktree.sh <pr-number>       Create worktree for existing PR
-#   ./scripts/worktree.sh --list            List all worktrees with PR status
-#   ./scripts/worktree.sh --prune           Only cleanup merged PR worktrees
-#   ./scripts/worktree.sh --remove <name>   Remove specific worktree
+#   ./scripts/start-issue.sh <issue-number>  Create worktree for issue (derives branch name)
+#   ./scripts/start-issue.sh --list          List all worktrees with PR status
+#   ./scripts/start-issue.sh --prune         Only cleanup merged PR worktrees
+#   ./scripts/start-issue.sh --remove <name> Remove specific worktree
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 WORKTREES_DIR="$(dirname "$REPO_ROOT")/worktrees"
+
+# Load shared branch naming configuration
+# shellcheck disable=SC1091 # Path is dynamic but verified at runtime
+source "$(dirname "${BASH_SOURCE[0]}")/lib/branch-config.sh"
 
 # Exit codes
 readonly EXIT_SUCCESS=0
@@ -18,7 +21,7 @@ readonly EXIT_INVALID_ARGS=1
 readonly EXIT_WORKTREE_EXISTS=2
 readonly EXIT_WORKTREE_NOT_FOUND=3
 readonly EXIT_PR_STILL_OPEN=4
-readonly EXIT_BRANCH_NOT_FOUND=5
+readonly EXIT_ISSUE_NOT_FOUND=5
 readonly EXIT_PR_CREATE_FAILED=6
 readonly EXIT_NPM_CI_FAILED=7
 readonly EXIT_GIT_FAILED=8
@@ -51,6 +54,69 @@ print_info() { echo -e "${BLUE}[INFO]${NC} $1"; }
 print_success() { echo -e "${GREEN}[SUCCESS]${NC} $1"; }
 print_warning() { echo -e "${YELLOW}[WARNING]${NC} $1"; }
 print_error() { echo -e "${RED}[ERROR]${NC} $1"; }
+
+# Parse type prefix from issue title
+# Returns: feat, fix, refactor, docs, chore, test, perf (defaults to feat)
+parse_type_from_title() {
+  local title="$1"
+  local lower_title
+  lower_title=$(echo "$title" | tr '[:upper:]' '[:lower:]')
+
+  local prefix
+  for prefix in $TYPE_PREFIXES; do
+    if [[ "$lower_title" =~ ^$prefix ]]; then
+      echo "$prefix"
+      return
+    fi
+  done
+  echo "feat"
+}
+
+# Check if title has a conventional commit prefix (case-insensitive)
+has_type_prefix() {
+  local title="$1"
+  local lower_title
+  lower_title=$(echo "$title" | tr '[:upper:]' '[:lower:]')
+
+  local prefix pattern
+  for prefix in $TYPE_PREFIXES; do
+    pattern="^${prefix}[:(]"
+    if [[ "$lower_title" =~ $pattern ]]; then
+      return 0
+    fi
+  done
+  return 1
+}
+
+# Slugify title for branch name
+# Removes type prefix, lowercases, replaces special chars with dashes
+# Truncates at word boundary to max 50 chars
+slugify_title() {
+  local title="$1"
+  local slug
+  slug=$(echo "$title" \
+    | sed -E 's/^[a-zA-Z]+(\([^)]*\))?[!]?:[ ]*//' \
+    | tr '[:upper:]' '[:lower:]' \
+    | tr -cs 'a-z0-9' '-' \
+    | sed 's/^-//;s/-$//')
+
+  # Fallback for empty slug (e.g., unicode-only titles)
+  if [ -z "$slug" ]; then
+    slug="issue"
+  fi
+
+  # Truncate at word boundary (last dash before 50 chars)
+  if [ ${#slug} -gt 50 ]; then
+    slug="${slug:0:50}"
+    # If we're in the middle of a word, cut back to last dash
+    if [[ "$slug" =~ -[^-]+$ ]] && [[ ! "${slug: -1}" == "-" ]]; then
+      slug="${slug%-*}"
+    fi
+    # Remove trailing dash if present
+    slug="${slug%-}"
+  fi
+  echo "$slug"
+}
 
 # Parse git worktree list --porcelain output
 # Outputs: path<TAB>branch for each worktree (branch is empty for detached HEAD)
@@ -232,64 +298,38 @@ sanitize_for_dirname() {
   echo "$1" | tr '/:*?"<>|@{} ' '-' | sed 's/--*/-/g; s/^-//; s/-$//'
 }
 
-# Create worktree from PR number
-create_from_pr() {
-  local pr_number="$1"
+# Create worktree from issue number
+create_from_issue() {
+  local issue_number="$1"
 
-  print_info "Fetching PR #$pr_number details..."
+  print_info "Fetching issue #$issue_number details..."
 
-  local pr_info pr_url
-  pr_info=$(gh pr view "$pr_number" --json headRefName,number,url 2>/dev/null)
+  local issue_info
+  issue_info=$(gh issue view "$issue_number" --json title,body,labels 2>/dev/null || true)
 
-  if [ -z "$pr_info" ]; then
-    print_error "PR #$pr_number not found"
-    exit "$EXIT_BRANCH_NOT_FOUND"
+  if [ -z "$issue_info" ]; then
+    print_error "Issue #$issue_number not found"
+    exit "$EXIT_ISSUE_NOT_FOUND"
   fi
 
-  local branch
-  branch=$(echo "$pr_info" | jq -r '.headRefName')
-  pr_url=$(echo "$pr_info" | jq -r '.url')
-  local sanitized_branch
-  sanitized_branch=$(sanitize_for_dirname "$branch")
-  local wt_name="${pr_number}-${sanitized_branch}"
-  local wt_path="$WORKTREES_DIR/$wt_name"
+  local issue_title
+  issue_title=$(echo "$issue_info" | jq -r '.title')
 
-  # Check if worktree already exists
-  if [ -d "$wt_path" ]; then
-    print_error "Worktree already exists at $wt_path"
-    exit "$EXIT_WORKTREE_EXISTS"
+  if [ -z "$issue_title" ] || [ "$issue_title" = "null" ]; then
+    print_error "Could not fetch issue title for #$issue_number"
+    exit "$EXIT_ISSUE_NOT_FOUND"
   fi
 
-  print_info "Creating worktree for PR #$pr_number (branch: $branch)..."
+  print_info "Issue title: $issue_title"
 
-  if ! git fetch origin "$branch"; then
-    print_error "Failed to fetch branch '$branch'"
-    exit "$EXIT_GIT_FAILED"
-  fi
+  # Parse type from title and slugify
+  local type_prefix slug branch
+  type_prefix=$(parse_type_from_title "$issue_title")
+  slug=$(slugify_title "$issue_title")
+  branch="${type_prefix}/${TICKET_PREFIX}${issue_number}-${slug}"
 
-  mkdir -p "$WORKTREES_DIR"
+  print_info "Derived branch name: $branch"
 
-  if ! git worktree add "$wt_path" "$branch"; then
-    print_error "Failed to create worktree"
-    exit "$EXIT_GIT_FAILED"
-  fi
-
-  print_info "Installing dependencies..."
-  if ! (cd "$wt_path" && npm ci); then
-    print_error "Failed to install dependencies"
-    exit "$EXIT_NPM_CI_FAILED"
-  fi
-
-  print_success "Worktree created at: $wt_path"
-  print_info "To navigate: cd $wt_path"
-
-  print_summary "$wt_path" "$branch" "$pr_number" "$pr_url"
-  exit "$EXIT_SUCCESS"
-}
-
-# Create worktree from branch name
-create_from_branch() {
-  local branch="$1"
   local sanitized_branch
   sanitized_branch=$(sanitize_for_dirname "$branch")
 
@@ -320,7 +360,7 @@ create_from_branch() {
   local pr_url
 
   if [ -n "$existing_pr" ]; then
-    # PR exists, use PR number in name
+    # PR exists, use PR number in worktree name
     pr_number="$existing_pr"
     pr_url="$existing_pr_url"
     wt_name="${existing_pr}-${sanitized_branch}"
@@ -335,13 +375,17 @@ create_from_branch() {
 
     if [ "$branch_exists" = true ]; then
       print_info "Creating worktree with existing branch '$branch'..."
-      if ! git worktree add "$wt_path" "$branch"; then
+      # NOTE: We disable git hooks during worktree creation because husky's path
+      # resolution fails when git runs hooks from a worktree context. The .husky
+      # directory is resolved relative to the new worktree path before files exist.
+      # This is safe because worktree creation doesn't modify tracked files.
+      if ! git -c core.hooksPath=/dev/null worktree add "$wt_path" "$branch"; then
         print_error "Failed to create worktree"
         exit "$EXIT_GIT_FAILED"
       fi
     else
       print_error "Branch '$branch' doesn't exist but PR #$existing_pr references it"
-      exit "$EXIT_BRANCH_NOT_FOUND"
+      exit "$EXIT_ISSUE_NOT_FOUND"
     fi
 
     print_info "Installing dependencies..."
@@ -368,27 +412,28 @@ create_from_branch() {
 
     print_info "Creating draft PR..."
 
-    # Determine PR title from branch name
-    local pr_title
-    pr_title=$(echo "$branch" | sed 's|^feat/|feat: |; s|^fix/|fix: |; s|^refactor/|refactor: |; s|^docs/|docs: |; s|^chore/|chore: |; s|-| |g')
+    # Create PR title from issue title (preserve original title format)
+    local pr_title="$issue_title"
 
-    pr_url=$(gh pr create --draft --head "$branch" --title "$pr_title" --body "$(cat <<'PREOF'
+    # Add type prefix if not already present (case-insensitive check)
+    if ! has_type_prefix "$pr_title"; then
+      pr_title="${type_prefix}: ${pr_title}"
+    fi
+
+    local pr_create_output
+    pr_create_output=$(gh pr create --draft --head "$branch" --title "$pr_title" --body "$(cat <<PREOF
 ## Summary
 
-<!-- Brief description of what this PR does and why -->
+Closes #${issue_number}
 
 ## Changes
 
 - [ ] TODO: List changes made
 
-## Related Issues
-
-<!-- Link related issues: Closes #123, Fixes #456, Related to #789 -->
-
 ## Test plan
 
-- [ ] Unit tests pass (`npm test`)
-- [ ] Lint passes (`npm run lint`)
+- [ ] Unit tests pass (\`npm test\`)
+- [ ] Lint passes (\`npm run lint\`)
 - [ ] Manual testing completed
 
 ## Screenshots (if applicable)
@@ -398,19 +443,23 @@ create_from_branch() {
 ---
 Generated with [Claude Code](https://claude.com/claude-code)
 PREOF
-)")
+)" 2>&1) || true
 
-    if [ -z "$pr_url" ]; then
-      print_error "Failed to create PR"
+    # Check if PR was created or if it failed due to "no commits"
+    if [[ "$pr_create_output" =~ ^https:// ]]; then
+      pr_url="$pr_create_output"
+      print_success "Draft PR created: $pr_url"
+      pr_number=$(gh pr list --head "$branch" --json number --jq '.[0].number' 2>/dev/null)
+      wt_name="${pr_number}-${sanitized_branch}"
+    elif [[ "$pr_create_output" =~ "No commits between" ]]; then
+      print_warning "No commits yet - PR will be created after first commit"
+      print_info "Hint: Make a commit, then run 'gh pr create' to create the PR"
+      wt_name="${issue_number}-${sanitized_branch}"
+    else
+      print_error "Failed to create PR: $pr_create_output"
       exit "$EXIT_PR_CREATE_FAILED"
     fi
 
-    print_success "Draft PR created: $pr_url"
-
-    # Get the PR number from the newly created PR
-    pr_number=$(gh pr list --head "$branch" --json number --jq '.[0].number' 2>/dev/null)
-
-    wt_name="${pr_number}-${sanitized_branch}"
     wt_path="$WORKTREES_DIR/$wt_name"
 
     # Check if worktree already exists
@@ -420,7 +469,11 @@ PREOF
     fi
 
     print_info "Creating worktree with branch '$branch'..."
-    if ! git worktree add "$wt_path" "$branch"; then
+    # NOTE: We disable git hooks during worktree creation because husky's path
+    # resolution fails when git runs hooks from a worktree context. The .husky
+    # directory is resolved relative to the new worktree path before files exist.
+    # This is safe because worktree creation doesn't modify tracked files.
+    if ! git -c core.hooksPath=/dev/null worktree add "$wt_path" "$branch"; then
       print_error "Failed to create worktree"
       exit "$EXIT_GIT_FAILED"
     fi
@@ -445,62 +498,63 @@ main() {
   check_dependencies
 
   # Parse arguments
-  case "${1:-}" in
-    --list|-l)
-      list_worktrees
-      exit "$EXIT_SUCCESS"
-      ;;
-    --prune|-p)
-      cleanup_merged_worktrees
-      exit "$EXIT_SUCCESS"
-      ;;
-    --remove|-r)
-      remove_worktree "$2"
-      exit "$EXIT_SUCCESS"
-      ;;
-    --help|-h|"")
-      echo "Usage: $0 <branch-name|pr-number|option>"
-      echo ""
-      echo "Options:"
-      echo "  <branch-name>       Create worktree for branch (creates if doesn't exist)"
-      echo "  <pr-number>         Create worktree for existing PR"
-      echo "  --list, -l          List all worktrees with PR status"
-      echo "  --prune, -p         Cleanup worktrees with merged/closed PRs"
-      echo "  --remove, -r <name> Remove specific worktree"
-      echo "  --help, -h          Show this help message"
-      echo ""
-      echo "Exit codes:"
-      echo "  0 - Success"
-      echo "  1 - Invalid arguments"
-      echo "  2 - Worktree already exists"
-      echo "  3 - Worktree not found"
-      echo "  4 - PR still open (cannot remove)"
-      echo "  5 - Branch not found"
-      echo "  6 - PR creation failed"
-      echo "  7 - npm ci failed"
-      echo "  8 - Git operation failed"
-      echo ""
-      echo "Examples:"
-      echo "  $0 feat/my-feature  # Create worktree for new feature branch"
-      echo "  $0 42               # Create worktree for PR #42"
-      echo "  $0 --list           # Show all worktrees"
-      echo "  $0 --prune          # Cleanup merged worktrees"
-      echo "  $0 --remove feat    # Remove worktree matching 'feat'"
-      exit "$EXIT_SUCCESS"
-      ;;
-    *)
-      # Cleanup first (unless just listing)
-      cleanup_merged_worktrees
-      echo ""
+  if [ "${1:-}" = "--list" ] || [ "${1:-}" = "-l" ]; then
+    list_worktrees
+    exit "$EXIT_SUCCESS"
+  elif [ "${1:-}" = "--prune" ] || [ "${1:-}" = "-p" ]; then
+    cleanup_merged_worktrees
+    exit "$EXIT_SUCCESS"
+  elif [ "${1:-}" = "--remove" ] || [ "${1:-}" = "-r" ]; then
+    remove_worktree "$2"
+    exit "$EXIT_SUCCESS"
+  elif [ "${1:-}" = "--help" ] || [ "${1:-}" = "-h" ] || [ -z "${1:-}" ]; then
+    echo "Usage: $0 <issue-number|option>"
+    echo ""
+    echo "Options:"
+    echo "  <issue-number>      Create worktree for GitHub issue (derives branch name)"
+    echo "  --list, -l          List all worktrees with PR status"
+    echo "  --prune, -p         Cleanup worktrees with merged/closed PRs"
+    echo "  --remove, -r <name> Remove specific worktree"
+    echo "  --help, -h          Show this help message"
+    echo ""
+    echo "Branch naming:"
+    echo "  Branch name is derived from issue title:"
+    echo "  - Format: <type>/<issue>-<slugified-title>"
+    echo "  - Example: 'feat: Add dark mode' -> feat/42-add-dark-mode"
+    echo "  - Type is parsed from title prefix (feat, fix, refactor, docs, chore, test, perf)"
+    echo "  - Defaults to 'feat' if no recognized prefix"
+    echo ""
+    echo "Exit codes:"
+    echo "  0 - Success"
+    echo "  1 - Invalid arguments"
+    echo "  2 - Worktree already exists"
+    echo "  3 - Worktree not found"
+    echo "  4 - PR still open (cannot remove)"
+    echo "  5 - Issue not found"
+    echo "  6 - PR creation failed"
+    echo "  7 - npm ci failed"
+    echo "  8 - Git operation failed"
+    echo ""
+    echo "Examples:"
+    echo "  $0 42               # Start work on issue #42"
+    echo "  $0 --list           # Show all worktrees"
+    echo "  $0 --prune          # Cleanup merged worktrees"
+    echo "  $0 --remove feat    # Remove worktree matching 'feat'"
+    exit "$EXIT_SUCCESS"
+  fi
 
-      # Determine if argument is PR number or branch name
-      if [[ "$1" =~ ^[0-9]+$ ]]; then
-        create_from_pr "$1"
-      else
-        create_from_branch "$1"
-      fi
-      ;;
-  esac
+  # Must be an issue number
+  if ! [[ "$1" =~ ^[0-9]+$ ]]; then
+    print_error "Argument must be a GitHub issue number"
+    echo "Usage: $0 <issue-number>" >&2
+    exit "$EXIT_INVALID_ARGS"
+  fi
+
+  # Cleanup first
+  cleanup_merged_worktrees
+  echo ""
+
+  create_from_issue "$1"
 }
 
 main "$@"

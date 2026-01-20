@@ -11,7 +11,8 @@ fi
 ISSUE_NUMBER="$1"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 REPO_ROOT="$(cd "$SCRIPT_DIR/../.." && pwd)"
-BRANCH_NAME="issue-$ISSUE_NUMBER"
+# Branch name is derived by start-issue.sh based on issue title
+BRANCH_NAME=""
 SESSION_NAME="issue-$ISSUE_NUMBER"
 WORKTREE_DIR=""
 
@@ -45,44 +46,53 @@ fi
 
 echo "Issue fetched: $ISSUE_TITLE"
 
-# Create worktree using scripts/worktree.sh (handles branch creation, PR, npm ci)
-WORKTREE_SCRIPT="$REPO_ROOT/scripts/worktree.sh"
+# Create worktree using scripts/start-issue.sh (handles branch creation, PR, npm ci)
+WORKTREE_SCRIPT="$REPO_ROOT/scripts/start-issue.sh"
 if [ ! -x "$WORKTREE_SCRIPT" ]; then
-    echo "Error: worktree.sh not found or not executable at $WORKTREE_SCRIPT"
+    echo "Error: start-issue.sh not found or not executable at $WORKTREE_SCRIPT"
     exit 1
 fi
 
-echo "Creating worktree for branch $BRANCH_NAME..."
+echo "Creating worktree for issue #$ISSUE_NUMBER..."
 set +e
 # Capture stdout and stderr separately to avoid parsing error messages
 WORKTREE_STDOUT=$(mktemp)
 WORKTREE_STDERR=$(mktemp)
-"$WORKTREE_SCRIPT" "$BRANCH_NAME" >"$WORKTREE_STDOUT" 2>"$WORKTREE_STDERR"
+"$WORKTREE_SCRIPT" "$ISSUE_NUMBER" >"$WORKTREE_STDOUT" 2>"$WORKTREE_STDERR"
 EXIT_CODE=$?
 WORKTREE_OUTPUT=$(cat "$WORKTREE_STDOUT")
 WORKTREE_ERRORS=$(cat "$WORKTREE_STDERR")
 set -e
 
 if [ $EXIT_CODE -eq 0 ]; then
-    # Success - parse WORKTREE_PATH from stdout only (grep -m 1 for first match)
+    # Success - parse WORKTREE_PATH and BRANCH from stdout only (grep -m 1 for first match)
     WORKTREE_DIR=$(echo "$WORKTREE_OUTPUT" | grep -m 1 "^WORKTREE_PATH=" | cut -d= -f2)
+    BRANCH_NAME=$(echo "$WORKTREE_OUTPUT" | grep -m 1 "^BRANCH=" | cut -d= -f2)
     echo "$WORKTREE_OUTPUT"
     [ -n "$WORKTREE_ERRORS" ] && echo "$WORKTREE_ERRORS" >&2
 elif [ $EXIT_CODE -eq 2 ]; then
     # Worktree already exists - find it via git worktree list
+    # Look for branches matching the issue number pattern: <type>/<issue_number>-* or legacy issue-<N>
     echo "Worktree already exists, finding path..."
     [ -n "$WORKTREE_OUTPUT" ] && echo "$WORKTREE_OUTPUT"
     while IFS= read -r line; do
         if [[ "$line" =~ ^worktree\ (.+)$ ]]; then
             wt_path="${BASH_REMATCH[1]}"
-        elif [[ "$line" =~ ^branch\ refs/heads/(.+)$ ]] && [[ "${BASH_REMATCH[1]}" == "$BRANCH_NAME" ]]; then
-            WORKTREE_DIR="$wt_path"
-            break
+        elif [[ "$line" =~ ^branch\ refs/heads/(.+)$ ]]; then
+            local_branch="${BASH_REMATCH[1]}"
+            # Match new format: feat/42-* or fix/42-*
+            # Also match legacy format: issue-42
+            if [[ "$local_branch" =~ ^[a-z]+/${ISSUE_NUMBER}- ]] || \
+               [[ "$local_branch" == "issue-${ISSUE_NUMBER}" ]]; then
+                WORKTREE_DIR="$wt_path"
+                BRANCH_NAME="$local_branch"
+                break
+            fi
         fi
     done < <(git worktree list --porcelain)
 
     if [ -n "$WORKTREE_DIR" ]; then
-        echo "Found existing worktree at: $WORKTREE_DIR"
+        echo "Found existing worktree at: $WORKTREE_DIR (branch: $BRANCH_NAME)"
         if ! (cd "$WORKTREE_DIR" && git pull --ff-only); then
             echo "Warning: git pull failed, continuing with existing state"
         fi
