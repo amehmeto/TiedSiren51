@@ -8,6 +8,7 @@ import { BlockingConditions } from '@/core/block-session/block-session'
 import { createBlockSession } from '@/core/block-session/usecases/create-block-session.usecase'
 import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
 import { Device } from '@/core/device/device'
+import { assertBlockSessionFormComplete } from '@/ui/screens/Home/schemas/assert-block-session-form-complete'
 import { validateBlockSessionForm } from '@/ui/screens/Home/schemas/validate-block-session-form'
 import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
 
@@ -45,6 +46,8 @@ export function BlockSessionForm({
 
   function saveBlockSession() {
     return (values: BlockSessionFormValues) => {
+      assertBlockSessionFormComplete(values)
+
       const {
         id,
         name,
@@ -54,19 +57,6 @@ export function BlockSessionForm({
         endedAt,
         blockingConditions,
       } = values
-
-      if (
-        !name ||
-        !startedAt ||
-        !endedAt ||
-        blocklistIds.length === 0 ||
-        devices.length === 0 ||
-        blockingConditions.length === 0
-      ) {
-        throw new Error(
-          `Some properties are invalid: ${JSON.stringify(values, null, 2)}`,
-        )
-      }
 
       assertHHmmString(startedAt)
       assertHHmmString(endedAt)
