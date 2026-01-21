@@ -1,0 +1,77 @@
+# Hecate (Ἑκάτη) - Goddess of crossroads in Greek mythology
+# https://www.wikiwand.com/en/articles/Hecate
+#
+# Depicted with three faces looking in three directions, she presides over
+# choices of paths and guides travelers at intersections.
+#
+# This workflow observes file changes and routes them to the right destination:
+# shell scripts, source code, tests, or config. It stands at the crossroads
+# of the CI pipeline, directing each change to its proper path.
+
+# Shared path filter configuration
+# This reusable workflow checks if app-related files have changed.
+# Used by Cerberus and Hades to avoid redundant builds.
+#
+# Filters are split (src, tests, config) to avoid dorny/paths-filter
+# negation pattern bug. See: https://github.com/dorny/paths-filter/issues/97
+
+name: Hecate
+
+on:
+  workflow_call:
+    outputs:
+      app-changed:
+        description: 'Whether app-related files have changed in the entire PR'
+        value: ${{ jobs.check-paths.outputs.app-changed }}
+      app-changed-this-push:
+        description: 'Whether app-related files have changed in the latest push only (excluding test-only changes)'
+        value: ${{ jobs.check-paths.outputs.app-changed-this-push }}
+      shell-only:
+        description: 'Whether only shell scripts have changed'
+        value: ${{ jobs.check-paths.outputs.shell-only }}
+      docs-only:
+        description: 'Whether only docs/lint config files have changed (no src, config, shell)'
+        value: ${{ jobs.check-paths.outputs.docs-only }}
+
+jobs:
+  check-paths:
+    runs-on: ubuntu-latest
+    outputs:
+      # app-changed: src OR config OR package.json deps changed
+      app-changed: ${{ steps.filter.outputs.src == 'true' || steps.filter.outputs.config == 'true' || steps.pkg-check.outputs.build-impact == 'true' }}
+      # app-changed-this-push: same but for latest push only
+      app-changed-this-push: ${{ steps.filter-push.outputs.src == 'true' || steps.filter-push.outputs.config == 'true' || steps.pkg-check-push.outputs.build-impact == 'true' }}
+      shell-only: ${{ steps.filter.outputs.shell == 'true' && steps.filter.outputs.src != 'true' && steps.filter.outputs.config != 'true' && steps.pkg-check.outputs.build-impact != 'true' }}
+      # docs-only: docs changed but no src, config, shell, or package.json deps
+      docs-only: ${{ steps.filter.outputs.docs == 'true' && steps.filter.outputs.src != 'true' && steps.filter.outputs.config != 'true' && steps.filter.outputs.shell != 'true' && steps.pkg-check.outputs.build-impact != 'true' }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Check for app changes (entire PR)
+        uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: .github/path-filters.yml
+
+      # Check only the latest push (for build optimization)
+      # On synchronize: compares against previous HEAD
+      # On opened: compares against base branch (same as full PR check)
+      - name: Check for app changes (this push only)
+        uses: dorny/paths-filter@v3
+        id: filter-push
+        with:
+          base: ${{ github.event.before }}
+          filters: .github/path-filters.yml
+
+      # Smart package.json check - only trigger if dependencies changed, not just scripts
+      # Script accepts two args: base_ref (for PRs) and fallback (for push events)
+      - name: Check package.json build impact (entire PR)
+        id: pkg-check
+        run: bash scripts/check-package-json-build-impact.sh "origin/${{ github.base_ref }}" "${{ github.event.before }}" >> "$GITHUB_OUTPUT"
+
+      - name: Check package.json build impact (this push)
+        id: pkg-check-push
+        run: bash scripts/check-package-json-build-impact.sh "${{ github.event.before }}" >> "$GITHUB_OUTPUT"

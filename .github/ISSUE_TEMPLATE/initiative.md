@@ -1,10 +1,22 @@
 ---
 name: 🚀 Initiative
 about: Strategic goal containing multiple epics
-title: '[Initiative] '
+title: 'TS-XXX: [Initiative] '
 labels: initiative
 assignees: ''
 ---
+
+<!--
+⚠️ IMPORTANT: After creating this issue, update the title with the actual issue number!
+Example: TS-62: [Initiative] Launch Android App
+
+Ticket prefixes by repo:
+- TS = TiedSiren51
+- TSBO = tied-siren-blocking-overlay
+- EAS = expo-accessibility-service
+- EFS = expo-foreground-service
+- ELIA = expo-list-installed-apps
+-->
 
 <!--
 📋 TICKET FRONTMATTER - Fill in these values
@@ -64,7 +76,29 @@ blocks: []
 
 ---
 
+## 🔗 Hierarchy
+
+<!--
+This is the TOP level - no parent needed
+Initiatives contain Epics, which contain Issues
+-->
+
+| Level | Description |
+|-------|-------------|
+| 🚀 **Initiative** | ← You are here |
+| 🏔️ Epics | Listed in table above |
+| 📋 Issues | Inside each Epic |
+
 ## 🔗 Related
 
-- 📚 Design Doc: [link]
-- 🎨 Figma: [link]
+<!--
+Link dependencies with full GitHub URLs for cross-repo support
+Remove lines that don't apply
+-->
+
+| Relation | Link |
+|----------|------|
+| ⬅️ Depends on | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| ➡️ Blocks | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 📚 Design Doc | [link] |
+| 🎨 Figma | [link] |

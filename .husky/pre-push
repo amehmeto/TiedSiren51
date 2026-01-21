@@ -8,4 +8,6 @@ npm run test:cov
 echo ""
 node scripts/compare-coverage.cjs
 
+sh .husky/scripts/check-conflicts-with-main.sh
+
 printf "✅ Proceeding with push. Remember to run e2e tests before final merge!\n"

@@ -9,16 +9,16 @@ import {
 } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
-export function TiedSTitle(
-  props: Readonly<{
-    text: string
-    style?: StyleProp<ViewStyle>
-    textStyle?: StyleProp<TextStyle>
-  }>,
-) {
+type TiedSTitleProps = Readonly<{
+  text: string
+  style?: StyleProp<ViewStyle>
+  textStyle?: StyleProp<TextStyle>
+}>
+
+export function TiedSTitle({ text, style, textStyle }: TiedSTitleProps) {
   return (
-    <View style={[styles.container, props.style]}>
-      <Text style={[styles.title, props.textStyle]}>{props.text}</Text>
+    <View style={[styles.container, style]}>
+      <Text style={[styles.title, textStyle]}>{text}</Text>
     </View>
   )
 }

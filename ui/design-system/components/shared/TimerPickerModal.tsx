@@ -79,7 +79,7 @@ export const TimerPickerModal = ({
         <TiedSButton
           onPress={handleSave}
           text="Save"
-          disabled={isZeroDuration}
+          isDisabled={isZeroDuration}
           style={styles.saveButton}
         />
       </ScrollView>

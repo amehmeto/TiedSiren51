@@ -117,6 +117,19 @@ module.exports = {
     'local-rules/reducer-in-domain-folder': 'error',
     'local-rules/no-module-level-constants': 'error',
     'local-rules/require-named-regex': 'error',
+    // Disabled globally - too many valid patterns. Enable per-file as needed.
+    // See: docs/adr/conventions/no-nested-call-expressions.md
+    'local-rules/no-nested-call-expressions': 'off',
+    'local-rules/prefer-array-destructuring': 'error',
+    // Warn-only: many valid patterns use named variables for self-documentation
+    'local-rules/prefer-inline-variable': 'warn',
+    'local-rules/react-props-destructuring': 'error',
+    // Extract call expressions from JSX props into variables for readability
+    'local-rules/no-call-expression-in-jsx-props': 'warn',
+    // Enforce one React component per file
+    'local-rules/one-component-per-file': 'error',
+    // Disallow else-if statements - use separate ifs or nested if-else
+    'local-rules/no-else-if': 'error',
   },
   overrides: [
     {
@@ -151,24 +164,24 @@ module.exports = {
               match: false,
             },
           },
-          // Enforce boolean naming convention (is, has, should, can, did, will)
+          // Enforce boolean naming convention (is, has, should, can, did, will, was)
           {
             selector: 'variable',
             types: ['boolean'],
             format: ['PascalCase'],
-            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will', 'was'],
           },
           {
             selector: 'parameter',
             types: ['boolean'],
             format: ['PascalCase'],
-            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will', 'was'],
           },
           {
             selector: 'classProperty',
             types: ['boolean'],
             format: ['PascalCase'],
-            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will', 'was'],
             leadingUnderscore: 'allow',
           },
         ],
@@ -177,9 +190,15 @@ module.exports = {
       },
     },
     {
-      files: ['scripts/**/*.{js,cjs}', 'electron.js'],
+      files: ['scripts/**/*.{js,cjs,mjs}', 'electron.js'],
       env: {
         node: true,
+      },
+      rules: {
+        'no-unused-vars': [
+          'error',
+          { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        ],
       },
     },
     {
@@ -433,26 +452,26 @@ module.exports = {
             selector: 'variable',
             types: ['boolean'],
             format: ['PascalCase'],
-            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will', 'was'],
           },
           {
             selector: 'parameter',
             types: ['boolean'],
             format: ['PascalCase'],
-            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will', 'was'],
           },
           {
             selector: 'classProperty',
             types: ['boolean'],
             format: ['PascalCase'],
-            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will', 'was'],
             leadingUnderscore: 'allow',
           },
           {
             selector: 'typeProperty',
             types: ['boolean'],
             format: ['PascalCase'],
-            prefix: ['is', 'has', 'should', 'can', 'did', 'will'],
+            prefix: ['is', 'has', 'should', 'can', 'did', 'will', 'was'],
           },
         ],
       },
@@ -490,6 +509,77 @@ module.exports = {
         ],
       },
     },
+    // Selectors - enforce no nested calls for readability
+    {
+      files: ['core/**/selectors/*.ts'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
+        'local-rules/no-nested-call-expressions': [
+          'error',
+          {
+            allowedPatterns: [
+              // Array methods
+              '^map$',
+              '^filter$',
+              '^flatMap$',
+              '^find$',
+              '^some$',
+              '^every$',
+              // Entity adapter
+              '^selectAll$',
+              '^selectById$',
+              '^selectIds$',
+              '^selectEntities$',
+              '^getSelectors$',
+            ],
+          },
+        ],
+      },
+    },
+    // Progressive enablement of no-nested-call-expressions rule
+    // Uncomment each block as violations are fixed
+    // See: docs/adr/conventions/no-nested-call-expressions.md
+    //
+    // {
+    //   files: ['**/*.fixture.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['core/**/listeners/*.ts'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['core/**/usecases/*.ts'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['infra/**/*.ts'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['ui/**/*.ts', 'ui/**/*.tsx'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['app/**/*.ts', 'app/**/*.tsx'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
     // JSONC files (tsconfig allows comments)
     {
       files: ['tsconfig.json', 'tsconfig.*.json'],

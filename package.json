@@ -16,8 +16,8 @@
     "ios": "expo run:ios",
     "web": "expo start --web",
     "electron:dev": "concurrently \"BROWSER=none npm run web -- --port 19006\" \"wait-on http://localhost:19006 && npm run electron:start\"",
-    "lint": "npm run lint:types && npm run lint:js -- \"**/*.{js,ts,jsx,tsx}\" \".claude/**/*.json\" \"tsconfig*.json\" && npm run lint:format -- \"**/*.{js,ts,jsx,tsx,json,yml,yaml}\" && npm run lint:sh -- scripts/*.sh .husky/scripts/*.sh .claude/hooks/*.sh && npm run lint:workflow && npm run lint:schema",
-    "lint:fix": "npm run lint:types && npm run lint:js:fix -- \"**/*.{js,ts,jsx,tsx}\" \".claude/**/*.json\" \"tsconfig*.json\" && npm run lint:format:fix -- \"**/*.{js,ts,jsx,tsx,json,yml,yaml}\" && npm run lint:sh -- scripts/*.sh .husky/scripts/*.sh .claude/hooks/*.sh && npm run lint:workflow && npm run lint:schema",
+    "lint": "bash scripts/lint.sh",
+    "lint:fix": "bash scripts/lint.sh --fix",
     "lint:types": "tsc --noEmit",
     "lint:js": "eslint",
     "lint:js:fix": "eslint --fix",
@@ -26,7 +26,7 @@
     "lint:md": "remark --frail",
     "lint:ticket": "remark --frail .github/ISSUE_TEMPLATE/",
     "lint:ticket:fix": "remark --output --rc-path .remarkrc.fix.mjs .github/ISSUE_TEMPLATE/",
-    "lint:sh": "shellcheck",
+    "lint:sh": "bash scripts/lint-sh.sh",
     "lint:workflow": "bash scripts/lint-workflow-scripts.sh",
     "lint:schema": "npx prisma validate",
     "test": "vitest",
@@ -51,9 +51,9 @@
     "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
     "expo:lint": "expo lint",
     "generate:schema": "npx prisma generate",
-    "graph": "node scripts/generate-dependency-graph.mjs",
-    "graph:view": "node scripts/generate-dependency-graph.mjs --ascii",
-    "graph:live": "node scripts/generate-dependency-graph.mjs --live"
+    "graph": "node scripts/ticket-graph/generate-dependency-graph.mjs",
+    "graph:view": "node scripts/ticket-graph/generate-dependency-graph.mjs --ascii",
+    "graph:live": "node scripts/ticket-graph/generate-dependency-graph.mjs --live"
   },
   "lint-staged": {
     "*.{js,ts,jsx,tsx}": [

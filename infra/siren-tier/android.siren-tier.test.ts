@@ -85,7 +85,7 @@ describe('AndroidSirenTier', () => {
       const expectedLog = {
         level: 'info',
         message:
-          '[AndroidSirenTier] Blocking schedule updated: 1 schedules, 2 apps',
+          '[AndroidSirenTier] Blocking schedule updated: 1 schedules, 2 apps: com.facebook.katana, com.example.instagram',
       }
 
       await androidSirenTier.updateBlockingSchedule(schedules)
@@ -99,7 +99,7 @@ describe('AndroidSirenTier', () => {
       const expectedLog = {
         level: 'info',
         message:
-          '[AndroidSirenTier] Blocking schedule updated: 0 schedules, 0 apps',
+          '[AndroidSirenTier] Blocking schedule updated: 0 schedules, 0 apps: ',
       }
 
       await androidSirenTier.updateBlockingSchedule([])
@@ -225,8 +225,7 @@ describe('toNativeBlockingWindows', () => {
       'com.example.instagram',
     ]
 
-    const result = toNativeBlockingWindows(schedules)
-    const [firstWindow] = result
+    const [firstWindow] = toNativeBlockingWindows(schedules)
 
     expect(firstWindow.packageNames).toStrictEqual(expectedPackageNames)
   })
@@ -248,8 +247,7 @@ describe('toNativeBlockingWindows', () => {
       }),
     ]
 
-    const result = toNativeBlockingWindows(schedules)
-    const [firstWindow] = result
+    const [firstWindow] = toNativeBlockingWindows(schedules)
 
     expect(firstWindow.packageNames).toStrictEqual([])
   })

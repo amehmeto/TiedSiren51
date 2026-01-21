@@ -4,24 +4,22 @@ import { ViewModelBlockSession } from '@/ui/screens/Home/HomeScreen/home-view-mo
 import { SessionCard } from '@/ui/screens/Home/HomeScreen/SessionCard'
 import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 
-export function SessionsBoard(
-  props: Readonly<{
-    sessions: {
-      title: string
-      blockSessions: ViewModelBlockSession[]
-    }
-    type: SessionType
-  }>,
-) {
+type SessionsBoardProps = Readonly<{
+  sessions: {
+    title: string
+    blockSessions: ViewModelBlockSession[]
+  }
+  type: SessionType
+}>
+
+export function SessionsBoard({ sessions, type }: SessionsBoardProps) {
   return (
     <>
-      <Text style={styles.title}>{props.sessions.title}</Text>
+      <Text style={styles.title}>{sessions.title}</Text>
       <FlatList
         style={styles.cardList}
-        data={props.sessions.blockSessions}
-        renderItem={({ item }) => (
-          <SessionCard session={item} type={props.type} />
-        )}
+        data={sessions.blockSessions}
+        renderItem={({ item }) => <SessionCard session={item} type={type} />}
       />
     </>
   )

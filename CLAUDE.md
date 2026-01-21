@@ -19,6 +19,18 @@ tests/        → Test utilities, fixtures, builders
 
 Read `/docs/adr/README.md` before structural changes - it indexes all architectural decisions by layer.
 
+## Before Writing Code
+
+**Read relevant ADRs before implementing.** ADRs contain naming conventions, patterns, and examples that must be followed:
+
+| When writing... | Read first |
+|-----------------|------------|
+| Listeners | `/docs/adr/core/listener-pattern.md` |
+| Tests & Fixtures | `/docs/adr/testing/fixture-pattern.md` |
+| Test doubles (stubs/fakes) | `/docs/adr/testing/stub-vs-fake-implementations.md` |
+| Repositories | `/docs/adr/core/repository-pattern.md` |
+| View models | `/docs/adr/ui/view-model-pattern.md` |
+
 ## Commands
 
 ```bash
@@ -28,6 +40,26 @@ npm run lint:fix      # Auto-fix lint issues
 npx prisma generate   # Regenerate Prisma client after schema changes
 SKIP_E2E_CHECK=true git push  # Push without interactive e2e test prompt
 ```
+
+## Workflow
+
+1. **When you believe you're done with a task, run `/commit-push`** to commit all changes and push to remote.
+2. **After CI passes, update the PR description** to accurately reflect all changes made.
+
+## CI Watch (Post-Push)
+
+After each push, CI status is automatically monitored via Husky hooks. The script polls GitHub Actions and reports results. Press **Ctrl+C** to cancel.
+
+**Environment variables:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CI_WATCH_EXCLUDED_JOBS` | `build` | Job patterns to exclude (supports partial matching) |
+| `CI_WATCH_REMOTE` | `origin` | Git remote name to watch |
+| `CI_WATCH_WORKFLOW` | (all) | Workflow name filter |
+| `SKIP_CI_WATCH` | (unset) | Skip CI monitoring (e.g., `SKIP_CI_WATCH=1 git push`) |
+
+**Exit codes:** `0` = success, `1` = failure, `2` = timeout
 
 ## IMPORTANT: Anti-patterns
 

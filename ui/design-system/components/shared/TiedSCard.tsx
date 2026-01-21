@@ -3,19 +3,19 @@ import React from 'react'
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
-export function TiedSCard(
-  props: Readonly<{
-    children: React.ReactNode
-    style?: StyleProp<ViewStyle>
-  }>,
-) {
+type TiedSCardProps = Readonly<{
+  children: React.ReactNode
+  style?: StyleProp<ViewStyle>
+}>
+
+export function TiedSCard({ children, style }: TiedSCardProps) {
   return (
     <BlurView
       intensity={T.effects.blur.intensity.strong}
-      style={[styles.container, props.style]}
+      style={[styles.container, style]}
       tint={'dark'}
     >
-      {props.children}
+      {children}
     </BlurView>
   )
 }

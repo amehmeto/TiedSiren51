@@ -1,8 +1,8 @@
 import * as NavigationBar from 'expo-navigation-bar'
 import { useEffect, useState } from 'react'
 import { Platform } from 'react-native'
-import { useSelector } from 'react-redux'
-import { AppStore } from '@/core/_redux_/createStore'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, AppStore } from '@/core/_redux_/createStore'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { loadUser } from '@/core/auth/usecases/load-user.usecase'
 import { dependencies } from '@/ui/dependencies'
@@ -12,17 +12,18 @@ import { handleUIError } from '@/ui/utils/handleUIError'
 export function useAppInitialization(store: AppStore) {
   const [error, setError] = useState<string | null>(null)
   const [isInitializing, setIsInitializing] = useState(true)
+  const dispatch = useDispatch<AppDispatch>()
 
-  const initializeServices = async (appStore: AppStore) => {
+  const initializeServices = async () => {
     try {
       const { logger, sirenTier } = dependencies
       logger.initialize()
       await dependencies.databaseService.initialize()
       await dependencies.notificationService.initialize()
-      await dependencies.backgroundTaskService.initialize(appStore)
+      await dependencies.backgroundTaskService.initialize(store)
       await sirenTier.initializeNativeBlocking()
 
-      await appStore.dispatch(loadUser())
+      await dispatch(loadUser())
 
       if (Platform.OS === 'android') {
         await NavigationBar.setBackgroundColorAsync(T.color.darkBlue).catch(
@@ -48,7 +49,7 @@ export function useAppInitialization(store: AppStore) {
 
     const init = async () => {
       try {
-        await initializeServices(store)
+        await initializeServices()
         if (!isMounted) return
         setError(null)
       } catch (error) {
@@ -64,7 +65,7 @@ export function useAppInitialization(store: AppStore) {
     return () => {
       isMounted = false
     }
-  }, [store])
+  }, [dispatch, store])
 
   const isAuthenticated = useSelector(selectIsUserAuthenticated)
 

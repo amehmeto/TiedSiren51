@@ -1,10 +1,9 @@
-import { EntityState } from '@reduxjs/toolkit'
+import { createSelector } from '@reduxjs/toolkit'
 import { DateProvider } from '@/core/_ports_/date-provider'
 import { BlockingSchedule } from '@/core/_ports_/siren.tier'
-import {
-  BlockSession,
-  blockSessionAdapter,
-} from '@/core/block-session/block-session'
+import { RootState } from '@/core/_redux_/createStore'
+import { blockSessionAdapter } from '@/core/block-session/block-session'
+import { blocklistAdapter } from '@/core/blocklist/blocklist'
 import { Sirens } from '@/core/siren/sirens'
 import { isActive } from './isActive'
 
@@ -48,26 +47,41 @@ const mergeSirens = (sirensArray: Sirens[]): Sirens => {
   }
 }
 
-export const selectBlockingSchedule = (
-  dateProvider: DateProvider,
-  blockSession: EntityState<BlockSession, string>,
-): BlockingSchedule[] => {
-  const activeSessions = blockSessionAdapter
-    .getSelectors()
-    .selectAll(blockSession)
-    .filter((session) => isActive(dateProvider, session))
+export const selectBlockingSchedule = createSelector(
+  [
+    (dateProvider: DateProvider) => dateProvider,
+    (_: DateProvider, state: RootState) => state.blockSession,
+    (_: DateProvider, state: RootState) => state.blocklist,
+  ],
+  (dateProvider, blockSessionState, blocklistState): BlockingSchedule[] => {
+    if (blockSessionState.ids.length === 0) return []
 
-  return activeSessions.map((session) => {
-    const schedule: BlockingSchedule = {
-      id: session.id,
-      startTime: dateProvider.toISOString(
-        dateProvider.recoverDate(session.startedAt),
-      ),
-      endTime: dateProvider.toISOString(
-        dateProvider.recoverDate(session.endedAt),
-      ),
-      sirens: mergeSirens(session.blocklists.map((bl) => bl.sirens)),
-    }
-    return schedule
-  })
-}
+    const activeSessions = blockSessionAdapter
+      .getSelectors()
+      .selectAll(blockSessionState)
+      .filter((session) => isActive(dateProvider, session))
+
+    if (activeSessions.length === 0) return []
+
+    const blocklists = blocklistAdapter
+      .getSelectors()
+      .selectEntities(blocklistState)
+
+    return activeSessions.map((session) => {
+      const startDate = dateProvider.recoverDate(session.startedAt)
+      const endDate = dateProvider.recoverDate(session.endedAt)
+      const sirens = mergeSirens(
+        session.blocklists
+          .flatMap(({ id }) => (id in blocklists ? [blocklists[id]] : []))
+          .map((bl) => bl.sirens),
+      )
+
+      return {
+        id: session.id,
+        startTime: dateProvider.toISOString(startDate),
+        endTime: dateProvider.toISOString(endDate),
+        sirens,
+      }
+    })
+  },
+)

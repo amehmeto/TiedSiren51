@@ -285,7 +285,7 @@ To update the native module:
 
 ## Related ADRs
 
-- [Hexagonal Architecture](../core/hexagonal-architecture.md) - Port/adapter pattern
+- [Hexagonal Architecture](../hexagonal-architecture.md) - Port/adapter pattern
 - [Repository Pattern](../core/repository-pattern.md) - Data access abstraction
 
 ## References

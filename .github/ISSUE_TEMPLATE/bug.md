@@ -1,10 +1,22 @@
 ---
 name: 🐛 Bug Report
 about: Something isn't working as expected
-title: 'fix(scope): '
+title: 'TS-XXX: fix(scope): '
 labels: bug
 assignees: ''
 ---
+
+<!--
+⚠️ IMPORTANT: After creating this issue, update the title with the actual issue number!
+Example: TS-123: fix(auth): login button not working
+
+Ticket prefixes by repo:
+- TS = TiedSiren51
+- TSBO = tied-siren-blocking-overlay
+- EAS = expo-accessibility-service
+- EFS = expo-foreground-service
+- ELIA = expo-list-installed-apps
+-->
 
 <!--
 📋 TICKET FRONTMATTER - Fill in these values
@@ -138,8 +150,28 @@ Then [correct expected behavior]
 
 ---
 
+## 🔗 Hierarchy
+
+<!--
+REQUIRED: Link to parent Epic and Initiative for navigation
+Replace XX with actual issue numbers
+-->
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+
 ## 🔗 Related
 
-- 🔥 Sentry Issue: [link]
-- 📌 Related Ticket: #XX
-- 📚 Relevant ADR: `/docs/adr/`
+<!--
+REQUIRED: Link dependencies with full GitHub URLs for cross-repo support
+Remove lines that don't apply
+-->
+
+| Relation | Link |
+|----------|------|
+| ⬅️ Depends on | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| ➡️ Blocks | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 🔥 Sentry Issue | [link] |
+| 📚 ADR | `/docs/adr/relevant-decision.md` |

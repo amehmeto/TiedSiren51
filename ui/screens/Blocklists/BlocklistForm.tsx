@@ -144,7 +144,7 @@ export function BlocklistForm({
       const scenes: Record<BlocklistTabKey, () => React.JSX.Element> = {
         apps: () => (
           <AppsSelectionScene
-            data={selectableSirens.android}
+            androidApps={selectableSirens.android}
             toggleAppSiren={toggleAppSiren}
             isSirenSelected={isSirenSelected}
           />

@@ -62,7 +62,7 @@ export class AndroidSirenTier implements SirenTier {
       await setBlockedApps(packageNames)
 
       this.logger.info(
-        `[AndroidSirenTier] Blocking schedule updated: ${schedule.length} schedules, ${packageNames.length} apps`,
+        `[AndroidSirenTier] Blocking schedule updated: ${schedule.length} schedules, ${packageNames.length} apps: ${packageNames.join(', ')}`,
       )
     } catch (error) {
       this.logger.error(

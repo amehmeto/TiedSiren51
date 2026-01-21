@@ -287,6 +287,143 @@ const store = createTestStore(state)
 3. **Minimal overrides**: Only override what's relevant to test
 4. **Immutability**: Fixtures shouldn't modify shared state
 5. **Type safety**: Use `Partial<T>` for overrides
+6. **Hide implementation details**: Don't expose infrastructure like store creation
+7. **Don't abstract one-liners**: Inline simple operations instead of creating helper functions
+
+### Hide Implementation Details
+
+Fixtures should only expose **meaningful business actions**, not infrastructure setup. Store creation, listener initialization, and other infrastructure are implementation details that should be hidden inside `when` methods.
+
+#### `then` Methods Must Encapsulate Assertions
+
+`then` methods should contain assertions, not return values for external assertion. Returning implementation details (like call counts) leaks internals and defeats the purpose of the fixture pattern.
+
+**Bad - Leaking implementation details**:
+```typescript
+// DON'T: Return values from then methods
+const callCount = fixture.then.updateBlockingScheduleCallCount()
+expect(callCount).toBe(0) // Assertion outside fixture
+
+// The test now knows about "call counts" - an implementation detail
+// What if we change how we track syncs? Every test breaks.
+```
+
+**Good - Encapsulated assertions**:
+```typescript
+// DO: then methods contain the assertion
+fixture.then.blockingScheduleShouldNotHaveBeenSynced()
+
+// Or if you need to assert a specific count:
+fixture.then.blockingScheduleShouldHaveBeenSyncedTimes(0)
+
+// Implementation in fixture:
+then: {
+  blockingScheduleShouldNotHaveBeenSynced() {
+    expect(sirenTier.updateCallCount).toBe(0)
+  },
+  blockingScheduleShouldHaveBeenSyncedTimes(expected: number) {
+    expect(sirenTier.updateCallCount).toBe(expected)
+  },
+}
+```
+
+**Why this matters**:
+- Tests express **what** should happen, not **how** to verify it
+- Implementation changes (e.g., tracking mechanism) only update the fixture
+- Tests remain readable business specifications
+
+#### Abstract Mechanisms into Business Concepts
+
+`then` methods should express business outcomes, not implementation mechanisms. Users think in terms of "blocking is active", not "foreground service is running and watching is started".
+
+**Bad - Exposing mechanisms**:
+```typescript
+// DON'T: Separate assertions for each mechanism
+fixture.then.foregroundServiceShouldBeStarted()
+fixture.then.watchingShouldBeStarted()
+
+// Tests now know about implementation details:
+// - What if we add a third mechanism? Update every test.
+// - What if we replace foreground service? Update every test.
+```
+
+**Good - Business-level abstraction**:
+```typescript
+// DO: Single assertion expressing business outcome
+fixture.then.blockingShouldBeActive()
+
+// Implementation hides the mechanisms:
+then: {
+  blockingShouldBeActive() {
+    expect(sirenLookout.isWatching).toBe(true)
+    expect(foregroundService.isRunning()).toBe(true)
+  },
+  blockingShouldBeInactive() {
+    expect(sirenLookout.isWatching).toBe(false)
+    expect(foregroundService.isRunning()).toBe(false)
+  },
+}
+```
+
+**Why this matters**:
+- Tests express user-visible outcomes ("blocking is active")
+- Implementation can change without updating tests
+- Adding new mechanisms only updates the fixture
+- Test names become clearer: "should activate blocking" vs "should start foreground service and watching"
+
+**Bad - Exposing infrastructure**:
+```typescript
+// DON'T: Exposes store creation as a "given"
+fixture.given.storeIsCreated()
+await fixture.when.blockSessionsChange([...])
+
+// DON'T: Creates unnecessary helper function
+const getStore = () => {
+  if (!store) store = createTestStore(...)
+  return store
+}
+```
+
+**Good - Infrastructure is implicit**:
+```typescript
+// DO: Store creation happens inside the when method
+async blockSessionsChange(sessions: BlockSession[]) {
+  store = createTestStore(dependencies, stateBuilder.getState())
+  store.dispatch(setBlockSessions(sessions))
+  await flushPromises()
+}
+
+// Test reads naturally - no infrastructure noise
+fixture.given.initialBlockSessions([...])
+await fixture.when.blockSessionsChange([])
+fixture.then.blockingScheduleShouldBeEmpty()
+```
+
+**Why inline `store = createTestStore(...)` instead of a helper?**
+
+The direct assignment is:
+- **One line** - no value in wrapping it
+- **Self-explanatory** - clearly creates a fresh store
+- **Local to where it's used** - easy to understand in context
+
+Each test gets a fresh store - don't use `??=` which would reuse a stale store.
+
+Don't abstract one-liners. Simple repetition of a clear pattern is better than premature abstraction.
+
+**Testing initialization behavior**:
+
+To test behavior that happens on initialization (e.g., listener syncs on startup), use a real `when` action and verify the combined result:
+
+```typescript
+// DON'T: Expose initialization as a separate action
+await fixture.when.listenerInitializes()
+fixture.then.blockingScheduleShouldContainApps([...])
+
+// DO: Trigger any action and verify initialization happened
+fixture.given.existingBlockSessions([activeSession])
+await fixture.when.unrelatedStateChanges()
+fixture.then.blockingScheduleShouldContainApps([...]) // Synced during init
+```
 
 ### DSL Conventions
 
@@ -337,22 +474,93 @@ fixture.then.actionShouldBeRejectedWith(action, 'No active timer')
 
 ### Domain Language
 
-Use domain-specific language in fixture methods, not technical terms:
+Fixture methods should express **business behavior**, not technical operations. Tests should read like specifications that describe what the user does, not how the code works.
+
+**Tests should read like specifications**:
+```typescript
+// The test reads as a business requirement:
+// "Given existing block sessions with a blocklist,
+//  when the user updates the blocklist,
+//  then the blocking schedule reflects the change"
+
+fixture.given.existingBlockSessions([sessionWithBlocklist])
+await fixture.when.updatingBlocklist(modifiedBlocklist)
+fixture.then.blockingScheduleShouldContainApps(['com.facebook.katana'])
+```
+
+**Name methods after use case actions, not code operations**:
+
+The `when` methods should reflect domain use cases, not technical operations. Use cases are decoupled from the UI - they express what business action is being performed:
+
+```typescript
+// Good: Named after use case / business actions
+fixture.when.creatingBlockSession(session)   // Use case: create a session
+fixture.when.updatingBlocklist(blocklist)    // Use case: update a blocklist
+fixture.when.startingTimer({ minutes: 30 })  // Use case: start a timer
+
+// Bad: Named after code operations
+fixture.when.dispatchingSetBlockSessions(sessions)  // Technical operation
+fixture.when.blockSessionsChange(sessions)          // Generic, unclear intent
+fixture.when.storeIsCreated()                       // Implementation detail
+```
 
 **Good (Domain Language)**:
 ```typescript
-fixture.then.timerShouldBePersisted(expectedEndAt)
-fixture.then.timerShouldBeStoredAs(expectedEndAt)
-fixture.given.existingTimer(endAt)
-fixture.given.noTimer()
+fixture.given.existingBlockSessions([session])  // Sessions exist
+fixture.given.existingBlocklists([blocklist])   // Blocklists exist
+fixture.when.updatingBlocklist(blocklist)       // User edits blocklist
+fixture.then.blockingScheduleShouldContainApps([...])
 ```
 
 **Avoid (Technical Terms)**:
 ```typescript
-fixture.then.timerShouldBeSavedInRepositoryAs(expectedEndAt)  // Too technical
-fixture.then.stateShouldEqual(expectedState)  // Implementation detail
-fixture.given.setRepositoryData(data)  // Technical operation
+fixture.given.initialBlockSessions([session])   // "initial" is technical
+fixture.given.setRepositoryData(data)           // Technical operation
+fixture.when.blocklistIsUpdated(blocklist)      // Passive voice, unclear actor
+fixture.when.unrelatedStateChanges()            // Not a use case, implementation detail
+fixture.then.stateShouldEqual(expectedState)    // Implementation detail
 ```
+
+### Only Test Through Real Use Case Actions
+
+Every `when` method should represent a real use case action. Avoid creating methods that exist only to trigger side effects or test implementation details.
+
+**Bad - Testing implementation behavior**:
+```typescript
+// DON'T: "unrelatedStateChanges" is not a use case
+it('should NOT sync when unrelated state changes', async () => {
+  fixture.given.existingBlockSessions([session])
+  await fixture.when.unrelatedStateChanges()  // What use case is this?
+  expect(callCount).toBe(1)
+})
+
+// DON'T: Testing that nothing happens is often an implementation detail
+it('should NOT sync on initialization when no active sessions', async () => {
+  await fixture.when.unrelatedStateChanges()
+  expect(callCount).toBe(0)  // Testing absence of behavior
+})
+```
+
+**Good - Testing through real use cases**:
+```typescript
+// DO: Test initialization implicitly through a real use case
+it('should restore blocking when updating blocklist after app restart', async () => {
+  fixture.given.existingBlockSessions([sessionWithBlocklist])
+
+  await fixture.when.updatingBlocklist(blocklistWithNewSiren)
+
+  // Verifies both: initialization synced existing apps AND update added new one
+  fixture.then.blockingScheduleShouldContainApps([
+    'com.facebook.katana',  // From initialization
+    'com.example.tiktok',   // From update
+  ])
+})
+```
+
+If you can't express a test through a real use case action, ask yourself:
+- Is this testing business behavior or implementation optimization?
+- Would a user care about this scenario?
+- Can this be verified as a side effect of a real action?
 
 ### Consolidating Tests with it.each
 

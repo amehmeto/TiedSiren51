@@ -49,7 +49,7 @@ function validateWithSchema<T>(
   if (!validation.success) {
     const fieldErrors: Record<string, string> = {}
     validation.error.errors.forEach((error) => {
-      const key = error.path[0]
+      const [key] = error.path
       if (typeof key === 'string') fieldErrors[key] = error.message
     })
 

@@ -6,16 +6,23 @@ import { T } from '@/ui/design-system/theme'
 
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
 
-export function TextInputSelectionScene(
-  props: Readonly<{
-    onSubmitEditing: (event: { nativeEvent: { text: string } }) => void
-    placeholder: string
-    sirenType: SirenType.WEBSITES | SirenType.KEYWORDS
-    data: string[]
-    toggleSiren: (sirenType: SirenType, sirenId: string) => void
-    isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
-  }>,
-) {
+type TextInputSelectionSceneProps = Readonly<{
+  onSubmitEditing: (event: { nativeEvent: { text: string } }) => void
+  placeholder: string
+  sirenType: SirenType.WEBSITES | SirenType.KEYWORDS
+  data: string[]
+  toggleSiren: (sirenType: SirenType, sirenId: string) => void
+  isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
+}>
+
+export function TextInputSelectionScene({
+  onSubmitEditing,
+  placeholder,
+  sirenType,
+  data,
+  toggleSiren,
+  isSirenSelected,
+}: TextInputSelectionSceneProps) {
   const [isFocused, setIsFocused] = useState(false)
 
   return (
@@ -25,21 +32,21 @@ export function TextInputSelectionScene(
           styles.addWebsiteInput,
           { borderColor: isFocused ? T.color.lightBlue : T.color.white },
         ]}
-        placeholder={props.placeholder}
+        placeholder={placeholder}
         placeholderTextColor={T.color.white}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
-        onSubmitEditing={props.onSubmitEditing}
+        onSubmitEditing={onSubmitEditing}
       />
       <FlatList
-        data={props.data}
+        data={data}
         keyExtractor={(item) => item}
         renderItem={({ item }) => (
           <SelectableSirenCard
-            sirenType={props.sirenType}
+            sirenType={sirenType}
             siren={item}
-            onPress={() => props.toggleSiren(props.sirenType, item)}
-            isSelected={props.isSirenSelected(props.sirenType, item)}
+            onPress={() => toggleSiren(sirenType, item)}
+            isSelected={isSirenSelected(sirenType, item)}
           />
         )}
       />

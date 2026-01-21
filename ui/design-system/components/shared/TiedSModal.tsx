@@ -3,24 +3,29 @@ import { Dimensions, Modal, StyleSheet, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { TiedSCard } from './TiedSCard'
 
-export function TiedSModal(
-  props: Readonly<{
-    isVisible: boolean
-    children: React.ReactNode
-    onRequestClose: () => void
-    style?: Record<string, unknown>
-  }>,
-) {
+type TiedSModalProps = Readonly<{
+  isVisible: boolean
+  children: React.ReactNode
+  onRequestClose: () => void
+  style?: Record<string, unknown>
+}>
+
+export function TiedSModal({
+  isVisible,
+  children,
+  onRequestClose,
+  style,
+}: TiedSModalProps) {
   return (
     <Modal
       style={styles.modalView}
       animationType="slide"
       transparent={true}
-      visible={props.isVisible}
-      onRequestClose={props.onRequestClose}
+      visible={isVisible}
+      onRequestClose={onRequestClose}
     >
       <View style={styles.centeredView}>
-        <TiedSCard style={props.style}>{props.children}</TiedSCard>
+        <TiedSCard style={style}>{children}</TiedSCard>
       </View>
     </Modal>
   )

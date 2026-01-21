@@ -104,7 +104,7 @@ export default function ForgotPasswordScreen() {
           onPress={handleResetPassword}
           text={viewModel.buttonText}
           style={styles.button}
-          disabled={viewModel.isLoading}
+          isDisabled={viewModel.isLoading}
         />
         {viewModel.error && <FormError error={viewModel.error} />}
         <Text style={styles.backText} onPress={handleBackToLogin}>

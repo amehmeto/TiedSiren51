@@ -11,6 +11,7 @@ import yaml from 'js-yaml'
 // Import configuration from shared config file
 import {
   VALID_REPOS,
+  GITHUB_ORG,
   NEW_REPO_PREFIX,
   VALID_LABELS,
   FIBONACCI_POINTS,
@@ -20,6 +21,7 @@ import {
   EPIC_SECTIONS,
   INITIATIVE_SECTIONS,
   SECTION_TEMPLATES,
+  HIERARCHY_TEMPLATES,
 } from './config.mjs'
 
 // ============================================================================
@@ -37,7 +39,10 @@ function isTicketFile(file, tree) {
   const filePath = file.path || file.history?.[0] || ''
 
   // Always validate files in ISSUE_TEMPLATE or temp ticket files
-  if (filePath.includes('.github/ISSUE_TEMPLATE/') || filePath.includes('/tmp/ticket-')) {
+  if (
+    filePath.includes('.github/ISSUE_TEMPLATE/') ||
+    filePath.includes('/tmp/ticket-')
+  ) {
     return true
   }
 
@@ -49,6 +54,15 @@ function isTicketFile(file, tree) {
 
   // Not a ticket file - skip validation
   return false
+}
+
+/**
+ * Check if a file is a template file (should skip hierarchy URL validation)
+ * Templates have placeholder #XX values which are intentional
+ */
+function isTemplateFile(file) {
+  const filePath = file.path || file.history?.[0] || ''
+  return filePath.includes('.github/ISSUE_TEMPLATE/')
 }
 
 /**
@@ -114,7 +128,8 @@ function hasGherkinBlocks(tree) {
  */
 function hasGherkinPatterns(tree) {
   let found = false
-  const gherkinPattern = /\b(Given|When|Then|And|But)\b.*\b(Given|When|Then|And|But)\b/is
+  const gherkinPattern =
+    /\b(Given|When|Then|And|But)\b.*\b(Given|When|Then|And|But)\b/is
 
   visit(tree, 'code', (node) => {
     if (gherkinPattern.test(node.value)) {
@@ -138,11 +153,17 @@ function detectTicketType(headings, metadata) {
     return 'initiative'
   }
 
-  if (metadata?.labels?.includes('epic') || headingTexts.some((h) => h.includes('goal') && h.includes('🎯'))) {
+  if (
+    metadata?.labels?.includes('epic') ||
+    headingTexts.some((h) => h.includes('goal') && h.includes('🎯'))
+  ) {
     return 'epic'
   }
 
-  if (metadata?.labels?.includes('bug') || headingTexts.some((h) => h.includes('bug'))) {
+  if (
+    metadata?.labels?.includes('bug') ||
+    headingTexts.some((h) => h.includes('bug'))
+  ) {
     return 'bug'
   }
 
@@ -176,10 +197,14 @@ function validateMetadata(tree, file) {
     // Valid: ticket requires creating a new repo
     const newRepoName = data.repo.slice(NEW_REPO_PREFIX.length).trim()
     if (!newRepoName) {
-      file.message(`❌ NEW_REPO: must be followed by the proposed repo name (e.g., "NEW_REPO: my-new-repo")`)
+      file.message(
+        `❌ NEW_REPO: must be followed by the proposed repo name (e.g., "NEW_REPO: my-new-repo")`,
+      )
     }
   } else if (!validRepoNames.includes(data.repo)) {
-    const repoList = validRepoNames.map((name) => `  - ${name}: ${VALID_REPOS[name]}`).join('\n')
+    const repoList = validRepoNames
+      .map((name) => `  - ${name}: ${VALID_REPOS[name]}`)
+      .join('\n')
     file.message(
       `❌ Invalid repo "${data.repo}". Must be one of:\n${repoList}\n  Or use "NEW_REPO: <name>" if a new repository is needed`,
     )
@@ -188,7 +213,9 @@ function validateMetadata(tree, file) {
   if (data.story_points === undefined) {
     file.message('❌ Missing `story_points` field in metadata')
   } else if (!FIBONACCI_POINTS.includes(data.story_points)) {
-    file.message(`❌ story_points must be Fibonacci: ${FIBONACCI_POINTS.join(', ')}`)
+    file.message(
+      `❌ story_points must be Fibonacci: ${FIBONACCI_POINTS.join(', ')}`,
+    )
   }
 
   if (!data.labels || !Array.isArray(data.labels)) {
@@ -200,18 +227,30 @@ function validateMetadata(tree, file) {
     }
   }
 
-  if (data.depends_on && !Array.isArray(data.depends_on)) {
+  // Validate depends_on (mandatory)
+  if (data.depends_on === undefined) {
+    file.message(
+      '❌ Missing `depends_on` field in metadata (use `depends_on: []` if no dependencies)',
+    )
+  } else if (!Array.isArray(data.depends_on)) {
     file.message('❌ `depends_on` must be an array')
   }
 
-  if (data.blocks && !Array.isArray(data.blocks)) {
+  // Validate blocks (mandatory)
+  if (data.blocks === undefined) {
+    file.message(
+      '❌ Missing `blocks` field in metadata (use `blocks: []` if this issue blocks nothing)',
+    )
+  } else if (!Array.isArray(data.blocks)) {
     file.message('❌ `blocks` must be an array')
   }
 
   // Bug-specific validation
   if (data.labels?.includes('bug') && data.severity) {
     if (!VALID_SEVERITIES.includes(data.severity)) {
-      file.message(`❌ Invalid severity "${data.severity}". Valid: ${VALID_SEVERITIES.join(', ')}`)
+      file.message(
+        `❌ Invalid severity "${data.severity}". Valid: ${VALID_SEVERITIES.join(', ')}`,
+      )
     }
   }
 
@@ -247,7 +286,9 @@ function validateGherkin(tree, file, ticketType) {
   }
 
   if (!hasGherkinBlocks(tree) && !hasGherkinPatterns(tree)) {
-    file.message('⚠️ Missing Given/When/Then scenarios (use ```gherkin code blocks)')
+    file.message(
+      '⚠️ Missing Given/When/Then scenarios (use ```gherkin code blocks)',
+    )
   }
 }
 
@@ -256,7 +297,129 @@ function validateStoryPointsNotInTitle(tree, file) {
 
   for (const heading of headings) {
     if (/\d+\s*sp\b/i.test(heading.text) || /\bsp\s*\d+/i.test(heading.text)) {
-      file.message('⚠️ Story points should be in metadata, not in title/heading')
+      file.message(
+        '⚠️ Story points should be in metadata, not in title/heading',
+      )
+    }
+  }
+}
+
+/**
+ * Validate hierarchy links are filled in (not placeholder #XX)
+ * Ticket hierarchy: Initiative > Epic > Issue
+ * - Issues (feature/bug) must link to Epic AND Initiative
+ * - Epics must link to Initiative
+ * - Initiatives are top-level (no parent required)
+ *
+ * Note: Template files (.github/ISSUE_TEMPLATE/) skip URL validation
+ * since they intentionally contain placeholder #XX values.
+ */
+function validateHierarchyLinks(tree, file, ticketType) {
+  // Skip hierarchy URL validation for template files (they have placeholders)
+  if (isTemplateFile(file)) {
+    return
+  }
+
+  // Build valid GitHub URL pattern from config
+  const validRepoNames = Object.keys(VALID_REPOS)
+  const validUrlPattern = new RegExp(
+    `https://github\\.com/${GITHUB_ORG}/(${validRepoNames.join('|')})/issues/(\\d+)`,
+    'g',
+  )
+
+  // Find the hierarchy section
+  let inHierarchySection = false
+  let hierarchyContent = ''
+  const foundUrls = []
+
+  visit(tree, (node) => {
+    if (node.type === 'heading') {
+      const text = node.children?.map((c) => c.value).join('') || ''
+      inHierarchySection = /🔗\s*Hierarchy/i.test(text)
+    } else if (inHierarchySection) {
+      if (node.type === 'heading') {
+        inHierarchySection = false
+      } else if (node.type === 'table' || node.type === 'tableRow' || node.type === 'tableCell') {
+        // Collect table content
+        if (node.children) {
+          node.children.forEach((child) => {
+            if (child.type === 'text') {
+              hierarchyContent += child.value + ' '
+            } else if (child.type === 'link') {
+              hierarchyContent += child.url + ' '
+              foundUrls.push(child.url)
+            }
+          })
+        }
+      } else if (node.type === 'text') {
+        hierarchyContent += node.value + ' '
+      } else if (node.type === 'link') {
+        hierarchyContent += node.url + ' '
+        foundUrls.push(node.url)
+      }
+    }
+  })
+
+  // Skip validation for initiatives (they're top-level)
+  if (ticketType === 'initiative') {
+    return
+  }
+
+  // Check for placeholder #XX in hierarchy section
+  if (hierarchyContent.includes('/issues/XX') || hierarchyContent.includes('#XX')) {
+    file.message(
+      '⚠️ Hierarchy links contain placeholder #XX - replace with actual issue numbers',
+    )
+  }
+
+  // Validate URLs are proper GitHub issue links to valid repos
+  for (const url of foundUrls) {
+    if (url.includes('github.com') && url.includes('/issues/')) {
+      // Check if it's a valid repo URL
+      const isValidRepo = validRepoNames.some((repo) =>
+        url.includes(`github.com/${GITHUB_ORG}/${repo}/issues/`),
+      )
+      if (!isValidRepo) {
+        file.message(
+          `⚠️ Invalid hierarchy link: ${url} - must link to a valid repo (${validRepoNames.join(', ')})`,
+        )
+      }
+      // Check it has a real issue number (not XX)
+      if (url.includes('/issues/XX')) {
+        file.message(
+          `⚠️ Hierarchy link has placeholder issue number: ${url}`,
+        )
+      }
+    }
+  }
+
+  // Validate that required parent links exist with proper GitHub URLs
+  const hasValidInitiativeLink =
+    /Initiative/i.test(hierarchyContent) &&
+    foundUrls.some((url) => validUrlPattern.test(url) && /Initiative/i.test(hierarchyContent))
+  const hasValidEpicLink =
+    /Epic/i.test(hierarchyContent) &&
+    foundUrls.some((url) => validUrlPattern.test(url) && /Epic/i.test(hierarchyContent))
+
+  // Reset the regex lastIndex
+  validUrlPattern.lastIndex = 0
+
+  if (ticketType === 'epic') {
+    if (!hasValidInitiativeLink) {
+      file.message(
+        '⚠️ Epic must link to parent Initiative with a valid GitHub issue URL',
+      )
+    }
+  } else if (ticketType === 'feature' || ticketType === 'bug') {
+    if (!hasValidInitiativeLink) {
+      file.message(
+        '⚠️ Issue must link to parent Initiative with a valid GitHub issue URL',
+      )
+    }
+    if (!hasValidEpicLink) {
+      file.message(
+        '⚠️ Issue must link to parent Epic with a valid GitHub issue URL',
+      )
     }
   }
 }
@@ -365,7 +528,12 @@ function createContentNodes(template) {
         children: [
           {
             type: 'paragraph',
-            children: [{ type: 'text', value: line.replace(/^- \[[ x]\] /, '').replace(/^- /, '') }],
+            children: [
+              {
+                type: 'text',
+                value: line.replace(/^- \[[ x]\] /, '').replace(/^- /, ''),
+              },
+            ],
           },
         ],
       })),
@@ -474,8 +642,15 @@ export default function remarkLintTicket(options = {}) {
     if (fix) {
       fixMissingSections(tree, file, ticketType)
       // Re-validate gherkin after potential fixes (still warn if missing)
-      if (!hasGherkinBlocks(tree) && !hasGherkinPatterns(tree) && ticketType !== 'epic' && ticketType !== 'initiative') {
-        file.message('⚠️ Missing Given/When/Then scenarios (use ```gherkin code blocks)')
+      if (
+        !hasGherkinBlocks(tree) &&
+        !hasGherkinPatterns(tree) &&
+        ticketType !== 'epic' &&
+        ticketType !== 'initiative'
+      ) {
+        file.message(
+          '⚠️ Missing Given/When/Then scenarios (use ```gherkin code blocks)',
+        )
       }
     } else {
       // Run validation rules (report mode)
@@ -484,6 +659,7 @@ export default function remarkLintTicket(options = {}) {
     }
 
     validateStoryPointsNotInTitle(tree, file)
+    validateHierarchyLinks(tree, file, ticketType)
   }
 }
 
@@ -499,7 +675,9 @@ export {
   EPIC_SECTIONS,
   INITIATIVE_SECTIONS,
   SECTION_TEMPLATES,
+  HIERARCHY_TEMPLATES,
   isTicketFile,
+  isTemplateFile,
   extractYamlFromCodeBlock,
   parseYaml,
   getHeadings,
@@ -510,6 +688,7 @@ export {
   validateRequiredSections,
   validateGherkin,
   validateStoryPointsNotInTitle,
+  validateHierarchyLinks,
   createHeading,
   createParagraph,
   createContentNodes,
