@@ -59,14 +59,10 @@ export function BlockSessionForm({
     return (session: Session) => {
       assertIsBlockSession(session)
 
+      const { blocklists, ...rest } = session
       const blockSessionPayload = {
-        id: session.id,
-        name: session.name,
-        blocklistIds: session.blocklists.map((bl) => bl.id),
-        devices: session.devices,
-        startedAt: session.startedAt,
-        endedAt: session.endedAt,
-        blockingConditions: session.blockingConditions,
+        ...rest,
+        blocklistIds: blocklists.map((bl) => bl.id),
       }
 
       if (mode === 'edit' && 'id' in session)
