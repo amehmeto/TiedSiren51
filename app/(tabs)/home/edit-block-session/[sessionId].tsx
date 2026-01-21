@@ -6,9 +6,9 @@ import { BlockSessionForm } from '@/ui/screens/Home/shared/BlockSessionForm'
 
 export default function EditBlockSessionScreen() {
   const { sessionId } = useLocalSearchParams<{ sessionId: string }>()
-  const session = useSelector((state: RootState) =>
+  const blockSession = useSelector((state: RootState) =>
     selectBlockSessionById(sessionId, state),
   )
 
-  return <BlockSessionForm session={session} mode="edit" />
+  return <BlockSessionForm initialValues={blockSession} mode="edit" />
 }

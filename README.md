@@ -88,7 +88,7 @@ After setup, you should be able to run Android commands:
 adb --version
 
 # Run the Android app
-yarn android
+npm run android
 ```
 
 ## Installation

@@ -1,7 +1,7 @@
 # Technical Debt & Future Improvements
 
 > Created: January 28, 2025
-> Last Updated: December 14, 2025
+> Last Updated: January 19, 2026
 > Status: Living document
 > Purpose: Track planned improvements across the codebase
 
@@ -24,6 +24,9 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 
 ### Performance
 - [Native Siren Filtering](native-siren-filtering.md) - 📋 **LOW PRIORITY** - Filter blocked apps at native level to reduce JS bridge calls
+
+### Maintenance
+- [Scripts Audit](scripts-audit.md) - 📋 **LOW PRIORITY** - Inventory of all scripts with usage status
 
 
 ## Priority Levels

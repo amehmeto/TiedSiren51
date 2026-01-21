@@ -32,8 +32,10 @@ export function blockingScheduleChangedFixture(
 
   return {
     given: {
-      existingBlockSessions(sessions: BlockSession[]) {
-        const blocklists = sessions.flatMap((s) => s.blocklists)
+      existingBlockSessions(
+        sessions: BlockSession[],
+        blocklists: Blocklist[] = [],
+      ) {
         testStateBuilderProvider.setState((builder) =>
           builder.withBlockSessions(sessions).withBlocklists(blocklists),
         )
@@ -53,12 +55,14 @@ export function blockingScheduleChangedFixture(
       },
     },
     when: {
-      async creatingBlockSession(sessions: BlockSession[]) {
+      async creatingBlockSession(
+        sessions: BlockSession[],
+        blocklists: Blocklist[] = [],
+      ) {
         store = createTestStore(
           dependencies,
           testStateBuilderProvider.getState(),
         )
-        const blocklists = sessions.flatMap((s) => s.blocklists)
         store.dispatch(setBlocklists(blocklists))
         store.dispatch(setBlockSessions(sessions))
       },

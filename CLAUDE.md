@@ -41,6 +41,26 @@ npx prisma generate   # Regenerate Prisma client after schema changes
 SKIP_E2E_CHECK=true git push  # Push without interactive e2e test prompt
 ```
 
+## Workflow
+
+1. **When you believe you're done with a task, run `/commit-push`** to commit all changes and push to remote.
+2. **After CI passes, update the PR description** to accurately reflect all changes made.
+
+## CI Watch (Post-Push)
+
+After each push, CI status is automatically monitored via Husky hooks. The script polls GitHub Actions and reports results. Press **Ctrl+C** to cancel.
+
+**Environment variables:**
+
+| Variable | Default | Description |
+|----------|---------|-------------|
+| `CI_WATCH_EXCLUDED_JOBS` | `build` | Job patterns to exclude (supports partial matching) |
+| `CI_WATCH_REMOTE` | `origin` | Git remote name to watch |
+| `CI_WATCH_WORKFLOW` | (all) | Workflow name filter |
+| `SKIP_CI_WATCH` | (unset) | Skip CI monitoring (e.g., `SKIP_CI_WATCH=1 git push`) |
+
+**Exit codes:** `0` = success, `1` = failure, `2` = timeout
+
 ## IMPORTANT: Anti-patterns
 
 **NEVER use `I` prefix for interfaces.** Ports use descriptive names: `AuthGateway`, not `IAuthGateway`. ESLint enforces this.

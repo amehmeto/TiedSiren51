@@ -7,6 +7,8 @@
  * - A chained access pattern (e.g., foo().bar() or foo().length)
  * - A complex operator expression (more than 3 terms)
  * - A multi-line initialization (hurts readability)
+ * - Loss of semantic meaning from descriptive variable names for literals, arrays, or objects
+ *   (e.g., `const deviceTypes = ['android', 'ios']` - the name documents what the array contains)
  *
  * @author TiedSiren
  * @see https://intellij-support.jetbrains.com/hc/en-us/community/posts/206942015
@@ -115,6 +117,20 @@ module.exports = {
       // Only applies to primitive literals
       if (initNode.type !== 'Literal') return false
       if (initNode.value === null) return false
+
+      return isDescriptiveName(varName)
+    }
+
+    /**
+     * Check if the variable name provides semantic meaning for an array or object literal
+     * e.g., `const deviceTypes = ['android', 'ios', 'web']` - "deviceTypes" explains what the array contains
+     * Arrays/objects with descriptive names document their contents and shouldn't be inlined
+     */
+    function isDescriptiveNameForArrayOrObject(varName, initNode) {
+      // Only applies to array and object literals
+      if (initNode.type !== 'ArrayExpression' && initNode.type !== 'ObjectExpression') {
+        return false
+      }
 
       return isDescriptiveName(varName)
     }
@@ -347,6 +363,9 @@ module.exports = {
 
         // Don't inline descriptive names for literals (magic numbers/strings)
         if (isDescriptiveNameForLiteral(varName, decl.init)) return
+
+        // Don't inline descriptive names for arrays/objects (semantic labeling)
+        if (isDescriptiveNameForArrayOrObject(varName, decl.init)) return
 
         // Don't inline descriptive names for call results (semantic labeling)
         if (isDescriptiveNameForCallResult(varName, decl.init)) return

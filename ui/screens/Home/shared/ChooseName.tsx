@@ -5,17 +5,17 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
-import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 
 type ChooseNameProps = Readonly<{
-  values: Session
+  values: BlockSessionFormValues
   onChange: (text: string) => void
   onBlur: () => (e: React.FocusEvent) => void
   setFieldValue: (
     field: string,
     value: string,
     shouldValidate?: boolean,
-  ) => Promise<void | FormikErrors<Session>>
+  ) => Promise<void | FormikErrors<BlockSessionFormValues>>
 }>
 
 export function ChooseName({

@@ -130,6 +130,8 @@ module.exports = {
     'local-rules/one-component-per-file': 'error',
     // Disallow else-if statements - use separate ifs or nested if-else
     'local-rules/no-else-if': 'error',
+    // Prevent direct adapter usage in UI layer - use selectors instead
+    'local-rules/no-adapter-in-ui': 'error',
   },
   overrides: [
     {
@@ -190,9 +192,15 @@ module.exports = {
       },
     },
     {
-      files: ['scripts/**/*.{js,cjs}', 'electron.js'],
+      files: ['scripts/**/*.{js,cjs,mjs}', 'electron.js'],
       env: {
         node: true,
+      },
+      rules: {
+        'no-unused-vars': [
+          'error',
+          { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
+        ],
       },
     },
     {

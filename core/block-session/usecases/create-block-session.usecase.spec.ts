@@ -1,9 +1,4 @@
 import { beforeEach, describe, expect, it } from 'vitest'
-import {
-  facebookAndroidSiren,
-  instagramAndroidSiren,
-} from '@/core/_tests_/data-builders/android-siren.builder'
-import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { BlockingConditions } from '@/core/block-session/block-session'
 import { blockSessionFixture } from './block-session.fixture'
 import { CreateBlockSessionPayload } from './create-block-session.usecase'
@@ -18,21 +13,7 @@ describe('Feature: Creating a block session', () => {
   it('should create a block session', async () => {
     const blockSessionPayload: CreateBlockSessionPayload = {
       name: 'Sleeping time',
-      blocklists: [
-        buildBlocklist({
-          id: 'blocklist-id',
-          name: 'Distraction',
-          sirens: {
-            android: [instagramAndroidSiren, facebookAndroidSiren],
-            ios: [],
-            linux: [],
-            macos: [],
-            windows: [],
-            websites: [],
-            keywords: [],
-          },
-        }),
-      ],
+      blocklistIds: ['blocklist-id'],
       devices: [
         {
           id: 'device-id',
@@ -73,21 +54,7 @@ describe('Feature: Creating a block session', () => {
         id: expect.any(String),
         name: 'Sleeping time',
         blockingConditions: [BlockingConditions.TIME],
-        blocklists: [
-          buildBlocklist({
-            id: 'blocklist-id',
-            name: 'Distraction',
-            sirens: {
-              android: [instagramAndroidSiren, facebookAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: [],
-              keywords: [],
-            },
-          }),
-        ],
+        blocklistIds: ['blocklist-id'],
         devices: [
           {
             id: 'device-id',

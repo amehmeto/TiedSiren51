@@ -37,6 +37,7 @@ Business logic: domain patterns, state management, use cases.
 **State Management:**
 - [Redux Toolkit for Business Logic](core/redux-toolkit-for-business-logic.md)
 - [Entity Adapter Normalization](core/entity-adapter-normalization.md)
+- [Adapters Encapsulated in Selectors](core/adapters-encapsulated-in-selectors.md)
 - [Typed Async Thunk Factory](core/typed-async-thunk-factory.md)
 - [Domain-Based Slices](core/domain-based-slices.md)
 

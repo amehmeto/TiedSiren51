@@ -39,12 +39,6 @@ yarn-error.*
 .DS_Store
 *.pem
 
-# Windows
-
-%ProgramData%/Microsoft/Windows/UUS/State/_active.uusver
-.uusver
-%ProgramData%/
-
 # local env files
 .env*.local
 
@@ -99,3 +93,7 @@ app.db
 # Firebase
 google-services.json
 GoogleService-Info.plist
+
+# Claude Code automation
+.claude-init.sh
+.claude-issue-prompt.md

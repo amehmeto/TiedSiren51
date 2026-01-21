@@ -3,9 +3,11 @@ import { useState } from 'react'
 import { Pressable, StyleSheet, Text } from 'react-native'
 import BlockingConditionModal from '@/ui/design-system/components/shared/BlockingConditionModal'
 import { T } from '@/ui/design-system/theme'
-import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 
-type SelectBlockingConditionProps = { form: FormikProps<Session> }
+type SelectBlockingConditionProps = {
+  form: FormikProps<BlockSessionFormValues>
+}
 
 export function SelectBlockingCondition({
   form,

@@ -20,20 +20,22 @@ import { PrismaTimerRepository } from '@/infra/timer-repository/prisma.timer.rep
 
 const logger = new SentryLogger()
 
+const dateProvider = new RealDateProvider()
+
 const androidDependencies: Dependencies = {
   authGateway: new FirebaseAuthGateway(logger),
   backgroundTaskService: new RealBackgroundTaskService(logger),
   blockSessionRepository: new PrismaBlockSessionRepository(logger),
   blocklistRepository: new PrismaBlocklistRepository(logger),
   databaseService: new PrismaDatabaseService(logger),
-  dateProvider: new RealDateProvider(),
+  dateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
   foregroundService: new AndroidForegroundService(logger),
   installedAppRepository: new ExpoListInstalledAppsRepository(logger),
   logger,
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),
-  sirenTier: new AndroidSirenTier(logger),
+  sirenTier: new AndroidSirenTier(logger, dateProvider),
   sirensRepository: new PrismaSirensRepository(logger),
   timerRepository: new PrismaTimerRepository(logger),
 }
@@ -45,20 +47,22 @@ function createE2EDateProvider(): StubDateProvider {
   return stubDateProvider
 }
 
+const e2eDateProvider = createE2EDateProvider()
+
 const e2eTestsDependencies: Dependencies = {
   authGateway: new FakeAuthGateway(),
   backgroundTaskService: new RealBackgroundTaskService(logger),
   blockSessionRepository: new PrismaBlockSessionRepository(logger),
   blocklistRepository: new PrismaBlocklistRepository(logger),
   databaseService: new PrismaDatabaseService(logger),
-  dateProvider: createE2EDateProvider(),
+  dateProvider: e2eDateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
   foregroundService: new AndroidForegroundService(logger),
   installedAppRepository: new FakeDataInstalledAppsRepository(),
   logger,
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),
-  sirenTier: new AndroidSirenTier(logger),
+  sirenTier: new AndroidSirenTier(logger, e2eDateProvider),
   sirensRepository: new PrismaSirensRepository(logger),
   timerRepository: new PrismaTimerRepository(logger),
 }

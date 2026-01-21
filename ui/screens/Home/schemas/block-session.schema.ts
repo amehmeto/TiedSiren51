@@ -14,13 +14,8 @@ export const blockSessionSchema = z.object({
     .refine((val) => isEmptyString(val), {
       message: 'A session name must be provided',
     }),
-  blocklists: z
-    .array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-      }),
-    )
+  blocklistIds: z
+    .array(z.string())
     .min(1, { message: 'At least one blocklist must be selected' }),
   devices: z
     .array(

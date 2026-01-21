@@ -8,16 +8,17 @@ import { Device } from '@/core/device/device'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
-import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { ChooseName } from '@/ui/screens/Home/shared/ChooseName'
 import { FieldErrors } from '@/ui/screens/Home/shared/FieldErrors'
 import { FormError } from '@/ui/screens/Home/shared/FormError'
 import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlockingCondition'
-import { SelectFromList } from '@/ui/screens/Home/shared/SelectFromList'
+import { SelectBlocklistsField } from '@/ui/screens/Home/shared/SelectBlocklistsField'
+import { SelectDevicesField } from '@/ui/screens/Home/shared/SelectDevicesField'
 import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
 
 type SelectBlockSessionParamsProps = {
-  form: FormikProps<Session>
+  form: FormikProps<BlockSessionFormValues>
 }
 
 export function SelectBlockSessionParams({
@@ -34,12 +35,12 @@ export function SelectBlockSessionParams({
   )
 
   useEffect(() => {
-    dependencies.deviceRepository.findAll().then((devices) => {
-      setDevices(devices)
+    dependencies.deviceRepository.findAll().then((foundDevices) => {
+      setDevices(foundDevices)
     })
   }, [])
 
-  function hasFieldError(field: keyof Session): boolean {
+  function hasFieldError(field: keyof BlockSessionFormValues): boolean {
     return !!form.touched[field] && !!form.errors[field]
   }
 
@@ -53,18 +54,16 @@ export function SelectBlockSessionParams({
           onBlur={() => form.handleBlur('name')}
         />
         {hasFieldError('name') && <FormError error={form.errors.name} />}
-        <SelectFromList
+        <SelectBlocklistsField
           values={form.values}
-          listType={'blocklists'}
           setFieldValue={form.setFieldValue}
           items={blocklists}
         />
-        {hasFieldError('blocklists') && (
-          <FieldErrors errors={form.errors} fieldName={'blocklists'} />
+        {hasFieldError('blocklistIds') && (
+          <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
         )}
-        <SelectFromList
+        <SelectDevicesField
           values={form.values}
-          listType={'devices'}
           setFieldValue={form.setFieldValue}
           items={devices}
         />
