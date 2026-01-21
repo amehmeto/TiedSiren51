@@ -40,9 +40,14 @@ const androidDependencies: Dependencies = {
   timerRepository: new PrismaTimerRepository(logger),
 }
 
-const e2eDateProvider = new StubDateProvider()
-// Fixed time: 10:00 AM for predictable E2E tests
-e2eDateProvider.now = new Date('2025-01-15T10:00:00.000Z')
+function createE2EDateProvider(): StubDateProvider {
+  const stubDateProvider = new StubDateProvider()
+  // Fixed time: 10:00 AM for predictable E2E tests
+  stubDateProvider.now = new Date('2025-01-15T10:00:00.000Z')
+  return stubDateProvider
+}
+
+const e2eDateProvider = createE2EDateProvider()
 
 const e2eTestsDependencies: Dependencies = {
   authGateway: new FakeAuthGateway(),
