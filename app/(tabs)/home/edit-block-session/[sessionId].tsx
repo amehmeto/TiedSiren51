@@ -1,6 +1,7 @@
 import { useLocalSearchParams } from 'expo-router'
 import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
+import { isDefined } from '@/core/__utils__/array.utils'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectBlockSessionById } from '@/core/block-session/selectors/selectBlockSessionById'
 import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
@@ -22,7 +23,7 @@ export default function EditBlockSessionScreen() {
       name: blockSession.name,
       blocklists: blockSession.blocklistIds
         .map((id) => allBlocklists.find((bl) => bl.id === id))
-        .filter((bl): bl is NonNullable<typeof bl> => bl !== undefined),
+        .filter(isDefined),
       devices: blockSession.devices,
       startedAt: blockSession.startedAt,
       endedAt: blockSession.endedAt,

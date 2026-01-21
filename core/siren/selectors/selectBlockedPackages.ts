@@ -14,17 +14,14 @@ export const selectBlockedPackages = createSelector(
     const blocklists = blocklistAdapter
       .getSelectors()
       .selectEntities(blocklistState)
-    const packages = new Set<string>()
 
-    for (const session of activeSessions) {
-      for (const blocklistId of session.blocklistIds) {
-        if (!(blocklistId in blocklists)) continue
-        const blocklist = blocklists[blocklistId]
-        for (const siren of blocklist.sirens.android)
-          packages.add(siren.packageName)
-      }
-    }
+    const allPackages = activeSessions.flatMap((session) =>
+      session.blocklistIds
+        .flatMap((id) => (id in blocklists ? [blocklists[id]] : []))
+        .flatMap((blocklist) => blocklist.sirens.android)
+        .map((siren) => siren.packageName),
+    )
 
-    return Array.from(packages)
+    return [...new Set(allPackages)]
   },
 )
