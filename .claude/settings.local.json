@@ -3,11 +3,15 @@
     "allow": [
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
+      "Bash(./node_modules/.bin/eslint:*)",
       "Bash(./scripts/*.sh:*)",
       "Bash(.claude/hooks/*.sh:*)",
+      "Bash(/home/ubuntu/ethernal-claude-issue-213/node_modules/.bin/eslint:*)",
+      "Bash(PATH=\"/home/ubuntu/.local/share/pnpm:$PATH\" pnpm eslint:*)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(base64:*)",
       "Bash(bash scripts/*.sh:*)",
+      "Bash(bash:*)",
       "Bash(cat:*)",
       "Bash(cloc:*)",
       "Bash(diff:*)",
@@ -95,6 +99,7 @@
       "Bash(pwd:*)",
       "Bash(shellcheck:*)",
       "Bash(sort:*)",
+      "Bash(source ~/.nvm/nvm.sh)",
       "Bash(type:*)",
       "Bash(wc:*)",
       "Bash(which:*)",
@@ -127,12 +132,7 @@
       "mcp__sentry__get_issue_details",
       "mcp__sentry__search_events",
       "mcp__sentry__search_issue_events",
-      "mcp__sentry__search_issues",
-      "Bash(source ~/.nvm/nvm.sh)",
-      "Bash(PATH=\"/home/ubuntu/.local/share/pnpm:$PATH\" pnpm eslint:*)",
-      "Bash(/home/ubuntu/ethernal-claude-issue-213/node_modules/.bin/eslint:*)",
-      "Bash(./node_modules/.bin/eslint:*)",
-      "Bash(bash:*)"
+      "mcp__sentry__search_issues"
     ],
     "deny": [
       "Bash(HUSKY=0:*)",

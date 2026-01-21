@@ -60,10 +60,11 @@ export default function StrictModeScreen() {
     if (duration.hours > 0)
       parts.push(`${duration.hours} ${duration.hours === 1 ? 'hour' : 'hours'}`)
 
-    if (duration.minutes > 0)
+    if (duration.minutes > 0) {
       parts.push(
         `${duration.minutes} ${duration.minutes === 1 ? 'minute' : 'minutes'}`,
       )
+    }
 
     return parts.join(', ') || '0 minutes'
   }
@@ -84,9 +85,7 @@ export default function StrictModeScreen() {
     setIsShowingConfirmation(false)
   }
 
-  const handleCancelConfirmation = () => {
-    setIsShowingConfirmation(false)
-  }
+  const formattedTimerDuration = formatDuration(timerDuration)
 
   if (isLoading) return <LoadingScreen />
 
@@ -148,9 +147,9 @@ export default function StrictModeScreen() {
 
       <StrictModeConfirmationModal
         isVisible={isShowingConfirmation}
-        formattedDuration={formatDuration(timerDuration)}
-        onRequestClose={handleCancelConfirmation}
-        onCancel={handleCancelConfirmation}
+        formattedDuration={formattedTimerDuration}
+        onRequestClose={() => setIsShowingConfirmation(false)}
+        onCancel={() => setIsShowingConfirmation(false)}
         onConfirm={handleConfirmStrictMode}
       />
     </View>
