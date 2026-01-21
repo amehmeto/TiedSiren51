@@ -171,4 +171,35 @@ describe('selectBlockedPackages', () => {
       'com.facebook.katana',
     ])
   })
+
+  test('should skip blocklist IDs that do not exist in store', () => {
+    dateProvider.now = new Date('2024-01-01T14:30:00')
+    const existingBlocklist = buildBlocklist({
+      id: 'existing-bl',
+      sirens: {
+        android: [facebookAndroidSiren],
+      },
+    })
+
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder()
+        .withBlockSessions([
+          buildBlockSession({
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: ['non-existent-bl', existingBlocklist.id],
+          }),
+        ])
+        .withBlocklists([existingBlocklist])
+        .build(),
+    )
+
+    const blockedPackages = selectBlockedPackages(
+      store.getState(),
+      dateProvider,
+    )
+
+    expect(blockedPackages).toStrictEqual(['com.facebook.katana'])
+  })
 })
