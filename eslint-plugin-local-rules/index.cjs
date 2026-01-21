@@ -47,6 +47,7 @@ const reactPropsDestructuring = require('../eslint-rules/react-props-destructuri
 const noCallExpressionInJsxProps = require('../eslint-rules/no-call-expression-in-jsx-props.cjs')
 const oneComponentPerFile = require('../eslint-rules/one-component-per-file.cjs')
 const noElseIf = require('../eslint-rules/no-else-if.cjs')
+const noAdapterInUi = require('../eslint-rules/no-adapter-in-ui.cjs')
 
 module.exports = {
   rules: {
@@ -95,5 +96,6 @@ module.exports = {
     'no-call-expression-in-jsx-props': noCallExpressionInJsxProps,
     'one-component-per-file': oneComponentPerFile,
     'no-else-if': noElseIf,
+    'no-adapter-in-ui': noAdapterInUi,
   },
 }
