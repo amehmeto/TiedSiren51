@@ -2,13 +2,14 @@ import { useRouter } from 'expo-router'
 import { Formik } from 'formik'
 import uuid from 'react-native-uuid'
 import { useDispatch } from 'react-redux'
-import { assertHHmmString } from '@/core/_ports_/date-provider'
+import { HHmmString } from '@/core/_ports_/date-provider'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { BlockingConditions } from '@/core/block-session/block-session'
 import { createBlockSession } from '@/core/block-session/usecases/create-block-session.usecase'
 import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
+import { assertIsBlockSession } from '@/ui/screens/Home/HomeScreen/assertIsBlockSession'
 import { validateBlockSessionForm } from '@/ui/screens/Home/schemas/validate-block-session-form'
 import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
 
@@ -19,6 +20,16 @@ export type Session = {
   devices: Device[]
   startedAt: string | null
   endedAt: string | null
+  blockingConditions: BlockingConditions[]
+}
+
+export type ValidatedSession = {
+  id: string
+  name: string
+  blocklists: Blocklist[]
+  devices: Device[]
+  startedAt: HHmmString
+  endedAt: HHmmString
   blockingConditions: BlockingConditions[]
 }
 
@@ -46,43 +57,16 @@ export function BlockSessionForm({
 
   function saveBlockSession() {
     return (session: Session) => {
-      const {
-        id,
-        name,
-        blocklists,
-        devices,
-        startedAt,
-        endedAt,
-        blockingConditions,
-      } = session
+      assertIsBlockSession(session)
 
-      if (
-        !name ||
-        !startedAt ||
-        !endedAt ||
-        blocklists.length === 0 ||
-        devices.length === 0 ||
-        blockingConditions.length === 0
-      ) {
-        throw new Error(
-          `Some properties are invalid: ${JSON.stringify(session, null, 2)}`,
-        )
-      }
-
-      assertHHmmString(startedAt)
-      assertHHmmString(endedAt)
-
+      const { blocklists, ...rest } = session
       const blockSessionPayload = {
-        id,
-        name,
+        ...rest,
         blocklistIds: blocklists.map((bl) => bl.id),
-        devices,
-        startedAt,
-        endedAt,
-        blockingConditions,
       }
 
-      if (mode === 'edit') dispatch(updateBlockSession(blockSessionPayload))
+      if (mode === 'edit' && 'id' in session)
+        dispatch(updateBlockSession(blockSessionPayload))
       else dispatch(createBlockSession(blockSessionPayload))
 
       router.push('/(tabs)')
