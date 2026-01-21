@@ -20,13 +20,14 @@ describe('selectBlockingSchedule', () => {
   test('should return blocking schedule for active sessions', () => {
     dateProvider.now.setHours(10, 0, 0, 0)
     const blocklist = buildBlocklist({
+      id: 'bl-1',
       sirens: { android: [facebookAndroidSiren] },
     })
     const activeSession = buildBlockSession({
       id: 'active-session',
       startedAt: '09:00',
       endedAt: '11:00',
-      blocklists: [blocklist],
+      blocklistIds: [blocklist.id],
     })
     const state = stateBuilder()
       .withBlockSessions([activeSession])
@@ -46,15 +47,17 @@ describe('selectBlockingSchedule', () => {
   test('should deduplicate sirens across blocklists', () => {
     dateProvider.now.setHours(10, 0, 0, 0)
     const blocklist1 = buildBlocklist({
+      id: 'bl-1',
       sirens: { android: [facebookAndroidSiren] },
     })
     const blocklist2 = buildBlocklist({
+      id: 'bl-2',
       sirens: { android: [facebookAndroidSiren, instagramAndroidSiren] },
     })
     const session = buildBlockSession({
       startedAt: '09:00',
       endedAt: '11:00',
-      blocklists: [blocklist1, blocklist2],
+      blocklistIds: [blocklist1.id, blocklist2.id],
     })
     const state = stateBuilder()
       .withBlockSessions([session])
@@ -73,6 +76,7 @@ describe('selectBlockingSchedule', () => {
     const session = buildBlockSession({
       startedAt: '09:00',
       endedAt: '11:00',
+      blocklistIds: [],
     })
     const state = stateBuilder().withBlockSessions([session]).build()
 
@@ -89,12 +93,8 @@ describe('selectBlockingSchedule', () => {
     expect(schedule).toHaveLength(0)
   })
 
-  test('should use current blocklist state, not session snapshot', () => {
+  test('should use current blocklist state', () => {
     dateProvider.now.setHours(10, 0, 0, 0)
-    const snapshotBlocklist = buildBlocklist({
-      id: 'bl-1',
-      sirens: { android: [facebookAndroidSiren] },
-    })
     const currentBlocklist = buildBlocklist({
       id: 'bl-1',
       sirens: { android: [tikTokAndroidSiren] },
@@ -102,7 +102,7 @@ describe('selectBlockingSchedule', () => {
     const session = buildBlockSession({
       startedAt: '09:00',
       endedAt: '11:00',
-      blocklists: [snapshotBlocklist],
+      blocklistIds: ['bl-1'],
     })
     const state = stateBuilder()
       .withBlockSessions([session])
@@ -112,19 +112,14 @@ describe('selectBlockingSchedule', () => {
     const [firstSchedule] = selectBlockingSchedule(dateProvider, state)
     const androidSirens = firstSchedule.sirens.android
     expect(androidSirens).toContainEqual(tikTokAndroidSiren)
-    expect(androidSirens).not.toContainEqual(facebookAndroidSiren)
   })
 
   test('should skip deleted blocklists', () => {
     dateProvider.now.setHours(10, 0, 0, 0)
-    const blocklist = buildBlocklist({
-      id: 'bl-deleted',
-      sirens: { android: [facebookAndroidSiren] },
-    })
     const session = buildBlockSession({
       startedAt: '09:00',
       endedAt: '11:00',
-      blocklists: [blocklist],
+      blocklistIds: ['bl-deleted'],
     })
     const state = stateBuilder()
       .withBlockSessions([session])

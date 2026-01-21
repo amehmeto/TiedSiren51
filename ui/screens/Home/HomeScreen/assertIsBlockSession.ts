@@ -1,5 +1,7 @@
-import { BlockSession } from '@/core/block-session/block-session'
-import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
+import {
+  Session,
+  ValidatedSession,
+} from '@/ui/screens/Home/shared/BlockSessionForm'
 
 function hasSomeEmptyField(values: Session) {
   const { name, blocklists, devices, startedAt, endedAt, blockingConditions } =
@@ -16,7 +18,7 @@ function hasSomeEmptyField(values: Session) {
 
 export function assertIsBlockSession(
   values: Session,
-): asserts values is BlockSession {
+): asserts values is ValidatedSession {
   if (hasSomeEmptyField(values)) {
     throw new Error(
       `Some properties are invalid: ${JSON.stringify(values, null, 2)}`,

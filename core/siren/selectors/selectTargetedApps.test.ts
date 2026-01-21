@@ -20,6 +20,12 @@ describe('selectTargetedApps', () => {
 
   test('should return empty array when there are no active block sessions', () => {
     dateProvider.now = new Date('2024-01-01T10:00:00')
+    const blocklist = buildBlocklist({
+      id: 'bl-1',
+      sirens: {
+        android: [facebookAndroidSiren],
+      },
+    })
 
     const store = createTestStore(
       { dateProvider },
@@ -28,15 +34,10 @@ describe('selectTargetedApps', () => {
           buildBlockSession({
             startedAt: '08:00',
             endedAt: '09:00', // Session ended
-            blocklists: [
-              buildBlocklist({
-                sirens: {
-                  android: [facebookAndroidSiren],
-                },
-              }),
-            ],
+            blocklistIds: [blocklist.id],
           }),
         ])
+        .withBlocklists([blocklist])
         .build(),
     )
 
@@ -47,6 +48,12 @@ describe('selectTargetedApps', () => {
 
   test('should return targeted apps from single active block session', () => {
     dateProvider.now = new Date('2024-01-01T14:30:00')
+    const blocklist = buildBlocklist({
+      id: 'bl-1',
+      sirens: {
+        android: [facebookAndroidSiren, instagramAndroidSiren],
+      },
+    })
 
     const store = createTestStore(
       { dateProvider },
@@ -55,15 +62,10 @@ describe('selectTargetedApps', () => {
           buildBlockSession({
             startedAt: '14:00',
             endedAt: '15:00', // Active session
-            blocklists: [
-              buildBlocklist({
-                sirens: {
-                  android: [facebookAndroidSiren, instagramAndroidSiren],
-                },
-              }),
-            ],
+            blocklistIds: [blocklist.id],
           }),
         ])
+        .withBlocklists([blocklist])
         .build(),
     )
 
@@ -77,6 +79,18 @@ describe('selectTargetedApps', () => {
 
   test('should return targeted apps from multiple active block sessions', () => {
     dateProvider.now = new Date('2024-01-01T14:30:00')
+    const blocklist1 = buildBlocklist({
+      id: 'bl-1',
+      sirens: {
+        android: [facebookAndroidSiren],
+      },
+    })
+    const blocklist2 = buildBlocklist({
+      id: 'bl-2',
+      sirens: {
+        android: [instagramAndroidSiren, youtubeAndroidSiren],
+      },
+    })
 
     const store = createTestStore(
       { dateProvider },
@@ -85,26 +99,15 @@ describe('selectTargetedApps', () => {
           buildBlockSession({
             startedAt: '14:00',
             endedAt: '15:00',
-            blocklists: [
-              buildBlocklist({
-                sirens: {
-                  android: [facebookAndroidSiren],
-                },
-              }),
-            ],
+            blocklistIds: [blocklist1.id],
           }),
           buildBlockSession({
             startedAt: '14:00',
             endedAt: '15:00',
-            blocklists: [
-              buildBlocklist({
-                sirens: {
-                  android: [instagramAndroidSiren, youtubeAndroidSiren],
-                },
-              }),
-            ],
+            blocklistIds: [blocklist2.id],
           }),
         ])
+        .withBlocklists([blocklist1, blocklist2])
         .build(),
     )
 
@@ -119,6 +122,18 @@ describe('selectTargetedApps', () => {
 
   test('should flatten apps from multiple blocklists in same session', () => {
     dateProvider.now = new Date('2024-01-01T14:30:00')
+    const blocklist1 = buildBlocklist({
+      id: 'bl-1',
+      sirens: {
+        android: [facebookAndroidSiren],
+      },
+    })
+    const blocklist2 = buildBlocklist({
+      id: 'bl-2',
+      sirens: {
+        android: [instagramAndroidSiren],
+      },
+    })
 
     const store = createTestStore(
       { dateProvider },
@@ -127,20 +142,10 @@ describe('selectTargetedApps', () => {
           buildBlockSession({
             startedAt: '14:00',
             endedAt: '15:00',
-            blocklists: [
-              buildBlocklist({
-                sirens: {
-                  android: [facebookAndroidSiren],
-                },
-              }),
-              buildBlocklist({
-                sirens: {
-                  android: [instagramAndroidSiren],
-                },
-              }),
-            ],
+            blocklistIds: [blocklist1.id, blocklist2.id],
           }),
         ])
+        .withBlocklists([blocklist1, blocklist2])
         .build(),
     )
 

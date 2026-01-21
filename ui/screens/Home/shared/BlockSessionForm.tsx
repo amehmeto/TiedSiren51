@@ -2,6 +2,7 @@ import { useRouter } from 'expo-router'
 import { Formik } from 'formik'
 import uuid from 'react-native-uuid'
 import { useDispatch } from 'react-redux'
+import { HHmmString } from '@/core/_ports_/date-provider'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { BlockingConditions } from '@/core/block-session/block-session'
 import { createBlockSession } from '@/core/block-session/usecases/create-block-session.usecase'
@@ -19,6 +20,16 @@ export type Session = {
   devices: Device[]
   startedAt: string | null
   endedAt: string | null
+  blockingConditions: BlockingConditions[]
+}
+
+export type ValidatedSession = {
+  id: string
+  name: string
+  blocklists: Blocklist[]
+  devices: Device[]
+  startedAt: HHmmString
+  endedAt: HHmmString
   blockingConditions: BlockingConditions[]
 }
 
@@ -48,9 +59,19 @@ export function BlockSessionForm({
     return (session: Session) => {
       assertIsBlockSession(session)
 
+      const blockSessionPayload = {
+        id: session.id,
+        name: session.name,
+        blocklistIds: session.blocklists.map((bl) => bl.id),
+        devices: session.devices,
+        startedAt: session.startedAt,
+        endedAt: session.endedAt,
+        blockingConditions: session.blockingConditions,
+      }
+
       if (mode === 'edit' && 'id' in session)
-        dispatch(updateBlockSession(session))
-      else dispatch(createBlockSession(session))
+        dispatch(updateBlockSession(blockSessionPayload))
+      else dispatch(createBlockSession(blockSessionPayload))
 
       router.push('/(tabs)')
     }

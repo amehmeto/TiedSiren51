@@ -4,7 +4,6 @@ import {
   BlockingConditions,
   BlockSession,
 } from '@/core/block-session/block-session'
-import { buildBlocklist } from './blocklist.builder'
 import { buildDevice } from './device.builder'
 
 export const buildBlockSession = (
@@ -26,7 +25,7 @@ export const buildBlockSession = (
     endedAt,
     startNotificationId: 'start-notification-id',
     endNotificationId: 'end-notification-id',
-    blocklists: [buildBlocklist()],
+    blocklistIds: [faker.string.uuid()],
     devices: [buildDevice(), buildDevice()],
     blockingConditions: [BlockingConditions.TIME],
   }
