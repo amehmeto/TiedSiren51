@@ -3,7 +3,7 @@ import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
-import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
 
 function formatTimeString(time: string): string {
@@ -14,7 +14,7 @@ function formatTimeString(time: string): string {
 type SelectTimeProps = Readonly<{
   timeField?: 'startedAt' | 'endedAt'
   setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
-  values: Session
+  values: BlockSessionFormValues
   isTimePickerVisible?: boolean
   setFieldValue: (field: string, value: string) => void
   handleChange: (field: 'startedAt' | 'endedAt') => void

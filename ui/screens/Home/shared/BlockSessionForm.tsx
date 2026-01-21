@@ -2,41 +2,29 @@ import { useRouter } from 'expo-router'
 import { Formik } from 'formik'
 import uuid from 'react-native-uuid'
 import { useDispatch } from 'react-redux'
-import { HHmmString } from '@/core/_ports_/date-provider'
+import { assertHHmmString } from '@/core/_ports_/date-provider'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { BlockingConditions } from '@/core/block-session/block-session'
 import { createBlockSession } from '@/core/block-session/usecases/create-block-session.usecase'
 import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
-import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '@/core/device/device'
-import { assertIsBlockSession } from '@/ui/screens/Home/HomeScreen/assertIsBlockSession'
 import { validateBlockSessionForm } from '@/ui/screens/Home/schemas/validate-block-session-form'
 import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
 
-export type Session = {
+export type BlockSessionFormValues = {
   id: string
   name: string | null
-  blocklists: Blocklist[]
+  blocklistIds: string[]
   devices: Device[]
   startedAt: string | null
   endedAt: string | null
   blockingConditions: BlockingConditions[]
 }
 
-export type ValidatedSession = {
-  id: string
-  name: string
-  blocklists: Blocklist[]
-  devices: Device[]
-  startedAt: HHmmString
-  endedAt: HHmmString
-  blockingConditions: BlockingConditions[]
-}
-
-const defaultSession: Session = {
+const defaultFormValues: BlockSessionFormValues = {
   id: uuid.v4().toString(),
   name: null,
-  blocklists: [],
+  blocklistIds: [],
   devices: [],
   startedAt: null,
   endedAt: null,
@@ -45,28 +33,55 @@ const defaultSession: Session = {
 
 type BlockSessionFormProps = Readonly<{
   mode: 'create' | 'edit'
-  session?: Session
+  initialValues?: BlockSessionFormValues
 }>
 
 export function BlockSessionForm({
-  session = defaultSession,
+  initialValues = defaultFormValues,
   mode,
 }: BlockSessionFormProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
   function saveBlockSession() {
-    return (session: Session) => {
-      assertIsBlockSession(session)
+    return (values: BlockSessionFormValues) => {
+      const {
+        id,
+        name,
+        blocklistIds,
+        devices,
+        startedAt,
+        endedAt,
+        blockingConditions,
+      } = values
 
-      const { blocklists, ...rest } = session
-      const blockSessionPayload = {
-        ...rest,
-        blocklistIds: blocklists.map((bl) => bl.id),
+      if (
+        !name ||
+        !startedAt ||
+        !endedAt ||
+        blocklistIds.length === 0 ||
+        devices.length === 0 ||
+        blockingConditions.length === 0
+      ) {
+        throw new Error(
+          `Some properties are invalid: ${JSON.stringify(values, null, 2)}`,
+        )
       }
 
-      if (mode === 'edit' && 'id' in session)
-        dispatch(updateBlockSession(blockSessionPayload))
+      assertHHmmString(startedAt)
+      assertHHmmString(endedAt)
+
+      const blockSessionPayload = {
+        id,
+        name,
+        blocklistIds,
+        devices,
+        startedAt,
+        endedAt,
+        blockingConditions,
+      }
+
+      if (mode === 'edit') dispatch(updateBlockSession(blockSessionPayload))
       else dispatch(createBlockSession(blockSessionPayload))
 
       router.push('/(tabs)')
@@ -75,7 +90,7 @@ export function BlockSessionForm({
 
   return (
     <Formik
-      initialValues={session}
+      initialValues={initialValues}
       validate={validateBlockSessionForm()}
       onSubmit={saveBlockSession()}
     >

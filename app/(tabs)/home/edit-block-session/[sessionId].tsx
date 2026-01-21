@@ -1,12 +1,10 @@
 import { useLocalSearchParams } from 'expo-router'
-import { useMemo } from 'react'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectBlockSessionById } from '@/core/block-session/selectors/selectBlockSessionById'
-import { selectBlocklistsByIds } from '@/core/blocklist/selectors/selectBlocklistsByIds'
 import {
   BlockSessionForm,
-  Session,
+  BlockSessionFormValues,
 } from '@/ui/screens/Home/shared/BlockSessionForm'
 
 export default function EditBlockSessionScreen() {
@@ -14,21 +12,16 @@ export default function EditBlockSessionScreen() {
   const blockSession = useSelector((state: RootState) =>
     selectBlockSessionById(sessionId, state),
   )
-  const blocklists = useSelector((state: RootState) =>
-    selectBlocklistsByIds(blockSession.blocklistIds, state),
-  )
 
-  const session: Session = useMemo(() => {
-    return {
-      id: blockSession.id,
-      name: blockSession.name,
-      blocklists,
-      devices: blockSession.devices,
-      startedAt: blockSession.startedAt,
-      endedAt: blockSession.endedAt,
-      blockingConditions: blockSession.blockingConditions,
-    }
-  }, [blockSession, blocklists])
+  const initialValues: BlockSessionFormValues = {
+    id: blockSession.id,
+    name: blockSession.name,
+    blocklistIds: blockSession.blocklistIds,
+    devices: blockSession.devices,
+    startedAt: blockSession.startedAt,
+    endedAt: blockSession.endedAt,
+    blockingConditions: blockSession.blockingConditions,
+  }
 
-  return <BlockSessionForm session={session} mode="edit" />
+  return <BlockSessionForm initialValues={initialValues} mode="edit" />
 }
