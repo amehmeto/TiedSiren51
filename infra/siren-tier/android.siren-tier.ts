@@ -24,8 +24,10 @@ export function toNativeBlockingWindows(
 }
 
 /**
- * Extracts HH:mm time from an ISO timestamp.
- * Example: "2024-01-15T14:30:00.000Z" -> "14:30"
+ * Extracts HH:mm time from an ISO timestamp in device-local timezone.
+ * Uses local time intentionally: users set schedules in their local timezone,
+ * and the native layer compares against device's local time.
+ * Example: "2024-01-15T14:30:00.000Z" -> "15:30" (if device is UTC+1)
  */
 function extractTimeFromISO(isoString: string): string {
   const date = new Date(isoString)
