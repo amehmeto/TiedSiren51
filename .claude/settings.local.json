@@ -6,8 +6,6 @@
       "Bash(./node_modules/.bin/eslint:*)",
       "Bash(./scripts/*.sh:*)",
       "Bash(.claude/hooks/*.sh:*)",
-      "Bash(/home/ubuntu/ethernal-claude-issue-213/node_modules/.bin/eslint:*)",
-      "Bash(PATH=\"/home/ubuntu/.local/share/pnpm:$PATH\" pnpm eslint:*)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(base64:*)",
       "Bash(bash scripts/*.sh:*)",
