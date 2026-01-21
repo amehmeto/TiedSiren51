@@ -55,13 +55,15 @@ export const selectBlocklistById = (blocklistId: string, state: RootState) =>
 ```typescript
 // core/blocklist/selectors/selectBlocklistsByIds.ts
 import { RootState } from '../../_redux_/createStore'
-import { selectBlocklistEntities } from './selectBlocklistEntities'
+import { blocklistAdapter } from '../blocklist'
 
 export const selectBlocklistsByIds = (
   blocklistIds: string[],
   state: RootState,
 ) => {
-  const entities = selectBlocklistEntities(state)
+  const entities = blocklistAdapter
+    .getSelectors()
+    .selectEntities(state.blocklist)
   return blocklistIds.flatMap((id) => (id in entities ? [entities[id]] : []))
 }
 ```
@@ -133,7 +135,6 @@ module.exports = {
 - `eslint-rules/no-adapter-in-ui.cjs` - ESLint rule
 - `core/blocklist/selectors/selectBlocklistById.ts` - Single lookup
 - `core/blocklist/selectors/selectBlocklistsByIds.ts` - Batch lookup
-- `core/blocklist/selectors/selectBlocklistEntities.ts` - Entities map
 
 ### Related ADRs
 - [Entity Adapter Pattern for Normalized State](entity-adapter-normalization.md)

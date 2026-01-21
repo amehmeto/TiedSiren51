@@ -1,9 +1,9 @@
 /**
- * @fileoverview Prevent direct usage of Redux entity adapters in UI layer (app/, ui/)
+ * @fileoverview Prevent direct usage of Redux entity adapters in UI layer
  * @author TiedSiren
  *
- * Adapters should only be used in core/selectors. UI components should use
- * pre-built selectors to access entity state.
+ * UI layer (app/, ui/) cannot use adapters - use selectors instead.
+ * Core layer can use adapters freely, including cross-domain.
  */
 
 module.exports = {
@@ -17,7 +17,7 @@ module.exports = {
     },
     messages: {
       noAdapterInUi:
-        'Do not use "{{adapterName}}" directly in UI layer. Create a selector in core/{{domain}}/selectors/ instead.',
+        'Do not use "{{adapterName}}" directly in UI layer. Use a selector from core/ instead.',
     },
     schema: [],
   },
@@ -35,27 +35,15 @@ module.exports = {
     return {
       // Check for imports of adapters
       ImportDeclaration(node) {
-        const source = node.source.value
-
-        // Check if importing from a file that likely exports an adapter
-        if (!source.includes('blocklist') && !source.includes('block-session'))
-          return
-
         node.specifiers.forEach((specifier) => {
           if (specifier.type !== 'ImportSpecifier') return
 
           const importedName = specifier.imported.name
           if (importedName.endsWith('Adapter')) {
-            // Extract domain from adapter name (e.g., blocklistAdapter -> blocklist)
-            const domain = importedName.replace('Adapter', '')
-
             context.report({
               node: specifier,
               messageId: 'noAdapterInUi',
-              data: {
-                adapterName: importedName,
-                domain,
-              },
+              data: { adapterName: importedName },
             })
           }
         })
@@ -67,15 +55,10 @@ module.exports = {
 
         const objectName = node.object.name
         if (objectName.endsWith('Adapter')) {
-          const domain = objectName.replace('Adapter', '')
-
           context.report({
             node,
             messageId: 'noAdapterInUi',
-            data: {
-              adapterName: objectName,
-              domain,
-            },
+            data: { adapterName: objectName },
           })
         }
       },
