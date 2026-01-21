@@ -1,5 +1,6 @@
 import { setCallbackClass } from '@amehmeto/expo-foreground-service'
 import {
+  BlockingWindow,
   BLOCKING_CALLBACK_CLASS,
   setBlockedApps,
   setBlockingSchedule,
@@ -8,36 +9,17 @@ import { Logger } from '@/core/_ports_/logger'
 import { BlockingSchedule, SirenTier } from '@core/_ports_/siren.tier'
 
 /**
- * Native blocking window format expected by the Kotlin module.
- * Time format is HH:mm (e.g., "14:00", "23:30").
- */
-export type NativeBlockingWindow = {
-  id: string
-  startTime: string
-  endTime: string
-  sirens: {
-    apps: string[]
-    websites: string[]
-    keywords: string[]
-  }
-}
-
-/**
- * Converts BlockingSchedule array to native format.
+ * Converts BlockingSchedule array to native BlockingWindow format.
  * Extracts HH:mm time from ISO timestamps and maps Android sirens to package names.
  */
 export function toNativeBlockingWindows(
   schedules: BlockingSchedule[],
-): NativeBlockingWindow[] {
+): BlockingWindow[] {
   return schedules.map((schedule) => ({
     id: schedule.id,
     startTime: extractTimeFromISO(schedule.startTime),
     endTime: extractTimeFromISO(schedule.endTime),
-    sirens: {
-      apps: schedule.sirens.android.map((app) => app.packageName),
-      websites: schedule.sirens.websites,
-      keywords: schedule.sirens.keywords,
-    },
+    packageNames: schedule.sirens.android.map((app) => app.packageName),
   }))
 }
 

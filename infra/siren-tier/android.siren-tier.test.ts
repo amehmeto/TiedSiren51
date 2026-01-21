@@ -188,7 +188,7 @@ describe('AndroidSirenTier', () => {
 })
 
 describe('toNativeBlockingWindows', () => {
-  it('converts BlockingSchedule array to native format', () => {
+  it('converts BlockingSchedule array to native BlockingWindow format', () => {
     const schedules = [
       buildBlockingSchedule({
         id: 'schedule-1',
@@ -204,17 +204,12 @@ describe('toNativeBlockingWindows', () => {
 
     const result = toNativeBlockingWindows(schedules)
     const [firstWindow] = result
-    const apps = firstWindow.sirens.apps
-    const websites = firstWindow.sirens.websites
-    const keywords = firstWindow.sirens.keywords
 
     expect(result).toHaveLength(1)
     expect(firstWindow.id).toBe('schedule-1')
     expect(firstWindow.startTime).toMatch(/^\d{2}:\d{2}$/)
     expect(firstWindow.endTime).toMatch(/^\d{2}:\d{2}$/)
-    expect(apps).toStrictEqual(['com.facebook.katana'])
-    expect(websites).toStrictEqual(['facebook.com'])
-    expect(keywords).toStrictEqual(['social'])
+    expect(firstWindow.packageNames).toStrictEqual(['com.facebook.katana'])
   })
 
   it('extracts package names from Android sirens', () => {
@@ -225,12 +220,15 @@ describe('toNativeBlockingWindows', () => {
         },
       }),
     ]
-    const expectedApps = ['com.facebook.katana', 'com.example.instagram']
+    const expectedPackageNames = [
+      'com.facebook.katana',
+      'com.example.instagram',
+    ]
 
     const result = toNativeBlockingWindows(schedules)
-    const apps = result[0].sirens.apps
+    const [firstWindow] = result
 
-    expect(apps).toStrictEqual(expectedApps)
+    expect(firstWindow.packageNames).toStrictEqual(expectedPackageNames)
   })
 
   it('handles empty schedule list', () => {
@@ -249,14 +247,10 @@ describe('toNativeBlockingWindows', () => {
         },
       }),
     ]
-    const expectedApps: string[] = []
-    const expectedWebsites = ['example.com']
 
     const result = toNativeBlockingWindows(schedules)
-    const apps = result[0].sirens.apps
-    const websites = result[0].sirens.websites
+    const [firstWindow] = result
 
-    expect(apps).toStrictEqual(expectedApps)
-    expect(websites).toStrictEqual(expectedWebsites)
+    expect(firstWindow.packageNames).toStrictEqual([])
   })
 })
