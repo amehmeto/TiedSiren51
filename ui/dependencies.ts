@@ -20,7 +20,7 @@ import { PrismaTimerRepository } from '@/infra/timer-repository/prisma.timer.rep
 
 const logger = new SentryLogger()
 
-const androidDateProvider = new RealDateProvider()
+const dateProvider = new RealDateProvider()
 
 const androidDependencies: Dependencies = {
   authGateway: new FirebaseAuthGateway(logger),
@@ -28,26 +28,21 @@ const androidDependencies: Dependencies = {
   blockSessionRepository: new PrismaBlockSessionRepository(logger),
   blocklistRepository: new PrismaBlocklistRepository(logger),
   databaseService: new PrismaDatabaseService(logger),
-  dateProvider: androidDateProvider,
+  dateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
   foregroundService: new AndroidForegroundService(logger),
   installedAppRepository: new ExpoListInstalledAppsRepository(logger),
   logger,
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),
-  sirenTier: new AndroidSirenTier(logger, androidDateProvider),
+  sirenTier: new AndroidSirenTier(logger, dateProvider),
   sirensRepository: new PrismaSirensRepository(logger),
   timerRepository: new PrismaTimerRepository(logger),
 }
 
-function createE2EDateProvider(): StubDateProvider {
-  const stubDateProvider = new StubDateProvider()
-  // Fixed time: 10:00 AM for predictable E2E tests
-  stubDateProvider.now = new Date('2025-01-15T10:00:00.000Z')
-  return stubDateProvider
-}
-
-const e2eDateProvider = createE2EDateProvider()
+const e2eDateProvider = new StubDateProvider()
+// Fixed time: 10:00 AM for predictable E2E tests
+e2eDateProvider.now = new Date('2025-01-15T10:00:00.000Z')
 
 const e2eTestsDependencies: Dependencies = {
   authGateway: new FakeAuthGateway(),
