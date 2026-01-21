@@ -42,13 +42,8 @@ export class PrismaBlockSessionRepository
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
     try {
-      const blocklistIds = sessionPayload.blocklists.map((b) => ({
-        where: { id: b.id },
-        create: {
-          id: b.id,
-          name: b.name,
-          sirens: JSON.stringify(b.sirens),
-        },
+      const blocklistIds = sessionPayload.blocklistIds.map((id) => ({
+        id,
       }))
 
       const deviceIds = sessionPayload.devices.map((d) => ({
@@ -69,7 +64,7 @@ export class PrismaBlockSessionRepository
           startNotificationId: sessionPayload.startNotificationId,
           endNotificationId: sessionPayload.endNotificationId,
           blockingConditions: JSON.stringify(sessionPayload.blockingConditions),
-          blocklists: { connectOrCreate: blocklistIds },
+          blocklists: { connect: blocklistIds },
           devices: { connectOrCreate: deviceIds },
         },
         include: {
@@ -99,10 +94,7 @@ export class PrismaBlockSessionRepository
       startNotificationId: dbSession.startNotificationId,
       endNotificationId: dbSession.endNotificationId,
       blockingConditions: JSON.parse(dbSession.blockingConditions),
-      blocklists: dbSession.blocklists.map((b) => ({
-        ...b,
-        sirens: JSON.parse(b.sirens),
-      })),
+      blocklistIds: dbSession.blocklists.map((b) => b.id),
       devices: dbSession.devices,
     }
   }
@@ -148,7 +140,7 @@ export class PrismaBlockSessionRepository
 
   async update(payload: UpdatePayload<BlockSession>): Promise<void> {
     try {
-      const blocklistIds = payload.blocklists?.map((b) => ({ id: b.id }))
+      const blocklistIds = payload.blocklistIds?.map((id) => ({ id }))
       const deviceIds = payload.devices?.map((d) => ({ id: d.id }))
 
       await this.baseClient.blockSession.update({

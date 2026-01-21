@@ -4,7 +4,7 @@ import { blockSessionSchema } from './block-session.schema'
 const validBlockSession = {
   id: '1',
   name: 'Test Session',
-  blocklists: [{ id: '1', name: 'Social Media' }],
+  blocklistIds: ['blocklist-1'],
   devices: [{ id: '1', name: 'Laptop' }],
   startedAt: '08:00',
   endedAt: '10:00',
@@ -63,14 +63,14 @@ describe('blockSessionSchema', () => {
   })
 
   describe('Blocklists and devices validation', () => {
-    it('should fail when blocklists is empty', () => {
+    it('should fail when blocklistIds is empty', () => {
       const result = blockSessionSchema.safeParse({
         ...validBlockSession,
-        blocklists: [],
+        blocklistIds: [],
       })
       expectValidationFailure(
         result,
-        'blocklists',
+        'blocklistIds',
         'At least one blocklist must be selected',
       )
     })

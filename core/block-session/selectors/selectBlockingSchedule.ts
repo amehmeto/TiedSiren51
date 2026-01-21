@@ -71,8 +71,8 @@ export const selectBlockingSchedule = createSelector(
       const startDate = dateProvider.recoverDate(session.startedAt)
       const endDate = dateProvider.recoverDate(session.endedAt)
       const sirens = mergeSirens(
-        session.blocklists
-          .flatMap(({ id }) => (id in blocklists ? [blocklists[id]] : []))
+        session.blocklistIds
+          .flatMap((id) => (id in blocklists ? [blocklists[id]] : []))
           .map((bl) => bl.sirens),
       )
 

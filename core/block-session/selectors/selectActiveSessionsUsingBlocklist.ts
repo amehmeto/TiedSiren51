@@ -10,6 +10,6 @@ export const selectActiveSessionsUsingBlocklist = (
 ): BlockSession[] => {
   const activeSessions = selectActiveSessions(dateProvider, blockSession)
   return activeSessions.filter((session) =>
-    session.blocklists.some((blocklist) => blocklist.id === blocklistId),
+    session.blocklistIds.includes(blocklistId),
   )
 }

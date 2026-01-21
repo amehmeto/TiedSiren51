@@ -1,10 +1,10 @@
 import { FormikProps } from 'formik'
-import { Session } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { FormError } from '@/ui/screens/Home/shared/FormError'
 
 type FieldErrorsProps = {
-  errors: FormikProps<Session>['errors']
-  fieldName: keyof Session
+  errors: FormikProps<BlockSessionFormValues>['errors']
+  fieldName: keyof BlockSessionFormValues
 }
 
 export function FieldErrors({ errors, fieldName }: FieldErrorsProps) {

@@ -2,10 +2,6 @@ import uuid from 'react-native-uuid'
 
 import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
 import { HHmmString } from '@/core/_ports_/date-provider'
-import {
-  facebookAndroidSiren,
-  instagramAndroidSiren,
-} from '@/core/_tests_/data-builders/android-siren.builder'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import {
   BlockingConditions,
@@ -26,34 +22,7 @@ export class FakeDataBlockSessionRepository
       buildBlockSession({
         id: String(uuid.v4()),
         name: 'Sleeping time',
-        blocklists: [
-          {
-            id: 'blocklist-id',
-            name: 'Distractions',
-            sirens: {
-              android: [instagramAndroidSiren, facebookAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: ['twitter.com'],
-              keywords: ['cat videos'],
-            },
-          },
-          {
-            id: 'blocklist-id-2',
-            name: 'Games',
-            sirens: {
-              android: [instagramAndroidSiren, facebookAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: ['twitter.com'],
-              keywords: ['cat videos'],
-            },
-          },
-        ],
+        blocklistIds: ['blocklist-id', 'blocklist-id-2'],
         devices: [
           {
             id: 'device-id',
@@ -74,34 +43,7 @@ export class FakeDataBlockSessionRepository
       buildBlockSession({
         id: String(uuid.v4()),
         name: 'Playing time',
-        blocklists: [
-          {
-            id: 'blocklist-id',
-            name: 'Distractions',
-            sirens: {
-              android: [instagramAndroidSiren, facebookAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: ['twitter.com'],
-              keywords: ['cat videos'],
-            },
-          },
-          {
-            id: 'blocklist-id-2',
-            name: 'Games',
-            sirens: {
-              android: [instagramAndroidSiren, facebookAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: ['twitter.com'],
-              keywords: ['cat videos'],
-            },
-          },
-        ],
+        blocklistIds: ['blocklist-id', 'blocklist-id-2'],
         devices: [
           {
             id: 'device-id',
@@ -123,34 +65,7 @@ export class FakeDataBlockSessionRepository
       buildBlockSession({
         id: String(uuid.v4()),
         name: 'Sleeping time',
-        blocklists: [
-          {
-            id: 'blocklist-id',
-            name: 'Distractions',
-            sirens: {
-              android: [instagramAndroidSiren, facebookAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: ['twitter.com'],
-              keywords: ['cat videos'],
-            },
-          },
-          {
-            id: 'blocklist-id-2',
-            name: 'Games',
-            sirens: {
-              android: [instagramAndroidSiren, facebookAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: ['twitter.com'],
-              keywords: ['cat videos'],
-            },
-          },
-        ],
+        blocklistIds: ['blocklist-id', 'blocklist-id-2'],
         devices: [
           {
             id: 'device-id',

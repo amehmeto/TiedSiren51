@@ -1,6 +1,5 @@
 import { createEntityAdapter } from '@reduxjs/toolkit'
 import { HHmmString } from '@/core/_ports_/date-provider'
-import { Blocklist } from '@/core/blocklist/blocklist'
 import { Device } from '../device/device'
 
 export enum BlockingConditions {
@@ -14,7 +13,7 @@ export enum BlockingConditions {
 export type BlockSession = {
   id: string
   name: string
-  blocklists: Blocklist[]
+  blocklistIds: string[]
   devices: Device[]
   startedAt: HHmmString
   endedAt: HHmmString

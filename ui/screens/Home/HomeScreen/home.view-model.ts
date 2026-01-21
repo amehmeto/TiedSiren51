@@ -73,7 +73,7 @@ function formatToViewModel(
       id: session.id,
       name: session.name,
       minutesLeft: timeline,
-      blocklists: session.blocklists.length,
+      blocklists: session.blocklistIds.length,
       devices: session.devices.length,
     }
   })
