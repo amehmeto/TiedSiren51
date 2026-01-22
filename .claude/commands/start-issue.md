@@ -27,5 +27,5 @@ Completion checklist:
 - CI passes on the PR
 - No merge conflicts with main branch
 
-When ALL criteria are met, output: <promise>COMPLETE</promise>" --completion-promise "COMPLETE" --max-iterations 30
+When ALL criteria are met, output: <promise>COMPLETE</promise>" --completion-promise "COMPLETE" --max-iterations 5
 ```
