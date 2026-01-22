@@ -3,7 +3,11 @@ set -euo pipefail
 
 # CI Watch Script
 # Polls GitHub Actions until all jobs (excluding configurable jobs) complete
-# Exits 0 on success, 1 on failure, 2 on timeout
+# Exit codes:
+#   0 - Success (all jobs passed)
+#   1 - Code error (legitimate failure requiring fixes)
+#   2 - Timeout
+#   3 - Transient error (infrastructure issue, should retry)
 #
 # Environment variables:
 #   CI_WATCH_EXCLUDED_JOBS - Comma-separated list of job patterns to exclude (default: "build")
@@ -183,6 +187,37 @@ is_excluded_job() {
   return 1
 }
 
+# Patterns that indicate transient/infrastructure failures (not code issues)
+readonly TRANSIENT_ERROR_PATTERNS=(
+  "rate limit"
+  "exceeded"
+  "ETIMEDOUT"
+  "ECONNRESET"
+  "ENOTFOUND"
+  "socket hang up"
+  "network error"
+  "connection reset"
+  "503 Service Unavailable"
+  "502 Bad Gateway"
+  "504 Gateway Timeout"
+  "npm ERR! network"
+  "npm ERR! fetch failed"
+  "ShellCheck binary"
+  "failed to download"
+)
+
+# Check if error logs contain transient error patterns
+is_transient_error() {
+  local logs="$1"
+  local pattern
+  for pattern in "${TRANSIENT_ERROR_PATTERNS[@]}"; do
+    if echo "$logs" | grep -qi "$pattern"; then
+      return 0
+    fi
+  done
+  return 1
+}
+
 # Wait for workflow run to be registered for the current commit
 wait_for_run() {
   local branch="$1"
@@ -308,10 +343,23 @@ main() {
           echo "  - $job"
         done
         echo ""
-        print_info "Fetching failed job logs..."
+
+        # Capture logs to analyze error type
+        local failed_logs
+        failed_logs=$(gh run view "$run_id" --log-failed 2>&1 || true)
+        echo "$failed_logs"
         echo ""
-        gh run view "$run_id" --log-failed
-        exit 1
+
+        # Provide actionable guidance based on error type
+        if is_transient_error "$failed_logs"; then
+          print_warning "🔄 TRANSIENT ERROR DETECTED - This is an infrastructure issue, not a code problem."
+          print_info "ACTION REQUIRED: Retry the CI run with: gh run rerun $run_id --failed"
+          exit 3  # Special exit code for transient errors
+        else
+          print_error "❌ CODE ERROR DETECTED - This is a legitimate failure that needs fixing."
+          print_info "ACTION REQUIRED: Fix the issues shown above, then commit and push again."
+          exit 1
+        fi
       else
         print_success "CI passed (excluded: $EXCLUDED_JOBS)"
         exit 0
