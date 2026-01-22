@@ -29,3 +29,5 @@ Completion checklist:
 
 When ALL criteria are met, output: <promise>COMPLETE</promise>" --completion-promise "COMPLETE" --max-iterations 5
 ```
+
+4. After PR is created, update the PR description to accurately reflect ALL changes made (not just the original issue scope)
