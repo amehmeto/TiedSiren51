@@ -12,4 +12,10 @@ After the script completes:
 
 1. Navigate to the new worktree directory if one was created
 2. Fetch the issue details with `gh issue view <issue-number>`
-3. **Immediately begin implementing the issue** - read the relevant files and start coding. Do NOT stop after showing the issue summary.
+3. Launch `/ralph-wiggum:ralph-loop` with these acceptance criteria:
+   - CI passes on the PR
+   - No merge conflicts with main branch
+   - All acceptance criteria from the ticket are met
+   - All unit tests pass
+   - Lint passes
+   - PR created and ready for review
