@@ -115,6 +115,7 @@
       "Bash(xargs cloc:*)",
       "Edit",
       "Read",
+      "Skill(commit-push)",
       "Skill(sync-project)",
       "Skill(worktree)",
       "WebFetch(domain:docs.expo.dev)",

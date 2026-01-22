@@ -10,7 +10,6 @@ import {
   instagramAndroidSiren,
 } from '@/core/_tests_/data-builders/android-siren.builder'
 import { buildBlockingSchedule } from '@/core/_tests_/data-builders/blocking-schedule.builder'
-import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { AndroidSirenTier, toNativeBlockingWindows } from './android.siren-tier'
 
@@ -31,13 +30,11 @@ const mockSetBlockingSchedule = vi.mocked(setBlockingSchedule)
 describe('AndroidSirenTier', () => {
   let androidSirenTier: AndroidSirenTier
   let logger: InMemoryLogger
-  let dateProvider: StubDateProvider
 
   beforeEach(() => {
     vi.clearAllMocks()
     logger = new InMemoryLogger()
-    dateProvider = new StubDateProvider()
-    androidSirenTier = new AndroidSirenTier(logger, dateProvider)
+    androidSirenTier = new AndroidSirenTier(logger)
   })
 
   describe('updateBlockingSchedule', () => {
@@ -55,7 +52,7 @@ describe('AndroidSirenTier', () => {
       await androidSirenTier.updateBlockingSchedule(schedules)
 
       expect(mockSetBlockingSchedule).toHaveBeenCalledWith(
-        toNativeBlockingWindows(schedules, dateProvider),
+        toNativeBlockingWindows(schedules),
       )
     })
 
@@ -191,9 +188,7 @@ describe('AndroidSirenTier', () => {
 })
 
 describe('toNativeBlockingWindows', () => {
-  const dateProvider = new StubDateProvider()
-
-  it('converts BlockingSchedule array to native BlockingWindow format', () => {
+  it('converts BlockingSchedule array to native BlockingWindow format with ISO strings', () => {
     const schedules = [
       buildBlockingSchedule({
         id: 'schedule-1',
@@ -207,13 +202,13 @@ describe('toNativeBlockingWindows', () => {
       }),
     ]
 
-    const result = toNativeBlockingWindows(schedules, dateProvider)
+    const result = toNativeBlockingWindows(schedules)
     const [firstWindow] = result
 
     expect(result).toHaveLength(1)
     expect(firstWindow.id).toBe('schedule-1')
-    expect(firstWindow.startTime).toMatch(/^\d{2}:\d{2}$/)
-    expect(firstWindow.endTime).toMatch(/^\d{2}:\d{2}$/)
+    expect(firstWindow.startTime).toBe('2024-01-15T14:30:00.000Z')
+    expect(firstWindow.endTime).toBe('2024-01-15T15:45:00.000Z')
     expect(firstWindow.packageNames).toStrictEqual(['com.facebook.katana'])
   })
 
@@ -230,13 +225,13 @@ describe('toNativeBlockingWindows', () => {
       'com.example.instagram',
     ]
 
-    const [firstWindow] = toNativeBlockingWindows(schedules, dateProvider)
+    const [firstWindow] = toNativeBlockingWindows(schedules)
 
     expect(firstWindow.packageNames).toStrictEqual(expectedPackageNames)
   })
 
   it('handles empty schedule list', () => {
-    const result = toNativeBlockingWindows([], dateProvider)
+    const result = toNativeBlockingWindows([])
 
     expect(result).toStrictEqual([])
   })
@@ -252,7 +247,7 @@ describe('toNativeBlockingWindows', () => {
       }),
     ]
 
-    const [firstWindow] = toNativeBlockingWindows(schedules, dateProvider)
+    const [firstWindow] = toNativeBlockingWindows(schedules)
 
     expect(firstWindow.packageNames).toStrictEqual([])
   })

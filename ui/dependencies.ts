@@ -35,7 +35,7 @@ const androidDependencies: Dependencies = {
   logger,
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),
-  sirenTier: new AndroidSirenTier(logger, dateProvider),
+  sirenTier: new AndroidSirenTier(logger),
   sirensRepository: new PrismaSirensRepository(logger),
   timerRepository: new PrismaTimerRepository(logger),
 }
@@ -47,22 +47,20 @@ function createE2EDateProvider(): StubDateProvider {
   return stubDateProvider
 }
 
-const e2eDateProvider = createE2EDateProvider()
-
 const e2eTestsDependencies: Dependencies = {
   authGateway: new FakeAuthGateway(),
   backgroundTaskService: new RealBackgroundTaskService(logger),
   blockSessionRepository: new PrismaBlockSessionRepository(logger),
   blocklistRepository: new PrismaBlocklistRepository(logger),
   databaseService: new PrismaDatabaseService(logger),
-  dateProvider: e2eDateProvider,
+  dateProvider: createE2EDateProvider(),
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
   foregroundService: new AndroidForegroundService(logger),
   installedAppRepository: new FakeDataInstalledAppsRepository(),
   logger,
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),
-  sirenTier: new AndroidSirenTier(logger, e2eDateProvider),
+  sirenTier: new AndroidSirenTier(logger),
   sirensRepository: new PrismaSirensRepository(logger),
   timerRepository: new PrismaTimerRepository(logger),
 }
