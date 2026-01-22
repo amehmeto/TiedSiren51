@@ -5,31 +5,35 @@ import {
   setBlockedApps,
   setBlockingSchedule,
 } from '@amehmeto/tied-siren-blocking-overlay'
-import { assertISODateString } from '@/core/_ports_/date-provider'
+import { assertISODateString, DateProvider } from '@/core/_ports_/date-provider'
 import { Logger } from '@/core/_ports_/logger'
 import { BlockingSchedule, SirenTier } from '@core/_ports_/siren.tier'
 
 /**
  * Converts BlockingSchedule array to native BlockingWindow format.
- * Passes ISO timestamps directly to Kotlin (Kotlin handles time conversion internally).
+ * Extracts HH:mm time from ISO timestamps and maps Android sirens to package names.
  */
 export function toNativeBlockingWindows(
   schedules: BlockingSchedule[],
+  dateProvider: DateProvider,
 ): BlockingWindow[] {
   return schedules.map((schedule) => {
     assertISODateString(schedule.startTime)
     assertISODateString(schedule.endTime)
     return {
       id: schedule.id,
-      startTime: schedule.startTime,
-      endTime: schedule.endTime,
+      startTime: dateProvider.toHHmm(new Date(schedule.startTime)),
+      endTime: dateProvider.toHHmm(new Date(schedule.endTime)),
       packageNames: schedule.sirens.android.map((app) => app.packageName),
     }
   })
 }
 
 export class AndroidSirenTier implements SirenTier {
-  constructor(private readonly logger: Logger) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly dateProvider: DateProvider,
+  ) {}
 
   async initializeNativeBlocking(): Promise<void> {
     try {
@@ -45,7 +49,7 @@ export class AndroidSirenTier implements SirenTier {
 
   async updateBlockingSchedule(schedule: BlockingSchedule[]): Promise<void> {
     try {
-      const nativeWindows = toNativeBlockingWindows(schedule)
+      const nativeWindows = toNativeBlockingWindows(schedule, this.dateProvider)
       await setBlockingSchedule(nativeWindows)
 
       const packageNames = schedule.flatMap((s) =>
