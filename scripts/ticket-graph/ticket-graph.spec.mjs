@@ -302,6 +302,72 @@ describe('buildGraphFromTickets', () => {
     expect(mismatchErrors.length).toBeGreaterThan(0)
   })
 
+  it('should include fix property in bidirectional mismatch errors for missing blocks', () => {
+    const tickets = [
+      {
+        repo: 'repo',
+        number: 1,
+        title: 'First',
+        type: 'feature',
+        status: 'done',
+        metadata: {
+          blocks: [], // Should have blocks: [2] since #2 depends on it
+        },
+      },
+      {
+        repo: 'repo',
+        number: 2,
+        title: 'Second',
+        type: 'feature',
+        status: 'todo',
+        metadata: {
+          depends_on: [{ repo: 'repo', number: 1 }],
+        },
+      },
+    ]
+
+    const { validationErrors } = buildGraphFromTickets(tickets, {
+      formatId: (repo, num) => `${repo}#${num}`,
+    })
+
+    const mismatchErrors = validationErrors.filter((e) => e.type === 'bidirectional_mismatch')
+    expect(mismatchErrors.length).toBe(1)
+    expect(mismatchErrors[0].fix).toEqual({ addBlocks: [2] })
+  })
+
+  it('should include fix property in bidirectional mismatch errors for missing depends_on', () => {
+    const tickets = [
+      {
+        repo: 'repo',
+        number: 1,
+        title: 'First',
+        type: 'feature',
+        status: 'done',
+        metadata: {
+          blocks: [{ repo: 'repo', number: 2 }], // Blocks #2
+        },
+      },
+      {
+        repo: 'repo',
+        number: 2,
+        title: 'Second',
+        type: 'feature',
+        status: 'todo',
+        metadata: {
+          depends_on: [], // Should have depends_on: [1] since #1 blocks it
+        },
+      },
+    ]
+
+    const { validationErrors } = buildGraphFromTickets(tickets, {
+      formatId: (repo, num) => `${repo}#${num}`,
+    })
+
+    const mismatchErrors = validationErrors.filter((e) => e.type === 'bidirectional_mismatch')
+    expect(mismatchErrors.length).toBe(1)
+    expect(mismatchErrors[0].fix).toEqual({ addDependsOn: [1] })
+  })
+
   it('should preserve ticket metadata', () => {
     const tickets = [
       {

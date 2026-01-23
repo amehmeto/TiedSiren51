@@ -21,7 +21,7 @@
 import { execSync } from 'node:child_process'
 import { exec } from 'node:child_process'
 import { promisify } from 'node:util'
-import { writeFileSync } from 'node:fs'
+import { writeFileSync, unlinkSync } from 'node:fs'
 
 const execAsync = promisify(exec)
 
@@ -495,20 +495,16 @@ async function fixBidirectionalMismatches(errors, tickets, validRepos) {
     const [targetRepo, targetNumberStr] = targetId.split('#')
     const targetNumber = parseInt(targetNumberStr, 10)
 
-    // Determine what type of fix is needed from the error message
-    const blocksMatch = error.message.match(/should have blocks: \[(\d+)\]/)
-    const dependsMatch = error.message.match(/should have depends_on: \[(\d+)\]/)
-
     if (!fixesByIssue.has(targetId)) {
       fixesByIssue.set(targetId, { repo: targetRepo, number: targetNumber, addBlocks: [], addDependsOn: [] })
     }
 
     const fixes = fixesByIssue.get(targetId)
-    if (blocksMatch) {
-      fixes.addBlocks.push(parseInt(blocksMatch[1], 10))
+    if (error.fix?.addBlocks) {
+      fixes.addBlocks.push(...error.fix.addBlocks)
     }
-    if (dependsMatch) {
-      fixes.addDependsOn.push(parseInt(dependsMatch[1], 10))
+    if (error.fix?.addDependsOn) {
+      fixes.addDependsOn.push(...error.fix.addDependsOn)
     }
   }
 
@@ -540,7 +536,15 @@ async function fixBidirectionalMismatches(errors, tickets, validRepos) {
       // Update the issue
       const tempFile = `/tmp/issue-body-${fixes.number}.md`
       writeFileSync(tempFile, updatedBody)
-      await execAsync(`gh issue edit ${fixes.number} --repo ${fullRepoName} --body-file "${tempFile}"`)
+      try {
+        await execAsync(`gh issue edit ${fixes.number} --repo ${fullRepoName} --body-file "${tempFile}"`)
+      } finally {
+        try {
+          unlinkSync(tempFile)
+        } catch {
+          // Ignore cleanup errors
+        }
+      }
 
       console.log(`  - ${issueId}: updated (added blocks: [${fixes.addBlocks.join(', ')}], depends_on: [${fixes.addDependsOn.join(', ')}])`)
       fixed++
@@ -760,4 +764,4 @@ if (isMainModule) {
 }
 
 // Export for testing
-export { formatTicketId, formatDepRef }
+export { formatTicketId, formatDepRef, updateYamlMetadata }
