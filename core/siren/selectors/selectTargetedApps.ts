@@ -4,6 +4,15 @@ import { selectActiveSessions } from '@/core/block-session/selectors/selectActiv
 import { blocklistAdapter } from '@/core/blocklist/blocklist'
 import { AndroidSiren } from '../sirens'
 
+/**
+ * @deprecated This selector was designed for the JS-side app blocking path which has been
+ * superseded by native blocking. The native path (AccessibilityService → BlockingCallback →
+ * SharedPreferences → showOverlay) handles blocking without JS involvement.
+ *
+ * Kept for potential future UI display needs (e.g., showing currently blocked apps).
+ *
+ * @see docs/tech-debt/native-siren-filtering.md for architecture context
+ */
 export const selectTargetedApps = createSelector(
   [
     (state: RootState) => state.blockSession,
