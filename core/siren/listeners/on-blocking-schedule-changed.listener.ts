@@ -45,6 +45,13 @@ export const onBlockingScheduleChangedListener = ({
   let lastScheduleKey = ''
   let lastBlockSessionState = store.getState().blockSession
   let lastBlocklistState = store.getState().blocklist
+  let isNativeBlockingInitialized = false
+
+  const ensureNativeBlockingInitialized = async () => {
+    if (isNativeBlockingInitialized) return
+    await sirenTier.initializeNativeBlocking()
+    isNativeBlockingInitialized = true
+  }
 
   const syncSchedule = async (
     schedule: BlockingSchedule[],
@@ -55,6 +62,9 @@ export const onBlockingScheduleChangedListener = ({
       await sirenTier.updateBlockingSchedule(schedule)
 
       if (!wasActive && isActive) {
+        // Initialize native blocking before starting foreground service
+        // This ensures setCallbackClass() is called before the service starts
+        await ensureNativeBlockingInitialized()
         sirenLookout.startWatching()
         await foregroundService.start()
       }

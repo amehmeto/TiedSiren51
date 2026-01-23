@@ -384,6 +384,66 @@ describe('Feature: Blocking schedule changed listener', () => {
 
       fixture.then.blockingShouldBeInactive()
     })
+
+    it('should initialize native blocking before starting foreground service', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      const blocklist = buildBlocklist({
+        id: 'bl-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+
+      await fixture.when.creatingBlockSession(
+        [
+          buildBlockSession({
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      fixture.then.nativeBlockingShouldBeInitializedBeforeForegroundService()
+    })
+
+    it('should not reinitialize native blocking on subsequent activations', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      const blocklist = buildBlocklist({
+        id: 'bl-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+
+      // First activation
+      await fixture.when.creatingBlockSession(
+        [
+          buildBlockSession({
+            id: 'session-1',
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      // Deactivate
+      await fixture.when.dispatchingBlockSessions([])
+
+      // Reactivate - should not reinitialize
+      await fixture.when.dispatchingBlockSessions(
+        [
+          buildBlockSession({
+            id: 'session-2',
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      fixture.then.nativeBlockingInitializationCountShouldBe(1)
+    })
   })
 
   describe('Sessions outside active time window', () => {
