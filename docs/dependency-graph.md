@@ -255,7 +255,7 @@ flowchart LR
         T_TS_208["⏳ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [5sp]"]:::blocking2_todo
         T_TS_201["✅ TS#201 BlockSession to store<br/>blocklist IDs instead of<br/>embedded blocklists [5sp]"]:::blocking0_done
         T_TS_185["⏳ TS#185 legacy updateBlockedApps calls<br/>and related code [2sp]"]:::blocking2_todo
-        T_TS_184["🔄 TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_in_progress
+        T_TS_184["✅ TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_done
         T_TS_183["✅ TS#183 dependency injection with new<br/>architecture [2sp]"]:::blocking1_done
         T_TS_182["✅ TS#182 AndroidSirenTier to call<br/>setBlockingSchedule [3sp]"]:::blocking1_done
         T_TS_170["⏳ TS#170 android: Blocking overlay<br/>never triggers - JS bridge<br/>architecture mismatch [8sp]"]:::blocking0_todo
