@@ -128,16 +128,24 @@ if ! echo "$body" | grep -qiE '^## Test [Pp]lan'; then
   errors+=("❌ Missing required section: ## Test plan")
 fi
 
-# Rule 3: Must reference issue via "Closes #", "Fixes #", "Resolves #", or "#NNN" in title
-combined="$title $body"
-has_issue_ref=false
-if echo "$combined" | grep -qiE '(Closes|Fixes|Resolves)\s+#[0-9]+'; then
-  has_issue_ref=true
-elif echo "$title" | grep -qE '#[0-9]+'; then
-  has_issue_ref=true
+# Rule 3: Body must have a ## 🔗 Hierarchy section with issue link
+if ! echo "$body" | grep -qE '^## 🔗 Hierarchy'; then
+  errors+=("❌ Missing required section: ## 🔗 Hierarchy")
+else
+  # Check for issue link in hierarchy table (📋 Issue row with Closes/Fixes/Resolves #NNN or markdown link)
+  if ! echo "$body" | grep -qE '📋 Issue.*#[0-9]+'; then
+    errors+=("❌ Hierarchy section must include '📋 Issue' row with issue reference (e.g., 'Closes #184')")
+  fi
 fi
-if [ "$has_issue_ref" = false ]; then
-  errors+=("❌ PR must reference the related GitHub issue (use 'Closes #NNN', 'Fixes #NNN', or '(#NNN)' in title)")
+
+# Rule 4: Must also have Closes/Fixes/Resolves for auto-close functionality
+combined="$title $body"
+has_close_ref=false
+if echo "$combined" | grep -qiE '(Closes|Fixes|Resolves)\s+#[0-9]+'; then
+  has_close_ref=true
+fi
+if [ "$has_close_ref" = false ]; then
+  errors+=("❌ PR must include 'Closes #NNN', 'Fixes #NNN', or 'Resolves #NNN' for auto-close")
 fi
 
 # ============================================================================
@@ -151,17 +159,23 @@ if [ ${#errors[@]} -gt 0 ]; then
   # Build hint with expected format
   hint="Expected PR format:
 
-Title: feat(scope): description (#ISSUE_NUMBER)
+Title: feat(scope): description
 
 Body:
 ## Summary
 - Brief description of changes
 
+## 🔗 Hierarchy
+
+| Level | Link |
+|-------|------|
+| 🚀 Initiative | [#XX - Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 🏔️ Epic | [#XX - Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 📋 Issue | Closes #ISSUE_NUMBER |
+
 ## Test plan
 - [x] Tests pass
 - [x] Lint passes
-
-Closes #ISSUE_NUMBER (optional, for auto-closing)
 
 🤖 Generated with [Claude Code](https://claude.com/claude-code)"
 
