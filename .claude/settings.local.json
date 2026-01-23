@@ -4,6 +4,7 @@
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
       "Bash(./scripts/*.sh:*)",
+      "Bash(./scripts/start-issue.sh:*)",
       "Bash(./scripts/worktree.sh prune:*)",
       "Bash(./scripts/worktree.sh:*)",
       "Bash(.claude/hooks/*.sh:*)",
