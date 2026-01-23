@@ -12,6 +12,12 @@ import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
 import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 
+const flushPromises = async () => {
+  // Wait multiple ticks to allow all async operations to complete
+  for (let i = 0; i < 10; i++)
+    await new Promise((resolve) => setTimeout(resolve, 10))
+}
+
 export function blockingScheduleChangedFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ) {
@@ -63,14 +69,20 @@ export function blockingScheduleChangedFixture(
           dependencies,
           testStateBuilderProvider.getState(),
         )
+        // Wait for initial sync to complete before dispatching new state
+        await flushPromises()
         store.dispatch(setBlocklists(blocklists))
         store.dispatch(setBlockSessions(sessions))
+        // Wait for listener's async side effects to complete
+        await flushPromises()
       },
       async updatingBlocklist(blocklist: Blocklist) {
         store = createTestStore(
           dependencies,
           testStateBuilderProvider.getState(),
         )
+        // Wait for initial sync to complete before dispatching new state
+        await flushPromises()
         const state = store.getState().blocklist
         const currentBlocklists = state.ids.map((id) => state.entities[id])
 
@@ -78,6 +90,8 @@ export function blockingScheduleChangedFixture(
           b.id === blocklist.id ? blocklist : b,
         )
         store.dispatch(setBlocklists(updatedBlocklists))
+        // Wait for listener's async side effects to complete
+        await flushPromises()
       },
     },
     then: {
@@ -129,6 +143,11 @@ export function blockingScheduleChangedFixture(
       },
       blockingScheduleShouldNotHaveBeenSynced() {
         expect(sirenTier.updateCallCount).toBe(0)
+      },
+      nativeBlockingShouldBeInitializedBeforeForegroundService() {
+        expect(sirenTier.isNativeBlockingInitialized).toBe(true)
+        expect(foregroundService.isRunning()).toBe(true)
+        expect(foregroundService.startCallCount).toBe(1)
       },
     },
   }

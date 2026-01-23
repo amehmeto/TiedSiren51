@@ -384,6 +384,27 @@ describe('Feature: Blocking schedule changed listener', () => {
 
       fixture.then.blockingShouldBeInactive()
     })
+
+    it('should initialize native blocking before starting foreground service', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      const blocklist = buildBlocklist({
+        id: 'bl-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+
+      await fixture.when.creatingBlockSession(
+        [
+          buildBlockSession({
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      fixture.then.nativeBlockingShouldBeInitializedBeforeForegroundService()
+    })
   })
 
   describe('Sessions outside active time window', () => {
