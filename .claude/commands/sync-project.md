@@ -160,40 +160,44 @@ This script will:
 1. Fetch issues from all repos in parallel (TiedSiren51, tied-siren-blocking-overlay, expo-*, etc.)
 2. Build a **TicketGraph** data structure with nodes and edges
 3. **Validate** the graph (detect cycles, dangling refs, bidirectional mismatches)
-4. Generate `docs/dependency-graph.md` with:
+4. **Auto-fix bidirectional mismatches** by updating GitHub issues via `gh issue edit`
+5. **Fail if mismatches cannot be fixed** (blocking behavior)
+6. Generate `docs/dependency-graph.md` with:
    - Graph statistics (nodes, edges, critical path)
    - Ticket inventory tables by type (initiatives, epics, features, bugs)
    - Mermaid diagram grouped by parent Epic
    - Dependency matrix
-   - Validation warnings
 
-### 5.1 Review Validation Warnings
+### 5.1 Bidirectional Mismatch Handling (Automatic)
 
-The script will output validation warnings. Review them:
+The script automatically fixes bidirectional mismatches:
+- If `#A depends_on #B` but `#B` doesn't have `blocks: [A]`, it adds the missing entry
+- If `#A blocks #B` but `#B` doesn't have `depends_on: [A]`, it adds the missing entry
 
+If auto-fix fails, the script exits with error and lists issues to fix manually.
+
+### 5.2 Validation Warnings Reference
+
+| Type | Severity | Action |
+|------|----------|--------|
+| `cycle` | Critical | Manual fix required - break the dependency cycle |
+| `dangling_ref` | Warning | Create the missing issue or remove the reference |
+| `bidirectional_mismatch` | **Auto-fixed** | Script updates issues automatically |
+
+### 5.3 Optional: Open in Mermaid Live
+
+To generate markdown AND open the interactive diagram:
+
+```bash
+npm run graph:live
 ```
-Validation warnings:
-  - [cycle] Cycle detected: #A -> #B -> #C -> #A
-  - [dangling_ref] Node #X depends on non-existent node #Y
-  - [bidirectional_mismatch] #A should have blocks: [B] (because #B depends on it)
-```
 
-For bidirectional mismatches, consider updating the blocking ticket's YAML metadata to add the missing `blocks: [...]` entry.
-
-### 5.2 Optional: Export Graph as JSON
+### 5.4 Optional: Export Graph as JSON
 
 For debugging or further analysis:
 
 ```bash
 node scripts/ticket-graph/generate-dependency-graph.mjs --json > graph.json
-```
-
-### 5.3 Optional: Open in Mermaid Live
-
-To view and edit the diagram interactively:
-
-```bash
-node scripts/ticket-graph/generate-dependency-graph.mjs --live
 ```
 
 ---
@@ -391,6 +395,11 @@ gh issue list --repo amehmeto/tied-siren-blocking-overlay --state all --json num
 
 # Update project item status (requires item ID)
 gh project item-edit --project-id PROJECT_ID --id ITEM_ID --field-id FIELD_ID --single-select-option-id OPTION_ID
+
+# Dependency graph commands
+npm run graph              # Generate markdown (auto-fixes bidirectional mismatches)
+npm run graph:live         # Generate markdown + open mermaid.live
+npm run graph:view         # ASCII tree view in terminal
 ```
 
 ### Repository Mapping
