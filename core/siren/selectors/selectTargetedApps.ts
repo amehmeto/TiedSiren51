@@ -11,7 +11,7 @@ import { AndroidSiren } from '../sirens'
  *
  * Kept for potential future UI display needs (e.g., showing currently blocked apps).
  *
- * @see docs/tech-debt/native-siren-filtering.md for architecture context
+ * @see /docs/tech-debt/native-siren-filtering.md for architecture context
  */
 export const selectTargetedApps = createSelector(
   [
