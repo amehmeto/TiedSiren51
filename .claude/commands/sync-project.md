@@ -186,7 +186,7 @@ If auto-fix fails, the script exits with error and lists issues to fix manually.
 
 ### 5.3 Optional: Open in Mermaid Live
 
-To generate markdown AND open the interactive diagram:
+To view the diagram interactively:
 
 ```bash
 npm run graph:live
@@ -398,7 +398,7 @@ gh project item-edit --project-id PROJECT_ID --id ITEM_ID --field-id FIELD_ID --
 
 # Dependency graph commands
 npm run graph              # Generate markdown (auto-fixes bidirectional mismatches)
-npm run graph:live         # Generate markdown + open mermaid.live
+npm run graph:live         # Open mermaid.live (auto-fixes bidirectional mismatches)
 npm run graph:view         # ASCII tree view in terminal
 ```
 

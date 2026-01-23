@@ -695,39 +695,37 @@ async function main() {
     // Export graph as JSON
     const json = JSON.stringify(graph.toJSON(), null, 2)
     console.log(json)
+  } else if (liveMode) {
+    // Open in mermaid.live (standalone)
+    const mermaidCode = renderMermaidDiagram(graph, { repoDisplayAbbrev: REPO_DISPLAY_ABBREV })
+      .replace(/```mermaid\n/, '')
+      .replace(/\n```$/, '')
+
+    console.log('Validating mermaid syntax...')
+    const validation = validateMermaid(mermaidCode)
+    if (!validation.valid) {
+      console.error('Mermaid syntax error:')
+      console.error(validation.error)
+      console.error('\nGenerated code:')
+      console.error(mermaidCode)
+      process.exit(1)
+    }
+    console.log('Syntax valid')
+
+    const state = JSON.stringify({ code: mermaidCode, mermaid: { theme: 'default' }, autoSync: true, updateDiagram: true })
+    const encoded = Buffer.from(state).toString('base64url')
+    const url = `https://mermaid.live/edit#base64:${encoded}`
+    console.log('Opening mermaid.live...')
+    execSync(`open "${url}"`)
   } else if (asciiMode) {
     // ASCII box graph (standalone)
     console.log(generateAsciiGraph(tickets))
   } else {
-    // Markdown mode: always write to file
+    // Markdown mode: write to file
     console.log('Generating markdown...')
     const markdown = generateMarkdown(tickets, graph, validationErrors)
     writeFileSync(OUTPUT_FILE, markdown)
     console.log(`Written to ${OUTPUT_FILE}`)
-
-    // If --live, also open in mermaid.live
-    if (liveMode) {
-      const mermaidCode = renderMermaidDiagram(graph, { repoDisplayAbbrev: REPO_DISPLAY_ABBREV })
-        .replace(/```mermaid\n/, '')
-        .replace(/\n```$/, '')
-
-      console.log('Validating mermaid syntax...')
-      const validation = validateMermaid(mermaidCode)
-      if (!validation.valid) {
-        console.error('Mermaid syntax error:')
-        console.error(validation.error)
-        console.error('\nGenerated code:')
-        console.error(mermaidCode)
-        process.exit(1)
-      }
-      console.log('Syntax valid')
-
-      const state = JSON.stringify({ code: mermaidCode, mermaid: { theme: 'default' }, autoSync: true, updateDiagram: true })
-      const encoded = Buffer.from(state).toString('base64url')
-      const url = `https://mermaid.live/edit#base64:${encoded}`
-      console.log('Opening mermaid.live...')
-      execSync(`open "${url}"`)
-    }
   }
 
   // Report other validation issues (non-bidirectional, since those are already handled)
