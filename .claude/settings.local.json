@@ -92,6 +92,7 @@
       "Bash(ls:*)",
       "Bash(mkdir:*)",
       "Bash(node eslint-rules/*.cjs:*)",
+      "Bash(node scripts/ticket-graph/generate-dependency-graph.mjs:*)",
       "Bash(npm ci:*)",
       "Bash(npm install:*)",
       "Bash(npm ls:*)",

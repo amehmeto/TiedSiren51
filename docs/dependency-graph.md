@@ -3,29 +3,17 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2026-01-18
-
-## Validation Warnings
-
-The following issues were detected in the dependency graph:
-
-- **bidirectional_mismatch**: TiedSiren51#180 should have blocks: [208] (because TiedSiren51#208 depends on it)
-- **bidirectional_mismatch**: tied-siren-blocking-overlay#5 should have blocks: [9] (because tied-siren-blocking-overlay#9 depends on it)
-- **bidirectional_mismatch**: tied-siren-blocking-overlay#5 should have blocks: [8] (because tied-siren-blocking-overlay#8 depends on it)
-- **bidirectional_mismatch**: tied-siren-blocking-overlay#5 should have blocks: [7] (because tied-siren-blocking-overlay#7 depends on it)
-- **bidirectional_mismatch**: tied-siren-blocking-overlay#5 should have blocks: [6] (because tied-siren-blocking-overlay#6 depends on it)
-
----
+> Last updated: 2026-01-23
 
 ## Graph Statistics
 
 | Metric | Value |
 |--------|-------|
-| Total Nodes | 71 |
+| Total Nodes | 74 |
 | Total Edges | 43 |
-| Root Nodes (no dependencies) | 43 |
-| Leaf Nodes (nothing depends on them) | 50 |
-| Orphan Nodes (isolated) | 31 |
+| Root Nodes (no dependencies) | 45 |
+| Leaf Nodes (nothing depends on them) | 52 |
+| Orphan Nodes (isolated) | 33 |
 | Critical Path Length | 5 |
 
 ### Critical Path
@@ -68,7 +56,7 @@ The longest dependency chain in the graph:
 | #80 | [Bug] Logout redirects to /login modal instead of /home, requires double close | - | medium | - |
 
 
-### Features - Other (14)
+### Features - Other (16)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #1 | Add ability to filter between system apps and user-installed apps on Android | - | - | - |
@@ -85,21 +73,24 @@ The longest dependency chain in the graph:
 | #200 | feat(strict-mode): block blocklist deletion during active strict mode sessions | - | - | - |
 | #201 | Refactor BlockSession to store blocklist IDs instead of embedded blocklists | 🟠 5 | - | - |
 | #202 | test | - | - | - |
+| #229 | feat(claude): add PreToolUse hook to block --no-verify in git push commands | - | - | - |
+| #233 | chore: Add fine-grained git checkout permissions to Claude settings | - | - | - |
 
 
-### Features - Blocking Architecture (28)
+### Features - Blocking Architecture (29)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
-| #5 | Implement BlockingScheduler with schedule storage | - | - | - |
+| #5 | Implement BlockingScheduler with schedule storage | - | - | #8, #7, #6 |
 | #6 | Add AlarmManager integration for start/end times | 🟠 5 | #5 | #7, #8, #9, #13 |
 | #7 | Handle overnight sessions in BlockingScheduler | 🟢 3 | #5, #6 | #8 |
 | #8 | Handle overlapping sessions - recalculate on window boundaries | 🟠 5 | #5, #6, #7 | #13 |
-| #9 | Expose setBlockingSchedule() API to JS | 🟢 3 | #5, #6 | - |
+| #9 | Expose setBlockingSchedule() API to JS | 🟢 2 | #6 | #15, #18 |
 | #10 | Extract AppTier abstraction from current blocking logic | 🟠 5 | - | #12 |
 | #11 | Extract AppLookout abstraction from AccessibilityService logic | 🟢 3 | - | #12 |
 | #12 | Add Noop interfaces for WebsiteTier, KeywordTier, WebsiteLookout, KeywordLookout | 🟢 2 | #10, #11 | - |
 | #13 | Handle daily recurrence in scheduler | 🟢 3 | #6, #8 | #14 |
 | #14 | Handle weekly recurrence in scheduler | 🟠 5 | #13 | - |
+| #18 | Connect AccessibilityService to native blocking logic | 🟢 3 | #9 | - |
 | #101 | Blocking Decision Logic - 2 sp | - | - | - |
 | #102 | Standalone Expo Module: Android Blocking Overlay Launcher - 1 sp | - | - | - |
 | #170 | fix(android): Blocking overlay never triggers - JS bridge architecture mismatch | 🔴 8 | - | - |
@@ -110,13 +101,13 @@ The longest dependency chain in the graph:
 | #177 | Refactor SirenTier port to support sub-dependencies injection | 🟢 3 | - | #180, #181, #182, #183 |
 | #178 | Refactor SirenLookout port to support sub-dependencies injection | 🟢 2 | - | #181, #183 |
 | #179 | Create selectBlockingSchedule selector with fresh blocklist join | 🟠 5 | - | #180 |
-| #180 | Create unified listener for blockSession and blocklist state changes | 🟠 5 | #177, #179 | #185 |
+| #180 | Create unified listener for blockSession and blocklist state changes | 🟠 5 | #177, #179 | #185, #208 |
 | #181 | Create Noop implementations for future tiers and lookouts | 🟢 2 | #177, #178 | - |
 | #182 | Update AndroidSirenTier to call setBlockingSchedule | 🟢 3 | #177 | #183, #184, #185 |
 | #183 | Update dependency injection with new architecture | 🟢 2 | #177, #178, #182 | - |
 | #184 | Deprecate JS detection path (blockLaunchedApp usecase) | 🟢 3 | #182 | #185 |
 | #185 | Remove legacy updateBlockedApps calls and related code | 🟢 2 | #180, #182, #184 | - |
-| #208 | feat(listener): Re-evaluate blocking schedule on periodic tick | 🟢 3 | #180 | - |
+| #208 | feat(listener): Re-evaluate blocking schedule on periodic tick | 🟠 5 | #180 | - |
 | #213 | Add confirmation modal before setting strict mode timer | 🟢 2 | - | - |
 
 
@@ -229,7 +220,7 @@ flowchart LR
     end
     subgraph Epics
         direction TB
-        T_TS_219["⏳ TS#219 Native Blocking Layer [13sp]"]:::epic1_todo
+        T_TS_219["✅ TS#219 Native Blocking Layer [13sp]"]:::epic1_done
         T_TS_61["⏳ TS#61 Schedule recurring block<br/>sessions"]:::epic1_todo
         T_TS_60["⏳ TS#60 Polish design"]:::epic0_todo
         T_TS_59["⏳ TS#59 Blocking keywords on Android"]:::epic1_todo
@@ -240,32 +231,33 @@ flowchart LR
     end
     subgraph Epic_219["TS#219 Native Blocking Layer"]
         direction TB
-        T_TSBO_12["⏳ TSBO#12 Noop interfaces for<br/>WebsiteTier, KeywordTier,<br/>WebsiteLookout, KeywordLookout [2sp]"]:::blocking1_todo
-        T_TSBO_11["⏳ TSBO#11 AppLookout abstraction from<br/>AccessibilityService logic [3sp]"]:::blocking0_todo
-        T_TSBO_10["⏳ TSBO#10 AppTier abstraction from<br/>current blocking logic [5sp]"]:::blocking0_todo
-        T_TSBO_9["⏳ TSBO#9 setBlockingSchedule API to JS [3sp]"]:::blocking1_todo
-        T_TSBO_8["⏳ TSBO#8 overlapping sessions -<br/>recalculate on window<br/>boundaries [5sp]"]:::blocking1_todo
-        T_TSBO_7["⏳ TSBO#7 overnight sessions in<br/>BlockingScheduler [3sp]"]:::blocking1_todo
-        T_TSBO_6["🔄 TSBO#6 AlarmManager integration for<br/>start/end times [5sp]"]:::blocking1_in_progress
+        T_TSBO_18["✅ TSBO#18 AccessibilityService to native<br/>blocking logic [3sp]"]:::blocking3_done
+        T_TSBO_12["✅ TSBO#12 Noop interfaces for<br/>WebsiteTier, KeywordTier,<br/>WebsiteLookout, KeywordLookout [2sp]"]:::blocking1_done
+        T_TSBO_11["✅ TSBO#11 AppLookout abstraction from<br/>AccessibilityService logic [3sp]"]:::blocking0_done
+        T_TSBO_10["✅ TSBO#10 AppTier abstraction from<br/>current blocking logic [5sp]"]:::blocking0_done
+        T_TSBO_9["✅ TSBO#9 setBlockingSchedule API to JS [2sp]"]:::blocking2_done
+        T_TSBO_8["✅ TSBO#8 overlapping sessions -<br/>recalculate on window<br/>boundaries [5sp]"]:::blocking1_done
+        T_TSBO_7["✅ TSBO#7 overnight sessions in<br/>BlockingScheduler [3sp]"]:::blocking1_done
+        T_TSBO_6["✅ TSBO#6 AlarmManager integration for<br/>start/end times [5sp]"]:::blocking1_done
     end
     subgraph Epic_61["TS#61 Schedule recurring blo..."]
         direction TB
-        T_TSBO_14["⏳ TSBO#14 weekly recurrence in scheduler [5sp]"]:::blocking3_todo
-        T_TSBO_13["⏳ TSBO#13 daily recurrence in scheduler [3sp]"]:::blocking2_todo
+        T_TSBO_14["✅ TSBO#14 weekly recurrence in scheduler [5sp]"]:::blocking3_done
+        T_TSBO_13["✅ TSBO#13 daily recurrence in scheduler [3sp]"]:::blocking2_done
     end
     subgraph Epic_57["TS#57 Strict Mode"]
         direction TB
-        T_TS_213["🔄 TS#213 confirmation modal before<br/>setting strict mode timer [2sp]"]:::blocking0_in_progress
+        T_TS_213["✅ TS#213 confirmation modal before<br/>setting strict mode timer [2sp]"]:::blocking0_done
         T_TS_200["⏳ TS#200 strict-mode: block blocklist<br/>deletion during active strict<br/>mode sessions"]:::blocking0_todo
     end
     subgraph Epic_55["TS#55 Blocking Apps on Android"]
         direction TB
-        T_TS_208["⏳ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [3sp]"]:::blocking2_todo
-        T_TS_201["⏳ TS#201 BlockSession to store<br/>blocklist IDs instead of<br/>embedded blocklists [5sp]"]:::blocking0_todo
+        T_TS_208["⏳ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [5sp]"]:::blocking2_todo
+        T_TS_201["✅ TS#201 BlockSession to store<br/>blocklist IDs instead of<br/>embedded blocklists [5sp]"]:::blocking0_done
         T_TS_185["⏳ TS#185 legacy updateBlockedApps calls<br/>and related code [2sp]"]:::blocking2_todo
-        T_TS_184["⏳ TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_todo
-        T_TS_183["⏳ TS#183 dependency injection with new<br/>architecture [2sp]"]:::blocking1_todo
-        T_TS_182["🔄 TS#182 AndroidSirenTier to call<br/>setBlockingSchedule [3sp]"]:::blocking1_in_progress
+        T_TS_184["🔄 TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_in_progress
+        T_TS_183["✅ TS#183 dependency injection with new<br/>architecture [2sp]"]:::blocking1_done
+        T_TS_182["✅ TS#182 AndroidSirenTier to call<br/>setBlockingSchedule [3sp]"]:::blocking1_done
         T_TS_170["⏳ TS#170 android: Blocking overlay<br/>never triggers - JS bridge<br/>architecture mismatch [8sp]"]:::blocking0_todo
     end
     subgraph Epic_54["TS#54 User Authentification"]
@@ -285,6 +277,8 @@ flowchart LR
     end
     subgraph Ungrouped
         direction TB
+        T_TS_233["✅ TS#233 : Add fine-grained git<br/>checkout permissions to Claude<br/>settings"]:::other0_done
+        T_TS_229["⏳ TS#229 claude: add PreToolUse hook to<br/>block --no-verify in git push<br/>commands"]:::other0_todo
         T_TS_202["✅ TS#202 "]:::other0_done
         T_TS_199["✅ TS#199 blocklist: add confirmation<br/>modal when deleting blocklist<br/>used in active sessions"]:::blocking0_done
         T_TS_181["✅ TS#181 Noop implementations for<br/>future tiers and lookouts [2sp]"]:::blocking1_done
@@ -339,6 +333,7 @@ flowchart LR
     T_TS_58 --> T_TS_59
     T_TS_55 --> T_TS_58
     T_TS_55 --> T_TS_57
+    T_TSBO_9 --> T_TSBO_18
     T_TSBO_13 --> T_TSBO_14
     T_TSBO_10 --> T_TSBO_12
     T_TSBO_11 --> T_TSBO_12
@@ -356,9 +351,11 @@ Quick reference showing what blocks what:
 
 | Blocker | Blocks These Issues |
 |---------|---------------------|
+| TSBO#5 | #8, #7, #6 |
 | TSBO#6 | #7, #8, #9, #13 |
 | TSBO#7 | #8 |
 | TSBO#8 | #13 |
+| TSBO#9 | #15, #18 |
 | TSBO#10 | #12 |
 | TSBO#11 | #12 |
 | TSBO#13 | #14 |
@@ -373,7 +370,7 @@ Quick reference showing what blocks what:
 | #177 | #180, #181, #182, #183 |
 | #178 | #181, #183 |
 | #179 | #180 |
-| #180 | #185 |
+| #180 | #185, #208 |
 | #182 | #183, #184, #185 |
 | #184 | #185 |
 
@@ -419,4 +416,4 @@ Quick reference showing what blocks what:
 
 ---
 
-*Auto-generated on 2026-01-18 from GitHub issue metadata*
+*Auto-generated on 2026-01-23 from GitHub issue metadata*
