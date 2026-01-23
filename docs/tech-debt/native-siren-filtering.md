@@ -43,24 +43,18 @@ The current architecture:
    - `setBlockedApps()` - passes package names to SharedPreferences
 3. **Native `BlockingCallback`** (in `tied-siren-blocking-overlay`) checks SharedPreferences directly
 
-## Deprecated Artifacts
+## Removed Artifacts
 
-The following were designed for the JS path and are now deprecated:
+The following were designed for the JS path and have been removed:
 
-- **`selectTargetedApps`** - Selector for getting blocked apps from Redux state
-  - Kept for potential future UI display needs
-  - Not used in production code
-
+- **`selectTargetedApps`** - Selector for getting blocked apps from Redux state (deleted)
 - **`blockLaunchedApp` usecase** - Was planned but never created
-  - Would have called `sirenTier.block()` from JS
-  - Superseded by native blocking before implementation
 
 ## Related Files
 
 - `core/_ports_/siren.tier.ts` - Port interface for blocking
 - `infra/siren-tier/android.siren-tier.ts` - Native module wrapper
 - `core/siren/listeners/on-blocking-schedule-changed.listener.ts` - Syncs schedule to native
-- `core/siren/selectors/selectTargetedApps.ts` - Deprecated selector
 
 ## See Also
 
