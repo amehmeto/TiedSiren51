@@ -6,9 +6,6 @@
 # This hook is called with: prepared, committed, or aborted
 # We only act on "committed" to run CI watch after successful push
 
-# Disable errexit - husky runs with sh -e, but we need to handle exit codes ourselves
-set +e
-
 # CI_WATCH_REMOTE: configurable remote name (default: origin)
 remote="${CI_WATCH_REMOTE:-origin}"
 
@@ -17,8 +14,15 @@ if [ "$1" != "committed" ]; then
   exit 0
 fi
 
-# Read ref updates from stdin, looking for tracking ref updates
-while IFS= read -r line || [ -n "$line" ]; do
+# Read all stdin first to avoid buffering/EOF issues with the while loop
+input=$(cat)
+
+# Find the first tracking ref update and run CI watch
+# Using a here-string approach to avoid subshell issues with pipes
+found=false
+while IFS= read -r line; do
+  [ -z "$line" ] && continue
+
   # Parse: oldvalue newvalue refname (oldvalue unused)
   rest="${line#* }"
   newvalue="${rest%% *}"
@@ -27,15 +31,21 @@ while IFS= read -r line || [ -n "$line" ]; do
   # Match refs/remotes/<remote>/<branch>
   case "$refname" in
     refs/remotes/"$remote"/*)
+      found=true
       # Extract branch name (quote $remote separately per SC2295)
       pushed_branch="${refname#refs/remotes/"$remote"/}"
-      # Run CI watch (blocks until complete, Ctrl+C to cancel)
-      PUSHED_BRANCH="$pushed_branch" PUSHED_SHA="$newvalue" sh .husky/post-push
-      # Exit immediately with the same code to avoid any loop exit issues
-      exit $?
+      break
       ;;
   esac
-done
+done <<EOF
+$input
+EOF
 
-# No matching refs found - exit success (normal for non-push operations)
+# Run CI watch if we found a matching ref
+if [ "$found" = true ]; then
+  PUSHED_BRANCH="$pushed_branch" PUSHED_SHA="$newvalue" sh .husky/post-push
+  exit $?
+fi
+
+# No matching refs found - exit success
 exit 0
