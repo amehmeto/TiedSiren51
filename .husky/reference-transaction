@@ -1,22 +1,38 @@
 #!/bin/sh
-# Disable errexit to handle while-read EOF gracefully
-set +e
+# Post-push CI watch trigger via reference-transaction hook
+# Git doesn't have a native post-push hook, so we detect successful pushes
+# by watching for tracking ref updates (refs/remotes/origin/...)
+#
+# This hook is called with: prepared, committed, or aborted
+# We only act on "committed" to run CI watch after successful push
 
-# Detect pushed branch from the ref being updated, not from current HEAD
-# This correctly handles: git push origin feature-x (while on main)
 # CI_WATCH_REMOTE: configurable remote name (default: origin)
 remote="${CI_WATCH_REMOTE:-origin}"
 
-while read -r oldvalue newvalue refname; do
-  if [ "$1" = "committed" ] && echo "$refname" | grep -q "^refs/remotes/$remote/"; then
-    # Extract branch name from refs/remotes/<remote>/<branch>
-    pushed_branch="${refname#refs/remotes/$remote/}"
-    # Run synchronously - blocks until CI completes (Ctrl+C to cancel)
-    PUSHED_BRANCH="$pushed_branch" PUSHED_SHA="$newvalue" sh .husky/post-push
-    ci_exit_code=$?
-    break
-  fi
+# Only process "committed" phase (refs successfully updated)
+if [ "$1" != "committed" ]; then
+  exit 0
+fi
+
+# Read ref updates from stdin, looking for tracking ref updates
+ci_exit_code=0
+while IFS= read -r line || [ -n "$line" ]; do
+  # Parse: oldvalue newvalue refname (oldvalue unused)
+  rest="${line#* }"
+  newvalue="${rest%% *}"
+  refname="${rest#* }"
+
+  # Match refs/remotes/<remote>/<branch>
+  case "$refname" in
+    refs/remotes/"$remote"/*)
+      # Extract branch name (quote $remote separately per SC2295)
+      pushed_branch="${refname#refs/remotes/"$remote"/}"
+      # Run CI watch (blocks until complete, Ctrl+C to cancel)
+      PUSHED_BRANCH="$pushed_branch" PUSHED_SHA="$newvalue" sh .husky/post-push
+      ci_exit_code=$?
+      break
+      ;;
+  esac
 done
 
-# Propagate CI watch exit code (0=success, 1=failure, 2=timeout)
-exit ${ci_exit_code:-0}
+exit $ci_exit_code
