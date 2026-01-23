@@ -9,16 +9,16 @@
 # CI_WATCH_REMOTE: configurable remote name (default: origin)
 remote="${CI_WATCH_REMOTE:-origin}"
 
-# DEBUG: Log invocation to understand behavior
-# echo "[ref-tx] Phase: $1" >&2
+# Read all stdin first
+input=$(cat)
+
+# DEBUG: Uncomment to see invocations
+echo "[ref-tx] Phase: $1, input: $input" >&2
 
 # Only process "committed" phase (refs successfully updated)
 if [ "$1" != "committed" ]; then
   exit 0
 fi
-
-# Read all stdin first to avoid buffering/EOF issues with the while loop
-input=$(cat)
 
 # Find the first tracking ref update and run CI watch
 # Using a here-string approach to avoid subshell issues with pipes
