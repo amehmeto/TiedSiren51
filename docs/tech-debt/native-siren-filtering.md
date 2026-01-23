@@ -1,95 +1,62 @@
 # Native-Level Siren Filtering Optimization
 
 > Created: December 11, 2025
-> Status: Proposed
-> Priority: 📋 **LOW** - Optimization for high-volume scenarios
-> Effort: Medium
+> Updated: January 2026
+> Status: **IMPLEMENTED** (via native blocking)
+> Priority: N/A - Superseded by native architecture
 
-## Context
+## Historical Context
 
-The current siren detection flow:
+This document originally proposed optimizing the JS-side app detection path. That path was never implemented because we moved directly to native blocking.
 
-1. **AccessibilityService** detects ANY app launch
-2. **JS Bridge** receives the package name via event listener
-3. **blockLaunchedApp usecase** queries Redux state via `selectTargetedApps`
-4. **If targeted**, calls `sirenTier.block(packageName)`
+### Original JS Path (Never Implemented)
 
-This means every app launch triggers a JS bridge call, even for non-blocked apps.
-
-## Current Design (Intentional)
-
-The `SirenLookout` interface was simplified to:
-
-```typescript
-interface SirenLookout {
-  startWatching(): void
-  stopWatching(): void
-  onSirenDetected(listener: (packageName: string) => void): void
-}
+```
+AccessibilityService → JS subscription → selectTargetedApps → blockLaunchedApp → showOverlay
 ```
 
-The lookout doesn't know which apps to block - it just detects app launches. Filtering happens in the business logic layer (`selectTargetedApps`), which is cleaner from a hexagonal architecture perspective:
+This approach would have required:
 
-- **Separation of concerns**: Detection vs. decision-making
-- **Single source of truth**: Block lists live in Redux/Prisma, not duplicated in native
-- **Testability**: Business logic is easily unit-tested without native mocking
+1. Every app launch triggering a JS bridge call
+2. A `blockLaunchedApp` usecase to query Redux state
+3. JS deciding whether to block and calling `sirenTier.block()`
 
-## Proposed Optimization
+### Current Native Path (Implemented)
 
-For performance-critical scenarios (many block sessions, frequent app switching), we could:
+```
+AccessibilityService → BlockingCallback → SharedPreferences → showOverlay
+```
 
-1. **Pass target package names to native layer**:
+The native path is:
 
-   ```typescript
-   interface OptimizedSirenLookout extends SirenLookout {
-     updateTargets(packageNames: string[]): void
-   }
-   ```
+- **Faster**: No JS bridge crossing for blocking decisions
+- **Reliable**: Works even when JS runtime is killed
+- **Simpler**: All blocking logic in Kotlin native module
 
-2. **Filter at native level** before crossing JS bridge:
-   - Only emit events for apps in the target list
-   - Reduces JS bridge calls significantly
+## Implementation Details
 
-3. **Sync targets on session changes**:
-   - Listener calls `updateTargets()` when block sessions change
-   - Native layer maintains a Set of target package names
+The current architecture:
 
-## Trade-offs
+1. **`onBlockingScheduleChangedListener`** syncs schedules to native via `SirenTier.updateBlockingSchedule()`
+2. **`AndroidSirenTier`** calls native module methods:
+   - `setBlockingSchedule()` - passes time windows to native
+   - `setBlockedApps()` - passes package names to SharedPreferences
+3. **Native `BlockingCallback`** (in `tied-siren-blocking-overlay`) checks SharedPreferences directly
 
-### Pros
+## Removed Artifacts
 
-- Fewer JS bridge crossings
-- Lower latency for non-blocked apps
-- Better battery efficiency in high-use scenarios
+The following were designed for the JS path and have been removed:
 
-### Cons
-
-- Duplicated state (targets in both Redux and native)
-- Sync complexity (must keep native list updated)
-- More complex native module code
-- Potential for inconsistency if sync fails
-
-## Trigger Points
-
-Consider implementing when:
-
-- Users report lag when switching apps
-- Profiling shows JS bridge as bottleneck
-- Block lists grow large (50+ apps)
-- Battery usage becomes a concern
-
-## Implementation Notes
-
-If implementing:
-
-1. Add `updateTargets(packageNames: string[])` to `AndroidSirenLookout`
-2. Modify `onBlockSessionsChangedListener` to extract and pass package names
-3. Update Kotlin native module to filter events
-4. Add fallback: if native filtering fails, fall back to current JS filtering
+- **`selectTargetedApps`** - Selector for getting blocked apps from Redux state (deleted)
+- **`blockLaunchedApp` usecase** - Was planned but never created
 
 ## Related Files
 
-- `core/_ports_/siren.lookout.ts`
-- `infra/siren-tier/real-android.siren-lookout.ts`
-- `core/siren/listeners/on-block-sessions-changed.listener.ts`
-- `core/siren/usecases/block-launched-app.usecase.ts`
+- `core/_ports_/siren.tier.ts` - Port interface for blocking
+- `infra/siren-tier/android.siren-tier.ts` - Native module wrapper
+- `core/siren/listeners/on-blocking-schedule-changed.listener.ts` - Syncs schedule to native
+
+## See Also
+
+- Issue #182: Update AndroidSirenTier to call setBlockingSchedule
+- Issue #184: Deprecate JS detection path (this update)

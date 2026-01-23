@@ -107,7 +107,7 @@ The longest dependency chain in the graph:
 | #183 | Update dependency injection with new architecture | 🟢 2 | #177, #178, #182 | - |
 | #184 | Deprecate JS detection path (blockLaunchedApp usecase) | 🟢 3 | #182 | #185 |
 | #185 | Remove legacy updateBlockedApps calls and related code | 🟢 2 | #180, #182, #184 | - |
-| #208 | feat(listener): Re-evaluate blocking schedule on periodic tick | 🟢 3 | #180 | - |
+| #208 | feat(listener): Re-evaluate blocking schedule on periodic tick | 🟠 5 | #180 | - |
 | #213 | Add confirmation modal before setting strict mode timer | 🟢 2 | - | - |
 
 
@@ -247,15 +247,15 @@ flowchart LR
     end
     subgraph Epic_57["TS#57 Strict Mode"]
         direction TB
-        T_TS_213["🔄 TS#213 confirmation modal before<br/>setting strict mode timer [2sp]"]:::blocking0_in_progress
+        T_TS_213["✅ TS#213 confirmation modal before<br/>setting strict mode timer [2sp]"]:::blocking0_done
         T_TS_200["⏳ TS#200 strict-mode: block blocklist<br/>deletion during active strict<br/>mode sessions"]:::blocking0_todo
     end
     subgraph Epic_55["TS#55 Blocking Apps on Android"]
         direction TB
-        T_TS_208["⏳ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [3sp]"]:::blocking2_todo
+        T_TS_208["⏳ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [5sp]"]:::blocking2_todo
         T_TS_201["✅ TS#201 BlockSession to store<br/>blocklist IDs instead of<br/>embedded blocklists [5sp]"]:::blocking0_done
         T_TS_185["⏳ TS#185 legacy updateBlockedApps calls<br/>and related code [2sp]"]:::blocking2_todo
-        T_TS_184["⏳ TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_todo
+        T_TS_184["🔄 TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_in_progress
         T_TS_183["✅ TS#183 dependency injection with new<br/>architecture [2sp]"]:::blocking1_done
         T_TS_182["✅ TS#182 AndroidSirenTier to call<br/>setBlockingSchedule [3sp]"]:::blocking1_done
         T_TS_170["⏳ TS#170 android: Blocking overlay<br/>never triggers - JS bridge<br/>architecture mismatch [8sp]"]:::blocking0_todo

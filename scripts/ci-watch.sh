@@ -74,6 +74,7 @@ cleanup() {
     rm -f "$LOCK_FILE"
   fi
   [[ -n "$API_ERROR_TMPFILE" ]] && rm -f "$API_ERROR_TMPFILE"
+  return 0  # Ensure cleanup doesn't affect exit code via trap
 }
 
 # Acquire lock to prevent race conditions from multiple pushes
