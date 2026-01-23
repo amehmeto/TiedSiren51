@@ -19,7 +19,11 @@
  */
 
 import { execSync } from 'node:child_process'
-import { writeFileSync } from 'node:fs'
+import { exec } from 'node:child_process'
+import { promisify } from 'node:util'
+import { writeFileSync, unlinkSync } from 'node:fs'
+
+const execAsync = promisify(exec)
 
 import { VALID_REPOS, REPO_ABBREVIATIONS, REPO_DISPLAY_ABBREV, MAIN_REPO } from '../remark-lint-ticket/config.mjs'
 import {
@@ -467,6 +471,155 @@ ${Object.entries(VALID_REPOS)
 }
 
 // ============================================================================
+// Bidirectional Mismatch Fixing
+// ============================================================================
+
+/**
+ * Fix bidirectional mismatches by updating GitHub issues
+ * @param {Array} errors - Validation errors from buildGraphFromTickets
+ * @param {Map} tickets - Tickets map for lookup
+ * @param {Object} validRepos - Valid repos map for building full repo names
+ * @returns {Promise<{fixed: number, failed: string[]}>}
+ */
+async function fixBidirectionalMismatches(errors, tickets, validRepos) {
+  const bidirectionalErrors = errors.filter((e) => e.type === 'bidirectional_mismatch')
+  if (bidirectionalErrors.length === 0) {
+    return { fixed: 0, failed: [] }
+  }
+
+  // Group fixes by target issue
+  const fixesByIssue = new Map()
+
+  for (const error of bidirectionalErrors) {
+    const targetId = error.nodes[0] // The issue that needs updating
+    const [targetRepo, targetNumberStr] = targetId.split('#')
+    const targetNumber = parseInt(targetNumberStr, 10)
+
+    if (!fixesByIssue.has(targetId)) {
+      fixesByIssue.set(targetId, { repo: targetRepo, number: targetNumber, addBlocks: [], addDependsOn: [] })
+    }
+
+    const fixes = fixesByIssue.get(targetId)
+    if (error.fix?.addBlocks) {
+      fixes.addBlocks.push(...error.fix.addBlocks)
+    }
+    if (error.fix?.addDependsOn) {
+      fixes.addDependsOn.push(...error.fix.addDependsOn)
+    }
+  }
+
+  let fixed = 0
+  const failed = []
+
+  for (const [issueId, fixes] of fixesByIssue) {
+    try {
+      const fullRepoName = validRepos[fixes.repo]?.replace('https://github.com/', '')
+      if (!fullRepoName) {
+        failed.push(`${issueId}: unknown repo ${fixes.repo}`)
+        continue
+      }
+
+      // Fetch current issue body
+      const { stdout } = await execAsync(
+        `gh issue view ${fixes.number} --repo ${fullRepoName} --json body -q '.body'`,
+      )
+      const currentBody = stdout.trim()
+
+      // Update the YAML block
+      const updatedBody = updateYamlMetadata(currentBody, fixes.addBlocks, fixes.addDependsOn)
+
+      if (updatedBody === currentBody) {
+        console.log(`  - ${issueId}: no changes needed`)
+        continue
+      }
+
+      // Update the issue
+      const tempFile = `/tmp/issue-body-${fixes.number}.md`
+      writeFileSync(tempFile, updatedBody)
+      try {
+        await execAsync(`gh issue edit ${fixes.number} --repo ${fullRepoName} --body-file "${tempFile}"`)
+      } finally {
+        try {
+          unlinkSync(tempFile)
+        } catch {
+          // Ignore cleanup errors
+        }
+      }
+
+      console.log(`  - ${issueId}: updated (added blocks: [${fixes.addBlocks.join(', ')}], depends_on: [${fixes.addDependsOn.join(', ')}])`)
+      fixed++
+    } catch (err) {
+      failed.push(`${issueId}: ${err.message}`)
+    }
+  }
+
+  return { fixed, failed }
+}
+
+/**
+ * Update YAML metadata in issue body to add missing blocks/depends_on
+ */
+function updateYamlMetadata(body, addBlocks, addDependsOn) {
+  if (!body) return body
+
+  const yamlMatch = body.match(/(```yaml\s*\n)([\s\S]*?)(```)/)
+
+  if (!yamlMatch) {
+    // No YAML block exists, create one
+    const newYaml = []
+    if (addBlocks.length > 0) {
+      newYaml.push(`blocks: [${addBlocks.join(', ')}]`)
+    }
+    if (addDependsOn.length > 0) {
+      newYaml.push(`depends_on: [${addDependsOn.join(', ')}]`)
+    }
+    if (newYaml.length === 0) return body
+
+    return `\`\`\`yaml\n${newYaml.join('\n')}\n\`\`\`\n\n${body}`
+  }
+
+  let yamlContent = yamlMatch[2]
+
+  // Update or add blocks
+  if (addBlocks.length > 0) {
+    const blocksMatch = yamlContent.match(/^blocks:\s*\[([^\]]*)\]/m)
+    if (blocksMatch) {
+      // Parse existing blocks and merge
+      const existing = blocksMatch[1]
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map(Number)
+      const merged = [...new Set([...existing, ...addBlocks])].sort((a, b) => a - b)
+      yamlContent = yamlContent.replace(/^blocks:\s*\[[^\]]*\]/m, `blocks: [${merged.join(', ')}]`)
+    } else {
+      // Add new blocks line
+      yamlContent = yamlContent.trimEnd() + `\nblocks: [${addBlocks.join(', ')}]\n`
+    }
+  }
+
+  // Update or add depends_on
+  if (addDependsOn.length > 0) {
+    const dependsMatch = yamlContent.match(/^depends_on:\s*\[([^\]]*)\]/m)
+    if (dependsMatch) {
+      // Parse existing depends_on and merge
+      const existing = dependsMatch[1]
+        .split(',')
+        .map((s) => s.trim())
+        .filter(Boolean)
+        .map(Number)
+      const merged = [...new Set([...existing, ...addDependsOn])].sort((a, b) => a - b)
+      yamlContent = yamlContent.replace(/^depends_on:\s*\[[^\]]*\]/m, `depends_on: [${merged.join(', ')}]`)
+    } else {
+      // Add new depends_on line
+      yamlContent = yamlContent.trimEnd() + `\ndepends_on: [${addDependsOn.join(', ')}]\n`
+    }
+  }
+
+  return body.replace(yamlMatch[0], yamlMatch[1] + yamlContent + yamlMatch[3])
+}
+
+// ============================================================================
 // Main Entry Point
 // ============================================================================
 
@@ -502,17 +655,52 @@ async function main() {
   if (!asciiMode && !jsonMode) {
     console.log('Building dependency graph...')
   }
-  const { graph, validationErrors } = buildGraphFromTickets(tickets, {
+  let { graph, validationErrors } = buildGraphFromTickets(tickets, {
     formatId: formatTicketId,
   })
 
-  // Step 4: Output
+  // Step 4: Auto-fix bidirectional mismatches (always enabled)
+  const bidirectionalErrors = validationErrors.filter((e) => e.type === 'bidirectional_mismatch')
+  if (bidirectionalErrors.length > 0 && !jsonMode && !asciiMode) {
+    console.log(`\nFixing ${bidirectionalErrors.length} bidirectional mismatch(es)...`)
+    const { fixed, failed } = await fixBidirectionalMismatches(bidirectionalErrors, tickets, VALID_REPOS)
+
+    if (fixed > 0) {
+      console.log(`Fixed ${fixed} issue(s). Re-fetching to verify...`)
+      // Re-fetch and rebuild to verify fixes
+      const freshIssues = await fetchAllIssues(REPOS)
+      const freshTickets = transformIssuesToTickets(freshIssues, MAIN_REPO, REPO_ABBREVIATIONS, VALID_REPOS)
+      const freshResult = buildGraphFromTickets(freshTickets, { formatId: formatTicketId })
+      graph = freshResult.graph
+      validationErrors = freshResult.validationErrors
+    }
+
+    if (failed.length > 0) {
+      console.error('Failed to fix:')
+      for (const f of failed) {
+        console.error(`  - ${f}`)
+      }
+    }
+  }
+
+  // Step 5: Check for remaining bidirectional errors (blocking)
+  const remainingBidirectionalErrors = validationErrors.filter((e) => e.type === 'bidirectional_mismatch')
+  if (remainingBidirectionalErrors.length > 0 && !jsonMode) {
+    console.error(`\n❌ ${remainingBidirectionalErrors.length} bidirectional mismatch(es) could not be fixed:`)
+    for (const error of remainingBidirectionalErrors) {
+      console.error(`  - ${error.message}`)
+    }
+    console.error('\nManually update the issues listed above.')
+    process.exit(1)
+  }
+
+  // Step 6: Output
   if (jsonMode) {
     // Export graph as JSON
     const json = JSON.stringify(graph.toJSON(), null, 2)
     console.log(json)
   } else if (liveMode) {
-    // Open in mermaid.live
+    // Open in mermaid.live (standalone)
     const mermaidCode = renderMermaidDiagram(graph, { repoDisplayAbbrev: REPO_DISPLAY_ABBREV })
       .replace(/```mermaid\n/, '')
       .replace(/\n```$/, '')
@@ -534,7 +722,7 @@ async function main() {
     console.log('Opening mermaid.live...')
     execSync(`open "${url}"`)
   } else if (asciiMode) {
-    // ASCII box graph
+    // ASCII box graph (standalone)
     console.log(generateAsciiGraph(tickets))
   } else {
     // Markdown mode: write to file
@@ -544,10 +732,11 @@ async function main() {
     console.log(`Written to ${OUTPUT_FILE}`)
   }
 
-  // Report validation issues
-  if (validationErrors.length > 0 && !jsonMode) {
+  // Report other validation issues (non-bidirectional, since those are already handled)
+  const otherErrors = validationErrors.filter((e) => e.type !== 'bidirectional_mismatch')
+  if (otherErrors.length > 0 && !jsonMode) {
     console.log('\nValidation warnings:')
-    for (const error of validationErrors) {
+    for (const error of otherErrors) {
       console.log(`  - [${error.type}] ${error.message}`)
     }
   }
@@ -575,4 +764,4 @@ if (isMainModule) {
 }
 
 // Export for testing
-export { formatTicketId, formatDepRef }
+export { formatTicketId, formatDepRef, updateYamlMetadata }

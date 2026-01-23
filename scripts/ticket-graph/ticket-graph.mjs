@@ -39,10 +39,17 @@
  */
 
 /**
+ * @typedef {Object} BidirectionalFix
+ * @property {number[]} [addBlocks] - Issue numbers to add to blocks
+ * @property {number[]} [addDependsOn] - Issue numbers to add to depends_on
+ */
+
+/**
  * @typedef {Object} ValidationError
  * @property {'cycle' | 'dangling_ref' | 'self_reference' | 'bidirectional_mismatch'} type
  * @property {string} message
  * @property {string[]} nodes - Node IDs involved
+ * @property {BidirectionalFix} [fix] - Fix info for bidirectional mismatches
  */
 
 // ============================================================================
@@ -613,6 +620,7 @@ function validateBidirectional(graph, declaredBlocks) {
           type: 'bidirectional_mismatch',
           message: `${depId} should have blocks: [${node.number}] (because ${nodeId} depends on it)`,
           nodes: [depId, nodeId],
+          fix: { addBlocks: [node.number] },
         })
       }
     }
@@ -632,6 +640,7 @@ function validateBidirectional(graph, declaredBlocks) {
           type: 'bidirectional_mismatch',
           message: `${blockedId} should have depends_on: [${node.number}] (because ${nodeId} blocks it)`,
           nodes: [blockedId, nodeId],
+          fix: { addDependsOn: [node.number] },
         })
       }
     }

@@ -2,7 +2,7 @@
  * Tests for dependency graph cross-repo parsing functions
  */
 import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest'
-import { parseDependencyRef, depRefKey, formatDepRef } from './generate-dependency-graph.mjs'
+import { parseDependencyRef, depRefKey, formatDepRef, updateYamlMetadata } from './generate-dependency-graph.mjs'
 
 describe('parseDependencyRef', () => {
   // Capture and suppress console.warn during tests
@@ -149,5 +149,110 @@ describe('formatDepRef', () => {
     // This tests the fallback path - in practice all repos have abbreviations
     const label = formatDepRef({ repo: 'unknown-repo', number: 1 }, 'TiedSiren51')
     expect(label).toBe('unknown-repo#1')
+  })
+})
+
+describe('updateYamlMetadata', () => {
+  describe('when no YAML block exists', () => {
+    it('creates YAML block with blocks when addBlocks is provided', () => {
+      const body = 'Some issue description'
+      const result = updateYamlMetadata(body, [42], [])
+
+      expect(result).toBe('```yaml\nblocks: [42]\n```\n\nSome issue description')
+    })
+
+    it('creates YAML block with depends_on when addDependsOn is provided', () => {
+      const body = 'Some issue description'
+      const result = updateYamlMetadata(body, [], [99])
+
+      expect(result).toBe('```yaml\ndepends_on: [99]\n```\n\nSome issue description')
+    })
+
+    it('creates YAML block with both blocks and depends_on', () => {
+      const body = 'Some issue description'
+      const result = updateYamlMetadata(body, [42], [99])
+
+      expect(result).toBe('```yaml\nblocks: [42]\ndepends_on: [99]\n```\n\nSome issue description')
+    })
+
+    it('returns body unchanged when both arrays are empty', () => {
+      const body = 'Some issue description'
+      const result = updateYamlMetadata(body, [], [])
+
+      expect(result).toBe(body)
+    })
+  })
+
+  describe('when YAML block exists with no blocks/depends_on', () => {
+    it('adds blocks to existing YAML', () => {
+      const body = '```yaml\ntype: feature\n```\n\nDescription'
+      const result = updateYamlMetadata(body, [42], [])
+
+      expect(result).toContain('blocks: [42]')
+      expect(result).toContain('type: feature')
+    })
+
+    it('adds depends_on to existing YAML', () => {
+      const body = '```yaml\ntype: feature\n```\n\nDescription'
+      const result = updateYamlMetadata(body, [], [99])
+
+      expect(result).toContain('depends_on: [99]')
+      expect(result).toContain('type: feature')
+    })
+  })
+
+  describe('when YAML block exists with existing blocks/depends_on', () => {
+    it('merges new blocks with existing blocks', () => {
+      const body = '```yaml\nblocks: [10, 20]\n```\n\nDescription'
+      const result = updateYamlMetadata(body, [30, 10], [])
+
+      expect(result).toContain('blocks: [10, 20, 30]')
+    })
+
+    it('merges new depends_on with existing depends_on', () => {
+      const body = '```yaml\ndepends_on: [5, 15]\n```\n\nDescription'
+      const result = updateYamlMetadata(body, [], [25, 5])
+
+      expect(result).toContain('depends_on: [5, 15, 25]')
+    })
+
+    it('sorts merged values numerically', () => {
+      const body = '```yaml\nblocks: [100, 5]\n```\n\nDescription'
+      const result = updateYamlMetadata(body, [50, 1], [])
+
+      expect(result).toContain('blocks: [1, 5, 50, 100]')
+    })
+
+    it('deduplicates values', () => {
+      const body = '```yaml\nblocks: [10, 20]\n```\n\nDescription'
+      const result = updateYamlMetadata(body, [10, 20, 30], [])
+
+      expect(result).toContain('blocks: [10, 20, 30]')
+    })
+  })
+
+  describe('edge cases', () => {
+    it('returns null/undefined body unchanged', () => {
+      expect(updateYamlMetadata(null, [42], [])).toBeNull()
+      expect(updateYamlMetadata(undefined, [42], [])).toBeUndefined()
+    })
+
+    it('returns empty body unchanged', () => {
+      expect(updateYamlMetadata('', [42], [])).toBe('')
+    })
+
+    it('handles YAML block with whitespace', () => {
+      const body = '```yaml  \ntype: feature\n```\n\nDescription'
+      const result = updateYamlMetadata(body, [42], [])
+
+      expect(result).toContain('blocks: [42]')
+    })
+
+    it('handles empty existing blocks array', () => {
+      const body = '```yaml\nblocks: []\n```\n\nDescription'
+      const result = updateYamlMetadata(body, [42], [])
+
+      expect(result).toContain('blocks: [42]')
+    })
   })
 })
