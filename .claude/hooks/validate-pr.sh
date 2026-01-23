@@ -171,7 +171,7 @@ Body:
 |-------|------|
 | 🚀 Initiative | [#XX - Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
 | 🏔️ Epic | [#XX - Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
-| 📋 Issue | Closes #ISSUE_NUMBER |
+| 📋 Issue | Closes #ISSUE_NUMBER |  ← 'Closes/Fixes/Resolves' auto-closes issue on merge
 
 ## Test plan
 - [x] Tests pass
