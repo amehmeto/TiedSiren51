@@ -93,6 +93,15 @@ export function blockingScheduleChangedFixture(
         // Wait for listener's async side effects to complete
         await flushPromises()
       },
+      async dispatchingBlockSessions(
+        sessions: BlockSession[],
+        blocklists: Blocklist[] = [],
+      ) {
+        // Dispatch to existing store (must call creatingBlockSession first)
+        store.dispatch(setBlocklists(blocklists))
+        store.dispatch(setBlockSessions(sessions))
+        await flushPromises()
+      },
     },
     then: {
       blockingScheduleShouldContainApps(expectedPackageNames: string[]) {
@@ -148,6 +157,9 @@ export function blockingScheduleChangedFixture(
         expect(sirenTier.isNativeBlockingInitialized).toBe(true)
         expect(foregroundService.isRunning()).toBe(true)
         expect(foregroundService.startCallCount).toBe(1)
+      },
+      nativeBlockingInitializationCountShouldBe(expected: number) {
+        expect(sirenTier.initializeNativeBlockingCallCount).toBe(expected)
       },
     },
   }
