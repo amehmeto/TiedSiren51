@@ -71,18 +71,29 @@ describe('selectBlockingSchedule', () => {
     expect(androidSirens).toContainEqual(instagramAndroidSiren)
   })
 
-  test('should return empty array for inactive sessions', () => {
+  test('should return scheduled (future) sessions for native layer to handle time checks', () => {
     dateProvider.now.setHours(8, 0, 0, 0)
-    const session = buildBlockSession({
+    const blocklist = buildBlocklist({
+      id: 'bl-1',
+      sirens: { android: [facebookAndroidSiren] },
+    })
+    const futureSession = buildBlockSession({
+      id: 'future-session',
       startedAt: '09:00',
       endedAt: '11:00',
-      blocklistIds: [],
+      blocklistIds: [blocklist.id],
     })
-    const state = stateBuilder().withBlockSessions([session]).build()
+    const state = stateBuilder()
+      .withBlockSessions([futureSession])
+      .withBlocklists([blocklist])
+      .build()
 
     const schedule = selectBlockingSchedule(dateProvider, state)
 
-    expect(schedule).toHaveLength(0)
+    const [firstSchedule] = schedule
+    const scheduleId = firstSchedule.id
+    expect(schedule).toHaveLength(1)
+    expect(scheduleId).toBe('future-session')
   })
 
   test('should return empty array when no sessions exist', () => {

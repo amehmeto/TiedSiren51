@@ -5,7 +5,6 @@ import { RootState } from '@/core/_redux_/createStore'
 import { blockSessionAdapter } from '@/core/block-session/block-session'
 import { blocklistAdapter } from '@/core/blocklist/blocklist'
 import { Sirens } from '@/core/siren/sirens'
-import { isActive } from './isActive'
 
 const uniqueBy = <T, K>(array: T[], keyExtractor: (item: T) => K): T[] => {
   return [...new Map(array.map((item) => [keyExtractor(item), item])).values()]
@@ -47,6 +46,11 @@ const mergeSirens = (sirensArray: Sirens[]): Sirens => {
   }
 }
 
+/**
+ * Selects all block sessions (active AND scheduled) as BlockingSchedule[].
+ * This is used for syncing to native layer, which handles time window checks itself.
+ * Future sessions are included so blocklist edits made before session start are reflected.
+ */
 export const selectBlockingSchedule = createSelector(
   [
     (dateProvider: DateProvider) => dateProvider,
@@ -56,18 +60,17 @@ export const selectBlockingSchedule = createSelector(
   (dateProvider, blockSessionState, blocklistState): BlockingSchedule[] => {
     if (blockSessionState.ids.length === 0) return []
 
-    const activeSessions = blockSessionAdapter
+    const allSessions = blockSessionAdapter
       .getSelectors()
       .selectAll(blockSessionState)
-      .filter((session) => isActive(dateProvider, session))
 
-    if (activeSessions.length === 0) return []
+    if (allSessions.length === 0) return []
 
     const blocklists = blocklistAdapter
       .getSelectors()
       .selectEntities(blocklistState)
 
-    return activeSessions.map((session) => {
+    return allSessions.map((session) => {
       const startDate = dateProvider.recoverDate(session.startedAt)
       const endDate = dateProvider.recoverDate(session.endedAt)
       const sirens = mergeSirens(

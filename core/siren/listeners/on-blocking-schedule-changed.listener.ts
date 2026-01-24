@@ -45,21 +45,24 @@ export const onBlockingScheduleChangedListener = ({
   let lastScheduleKey = ''
   let lastBlockSessionState = store.getState().blockSession
   let lastBlocklistState = store.getState().blocklist
+  let wasScheduled = false
 
   const syncSchedule = async (
     schedule: BlockingSchedule[],
-    wasActive: boolean,
-    isActive: boolean,
+    wasScheduledBefore: boolean,
+    hasScheduledSessions: boolean,
   ) => {
     try {
       await sirenTier.updateBlockingSchedule(schedule)
 
-      if (!wasActive && isActive) {
+      // Start/stop foreground service based on whether ANY sessions are scheduled
+      // Native layer handles time window checks for blocking
+      if (!wasScheduledBefore && hasScheduledSessions) {
         sirenLookout.startWatching()
         await foregroundService.start()
       }
 
-      if (wasActive && !isActive) {
+      if (wasScheduledBefore && !hasScheduledSessions) {
         sirenLookout.stopWatching()
         await foregroundService.stop()
       }
@@ -68,11 +71,15 @@ export const onBlockingScheduleChangedListener = ({
     }
   }
 
+  // Initial sync on listener registration
   const initialState = store.getState()
   const initialSchedule = selectBlockingSchedule(dateProvider, initialState)
   if (initialSchedule.length > 0) {
     lastScheduleKey = getScheduleHashKey(initialSchedule)
-    void syncSchedule(initialSchedule, false, true)
+    // Update state synchronously BEFORE async operations to prevent race conditions
+    const wasScheduledBefore = wasScheduled
+    wasScheduled = true
+    void syncSchedule(initialSchedule, wasScheduledBefore, true)
   }
 
   return store.subscribe(() => {
@@ -92,12 +99,13 @@ export const onBlockingScheduleChangedListener = ({
 
     if (scheduleKey === lastScheduleKey) return
 
-    const wasActive = lastScheduleKey !== ''
-    const isActive = scheduleKey !== ''
+    const hasScheduledSessions = schedule.length > 0
 
     // Update state synchronously BEFORE async operations to prevent race conditions
     lastScheduleKey = scheduleKey
+    const wasScheduledBefore = wasScheduled
+    wasScheduled = hasScheduledSessions
 
-    void syncSchedule(schedule, wasActive, isActive)
+    void syncSchedule(schedule, wasScheduledBefore, hasScheduledSessions)
   })
 }
