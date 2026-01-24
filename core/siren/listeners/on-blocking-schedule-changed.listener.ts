@@ -4,8 +4,7 @@ import { Logger } from '@/core/_ports_/logger'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { BlockingSchedule, SirenTier } from '@/core/_ports_/siren.tier'
 import { AppStore } from '@/core/_redux_/createStore'
-import { selectActiveSessions } from '@/core/block-session/selectors/selectActiveSessions'
-import { selectBlockingSchedule } from '@/core/block-session/selectors/selectBlockingSchedule'
+import { selectBlockingScheduleWithActiveFlag } from '@/core/block-session/selectors/selectBlockingScheduleWithActiveFlag'
 
 export const onBlockingScheduleChangedListener = ({
   store,
@@ -73,15 +72,14 @@ export const onBlockingScheduleChangedListener = ({
 
   // Initial sync on listener registration
   const initialState = store.getState()
-  const initialSchedule = selectBlockingSchedule(dateProvider, initialState)
+  const { schedule: initialSchedule, hasActiveSession: hasActiveOnInit } =
+    selectBlockingScheduleWithActiveFlag(dateProvider, initialState)
   if (initialSchedule.length > 0) {
     lastScheduleKey = getScheduleHashKey(initialSchedule)
-    const hasActiveSessionNow =
-      selectActiveSessions(dateProvider, initialState.blockSession).length > 0
     // Update state synchronously BEFORE async operations to prevent race conditions
     const wasActiveBefore = wasActiveNow
-    wasActiveNow = hasActiveSessionNow
-    void syncSchedule(initialSchedule, wasActiveBefore, hasActiveSessionNow)
+    wasActiveNow = hasActiveOnInit
+    void syncSchedule(initialSchedule, wasActiveBefore, hasActiveOnInit)
   }
 
   return store.subscribe(() => {
@@ -96,19 +94,19 @@ export const onBlockingScheduleChangedListener = ({
     lastBlockSessionState = state.blockSession
     lastBlocklistState = state.blocklist
 
-    const schedule = selectBlockingSchedule(dateProvider, state)
+    const { schedule, hasActiveSession } = selectBlockingScheduleWithActiveFlag(
+      dateProvider,
+      state,
+    )
     const scheduleKey = getScheduleHashKey(schedule)
 
     if (scheduleKey === lastScheduleKey) return
 
-    const hasActiveSessionNow =
-      selectActiveSessions(dateProvider, state.blockSession).length > 0
-
     // Update state synchronously BEFORE async operations to prevent race conditions
     lastScheduleKey = scheduleKey
     const wasActiveBefore = wasActiveNow
-    wasActiveNow = hasActiveSessionNow
+    wasActiveNow = hasActiveSession
 
-    void syncSchedule(schedule, wasActiveBefore, hasActiveSessionNow)
+    void syncSchedule(schedule, wasActiveBefore, hasActiveSession)
   })
 }
