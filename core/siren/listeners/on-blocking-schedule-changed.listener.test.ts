@@ -387,7 +387,7 @@ describe('Feature: Blocking schedule changed listener', () => {
   })
 
   describe('Sessions outside active time window', () => {
-    it('should sync scheduled sessions even outside active time (native handles time checks)', async () => {
+    it('should sync scheduled sessions but not start foreground when outside active time', async () => {
       fixture.given.nowIs({ hours: 16, minutes: 30 })
       const blocklist = buildBlocklist({
         id: 'bl-1',
@@ -407,6 +407,8 @@ describe('Feature: Blocking schedule changed listener', () => {
 
       // Schedule is synced to native - native layer checks time windows
       fixture.then.blockingScheduleShouldContainApps(['com.facebook.katana'])
+      // But foreground service should NOT be started since no session is active NOW
+      fixture.then.blockingShouldBeInactive()
     })
   })
 
