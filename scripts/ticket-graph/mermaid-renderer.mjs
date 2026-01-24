@@ -14,6 +14,8 @@ import { writeFileSync, unlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
+import { BLOCKING_REPOS, CATEGORY_KEYWORDS } from '../remark-lint-ticket/config.mjs'
+
 // ============================================================================
 // Constants
 // ============================================================================
@@ -21,7 +23,7 @@ import { join } from 'node:path'
 const STATUS_EMOJI = {
   done: '✅',
   in_progress: '🔄',
-  todo: '⏳',
+  todo: '📝',
 }
 
 // Color manipulation constants
@@ -38,15 +40,6 @@ const CATEGORY_COLOR_SHADES = {
   bug: ['#dc2626', '#ef4444', '#f87171', '#fca5a5', '#fecaca'],
   other: ['#4b5563', '#6b7280', '#9ca3af', '#d1d5db', '#e5e7eb'],
 }
-
-// Category keywords for matching epic titles/labels
-const CATEGORY_KEYWORDS = {
-  auth: ['auth', 'sign-in', 'password', 'login', 'firebase', 'session'],
-  blocking: ['blocking', 'siren', 'tier', 'lookout', 'strict', 'overlay', 'schedule', 'native'],
-}
-
-// Repos automatically categorized as blocking
-const BLOCKING_REPOS = ['tied-siren-blocking-overlay', 'expo-accessibility-service', 'expo-foreground-service']
 
 // ============================================================================
 // Color Utilities

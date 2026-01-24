@@ -1,31 +1,25 @@
-# TiedSiren51 - Expo Mobile App
+# TiedSiren51
 
-## Code Coverage
+A React Native app blocker that helps users stay focused. Create "sirens" (apps, websites, or keywords to block), organize them into blocklists, and run timed block sessions to limit distractions.
 
-This project tracks code coverage to maintain quality. Use these commands:
+## Features
 
-- `npm run test:cov` - Run tests with coverage report
-- `npm run test:cov:track` - Run tests and track coverage history locally
-- `npm run test:cov:history` - View coverage history
+- **Sirens** - Define what to block: specific apps, websites, or keywords
+- **Blocklists** - Group sirens into reusable collections
+- **Block Sessions** - Run timed focus sessions that enforce your blocklists
+- **Device Sync** - Keep your configuration synchronized across devices
+- **Firebase Auth** - Secure user authentication
 
-**Current Coverage: 42.1%** 📊
+## Documentation
 
-### Automated PR Coverage
-
-Every pull request automatically gets a coverage comparison comment showing:
-- Coverage changes compared to the base branch
-- Visual indicators (📈/📉) for improvements/regressions
-- Detailed breakdown by metric (statements, functions, branches, lines)
-
-The GitHub Action runs on every PR and updates the comment automatically.
-
-A React Native mobile application built with Expo, featuring authentication, block sessions management, and more.
+- [CLAUDE.md](./CLAUDE.md) - Developer guide with patterns, commands, and anti-patterns
+- [Architecture Decision Records](./docs/adr/README.md) - Index of all architectural decisions
 
 ## Prerequisites
 
 - Node.js (v18 or newer recommended)
 - npm (comes with Node.js)
-- iOS Simulator (for Mac users) and / or Android Studio (for Android development)
+- Android Studio (for Android development)
 
 
 ## Android Development Setup for macOS
