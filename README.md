@@ -2,6 +2,25 @@
 
 A React Native app blocker that helps users stay focused. Create "sirens" (apps, websites, or keywords to block), organize them into blocklists, and run timed block sessions to limit distractions.
 
+## Tech Stack
+
+- **React Native / Expo** - Cross-platform mobile framework
+- **TypeScript** - Type-safe JavaScript
+- **Redux Toolkit** - State management
+- **Firebase Auth** - User authentication
+- **Prisma** - Database ORM
+
+### Custom Expo Modules
+
+Four in-house native modules power the Android blocking functionality:
+
+| Module | Purpose |
+|--------|---------|
+| [@amehmeto/expo-foreground-service](https://github.com/amehmeto/expo-foreground-service) | Persistent background service with notification |
+| [@amehmeto/tied-siren-blocking-overlay](https://github.com/amehmeto/tied-siren-blocking-overlay) | Native blocking overlay and schedule enforcement |
+| [@amehmeto/expo-accessibility-service](https://github.com/amehmeto/expo-accessibility-service) | Foreground app detection via Android Accessibility |
+| [@amehmeto/expo-list-installed-apps](https://github.com/amehmeto/expo-list-installed-apps) | Enumerate installed apps on device |
+
 ## Features
 
 - **Sirens** - Define what to block: specific apps, websites, or keywords
