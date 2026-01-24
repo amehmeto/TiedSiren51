@@ -81,6 +81,19 @@ export const FIBONACCI_POINTS = [0, 1, 2, 3, 5, 8, 13, 21]
 
 export const VALID_SEVERITIES = ['low', 'medium', 'high', 'critical']
 
+// Repos that are automatically categorized as "blocking" in graphs
+export const BLOCKING_REPOS = [
+  'tied-siren-blocking-overlay',
+  'expo-accessibility-service',
+  'expo-foreground-service',
+]
+
+// Category keywords for matching tickets to categories in graphs
+export const CATEGORY_KEYWORDS = {
+  auth: ['auth', 'sign-in', 'password', 'login', 'firebase', 'session'],
+  blocking: ['blocking', 'siren', 'tier', 'lookout', 'strict', 'overlay', 'schedule', 'native'],
+}
+
 // Required sections for different ticket types
 // Hierarchy: Initiative > Epic > Issue (feature/bug)
 export const FEATURE_SECTIONS = [

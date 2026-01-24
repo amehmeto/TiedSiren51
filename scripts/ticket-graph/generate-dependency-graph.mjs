@@ -25,7 +25,7 @@ import { writeFileSync, unlinkSync } from 'node:fs'
 
 const execAsync = promisify(exec)
 
-import { VALID_REPOS, REPO_ABBREVIATIONS, REPO_DISPLAY_ABBREV, MAIN_REPO } from '../remark-lint-ticket/config.mjs'
+import { VALID_REPOS, REPO_ABBREVIATIONS, REPO_DISPLAY_ABBREV, MAIN_REPO, BLOCKING_REPOS, CATEGORY_KEYWORDS } from '../remark-lint-ticket/config.mjs'
 import {
   buildGraphFromTickets,
   fetchAllIssues,
@@ -259,14 +259,6 @@ const CATEGORY_COLORS = {
   other: ANSI.white,
 }
 
-// Category keywords for matching
-const ASCII_CATEGORY_KEYWORDS = {
-  auth: ['auth', 'sign-in', 'password', 'login', 'firebase', 'session'],
-  blocking: ['blocking', 'siren', 'tier', 'lookout', 'strict', 'overlay', 'schedule', 'native'],
-}
-
-const BLOCKING_REPOS = ['tied-siren-blocking-overlay', 'expo-accessibility-service', 'expo-foreground-service']
-
 function categorizeTicket(ticket, epicCategories) {
   if (ticket.type === 'initiative') return 'initiative'
   if (ticket.type === 'epic') return 'epic'
@@ -283,7 +275,7 @@ function categorizeTicket(ticket, epicCategories) {
   const title = ticket.title.toLowerCase()
   const labels = ticket.metadata?.labels || []
 
-  for (const [category, keywords] of Object.entries(ASCII_CATEGORY_KEYWORDS)) {
+  for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
     if (keywords.some(kw => title.includes(kw) || labels.some(l => l.includes(kw)))) {
       return category
     }
@@ -301,7 +293,7 @@ function buildEpicCategories(tickets) {
     const title = ticket.title.toLowerCase()
     const labels = ticket.metadata?.labels || []
 
-    for (const [category, keywords] of Object.entries(ASCII_CATEGORY_KEYWORDS)) {
+    for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
       if (keywords.some(kw => title.includes(kw) || labels.some(l => l.includes(kw)))) {
         epicCategories.set(ticket.number, category)
         break
@@ -450,7 +442,6 @@ function generateAsciiGraph(tickets) {
 
   // Group features by parent epic
   const featuresByEpic = new Map()
-  const orphanFeatures = []
 
   for (const ticket of features) {
     const parentEpic = ticket.metadata?.parentEpic
@@ -459,8 +450,6 @@ function generateAsciiGraph(tickets) {
         featuresByEpic.set(parentEpic, [])
       }
       featuresByEpic.get(parentEpic).push(ticket)
-    } else {
-      orphanFeatures.push(ticket)
     }
   }
 
