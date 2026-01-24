@@ -21,7 +21,7 @@ import { join } from 'node:path'
 const STATUS_EMOJI = {
   done: '✅',
   in_progress: '🔄',
-  todo: '⏳',
+  todo: '📝',
 }
 
 // Color manipulation constants

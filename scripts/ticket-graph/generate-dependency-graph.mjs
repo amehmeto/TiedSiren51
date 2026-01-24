@@ -204,8 +204,160 @@ function generateDependencyMatrix(tickets) {
 }
 
 // ============================================================================
-// ASCII Graph
+// ASCII Graph with ANSI Colors
 // ============================================================================
+
+// ANSI color codes
+const ANSI = {
+  reset: '\x1b[0m',
+  bold: '\x1b[1m',
+  dim: '\x1b[2m',
+  italic: '\x1b[3m',
+  strikethrough: '\x1b[9m',
+  // Foreground colors
+  black: '\x1b[30m',
+  red: '\x1b[31m',
+  green: '\x1b[32m',
+  yellow: '\x1b[33m',
+  blue: '\x1b[34m',
+  magenta: '\x1b[35m',
+  cyan: '\x1b[36m',
+  white: '\x1b[37m',
+  gray: '\x1b[90m',
+  // Bright foreground
+  brightRed: '\x1b[91m',
+  brightGreen: '\x1b[92m',
+  brightYellow: '\x1b[93m',
+  brightBlue: '\x1b[94m',
+  brightMagenta: '\x1b[95m',
+  brightCyan: '\x1b[96m',
+  // Background colors
+  bgBlack: '\x1b[40m',
+  bgRed: '\x1b[41m',
+  bgGreen: '\x1b[42m',
+  bgYellow: '\x1b[43m',
+  bgBlue: '\x1b[44m',
+  bgMagenta: '\x1b[45m',
+  bgCyan: '\x1b[46m',
+  bgWhite: '\x1b[47m',
+}
+
+// Status styling
+const STATUS_STYLES = {
+  done: { emoji: '✅', color: ANSI.gray, style: ANSI.dim + ANSI.strikethrough },
+  in_progress: { emoji: '🔄', color: ANSI.brightYellow, style: ANSI.bold },
+  todo: { emoji: '📝', color: ANSI.white, style: '' },
+}
+
+// Category colors
+const CATEGORY_COLORS = {
+  initiative: ANSI.brightMagenta,
+  epic: ANSI.brightBlue,
+  auth: ANSI.brightGreen,
+  blocking: ANSI.brightRed,
+  bug: ANSI.red,
+  other: ANSI.white,
+}
+
+// Category keywords for matching
+const ASCII_CATEGORY_KEYWORDS = {
+  auth: ['auth', 'sign-in', 'password', 'login', 'firebase', 'session'],
+  blocking: ['blocking', 'siren', 'tier', 'lookout', 'strict', 'overlay', 'schedule', 'native'],
+}
+
+const BLOCKING_REPOS = ['tied-siren-blocking-overlay', 'expo-accessibility-service', 'expo-foreground-service']
+
+function categorizeTicket(ticket, epicCategories) {
+  if (ticket.type === 'initiative') return 'initiative'
+  if (ticket.type === 'epic') return 'epic'
+  if (ticket.type === 'bug') return 'bug'
+
+  if (BLOCKING_REPOS.includes(ticket.repo)) return 'blocking'
+
+  // Check parent epic category
+  const parentEpic = ticket.metadata?.parentEpic
+  if (parentEpic && epicCategories.has(parentEpic)) {
+    return epicCategories.get(parentEpic)
+  }
+
+  const title = ticket.title.toLowerCase()
+  const labels = ticket.metadata?.labels || []
+
+  for (const [category, keywords] of Object.entries(ASCII_CATEGORY_KEYWORDS)) {
+    if (keywords.some(kw => title.includes(kw) || labels.some(l => l.includes(kw)))) {
+      return category
+    }
+  }
+
+  return 'other'
+}
+
+function buildEpicCategories(tickets) {
+  const epicCategories = new Map()
+
+  for (const ticket of tickets) {
+    if (ticket.type !== 'epic') continue
+
+    const title = ticket.title.toLowerCase()
+    const labels = ticket.metadata?.labels || []
+
+    for (const [category, keywords] of Object.entries(ASCII_CATEGORY_KEYWORDS)) {
+      if (keywords.some(kw => title.includes(kw) || labels.some(l => l.includes(kw)))) {
+        epicCategories.set(ticket.number, category)
+        break
+      }
+    }
+
+    if (!epicCategories.has(ticket.number)) {
+      epicCategories.set(ticket.number, 'other')
+    }
+  }
+
+  return epicCategories
+}
+
+function truncateTitle(title, maxLen = 40) {
+  // Remove common prefixes
+  let cleaned = title
+    .replace(/^\[?\w+\]?\s*/i, '')           // [Epic], [Bug], etc.
+    .replace(/^feat\([^)]*\):\s*/i, '')      // feat(scope):
+    .replace(/^fix\([^)]*\):\s*/i, '')       // fix(scope):
+    .replace(/^refactor\([^)]*\):\s*/i, '')  // refactor(scope):
+    .replace(/^chore\([^)]*\):\s*/i, '')     // chore(scope):
+    .replace(/^test\([^)]*\):\s*/i, '')      // test(scope):
+    .replace(/^\([^)]*\):\s*/i, '')          // (scope): without type prefix
+
+  if (cleaned.length > maxLen) {
+    return cleaned.substring(0, maxLen - 3) + '...'
+  }
+  return cleaned
+}
+
+function formatAsciiTicket(ticket, epicCategories) {
+  const status = ticket.status || 'todo'
+  const statusStyle = STATUS_STYLES[status]
+  const category = categorizeTicket(ticket, epicCategories)
+  const categoryColor = CATEGORY_COLORS[category]
+
+  const repoAbbrev = REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
+  const id = `${repoAbbrev}#${ticket.number}`
+  const title = truncateTitle(ticket.title)
+  const sp = ticket.metadata?.story_points ? ` [${ticket.metadata.story_points}sp]` : ''
+
+  const emoji = statusStyle.emoji
+  const idColored = `${categoryColor}${id}${ANSI.reset}`
+
+  let titleColored = title
+  if (status === 'done') {
+    titleColored = `${ANSI.gray}${ANSI.dim}${title}${ANSI.reset}`
+  } else if (status === 'in_progress') {
+    titleColored = `${ANSI.bold}${ANSI.brightYellow}${title}${ANSI.reset}`
+  }
+
+  const spColored = sp ? `${ANSI.cyan}${sp}${ANSI.reset}` : ''
+
+  return `${emoji} ${idColored} ${titleColored}${spColored}`
+}
 
 function buildAsciiTreeContext(tickets) {
   const withDeps = tickets.filter(
@@ -214,6 +366,7 @@ function buildAsciiTreeContext(tickets) {
 
   const ticketByKey = new Map(withDeps.map((t) => [formatTicketId(t.repo, t.number), t]))
   const ticketKeys = new Set(ticketByKey.keys())
+  const allTicketsByKey = new Map(tickets.map((t) => [formatTicketId(t.repo, t.number), t]))
 
   const children = new Map()
   for (const t of withDeps) {
@@ -231,78 +384,170 @@ function buildAsciiTreeContext(tickets) {
     .filter((t) => !hasParent.has(formatTicketId(t.repo, t.number)))
     .map((t) => formatTicketId(t.repo, t.number))
 
-  return { ticketByKey, ticketKeys, children, roots }
+  return { ticketByKey, ticketKeys, children, roots, allTicketsByKey }
 }
 
-function formatAsciiLabel(key, ticketByKey) {
-  const ticket = ticketByKey.get(key)
-  if (ticket) {
-    return formatDepRef({ repo: ticket.repo, number: ticket.number }, MAIN_REPO)
-  }
-  return key
-}
+function renderAsciiTree(key, prefix, context, epicCategories, printed, lines, connector = '') {
+  const { ticketByKey, ticketKeys, children, allTicketsByKey } = context
+  const ticket = ticketByKey.get(key) || allTicketsByKey.get(key)
 
-function renderAsciiBox(label, hasChildren, indent) {
-  const labelPad = label.length > 5 ? label : label.padStart(5)
-  const lines = []
-
-  lines.push(`${indent}┌${'─'.repeat(labelPad.length + 2)}┐`)
-  lines.push(`${indent}│ ${labelPad} │`)
-
-  if (hasChildren) {
-    lines.push(`${indent}└──┬${'─'.repeat(labelPad.length - 1)}┘`)
-    lines.push(`${indent}   │`)
-  } else {
-    lines.push(`${indent}└${'─'.repeat(labelPad.length + 2)}┘`)
-  }
-
-  return lines
-}
-
-function renderAsciiTree(key, indent, context, printed, lines) {
-  const { ticketByKey, ticketKeys, children } = context
-
+  // Handle already printed (backreference)
   if (printed.has(key)) {
-    lines.push(`${indent}└─▶ ${formatAsciiLabel(key, ticketByKey)} (↑)`)
+    const repoAbbrev = ticket ? (REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo) : ''
+    const num = ticket ? ticket.number : key.split('#')[1]
+    lines.push(`${prefix}${connector}${ANSI.gray}↑ ${repoAbbrev}#${num} (see above)${ANSI.reset}`)
     return
   }
   printed.add(key)
 
+  // Format and print this node
+  const formatted = ticket ? formatAsciiTicket(ticket, epicCategories) : `${ANSI.gray}${key}${ANSI.reset}`
+  lines.push(`${prefix}${connector}${formatted}`)
+
+  // Get children
   const blockRefs = children.get(key) || []
   const kids = blockRefs
     .map((ref) => formatTicketId(ref.repo, ref.number))
     .filter((k) => ticketKeys.has(k))
 
-  const label = formatAsciiLabel(key, ticketByKey)
-  const boxLines = renderAsciiBox(label, kids.length > 0, indent)
-  lines.push(...boxLines)
-
+  // Render children
   kids.forEach((kid, i) => {
     const isLast = i === kids.length - 1
-    const connector = isLast ? '└─▶ ' : '├─▶ '
-    const childIndent = indent + (isLast ? '    ' : '│   ')
-
-    if (printed.has(kid)) {
-      lines.push(`${indent}   ${connector}${formatAsciiLabel(kid, ticketByKey)} (↑)`)
-    } else {
-      lines.push(`${indent}   ${connector}`)
-      renderAsciiTree(kid, childIndent, context, printed, lines)
-    }
+    const childConnector = isLast ? '└─ ' : '├─ '
+    const childPrefix = prefix + (connector ? (connector.startsWith('└') ? '   ' : '│  ') : '')
+    renderAsciiTree(kid, childPrefix, context, epicCategories, printed, lines, childConnector)
   })
 }
 
 function generateAsciiGraph(tickets) {
+  const epicCategories = buildEpicCategories(tickets)
   const context = buildAsciiTreeContext(tickets)
 
-  if (context.roots.length === 0) return 'No dependencies found.'
+  if (context.roots.length === 0) {
+    return `${ANSI.yellow}No dependencies found.${ANSI.reset}`
+  }
 
-  const printed = new Set()
   const lines = []
 
-  context.roots.forEach((root, i) => {
-    if (i > 0) lines.push('\n' + '─'.repeat(40) + '\n')
-    renderAsciiTree(root, '', context, printed, lines)
+  // Header
+  lines.push(`${ANSI.bold}${ANSI.cyan}═══════════════════════════════════════════════════════════════${ANSI.reset}`)
+  lines.push(`${ANSI.bold}${ANSI.cyan}                    TICKET DEPENDENCY GRAPH${ANSI.reset}`)
+  lines.push(`${ANSI.bold}${ANSI.cyan}═══════════════════════════════════════════════════════════════${ANSI.reset}`)
+  lines.push('')
+
+  // Legend
+  lines.push(`${ANSI.bold}Legend:${ANSI.reset}`)
+  lines.push(`  ${STATUS_STYLES.done.emoji} Done    ${STATUS_STYLES.in_progress.emoji} In Progress    ${STATUS_STYLES.todo.emoji} To Do`)
+  lines.push(`  ${CATEGORY_COLORS.initiative}■${ANSI.reset} Initiative  ${CATEGORY_COLORS.epic}■${ANSI.reset} Epic  ${CATEGORY_COLORS.auth}■${ANSI.reset} Auth  ${CATEGORY_COLORS.blocking}■${ANSI.reset} Blocking  ${CATEGORY_COLORS.bug}■${ANSI.reset} Bug`)
+  lines.push('')
+  lines.push(`${ANSI.bold}${ANSI.cyan}───────────────────────────────────────────────────────────────${ANSI.reset}`)
+  lines.push('')
+
+  // Separate tickets by type
+  const initiatives = tickets.filter(t => t.type === 'initiative')
+  const epics = tickets.filter(t => t.type === 'epic')
+  const features = tickets.filter(t => t.type === 'feature')
+
+  // Group features by parent epic
+  const featuresByEpic = new Map()
+  const orphanFeatures = []
+
+  for (const ticket of features) {
+    const parentEpic = ticket.metadata?.parentEpic
+    if (parentEpic) {
+      if (!featuresByEpic.has(parentEpic)) {
+        featuresByEpic.set(parentEpic, [])
+      }
+      featuresByEpic.get(parentEpic).push(ticket)
+    } else {
+      orphanFeatures.push(ticket)
+    }
+  }
+
+  const printed = new Set()
+
+  // Section: Initiatives (if they have dependencies)
+  const initiativesWithDeps = initiatives.filter(t => context.ticketKeys.has(formatTicketId(t.repo, t.number)))
+  if (initiativesWithDeps.length > 0) {
+    lines.push(`${ANSI.bold}${CATEGORY_COLORS.initiative}━━━ INITIATIVES ━━━${ANSI.reset}`)
+    lines.push('')
+    for (const init of initiativesWithDeps) {
+      const key = formatTicketId(init.repo, init.number)
+      if (!printed.has(key)) {
+        renderAsciiTree(key, '', context, epicCategories, printed, lines, '')
+        lines.push('')
+      }
+    }
+  }
+
+  // Section: Epics with their children
+  const epicsWithContent = epics.filter(epic => {
+    const epicKey = formatTicketId(epic.repo, epic.number)
+    const children = featuresByEpic.get(epic.number) || []
+    const childrenWithDeps = children.filter(t => context.ticketKeys.has(formatTicketId(t.repo, t.number)))
+    return context.ticketKeys.has(epicKey) || childrenWithDeps.length > 0
   })
+
+  if (epicsWithContent.length > 0) {
+    lines.push(`${ANSI.bold}${CATEGORY_COLORS.epic}━━━ EPICS ━━━${ANSI.reset}`)
+    lines.push('')
+
+    for (const epic of epicsWithContent) {
+      const epicKey = formatTicketId(epic.repo, epic.number)
+      const epicChildren = featuresByEpic.get(epic.number) || []
+      const childrenWithDeps = epicChildren.filter(t => context.ticketKeys.has(formatTicketId(t.repo, t.number)))
+
+      // Epic header
+      const epicTitle = truncateTitle(epic.title, 45)
+      const epicStatus = STATUS_STYLES[epic.status || 'todo']
+      lines.push(`${ANSI.bold}${CATEGORY_COLORS.epic}┌─ #${epic.number}: ${epicTitle} ${epicStatus.emoji}${ANSI.reset}`)
+
+      // If epic itself has dependencies, show it in the tree
+      if (context.ticketKeys.has(epicKey) && !printed.has(epicKey)) {
+        renderAsciiTree(epicKey, `${CATEGORY_COLORS.epic}│${ANSI.reset} `, context, epicCategories, printed, lines, '')
+      }
+
+      // Render children that are roots (not blocked by anything in the tree)
+      const childRoots = childrenWithDeps.filter(child => {
+        const childKey = formatTicketId(child.repo, child.number)
+        return context.roots.includes(childKey) && !printed.has(childKey)
+      })
+
+      for (const child of childRoots) {
+        const childKey = formatTicketId(child.repo, child.number)
+        renderAsciiTree(childKey, `${CATEGORY_COLORS.epic}│${ANSI.reset} `, context, epicCategories, printed, lines, '')
+      }
+
+      lines.push(`${CATEGORY_COLORS.epic}└${'─'.repeat(50)}${ANSI.reset}`)
+      lines.push('')
+    }
+  }
+
+  // Section: Ungrouped features (features without parent epic but with dependencies)
+  const orphanRoots = context.roots.filter(r => {
+    if (printed.has(r)) return false
+    const ticket = context.allTicketsByKey.get(r)
+    return ticket && ticket.type === 'feature' && !ticket.metadata?.parentEpic
+  })
+
+  if (orphanRoots.length > 0) {
+    lines.push(`${ANSI.bold}${ANSI.white}━━━ UNGROUPED FEATURES ━━━${ANSI.reset}`)
+    lines.push('')
+    for (const root of orphanRoots) {
+      renderAsciiTree(root, '', context, epicCategories, printed, lines, '')
+      lines.push('')
+    }
+  }
+
+  // Stats footer
+  lines.push(`${ANSI.bold}${ANSI.cyan}───────────────────────────────────────────────────────────────${ANSI.reset}`)
+  const stats = {
+    total: tickets.length,
+    done: tickets.filter(t => t.status === 'done').length,
+    inProgress: tickets.filter(t => t.status === 'in_progress').length,
+    todo: tickets.filter(t => t.status === 'todo').length,
+  }
+  lines.push(`${ANSI.bold}Stats:${ANSI.reset} ${stats.total} tickets | ✅ ${stats.done} done | 🔄 ${stats.inProgress} in progress | 📝 ${stats.todo} todo`)
 
   return lines.join('\n')
 }
@@ -451,7 +696,7 @@ ${Object.entries(VALID_REPOS)
 |-------|--------|-------|
 | ✅ | Done | Grayscale, dashed border |
 | 🔄 | In Progress | Bright, thick border |
-| ⏳ | To Do | Normal colors |
+| 📝 | To Do | Normal colors |
 
 ### Story Points
 
@@ -648,7 +893,7 @@ async function main() {
     for (const [repo, count] of Object.entries(repoCounts)) {
       console.log(`  - ${repo}: ${count}`)
     }
-    console.log(`Status breakdown: ✅ ${statusCounts.done} done, 🔄 ${statusCounts.in_progress} in progress, ⏳ ${statusCounts.todo} todo`)
+    console.log(`Status breakdown: ✅ ${statusCounts.done} done, 🔄 ${statusCounts.in_progress} in progress, 📝 ${statusCounts.todo} todo`)
   }
 
   // Step 3: Build the graph
@@ -720,7 +965,7 @@ async function main() {
     const encoded = Buffer.from(state).toString('base64url')
     const url = `https://mermaid.live/edit#base64:${encoded}`
     console.log('Opening mermaid.live...')
-    execSync(`open "${url}"`)
+    execSync(`open -a "Opera GX" "${url}"`)
   } else if (asciiMode) {
     // ASCII box graph (standalone)
     console.log(generateAsciiGraph(tickets))
