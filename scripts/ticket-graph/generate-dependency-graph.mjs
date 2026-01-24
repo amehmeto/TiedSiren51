@@ -954,7 +954,7 @@ async function main() {
     const encoded = Buffer.from(state).toString('base64url')
     const url = `https://mermaid.live/edit#base64:${encoded}`
     console.log('Opening mermaid.live...')
-    execSync(`open "${url}"`)
+    execSync(`open -a "Opera GX" "${url}"`)
   } else if (asciiMode) {
     // ASCII box graph (standalone)
     console.log(generateAsciiGraph(tickets))
