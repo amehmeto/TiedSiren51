@@ -64,8 +64,6 @@ export const selectBlockingSchedule = createSelector(
       .getSelectors()
       .selectAll(blockSessionState)
 
-    if (allSessions.length === 0) return []
-
     const blocklists = blocklistAdapter
       .getSelectors()
       .selectEntities(blocklistState)
