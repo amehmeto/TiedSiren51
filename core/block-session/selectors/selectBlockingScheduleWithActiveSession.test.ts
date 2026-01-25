@@ -7,9 +7,9 @@ import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.bu
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
-import { selectBlockingScheduleWithActiveFlag } from './selectBlockingScheduleWithActiveFlag'
+import { selectBlockingScheduleWithActiveSession } from './selectBlockingScheduleWithActiveSession'
 
-describe('selectBlockingScheduleWithActiveFlag', () => {
+describe('selectBlockingScheduleWithActiveSession', () => {
   let dateProvider: StubDateProvider
 
   beforeEach(() => {
@@ -33,7 +33,7 @@ describe('selectBlockingScheduleWithActiveFlag', () => {
       .withBlocklists([blocklist])
       .build()
 
-    const result = selectBlockingScheduleWithActiveFlag(dateProvider, state)
+    const result = selectBlockingScheduleWithActiveSession(dateProvider, state)
 
     expect(result.schedule).toHaveLength(1)
     expect(result.hasActiveSession).toBe(true)
@@ -56,7 +56,7 @@ describe('selectBlockingScheduleWithActiveFlag', () => {
       .withBlocklists([blocklist])
       .build()
 
-    const result = selectBlockingScheduleWithActiveFlag(dateProvider, state)
+    const result = selectBlockingScheduleWithActiveSession(dateProvider, state)
 
     expect(result.schedule).toHaveLength(1)
     expect(result.hasActiveSession).toBe(false)
@@ -65,7 +65,7 @@ describe('selectBlockingScheduleWithActiveFlag', () => {
   test('should return empty schedule and hasActiveSession=false when no sessions exist', () => {
     const state = stateBuilder().build()
 
-    const result = selectBlockingScheduleWithActiveFlag(dateProvider, state)
+    const result = selectBlockingScheduleWithActiveSession(dateProvider, state)
 
     expect(result.schedule).toHaveLength(0)
     expect(result.hasActiveSession).toBe(false)
@@ -94,7 +94,7 @@ describe('selectBlockingScheduleWithActiveFlag', () => {
       .withBlocklists([blocklist])
       .build()
 
-    const result = selectBlockingScheduleWithActiveFlag(dateProvider, state)
+    const result = selectBlockingScheduleWithActiveSession(dateProvider, state)
 
     const scheduleIds = result.schedule.map((s) => s.id)
     expect(result.schedule).toHaveLength(2)
@@ -119,7 +119,7 @@ describe('selectBlockingScheduleWithActiveFlag', () => {
       .withBlocklists([blocklist])
       .build()
 
-    const result = selectBlockingScheduleWithActiveFlag(dateProvider, state)
+    const result = selectBlockingScheduleWithActiveSession(dateProvider, state)
 
     const [firstSchedule] = result.schedule
     const androidSirens = firstSchedule.sirens.android

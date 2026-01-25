@@ -7,7 +7,7 @@ import { blockSessionAdapter } from '@/core/block-session/block-session'
 import { blocklistAdapter } from '@/core/blocklist/blocklist'
 import { isActive } from './isActive'
 
-export type BlockingScheduleWithActiveFlag = {
+export type BlockingScheduleWithActiveSession = {
   schedule: BlockingSchedule[]
   hasActiveSession: boolean
 }
@@ -18,7 +18,7 @@ export type BlockingScheduleWithActiveFlag = {
  * - schedule: All sessions (active + scheduled) for native layer to handle time windows
  * - hasActiveSession: Whether any session is currently active (for foreground service lifecycle)
  */
-export const selectBlockingScheduleWithActiveFlag = createSelector(
+export const selectBlockingScheduleWithActiveSession = createSelector(
   [
     (dateProvider: DateProvider) => dateProvider,
     (_: DateProvider, state: RootState) => state.blockSession,
@@ -28,7 +28,7 @@ export const selectBlockingScheduleWithActiveFlag = createSelector(
     dateProvider,
     blockSessionState,
     blocklistState,
-  ): BlockingScheduleWithActiveFlag => {
+  ): BlockingScheduleWithActiveSession => {
     if (blockSessionState.ids.length === 0)
       return { schedule: [], hasActiveSession: false }
 

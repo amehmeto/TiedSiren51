@@ -4,7 +4,7 @@ import { Logger } from '@/core/_ports_/logger'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { BlockingSchedule, SirenTier } from '@/core/_ports_/siren.tier'
 import { AppStore } from '@/core/_redux_/createStore'
-import { selectBlockingScheduleWithActiveFlag } from '@/core/block-session/selectors/selectBlockingScheduleWithActiveFlag'
+import { selectBlockingScheduleWithActiveSession } from '@/core/block-session/selectors/selectBlockingScheduleWithActiveSession'
 
 export const onBlockingScheduleChangedListener = ({
   store,
@@ -73,7 +73,7 @@ export const onBlockingScheduleChangedListener = ({
   // Initial sync on listener registration
   const initialState = store.getState()
   const { schedule: initialSchedule, hasActiveSession: hasActiveOnInit } =
-    selectBlockingScheduleWithActiveFlag(dateProvider, initialState)
+    selectBlockingScheduleWithActiveSession(dateProvider, initialState)
   if (initialSchedule.length > 0) {
     lastScheduleKey = getScheduleHashKey(initialSchedule)
     // Update state synchronously BEFORE async operations to prevent race conditions
@@ -94,10 +94,8 @@ export const onBlockingScheduleChangedListener = ({
     lastBlockSessionState = state.blockSession
     lastBlocklistState = state.blocklist
 
-    const { schedule, hasActiveSession } = selectBlockingScheduleWithActiveFlag(
-      dateProvider,
-      state,
-    )
+    const { schedule, hasActiveSession } =
+      selectBlockingScheduleWithActiveSession(dateProvider, state)
     const scheduleKey = getScheduleHashKey(schedule)
 
     if (scheduleKey === lastScheduleKey) return
