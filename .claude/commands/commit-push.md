@@ -23,9 +23,10 @@ Commit and push workflow:
 Co-Authored-By: Claude Opus 4.5 <noreply@anthropic.com>
 ```
 
-5. **Create PR if needed**:
+5. **Create or update PR**:
    - After pushing, check if a PR already exists for the current branch: `gh pr view --json url 2>/dev/null`
    - If no PR exists, create one with `gh pr create`
+   - If PR exists, update the description with `gh pr edit <number> --body` to reflect all changes made
    - Use a descriptive title and summary of changes in the body
 
 Execute the commit and push now.

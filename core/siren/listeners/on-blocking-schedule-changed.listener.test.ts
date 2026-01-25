@@ -284,8 +284,8 @@ describe('Feature: Blocking schedule changed listener', () => {
     })
   })
 
-  describe('Scenario 3: Blocklist edited without active session', () => {
-    it('should NOT sync when blocklist edited but no active session', async () => {
+  describe('Scenario 3: Blocklist edited without any session', () => {
+    it('should NOT sync when blocklist edited but no session exists', async () => {
       const blocklist = buildBlocklist({
         id: 'blocklist-1',
         sirens: { android: [facebookAndroidSiren] },
@@ -305,7 +305,42 @@ describe('Feature: Blocking schedule changed listener', () => {
     })
   })
 
-  describe('Scenario 4: App restart with active session', () => {
+  describe('Scenario 4: Blocklist edited while session is scheduled (future)', () => {
+    it('should sync updated blocklist for scheduled session without starting foreground', async () => {
+      const blocklist = buildBlocklist({
+        id: 'blocklist-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+      fixture.given.nowIs({ hours: 13, minutes: 30 })
+      fixture.given.existingBlockSessions(
+        [
+          buildBlockSession({
+            id: 'scheduled-session',
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      await fixture.when.updatingBlocklist({
+        ...blocklist,
+        sirens: {
+          ...blocklist.sirens,
+          android: [facebookAndroidSiren, tikTokAndroidSiren],
+        },
+      })
+
+      fixture.then.blockingScheduleShouldContainApps([
+        'com.facebook.katana',
+        'com.example.tiktok',
+      ])
+      fixture.then.blockingShouldBeInactive()
+    })
+  })
+
+  describe('Scenario 5: App restart with active session', () => {
     it('should restore blocking when updating blocklist after app restart', async () => {
       const blocklist = buildBlocklist({
         id: 'blocklist-1',
@@ -387,7 +422,7 @@ describe('Feature: Blocking schedule changed listener', () => {
   })
 
   describe('Sessions outside active time window', () => {
-    it('should not sync blocked apps for sessions outside active time', async () => {
+    it('should sync scheduled sessions but not start foreground when outside active time', async () => {
       fixture.given.nowIs({ hours: 16, minutes: 30 })
       const blocklist = buildBlocklist({
         id: 'bl-1',
@@ -405,7 +440,8 @@ describe('Feature: Blocking schedule changed listener', () => {
         [blocklist],
       )
 
-      fixture.then.blockingScheduleShouldBeEmpty()
+      fixture.then.blockingScheduleShouldContainApps(['com.facebook.katana'])
+      fixture.then.blockingShouldBeInactive()
     })
   })
 

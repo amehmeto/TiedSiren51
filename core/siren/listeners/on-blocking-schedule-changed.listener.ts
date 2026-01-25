@@ -5,6 +5,7 @@ import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { BlockingSchedule, SirenTier } from '@/core/_ports_/siren.tier'
 import { AppStore } from '@/core/_redux_/createStore'
 import { selectBlockingSchedule } from '@/core/block-session/selectors/selectBlockingSchedule'
+import { selectHasActiveSession } from '@/core/block-session/selectors/selectHasActiveSession'
 
 export const onBlockingScheduleChangedListener = ({
   store,
@@ -21,7 +22,6 @@ export const onBlockingScheduleChangedListener = ({
   dateProvider: DateProvider
   logger: Logger
 }): (() => void) => {
-  // Creates a hash key from schedule to detect changes via string comparison
   const getScheduleHashKey = (schedule: BlockingSchedule[]): string => {
     return schedule
       .map((s) => {
@@ -45,21 +45,22 @@ export const onBlockingScheduleChangedListener = ({
   let lastScheduleKey = ''
   let lastBlockSessionState = store.getState().blockSession
   let lastBlocklistState = store.getState().blocklist
+  let isActiveNow = false
 
   const syncSchedule = async (
     schedule: BlockingSchedule[],
-    wasActive: boolean,
-    isActive: boolean,
+    wasActiveBefore: boolean,
+    hasActiveSessionNow: boolean,
   ) => {
     try {
       await sirenTier.updateBlockingSchedule(schedule)
 
-      if (!wasActive && isActive) {
+      if (!wasActiveBefore && hasActiveSessionNow) {
         sirenLookout.startWatching()
         await foregroundService.start()
       }
 
-      if (wasActive && !isActive) {
+      if (wasActiveBefore && !hasActiveSessionNow) {
         sirenLookout.stopWatching()
         await foregroundService.stop()
       }
@@ -70,9 +71,13 @@ export const onBlockingScheduleChangedListener = ({
 
   const initialState = store.getState()
   const initialSchedule = selectBlockingSchedule(dateProvider, initialState)
+  const hasActiveOnInit = selectHasActiveSession(dateProvider, initialState)
   if (initialSchedule.length > 0) {
     lastScheduleKey = getScheduleHashKey(initialSchedule)
-    void syncSchedule(initialSchedule, false, true)
+    // Update state synchronously BEFORE async operations to prevent race conditions
+    const wasActiveBefore = isActiveNow
+    isActiveNow = hasActiveOnInit
+    void syncSchedule(initialSchedule, wasActiveBefore, hasActiveOnInit)
   }
 
   return store.subscribe(() => {
@@ -88,16 +93,16 @@ export const onBlockingScheduleChangedListener = ({
     lastBlocklistState = state.blocklist
 
     const schedule = selectBlockingSchedule(dateProvider, state)
+    const hasActiveSession = selectHasActiveSession(dateProvider, state)
     const scheduleKey = getScheduleHashKey(schedule)
 
     if (scheduleKey === lastScheduleKey) return
 
-    const wasActive = lastScheduleKey !== ''
-    const isActive = scheduleKey !== ''
-
     // Update state synchronously BEFORE async operations to prevent race conditions
     lastScheduleKey = scheduleKey
+    const wasActiveBefore = isActiveNow
+    isActiveNow = hasActiveSession
 
-    void syncSchedule(schedule, wasActive, isActive)
+    void syncSchedule(schedule, wasActiveBefore, hasActiveSession)
   })
 }

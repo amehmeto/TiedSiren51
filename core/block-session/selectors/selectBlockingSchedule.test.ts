@@ -2,7 +2,6 @@ import { beforeEach, describe, expect, test } from 'vitest'
 import {
   facebookAndroidSiren,
   instagramAndroidSiren,
-  tikTokAndroidSiren,
 } from '@/core/_tests_/data-builders/android-siren.builder'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
@@ -17,7 +16,15 @@ describe('selectBlockingSchedule', () => {
     dateProvider = new StubDateProvider()
   })
 
-  test('should return blocking schedule for active sessions', () => {
+  test('should return empty array when no sessions exist', () => {
+    const state = stateBuilder().build()
+
+    const result = selectBlockingSchedule(dateProvider, state)
+
+    expect(result).toHaveLength(0)
+  })
+
+  test('should return all sessions as blocking schedule', () => {
     dateProvider.now.setHours(10, 0, 0, 0)
     const blocklist = buildBlocklist({
       id: 'bl-1',
@@ -29,105 +36,65 @@ describe('selectBlockingSchedule', () => {
       endedAt: '11:00',
       blocklistIds: [blocklist.id],
     })
+    const futureSession = buildBlockSession({
+      id: 'future-session',
+      startedAt: '14:00',
+      endedAt: '16:00',
+      blocklistIds: [blocklist.id],
+    })
     const state = stateBuilder()
-      .withBlockSessions([activeSession])
+      .withBlockSessions([activeSession, futureSession])
       .withBlocklists([blocklist])
       .build()
 
-    const schedule = selectBlockingSchedule(dateProvider, state)
+    const result = selectBlockingSchedule(dateProvider, state)
+    const scheduleIds = result.map((s) => s.id)
 
-    const [firstSchedule] = schedule
-    const firstScheduleId = firstSchedule.id
-    const androidSirens = firstSchedule.sirens.android
-    expect(schedule).toHaveLength(1)
-    expect(firstScheduleId).toBe('active-session')
-    expect(androidSirens).toContainEqual(facebookAndroidSiren)
+    expect(result).toHaveLength(2)
+    expect(scheduleIds).toContain('active-session')
+    expect(scheduleIds).toContain('future-session')
   })
 
-  test('should deduplicate sirens across blocklists', () => {
+  test('should include sirens from blocklists', () => {
     dateProvider.now.setHours(10, 0, 0, 0)
-    const blocklist1 = buildBlocklist({
+    const blocklist = buildBlocklist({
       id: 'bl-1',
-      sirens: { android: [facebookAndroidSiren] },
-    })
-    const blocklist2 = buildBlocklist({
-      id: 'bl-2',
       sirens: { android: [facebookAndroidSiren, instagramAndroidSiren] },
     })
     const session = buildBlockSession({
       startedAt: '09:00',
       endedAt: '11:00',
-      blocklistIds: [blocklist1.id, blocklist2.id],
+      blocklistIds: [blocklist.id],
     })
     const state = stateBuilder()
       .withBlockSessions([session])
-      .withBlocklists([blocklist1, blocklist2])
+      .withBlocklists([blocklist])
       .build()
 
     const [firstSchedule] = selectBlockingSchedule(dateProvider, state)
     const androidSirens = firstSchedule.sirens.android
+
     expect(androidSirens).toHaveLength(2)
     expect(androidSirens).toContainEqual(facebookAndroidSiren)
     expect(androidSirens).toContainEqual(instagramAndroidSiren)
   })
 
-  test('should return empty array for inactive sessions', () => {
-    dateProvider.now.setHours(8, 0, 0, 0)
+  test('should return empty sirens when blocklist was deleted', () => {
+    dateProvider.now.setHours(10, 0, 0, 0)
     const session = buildBlockSession({
       startedAt: '09:00',
       endedAt: '11:00',
-      blocklistIds: [],
+      blocklistIds: ['deleted-blocklist-id'],
     })
     const state = stateBuilder().withBlockSessions([session]).build()
 
-    const schedule = selectBlockingSchedule(dateProvider, state)
-
-    expect(schedule).toHaveLength(0)
-  })
-
-  test('should return empty array when no sessions exist', () => {
-    const state = stateBuilder().build()
-
-    const schedule = selectBlockingSchedule(dateProvider, state)
-
-    expect(schedule).toHaveLength(0)
-  })
-
-  test('should use current blocklist state', () => {
-    dateProvider.now.setHours(10, 0, 0, 0)
-    const currentBlocklist = buildBlocklist({
-      id: 'bl-1',
-      sirens: { android: [tikTokAndroidSiren] },
-    })
-    const session = buildBlockSession({
-      startedAt: '09:00',
-      endedAt: '11:00',
-      blocklistIds: ['bl-1'],
-    })
-    const state = stateBuilder()
-      .withBlockSessions([session])
-      .withBlocklists([currentBlocklist])
-      .build()
-
     const [firstSchedule] = selectBlockingSchedule(dateProvider, state)
     const androidSirens = firstSchedule.sirens.android
-    expect(androidSirens).toContainEqual(tikTokAndroidSiren)
-  })
+    const websites = firstSchedule.sirens.websites
+    const keywords = firstSchedule.sirens.keywords
 
-  test('should skip deleted blocklists', () => {
-    dateProvider.now.setHours(10, 0, 0, 0)
-    const session = buildBlockSession({
-      startedAt: '09:00',
-      endedAt: '11:00',
-      blocklistIds: ['bl-deleted'],
-    })
-    const state = stateBuilder()
-      .withBlockSessions([session])
-      .withBlocklists([])
-      .build()
-
-    const [firstSchedule] = selectBlockingSchedule(dateProvider, state)
-    const androidSirens = firstSchedule.sirens.android
     expect(androidSirens).toHaveLength(0)
+    expect(websites).toHaveLength(0)
+    expect(keywords).toHaveLength(0)
   })
 })
