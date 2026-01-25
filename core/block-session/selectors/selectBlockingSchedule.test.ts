@@ -78,4 +78,23 @@ describe('selectBlockingSchedule', () => {
     expect(androidSirens).toContainEqual(facebookAndroidSiren)
     expect(androidSirens).toContainEqual(instagramAndroidSiren)
   })
+
+  test('should return empty sirens when blocklist was deleted', () => {
+    dateProvider.now.setHours(10, 0, 0, 0)
+    const session = buildBlockSession({
+      startedAt: '09:00',
+      endedAt: '11:00',
+      blocklistIds: ['deleted-blocklist-id'],
+    })
+    const state = stateBuilder().withBlockSessions([session]).build()
+
+    const [firstSchedule] = selectBlockingSchedule(dateProvider, state)
+    const androidSirens = firstSchedule.sirens.android
+    const websites = firstSchedule.sirens.websites
+    const keywords = firstSchedule.sirens.keywords
+
+    expect(androidSirens).toHaveLength(0)
+    expect(websites).toHaveLength(0)
+    expect(keywords).toHaveLength(0)
+  })
 })
