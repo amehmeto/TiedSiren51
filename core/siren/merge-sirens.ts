@@ -1,11 +1,5 @@
-import { Sirens } from '@/core/siren/sirens'
-
-export const uniqueBy = <T, K>(
-  array: T[],
-  keyExtractor: (item: T) => K,
-): T[] => {
-  return [...new Map(array.map((item) => [keyExtractor(item), item])).values()]
-}
+import { uniqueBy } from '@/core/__utils__/array.utils'
+import { Sirens } from './sirens'
 
 export const mergeSirens = (sirensArray: Sirens[]): Sirens => {
   const merge = <T, K>(extract: (s: Sirens) => T[], key: (item: T) => K) =>

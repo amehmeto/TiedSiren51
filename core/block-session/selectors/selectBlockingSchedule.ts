@@ -1,10 +1,10 @@
 import { createSelector } from '@reduxjs/toolkit'
-import { mergeSirens } from '@/core/__utils__/siren-merge.utils'
 import { DateProvider } from '@/core/_ports_/date-provider'
 import { BlockingSchedule } from '@/core/_ports_/siren.tier'
 import { RootState } from '@/core/_redux_/createStore'
 import { blockSessionAdapter } from '@/core/block-session/block-session'
 import { blocklistAdapter } from '@/core/blocklist/blocklist'
+import { mergeSirens } from '@/core/siren/merge-sirens'
 
 export const selectBlockingSchedule = createSelector(
   [
