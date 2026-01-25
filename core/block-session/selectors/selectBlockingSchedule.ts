@@ -5,32 +5,15 @@ import { BlockingSchedule } from '@/core/_ports_/siren.tier'
 import { RootState } from '@/core/_redux_/createStore'
 import { blockSessionAdapter } from '@/core/block-session/block-session'
 import { blocklistAdapter } from '@/core/blocklist/blocklist'
-import { isActive } from './isActive'
 
-export type BlockingScheduleWithActiveSession = {
-  schedule: BlockingSchedule[]
-  hasActiveSession: boolean
-}
-
-/**
- * Selects all block sessions as BlockingSchedule[] and whether any session is active NOW.
- * Combines schedule selection with active check in a single iteration for performance.
- * - schedule: All sessions (active + scheduled) for native layer to handle time windows
- * - hasActiveSession: Whether any session is currently active (for foreground service lifecycle)
- */
-export const selectBlockingScheduleWithActiveSession = createSelector(
+export const selectBlockingSchedule = createSelector(
   [
     (dateProvider: DateProvider) => dateProvider,
     (_: DateProvider, state: RootState) => state.blockSession,
     (_: DateProvider, state: RootState) => state.blocklist,
   ],
-  (
-    dateProvider,
-    blockSessionState,
-    blocklistState,
-  ): BlockingScheduleWithActiveSession => {
-    if (blockSessionState.ids.length === 0)
-      return { schedule: [], hasActiveSession: false }
+  (dateProvider, blockSessionState, blocklistState): BlockingSchedule[] => {
+    if (blockSessionState.ids.length === 0) return []
 
     const allSessions = blockSessionAdapter
       .getSelectors()
@@ -40,12 +23,7 @@ export const selectBlockingScheduleWithActiveSession = createSelector(
       .getSelectors()
       .selectEntities(blocklistState)
 
-    let hasActiveSession = false
-
-    const schedule = allSessions.map((session) => {
-      if (!hasActiveSession && isActive(dateProvider, session))
-        hasActiveSession = true
-
+    return allSessions.map((session) => {
       const startDate = dateProvider.recoverDate(session.startedAt)
       const endDate = dateProvider.recoverDate(session.endedAt)
       const sirens = mergeSirens(
@@ -61,7 +39,5 @@ export const selectBlockingScheduleWithActiveSession = createSelector(
         sirens,
       }
     })
-
-    return { schedule, hasActiveSession }
   },
 )
