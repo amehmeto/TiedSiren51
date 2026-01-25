@@ -74,6 +74,7 @@ export const onBlockingScheduleChangedListener = ({
   const hasActiveOnInit = selectHasActiveSession(dateProvider, initialState)
   if (initialSchedule.length > 0) {
     lastScheduleKey = getScheduleHashKey(initialSchedule)
+    // Update state synchronously BEFORE async operations to prevent race conditions
     const wasActiveBefore = isActiveNow
     isActiveNow = hasActiveOnInit
     void syncSchedule(initialSchedule, wasActiveBefore, hasActiveOnInit)
@@ -97,6 +98,7 @@ export const onBlockingScheduleChangedListener = ({
 
     if (scheduleKey === lastScheduleKey) return
 
+    // Update state synchronously BEFORE async operations to prevent race conditions
     lastScheduleKey = scheduleKey
     const wasActiveBefore = isActiveNow
     isActiveNow = hasActiveSession
