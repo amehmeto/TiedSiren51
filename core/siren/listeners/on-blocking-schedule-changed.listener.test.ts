@@ -305,7 +305,7 @@ describe('Feature: Blocking schedule changed listener', () => {
     })
   })
 
-  describe('Scenario 3b: Blocklist edited while session is scheduled (future)', () => {
+  describe('Scenario 4: Blocklist edited while session is scheduled (future)', () => {
     it('should sync updated blocklist for scheduled session without starting foreground', async () => {
       const blocklist = buildBlocklist({
         id: 'blocklist-1',
@@ -340,7 +340,7 @@ describe('Feature: Blocking schedule changed listener', () => {
     })
   })
 
-  describe('Scenario 4: App restart with active session', () => {
+  describe('Scenario 5: App restart with active session', () => {
     it('should restore blocking when updating blocklist after app restart', async () => {
       const blocklist = buildBlocklist({
         id: 'blocklist-1',
