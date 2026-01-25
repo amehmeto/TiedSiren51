@@ -311,7 +311,6 @@ describe('Feature: Blocking schedule changed listener', () => {
         id: 'blocklist-1',
         sirens: { android: [facebookAndroidSiren] },
       })
-      // Current time is BEFORE session starts
       fixture.given.nowIs({ hours: 13, minutes: 30 })
       fixture.given.existingBlockSessions(
         [
@@ -333,12 +332,10 @@ describe('Feature: Blocking schedule changed listener', () => {
         },
       })
 
-      // Schedule should be synced with updated blocklist
       fixture.then.blockingScheduleShouldContainApps([
         'com.facebook.katana',
         'com.example.tiktok',
       ])
-      // But foreground should NOT be started since session is not active yet
       fixture.then.blockingShouldBeInactive()
     })
   })
@@ -443,9 +440,7 @@ describe('Feature: Blocking schedule changed listener', () => {
         [blocklist],
       )
 
-      // Schedule is synced to native - native layer checks time windows
       fixture.then.blockingScheduleShouldContainApps(['com.facebook.katana'])
-      // But foreground service should NOT be started since no session is active NOW
       fixture.then.blockingShouldBeInactive()
     })
   })
