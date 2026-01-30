@@ -3,7 +3,7 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2026-01-24
+> Last updated: 2026-01-25
 
 ## Graph Statistics
 
@@ -211,23 +211,23 @@ flowchart LR
 
     subgraph Initiatives
         direction TB
-        T_TS_67["⏳ TS#67 Goal based locking/unlocking"]:::initiative1_todo
-        T_TS_66["⏳ TS#66 Launch Windows desktop App"]:::initiative1_todo
-        T_TS_65["⏳ TS#65 Launch MacOS desktop App"]:::initiative1_todo
-        T_TS_64["⏳ TS#64 Multi device sync"]:::initiative1_todo
-        T_TS_63["⏳ TS#63 Launch iOS App"]:::initiative1_todo
-        T_TS_62["⏳ TS#62 Launch Android App"]:::initiative0_todo
+        T_TS_67["📝 TS#67 Goal based locking/unlocking"]:::initiative1_todo
+        T_TS_66["📝 TS#66 Launch Windows desktop App"]:::initiative1_todo
+        T_TS_65["📝 TS#65 Launch MacOS desktop App"]:::initiative1_todo
+        T_TS_64["📝 TS#64 Multi device sync"]:::initiative1_todo
+        T_TS_63["📝 TS#63 Launch iOS App"]:::initiative1_todo
+        T_TS_62["📝 TS#62 Launch Android App"]:::initiative0_todo
     end
     subgraph Epics
         direction TB
         T_TS_219["✅ TS#219 Native Blocking Layer [13sp]"]:::epic1_done
-        T_TS_61["⏳ TS#61 Schedule recurring block<br/>sessions"]:::epic1_todo
-        T_TS_60["⏳ TS#60 Polish design"]:::epic0_todo
-        T_TS_59["⏳ TS#59 Blocking keywords on Android"]:::epic1_todo
-        T_TS_58["⏳ TS#58 Block websites on Android"]:::epic1_todo
-        T_TS_57["⏳ TS#57 Strict Mode [8sp]"]:::epic1_todo
-        T_TS_55["⏳ TS#55 Blocking Apps on Android [13sp]"]:::epic0_todo
-        T_TS_54["⏳ TS#54 User Authentification [21sp]"]:::epic0_todo
+        T_TS_61["📝 TS#61 Schedule recurring block<br/>sessions"]:::epic1_todo
+        T_TS_60["📝 TS#60 Polish design"]:::epic0_todo
+        T_TS_59["📝 TS#59 Blocking keywords on Android"]:::epic1_todo
+        T_TS_58["📝 TS#58 Block websites on Android"]:::epic1_todo
+        T_TS_57["📝 TS#57 Strict Mode [8sp]"]:::epic1_todo
+        T_TS_55["📝 TS#55 Blocking Apps on Android [13sp]"]:::epic0_todo
+        T_TS_54["📝 TS#54 User Authentification [21sp]"]:::epic0_todo
     end
     subgraph Epic_219["TS#219 Native Blocking Layer"]
         direction TB
@@ -248,11 +248,11 @@ flowchart LR
     subgraph Epic_57["TS#57 Strict Mode"]
         direction TB
         T_TS_213["✅ TS#213 confirmation modal before<br/>setting strict mode timer [2sp]"]:::blocking0_done
-        T_TS_200["⏳ TS#200 strict-mode: block blocklist<br/>deletion during active strict<br/>mode sessions"]:::blocking0_todo
+        T_TS_200["📝 TS#200 strict-mode: block blocklist<br/>deletion during active strict<br/>mode sessions"]:::blocking0_todo
     end
     subgraph Epic_55["TS#55 Blocking Apps on Android"]
         direction TB
-        T_TS_208["⏳ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [5sp]"]:::blocking2_todo
+        T_TS_208["✅ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [5sp]"]:::blocking2_done
         T_TS_201["✅ TS#201 BlockSession to store<br/>blocklist IDs instead of<br/>embedded blocklists [5sp]"]:::blocking0_done
         T_TS_185["✅ TS#185 legacy updateBlockedApps calls<br/>and related code [2sp]"]:::blocking2_done
         T_TS_184["✅ TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_done
@@ -262,23 +262,23 @@ flowchart LR
     end
     subgraph Epic_54["TS#54 User Authentification"]
         direction TB
-        T_TS_169["⏳ TS#169 auth: deep link to email app<br/>after signup [2sp]"]:::auth0_todo
-        T_TS_168["⏳ TS#168 auth: security notification<br/>emails [3sp]"]:::auth0_todo
-        T_TS_167["⏳ TS#167 auth: brute force protection<br/>on login [2sp]"]:::auth0_todo
-        T_TS_166["⏳ TS#166 auth: invalidate sessions<br/>after password reset [3sp]"]:::auth1_todo
-        T_TS_165["⏳ TS#165 auth: resend password reset<br/>email [1sp]"]:::auth0_todo
-        T_TS_164["⏳ TS#164 auth: re-authentication for<br/>sensitive operations [2sp]"]:::auth0_todo
-        T_TS_163["⏳ TS#163 auth: account deletion GDPR<br/>compliance [5sp]"]:::auth1_todo
-        T_TS_162["⏳ TS#162 auth: change password when<br/>logged in [2sp]"]:::auth1_todo
-        T_TS_161["⏳ TS#161 auth: implement email<br/>verification flow [3sp]"]:::auth0_todo
-        T_TS_160["⏳ TS#160 auth: custom in-app password<br/>reset confirmation flow [5sp]"]:::auth0_todo
-        T_TS_89["⏳ TS#89 Authentication Error Handling [3sp]"]:::auth0_todo
-        T_TS_88["⏳ TS#88 Apple Sign-In with Firebase [3sp]"]:::auth0_todo
+        T_TS_169["📝 TS#169 auth: deep link to email app<br/>after signup [2sp]"]:::auth0_todo
+        T_TS_168["📝 TS#168 auth: security notification<br/>emails [3sp]"]:::auth0_todo
+        T_TS_167["📝 TS#167 auth: brute force protection<br/>on login [2sp]"]:::auth0_todo
+        T_TS_166["📝 TS#166 auth: invalidate sessions<br/>after password reset [3sp]"]:::auth1_todo
+        T_TS_165["📝 TS#165 auth: resend password reset<br/>email [1sp]"]:::auth0_todo
+        T_TS_164["📝 TS#164 auth: re-authentication for<br/>sensitive operations [2sp]"]:::auth0_todo
+        T_TS_163["📝 TS#163 auth: account deletion GDPR<br/>compliance [5sp]"]:::auth1_todo
+        T_TS_162["📝 TS#162 auth: change password when<br/>logged in [2sp]"]:::auth1_todo
+        T_TS_161["📝 TS#161 auth: implement email<br/>verification flow [3sp]"]:::auth0_todo
+        T_TS_160["📝 TS#160 auth: custom in-app password<br/>reset confirmation flow [5sp]"]:::auth0_todo
+        T_TS_89["📝 TS#89 Authentication Error Handling [3sp]"]:::auth0_todo
+        T_TS_88["📝 TS#88 Apple Sign-In with Firebase [3sp]"]:::auth0_todo
     end
     subgraph Ungrouped
         direction TB
         T_TS_233["✅ TS#233 : Add fine-grained git<br/>checkout permissions to Claude<br/>settings"]:::other0_done
-        T_TS_229["⏳ TS#229 claude: add PreToolUse hook to<br/>block --no-verify in git push<br/>commands"]:::other0_todo
+        T_TS_229["📝 TS#229 claude: add PreToolUse hook to<br/>block --no-verify in git push<br/>commands"]:::other0_todo
         T_TS_202["✅ TS#202 "]:::other0_done
         T_TS_199["✅ TS#199 blocklist: add confirmation<br/>modal when deleting blocklist<br/>used in active sessions"]:::blocking0_done
         T_TS_181["✅ TS#181 Noop implementations for<br/>future tiers and lookouts [2sp]"]:::blocking1_done
@@ -305,7 +305,7 @@ flowchart LR
         T_TS_56["✅ TS#56 Maintenance"]:::other0_done
         T_EFS_4["✅ EFS#4 for this module and request<br/>for tutorial or guide"]:::blocking0_done
         T_TSBO_5["✅ TSBO#5 BlockingScheduler with<br/>schedule storage"]:::blocking0_done
-        T_ELIA_1["⏳ ELIA#1 ability to filter between<br/>system apps and user-installed<br/>apps on Android"]:::other0_todo
+        T_ELIA_1["📝 ELIA#1 ability to filter between<br/>system apps and user-installed<br/>apps on Android"]:::other0_todo
     end
 
     T_TS_55 --> T_TS_219
@@ -403,7 +403,7 @@ Quick reference showing what blocks what:
 |-------|--------|-------|
 | ✅ | Done | Grayscale, dashed border |
 | 🔄 | In Progress | Bright, thick border |
-| ⏳ | To Do | Normal colors |
+| 📝 | To Do | Normal colors |
 
 ### Story Points
 
@@ -416,4 +416,4 @@ Quick reference showing what blocks what:
 
 ---
 
-*Auto-generated on 2026-01-24 from GitHub issue metadata*
+*Auto-generated on 2026-01-25 from GitHub issue metadata*

@@ -11,3 +11,8 @@ node scripts/compare-coverage.cjs
 sh .husky/scripts/check-conflicts-with-main.sh
 
 printf "✅ Proceeding with push. Remember to run e2e tests before final merge!\n"
+
+# Signal to reference-transaction hook that this is a push operation
+# (vs git pull/fetch which also updates tracking refs)
+mkdir -p .husky/_
+touch .husky/_/.push-in-progress
