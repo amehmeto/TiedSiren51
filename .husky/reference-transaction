@@ -5,12 +5,22 @@
 #
 # This hook is called with: prepared, committed, or aborted
 # We only act on "committed" to run CI watch after successful push
+#
+# IMPORTANT: We use a marker file (.husky/_/.push-in-progress) set by pre-push
+# to distinguish pushes from pulls/fetches (both update tracking refs)
 
 # CI_WATCH_REMOTE: configurable remote name (default: origin)
 remote="${CI_WATCH_REMOTE:-origin}"
 
 # Only process "committed" phase (refs successfully updated)
 [ "$1" != "committed" ] && exit 0
+
+# Check if this is actually a push (marker set by pre-push hook)
+# git pull/fetch also updates tracking refs, but we only want CI watch on push
+marker_file=".husky/_/.push-in-progress"
+if [ ! -f "$marker_file" ]; then
+  exit 0
+fi
 
 # Read all stdin first
 input=$(cat)
@@ -41,9 +51,14 @@ EOF
 
 # Run CI watch if we found a matching ref
 if [ "$found" = true ]; then
+  # Clean up marker file before running (ensures cleanup even if CI watch fails)
+  rm -f "$marker_file"
   PUSHED_BRANCH="$pushed_branch" PUSHED_SHA="$newvalue" sh .husky/post-push || exit $?
   exit 0
 fi
+
+# Clean up marker file if no matching refs found
+rm -f "$marker_file"
 
 # No matching refs found - exit success (normal for prepared/aborted phases)
 exit 0

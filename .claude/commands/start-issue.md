@@ -10,8 +10,14 @@ Run the start-issue script with the provided arguments:
 
 After the script completes:
 
-1. Navigate to the new worktree directory if one was created
+1. **Change to the worktree directory** using the WORKTREE_PATH from the script's SUMMARY output:
+   ```bash
+   cd .worktrees/<worktree-name>
+   ```
+   This is critical - all work must happen in the worktree, not the main repo.
+
 2. Fetch the issue details with `gh issue view <issue-number>`
+
 3. Launch a ralph loop to implement the issue:
 
 ```
