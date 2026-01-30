@@ -9,7 +9,7 @@ set -e
 #   ./scripts/start-issue.sh --remove <name> Remove specific worktree
 
 REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-WORKTREES_DIR="$(dirname "$REPO_ROOT")/worktrees"
+WORKTREES_DIR="$REPO_ROOT/.worktrees"
 
 # Load shared branch naming configuration
 # shellcheck disable=SC1091 # Path is dynamic but verified at runtime

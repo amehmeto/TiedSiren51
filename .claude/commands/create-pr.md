@@ -10,9 +10,11 @@ Create PR workflow:
    - Run `git log origin/main..HEAD --oneline` to see unpushed commits
 
 2. **Create feature branch if on main**:
-   - If on `main` or `master`, create a new branch:
-     - Generate a descriptive branch name based on the changes (e.g., `feat/add-user-auth`, `fix/login-validation`)
-     - Use format: `<type>/<short-description>` where type is feat, fix, refactor, chore, docs, test
+   - If on `main` or `master`:
+     - First, create a GitHub issue if one doesn't exist: `gh issue create --title "<description>" --body "..."`
+     - Generate branch name with format: `<type>/TS<issue-number>-<short-description>`
+     - Example: `feat/TS42-add-dark-mode`, `fix/TS243-login-validation`
+     - Types: feat, fix, refactor, chore, docs, test, perf
      - Run `git checkout -b <branch-name>`
    - If already on a feature branch, continue with that branch
 
@@ -32,7 +34,8 @@ Create PR workflow:
    ```
 
 4. **Push to remote**:
-   - Use `SKIP_E2E_CHECK=true git push -u origin <branch-name>` to push and set upstream
+   - Use `git push -u origin <branch-name>` to push and set upstream
+   - If e2e check prompt fails (non-interactive), use `SKIP_E2E_CHECK=true git push -u origin <branch-name>`
 
 5. **Create or update PR**:
    - Check if PR exists: `gh pr view --json url 2>/dev/null`
