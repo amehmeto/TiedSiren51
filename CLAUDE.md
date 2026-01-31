@@ -55,6 +55,7 @@ After each push, CI status is automatically monitored via Husky hooks. The scrip
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CI_WATCH_EXCLUDED_JOBS` | `build` | Job patterns to exclude (supports partial matching) |
+| `CI_WATCH_INITIAL_DELAY` | `5` | Seconds to wait before polling for workflow |
 | `CI_WATCH_REMOTE` | `origin` | Git remote name to watch |
 | `CI_WATCH_WORKFLOW` | (all) | Workflow name filter |
 | `SKIP_CI_WATCH` | (unset) | Skip CI monitoring (e.g., `SKIP_CI_WATCH=1 git push`) |
