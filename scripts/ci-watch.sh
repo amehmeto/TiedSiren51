@@ -46,7 +46,8 @@ readonly EXCLUDED_JOBS="${CI_WATCH_EXCLUDED_JOBS:-build}"
 readonly WORKFLOW_NAME="${CI_WATCH_WORKFLOW:-}"
 readonly INITIAL_DELAY="${CI_WATCH_INITIAL_DELAY:-10}"
 readonly MAX_RUN_DETECTION_ATTEMPTS=10
-readonly RUN_DETECTION_INTERVAL=3
+readonly RUN_DETECTION_INTERVAL=3  # Base interval; actual wait uses incremental backoff
+# Max wait for workflow detection: INITIAL_DELAY + sum of (3,5,7,...,21) = 10 + 120 = ~130s
 readonly MAX_NO_JOBS_ATTEMPTS=5
 
 # Hash command for portability (macOS has shasum, Linux may only have sha1sum)
