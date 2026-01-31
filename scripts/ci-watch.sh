@@ -12,7 +12,7 @@ set -euo pipefail
 # Environment variables:
 #   CI_WATCH_EXCLUDED_JOBS - Comma-separated list of job patterns to exclude (default: "build")
 #   CI_WATCH_WORKFLOW - Workflow name to filter by (default: all workflows)
-#   CI_WATCH_INITIAL_DELAY - Seconds to wait before polling for workflow (default: 5)
+#   CI_WATCH_INITIAL_DELAY - Seconds to wait before polling for workflow (default: 10)
 #   SKIP_CI_WATCH - Set to any non-empty value to skip CI watching
 
 # Source shared colors
@@ -44,7 +44,7 @@ readonly POLL_INTERVAL=15
 readonly TIMEOUT_SECONDS=600  # 10 minutes
 readonly EXCLUDED_JOBS="${CI_WATCH_EXCLUDED_JOBS:-build}"
 readonly WORKFLOW_NAME="${CI_WATCH_WORKFLOW:-}"
-readonly INITIAL_DELAY="${CI_WATCH_INITIAL_DELAY:-5}"
+readonly INITIAL_DELAY="${CI_WATCH_INITIAL_DELAY:-10}"
 readonly MAX_RUN_DETECTION_ATTEMPTS=10
 readonly RUN_DETECTION_INTERVAL=3
 readonly MAX_NO_JOBS_ATTEMPTS=5
@@ -245,8 +245,10 @@ wait_for_run() {
       return 0
     fi
 
-    print_info "Attempt $attempt/$MAX_RUN_DETECTION_ATTEMPTS: workflow not found yet..." >&2
-    sleep "$RUN_DETECTION_INTERVAL"
+    # Incremental backoff: base interval + 2s per attempt (3, 5, 7, 9, ...)
+    local wait_time=$((RUN_DETECTION_INTERVAL + (attempt - 1) * 2))
+    print_info "Attempt $attempt/$MAX_RUN_DETECTION_ATTEMPTS: workflow not found yet (retry in ${wait_time}s)..." >&2
+    sleep "$wait_time"
     attempt=$((attempt + 1))
   done
 

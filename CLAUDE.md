@@ -50,12 +50,14 @@ SKIP_E2E_CHECK=true git push  # Push without interactive e2e test prompt
 
 After each push, CI status is automatically monitored via Husky hooks. The script polls GitHub Actions and reports results. Press **Ctrl+C** to cancel.
 
+**IMPORTANT FOR CLAUDE CODE:** The CI watch script is blocking. Always wait for CI to complete after pushing. Do NOT run `git push` in the background or ignore its output. Treat CI failures the same as local test failures - they must be fixed before proceeding.
+
 **Environment variables:**
 
 | Variable | Default | Description |
 |----------|---------|-------------|
 | `CI_WATCH_EXCLUDED_JOBS` | `build` | Job patterns to exclude (supports partial matching) |
-| `CI_WATCH_INITIAL_DELAY` | `5` | Seconds to wait before polling for workflow |
+| `CI_WATCH_INITIAL_DELAY` | `10` | Seconds to wait before polling for workflow |
 | `CI_WATCH_REMOTE` | `origin` | Git remote name to watch |
 | `CI_WATCH_WORKFLOW` | (all) | Workflow name filter |
 | `SKIP_CI_WATCH` | (unset) | Skip CI monitoring (e.g., `SKIP_CI_WATCH=1 git push`) |
