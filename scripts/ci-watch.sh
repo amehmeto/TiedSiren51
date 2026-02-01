@@ -20,8 +20,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
 source "$SCRIPT_DIR/lib/colors.sh"
 
-# Allow skipping CI watch (useful for quick pushes)
+# Allow skipping CI watch (useful for quick pushes by developers)
+# Claude Code cannot skip CI watch - it's mandatory
 if [[ -n "${SKIP_CI_WATCH:-}" ]]; then
+  if is_claude_code; then
+    print_error "SKIP_CI_WATCH is not allowed for Claude Code - CI watch is mandatory"
+    exit 1
+  fi
   print_info "SKIP_CI_WATCH is set, skipping CI monitoring"
   exit 0
 fi

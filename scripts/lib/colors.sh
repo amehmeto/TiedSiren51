@@ -12,3 +12,9 @@ print_info() { echo -e "${COLOR_BLUE}[INFO]${COLOR_NC} $1"; }
 print_success() { echo -e "${COLOR_GREEN}[SUCCESS]${COLOR_NC} $1"; }
 print_warning() { echo -e "${COLOR_YELLOW}[WARNING]${COLOR_NC} $1"; }
 print_error() { echo -e "${COLOR_RED}[ERROR]${COLOR_NC} $1"; }
+
+# Check if running from Claude Code (set via .claude/settings.local.json env)
+is_claude_code() { [[ -n "${CLAUDE_CODE:-}" ]]; }
+
+# Check if running from developer terminal (not Claude Code)
+is_developer() { [[ -z "${CLAUDE_CODE:-}" ]]; }

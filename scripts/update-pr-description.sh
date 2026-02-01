@@ -19,6 +19,12 @@ if [[ -n "${SKIP_PR_UPDATE:-}" ]]; then
   exit 0
 fi
 
+# Only auto-update PR description for Claude Code (or if developer opts in)
+if is_developer && [[ -z "${AUTO_PR_UPDATE:-}" ]]; then
+  # Developers can opt-in with AUTO_PR_UPDATE=1
+  exit 0
+fi
+
 # Check for required dependencies
 if ! command -v gh &>/dev/null; then
   print_warning "GitHub CLI (gh) not found, skipping PR update"

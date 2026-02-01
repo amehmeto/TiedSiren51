@@ -50,7 +50,10 @@ SKIP_E2E_CHECK=true git push  # Push without interactive e2e test prompt
 
 After each push, CI status is automatically monitored via Husky hooks. The script polls GitHub Actions and reports results. Press **Ctrl+C** to cancel.
 
-**IMPORTANT FOR CLAUDE CODE:** The CI watch script is blocking. Always wait for CI to complete after pushing. Do NOT run `git push` in the background or ignore its output. Treat CI failures the same as local test failures - they must be fixed before proceeding.
+**IMPORTANT FOR CLAUDE CODE:** The `CLAUDE_CODE=1` env var is set via `.claude/settings.local.json`. This enables stricter behavior:
+- CI watch is mandatory (cannot be skipped with `SKIP_CI_WATCH`)
+- PR descriptions are auto-updated after CI passes
+- Always wait for CI to complete - treat failures like local test failures
 
 **Environment variables:**
 
