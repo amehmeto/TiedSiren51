@@ -1,4 +1,7 @@
 {
+  "env": {
+    "CLAUDE_CODE": "1"
+  },
   "permissions": {
     "allow": [
       "Bash(./android/gradlew:*)",
@@ -13,6 +16,7 @@
       "Bash(/usr/local/bin/shellcheck:*)",
       "Bash(OWNER=$(gh repo view --json owner -q '.owner.login') && gh project item-list:*)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
+      "Bash(__NEW_LINE_f5b6cbc2de818462__ echo \"\")",
       "Bash(adb devices:*)",
       "Bash(adb install:*)",
       "Bash(adb logcat:*)",
@@ -99,6 +103,7 @@
       "Bash(git pull:*)",
       "Bash(git push:*)",
       "Bash(git remote:*)",
+      "Bash(git rev-parse:*)",
       "Bash(git show:*)",
       "Bash(git stash:*)",
       "Bash(git worktree:*)",
@@ -116,6 +121,7 @@
       "Bash(npm pkg:*)",
       "Bash(npm run:*)",
       "Bash(npm test:*)",
+      "Bash(npm update:*)",
       "Bash(npm view:*)",
       "Bash(npm why:*)",
       "Bash(npx eslint:*)",
@@ -132,6 +138,7 @@
       "Bash(npx tsc:*)",
       "Bash(npx vitest:*)",
       "Bash(pgrep:*)",
+      "Bash(printf:*)",
       "Bash(pwd:*)",
       "Bash(shellcheck:*)",
       "Bash(sort:*)",
@@ -140,6 +147,7 @@
       "Bash(type:*)",
       "Bash(wc:*)",
       "Bash(which:*)",
+      "Bash(while IFS='|' read dur status)",
       "Bash(xargs cloc:*)",
       "Edit",
       "Read",
