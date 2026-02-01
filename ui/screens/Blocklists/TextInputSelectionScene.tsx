@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useState } from 'react'
 import { FlatList, StyleSheet, TextInput } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SirenType } from '@/core/siren/sirens'
 import { T } from '@/ui/design-system/theme'
 
@@ -24,6 +25,7 @@ export function TextInputSelectionScene({
   isSirenSelected,
 }: TextInputSelectionSceneProps) {
   const [isFocused, setIsFocused] = useState(false)
+  const insets = useSafeAreaInsets()
 
   return (
     <>
@@ -49,6 +51,12 @@ export function TextInputSelectionScene({
             isSelected={isSirenSelected(sirenType, item)}
           />
         )}
+        style={styles.list}
+        contentContainerStyle={{
+          paddingBottom: Math.max(insets.bottom, 40) + 20,
+        }}
+        overScrollMode="never"
+        bounces={false}
       />
     </>
   )
@@ -59,5 +67,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: T.border.width.medium,
     padding: T.spacing.small,
     color: T.color.white,
+  },
+  list: {
+    flex: 1,
   },
 })

@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { FlatList } from 'react-native'
+import { FlatList, StyleSheet } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
@@ -15,6 +16,8 @@ export function AppsSelectionScene({
   toggleAppSiren,
   isSirenSelected,
 }: AppsSelectionSceneProps) {
+  const insets = useSafeAreaInsets()
+
   return (
     <FlatList
       data={androidApps}
@@ -30,6 +33,18 @@ export function AppsSelectionScene({
           />
         )
       }}
+      style={styles.list}
+      contentContainerStyle={{
+        paddingBottom: Math.max(insets.bottom, 40) + 20,
+      }}
+      overScrollMode="never"
+      bounces={false}
     />
   )
 }
+
+const styles = StyleSheet.create({
+  list: {
+    flex: 1,
+  },
+})
