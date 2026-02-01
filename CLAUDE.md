@@ -19,6 +19,13 @@ tests/        → Test utilities, fixtures, builders
 
 Read `/docs/adr/README.md` before structural changes - it indexes all architectural decisions by layer.
 
+## Domains
+
+- **auth** - Firebase authentication, user sessions
+- **block-session** - Timed focus sessions with start/end lifecycle
+- **blocklist** - Collections of sirens, can be shared across sessions
+- **siren** - Individual block targets (apps, websites, keywords)
+
 ## ADR Reference
 
 **Read relevant ADRs before implementing.** ADRs contain naming conventions, patterns, and examples that must be followed:
@@ -40,6 +47,11 @@ npm test              # Run tests (watch mode)
 npm run lint          # TypeScript + ESLint + Prettier
 npm run lint:fix      # Auto-fix lint issues
 npx prisma generate   # Regenerate Prisma client after schema changes
+
+# Quick package.json inspection
+jq '.scripts' package.json        # View npm scripts (alias: jqs)
+jq '.dependencies' package.json   # View dependencies (alias: jqd)
+jq '.devDependencies' package.json  # View devDependencies (alias: jqdd)
 ```
 
 ## Workflow
