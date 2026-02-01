@@ -43,14 +43,17 @@ export function TextInputSelectionScene({
       <FlatList
         data={data}
         keyExtractor={(item) => item}
-        renderItem={({ item }) => (
-          <SelectableSirenCard
-            sirenType={sirenType}
-            siren={item}
-            onPress={() => toggleSiren(sirenType, item)}
-            isSelected={isSirenSelected(sirenType, item)}
-          />
-        )}
+        renderItem={({ item }) => {
+          const isSelected = isSirenSelected(sirenType, item)
+          return (
+            <SelectableSirenCard
+              sirenType={sirenType}
+              siren={item}
+              onPress={() => toggleSiren(sirenType, item)}
+              isSelected={isSelected}
+            />
+          )
+        }}
         style={styles.list}
         contentContainerStyle={{
           paddingBottom: Math.max(insets.bottom, 40) + 20,
