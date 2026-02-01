@@ -12,6 +12,7 @@ set -euo pipefail
 # Environment variables:
 #   CI_WATCH_EXCLUDED_JOBS - Comma-separated list of job patterns to exclude (default: "build")
 #   CI_WATCH_WORKFLOW - Workflow name to filter by (default: all workflows)
+#   CI_WATCH_INITIAL_DELAY - Seconds to wait before polling for workflow (default: 10)
 #   SKIP_CI_WATCH - Set to any non-empty value to skip CI watching
 
 # Source shared colors
@@ -19,8 +20,13 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
 source "$SCRIPT_DIR/lib/colors.sh"
 
-# Allow skipping CI watch (useful for quick pushes)
+# Allow skipping CI watch (useful for quick pushes by developers)
+# Claude Code cannot skip CI watch - it's mandatory
 if [[ -n "${SKIP_CI_WATCH:-}" ]]; then
+  if is_claude_code; then
+    print_error "SKIP_CI_WATCH is not allowed for Claude Code - CI watch is mandatory"
+    exit 1
+  fi
   print_info "SKIP_CI_WATCH is set, skipping CI monitoring"
   exit 0
 fi
@@ -43,8 +49,10 @@ readonly POLL_INTERVAL=15
 readonly TIMEOUT_SECONDS=600  # 10 minutes
 readonly EXCLUDED_JOBS="${CI_WATCH_EXCLUDED_JOBS:-build}"
 readonly WORKFLOW_NAME="${CI_WATCH_WORKFLOW:-}"
+readonly INITIAL_DELAY="${CI_WATCH_INITIAL_DELAY:-10}"
 readonly MAX_RUN_DETECTION_ATTEMPTS=10
-readonly RUN_DETECTION_INTERVAL=3
+readonly RUN_DETECTION_INTERVAL=3  # Base interval; actual wait uses incremental backoff
+# Max wait for workflow detection: INITIAL_DELAY + sum of (3,5,7,...,21) = 10 + 120 = ~130s
 readonly MAX_NO_JOBS_ATTEMPTS=5
 
 # Hash command for portability (macOS has shasum, Linux may only have sha1sum)
@@ -228,6 +236,12 @@ wait_for_run() {
   # Send info messages to stderr so they don't pollute the run_id output
   print_info "Waiting for workflow run for commit ${expected_sha:0:7}..." >&2
 
+  # Initial delay to let GitHub register the workflow before polling
+  if [[ "$INITIAL_DELAY" -gt 0 ]]; then
+    print_info "Waiting ${INITIAL_DELAY}s for GitHub to register workflow..." >&2
+    sleep "$INITIAL_DELAY"
+  fi
+
   while [[ $attempt -le $MAX_RUN_DETECTION_ATTEMPTS ]]; do
     local run_id
     run_id=$(get_run_id_for_sha "$branch" "$expected_sha")
@@ -237,8 +251,10 @@ wait_for_run() {
       return 0
     fi
 
-    print_info "Attempt $attempt/$MAX_RUN_DETECTION_ATTEMPTS: workflow not found yet..." >&2
-    sleep "$RUN_DETECTION_INTERVAL"
+    # Incremental backoff: base interval + 2s per attempt (3, 5, 7, 9, ...)
+    local wait_time=$((RUN_DETECTION_INTERVAL + (attempt - 1) * 2))
+    print_info "Attempt $attempt/$MAX_RUN_DETECTION_ATTEMPTS: workflow not found yet (retry in ${wait_time}s)..." >&2
+    sleep "$wait_time"
     attempt=$((attempt + 1))
   done
 
