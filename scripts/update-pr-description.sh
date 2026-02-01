@@ -92,5 +92,3 @@ if gh pr edit "$pr_number" --body "$body" >/dev/null 2>&1; then
 else
   print_warning "Failed to update PR description (non-fatal)"
 fi
-
-exit 0

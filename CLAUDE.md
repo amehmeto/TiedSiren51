@@ -64,6 +64,7 @@ After each push, CI status is automatically monitored via Husky hooks. The scrip
 | `CI_WATCH_REMOTE` | `origin` | Git remote name to watch |
 | `CI_WATCH_WORKFLOW` | (all) | Workflow name filter |
 | `SKIP_CI_WATCH` | (unset) | Skip CI monitoring (e.g., `SKIP_CI_WATCH=1 git push`) |
+| `AUTO_PR_UPDATE` | (unset) | Developers: opt-in to auto-update PR description after CI |
 
 **Exit codes:** `0` = success, `1` = failure, `2` = timeout
 
