@@ -56,7 +56,9 @@ export function TextInputSelectionScene({
         }}
         style={styles.list}
         contentContainerStyle={{
-          paddingBottom: Math.max(insets.bottom, 40) + 20,
+          paddingBottom:
+            Math.max(insets.bottom, T.scroll.padding.minBottom) +
+            T.scroll.padding.additional,
         }}
         overScrollMode="never"
         bounces={false}
