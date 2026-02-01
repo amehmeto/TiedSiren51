@@ -63,8 +63,6 @@ After each push, CI status is automatically monitored via Husky hooks. See [docs
 
 ## Anti-patterns
 
-**NEVER use `I` prefix for interfaces.** Ports use descriptive names: `AuthGateway`, not `IAuthGateway`. ESLint enforces this.
-
 **NEVER import from `infra/` in `core/`.** Core defines ports; Infra implements them. Dependency inversion is mandatory.
 
 **NEVER put business logic in React components.** Logic belongs in Redux slices, use cases, or listeners. Components consume view models.
