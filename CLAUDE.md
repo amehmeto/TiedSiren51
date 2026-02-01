@@ -19,6 +19,17 @@ tests/        → Test utilities, fixtures, builders
 
 Read `/docs/adr/README.md` before structural changes - it indexes all architectural decisions by layer.
 
+## Related Expo Modules
+
+Custom native modules in sibling repositories (cloned to parent directory):
+
+| Module | Purpose |
+|--------|---------|
+| [expo-accessibility-service](https://github.com/amehmeto/expo-accessibility-service) | Android AccessibilityService for app/website detection |
+| [expo-foreground-service](https://github.com/amehmeto/expo-foreground-service) | Persistent foreground service for background blocking |
+| [expo-list-installed-apps](https://github.com/amehmeto/expo-list-installed-apps) | Query installed apps on device |
+| [tied-siren-blocking-overlay](https://github.com/amehmeto/tied-siren-blocking-overlay) | Full-screen overlay displayed when blocked content detected |
+
 ## Domains
 
 - **auth** - Firebase authentication, user sessions
@@ -56,7 +67,7 @@ jq '.devDependencies' package.json  # View devDependencies (alias: jqdd)
 
 ## Workflow
 
-1. **When you believe you're done with a task, run `/commit-push`** to commit all changes and push to remote.
+1. **When you believe you're done with a task, run `/commit-push`** to commit all changes and push to remote. Do not ask for permission—just do it.
 2. **After CI passes, update the PR description** to accurately reflect all changes made.
 
 After each push, CI status is automatically monitored via Husky hooks. See [docs/CI-WATCH.md](./docs/CI-WATCH.md) for configuration options and Claude Code behavior.
