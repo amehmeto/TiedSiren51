@@ -18,6 +18,8 @@ import { NoSessionBoard } from '@/ui/screens/Home/HomeScreen/NoSessionBoard'
 import { SessionsBoard } from '@/ui/screens/Home/HomeScreen/SessionsBoard'
 import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 
+const logoSource = require('@/assets/tiedsirenlogo.png')
+
 export default function HomeScreen() {
   const router = useRouter()
   const { dateProvider, sirenLookout } = dependencies
@@ -79,10 +81,7 @@ export default function HomeScreen() {
 
   return (
     <>
-      <Image
-        style={styles.image}
-        source={require('@/assets/tiedsirenlogo.png')}
-      />
+      <Image style={styles.image} source={logoSource} />
       <Text style={styles.greetings}>{viewModel.greetings}</Text>
       <Text style={styles.text}>{"Let's make it productive"}</Text>
 

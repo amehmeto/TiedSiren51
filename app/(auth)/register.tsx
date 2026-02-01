@@ -7,6 +7,8 @@ import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAut
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
 
+const logoSource = require('@/assets/tiedsirenlogo.png')
+
 export default function RegisterScreen() {
   const isUserAuthenticated = useSelector((state: RootState) =>
     selectIsUserAuthenticated(state),
@@ -19,10 +21,7 @@ export default function RegisterScreen() {
 
   return (
     <View style={styles.container}>
-      <Image
-        style={styles.image}
-        source={require('@/assets/tiedsirenlogo.png')}
-      />
+      <Image style={styles.image} source={logoSource} />
       <Text style={styles.title}>{"Let's make it productive"}</Text>
       <TiedSButton
         style={styles.button}

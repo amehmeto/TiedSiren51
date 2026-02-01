@@ -52,13 +52,18 @@ export const TimeStepper = ({
     isDisabled && styles.buttonDisabled,
   ]
 
+  const minButtonStyle = buttonStyle(isMin)
+  const maxButtonStyle = buttonStyle(isMax)
+  const removeIcon = renderIcon('remove-circle', isMin)
+  const addIcon = renderIcon('add-circle', isMax)
+
   return (
     <View style={styles.container}>
       <TiedSButton
         isDisabled={isMin}
-        style={buttonStyle(isMin)}
+        style={minButtonStyle}
         onPress={() => changeValue(-1)}
-        text={renderIcon('remove-circle', isMin)}
+        text={removeIcon}
       />
 
       <View style={styles.valueContainer}>
@@ -67,9 +72,9 @@ export const TimeStepper = ({
 
       <TiedSButton
         isDisabled={isMax}
-        style={buttonStyle(isMax)}
+        style={maxButtonStyle}
         onPress={() => changeValue(1)}
-        text={renderIcon('add-circle', isMax)}
+        text={addIcon}
       />
     </View>
   )

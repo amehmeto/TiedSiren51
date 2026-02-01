@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useState } from 'react'
 import { FlatList, StyleSheet, TextInput } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SirenType } from '@/core/siren/sirens'
 import { T } from '@/ui/design-system/theme'
 
@@ -24,6 +25,7 @@ export function TextInputSelectionScene({
   isSirenSelected,
 }: TextInputSelectionSceneProps) {
   const [isFocused, setIsFocused] = useState(false)
+  const insets = useSafeAreaInsets()
 
   return (
     <>
@@ -41,14 +43,25 @@ export function TextInputSelectionScene({
       <FlatList
         data={data}
         keyExtractor={(item) => item}
-        renderItem={({ item }) => (
-          <SelectableSirenCard
-            sirenType={sirenType}
-            siren={item}
-            onPress={() => toggleSiren(sirenType, item)}
-            isSelected={isSirenSelected(sirenType, item)}
-          />
-        )}
+        renderItem={({ item }) => {
+          const isSelected = isSirenSelected(sirenType, item)
+          return (
+            <SelectableSirenCard
+              sirenType={sirenType}
+              siren={item}
+              onPress={() => toggleSiren(sirenType, item)}
+              isSelected={isSelected}
+            />
+          )
+        }}
+        style={styles.list}
+        contentContainerStyle={{
+          paddingBottom:
+            Math.max(insets.bottom, T.scroll.padding.minBottom) +
+            T.scroll.padding.additional,
+        }}
+        overScrollMode="never"
+        bounces={false}
       />
     </>
   )
@@ -59,5 +72,8 @@ const styles = StyleSheet.create({
     borderBottomWidth: T.border.width.medium,
     padding: T.spacing.small,
     color: T.color.white,
+  },
+  list: {
+    flex: 1,
   },
 })

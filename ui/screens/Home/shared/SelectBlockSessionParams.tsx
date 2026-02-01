@@ -44,12 +44,14 @@ export function SelectBlockSessionParams({
     return !!form.touched[field] && !!form.errors[field]
   }
 
+  const handleNameChange = form.handleChange('name')
+
   return (
     <View>
       <TiedSCard style={styles.blockSession}>
         <ChooseName
           values={form.values}
-          onChange={form.handleChange('name')}
+          onChange={handleNameChange}
           setFieldValue={form.setFieldValue}
           onBlur={() => form.handleBlur('name')}
         />

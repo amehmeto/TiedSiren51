@@ -167,6 +167,12 @@ export const T = {
       },
     },
   },
+  scroll: {
+    padding: {
+      minBottom: 40,
+      additional: 20,
+    },
+  },
   // Legacy icon size constants (kept for backward compatibility)
   sirenIconSize: 20,
   largeIconSize: 32,

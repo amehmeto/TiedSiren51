@@ -125,7 +125,7 @@ module.exports = {
     'local-rules/prefer-inline-variable': 'warn',
     'local-rules/react-props-destructuring': 'error',
     // Extract call expressions from JSX props into variables for readability
-    'local-rules/no-call-expression-in-jsx-props': 'warn',
+    'local-rules/no-call-expression-in-jsx-props': 'error',
     // Enforce one React component per file
     'local-rules/one-component-per-file': 'error',
     // Disallow else-if statements - use separate ifs or nested if-else
