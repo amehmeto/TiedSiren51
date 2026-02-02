@@ -20,8 +20,7 @@ export function TiedSMenuOption({
   iconName,
   isDisabled = false,
 }: TiedSMenuOptionProps) {
-  const textColor = isDisabled ? T.color.grey : T.color.white
-  const iconColor = isDisabled ? T.color.grey : T.color.white
+  const enabledColor = isDisabled ? T.color.grey : T.color.white
 
   return (
     <MenuOption
@@ -29,7 +28,7 @@ export function TiedSMenuOption({
       style={[styles.menuOption, isDisabled && styles.menuOptionDisabled]}
     >
       <View style={styles.textContainer}>
-        <Text style={[styles.menuOptionText, { color: textColor }]}>
+        <Text style={[styles.menuOptionText, { color: enabledColor }]}>
           {optionName}
         </Text>
         {isDisabled && (
@@ -41,7 +40,7 @@ export function TiedSMenuOption({
           />
         )}
       </View>
-      <Ionicons name={iconName} size={T.icon.size.large} color={iconColor} />
+      <Ionicons name={iconName} size={T.icon.size.large} color={enabledColor} />
     </MenuOption>
   )
 }

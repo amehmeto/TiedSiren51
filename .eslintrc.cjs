@@ -132,6 +132,8 @@ module.exports = {
     'local-rules/no-else-if': 'error',
     // Prevent direct adapter usage in UI layer - use selectors instead
     'local-rules/no-adapter-in-ui': 'error',
+    // Prevent selecting entire Redux state - select specific slices instead
+    'local-rules/no-entire-state-selector': 'error',
   },
   overrides: [
     {

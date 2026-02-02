@@ -31,18 +31,17 @@ type SessionCardProps = Readonly<{
 
 export function SessionCard({ session, type }: SessionCardProps) {
   const dispatch = useDispatch<AppDispatch>()
-  const state = useSelector((s: RootState) => s)
-
   const router = useRouter()
+
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
+  const timeLeft = useSelector((state: RootState) =>
+    selectStrictModeTimeLeft(state, dependencies.dateProvider),
+  )
 
   const [isRenameModalVisible, setIsRenameModalVisible] = useState(false)
   const [isDuplicateModalVisible, setIsDuplicateModalVisible] = useState(false)
-
-  const isStrictModeActive = selectIsStrictModeActive(
-    state,
-    dependencies.dateProvider,
-  )
-  const timeLeft = selectStrictModeTimeLeft(state, dependencies.dateProvider)
   const timeRemainingMessage = isStrictModeActive
     ? `Cannot perform this action during strict mode (${formatDuration(timeLeft)} remaining)`
     : undefined

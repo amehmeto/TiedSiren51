@@ -48,6 +48,7 @@ const noCallExpressionInJsxProps = require('../eslint-rules/no-call-expression-i
 const oneComponentPerFile = require('../eslint-rules/one-component-per-file.cjs')
 const noElseIf = require('../eslint-rules/no-else-if.cjs')
 const noAdapterInUi = require('../eslint-rules/no-adapter-in-ui.cjs')
+const noEntireStateSelector = require('../eslint-rules/no-entire-state-selector.cjs')
 
 module.exports = {
   rules: {
@@ -97,5 +98,6 @@ module.exports = {
     'one-component-per-file': oneComponentPerFile,
     'no-else-if': noElseIf,
     'no-adapter-in-ui': noAdapterInUi,
+    'no-entire-state-selector': noEntireStateSelector,
   },
 }
