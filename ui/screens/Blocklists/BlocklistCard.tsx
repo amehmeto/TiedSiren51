@@ -48,7 +48,7 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
     BlockSession[]
   >([])
   const timeRemainingMessage = isStrictModeActive
-    ? `Cannot perform this action during strict mode (${formatDuration(timeLeft)} remaining)`
+    ? `Locked (${formatDuration(timeLeft)} left)`
     : undefined
 
   const blocklistCardMenu = [

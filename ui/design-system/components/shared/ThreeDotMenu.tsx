@@ -1,13 +1,13 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useMemo } from 'react'
 import {
-  Alert,
   StyleProp,
   StyleSheet,
   useWindowDimensions,
   ViewStyle,
 } from 'react-native'
 import { Menu, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
+import { useToast } from '@/ui/design-system/context/ToastContext'
 import { T } from '@/ui/design-system/theme'
 import { TiedSCard } from './TiedSCard'
 import { TiedSMenuOption } from './TiedSMenuOption'
@@ -33,6 +33,7 @@ type ThreeDotMenuProps = Readonly<{
 
 export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
   const { width: windowWidth } = useWindowDimensions()
+  const { showToast } = useToast()
 
   const menuWidth = useMemo(() => {
     const fortyPercent = windowWidth * 0.4
@@ -50,8 +51,7 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
     if (!selectedOption) throw new Error('Invalid menu option')
 
     if (selectedOption.isDisabled) {
-      Alert.alert(
-        'Action Unavailable',
+      showToast(
         selectedOption.disabledMessage ?? 'This action is currently disabled',
       )
       return

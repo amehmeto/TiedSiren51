@@ -5,6 +5,7 @@ import { MenuProvider } from 'react-native-popup-menu'
 import { AppStore } from '@/core/_redux_/createStore'
 import { InitializingView } from '@/ui/design-system/components/shared/InitializingView'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
+import { ToastProvider } from '@/ui/design-system/context/ToastContext'
 import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
 
 type AppWithInitializationProps = Readonly<{
@@ -33,26 +34,28 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
 
   return (
     <MenuProvider>
-      <StatusBar style={'auto'} />
-      <TiedSLinearBackground>
-        <Stack
-          screenOptions={{
-            header: () => null,
-            contentStyle: { backgroundColor: 'transparent' },
-          }}
-        >
-          {routes.map((route) => (
-            <Stack.Screen
-              key={route}
-              name={route}
-              options={{
-                header: () => null,
-                contentStyle: { backgroundColor: 'transparent' },
-              }}
-            />
-          ))}
-        </Stack>
-      </TiedSLinearBackground>
+      <ToastProvider>
+        <StatusBar style={'auto'} />
+        <TiedSLinearBackground>
+          <Stack
+            screenOptions={{
+              header: () => null,
+              contentStyle: { backgroundColor: 'transparent' },
+            }}
+          >
+            {routes.map((route) => (
+              <Stack.Screen
+                key={route}
+                name={route}
+                options={{
+                  header: () => null,
+                  contentStyle: { backgroundColor: 'transparent' },
+                }}
+              />
+            ))}
+          </Stack>
+        </TiedSLinearBackground>
+      </ToastProvider>
     </MenuProvider>
   )
 }

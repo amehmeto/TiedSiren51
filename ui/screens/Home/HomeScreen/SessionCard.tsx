@@ -43,7 +43,7 @@ export function SessionCard({ session, type }: SessionCardProps) {
   const [isRenameModalVisible, setIsRenameModalVisible] = useState(false)
   const [isDuplicateModalVisible, setIsDuplicateModalVisible] = useState(false)
   const timeRemainingMessage = isStrictModeActive
-    ? `Cannot perform this action during strict mode (${formatDuration(timeLeft)} remaining)`
+    ? `Locked (${formatDuration(timeLeft)} left)`
     : undefined
 
   const sessionCardMenu = [
