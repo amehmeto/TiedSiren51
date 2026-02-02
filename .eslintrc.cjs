@@ -134,6 +134,8 @@ module.exports = {
     'local-rules/no-adapter-in-ui': 'error',
     // Prevent selecting entire Redux state - select specific slices instead
     'local-rules/no-entire-state-selector': 'error',
+    // Extract complex expressions with long strings to variables
+    'local-rules/no-complex-inline-arguments': 'error',
   },
   overrides: [
     {

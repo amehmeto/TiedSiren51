@@ -53,11 +53,9 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
     if (!selectedOption) throw new Error('Invalid menu option')
 
     if (selectedOption.isDisabled) {
-      dispatch(
-        showToast(
-          selectedOption.disabledMessage ?? 'This action is currently disabled',
-        ),
-      )
+      const message =
+        selectedOption.disabledMessage ?? 'This action is currently disabled'
+      dispatch(showToast(message))
       return
     }
 

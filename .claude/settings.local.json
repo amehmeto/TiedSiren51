@@ -112,6 +112,7 @@
       "Bash(ls:*)",
       "Bash(lsof:*)",
       "Bash(mkdir:*)",
+      "Bash(node /Users/arthurmehmetoglu/Development/tied-siren-project/TiedSiren51/eslint-rules/no-complex-inline-arguments.spec.cjs:*)",
       "Bash(node eslint-rules/*.cjs:*)",
       "Bash(node eslint-rules/no-entire-state-selector.spec.cjs:*)",
       "Bash(node scripts/ticket-graph/generate-dependency-graph.mjs:*)",
