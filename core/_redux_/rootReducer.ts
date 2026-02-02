@@ -4,6 +4,7 @@ import { blockSessionSlice } from '../block-session/block-session.slice'
 import { blocklistSlice } from '../blocklist/blocklist.slice'
 import { sirenSlice } from '../siren/siren.slice'
 import { strictModeSlice } from '../strict-mode/strict-mode.slice'
+import { toastSlice } from '../toast/toast.slice'
 
 export const rootReducer = combineReducers({
   blockSession: blockSessionSlice.reducer,
@@ -11,4 +12,5 @@ export const rootReducer = combineReducers({
   siren: sirenSlice.reducer,
   auth: authReducer,
   strictMode: strictModeSlice.reducer,
+  toast: toastSlice.reducer,
 })
