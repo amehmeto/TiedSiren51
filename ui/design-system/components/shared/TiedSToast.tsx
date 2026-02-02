@@ -1,4 +1,4 @@
-import { useEffect, useMemo } from 'react'
+import { useEffect, useMemo, useRef } from 'react'
 import { Animated, StyleSheet, Text } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
@@ -16,10 +16,16 @@ export function TiedSToast({
   duration = 2000,
 }: TiedSToastProps) {
   const fadeAnim = useMemo(() => new Animated.Value(0), [])
+  const animationRef = useRef<Animated.CompositeAnimation | null>(null)
 
   useEffect(() => {
     if (isVisible) {
-      Animated.sequence([
+      // Stop any running animation and reset
+      if (animationRef.current) animationRef.current.stop()
+
+      fadeAnim.setValue(0)
+
+      animationRef.current = Animated.sequence([
         Animated.timing(fadeAnim, {
           toValue: 1,
           duration: 200,
@@ -31,7 +37,19 @@ export function TiedSToast({
           duration: 200,
           useNativeDriver: true,
         }),
-      ]).start(() => onHide())
+      ])
+
+      animationRef.current.start(() => {
+        animationRef.current = null
+        onHide()
+      })
+    }
+
+    return () => {
+      if (animationRef.current) {
+        animationRef.current.stop()
+        animationRef.current = null
+      }
     }
   }, [isVisible, fadeAnim, duration, onHide])
 

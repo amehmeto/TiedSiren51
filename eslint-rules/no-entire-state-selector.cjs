@@ -161,7 +161,9 @@ module.exports = {
           }
 
           // Also check via scope analysis (for variables declared before tracking started)
-          const scope = context.getScope()
+          const scope = context.sourceCode
+            ? context.sourceCode.getScope(node)
+            : context.getScope()
           const definition = findVariableDefinition(scope, arg.name)
 
           if (definition && isEntireStateSelector(definition)) {
