@@ -89,6 +89,178 @@ function formatStoryPointsMarkdown(points) {
 }
 
 // ============================================================================
+// Epic Completion Detection
+// ============================================================================
+
+/**
+ * Parse subtask references from an epic's body
+ * Looks for patterns like:
+ * - | #123 | in tables
+ * - #123 in inline text (with word boundary)
+ * - TSBO#5, EFS#4, etc. (cross-repo refs)
+ *
+ * Searches in these sections:
+ * - ## 📋 Stories / Tasks
+ * - ### Sub-Epics
+ *
+ * @param {string} body - The epic's body text
+ * @param {string} currentRepo - The repo this epic belongs to
+ * @returns {Array<{repo: string, number: number}>} - Array of issue references
+ */
+function parseEpicSubtasks(body, currentRepo) {
+  if (!body) return []
+
+  const subtasks = []
+  const seen = new Set()
+
+  // Find relevant sections - Stories/Tasks and Sub-Epics
+  const sectionPatterns = [
+    /##\s*📋\s*Stories\s*\/\s*Tasks[\s\S]*?(?=\n##|$)/i,
+    /###\s*Sub-Epics[\s\S]*?(?=\n##|\n###|$)/i,
+  ]
+
+  let combinedText = ''
+  for (const pattern of sectionPatterns) {
+    const match = body.match(pattern)
+    if (match) {
+      combinedText += match[0] + '\n'
+    }
+  }
+
+  if (!combinedText) return []
+
+  // Pattern 1: Table rows with issue numbers like "| #123 |" (requires # prefix)
+  const tablePattern = /\|\s*#(\d+)\s*\|/g
+  let match
+  while ((match = tablePattern.exec(combinedText)) !== null) {
+    const number = parseInt(match[1], 10)
+    const key = `${currentRepo}#${number}`
+    if (!seen.has(key)) {
+      seen.add(key)
+      subtasks.push({ repo: currentRepo, number })
+    }
+  }
+
+  // Pattern 2: Cross-repo refs like "| TSBO#5 |" in tables
+  const crossRepoTablePattern = /\|\s*([A-Z]+)#(\d+)\s*\|/g
+  while ((match = crossRepoTablePattern.exec(combinedText)) !== null) {
+    const repoAbbrev = match[1]
+    const number = parseInt(match[2], 10)
+    const repo = REPO_ABBREVIATIONS[repoAbbrev] || currentRepo
+    const key = `${repo}#${number}`
+    if (!seen.has(key)) {
+      seen.add(key)
+      subtasks.push({ repo, number })
+    }
+  }
+
+  return subtasks
+}
+
+/**
+ * Detect epics that may be ready to close (all subtasks done)
+ * Also detects epics with stale status tables
+ *
+ * @param {Array} tickets - All tickets fetched from GitHub
+ * @param {Map} issuesByKey - Map of "repo#number" -> issue data
+ * @returns {Array} - Array of findings
+ */
+function detectCompletableEpics(tickets, issuesByKey) {
+  const findings = []
+
+  // Filter to open epics only
+  const openEpics = tickets.filter(
+    (t) => t.type === 'epic' && t.status !== 'done'
+  )
+
+  for (const epic of openEpics) {
+    const subtaskRefs = parseEpicSubtasks(epic.body, epic.repo)
+
+    if (subtaskRefs.length === 0) continue
+
+    const subtaskStatuses = []
+    let allClosed = true
+    let hasUnknown = false
+
+    for (const ref of subtaskRefs) {
+      const key = `${ref.repo}#${ref.number}`
+      const subtask = issuesByKey.get(key)
+
+      if (!subtask) {
+        subtaskStatuses.push({ ref, status: 'unknown', title: '(not found)' })
+        hasUnknown = true
+        allClosed = false
+      } else if (subtask.status === 'done') {
+        subtaskStatuses.push({ ref, status: 'done', title: subtask.title })
+      } else {
+        subtaskStatuses.push({ ref, status: subtask.status, title: subtask.title })
+        allClosed = false
+      }
+    }
+
+    if (allClosed && !hasUnknown) {
+      findings.push({
+        type: 'epic_ready_to_close',
+        epic,
+        subtasks: subtaskStatuses,
+        message: `Epic #${epic.number} "${epic.title}" has all ${subtaskRefs.length} subtasks closed`,
+      })
+    } else if (!allClosed) {
+      // Check if remaining open tasks might be obsolete
+      const openSubtasks = subtaskStatuses.filter((s) => s.status !== 'done')
+      const closedSubtasks = subtaskStatuses.filter((s) => s.status === 'done')
+
+      // Only report if majority are done (suggest review)
+      const closedRatio = closedSubtasks.length / subtaskStatuses.length
+      if (closedRatio >= 0.8 && openSubtasks.length <= 3) {
+        findings.push({
+          type: 'epic_nearly_complete',
+          epic,
+          subtasks: subtaskStatuses,
+          openSubtasks,
+          closedCount: closedSubtasks.length,
+          totalCount: subtaskStatuses.length,
+          message: `Epic #${epic.number} is ${Math.round(closedRatio * 100)}% complete (${closedSubtasks.length}/${subtaskStatuses.length})`,
+        })
+      }
+    }
+  }
+
+  return findings
+}
+
+/**
+ * Format epic completion findings for console output
+ */
+function formatEpicFindings(findings) {
+  if (findings.length === 0) return null
+
+  const lines = []
+  lines.push('\n' + ANSI.bold + ANSI.cyan + '━━━ EPIC COMPLETION CHECK ━━━' + ANSI.reset)
+
+  for (const finding of findings) {
+    if (finding.type === 'epic_ready_to_close') {
+      lines.push('')
+      lines.push(`  ${ANSI.green}✓${ANSI.reset} ${ANSI.bold}#${finding.epic.number}${ANSI.reset} "${finding.epic.title}"`)
+      lines.push(`    ${ANSI.green}All ${finding.subtasks.length} subtasks are CLOSED - epic can be closed${ANSI.reset}`)
+    } else if (finding.type === 'epic_nearly_complete') {
+      lines.push('')
+      lines.push(`  ${ANSI.yellow}⚠${ANSI.reset} ${ANSI.bold}#${finding.epic.number}${ANSI.reset} "${finding.epic.title}"`)
+      lines.push(`    ${finding.closedCount}/${finding.totalCount} subtasks closed (${Math.round(finding.closedCount / finding.totalCount * 100)}%)`)
+      lines.push(`    ${ANSI.yellow}Remaining open:${ANSI.reset}`)
+      for (const open of finding.openSubtasks) {
+        const refStr = open.ref.repo === finding.epic.repo
+          ? `#${open.ref.number}`
+          : `${REPO_DISPLAY_ABBREV[open.ref.repo] || open.ref.repo}#${open.ref.number}`
+        lines.push(`      - ${refStr}: ${open.title}`)
+      }
+    }
+  }
+
+  return lines.join('\n')
+}
+
+// ============================================================================
 // Inventory Tables
 // ============================================================================
 
@@ -926,6 +1098,22 @@ async function main() {
     }
     console.error('\nManually update the issues listed above.')
     process.exit(1)
+  }
+
+  // Step 5.5: Epic completion check
+  if (!jsonMode && !asciiMode) {
+    // Build lookup map for tickets
+    const issuesByKey = new Map()
+    for (const ticket of tickets) {
+      const key = formatTicketId(ticket.repo, ticket.number)
+      issuesByKey.set(key, ticket)
+    }
+
+    const epicFindings = detectCompletableEpics(tickets, issuesByKey)
+    const epicOutput = formatEpicFindings(epicFindings)
+    if (epicOutput) {
+      console.log(epicOutput)
+    }
   }
 
   // Step 6: Output

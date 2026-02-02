@@ -3,17 +3,17 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2026-01-25
+> Last updated: 2026-02-02
 
 ## Graph Statistics
 
 | Metric | Value |
 |--------|-------|
-| Total Nodes | 74 |
+| Total Nodes | 80 |
 | Total Edges | 43 |
-| Root Nodes (no dependencies) | 45 |
-| Leaf Nodes (nothing depends on them) | 52 |
-| Orphan Nodes (isolated) | 33 |
+| Root Nodes (no dependencies) | 51 |
+| Leaf Nodes (nothing depends on them) | 58 |
+| Orphan Nodes (isolated) | 39 |
 | Critical Path Length | 5 |
 
 ### Critical Path
@@ -56,11 +56,12 @@ The longest dependency chain in the graph:
 | #80 | [Bug] Logout redirects to /login modal instead of /home, requires double close | - | medium | - |
 
 
-### Features - Other (16)
+### Features - Other (22)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #1 | Add ability to filter between system apps and user-installed apps on Android | - | - | - |
 | #4 | Thanks for this module and request for tutorial or guide | - | - | - |
+| #10 | feat: Add uniqueBy option to deduplicate apps by package or activity | - | - | - |
 | #56 | Misc Maintenance | - | - | - |
 | #81 | [Refactor] 🐛 Unnecessary Store State Management in `useAppInitialization` Hook | - | - | - |
 | #87 | Implement Google Sign-In with Firebase | - | - | - |
@@ -75,6 +76,11 @@ The longest dependency chain in the graph:
 | #202 | test | - | - | - |
 | #229 | feat(claude): add PreToolUse hook to block --no-verify in git push commands | - | - | - |
 | #233 | chore: Add fine-grained git checkout permissions to Claude settings | - | - | - |
+| #243 | fix: git pull triggers CI watch incorrectly | - | - | - |
+| #246 | Update expo-list-installed-apps to include launcher apps fix | - | - | - |
+| #248 | Add initial delay to CI watch before polling | - | - | - |
+| #250 | Fix FlatList scroll cutoff on selection scenes | - | - | - |
+| #252 | Refactor CLAUDE.md using progressive disclosure | - | - | - |
 
 
 ### Features - Blocking Architecture (29)
@@ -226,7 +232,7 @@ flowchart LR
         T_TS_59["📝 TS#59 Blocking keywords on Android"]:::epic1_todo
         T_TS_58["📝 TS#58 Block websites on Android"]:::epic1_todo
         T_TS_57["📝 TS#57 Strict Mode [8sp]"]:::epic1_todo
-        T_TS_55["📝 TS#55 Blocking Apps on Android [13sp]"]:::epic0_todo
+        T_TS_55["✅ TS#55 Blocking Apps on Android [13sp]"]:::epic0_done
         T_TS_54["📝 TS#54 User Authentification [21sp]"]:::epic0_todo
     end
     subgraph Epic_219["TS#219 Native Blocking Layer"]
@@ -258,7 +264,7 @@ flowchart LR
         T_TS_184["✅ TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_done
         T_TS_183["✅ TS#183 dependency injection with new<br/>architecture [2sp]"]:::blocking1_done
         T_TS_182["✅ TS#182 AndroidSirenTier to call<br/>setBlockingSchedule [3sp]"]:::blocking1_done
-        T_TS_170["🔄 TS#170 android: Blocking overlay<br/>never triggers - JS bridge<br/>architecture mismatch [8sp]"]:::blocking0_in_progress
+        T_TS_170["✅ TS#170 android: Blocking overlay<br/>never triggers - JS bridge<br/>architecture mismatch [8sp]"]:::blocking0_done
     end
     subgraph Epic_54["TS#54 User Authentification"]
         direction TB
@@ -277,6 +283,11 @@ flowchart LR
     end
     subgraph Ungrouped
         direction TB
+        T_TS_252["✅ TS#252 CLAUDE.md using progressive<br/>disclosure"]:::other0_done
+        T_TS_250["✅ TS#250 FlatList scroll cutoff on<br/>selection scenes"]:::other0_done
+        T_TS_248["✅ TS#248 initial delay to CI watch<br/>before polling"]:::other0_done
+        T_TS_246["✅ TS#246 expo-list-installed-apps to<br/>include launcher apps fix"]:::other0_done
+        T_TS_243["✅ TS#243 : git pull triggers CI watch<br/>incorrectly"]:::other0_done
         T_TS_233["✅ TS#233 : Add fine-grained git<br/>checkout permissions to Claude<br/>settings"]:::other0_done
         T_TS_229["📝 TS#229 claude: add PreToolUse hook to<br/>block --no-verify in git push<br/>commands"]:::other0_todo
         T_TS_202["✅ TS#202 "]:::other0_done
@@ -305,6 +316,7 @@ flowchart LR
         T_TS_56["✅ TS#56 Maintenance"]:::other0_done
         T_EFS_4["✅ EFS#4 for this module and request<br/>for tutorial or guide"]:::blocking0_done
         T_TSBO_5["✅ TSBO#5 BlockingScheduler with<br/>schedule storage"]:::blocking0_done
+        T_ELIA_10["✅ ELIA#10 : Add uniqueBy option to<br/>deduplicate apps by package or<br/>activity"]:::other0_done
         T_ELIA_1["📝 ELIA#1 ability to filter between<br/>system apps and user-installed<br/>apps on Android"]:::other0_todo
     end
 
@@ -416,4 +428,4 @@ Quick reference showing what blocks what:
 
 ---
 
-*Auto-generated on 2026-01-25 from GitHub issue metadata*
+*Auto-generated on 2026-02-02 from GitHub issue metadata*

@@ -65,6 +65,7 @@
       "Bash(gh project field-list:*)",
       "Bash(gh project item-add:*)",
       "Bash(gh project item-list 1 --owner *)",
+      "Bash(gh project item-list 1 --owner amehmeto:*)",
       "Bash(gh project item-list:*)",
       "Bash(gh project list:*)",
       "Bash(gh release list:*)",
