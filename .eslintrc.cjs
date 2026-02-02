@@ -138,6 +138,8 @@ module.exports = {
     'local-rules/no-complex-inline-arguments': 'error',
     // Warn when useCallback is unnecessarily wrapping a selector for useSelector
     'local-rules/no-usecallback-selector-wrapper': 'warn',
+    // Prefer named selectors over inline state slice access
+    'local-rules/prefer-named-selector': 'warn',
   },
   overrides: [
     {

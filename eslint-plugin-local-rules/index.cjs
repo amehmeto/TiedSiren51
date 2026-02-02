@@ -51,6 +51,7 @@ const noAdapterInUi = require('../eslint-rules/no-adapter-in-ui.cjs')
 const noEntireStateSelector = require('../eslint-rules/no-entire-state-selector.cjs')
 const noComplexInlineArguments = require('../eslint-rules/no-complex-inline-arguments.cjs')
 const noUsecallbackSelectorWrapper = require('../eslint-rules/no-usecallback-selector-wrapper.cjs')
+const preferNamedSelector = require('../eslint-rules/prefer-named-selector.cjs')
 
 module.exports = {
   rules: {
@@ -103,5 +104,6 @@ module.exports = {
     'no-entire-state-selector': noEntireStateSelector,
     'no-complex-inline-arguments': noComplexInlineArguments,
     'no-usecallback-selector-wrapper': noUsecallbackSelectorWrapper,
+    'prefer-named-selector': preferNamedSelector,
   },
 }
