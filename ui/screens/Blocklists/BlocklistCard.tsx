@@ -8,12 +8,15 @@ import { selectActiveSessionsUsingBlocklist } from '@/core/block-session/selecto
 import { deleteBlocklist } from '@/core/blocklist/usecases/delete-blocklist.usecase'
 import { duplicateBlocklist } from '@/core/blocklist/usecases/duplicate-blocklist.usecase'
 import { renameBlocklist } from '@/core/blocklist/usecases/rename-blocklist.usecase'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
 import { dependencies } from '@/ui/dependencies'
 import { ThreeDotMenu } from '@/ui/design-system/components/shared/ThreeDotMenu'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 import { BlocklistDeletionConfirmationModal } from '@/ui/screens/Blocklists/BlocklistDeletionConfirmationModal'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
+import { formatDuration } from '@/ui/screens/StrictMode/format-duration.helper'
 
 type BlocklistCardProps = Readonly<{
   blocklist: {
@@ -26,6 +29,7 @@ type BlocklistCardProps = Readonly<{
 export function BlocklistCard({ blocklist }: BlocklistCardProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const state = useSelector((s: RootState) => s)
 
   const [isRenameModalVisible, setRenameModalVisible] = useState(false)
   const [isDuplicateModalVisible, setIsDuplicateModalVisible] = useState(false)
@@ -35,9 +39,16 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
     BlockSession[]
   >([])
 
-  const blockSessionState = useSelector(
-    (state: RootState) => state.blockSession,
+  const blockSessionState = state.blockSession
+
+  const isStrictModeActive = selectIsStrictModeActive(
+    state,
+    dependencies.dateProvider,
   )
+  const timeLeft = selectStrictModeTimeLeft(state, dependencies.dateProvider)
+  const timeRemainingMessage = isStrictModeActive
+    ? `Cannot perform this action during strict mode (${formatDuration(timeLeft)} remaining)`
+    : undefined
 
   const blocklistCardMenu = [
     {
@@ -56,6 +67,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
           params: { blocklistId: blocklist.id },
         })
       },
+      isDisabled: isStrictModeActive,
+      disabledMessage: timeRemainingMessage,
     },
     {
       name: 'Duplicate',
@@ -78,6 +91,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
           setIsDeleteConfirmationVisible(true)
         } else dispatch(deleteBlocklist(blocklist.id))
       },
+      isDisabled: isStrictModeActive,
+      disabledMessage: timeRemainingMessage,
     },
   ]
 

@@ -2,17 +2,21 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { deleteBlockSession } from '@/core/block-session/usecases/delete-block-session.usecase'
 import { duplicateBlockSession } from '@/core/block-session/usecases/duplicate-block-session.usecase'
 import { renameBlockSession } from '@/core/block-session/usecases/rename-block-session.usecase'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
+import { dependencies } from '@/ui/dependencies'
 import { ThreeDotMenu } from '@/ui/design-system/components/shared/ThreeDotMenu'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 import { RoundBlueDot } from '@/ui/screens/Home/HomeScreen/RoundBlueDot'
 import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
+import { formatDuration } from '@/ui/screens/StrictMode/format-duration.helper'
 
 type SessionCardProps = Readonly<{
   session: {
@@ -27,11 +31,21 @@ type SessionCardProps = Readonly<{
 
 export function SessionCard({ session, type }: SessionCardProps) {
   const dispatch = useDispatch<AppDispatch>()
+  const state = useSelector((s: RootState) => s)
 
   const router = useRouter()
 
   const [isRenameModalVisible, setIsRenameModalVisible] = useState(false)
   const [isDuplicateModalVisible, setIsDuplicateModalVisible] = useState(false)
+
+  const isStrictModeActive = selectIsStrictModeActive(
+    state,
+    dependencies.dateProvider,
+  )
+  const timeLeft = selectStrictModeTimeLeft(state, dependencies.dateProvider)
+  const timeRemainingMessage = isStrictModeActive
+    ? `Cannot perform this action during strict mode (${formatDuration(timeLeft)} remaining)`
+    : undefined
 
   const sessionCardMenu = [
     {
@@ -50,6 +64,8 @@ export function SessionCard({ session, type }: SessionCardProps) {
           params: { sessionId: session.id },
         })
       },
+      isDisabled: isStrictModeActive,
+      disabledMessage: timeRemainingMessage,
     },
     {
       name: 'Duplicate',
@@ -64,6 +80,8 @@ export function SessionCard({ session, type }: SessionCardProps) {
       action: () => {
         dispatch(deleteBlockSession(session.id))
       },
+      isDisabled: isStrictModeActive,
+      disabledMessage: timeRemainingMessage,
     },
   ]
 

@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useMemo } from 'react'
 import {
+  Alert,
   StyleProp,
   StyleSheet,
   useWindowDimensions,
@@ -17,10 +18,12 @@ type IconName =
   | 'copy-outline'
   | 'trash-outline'
 
-type TiedSMenu = {
+export type TiedSMenu = {
   name: string
   iconName: IconName
   action: () => void
+  isDisabled?: boolean
+  disabledMessage?: string
 }
 
 type ThreeDotMenuProps = Readonly<{
@@ -45,6 +48,15 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
       (option) => option.name === optionName,
     )
     if (!selectedOption) throw new Error('Invalid menu option')
+
+    if (selectedOption.isDisabled) {
+      Alert.alert(
+        'Action Unavailable',
+        selectedOption.disabledMessage ?? 'This action is currently disabled',
+      )
+      return
+    }
+
     selectedOption.action()
   }
 
@@ -91,6 +103,7 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
               key={option.name}
               optionName={option.name}
               iconName={option.iconName}
+              isDisabled={option.isDisabled}
             />
           ))}
         </TiedSCard>

@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { MenuOption } from 'react-native-popup-menu'
 import { T } from '@/ui/design-system/theme'
 
@@ -12,20 +12,36 @@ type IconName =
 type TiedSMenuOptionProps = Readonly<{
   optionName: string
   iconName: IconName
+  isDisabled?: boolean
 }>
 
 export function TiedSMenuOption({
   optionName,
   iconName,
+  isDisabled = false,
 }: TiedSMenuOptionProps) {
+  const textColor = isDisabled ? T.color.grey : T.color.white
+  const iconColor = isDisabled ? T.color.grey : T.color.white
+
   return (
-    <MenuOption value={optionName} style={styles.menuOption}>
-      <Text style={styles.menuOptionText}>{optionName}</Text>
-      <Ionicons
-        name={iconName}
-        size={T.icon.size.large}
-        color={T.color.white}
-      />
+    <MenuOption
+      value={optionName}
+      style={[styles.menuOption, isDisabled && styles.menuOptionDisabled]}
+    >
+      <View style={styles.textContainer}>
+        <Text style={[styles.menuOptionText, { color: textColor }]}>
+          {optionName}
+        </Text>
+        {isDisabled && (
+          <Ionicons
+            name="lock-closed"
+            size={T.icon.size.xSmall}
+            color={T.color.grey}
+            style={styles.lockIcon}
+          />
+        )}
+      </View>
+      <Ionicons name={iconName} size={T.icon.size.large} color={iconColor} />
     </MenuOption>
   )
 }
@@ -34,7 +50,14 @@ const styles = StyleSheet.create({
   menuOptionText: {
     color: T.color.white,
     fontSize: T.font.size.small,
+  },
+  textContainer: {
     flex: 1,
+    flexDirection: 'row',
+    alignItems: 'center',
+  },
+  lockIcon: {
+    marginLeft: T.spacing.extraSmall,
   },
   menuOption: {
     display: 'flex',
@@ -43,5 +66,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: T.spacing.small,
     backgroundColor: T.color.transparent,
+  },
+  menuOptionDisabled: {
+    opacity: T.opacity.disabled,
   },
 })
