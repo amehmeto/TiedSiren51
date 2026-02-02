@@ -87,10 +87,10 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
 
   return (
     <Menu onSelect={selectMenuOption} style={style}>
-      <MenuTrigger>
+      <MenuTrigger style={styles.menuTrigger}>
         <Ionicons
           name={'ellipsis-horizontal'}
-          size={T.icon.size.large}
+          size={T.icon.size.xxLarge}
           color={T.color.text}
         />
       </MenuTrigger>
@@ -115,6 +115,9 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
 }
 
 const styles = StyleSheet.create({
+  menuTrigger: {
+    padding: T.spacing.small,
+  },
   menuOptions: {
     flexDirection: 'column',
     alignItems: 'flex-start',

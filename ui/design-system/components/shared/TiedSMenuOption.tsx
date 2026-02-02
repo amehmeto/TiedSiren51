@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
-import { StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import { MenuOption } from 'react-native-popup-menu'
 import { T } from '@/ui/design-system/theme'
 
@@ -27,19 +27,9 @@ export function TiedSMenuOption({
       value={optionName}
       style={[styles.menuOption, isDisabled && styles.menuOptionDisabled]}
     >
-      <View style={styles.textContainer}>
-        <Text style={[styles.menuOptionText, { color: enabledColor }]}>
-          {optionName}
-        </Text>
-        {isDisabled && (
-          <Ionicons
-            name="lock-closed"
-            size={T.icon.size.xSmall}
-            color={T.color.grey}
-            style={styles.lockIcon}
-          />
-        )}
-      </View>
+      <Text style={[styles.menuOptionText, { color: enabledColor }]}>
+        {optionName}
+      </Text>
       <Ionicons name={iconName} size={T.icon.size.large} color={enabledColor} />
     </MenuOption>
   )
@@ -49,14 +39,7 @@ const styles = StyleSheet.create({
   menuOptionText: {
     color: T.color.white,
     fontSize: T.font.size.small,
-  },
-  textContainer: {
     flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-  },
-  lockIcon: {
-    marginLeft: T.spacing.extraSmall,
   },
   menuOption: {
     display: 'flex',
