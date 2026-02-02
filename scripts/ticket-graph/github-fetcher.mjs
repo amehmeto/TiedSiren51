@@ -353,6 +353,7 @@ export function transformIssuesToTickets(issues, mainRepo, repoAbbreviations, va
     return {
       number: issue.number,
       title: issue.title,
+      body: issue.body,
       labels: issue.labels,
       repo: ticketRepo,
       metadata,
