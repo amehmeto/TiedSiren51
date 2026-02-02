@@ -1,7 +1,8 @@
 import { useEffect, useMemo, useRef } from 'react'
 import { Animated, StyleSheet, Text } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { AppDispatch } from '@/core/_redux_/createStore'
+import { selectToast } from '@/core/toast/selectors/selectToast'
 import { hideToast } from '@/core/toast/toast.slice'
 import { T } from '@/ui/design-system/theme'
 
@@ -11,7 +12,7 @@ type TiedSToastProps = Readonly<{
 
 export function TiedSToast({ duration = 2000 }: TiedSToastProps) {
   const dispatch = useDispatch<AppDispatch>()
-  const { message, isVisible } = useSelector((state: RootState) => state.toast)
+  const { message, isVisible } = useSelector(selectToast)
   const fadeAnim = useMemo(() => new Animated.Value(0), [])
   const animationRef = useRef<Animated.CompositeAnimation | null>(null)
 

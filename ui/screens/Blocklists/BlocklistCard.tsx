@@ -185,8 +185,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   menu: {
-    color: T.color.text,
-    fontSize: T.font.size.small,
     marginRight: T.spacing.small,
   },
 })
