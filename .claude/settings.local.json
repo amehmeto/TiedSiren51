@@ -116,6 +116,7 @@
       "Bash(node eslint-rules/*.cjs:*)",
       "Bash(node eslint-rules/no-entire-state-selector.spec.cjs:*)",
       "Bash(node scripts/ticket-graph/generate-dependency-graph.mjs:*)",
+      "Bash(node:*)",
       "Bash(npm ci:*)",
       "Bash(npm install:*)",
       "Bash(npm ls:*)",

@@ -136,6 +136,8 @@ module.exports = {
     'local-rules/no-entire-state-selector': 'error',
     // Extract complex expressions with long strings to variables
     'local-rules/no-complex-inline-arguments': 'error',
+    // Warn when useCallback is unnecessarily wrapping a selector for useSelector
+    'local-rules/no-usecallback-selector-wrapper': 'warn',
   },
   overrides: [
     {

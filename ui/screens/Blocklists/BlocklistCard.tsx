@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
@@ -30,24 +30,15 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
-  const selectBlockSession = useCallback(
+  const blockSessionState = useSelector(
     (state: RootState) => state.blockSession,
-    [],
   )
-  const selectStrictModeActiveWithDeps = useCallback(
-    (state: RootState) =>
-      selectIsStrictModeActive(state, dependencies.dateProvider),
-    [],
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
   )
-  const selectTimeLeftWithDeps = useCallback(
-    (state: RootState) =>
-      selectStrictModeTimeLeft(state, dependencies.dateProvider),
-    [],
+  const timeLeft = useSelector((state: RootState) =>
+    selectStrictModeTimeLeft(state, dependencies.dateProvider),
   )
-
-  const blockSessionState = useSelector(selectBlockSession)
-  const isStrictModeActive = useSelector(selectStrictModeActiveWithDeps)
-  const timeLeft = useSelector(selectTimeLeftWithDeps)
 
   const [isRenameModalVisible, setRenameModalVisible] = useState(false)
   const [isDuplicateModalVisible, setIsDuplicateModalVisible] = useState(false)
