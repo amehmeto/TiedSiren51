@@ -35,7 +35,7 @@ describe('selectActiveSessionsUsingBlocklist', () => {
 
     const sessions = selectActiveSessionsUsingBlocklist(
       dateProvider,
-      state.blockSession,
+      state,
       'target-blocklist',
     )
 
@@ -56,7 +56,7 @@ describe('selectActiveSessionsUsingBlocklist', () => {
 
     const sessions = selectActiveSessionsUsingBlocklist(
       dateProvider,
-      state.blockSession,
+      state,
       'target-blocklist',
     )
 
@@ -75,7 +75,7 @@ describe('selectActiveSessionsUsingBlocklist', () => {
 
     const sessions = selectActiveSessionsUsingBlocklist(
       dateProvider,
-      state.blockSession,
+      state,
       'target-blocklist',
     )
 
@@ -94,7 +94,7 @@ describe('selectActiveSessionsUsingBlocklist', () => {
 
     const sessions = selectActiveSessionsUsingBlocklist(
       dateProvider,
-      state.blockSession,
+      state,
       'target-blocklist',
     )
 

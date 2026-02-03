@@ -1,7 +1,7 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector, useStore } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { BlockSession } from '@/core/block-session/block-session'
 import { selectActiveSessionsUsingBlocklist } from '@/core/block-session/selectors/selectActiveSessionsUsingBlocklist'
@@ -29,10 +29,8 @@ type BlocklistCardProps = Readonly<{
 export function BlocklistCard({ blocklist }: BlocklistCardProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const store = useStore<RootState>()
 
-  const blockSessionState = useSelector(
-    (state: RootState) => state.blockSession,
-  )
   const isStrictModeActive = useSelector((state: RootState) =>
     selectIsStrictModeActive(state, dependencies.dateProvider),
   )
@@ -84,7 +82,7 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
       action: () => {
         const activeSessions = selectActiveSessionsUsingBlocklist(
           dependencies.dateProvider,
-          blockSessionState,
+          store.getState(),
           blocklist.id,
         )
         if (activeSessions.length > 0) {
