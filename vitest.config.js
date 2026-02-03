@@ -16,6 +16,7 @@ export default {
       'infra/**/prisma.*.test.ts',
       '**/node_modules/**',
       'eslint-rules/**',
+      '.worktrees/**',
     ],
     coverage: {
       provider: 'v8',
