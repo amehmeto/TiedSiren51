@@ -140,6 +140,8 @@ module.exports = {
     'local-rules/no-usecallback-selector-wrapper': 'warn',
     // Prefer named selectors over inline state slice access
     'local-rules/prefer-named-selector': 'warn',
+    // Enforce state as first parameter in selectors
+    'local-rules/selector-state-first-param': 'error',
   },
   overrides: [
     {
