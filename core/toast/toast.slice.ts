@@ -1,13 +1,11 @@
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 type ToastState = {
-  message: string
-  isVisible: boolean
+  message: string | null
 }
 
 const initialState: ToastState = {
-  message: '',
-  isVisible: false,
+  message: null,
 }
 
 export const toastSlice = createSlice({
@@ -16,12 +14,11 @@ export const toastSlice = createSlice({
   reducers: {
     showToast: (state, action: PayloadAction<string>) => {
       state.message = action.payload
-      state.isVisible = true
     },
-    hideToast: (state) => {
-      state.isVisible = false
+    clearToast: (state) => {
+      state.message = null
     },
   },
 })
 
-export const { showToast, hideToast } = toastSlice.actions
+export const { showToast, clearToast } = toastSlice.actions

@@ -2,13 +2,13 @@ import { useEffect, useMemo, useRef } from 'react'
 import { Animated } from 'react-native'
 
 type UseFadeAnimationOptions = {
-  isVisible: boolean
+  isActive: boolean
   duration: number
   onAnimationComplete: () => void
 }
 
 export function useFadeAnimation({
-  isVisible,
+  isActive,
   duration,
   onAnimationComplete,
 }: UseFadeAnimationOptions) {
@@ -16,9 +16,8 @@ export function useFadeAnimation({
   const animationRef = useRef<Animated.CompositeAnimation | null>(null)
 
   useEffect(() => {
-    if (!isVisible) return
+    if (!isActive) return
 
-    // Stop any running animation and reset
     if (animationRef.current) animationRef.current.stop()
 
     fadeAnim.setValue(0)
@@ -48,7 +47,7 @@ export function useFadeAnimation({
         animationRef.current = null
       }
     }
-  }, [isVisible, fadeAnim, duration, onAnimationComplete])
+  }, [isActive, fadeAnim, duration, onAnimationComplete])
 
   return fadeAnim
 }
