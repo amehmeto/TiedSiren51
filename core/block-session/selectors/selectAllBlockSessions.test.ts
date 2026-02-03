@@ -9,7 +9,7 @@ describe('selectAllBlockSessions', () => {
     const session2 = buildBlockSession({ id: 'session-2' })
     const state = stateBuilder().withBlockSessions([session1, session2]).build()
 
-    const sessions = selectAllBlockSessions(state.blockSession)
+    const sessions = selectAllBlockSessions(state)
 
     const ids = sessions.map((s) => s.id)
     expect(sessions).toHaveLength(2)
@@ -20,7 +20,7 @@ describe('selectAllBlockSessions', () => {
   test('should return empty array when no sessions exist', () => {
     const state = stateBuilder().build()
 
-    const sessions = selectAllBlockSessions(state.blockSession)
+    const sessions = selectAllBlockSessions(state)
 
     expect(sessions).toHaveLength(0)
   })

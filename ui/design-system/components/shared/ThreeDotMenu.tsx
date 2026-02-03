@@ -7,6 +7,9 @@ import {
   ViewStyle,
 } from 'react-native'
 import { Menu, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '@/core/_redux_/createStore'
+import { showToast } from '@/core/toast/toast.slice'
 import { T } from '@/ui/design-system/theme'
 import { TiedSCard } from './TiedSCard'
 import { TiedSMenuOption } from './TiedSMenuOption'
@@ -17,10 +20,12 @@ type IconName =
   | 'copy-outline'
   | 'trash-outline'
 
-type TiedSMenu = {
+export type TiedSMenu = {
   name: string
   iconName: IconName
   action: () => void
+  isDisabled?: boolean
+  disabledMessage?: string
 }
 
 type ThreeDotMenuProps = Readonly<{
@@ -30,6 +35,7 @@ type ThreeDotMenuProps = Readonly<{
 
 export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
   const { width: windowWidth } = useWindowDimensions()
+  const dispatch = useDispatch<AppDispatch>()
 
   const menuWidth = useMemo(() => {
     const fortyPercent = windowWidth * 0.4
@@ -45,6 +51,14 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
       (option) => option.name === optionName,
     )
     if (!selectedOption) throw new Error('Invalid menu option')
+
+    if (selectedOption.isDisabled) {
+      const message =
+        selectedOption.disabledMessage ?? 'This action is currently disabled'
+      dispatch(showToast(message))
+      return
+    }
+
     selectedOption.action()
   }
 
@@ -73,10 +87,10 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
 
   return (
     <Menu onSelect={selectMenuOption} style={style}>
-      <MenuTrigger>
+      <MenuTrigger style={styles.menuTrigger}>
         <Ionicons
           name={'ellipsis-horizontal'}
-          size={T.icon.size.large}
+          size={T.icon.size.xxLarge}
           color={T.color.text}
         />
       </MenuTrigger>
@@ -91,6 +105,7 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
               key={option.name}
               optionName={option.name}
               iconName={option.iconName}
+              isDisabled={option.isDisabled}
             />
           ))}
         </TiedSCard>
@@ -100,6 +115,9 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
 }
 
 const styles = StyleSheet.create({
+  menuTrigger: {
+    padding: T.spacing.small,
+  },
   menuOptions: {
     flexDirection: 'column',
     alignItems: 'flex-start',

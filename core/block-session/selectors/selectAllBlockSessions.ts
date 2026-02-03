@@ -1,6 +1,5 @@
-import { EntityState } from '@reduxjs/toolkit'
-import { BlockSession, blockSessionAdapter } from '../block-session'
+import { RootState } from '@/core/_redux_/createStore'
+import { blockSessionAdapter } from '../block-session'
 
-export const selectAllBlockSessions = (
-  blockSession: EntityState<BlockSession, string>,
-) => blockSessionAdapter.getSelectors().selectAll(blockSession)
+export const selectAllBlockSessions = (state: RootState) =>
+  blockSessionAdapter.getSelectors().selectAll(state.blockSession)

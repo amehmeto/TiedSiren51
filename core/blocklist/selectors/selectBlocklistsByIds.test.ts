@@ -7,7 +7,7 @@ describe('selectBlocklistsByIds', () => {
   test('should return empty array when no blocklist ids provided', () => {
     const state = stateBuilder().build()
 
-    const result = selectBlocklistsByIds([], state)
+    const result = selectBlocklistsByIds(state, [])
 
     expect(result).toStrictEqual([])
   })
@@ -20,7 +20,7 @@ describe('selectBlocklistsByIds', () => {
       .build()
     const expectedBlocklists = [blocklist1, blocklist2]
 
-    const result = selectBlocklistsByIds(['bl-1', 'bl-2'], state)
+    const result = selectBlocklistsByIds(state, ['bl-1', 'bl-2'])
 
     expect(result).toStrictEqual(expectedBlocklists)
   })
@@ -30,7 +30,7 @@ describe('selectBlocklistsByIds', () => {
     const state = stateBuilder().withBlocklists([blocklist]).build()
     const expectedBlocklists = [blocklist]
 
-    const result = selectBlocklistsByIds(['bl-1', 'non-existent'], state)
+    const result = selectBlocklistsByIds(state, ['bl-1', 'non-existent'])
 
     expect(result).toStrictEqual(expectedBlocklists)
   })
@@ -38,10 +38,10 @@ describe('selectBlocklistsByIds', () => {
   test('should return empty array when all ids are non-existent', () => {
     const state = stateBuilder().build()
 
-    const result = selectBlocklistsByIds(
-      ['non-existent-1', 'non-existent-2'],
-      state,
-    )
+    const result = selectBlocklistsByIds(state, [
+      'non-existent-1',
+      'non-existent-2',
+    ])
 
     expect(result).toStrictEqual([])
   })

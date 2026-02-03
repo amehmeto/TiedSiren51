@@ -27,7 +27,7 @@ describe('selectScheduledSessions', () => {
       .withBlockSessions([activeSession, scheduledSession])
       .build()
 
-    const scheduled = selectScheduledSessions(dateProvider, state.blockSession)
+    const scheduled = selectScheduledSessions(state, dateProvider)
 
     const ids = scheduled.map((s) => s.id)
     expect(scheduled).toHaveLength(1)
@@ -48,7 +48,7 @@ describe('selectScheduledSessions', () => {
     })
     const state = stateBuilder().withBlockSessions([session1, session2]).build()
 
-    const scheduled = selectScheduledSessions(dateProvider, state.blockSession)
+    const scheduled = selectScheduledSessions(state, dateProvider)
 
     expect(scheduled).toHaveLength(2)
   })
@@ -56,7 +56,7 @@ describe('selectScheduledSessions', () => {
   test('should return empty array when no sessions exist', () => {
     const state = stateBuilder().build()
 
-    const scheduled = selectScheduledSessions(dateProvider, state.blockSession)
+    const scheduled = selectScheduledSessions(state, dateProvider)
 
     expect(scheduled).toHaveLength(0)
   })

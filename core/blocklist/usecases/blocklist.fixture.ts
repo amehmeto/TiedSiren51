@@ -80,8 +80,8 @@ export function blocklistFixture(
     then: {
       blocklistShouldBeStoredAs: (expectedBlocklist: Blocklist) => {
         const retrievedBlocklist = selectBlocklistById(
-          expectedBlocklist.id,
           store.getState(),
+          expectedBlocklist.id,
         )
         expect(retrievedBlocklist).toStrictEqual(expectedBlocklist)
       },
@@ -102,8 +102,8 @@ export function blocklistFixture(
       },
       blocklistShouldNotBeInStore(deletedSessionId: string) {
         const retrievedBlocklist = selectBlocklistById(
-          deletedSessionId,
           store.getState(),
+          deletedSessionId,
         )
         expect(retrievedBlocklist).toBeUndefined()
       },

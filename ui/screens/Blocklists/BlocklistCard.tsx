@@ -1,19 +1,22 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector, useStore } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { BlockSession } from '@/core/block-session/block-session'
 import { selectActiveSessionsUsingBlocklist } from '@/core/block-session/selectors/selectActiveSessionsUsingBlocklist'
 import { deleteBlocklist } from '@/core/blocklist/usecases/delete-blocklist.usecase'
 import { duplicateBlocklist } from '@/core/blocklist/usecases/duplicate-blocklist.usecase'
 import { renameBlocklist } from '@/core/blocklist/usecases/rename-blocklist.usecase'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
 import { dependencies } from '@/ui/dependencies'
 import { ThreeDotMenu } from '@/ui/design-system/components/shared/ThreeDotMenu'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 import { BlocklistDeletionConfirmationModal } from '@/ui/screens/Blocklists/BlocklistDeletionConfirmationModal'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
+import { formatDuration } from '@/ui/screens/StrictMode/format-duration.helper'
 
 type BlocklistCardProps = Readonly<{
   blocklist: {
@@ -26,6 +29,14 @@ type BlocklistCardProps = Readonly<{
 export function BlocklistCard({ blocklist }: BlocklistCardProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const store = useStore<RootState>()
+
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
+  const timeLeft = useSelector((state: RootState) =>
+    selectStrictModeTimeLeft(state, dependencies.dateProvider),
+  )
 
   const [isRenameModalVisible, setRenameModalVisible] = useState(false)
   const [isDuplicateModalVisible, setIsDuplicateModalVisible] = useState(false)
@@ -34,10 +45,9 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
   const [activeSessionsForDeletion, setActiveSessionsForDeletion] = useState<
     BlockSession[]
   >([])
-
-  const blockSessionState = useSelector(
-    (state: RootState) => state.blockSession,
-  )
+  const timeRemainingMessage = isStrictModeActive
+    ? `Locked (${formatDuration(timeLeft)} left)`
+    : undefined
 
   const blocklistCardMenu = [
     {
@@ -56,6 +66,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
           params: { blocklistId: blocklist.id },
         })
       },
+      isDisabled: isStrictModeActive,
+      disabledMessage: timeRemainingMessage,
     },
     {
       name: 'Duplicate',
@@ -69,8 +81,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
       iconName: 'trash-outline' as const,
       action: () => {
         const activeSessions = selectActiveSessionsUsingBlocklist(
+          store.getState(),
           dependencies.dateProvider,
-          blockSessionState,
           blocklist.id,
         )
         if (activeSessions.length > 0) {
@@ -78,6 +90,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
           setIsDeleteConfirmationVisible(true)
         } else dispatch(deleteBlocklist(blocklist.id))
       },
+      isDisabled: isStrictModeActive,
+      disabledMessage: timeRemainingMessage,
     },
   ]
 
@@ -169,8 +183,6 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
   },
   menu: {
-    color: T.color.text,
-    fontSize: T.font.size.small,
     marginRight: T.spacing.small,
   },
 })

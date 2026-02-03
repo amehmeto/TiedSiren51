@@ -11,7 +11,7 @@ describe('selectBlocklistById', () => {
     })
     const state = stateBuilder().withBlocklists([blocklist]).build()
 
-    const result = selectBlocklistById('blocklist-1', state)
+    const result = selectBlocklistById(state, 'blocklist-1')
 
     expect(result).toBeDefined()
     expect(result.id).toBe('blocklist-1')
@@ -21,7 +21,7 @@ describe('selectBlocklistById', () => {
   test('should return undefined when blocklist does not exist', () => {
     const state = stateBuilder().build()
 
-    const result = selectBlocklistById('non-existent', state)
+    const result = selectBlocklistById(state, 'non-existent')
 
     expect(result).toBeUndefined()
   })

@@ -5,6 +5,7 @@ import { MenuProvider } from 'react-native-popup-menu'
 import { AppStore } from '@/core/_redux_/createStore'
 import { InitializingView } from '@/ui/design-system/components/shared/InitializingView'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
+import { TiedSToast } from '@/ui/design-system/components/shared/TiedSToast'
 import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
 
 type AppWithInitializationProps = Readonly<{
@@ -53,6 +54,7 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
           ))}
         </Stack>
       </TiedSLinearBackground>
+      <TiedSToast />
     </MenuProvider>
   )
 }

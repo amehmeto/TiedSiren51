@@ -23,6 +23,7 @@ Presentation layer: components, screens, design system, routing.
 - [View Model Pattern](ui/view-model-pattern.md)
 - [Expo Router File-Based Routing](ui/expo-router-file-based.md)
 - [Minimize useEffect Hook Usage](ui/minimize-useeffect-usage.md)
+- [Redux Over Context for UI State](ui/redux-over-context-for-ui-state.md)
 - [Centralized Services Initialization](services-initialization.md)
 
 #### Core Layer (`core/`)

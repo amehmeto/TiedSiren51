@@ -48,6 +48,11 @@ const noCallExpressionInJsxProps = require('../eslint-rules/no-call-expression-i
 const oneComponentPerFile = require('../eslint-rules/one-component-per-file.cjs')
 const noElseIf = require('../eslint-rules/no-else-if.cjs')
 const noAdapterInUi = require('../eslint-rules/no-adapter-in-ui.cjs')
+const noEntireStateSelector = require('../eslint-rules/no-entire-state-selector.cjs')
+const noComplexInlineArguments = require('../eslint-rules/no-complex-inline-arguments.cjs')
+const noUsecallbackSelectorWrapper = require('../eslint-rules/no-usecallback-selector-wrapper.cjs')
+const preferNamedSelector = require('../eslint-rules/prefer-named-selector.cjs')
+const selectorStateFirstParam = require('../eslint-rules/selector-state-first-param.cjs')
 
 module.exports = {
   rules: {
@@ -97,5 +102,10 @@ module.exports = {
     'one-component-per-file': oneComponentPerFile,
     'no-else-if': noElseIf,
     'no-adapter-in-ui': noAdapterInUi,
+    'no-entire-state-selector': noEntireStateSelector,
+    'no-complex-inline-arguments': noComplexInlineArguments,
+    'no-usecallback-selector-wrapper': noUsecallbackSelectorWrapper,
+    'prefer-named-selector': preferNamedSelector,
+    'selector-state-first-param': selectorStateFirstParam,
   },
 }

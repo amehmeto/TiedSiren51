@@ -132,6 +132,16 @@ module.exports = {
     'local-rules/no-else-if': 'error',
     // Prevent direct adapter usage in UI layer - use selectors instead
     'local-rules/no-adapter-in-ui': 'error',
+    // Prevent selecting entire Redux state - select specific slices instead
+    'local-rules/no-entire-state-selector': 'error',
+    // Extract complex expressions with long strings to variables
+    'local-rules/no-complex-inline-arguments': 'error',
+    // Warn when useCallback is unnecessarily wrapping a selector for useSelector
+    'local-rules/no-usecallback-selector-wrapper': 'warn',
+    // Prefer named selectors over inline state slice access
+    'local-rules/prefer-named-selector': 'warn',
+    // Enforce state as first parameter in selectors
+    'local-rules/selector-state-first-param': 'error',
   },
   overrides: [
     {

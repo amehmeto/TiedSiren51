@@ -12,20 +12,25 @@ type IconName =
 type TiedSMenuOptionProps = Readonly<{
   optionName: string
   iconName: IconName
+  isDisabled?: boolean
 }>
 
 export function TiedSMenuOption({
   optionName,
   iconName,
+  isDisabled = false,
 }: TiedSMenuOptionProps) {
+  const enabledColor = isDisabled ? T.color.grey : T.color.white
+
   return (
-    <MenuOption value={optionName} style={styles.menuOption}>
-      <Text style={styles.menuOptionText}>{optionName}</Text>
-      <Ionicons
-        name={iconName}
-        size={T.icon.size.large}
-        color={T.color.white}
-      />
+    <MenuOption
+      value={optionName}
+      style={[styles.menuOption, isDisabled && styles.menuOptionDisabled]}
+    >
+      <Text style={[styles.menuOptionText, { color: enabledColor }]}>
+        {optionName}
+      </Text>
+      <Ionicons name={iconName} size={T.icon.size.large} color={enabledColor} />
     </MenuOption>
   )
 }
@@ -43,5 +48,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: T.spacing.small,
     backgroundColor: T.color.transparent,
+  },
+  menuOptionDisabled: {
+    opacity: T.opacity.disabled,
   },
 })

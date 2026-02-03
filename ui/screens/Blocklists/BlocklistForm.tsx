@@ -48,7 +48,7 @@ export function BlocklistForm({
   )
 
   const blocklistFromState = useSelector((state: RootState) =>
-    blocklistId ? selectBlocklistById(blocklistId, state) : undefined,
+    blocklistId ? selectBlocklistById(state, blocklistId) : undefined,
   )
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(

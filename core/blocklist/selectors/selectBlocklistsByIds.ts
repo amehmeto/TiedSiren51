@@ -2,8 +2,8 @@ import { RootState } from '../../_redux_/createStore'
 import { blocklistAdapter } from '../blocklist'
 
 export const selectBlocklistsByIds = (
-  blocklistIds: string[],
   state: RootState,
+  blocklistIds: string[],
 ) => {
   const entities = blocklistAdapter
     .getSelectors()
