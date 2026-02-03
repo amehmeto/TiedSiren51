@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useEffect, useLayoutEffect, useMemo, useRef } from 'react'
 import { Animated } from 'react-native'
 
 type UseFadeAnimationOptions = {
@@ -16,7 +16,7 @@ export function useFadeAnimation({
   const animationRef = useRef<Animated.CompositeAnimation | null>(null)
   const onCompleteRef = useRef(onAnimationComplete)
 
-  useEffect(() => {
+  useLayoutEffect(() => {
     onCompleteRef.current = onAnimationComplete
   }, [onAnimationComplete])
 
