@@ -27,10 +27,7 @@ describe('selectActiveSessions', () => {
       .withBlockSessions([activeSession, inactiveSession])
       .build()
 
-    const activeSessions = selectActiveSessions(
-      dateProvider,
-      state.blockSession,
-    )
+    const activeSessions = selectActiveSessions(state, dateProvider)
 
     const ids = activeSessions.map((s) => s.id)
     expect(activeSessions).toHaveLength(1)
@@ -45,10 +42,7 @@ describe('selectActiveSessions', () => {
     })
     const state = stateBuilder().withBlockSessions([session]).build()
 
-    const activeSessions = selectActiveSessions(
-      dateProvider,
-      state.blockSession,
-    )
+    const activeSessions = selectActiveSessions(state, dateProvider)
 
     expect(activeSessions).toHaveLength(0)
   })
@@ -56,10 +50,7 @@ describe('selectActiveSessions', () => {
   test('should return empty array when no sessions exist', () => {
     const state = stateBuilder().build()
 
-    const activeSessions = selectActiveSessions(
-      dateProvider,
-      state.blockSession,
-    )
+    const activeSessions = selectActiveSessions(state, dateProvider)
 
     expect(activeSessions).toHaveLength(0)
   })

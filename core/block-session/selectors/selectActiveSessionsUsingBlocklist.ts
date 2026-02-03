@@ -4,11 +4,11 @@ import { BlockSession } from '@/core/block-session/block-session'
 import { selectActiveSessions } from './selectActiveSessions'
 
 export const selectActiveSessionsUsingBlocklist = (
-  dateProvider: DateProvider,
   state: RootState,
+  dateProvider: DateProvider,
   blocklistId: string,
 ): BlockSession[] => {
-  const activeSessions = selectActiveSessions(dateProvider, state.blockSession)
+  const activeSessions = selectActiveSessions(state, dateProvider)
   return activeSessions.filter((session) =>
     session.blocklistIds.includes(blocklistId),
   )

@@ -81,8 +81,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
       iconName: 'trash-outline' as const,
       action: () => {
         const activeSessions = selectActiveSessionsUsingBlocklist(
-          dependencies.dateProvider,
           store.getState(),
+          dependencies.dateProvider,
           blocklist.id,
         )
         if (activeSessions.length > 0) {

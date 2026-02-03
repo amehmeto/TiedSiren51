@@ -1,5 +1,5 @@
-import { EntityState } from '@reduxjs/toolkit'
 import { DateProvider } from '@/core/_ports_/date-provider'
+import { RootState } from '@/core/_redux_/createStore'
 import {
   BlockSession,
   blockSessionAdapter,
@@ -7,11 +7,11 @@ import {
 import { isActive } from './isActive'
 
 export const selectActiveSessions = (
+  state: RootState,
   dateProvider: DateProvider,
-  blockSession: EntityState<BlockSession, string>,
 ): BlockSession[] => {
   return blockSessionAdapter
     .getSelectors()
-    .selectAll(blockSession)
+    .selectAll(state.blockSession)
     .filter((session) => isActive(dateProvider, session))
 }

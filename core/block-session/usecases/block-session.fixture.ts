@@ -109,8 +109,8 @@ export function blockSessionFixture(
     then: {
       blockSessionShouldBeStoredAs: (expectedBlockSession: BlockSession) => {
         const retrievedBlockSessions = selectBlockSessionById(
-          expectedBlockSession.id,
           store.getState(),
+          expectedBlockSession.id,
         )
         expect(retrievedBlockSessions).toStrictEqual(expectedBlockSession)
 
@@ -126,8 +126,8 @@ export function blockSessionFixture(
       },
       blockSessionShouldNotBeInStore(sessionId: string) {
         const retrievedBlockSession = selectBlockSessionById(
-          sessionId,
           store.getState(),
+          sessionId,
         )
         expect(retrievedBlockSession).toBeUndefined()
       },

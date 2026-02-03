@@ -86,9 +86,9 @@ const selectDateProvider = (
 ) => dateProvider
 
 export const selectHomeViewModel = createSelector(
-  [(rootState: RootState) => rootState.blockSession, selectDateProvider],
-  (blockSession, dateProvider): HomeViewModelType => {
-    const blockSessions = selectAllBlockSessions(blockSession)
+  [(rootState: RootState) => rootState, selectDateProvider],
+  (state, dateProvider): HomeViewModelType => {
+    const blockSessions = selectAllBlockSessions(state)
 
     const greetings = greetUser(dateProvider.getNow())
 
@@ -111,16 +111,13 @@ export const selectHomeViewModel = createSelector(
       }
     }
 
-    const activeSessions = selectActiveSessions(dateProvider, blockSession)
+    const activeSessions = selectActiveSessions(state, dateProvider)
     const formattedActiveSessions = formatToViewModel(
       activeSessions,
       dateProvider,
     )
 
-    const scheduledSessions = selectScheduledSessions(
-      dateProvider,
-      blockSession,
-    )
+    const scheduledSessions = selectScheduledSessions(state, dateProvider)
     const formattedScheduledSessions = formatToViewModel(
       scheduledSessions,
       dateProvider,
