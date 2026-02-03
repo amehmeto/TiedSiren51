@@ -35,11 +35,13 @@ const defaultFormValues: BlockSessionFormValues = {
 type BlockSessionFormProps = Readonly<{
   mode: 'create' | 'edit'
   initialValues?: BlockSessionFormValues
+  isStrictModeActive?: boolean
 }>
 
 export function BlockSessionForm({
   initialValues = defaultFormValues,
   mode,
+  isStrictModeActive = false,
 }: BlockSessionFormProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
@@ -84,7 +86,13 @@ export function BlockSessionForm({
       validate={validateBlockSessionForm()}
       onSubmit={saveBlockSession()}
     >
-      {(form) => <SelectBlockSessionParams form={form} />}
+      {(form) => (
+        <SelectBlockSessionParams
+          form={form}
+          isStrictModeActive={isStrictModeActive}
+          initialValues={initialValues}
+        />
+      )}
     </Formik>
   )
 }

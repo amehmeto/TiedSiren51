@@ -15,15 +15,54 @@ import { FormError } from '@/ui/screens/Home/shared/FormError'
 import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlockingCondition'
 import { SelectBlocklistsField } from '@/ui/screens/Home/shared/SelectBlocklistsField'
 import { SelectDevicesField } from '@/ui/screens/Home/shared/SelectDevicesField'
-import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
+import { SelectTime, StrictBound } from '@/ui/screens/Home/shared/SelectTime'
+
+function computeLockedIds(
+  isStrictModeActive: boolean,
+  ids: string[],
+): string[] {
+  if (!isStrictModeActive) return []
+  return ids
+}
+
+function computeStrictBound(
+  isStrictModeActive: boolean,
+  direction: 'earlier' | 'later',
+  limit: string | null | undefined,
+): StrictBound | undefined {
+  if (!isStrictModeActive || !limit) return undefined
+  return { direction, limit }
+}
 
 type SelectBlockSessionParamsProps = {
   form: FormikProps<BlockSessionFormValues>
+  isStrictModeActive?: boolean
+  initialValues?: BlockSessionFormValues
 }
 
 export function SelectBlockSessionParams({
   form,
+  isStrictModeActive = false,
+  initialValues,
 }: SelectBlockSessionParamsProps) {
+  const lockedBlocklistIds = computeLockedIds(
+    isStrictModeActive,
+    initialValues?.blocklistIds ?? [],
+  )
+  const lockedDeviceIds = computeLockedIds(
+    isStrictModeActive,
+    initialValues?.devices.map((d) => d.id) ?? [],
+  )
+  const startTimeBound = computeStrictBound(
+    isStrictModeActive,
+    'earlier',
+    initialValues?.startedAt,
+  )
+  const endTimeBound = computeStrictBound(
+    isStrictModeActive,
+    'later',
+    initialValues?.endedAt,
+  )
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
@@ -60,6 +99,7 @@ export function SelectBlockSessionParams({
           values={form.values}
           setFieldValue={form.setFieldValue}
           items={blocklists}
+          lockedIds={lockedBlocklistIds}
         />
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
@@ -68,6 +108,7 @@ export function SelectBlockSessionParams({
           values={form.values}
           setFieldValue={form.setFieldValue}
           items={devices}
+          lockedIds={lockedDeviceIds}
         />
         {hasFieldError('devices') && (
           <FieldErrors errors={form.errors} fieldName={'devices'} />
@@ -79,6 +120,11 @@ export function SelectBlockSessionParams({
           isTimePickerVisible={isStartTimePickerVisible}
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
+          strictBound={
+            isStrictModeActive && initialValues?.startedAt
+              ? { direction: 'earlier', limit: initialValues.startedAt }
+              : undefined
+          }
         />
         {hasFieldError('startedAt') && (
           <FormError error={form.errors.startedAt} />
@@ -90,6 +136,11 @@ export function SelectBlockSessionParams({
           isTimePickerVisible={isEndTimePickerVisible}
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
+          strictBound={
+            isStrictModeActive && initialValues?.endedAt
+              ? { direction: 'later', limit: initialValues.endedAt }
+              : undefined
+          }
         />
         {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
         <SelectBlockingCondition form={form} />

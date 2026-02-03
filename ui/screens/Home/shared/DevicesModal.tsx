@@ -1,7 +1,10 @@
 import * as ExpoDevice from 'expo-device'
 import { useState } from 'react'
 import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '@/core/_redux_/createStore'
 import { Device } from '@/core/device/device'
+import { showToast } from '@/core/toast/toast.slice'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
@@ -27,6 +30,7 @@ type DevicesModalProps = Readonly<{
   onRequestClose: () => void
   setFieldValue: (field: string, value: Device[]) => void
   items: Device[]
+  lockedIds?: string[]
 }>
 
 export function DevicesModal({
@@ -35,7 +39,9 @@ export function DevicesModal({
   onRequestClose,
   setFieldValue,
   items,
+  lockedIds = [],
 }: DevicesModalProps) {
+  const dispatch = useDispatch<AppDispatch>()
   const [wasVisible, setWasVisible] = useState(isVisible)
   const [selectedIds, setSelectedIds] = useState<string[]>(
     currentSelections.map((d) => d.id),
@@ -60,6 +66,10 @@ export function DevicesModal({
   }
 
   function toggleItem(itemId: string, isNowSelected: boolean) {
+    if (!isNowSelected && lockedIds.includes(itemId)) {
+      dispatch(showToast('Cannot remove device during strict mode'))
+      return
+    }
     const newSelections = isNowSelected
       ? [...selectedIds, itemId]
       : selectedIds.filter((id) => id !== itemId)
@@ -74,6 +84,7 @@ export function DevicesModal({
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
             const isItemSelected = selectedIds.includes(item.id)
+            const isLocked = isItemSelected && lockedIds.includes(item.id)
             return (
               <View style={styles.item}>
                 <Text style={styles.itemText}>{item.name}</Text>
@@ -81,6 +92,7 @@ export function DevicesModal({
                   accessibilityLabel={`Toggle ${item.name}`}
                   style={styles.itemSelector}
                   value={isItemSelected}
+                  disabled={isLocked}
                   onValueChange={(isNowSelected) =>
                     toggleItem(item.id, isNowSelected)
                   }

@@ -1,7 +1,10 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
+import { useDispatch } from 'react-redux'
+import { AppDispatch } from '@/core/_redux_/createStore'
 import { Blocklist } from '@/core/blocklist/blocklist'
+import { showToast } from '@/core/toast/toast.slice'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
@@ -12,6 +15,7 @@ type BlocklistsModalProps = Readonly<{
   onRequestClose: () => void
   setFieldValue: (field: string, value: string[]) => void
   items: Blocklist[]
+  lockedIds?: string[]
 }>
 
 export function BlocklistsModal({
@@ -20,7 +24,9 @@ export function BlocklistsModal({
   onRequestClose,
   setFieldValue,
   items,
+  lockedIds = [],
 }: BlocklistsModalProps) {
+  const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
   const [wasVisible, setWasVisible] = useState(isVisible)
   const [selectedIds, setSelectedIds] = useState<string[]>(currentSelections)
@@ -37,6 +43,10 @@ export function BlocklistsModal({
   }
 
   function toggleItem(itemId: string, isNowSelected: boolean) {
+    if (!isNowSelected && lockedIds.includes(itemId)) {
+      dispatch(showToast('Cannot remove blocklist during strict mode'))
+      return
+    }
     const newSelections = isNowSelected
       ? [...selectedIds, itemId]
       : selectedIds.filter((id) => id !== itemId)
@@ -55,6 +65,7 @@ export function BlocklistsModal({
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
             const isItemSelected = selectedIds.includes(item.id)
+            const isLocked = isItemSelected && lockedIds.includes(item.id)
             return (
               <View style={styles.item}>
                 <Text style={styles.itemText}>{item.name}</Text>
@@ -62,6 +73,7 @@ export function BlocklistsModal({
                   accessibilityLabel={`Toggle ${item.name}`}
                   style={styles.itemSelector}
                   value={isItemSelected}
+                  disabled={isLocked}
                   onValueChange={(isNowSelected) =>
                     toggleItem(item.id, isNowSelected)
                   }
