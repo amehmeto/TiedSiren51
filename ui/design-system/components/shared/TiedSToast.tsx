@@ -1,10 +1,11 @@
-import { useEffect, useMemo, useRef } from 'react'
+import { useCallback } from 'react'
 import { Animated, StyleSheet, Text } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { selectToast } from '@/core/toast/selectors/selectToast'
 import { hideToast } from '@/core/toast/toast.slice'
 import { T } from '@/ui/design-system/theme'
+import { useFadeAnimation } from '@/ui/hooks/useFadeAnimation'
 
 type TiedSToastProps = Readonly<{
   duration?: number
@@ -13,43 +14,16 @@ type TiedSToastProps = Readonly<{
 export function TiedSToast({ duration = 2000 }: TiedSToastProps) {
   const dispatch = useDispatch<AppDispatch>()
   const { message, isVisible } = useSelector(selectToast)
-  const fadeAnim = useMemo(() => new Animated.Value(0), [])
-  const animationRef = useRef<Animated.CompositeAnimation | null>(null)
 
-  useEffect(() => {
-    if (!isVisible) return
+  const onAnimationComplete = useCallback(() => {
+    dispatch(hideToast())
+  }, [dispatch])
 
-    // Stop any running animation and reset
-    if (animationRef.current) animationRef.current.stop()
-
-    fadeAnim.setValue(0)
-
-    animationRef.current = Animated.sequence([
-      Animated.timing(fadeAnim, {
-        toValue: 1,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-      Animated.delay(duration),
-      Animated.timing(fadeAnim, {
-        toValue: 0,
-        duration: 200,
-        useNativeDriver: true,
-      }),
-    ])
-
-    animationRef.current.start(() => {
-      animationRef.current = null
-      dispatch(hideToast())
-    })
-
-    return () => {
-      if (animationRef.current) {
-        animationRef.current.stop()
-        animationRef.current = null
-      }
-    }
-  }, [isVisible, fadeAnim, duration, dispatch])
+  const fadeAnim = useFadeAnimation({
+    isVisible,
+    duration,
+    onAnimationComplete,
+  })
 
   if (!isVisible) return null
 
