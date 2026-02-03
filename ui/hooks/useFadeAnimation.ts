@@ -14,6 +14,11 @@ export function useFadeAnimation({
 }: UseFadeAnimationOptions) {
   const fadeAnim = useMemo(() => new Animated.Value(0), [])
   const animationRef = useRef<Animated.CompositeAnimation | null>(null)
+  const onCompleteRef = useRef(onAnimationComplete)
+
+  useEffect(() => {
+    onCompleteRef.current = onAnimationComplete
+  }, [onAnimationComplete])
 
   useEffect(() => {
     if (!isActive) return
@@ -38,7 +43,7 @@ export function useFadeAnimation({
 
     animationRef.current.start(() => {
       animationRef.current = null
-      onAnimationComplete()
+      onCompleteRef.current()
     })
 
     return () => {
@@ -47,7 +52,7 @@ export function useFadeAnimation({
         animationRef.current = null
       }
     }
-  }, [isActive, fadeAnim, duration, onAnimationComplete])
+  }, [isActive, fadeAnim, duration])
 
   return fadeAnim
 }

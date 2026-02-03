@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { Animated, StyleSheet, Text } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
@@ -15,14 +14,10 @@ export function TiedSToast({ duration = 2000 }: TiedSToastProps) {
   const dispatch = useDispatch<AppDispatch>()
   const { message } = useSelector(selectToast)
 
-  const onAnimationComplete = useCallback(() => {
-    dispatch(clearToast())
-  }, [dispatch])
-
   const fadeAnim = useFadeAnimation({
     isActive: message !== null,
     duration,
-    onAnimationComplete,
+    onAnimationComplete: () => dispatch(clearToast()),
   })
 
   if (!message) return null
