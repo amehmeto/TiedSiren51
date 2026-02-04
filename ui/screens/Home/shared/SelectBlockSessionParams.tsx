@@ -120,11 +120,7 @@ export function SelectBlockSessionParams({
           isTimePickerVisible={isStartTimePickerVisible}
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
-          strictBound={
-            isStrictModeActive && initialValues?.startedAt
-              ? { direction: 'earlier', limit: initialValues.startedAt }
-              : undefined
-          }
+          strictBound={startTimeBound}
         />
         {hasFieldError('startedAt') && (
           <FormError error={form.errors.startedAt} />
@@ -136,11 +132,7 @@ export function SelectBlockSessionParams({
           isTimePickerVisible={isEndTimePickerVisible}
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
-          strictBound={
-            isStrictModeActive && initialValues?.endedAt
-              ? { direction: 'later', limit: initialValues.endedAt }
-              : undefined
-          }
+          strictBound={endTimeBound}
         />
         {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
         <SelectBlockingCondition form={form} />

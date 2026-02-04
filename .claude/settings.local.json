@@ -4,6 +4,7 @@
   },
   "permissions": {
     "allow": [
+      "Bash(\"/Users/arthurmehmetoglu/.claude/plugins/cache/claude-code-plugins/ralph-wiggum/1.0.0/scripts/setup-ralph-loop.sh\" 'Work on GitHub issue 258: enforce stricter-only editing of block sessions. Check acceptance criteria, review implementation, fix anything missing, ensure tests and lint pass, then commit and push. When all criteria are met output the promise tag TASK COMPLETE.' --completion-promise 'TASK COMPLETE' --max-iterations 10)",
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
       "Bash(./scripts/*.sh:*)",
@@ -156,6 +157,7 @@
       "Edit",
       "Read",
       "Skill(commit-push)",
+      "Skill(ralph-wiggum:help)",
       "Skill(ralph-wiggum:ralph-loop)",
       "Skill(sync-project)",
       "Skill(worktree)",
