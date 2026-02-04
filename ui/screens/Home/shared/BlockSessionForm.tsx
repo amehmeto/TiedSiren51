@@ -33,14 +33,14 @@ const defaultFormValues: BlockSessionFormValues = {
   blockingConditions: [],
 }
 
-type BlockSessionFormProps = Readonly<{
-  mode: 'create' | 'edit'
-  sessionId?: string
-}>
+type BlockSessionFormProps = Readonly<
+  { mode: 'create' } | { mode: 'edit'; sessionId: string }
+>
 
-export function BlockSessionForm({ mode, sessionId }: BlockSessionFormProps) {
+export function BlockSessionForm({ mode, ...rest }: BlockSessionFormProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const sessionId = 'sessionId' in rest ? rest.sessionId : undefined
   const blockSession = useSelector((state: RootState) =>
     sessionId ? selectBlockSessionById(state, sessionId) : undefined,
   )

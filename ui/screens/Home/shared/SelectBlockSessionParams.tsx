@@ -94,7 +94,7 @@ export function SelectBlockSessionParams({
         <SelectBlocklistsField
           values={form.values}
           setFieldValue={form.setFieldValue}
-          lockedIds={lockedBlocklistIds}
+          lockedBlocklistIds={lockedBlocklistIds}
         />
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />

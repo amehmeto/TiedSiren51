@@ -14,7 +14,7 @@ type BlocklistsModalProps = Readonly<{
   currentSelections: string[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: string[]) => void
-  lockedIds?: string[]
+  lockedBlocklistIds?: string[]
 }>
 
 export function BlocklistsModal({
@@ -22,7 +22,7 @@ export function BlocklistsModal({
   currentSelections,
   onRequestClose,
   setFieldValue,
-  lockedIds = [],
+  lockedBlocklistIds = [],
 }: BlocklistsModalProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
@@ -42,7 +42,7 @@ export function BlocklistsModal({
   }
 
   function toggleItem(itemId: string, isNowSelected: boolean) {
-    if (!isNowSelected && lockedIds.includes(itemId)) {
+    if (!isNowSelected && lockedBlocklistIds.includes(itemId)) {
       dispatch(showToast('Cannot remove blocklist during strict mode'))
       return
     }
@@ -64,7 +64,8 @@ export function BlocklistsModal({
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => {
             const isItemSelected = selectedIds.includes(item.id)
-            const isLocked = isItemSelected && lockedIds.includes(item.id)
+            const isLocked =
+              isItemSelected && lockedBlocklistIds.includes(item.id)
             return (
               <View style={styles.item}>
                 <Text style={styles.itemText}>{item.name}</Text>

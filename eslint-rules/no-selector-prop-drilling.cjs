@@ -16,9 +16,25 @@ module.exports = {
       noSelectorPropDrilling:
         'Do not pass useSelector result "{{variable}}" as prop "{{prop}}". The child component should call useSelector itself.',
     },
-    schema: [],
+    schema: [
+      {
+        type: 'object',
+        properties: {
+          ignoredComponents: {
+            type: 'array',
+            items: { type: 'string' },
+            description:
+              'Component names to ignore (e.g. framework components like FlatList that cannot call useSelector).',
+          },
+        },
+        additionalProperties: false,
+      },
+    ],
   },
   create(context) {
+    const options = context.options[0] || {}
+    const ignoredComponents = new Set(options.ignoredComponents || [])
+
     // Track variable names assigned from useSelector()
     const selectorVars = new Set()
 
@@ -70,6 +86,11 @@ module.exports = {
           elementName.type === 'JSXMemberExpression'
 
         if (!isComponent) return
+
+        // Skip framework components that cannot call useSelector
+        const componentName =
+          elementName.type === 'JSXIdentifier' ? elementName.name : null
+        if (componentName && ignoredComponents.has(componentName)) return
 
         const propName =
           attribute.name.type === 'JSXIdentifier' ? attribute.name.name : ''
