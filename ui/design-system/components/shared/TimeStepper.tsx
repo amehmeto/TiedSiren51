@@ -1,7 +1,8 @@
-import React, { useCallback } from 'react'
+import { Ionicons } from '@expo/vector-icons'
+import React, { useCallback, useMemo } from 'react'
 import { View, Text, StyleSheet } from 'react-native'
 import { T } from '@/ui/design-system/theme'
-import { TiedSIconButton } from './TiedSIconButton'
+import { TiedSButton } from './TiedSButton'
 
 type TimeStepperProps = {
   selectedValue: number
@@ -21,7 +22,11 @@ export const TimeStepper = ({
   const isMin = selectedValue <= 0
   const isMax = selectedValue >= max
 
-  const label = selectedValue === 1 ? labelSingular : labelPlural
+  const displayText = useMemo(
+    () =>
+      `${selectedValue} ${selectedValue === 1 ? labelSingular : labelPlural}`,
+    [selectedValue, labelSingular, labelPlural],
+  )
 
   const changeValue = useCallback(
     (delta: number) => {
@@ -31,23 +36,45 @@ export const TimeStepper = ({
     [selectedValue, max, onValueChange],
   )
 
+  const renderIcon = useCallback(
+    (name: 'add-circle' | 'remove-circle', isDisabled: boolean) => (
+      <Ionicons
+        name={name}
+        size={T.icon.size.large}
+        color={isDisabled ? T.color.modalBackgroundColor : T.color.white}
+      />
+    ),
+    [],
+  )
+
+  const buttonStyle = (isDisabled: boolean) => [
+    styles.button,
+    isDisabled && styles.buttonDisabled,
+  ]
+
+  const minButtonStyle = buttonStyle(isMin)
+  const maxButtonStyle = buttonStyle(isMax)
+  const removeIcon = renderIcon('remove-circle', isMin)
+  const addIcon = renderIcon('add-circle', isMax)
+
   return (
     <View style={styles.container}>
-      <TiedSIconButton
-        iconName="add-circle"
-        isDisabled={isMax}
-        onPress={() => changeValue(1)}
+      <TiedSButton
+        isDisabled={isMin}
+        style={minButtonStyle}
+        onPress={() => changeValue(-1)}
+        text={removeIcon}
       />
 
       <View style={styles.valueContainer}>
-        <Text style={styles.valueNumber}>{selectedValue}</Text>
-        <Text style={styles.valueLabel}>{label}</Text>
+        <Text style={styles.valueText}>{displayText}</Text>
       </View>
 
-      <TiedSIconButton
-        iconName="remove-circle"
-        isDisabled={isMin}
-        onPress={() => changeValue(-1)}
+      <TiedSButton
+        isDisabled={isMax}
+        style={maxButtonStyle}
+        onPress={() => changeValue(1)}
+        text={addIcon}
       />
     </View>
   )
@@ -59,24 +86,28 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  button: {
+    borderRadius: T.border.radius.fullRound,
+    backgroundColor: T.color.lightBlue,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: T.spacing.extraSmall,
+  },
+  buttonDisabled: {
+    backgroundColor: T.color.textSecondary,
+    opacity: T.opacity.disabled,
+  },
   valueContainer: {
     minHeight: T.spacing.xxx_large,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: T.spacing.small,
+    paddingVertical: T.spacing.extraSmall,
   },
-  valueNumber: {
+  valueText: {
     color: T.color.white,
-    fontSize: T.font.size.xLarge,
-    fontWeight: T.font.weight.bold,
+    fontSize: T.font.size.regular,
     fontFamily: T.font.family.primary,
     textAlign: 'center',
-  },
-  valueLabel: {
-    color: T.color.grey,
-    fontSize: T.font.size.small,
-    fontFamily: T.font.family.primary,
-    textAlign: 'center',
-    marginTop: T.spacing.extraExtraSmall,
+    lineHeight: T.font.size.regular * T.font.lineHeight.normal,
   },
 })

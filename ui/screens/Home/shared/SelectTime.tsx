@@ -1,9 +1,15 @@
 import React from 'react'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
+import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { dependencies } from '@/ui/dependencies'
-import { TiedSTimePickerModal } from '@/ui/design-system/components/shared/TiedSTimePickerModal'
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
+
+function formatTimeString(time: string): string {
+  const [hours, minutes] = time.split(':').map(Number)
+  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+}
 
 type SelectTimeProps = Readonly<{
   timeField?: 'startedAt' | 'endedAt'
@@ -11,6 +17,7 @@ type SelectTimeProps = Readonly<{
   values: BlockSessionFormValues
   isTimePickerVisible?: boolean
   setFieldValue: (field: string, value: string) => void
+  handleChange: (field: 'startedAt' | 'endedAt') => void
 }>
 
 export function SelectTime({
@@ -19,6 +26,7 @@ export function SelectTime({
   values,
   isTimePickerVisible = false,
   setFieldValue,
+  handleChange,
 }: SelectTimeProps) {
   const { dateProvider } = dependencies
   const localeNow = dateProvider.getHHmmNow()
@@ -33,6 +41,11 @@ export function SelectTime({
       ? (values.startedAt ?? `Select start time...`)
       : (values.endedAt ?? `Select end time...`)
 
+  const handleTimeChange = (time: string) => {
+    const formattedTime = formatTimeString(time)
+    setFieldValue(timeField, formattedTime)
+  }
+
   return (
     <>
       <View style={styles.param}>
@@ -43,15 +56,29 @@ export function SelectTime({
           <Text style={styles.option}>{placeholder}</Text>
         </Pressable>
       </View>
-      <TiedSTimePickerModal
-        visible={isTimePickerVisible}
-        onClose={() => setIsTimePickerVisible(false)}
-        onConfirm={(time) => setFieldValue(timeField, time)}
-        initialTime={chosenTime}
-        title={
-          timeField === 'startedAt' ? 'Select start time' : 'Select end time'
-        }
-      />
+      <View>
+        {Platform.OS === 'web' ? (
+          isTimePickerVisible && (
+            <WebTimePicker
+              chosenTime={chosenTime}
+              handleChange={() => handleChange(timeField)}
+              setTime={handleTimeChange}
+              setIsTimePickerVisible={setIsTimePickerVisible}
+            />
+          )
+        ) : (
+          <DateTimePickerModal
+            isVisible={isTimePickerVisible}
+            is24Hour={true}
+            mode="time"
+            onConfirm={(date) => {
+              handleTimeChange(dateProvider.toHHmm(date))
+              setIsTimePickerVisible(false)
+            }}
+            onCancel={() => setIsTimePickerVisible(false)}
+          />
+        )}
+      </View>
     </>
   )
 }
