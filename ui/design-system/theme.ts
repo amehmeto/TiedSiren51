@@ -122,6 +122,7 @@ export const T = {
     roundButton: 60,
     chipMinWidth: 50,
     textInputHeight: 40,
+    iconButton: 40,
     modalButton: 120,
     tiedSirenLogo: 100,
   },
