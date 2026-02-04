@@ -1,9 +1,6 @@
 import { FormikProps } from 'formik'
 import { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/core/_redux_/createStore'
-import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
 import { Device } from '@/core/device/device'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -69,10 +66,6 @@ export function SelectBlockSessionParams({
   const [isEndTimePickerVisible, setIsEndTimePickerVisible] =
     useState<boolean>(false)
 
-  const blocklists = useSelector((state: RootState) =>
-    selectAllBlocklists(state),
-  )
-
   useEffect(() => {
     dependencies.deviceRepository.findAll().then((foundDevices) => {
       setDevices(foundDevices)
@@ -98,7 +91,6 @@ export function SelectBlockSessionParams({
         <SelectBlocklistsField
           values={form.values}
           setFieldValue={form.setFieldValue}
-          items={blocklists}
           lockedIds={lockedBlocklistIds}
         />
         {hasFieldError('blocklistIds') && (

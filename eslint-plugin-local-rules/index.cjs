@@ -53,6 +53,7 @@ const noComplexInlineArguments = require('../eslint-rules/no-complex-inline-argu
 const noUsecallbackSelectorWrapper = require('../eslint-rules/no-usecallback-selector-wrapper.cjs')
 const preferNamedSelector = require('../eslint-rules/prefer-named-selector.cjs')
 const selectorStateFirstParam = require('../eslint-rules/selector-state-first-param.cjs')
+const noSelectorPropDrilling = require('../eslint-rules/no-selector-prop-drilling.cjs')
 
 module.exports = {
   rules: {
@@ -107,5 +108,6 @@ module.exports = {
     'no-usecallback-selector-wrapper': noUsecallbackSelectorWrapper,
     'prefer-named-selector': preferNamedSelector,
     'selector-state-first-param': selectorStateFirstParam,
+    'no-selector-prop-drilling': noSelectorPropDrilling,
   },
 }

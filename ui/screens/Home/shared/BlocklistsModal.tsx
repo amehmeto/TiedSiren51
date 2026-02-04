@@ -1,9 +1,9 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '@/core/_redux_/createStore'
-import { Blocklist } from '@/core/blocklist/blocklist'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
 import { showToast } from '@/core/toast/toast.slice'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
@@ -14,7 +14,6 @@ type BlocklistsModalProps = Readonly<{
   currentSelections: string[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: string[]) => void
-  items: Blocklist[]
   lockedIds?: string[]
 }>
 
@@ -23,11 +22,11 @@ export function BlocklistsModal({
   currentSelections,
   onRequestClose,
   setFieldValue,
-  items,
   lockedIds = [],
 }: BlocklistsModalProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const items = useSelector((state: RootState) => selectAllBlocklists(state))
   const [wasVisible, setWasVisible] = useState(isVisible)
   const [selectedIds, setSelectedIds] = useState<string[]>(currentSelections)
 

@@ -142,6 +142,8 @@ module.exports = {
     'local-rules/prefer-named-selector': 'warn',
     // Enforce state as first parameter in selectors
     'local-rules/selector-state-first-param': 'error',
+    // Prevent passing useSelector results as props - child should call useSelector itself
+    'local-rules/no-selector-prop-drilling': 'warn',
   },
   overrides: [
     {

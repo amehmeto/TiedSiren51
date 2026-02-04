@@ -1,7 +1,9 @@
 import { FormikErrors } from 'formik'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { Blocklist } from '@/core/blocklist/blocklist'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/core/_redux_/createStore'
+import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
 import { T } from '@/ui/design-system/theme'
 import { BlocklistsModal } from '@/ui/screens/Home/shared/BlocklistsModal'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
@@ -13,17 +15,16 @@ type SelectBlocklistsFieldProps = Readonly<{
     value: string[],
     shouldValidate?: boolean,
   ) => Promise<void | FormikErrors<BlockSessionFormValues>>
-  items: Blocklist[]
   lockedIds?: string[]
 }>
 
 export function SelectBlocklistsField({
   values,
   setFieldValue,
-  items,
   lockedIds = [],
 }: SelectBlocklistsFieldProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
+  const items = useSelector((state: RootState) => selectAllBlocklists(state))
 
   const selectedIds = values.blocklistIds
   const displayText =
@@ -47,7 +48,6 @@ export function SelectBlocklistsField({
         currentSelections={selectedIds}
         onRequestClose={() => setIsModalOpen(false)}
         setFieldValue={setFieldValue}
-        items={items}
         lockedIds={lockedIds}
       />
     </>
