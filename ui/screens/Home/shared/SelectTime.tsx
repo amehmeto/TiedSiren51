@@ -71,6 +71,10 @@ export function SelectTime({
             isVisible={isTimePickerVisible}
             is24Hour={true}
             mode="time"
+            isDarkModeEnabled={true}
+            themeVariant="dark"
+            accentColor={T.color.lightBlue}
+            buttonTextColorIOS={T.color.lightBlue}
             onConfirm={(date) => {
               handleTimeChange(dateProvider.toHHmm(date))
               setIsTimePickerVisible(false)
