@@ -1,10 +1,11 @@
 import { useRouter } from 'expo-router'
 import { Formik } from 'formik'
 import uuid from 'react-native-uuid'
-import { useDispatch } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
 import { assertHHmmString } from '@/core/_ports_/date-provider'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { BlockingConditions } from '@/core/block-session/block-session'
+import { selectBlockSessionById } from '@/core/block-session/selectors/selectBlockSessionById'
 import { createBlockSession } from '@/core/block-session/usecases/create-block-session.usecase'
 import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
 import { Device } from '@/core/device/device'
@@ -34,17 +35,16 @@ const defaultFormValues: BlockSessionFormValues = {
 
 type BlockSessionFormProps = Readonly<{
   mode: 'create' | 'edit'
-  initialValues?: BlockSessionFormValues
-  isStrictModeActive?: boolean
+  sessionId?: string
 }>
 
-export function BlockSessionForm({
-  initialValues = defaultFormValues,
-  mode,
-  isStrictModeActive = false,
-}: BlockSessionFormProps) {
+export function BlockSessionForm({ mode, sessionId }: BlockSessionFormProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const blockSession = useSelector((state: RootState) =>
+    sessionId ? selectBlockSessionById(state, sessionId) : undefined,
+  )
+  const initialValues = blockSession ?? defaultFormValues
 
   function saveBlockSession() {
     return (values: BlockSessionFormValues) => {
@@ -86,13 +86,7 @@ export function BlockSessionForm({
       validate={validateBlockSessionForm()}
       onSubmit={saveBlockSession()}
     >
-      {(form) => (
-        <SelectBlockSessionParams
-          form={form}
-          isStrictModeActive={isStrictModeActive}
-          initialValues={initialValues}
-        />
-      )}
+      {(form) => <SelectBlockSessionParams form={form} />}
     </Formik>
   )
 }

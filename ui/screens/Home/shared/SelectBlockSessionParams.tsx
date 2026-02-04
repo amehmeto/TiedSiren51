@@ -1,7 +1,10 @@
 import { FormikProps } from 'formik'
 import { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/core/_redux_/createStore'
 import { Device } from '@/core/device/device'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -33,32 +36,32 @@ function computeStrictBound(
 
 type SelectBlockSessionParamsProps = {
   form: FormikProps<BlockSessionFormValues>
-  isStrictModeActive?: boolean
-  initialValues?: BlockSessionFormValues
 }
 
 export function SelectBlockSessionParams({
   form,
-  isStrictModeActive = false,
-  initialValues,
 }: SelectBlockSessionParamsProps) {
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
+  const initialValues = form.initialValues
   const lockedBlocklistIds = computeLockedIds(
     isStrictModeActive,
-    initialValues?.blocklistIds ?? [],
+    initialValues.blocklistIds,
   )
   const lockedDeviceIds = computeLockedIds(
     isStrictModeActive,
-    initialValues?.devices.map((d) => d.id) ?? [],
+    initialValues.devices.map((d) => d.id),
   )
   const startTimeBound = computeStrictBound(
     isStrictModeActive,
     'earlier',
-    initialValues?.startedAt,
+    initialValues.startedAt,
   )
   const endTimeBound = computeStrictBound(
     isStrictModeActive,
     'later',
-    initialValues?.endedAt,
+    initialValues.endedAt,
   )
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
