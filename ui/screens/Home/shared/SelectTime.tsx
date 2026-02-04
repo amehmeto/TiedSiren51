@@ -52,13 +52,6 @@ export function SelectTime({
       ? (values.startedAt ?? `Select start time...`)
       : (values.endedAt ?? `Select end time...`)
 
-  const pickerDate = (() => {
-    const [h, m] = chosenTime.split(':').map(Number)
-    const d = new Date()
-    d.setHours(h, m, 0, 0)
-    return d
-  })()
-
   const handleTimeChange = (time: string) => {
     const formattedTime = formatTimeString(time)
 
@@ -103,7 +96,6 @@ export function SelectTime({
           )
         ) : (
           <DateTimePickerModal
-            date={pickerDate}
             isVisible={isTimePickerVisible}
             is24Hour={true}
             mode="time"
