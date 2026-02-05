@@ -71,6 +71,7 @@ export function SelectTime({
         buttonTextColorIOS={T.color.lightBlue}
         textColor={T.color.white}
         pickerContainerStyleIOS={styles.pickerContainer}
+        modalStyleIOS={styles.modalStyle}
         onConfirm={(date) => {
           handleTimeChange(dateProvider.toHHmm(date))
           setIsTimePickerVisible(false)
@@ -112,6 +113,10 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
   pickerContainer: {
+    borderRadius: T.border.radius.extraRounded,
+    overflow: 'hidden',
+  },
+  modalStyle: {
     borderRadius: T.border.radius.extraRounded,
   },
 })
