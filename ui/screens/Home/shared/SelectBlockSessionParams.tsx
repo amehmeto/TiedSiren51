@@ -15,12 +15,7 @@ import { FormError } from '@/ui/screens/Home/shared/FormError'
 import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlockingCondition'
 import { SelectBlocklistsField } from '@/ui/screens/Home/shared/SelectBlocklistsField'
 import { SelectDevicesField } from '@/ui/screens/Home/shared/SelectDevicesField'
-import {
-  computeStrictBound,
-  SelectTime,
-  StrictBoundDirection,
-  TimeField,
-} from '@/ui/screens/Home/shared/SelectTime'
+import { SelectTime, TimeField } from '@/ui/screens/Home/shared/SelectTime'
 
 const computeLockedIds = (
   isStrictModeActive: boolean,
@@ -45,16 +40,6 @@ export function SelectBlockSessionParams({
   const deviceIds = computeLockedIds(
     isStrictModeActive,
     initialValues.devices.map((d) => d.id),
-  )
-  const startTimeBound = computeStrictBound(
-    isStrictModeActive,
-    StrictBoundDirection.Earlier,
-    initialValues.startedAt,
-  )
-  const endTimeBound = computeStrictBound(
-    isStrictModeActive,
-    StrictBoundDirection.Later,
-    initialValues.endedAt,
   )
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
@@ -108,7 +93,7 @@ export function SelectBlockSessionParams({
           isTimePickerVisible={isStartTimePickerVisible}
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
-          strictBound={startTimeBound}
+          initialTime={initialValues.startedAt}
         />
         {hasFieldError('startedAt') && (
           <FormError error={form.errors.startedAt} />
@@ -120,7 +105,7 @@ export function SelectBlockSessionParams({
           isTimePickerVisible={isEndTimePickerVisible}
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
-          strictBound={endTimeBound}
+          initialTime={initialValues.endedAt}
         />
         {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
         <SelectBlockingCondition form={form} />

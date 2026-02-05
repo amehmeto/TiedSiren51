@@ -1,30 +1,24 @@
 import React from 'react'
 import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
 
-export enum StrictBoundDirection {
+enum StrictBoundDirection {
   Earlier = 'earlier',
   Later = 'later',
 }
 
-export type StrictBound = Readonly<{
+type StrictBound = Readonly<{
   direction: StrictBoundDirection
   limit: string
 }>
-
-export const computeStrictBound = (
-  isStrictModeActive: boolean,
-  direction: StrictBoundDirection,
-  limit?: string | null,
-): StrictBound | undefined =>
-  isStrictModeActive && limit ? { direction, limit } : undefined
 
 function formatTimeString(time: string): string {
   const [hours, minutes] = time.split(':').map(Number)
@@ -43,7 +37,7 @@ type SelectTimeProps = Readonly<{
   isTimePickerVisible?: boolean
   setFieldValue: (field: string, value: string) => void
   handleChange: (field: TimeField) => void
-  strictBound?: StrictBound
+  initialTime?: string | null
 }>
 
 export function SelectTime({
@@ -53,16 +47,28 @@ export function SelectTime({
   isTimePickerVisible = false,
   setFieldValue,
   handleChange,
-  strictBound,
+  initialTime,
 }: SelectTimeProps) {
   const dispatch = useDispatch<AppDispatch>()
   const { dateProvider } = dependencies
   const localeNow = dateProvider.getHHmmNow()
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dateProvider),
+  )
 
   const chosenTime =
     timeField === TimeField.StartedAt
       ? (values.startedAt ?? localeNow)
       : (values.endedAt ?? localeNow)
+
+  const strictBound: StrictBound | undefined = (() => {
+    if (!isStrictModeActive || !initialTime) return undefined
+    const direction =
+      timeField === TimeField.StartedAt
+        ? StrictBoundDirection.Earlier
+        : StrictBoundDirection.Later
+    return { direction, limit: initialTime }
+  })()
 
   const placeholder =
     timeField === TimeField.StartedAt
