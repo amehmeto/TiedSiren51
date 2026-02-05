@@ -30,7 +30,7 @@ export type StrictBound = Readonly<{
 const computeStrictBound = (
   isStrictModeActive: boolean,
   direction: 'earlier' | 'later',
-  limit: string | null | undefined,
+  limit?: string | null,
 ): StrictBound | undefined =>
   isStrictModeActive && limit ? { direction, limit } : undefined
 
