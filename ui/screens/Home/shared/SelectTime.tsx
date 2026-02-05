@@ -7,17 +7,13 @@ import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { StrictBound } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
 import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
 
 function formatTimeString(time: string): string {
   const [hours, minutes] = time.split(':').map(Number)
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
 }
-
-export type StrictBound = Readonly<{
-  direction: 'earlier' | 'later'
-  limit: string
-}>
 
 type SelectTimeProps = Readonly<{
   timeField?: 'startedAt' | 'endedAt'
