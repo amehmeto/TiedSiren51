@@ -14,7 +14,7 @@ type BlocklistsModalProps = Readonly<{
   currentSelections: string[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: string[]) => void
-  lockedBlocklistIds?: string[]
+  blocklistIds?: string[]
 }>
 
 export function BlocklistsModal({
@@ -22,11 +22,13 @@ export function BlocklistsModal({
   currentSelections,
   onRequestClose,
   setFieldValue,
-  lockedBlocklistIds = [],
+  blocklistIds = [],
 }: BlocklistsModalProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
-  const items = useSelector((state: RootState) => selectAllBlocklists(state))
+  const blocklists = useSelector((state: RootState) =>
+    selectAllBlocklists(state),
+  )
   const [wasVisible, setWasVisible] = useState(isVisible)
   const [selectedIds, setSelectedIds] = useState<string[]>(currentSelections)
 
@@ -41,48 +43,48 @@ export function BlocklistsModal({
     onRequestClose()
   }
 
-  function toggleItem(itemId: string, isNowSelected: boolean) {
-    if (!isNowSelected && lockedBlocklistIds.includes(itemId)) {
+  function toggleBlocklist(blocklistId: string, isNowSelected: boolean) {
+    if (!isNowSelected && blocklistIds.includes(blocklistId)) {
       dispatch(showToast('Cannot remove blocklist during strict mode'))
       return
     }
     const newSelections = isNowSelected
-      ? [...selectedIds, itemId]
-      : selectedIds.filter((id) => id !== itemId)
+      ? [...selectedIds, blocklistId]
+      : selectedIds.filter((id) => id !== blocklistId)
     setSelectedIds(newSelections)
   }
 
   return (
     <TiedSModal isVisible={isVisible} onRequestClose={onRequestClose}>
       <View>
-        {items.length === 0 && (
-          <Text style={styles.itemText}>No blocklists available</Text>
+        {blocklists.length === 0 && (
+          <Text style={styles.blocklistText}>No blocklists available</Text>
         )}
 
         <FlatList
-          data={items}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            const isItemSelected = selectedIds.includes(item.id)
+          data={blocklists}
+          keyExtractor={(blocklist) => blocklist.id}
+          renderItem={({ item: blocklist }) => {
+            const isBlocklistSelected = selectedIds.includes(blocklist.id)
             const isLocked =
-              isItemSelected && lockedBlocklistIds.includes(item.id)
+              isBlocklistSelected && blocklistIds.includes(blocklist.id)
             return (
-              <View style={styles.item}>
-                <Text style={styles.itemText}>{item.name}</Text>
+              <View style={styles.blocklist}>
+                <Text style={styles.blocklistText}>{blocklist.name}</Text>
                 <Switch
-                  accessibilityLabel={`Toggle ${item.name}`}
-                  style={styles.itemSelector}
-                  value={isItemSelected}
+                  accessibilityLabel={`Toggle ${blocklist.name}`}
+                  style={styles.blocklistSelector}
+                  value={isBlocklistSelected}
                   disabled={isLocked}
                   onValueChange={(isNowSelected) =>
-                    toggleItem(item.id, isNowSelected)
+                    toggleBlocklist(blocklist.id, isNowSelected)
                   }
                 />
               </View>
             )
           }}
         />
-        {items.length === 0 ? (
+        {blocklists.length === 0 ? (
           <TiedSButton
             style={styles.button}
             onPress={() => {
@@ -100,16 +102,16 @@ export function BlocklistsModal({
 }
 
 const styles = StyleSheet.create({
-  item: {
+  blocklist: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     flex: 1,
     padding: T.spacing.small,
   },
-  itemText: { color: T.color.text },
+  blocklistText: { color: T.color.text },
   button: {
     alignSelf: 'center',
     marginTop: T.spacing.medium,
   },
-  itemSelector: { marginLeft: T.spacing.medium },
+  blocklistSelector: { marginLeft: T.spacing.medium },
 })

@@ -147,6 +147,8 @@ module.exports = {
       'error',
       { ignoredComponents: ['FlatList', 'SectionList', 'VirtualizedList'] },
     ],
+    // Prefer ternary over if-return followed by return
+    'local-rules/prefer-ternary-return': ['error', { skipJsx: true }],
   },
   overrides: [
     {

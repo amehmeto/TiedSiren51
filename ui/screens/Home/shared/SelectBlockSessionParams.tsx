@@ -17,22 +17,17 @@ import { SelectBlocklistsField } from '@/ui/screens/Home/shared/SelectBlocklists
 import { SelectDevicesField } from '@/ui/screens/Home/shared/SelectDevicesField'
 import { SelectTime, StrictBound } from '@/ui/screens/Home/shared/SelectTime'
 
-function computeLockedIds(
+const computeLockedIds = (
   isStrictModeActive: boolean,
   ids: string[],
-): string[] {
-  if (!isStrictModeActive) return []
-  return ids
-}
+): string[] => (isStrictModeActive ? ids : [])
 
-function computeStrictBound(
+const computeStrictBound = (
   isStrictModeActive: boolean,
   direction: 'earlier' | 'later',
   limit: string | null | undefined,
-): StrictBound | undefined {
-  if (!isStrictModeActive || !limit) return undefined
-  return { direction, limit }
-}
+): StrictBound | undefined =>
+  isStrictModeActive && limit ? { direction, limit } : undefined
 
 type SelectBlockSessionParamsProps = {
   form: FormikProps<BlockSessionFormValues>
@@ -45,11 +40,11 @@ export function SelectBlockSessionParams({
     selectIsStrictModeActive(state, dependencies.dateProvider),
   )
   const initialValues = form.initialValues
-  const lockedBlocklistIds = computeLockedIds(
+  const blocklistIds = computeLockedIds(
     isStrictModeActive,
     initialValues.blocklistIds,
   )
-  const lockedDeviceIds = computeLockedIds(
+  const deviceIds = computeLockedIds(
     isStrictModeActive,
     initialValues.devices.map((d) => d.id),
   )
@@ -94,7 +89,7 @@ export function SelectBlockSessionParams({
         <SelectBlocklistsField
           values={form.values}
           setFieldValue={form.setFieldValue}
-          lockedBlocklistIds={lockedBlocklistIds}
+          blocklistIds={blocklistIds}
         />
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
@@ -102,8 +97,8 @@ export function SelectBlockSessionParams({
         <SelectDevicesField
           values={form.values}
           setFieldValue={form.setFieldValue}
-          items={devices}
-          lockedIds={lockedDeviceIds}
+          devices={devices}
+          deviceIds={deviceIds}
         />
         {hasFieldError('devices') && (
           <FieldErrors errors={form.errors} fieldName={'devices'} />

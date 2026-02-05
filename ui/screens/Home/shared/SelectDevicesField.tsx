@@ -13,15 +13,15 @@ type SelectDevicesFieldProps = Readonly<{
     value: Device[],
     shouldValidate?: boolean,
   ) => Promise<void | FormikErrors<BlockSessionFormValues>>
-  items: Device[]
-  lockedIds?: string[]
+  devices: Device[]
+  deviceIds?: string[]
 }>
 
 export function SelectDevicesField({
   values,
   setFieldValue,
-  items,
-  lockedIds = [],
+  devices,
+  deviceIds = [],
 }: SelectDevicesFieldProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -44,8 +44,8 @@ export function SelectDevicesField({
         currentSelections={selectedDevices}
         onRequestClose={() => setIsModalOpen(false)}
         setFieldValue={setFieldValue}
-        items={items}
-        lockedIds={lockedIds}
+        devices={devices}
+        deviceIds={deviceIds}
       />
     </>
   )
