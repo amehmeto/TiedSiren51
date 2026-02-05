@@ -166,6 +166,7 @@
       "WebFetch(domain:www.npmjs.com)",
       "WebSearch",
       "Write",
+      "mcp__context7__resolve-library-id",
       "mcp__github__add_issue_comment",
       "mcp__github__create_pull_request",
       "mcp__github__get_commit",

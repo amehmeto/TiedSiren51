@@ -1,3 +1,17 @@
+import { T } from './ui/design-system/theme'
+
+const DIGITS_REGEX = /\d+/g
+
+function rgbaToHex(rgba) {
+  const [r, g, b] = rgba.match(DIGITS_REGEX).map(Number)
+  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1).toUpperCase()}`
+}
+
+const darkBlue = rgbaToHex(T.color.darkBlue)
+const darkBlueGray = rgbaToHex(T.color.darkBlueGray)
+const lightBlue = rgbaToHex(T.color.lightBlue)
+const white = rgbaToHex(T.color.white)
+
 export default {
   expo: {
     name: 'TiedSiren51',
@@ -10,7 +24,7 @@ export default {
     splash: {
       image: './assets/images/splash.png',
       resizeMode: 'contain',
-      backgroundColor: '#0C207A',
+      backgroundColor: darkBlue,
     },
     ios: {
       supportsTablet: true,
@@ -21,7 +35,7 @@ export default {
     android: {
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
-        backgroundColor: '#0C207A',
+        backgroundColor: darkBlue,
       },
       package: 'com.tiedsiren.tiedsiren',
       googleServicesFile:
@@ -45,6 +59,23 @@ export default {
         {
           organization: process.env.SENTRY_ORG,
           project: process.env.SENTRY_PROJECT,
+        },
+      ],
+      [
+        '@react-native-community/datetimepicker',
+        {
+          android: {
+            timePicker: {
+              background: { light: darkBlueGray, dark: darkBlueGray },
+              headerBackground: { light: darkBlue, dark: darkBlue },
+              numbersBackgroundColor: {
+                light: darkBlueGray,
+                dark: darkBlueGray,
+              },
+              numbersSelectorColor: { light: lightBlue, dark: lightBlue },
+              numbersTextColor: { light: white, dark: white },
+            },
+          },
         },
       ],
       'expo-apple-authentication',

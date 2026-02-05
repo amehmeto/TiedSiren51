@@ -46,6 +46,40 @@ export function SelectTime({
     setFieldValue(timeField, formattedTime)
   }
 
+  let timePicker: React.ReactNode = null
+
+  if (Platform.OS === 'web') {
+    if (isTimePickerVisible) {
+      timePicker = (
+        <WebTimePicker
+          chosenTime={chosenTime}
+          handleChange={() => handleChange(timeField)}
+          setTime={handleTimeChange}
+          setIsTimePickerVisible={setIsTimePickerVisible}
+        />
+      )
+    }
+  } else {
+    timePicker = (
+      <DateTimePickerModal
+        isVisible={isTimePickerVisible}
+        is24Hour={true}
+        mode="time"
+        isDarkModeEnabled={true}
+        themeVariant="dark"
+        accentColor={T.color.lightBlue}
+        buttonTextColorIOS={T.color.lightBlue}
+        textColor={T.color.white}
+        pickerContainerStyleIOS={styles.pickerContainer}
+        onConfirm={(date) => {
+          handleTimeChange(dateProvider.toHHmm(date))
+          setIsTimePickerVisible(false)
+        }}
+        onCancel={() => setIsTimePickerVisible(false)}
+      />
+    )
+  }
+
   return (
     <>
       <View style={styles.param}>
@@ -56,33 +90,7 @@ export function SelectTime({
           <Text style={styles.option}>{placeholder}</Text>
         </Pressable>
       </View>
-      <View>
-        {Platform.OS === 'web' ? (
-          isTimePickerVisible && (
-            <WebTimePicker
-              chosenTime={chosenTime}
-              handleChange={() => handleChange(timeField)}
-              setTime={handleTimeChange}
-              setIsTimePickerVisible={setIsTimePickerVisible}
-            />
-          )
-        ) : (
-          <DateTimePickerModal
-            isVisible={isTimePickerVisible}
-            is24Hour={true}
-            mode="time"
-            isDarkModeEnabled={true}
-            themeVariant="dark"
-            accentColor={T.color.lightBlue}
-            buttonTextColorIOS={T.color.lightBlue}
-            onConfirm={(date) => {
-              handleTimeChange(dateProvider.toHHmm(date))
-              setIsTimePickerVisible(false)
-            }}
-            onCancel={() => setIsTimePickerVisible(false)}
-          />
-        )}
-      </View>
+      <View>{timePicker}</View>
     </>
   )
 }
@@ -102,5 +110,8 @@ const styles = StyleSheet.create({
   option: {
     color: T.color.lightBlue,
     textAlign: 'right',
+  },
+  pickerContainer: {
+    borderRadius: T.border.radius.extraRounded,
   },
 })
