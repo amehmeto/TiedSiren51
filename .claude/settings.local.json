@@ -128,6 +128,7 @@
       "Bash(npm view:*)",
       "Bash(npm why:*)",
       "Bash(npx eslint:*)",
+      "Bash(npx expo config:*)",
       "Bash(npx expo prebuild --platform android --clean)",
       "Bash(npx expo run:android:*)",
       "Bash(npx expo-module:*)",
