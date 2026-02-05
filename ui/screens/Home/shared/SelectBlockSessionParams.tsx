@@ -1,10 +1,7 @@
 import { FormikProps } from 'formik'
 import { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/core/_redux_/createStore'
 import { Device } from '@/core/device/device'
-import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -17,11 +14,6 @@ import { SelectBlocklistsField } from '@/ui/screens/Home/shared/SelectBlocklists
 import { SelectDevicesField } from '@/ui/screens/Home/shared/SelectDevicesField'
 import { SelectTime, TimeField } from '@/ui/screens/Home/shared/SelectTime'
 
-const computeLockedIds = (
-  isStrictModeActive: boolean,
-  ids: string[],
-): string[] => (isStrictModeActive ? ids : [])
-
 type SelectBlockSessionParamsProps = {
   form: FormikProps<BlockSessionFormValues>
 }
@@ -29,18 +21,8 @@ type SelectBlockSessionParamsProps = {
 export function SelectBlockSessionParams({
   form,
 }: SelectBlockSessionParamsProps) {
-  const isStrictModeActive = useSelector((state: RootState) =>
-    selectIsStrictModeActive(state, dependencies.dateProvider),
-  )
   const initialValues = form.initialValues
-  const blocklistIds = computeLockedIds(
-    isStrictModeActive,
-    initialValues.blocklistIds,
-  )
-  const deviceIds = computeLockedIds(
-    isStrictModeActive,
-    initialValues.devices.map((d) => d.id),
-  )
+  const initialDeviceIds = initialValues.devices.map((d) => d.id)
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
@@ -72,7 +54,7 @@ export function SelectBlockSessionParams({
         <SelectBlocklistsField
           values={form.values}
           setFieldValue={form.setFieldValue}
-          blocklistIds={blocklistIds}
+          initialBlocklistIds={initialValues.blocklistIds}
         />
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
@@ -81,7 +63,7 @@ export function SelectBlockSessionParams({
           values={form.values}
           setFieldValue={form.setFieldValue}
           devices={devices}
-          deviceIds={deviceIds}
+          initialDeviceIds={initialDeviceIds}
         />
         {hasFieldError('devices') && (
           <FieldErrors errors={form.errors} fieldName={'devices'} />

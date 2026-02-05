@@ -4,7 +4,9 @@ import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { showToast } from '@/core/toast/toast.slice'
+import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
@@ -14,7 +16,7 @@ type BlocklistsModalProps = Readonly<{
   currentSelections: string[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: string[]) => void
-  blocklistIds?: string[]
+  initialBlocklistIds?: string[]
 }>
 
 export function BlocklistsModal({
@@ -22,13 +24,17 @@ export function BlocklistsModal({
   currentSelections,
   onRequestClose,
   setFieldValue,
-  blocklistIds = [],
+  initialBlocklistIds = [],
 }: BlocklistsModalProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
   const blocklists = useSelector((state: RootState) =>
     selectAllBlocklists(state),
   )
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
+  const lockedBlocklistIds = isStrictModeActive ? initialBlocklistIds : []
   const [wasVisible, setWasVisible] = useState(isVisible)
   const [selectedIds, setSelectedIds] = useState<string[]>(currentSelections)
 
@@ -44,7 +50,7 @@ export function BlocklistsModal({
   }
 
   function toggleBlocklist(blocklistId: string, isNowSelected: boolean) {
-    if (!isNowSelected && blocklistIds.includes(blocklistId)) {
+    if (!isNowSelected && lockedBlocklistIds.includes(blocklistId)) {
       dispatch(showToast('Cannot remove blocklist during strict mode'))
       return
     }
@@ -67,7 +73,7 @@ export function BlocklistsModal({
           renderItem={({ item: blocklist }) => {
             const isBlocklistSelected = selectedIds.includes(blocklist.id)
             const isLocked =
-              isBlocklistSelected && blocklistIds.includes(blocklist.id)
+              isBlocklistSelected && lockedBlocklistIds.includes(blocklist.id)
             return (
               <View style={styles.blocklist}>
                 <Text style={styles.blocklistText}>{blocklist.name}</Text>

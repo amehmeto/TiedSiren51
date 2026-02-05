@@ -1,10 +1,12 @@
 import * as ExpoDevice from 'expo-device'
 import { useState } from 'react'
 import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { Device } from '@/core/device/device'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { showToast } from '@/core/toast/toast.slice'
+import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
@@ -30,7 +32,7 @@ type DevicesModalProps = Readonly<{
   onRequestClose: () => void
   setFieldValue: (field: string, value: Device[]) => void
   devices: Device[]
-  deviceIds?: string[]
+  initialDeviceIds?: string[]
 }>
 
 export function DevicesModal({
@@ -39,9 +41,13 @@ export function DevicesModal({
   onRequestClose,
   setFieldValue,
   devices,
-  deviceIds = [],
+  initialDeviceIds = [],
 }: DevicesModalProps) {
   const dispatch = useDispatch<AppDispatch>()
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
+  const lockedDeviceIds = isStrictModeActive ? initialDeviceIds : []
   const [wasVisible, setWasVisible] = useState(isVisible)
   const [selectedIds, setSelectedIds] = useState<string[]>(
     currentSelections.map((d) => d.id),
@@ -66,7 +72,7 @@ export function DevicesModal({
   }
 
   function toggleDevice(deviceId: string, isNowSelected: boolean) {
-    if (!isNowSelected && deviceIds.includes(deviceId)) {
+    if (!isNowSelected && lockedDeviceIds.includes(deviceId)) {
       dispatch(showToast('Cannot remove device during strict mode'))
       return
     }
@@ -84,7 +90,8 @@ export function DevicesModal({
           keyExtractor={(device) => device.id}
           renderItem={({ item: device }) => {
             const isDeviceSelected = selectedIds.includes(device.id)
-            const isLocked = isDeviceSelected && deviceIds.includes(device.id)
+            const isLocked =
+              isDeviceSelected && lockedDeviceIds.includes(device.id)
             return (
               <View style={styles.device}>
                 <Text style={styles.deviceText}>{device.name}</Text>
