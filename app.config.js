@@ -63,6 +63,10 @@ export default {
         '@react-native-community/datetimepicker',
         {
           android: {
+            datePicker: {
+              colorAccent: { light: LIGHT_BLUE, dark: LIGHT_BLUE },
+              textColorPrimary: { light: WHITE, dark: WHITE },
+            },
             timePicker: {
               background: { light: DARK_BLUE_GRAY, dark: DARK_BLUE_GRAY },
               headerBackground: { light: DARK_BLUE, dark: DARK_BLUE },
