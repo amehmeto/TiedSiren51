@@ -1,16 +1,14 @@
-import { T } from './ui/design-system/theme'
-
-const DIGITS_REGEX = /\d+/g
-
-function rgbaToHex(rgba) {
-  const [r, g, b] = rgba.match(DIGITS_REGEX).map(Number)
-  return `#${((1 << 24) | (r << 16) | (g << 8) | b).toString(16).slice(1).toUpperCase()}`
-}
-
-const darkBlue = rgbaToHex(T.color.darkBlue)
-const darkBlueGray = rgbaToHex(T.color.darkBlueGray)
-const lightBlue = rgbaToHex(T.color.lightBlue)
-const white = rgbaToHex(T.color.white)
+/**
+ * Colors must stay in sync with ui/design-system/theme.ts
+ * - darkBlue:     T.color.darkBlue     = rgba(12, 32, 122, 1)
+ * - darkBlueGray: T.color.darkBlueGray = rgba(30, 41, 59, 1)
+ * - lightBlue:    T.color.lightBlue    = rgba(0, 212, 255, 1)
+ * - white:        T.color.white        = rgba(255, 255, 255, 1)
+ */
+const DARK_BLUE = '#0C207A'
+const DARK_BLUE_GRAY = '#1E293B'
+const LIGHT_BLUE = '#00D4FF'
+const WHITE = '#FFFFFF'
 
 export default {
   expo: {
@@ -24,7 +22,7 @@ export default {
     splash: {
       image: './assets/images/splash.png',
       resizeMode: 'contain',
-      backgroundColor: darkBlue,
+      backgroundColor: DARK_BLUE,
     },
     ios: {
       supportsTablet: true,
@@ -35,7 +33,7 @@ export default {
     android: {
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
-        backgroundColor: darkBlue,
+        backgroundColor: DARK_BLUE,
       },
       package: 'com.tiedsiren.tiedsiren',
       googleServicesFile:
@@ -66,14 +64,14 @@ export default {
         {
           android: {
             timePicker: {
-              background: { light: darkBlueGray, dark: darkBlueGray },
-              headerBackground: { light: darkBlue, dark: darkBlue },
+              background: { light: DARK_BLUE_GRAY, dark: DARK_BLUE_GRAY },
+              headerBackground: { light: DARK_BLUE, dark: DARK_BLUE },
               numbersBackgroundColor: {
-                light: darkBlueGray,
-                dark: darkBlueGray,
+                light: DARK_BLUE_GRAY,
+                dark: DARK_BLUE_GRAY,
               },
-              numbersSelectorColor: { light: lightBlue, dark: lightBlue },
-              numbersTextColor: { light: white, dark: white },
+              numbersSelectorColor: { light: LIGHT_BLUE, dark: LIGHT_BLUE },
+              numbersTextColor: { light: WHITE, dark: WHITE },
             },
           },
         },
