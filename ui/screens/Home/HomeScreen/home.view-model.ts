@@ -16,14 +16,13 @@ import {
   SessionBoardTitle,
 } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 
-const getGreetingForHour = (hour: number): Greetings => {
+function greetUser(now: Date) {
+  const hour = now.getHours()
   if (hour >= 6 && hour < 12) return Greetings.GoodMorning
   if (hour >= 12 && hour < 18) return Greetings.GoodAfternoon
   if (hour >= 18 && hour < 22) return Greetings.GoodEvening
   return Greetings.GoodNight
 }
-
-const greetUser = (now: Date) => getGreetingForHour(now.getHours())
 
 function generateEndTime(
   dateProvider: DateProvider,
