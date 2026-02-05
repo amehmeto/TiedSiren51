@@ -7,11 +7,24 @@ import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
-import {
-  StrictBound,
-  StrictBoundDirection,
-} from '@/ui/screens/Home/shared/SelectBlockSessionParams'
 import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
+
+export enum StrictBoundDirection {
+  Earlier = 'earlier',
+  Later = 'later',
+}
+
+export type StrictBound = Readonly<{
+  direction: StrictBoundDirection
+  limit: string
+}>
+
+export const computeStrictBound = (
+  isStrictModeActive: boolean,
+  direction: StrictBoundDirection,
+  limit?: string | null,
+): StrictBound | undefined =>
+  isStrictModeActive && limit ? { direction, limit } : undefined
 
 function formatTimeString(time: string): string {
   const [hours, minutes] = time.split(':').map(Number)
