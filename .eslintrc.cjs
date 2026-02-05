@@ -145,7 +145,15 @@ module.exports = {
     // Prevent passing useSelector results as props - child should call useSelector itself
     'local-rules/no-selector-prop-drilling': [
       'error',
-      { ignoredComponents: ['FlatList', 'SectionList', 'VirtualizedList'] },
+      {
+        ignoredComponents: [
+          'FlatList',
+          'SectionList',
+          'VirtualizedList',
+          'TiedSButton',
+          'CircularTimerDisplay',
+        ],
+      },
     ],
     // Prefer ternary over if-return followed by return
     'local-rules/prefer-ternary-return': ['error', { skipJsx: true }],

@@ -108,6 +108,18 @@ module.exports = {
         const nextStatement = siblings[index + 1]
         if (nextStatement.type !== 'ReturnStatement') return
 
+        // Skip if this is part of a chain of if-returns (would create nested ternaries)
+        if (index > 0) {
+          const prevStatement = siblings[index - 1]
+          if (
+            prevStatement.type === 'IfStatement' &&
+            !prevStatement.alternate &&
+            getReturnStatement(prevStatement.consequent)
+          ) {
+            return
+          }
+        }
+
         // Skip if either return contains JSX and skipJsx is enabled
         if (skipJsx) {
           if (
