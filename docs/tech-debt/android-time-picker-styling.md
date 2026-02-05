@@ -61,6 +61,24 @@ Consider addressing when:
 - Design system audit requires strict cross-platform consistency
 - Migrating to a different date/time picker for other reasons
 
+## Expo Version Override
+
+The `@react-native-community/datetimepicker` package is excluded from Expo's version compatibility check in `package.json`:
+
+```json
+"expo": {
+  "install": {
+    "exclude": ["@react-native-community/datetimepicker"]
+  }
+}
+```
+
+**Why:** Expo SDK 51 expects datetimepicker 8.0.1, but we need 8.2.0+ for the Expo config plugin that enables Android theming.
+
+**Risk:** During Expo SDK upgrades, this override may cause compatibility issues. The datetimepicker version should be reviewed and updated when upgrading Expo SDK.
+
+**Action Required:** When upgrading Expo SDK, check if the new SDK supports datetimepicker 8.2.0+ natively. If so, remove the `expo.install.exclude` entry.
+
 ## References
 
 - [datetimepicker android-styling.md](https://github.com/react-native-datetimepicker/datetimepicker/blob/master/docs/android-styling.md)
