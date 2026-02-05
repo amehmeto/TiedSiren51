@@ -157,6 +157,11 @@ module.exports = {
     ],
     // Prefer ternary over if-return followed by return
     'local-rules/prefer-ternary-return': ['error', { skipJsx: true }],
+    // Prefer enum over string literal unions
+    'local-rules/prefer-enum-over-string-union': [
+      'error',
+      { ignoredPatterns: ['-outline$', '^logo-', '^add-', '^remove-'] },
+    ],
   },
   overrides: [
     {

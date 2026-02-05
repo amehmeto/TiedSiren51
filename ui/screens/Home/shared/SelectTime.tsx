@@ -7,7 +7,10 @@ import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
-import { StrictBound } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
+import {
+  StrictBound,
+  StrictBoundDirection,
+} from '@/ui/screens/Home/shared/SelectBlockSessionParams'
 import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
 
 function formatTimeString(time: string): string {
@@ -15,18 +18,23 @@ function formatTimeString(time: string): string {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
 }
 
+export enum TimeField {
+  StartedAt = 'startedAt',
+  EndedAt = 'endedAt',
+}
+
 type SelectTimeProps = Readonly<{
-  timeField?: 'startedAt' | 'endedAt'
+  timeField?: TimeField
   setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
   values: BlockSessionFormValues
   isTimePickerVisible?: boolean
   setFieldValue: (field: string, value: string) => void
-  handleChange: (field: 'startedAt' | 'endedAt') => void
+  handleChange: (field: TimeField) => void
   strictBound?: StrictBound
 }>
 
 export function SelectTime({
-  timeField = 'startedAt',
+  timeField = TimeField.StartedAt,
   setIsTimePickerVisible,
   values,
   isTimePickerVisible = false,
@@ -39,12 +47,12 @@ export function SelectTime({
   const localeNow = dateProvider.getHHmmNow()
 
   const chosenTime =
-    timeField === 'startedAt'
+    timeField === TimeField.StartedAt
       ? (values.startedAt ?? localeNow)
       : (values.endedAt ?? localeNow)
 
   const placeholder =
-    timeField === 'startedAt'
+    timeField === TimeField.StartedAt
       ? (values.startedAt ?? `Select start time...`)
       : (values.endedAt ?? `Select end time...`)
 
@@ -53,13 +61,13 @@ export function SelectTime({
 
     if (strictBound) {
       const isInvalid =
-        strictBound.direction === 'earlier'
+        strictBound.direction === StrictBoundDirection.Earlier
           ? formattedTime > strictBound.limit
           : formattedTime < strictBound.limit
 
       if (isInvalid) {
         const message =
-          strictBound.direction === 'earlier'
+          strictBound.direction === StrictBoundDirection.Earlier
             ? 'Cannot set a later start time during strict mode'
             : 'Cannot set an earlier end time during strict mode'
         dispatch(showToast(message))
@@ -74,7 +82,7 @@ export function SelectTime({
     <>
       <View style={styles.param}>
         <Text style={styles.label}>
-          {timeField === 'startedAt' ? 'Start Time' : 'End Time'}
+          {timeField === TimeField.StartedAt ? 'Start Time' : 'End Time'}
         </Text>
         <Pressable onPress={() => setIsTimePickerVisible(true)}>
           <Text style={styles.option}>{placeholder}</Text>

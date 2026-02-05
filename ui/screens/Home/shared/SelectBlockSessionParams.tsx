@@ -15,21 +15,26 @@ import { FormError } from '@/ui/screens/Home/shared/FormError'
 import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlockingCondition'
 import { SelectBlocklistsField } from '@/ui/screens/Home/shared/SelectBlocklistsField'
 import { SelectDevicesField } from '@/ui/screens/Home/shared/SelectDevicesField'
-import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
+import { SelectTime, TimeField } from '@/ui/screens/Home/shared/SelectTime'
 
 const computeLockedIds = (
   isStrictModeActive: boolean,
   ids: string[],
 ): string[] => (isStrictModeActive ? ids : [])
 
+export enum StrictBoundDirection {
+  Earlier = 'earlier',
+  Later = 'later',
+}
+
 export type StrictBound = Readonly<{
-  direction: 'earlier' | 'later'
+  direction: StrictBoundDirection
   limit: string
 }>
 
 const computeStrictBound = (
   isStrictModeActive: boolean,
-  direction: 'earlier' | 'later',
+  direction: StrictBoundDirection,
   limit?: string | null,
 ): StrictBound | undefined =>
   isStrictModeActive && limit ? { direction, limit } : undefined
@@ -55,12 +60,12 @@ export function SelectBlockSessionParams({
   )
   const startTimeBound = computeStrictBound(
     isStrictModeActive,
-    'earlier',
+    StrictBoundDirection.Earlier,
     initialValues.startedAt,
   )
   const endTimeBound = computeStrictBound(
     isStrictModeActive,
-    'later',
+    StrictBoundDirection.Later,
     initialValues.endedAt,
   )
   const [devices, setDevices] = useState<Device[]>([])
@@ -109,7 +114,7 @@ export function SelectBlockSessionParams({
           <FieldErrors errors={form.errors} fieldName={'devices'} />
         )}
         <SelectTime
-          timeField={'startedAt'}
+          timeField={TimeField.StartedAt}
           setIsTimePickerVisible={setIsStartTimePickerVisible}
           values={form.values}
           isTimePickerVisible={isStartTimePickerVisible}
@@ -121,7 +126,7 @@ export function SelectBlockSessionParams({
           <FormError error={form.errors.startedAt} />
         )}
         <SelectTime
-          timeField={'endedAt'}
+          timeField={TimeField.EndedAt}
           setIsTimePickerVisible={setIsEndTimePickerVisible}
           values={form.values}
           isTimePickerVisible={isEndTimePickerVisible}

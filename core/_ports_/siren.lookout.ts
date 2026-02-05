@@ -1,5 +1,11 @@
+export enum DetectedSirenType {
+  App = 'app',
+  Website = 'website',
+  Keyword = 'keyword',
+}
+
 export interface DetectedSiren {
-  type: 'app' | 'website' | 'keyword'
+  type: DetectedSirenType
   identifier: string
   timestamp: number
 }

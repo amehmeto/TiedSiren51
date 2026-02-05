@@ -55,6 +55,7 @@ const preferNamedSelector = require('../eslint-rules/prefer-named-selector.cjs')
 const selectorStateFirstParam = require('../eslint-rules/selector-state-first-param.cjs')
 const noSelectorPropDrilling = require('../eslint-rules/no-selector-prop-drilling.cjs')
 const preferTernaryReturn = require('../eslint-rules/prefer-ternary-return.cjs')
+const preferEnumOverStringUnion = require('../eslint-rules/prefer-enum-over-string-union.cjs')
 
 module.exports = {
   rules: {
@@ -111,5 +112,6 @@ module.exports = {
     'selector-state-first-param': selectorStateFirstParam,
     'no-selector-prop-drilling': noSelectorPropDrilling,
     'prefer-ternary-return': preferTernaryReturn,
+    'prefer-enum-over-string-union': preferEnumOverStringUnion,
   },
 }
