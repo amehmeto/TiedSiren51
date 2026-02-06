@@ -15,13 +15,11 @@ type SelectBlocklistsFieldProps = Readonly<{
     value: string[],
     shouldValidate?: boolean,
   ) => Promise<void | FormikErrors<BlockSessionFormValues>>
-  initialBlocklistIds?: string[]
 }>
 
 export function SelectBlocklistsField({
   values,
   setFieldValue,
-  initialBlocklistIds = [],
 }: SelectBlocklistsFieldProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
   const items = useSelector((state: RootState) => selectAllBlocklists(state))
@@ -48,7 +46,6 @@ export function SelectBlocklistsField({
         currentSelections={selectedIds}
         onRequestClose={() => setIsModalOpen(false)}
         setFieldValue={setFieldValue}
-        initialBlocklistIds={initialBlocklistIds}
       />
     </>
   )

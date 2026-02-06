@@ -16,7 +16,6 @@ type BlocklistsModalProps = Readonly<{
   currentSelections: string[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: string[]) => void
-  initialBlocklistIds?: string[]
 }>
 
 export function BlocklistsModal({
@@ -24,7 +23,6 @@ export function BlocklistsModal({
   currentSelections,
   onRequestClose,
   setFieldValue,
-  initialBlocklistIds = [],
 }: BlocklistsModalProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
@@ -34,13 +32,14 @@ export function BlocklistsModal({
   const isStrictModeActive = useSelector((state: RootState) =>
     selectIsStrictModeActive(state, dependencies.dateProvider),
   )
-  const lockedBlocklistIds = isStrictModeActive ? initialBlocklistIds : []
   const [wasVisible, setWasVisible] = useState(isVisible)
   const [selectedIds, setSelectedIds] = useState<string[]>(currentSelections)
+  const [lockedBlocklistIds, setLockedBlocklistIds] = useState<string[]>([])
 
   if (isVisible && !wasVisible) {
     setWasVisible(true)
     setSelectedIds(currentSelections)
+    setLockedBlocklistIds(isStrictModeActive ? currentSelections : [])
   }
   if (!isVisible && wasVisible) setWasVisible(false)
 

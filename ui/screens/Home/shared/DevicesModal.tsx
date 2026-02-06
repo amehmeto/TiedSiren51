@@ -32,7 +32,6 @@ type DevicesModalProps = Readonly<{
   onRequestClose: () => void
   setFieldValue: (field: string, value: Device[]) => void
   devices: Device[]
-  initialDeviceIds?: string[]
 }>
 
 export function DevicesModal({
@@ -41,17 +40,16 @@ export function DevicesModal({
   onRequestClose,
   setFieldValue,
   devices,
-  initialDeviceIds = [],
 }: DevicesModalProps) {
   const dispatch = useDispatch<AppDispatch>()
   const isStrictModeActive = useSelector((state: RootState) =>
     selectIsStrictModeActive(state, dependencies.dateProvider),
   )
-  const lockedDeviceIds = isStrictModeActive ? initialDeviceIds : []
   const [wasVisible, setWasVisible] = useState(isVisible)
   const [selectedIds, setSelectedIds] = useState<string[]>(
     currentSelections.map((d) => d.id),
   )
+  const [lockedDeviceIds, setLockedDeviceIds] = useState<string[]>([])
 
   const availableDevices = [
     ...new Map([currentDevice, ...devices].map((d) => [d.id, d])).values(),
@@ -60,6 +58,9 @@ export function DevicesModal({
   if (isVisible && !wasVisible) {
     setWasVisible(true)
     setSelectedIds(currentSelections.map((d) => d.id))
+    setLockedDeviceIds(
+      isStrictModeActive ? currentSelections.map((d) => d.id) : [],
+    )
   }
   if (!isVisible && wasVisible) setWasVisible(false)
 

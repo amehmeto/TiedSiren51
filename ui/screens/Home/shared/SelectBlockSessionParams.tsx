@@ -21,7 +21,6 @@ type SelectBlockSessionParamsProps = {
 export function SelectBlockSessionParams({
   form,
 }: SelectBlockSessionParamsProps) {
-  const initialDeviceIds = form.initialValues.devices.map((d) => d.id)
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
@@ -53,7 +52,6 @@ export function SelectBlockSessionParams({
         <SelectBlocklistsField
           values={form.values}
           setFieldValue={form.setFieldValue}
-          initialBlocklistIds={form.initialValues.blocklistIds}
         />
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
@@ -62,7 +60,6 @@ export function SelectBlockSessionParams({
           values={form.values}
           setFieldValue={form.setFieldValue}
           devices={devices}
-          initialDeviceIds={initialDeviceIds}
         />
         {hasFieldError('devices') && (
           <FieldErrors errors={form.errors} fieldName={'devices'} />
