@@ -15,6 +15,13 @@ if ! git fetch origin main --quiet 2>/dev/null; then
   exit 0
 fi
 
+# Check if branch is behind main
+commits_behind=$(git rev-list --count HEAD..origin/main 2>/dev/null || echo "0")
+if [ "$commits_behind" -gt 0 ]; then
+  printf "❌ Branch is %s commit(s) behind main. Run: git merge origin/main\n" "$commits_behind"
+  exit 1
+fi
+
 # Use new git merge-tree syntax (Git 2.38+)
 # Exit code 0 = no conflicts, non-zero = conflicts
 if ! git merge-tree --write-tree HEAD origin/main >/dev/null 2>&1; then
