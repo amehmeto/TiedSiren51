@@ -50,16 +50,16 @@ export function SelectBlockSessionParams({
         />
         {hasFieldError('name') && <FormError error={form.errors.name} />}
         <SelectBlocklistsField
-          values={form.values}
+          blocklistIds={form.values.blocklistIds}
           setFieldValue={form.setFieldValue}
         />
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
         )}
         <SelectDevicesField
-          values={form.values}
+          selectedDevices={form.values.devices}
           setFieldValue={form.setFieldValue}
-          devices={devices}
+          availableDevices={devices}
         />
         {hasFieldError('devices') && (
           <FieldErrors errors={form.errors} fieldName={'devices'} />

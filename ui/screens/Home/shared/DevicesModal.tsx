@@ -90,8 +90,6 @@ export function DevicesModal({
           keyExtractor={(device) => device.id}
           renderItem={({ item: device }) => {
             const isDeviceSelected = selectedIds.includes(device.id)
-            const isLocked =
-              isDeviceSelected && lockedDeviceIds.includes(device.id)
             return (
               <View style={styles.device}>
                 <Text style={styles.deviceText}>{device.name}</Text>
@@ -99,7 +97,6 @@ export function DevicesModal({
                   accessibilityLabel={`Toggle ${device.name}`}
                   style={styles.deviceSelector}
                   value={isDeviceSelected}
-                  disabled={isLocked}
                   onValueChange={(isNowSelected) =>
                     toggleDevice(device.id, isNowSelected)
                   }

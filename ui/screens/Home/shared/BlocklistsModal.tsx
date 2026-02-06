@@ -70,8 +70,6 @@ export function BlocklistsModal({
           keyExtractor={(blocklist) => blocklist.id}
           renderItem={({ item: blocklist }) => {
             const isBlocklistSelected = selectedIds.includes(blocklist.id)
-            const isLocked =
-              isBlocklistSelected && lockedBlocklistIds.includes(blocklist.id)
             return (
               <View style={styles.blocklist}>
                 <Text style={styles.blocklistText}>{blocklist.name}</Text>
@@ -79,7 +77,6 @@ export function BlocklistsModal({
                   accessibilityLabel={`Toggle ${blocklist.name}`}
                   style={styles.blocklistSelector}
                   value={isBlocklistSelected}
-                  disabled={isLocked}
                   onValueChange={(isNowSelected) =>
                     toggleBlocklist(blocklist.id, isNowSelected)
                   }
