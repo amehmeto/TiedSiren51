@@ -19,6 +19,64 @@ function formatTimeString(time: string): string {
   return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
 }
 
+function parseTimeToDate(timeString: string): Date {
+  const [h, m] = timeString.split(':').map(Number)
+  const d = new Date()
+  d.setHours(h, m, 0, 0)
+  return d
+}
+
+type TimePickerProps = Readonly<{
+  isVisible: boolean
+  chosenTimeAsDate: Date
+  onConfirm: (date: Date) => void
+  onCancel: () => void
+  chosenTime: string
+  handleChange: () => void
+  setTime: (time: string) => void
+  setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
+}>
+
+function renderTimePicker({
+  isVisible,
+  chosenTimeAsDate,
+  onConfirm,
+  onCancel,
+  chosenTime,
+  handleChange,
+  setTime,
+  setIsTimePickerVisible,
+}: TimePickerProps): React.ReactNode {
+  if (Platform.OS === 'web') {
+    if (!isVisible) return null
+    return (
+      <WebTimePicker
+        chosenTime={chosenTime}
+        handleChange={handleChange}
+        setTime={setTime}
+        setIsTimePickerVisible={setIsTimePickerVisible}
+      />
+    )
+  }
+  return (
+    <DateTimePickerModal
+      date={chosenTimeAsDate}
+      isVisible={isVisible}
+      is24Hour={true}
+      mode="time"
+      isDarkModeEnabled={true}
+      themeVariant="dark"
+      accentColor={T.color.lightBlue}
+      buttonTextColorIOS={T.color.lightBlue}
+      textColor={T.color.white}
+      pickerContainerStyleIOS={styles.pickerContainer}
+      modalStyleIOS={styles.modalStyle}
+      onConfirm={onConfirm}
+      onCancel={onCancel}
+    />
+  )
+}
+
 export enum TimeField {
   StartedAt = 'startedAt',
   EndedAt = 'endedAt',
@@ -68,12 +126,7 @@ export function SelectTime({
       ? (values.startedAt ?? `Select start time...`)
       : (values.endedAt ?? `Select end time...`)
 
-  const chosenTimeAsDate = (() => {
-    const [h, m] = chosenTime.split(':').map(Number)
-    const d = new Date()
-    d.setHours(h, m, 0, 0)
-    return d
-  })()
+  const chosenTimeAsDate = parseTimeToDate(chosenTime)
 
   const handleTimeChange = (time: string) => {
     const formattedTime = formatTimeString(time)
@@ -94,41 +147,19 @@ export function SelectTime({
     setFieldValue(timeField, formattedTime)
   }
 
-  let timePicker: React.ReactNode = null
-
-  if (Platform.OS === 'web') {
-    if (isTimePickerVisible) {
-      timePicker = (
-        <WebTimePicker
-          chosenTime={chosenTime}
-          handleChange={() => handleChange(timeField)}
-          setTime={handleTimeChange}
-          setIsTimePickerVisible={setIsTimePickerVisible}
-        />
-      )
-    }
-  } else {
-    timePicker = (
-      <DateTimePickerModal
-        date={chosenTimeAsDate}
-        isVisible={isTimePickerVisible}
-        is24Hour={true}
-        mode="time"
-        isDarkModeEnabled={true}
-        themeVariant="dark"
-        accentColor={T.color.lightBlue}
-        buttonTextColorIOS={T.color.lightBlue}
-        textColor={T.color.white}
-        pickerContainerStyleIOS={styles.pickerContainer}
-        modalStyleIOS={styles.modalStyle}
-        onConfirm={(date) => {
-          handleTimeChange(dateProvider.toHHmm(date))
-          setIsTimePickerVisible(false)
-        }}
-        onCancel={() => setIsTimePickerVisible(false)}
-      />
-    )
-  }
+  const timePicker = renderTimePicker({
+    isVisible: isTimePickerVisible,
+    chosenTimeAsDate,
+    onConfirm: (date) => {
+      handleTimeChange(dateProvider.toHHmm(date))
+      setIsTimePickerVisible(false)
+    },
+    onCancel: () => setIsTimePickerVisible(false),
+    chosenTime,
+    handleChange: () => handleChange(timeField),
+    setTime: handleTimeChange,
+    setIsTimePickerVisible,
+  })
 
   return (
     <>
