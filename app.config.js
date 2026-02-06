@@ -1,3 +1,15 @@
+/**
+ * Colors must stay in sync with ui/design-system/theme.ts
+ * - darkBlue:     T.color.darkBlue     = rgba(12, 32, 122, 1)
+ * - darkBlueGray: T.color.darkBlueGray = rgba(30, 41, 59, 1)
+ * - lightBlue:    T.color.lightBlue    = rgba(0, 212, 255, 1)
+ * - white:        T.color.white        = rgba(255, 255, 255, 1)
+ */
+const DARK_BLUE = '#0C207A'
+const DARK_BLUE_GRAY = '#1E293B'
+const LIGHT_BLUE = '#00D4FF'
+const WHITE = '#FFFFFF'
+
 export default {
   expo: {
     name: 'TiedSiren51',
@@ -10,7 +22,7 @@ export default {
     splash: {
       image: './assets/images/splash.png',
       resizeMode: 'contain',
-      backgroundColor: '#0C207A',
+      backgroundColor: DARK_BLUE,
     },
     ios: {
       supportsTablet: true,
@@ -21,7 +33,7 @@ export default {
     android: {
       adaptiveIcon: {
         foregroundImage: './assets/images/adaptive-icon.png',
-        backgroundColor: '#0C207A',
+        backgroundColor: DARK_BLUE,
       },
       package: 'com.tiedsiren.tiedsiren',
       googleServicesFile:
@@ -45,6 +57,27 @@ export default {
         {
           organization: process.env.SENTRY_ORG,
           project: process.env.SENTRY_PROJECT,
+        },
+      ],
+      [
+        '@react-native-community/datetimepicker',
+        {
+          android: {
+            datePicker: {
+              colorAccent: { light: LIGHT_BLUE, dark: LIGHT_BLUE },
+              textColorPrimary: { light: WHITE, dark: WHITE },
+            },
+            timePicker: {
+              background: { light: DARK_BLUE_GRAY, dark: DARK_BLUE_GRAY },
+              headerBackground: { light: DARK_BLUE, dark: DARK_BLUE },
+              numbersBackgroundColor: {
+                light: DARK_BLUE_GRAY,
+                dark: DARK_BLUE_GRAY,
+              },
+              numbersSelectorColor: { light: LIGHT_BLUE, dark: LIGHT_BLUE },
+              numbersTextColor: { light: WHITE, dark: WHITE },
+            },
+          },
         },
       ],
       'expo-apple-authentication',

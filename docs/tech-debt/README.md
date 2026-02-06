@@ -25,6 +25,9 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ### Performance
 - [Native Siren Filtering](native-siren-filtering.md) - 📋 **LOW PRIORITY** - Filter blocked apps at native level to reduce JS bridge calls
 
+### UI/UX
+- [Android Time Picker Styling](android-time-picker-styling.md) - 📋 **LOW PRIORITY** - Border radius not supported on Android
+
 ### Maintenance
 - [Scripts Audit](scripts-audit.md) - 📋 **LOW PRIORITY** - Inventory of all scripts with usage status
 

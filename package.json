@@ -90,7 +90,7 @@
     "@prisma/client": "5.22.0",
     "@prisma/react-native": "^6.0.1",
     "@react-native-async-storage/async-storage": "1.23.1",
-    "@react-native-community/datetimepicker": "8.0.1",
+    "@react-native-community/datetimepicker": "^8.2.0",
     "@react-native-google-signin/google-signin": "10.1.1",
     "@react-native-picker/picker": "2.7.5",
     "@reduxjs/toolkit": "^2.2.5",
@@ -190,6 +190,13 @@
     "vitest": "^1.6.0",
     "vitest-tsconfig-paths": "^3.4.1",
     "wait-on": "^7.2.0"
+  },
+  "expo": {
+    "install": {
+      "exclude": [
+        "@react-native-community/datetimepicker"
+      ]
+    }
   },
   "private": true
 }
