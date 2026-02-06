@@ -8,17 +8,12 @@ import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
+import {
+  StrictBound,
+  StrictBoundDirection,
+  validateStrictBoundTime,
+} from '@/ui/screens/Home/shared/validateStrictBoundTime'
 import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
-
-enum StrictBoundDirection {
-  Earlier = 'earlier',
-  Later = 'later',
-}
-
-type StrictBound = Readonly<{
-  direction: StrictBoundDirection
-  limit: string
-}>
 
 function formatTimeString(time: string): string {
   const [hours, minutes] = time.split(':').map(Number)
@@ -86,17 +81,9 @@ export function SelectTime({
     const formattedTime = formatTimeString(time)
 
     if (strictBound) {
-      const isInvalid =
-        strictBound.direction === StrictBoundDirection.Earlier
-          ? formattedTime > strictBound.limit
-          : formattedTime < strictBound.limit
-
-      if (isInvalid) {
-        const message =
-          strictBound.direction === StrictBoundDirection.Earlier
-            ? 'Cannot set a later start time during strict mode'
-            : 'Cannot set an earlier end time during strict mode'
-        dispatch(showToast(message))
+      const validation = validateStrictBoundTime(formattedTime, strictBound)
+      if (!validation.isValid) {
+        dispatch(showToast(validation.errorMessage))
         return
       }
     }

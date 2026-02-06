@@ -106,6 +106,7 @@
       "Bash(git rev-parse:*)",
       "Bash(git show:*)",
       "Bash(git stash:*)",
+      "Bash(git status:*)",
       "Bash(git worktree:*)",
       "Bash(grep:*)",
       "Bash(jq:*)",
