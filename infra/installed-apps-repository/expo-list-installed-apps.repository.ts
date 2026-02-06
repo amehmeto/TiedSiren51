@@ -13,7 +13,7 @@ export class ExpoListInstalledAppsRepository implements InstalledAppRepository {
   async getInstalledApps(): Promise<AppModel[]> {
     try {
       const installedApps = await listInstalledApps({
-        type: AppType.USER,
+        type: AppType.ALL,
       })
 
       const sortedApps = installedApps
