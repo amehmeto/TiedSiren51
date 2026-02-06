@@ -34,12 +34,11 @@ export function BlocklistsModal({
   )
   const [wasVisible, setWasVisible] = useState(isVisible)
   const [selectedIds, setSelectedIds] = useState<string[]>(currentSelections)
-  const [lockedBlocklistIds, setLockedBlocklistIds] = useState<string[]>([])
+  const lockedBlocklistIds = isStrictModeActive ? currentSelections : []
 
   if (isVisible && !wasVisible) {
     setWasVisible(true)
     setSelectedIds(currentSelections)
-    setLockedBlocklistIds(isStrictModeActive ? currentSelections : [])
   }
   if (!isVisible && wasVisible) setWasVisible(false)
 

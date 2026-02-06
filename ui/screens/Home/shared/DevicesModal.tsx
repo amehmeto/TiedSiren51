@@ -49,7 +49,9 @@ export function DevicesModal({
   const [selectedIds, setSelectedIds] = useState<string[]>(
     currentSelections.map((d) => d.id),
   )
-  const [lockedDeviceIds, setLockedDeviceIds] = useState<string[]>([])
+  const lockedDeviceIds = isStrictModeActive
+    ? currentSelections.map((d) => d.id)
+    : []
 
   const availableDevices = [
     ...new Map([currentDevice, ...devices].map((d) => [d.id, d])).values(),
@@ -58,9 +60,6 @@ export function DevicesModal({
   if (isVisible && !wasVisible) {
     setWasVisible(true)
     setSelectedIds(currentSelections.map((d) => d.id))
-    setLockedDeviceIds(
-      isStrictModeActive ? currentSelections.map((d) => d.id) : [],
-    )
   }
   if (!isVisible && wasVisible) setWasVisible(false)
 
