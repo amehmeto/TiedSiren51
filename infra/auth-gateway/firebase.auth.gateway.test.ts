@@ -2,6 +2,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import { FirebaseError } from 'firebase/app'
 import * as firebaseAuth from 'firebase/auth'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { AuthMethod } from '@/core/auth/auth.type'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { FirebaseAuthGateway } from './firebase.auth.gateway'
 
@@ -59,11 +60,6 @@ vi.mock('./firebaseConfig', () => ({
     webClientId: 'test-web-client-id',
   },
 }))
-
-enum AuthMethod {
-  SignInWithEmail = 'signInWithEmail',
-  SignUpWithEmail = 'signUpWithEmail',
-}
 
 describe('FirebaseAuthGateway - Error Translation', () => {
   let gateway: FirebaseAuthGateway
