@@ -3,6 +3,7 @@ import {
   StrictBound,
   StrictBoundDirection,
   validateStrictBoundTime,
+  validateStrictModeTime,
 } from './validateStrictBoundTime'
 
 describe('validateStrictBoundTime', () => {
@@ -90,80 +91,147 @@ describe('validateStrictBoundTime', () => {
     })
   })
 
-  describe('edge cases around midnight', () => {
-    describe('late night start times', () => {
-      const lateNightBound: StrictBound = {
+  describe('midnight-spanning sessions (e.g., 23:00 → 04:00)', () => {
+    describe('start time validation with otherBound', () => {
+      const midnightSpanningStartBound: StrictBound = {
         direction: StrictBoundDirection.Earlier,
         limit: '23:00',
+        otherBound: '04:00',
       }
       const validResult = { isValid: true }
+      const invalidResult = {
+        isValid: false,
+        errorMessage: 'Cannot set a later start time during strict mode',
+      }
 
-      it('allows 22:00 as earlier than 23:00', () => {
-        const result = validateStrictBoundTime('22:00', lateNightBound)
+      it('allows 22:00 as earlier start time (evening zone)', () => {
+        const result = validateStrictBoundTime(
+          '22:00',
+          midnightSpanningStartBound,
+        )
 
-        expect(result.isValid).toBe(true)
+        expect(result).toStrictEqual(validResult)
+      })
+
+      it('allows 21:00 as earlier start time (evening zone)', () => {
+        const result = validateStrictBoundTime(
+          '21:00',
+          midnightSpanningStartBound,
+        )
+
+        expect(result).toStrictEqual(validResult)
       })
 
       it('rejects 23:30 as later than 23:00', () => {
-        const result = validateStrictBoundTime('23:30', lateNightBound)
+        const result = validateStrictBoundTime(
+          '23:30',
+          midnightSpanningStartBound,
+        )
 
-        expect(result.isValid).toBe(false)
+        expect(result).toStrictEqual(invalidResult)
       })
 
-      it('treats 00:30 as earlier than 23:00 (lexicographic)', () => {
-        const result = validateStrictBoundTime('00:30', lateNightBound)
+      it('rejects 00:30 as it falls in the morning zone (after midnight)', () => {
+        const result = validateStrictBoundTime(
+          '00:30',
+          midnightSpanningStartBound,
+        )
+
+        expect(result).toStrictEqual(invalidResult)
+      })
+
+      it('rejects 03:00 as it falls in the morning zone (before end time)', () => {
+        const result = validateStrictBoundTime(
+          '03:00',
+          midnightSpanningStartBound,
+        )
+
+        expect(result).toStrictEqual(invalidResult)
+      })
+
+      it('rejects 04:00 as it equals the end time (boundary)', () => {
+        const result = validateStrictBoundTime(
+          '04:00',
+          midnightSpanningStartBound,
+        )
+
+        expect(result).toStrictEqual(invalidResult)
+      })
+
+      it('allows 05:00 as it is after the end time (valid evening zone)', () => {
+        const result = validateStrictBoundTime(
+          '05:00',
+          midnightSpanningStartBound,
+        )
 
         expect(result).toStrictEqual(validResult)
       })
     })
 
-    describe('early morning end times', () => {
-      const earlyMorningBound: StrictBound = {
+    describe('end time validation with otherBound', () => {
+      const midnightSpanningEndBound: StrictBound = {
         direction: StrictBoundDirection.Later,
-        limit: '02:00',
+        limit: '04:00',
+        otherBound: '23:00',
       }
       const validResult = { isValid: true }
+      const invalidResult = {
+        isValid: false,
+        errorMessage: 'Cannot set an earlier end time during strict mode',
+      }
 
-      it('allows 03:00 as later than 02:00', () => {
-        const result = validateStrictBoundTime('03:00', earlyMorningBound)
-
-        expect(result.isValid).toBe(true)
-      })
-
-      it('rejects 01:00 as earlier than 02:00', () => {
-        const result = validateStrictBoundTime('01:00', earlyMorningBound)
-
-        expect(result.isValid).toBe(false)
-      })
-
-      it('treats 23:00 as later than 02:00 (lexicographic)', () => {
-        const result = validateStrictBoundTime('23:00', earlyMorningBound)
+      it('allows 05:00 as later end time (morning zone)', () => {
+        const result = validateStrictBoundTime(
+          '05:00',
+          midnightSpanningEndBound,
+        )
 
         expect(result).toStrictEqual(validResult)
       })
-    })
 
-    describe('midnight boundary', () => {
-      it('handles 00:00 as start time limit', () => {
-        const midnightBound: StrictBound = {
-          direction: StrictBoundDirection.Earlier,
-          limit: '00:00',
-        }
+      it('allows 06:00 as later end time (morning zone)', () => {
+        const result = validateStrictBoundTime(
+          '06:00',
+          midnightSpanningEndBound,
+        )
 
-        const result = validateStrictBoundTime('00:01', midnightBound)
-
-        expect(result.isValid).toBe(false)
+        expect(result).toStrictEqual(validResult)
       })
 
-      it('handles 23:59 as end time limit', () => {
-        const endOfDayBound: StrictBound = {
-          direction: StrictBoundDirection.Later,
-          limit: '23:59',
-        }
+      it('rejects 03:00 as earlier than 04:00', () => {
+        const result = validateStrictBoundTime(
+          '03:00',
+          midnightSpanningEndBound,
+        )
 
-        const result = validateStrictBoundTime('23:58', endOfDayBound)
+        expect(result).toStrictEqual(invalidResult)
+      })
 
-        expect(result.isValid).toBe(false)
+      it('rejects 23:00 as it falls in the evening zone (at start time)', () => {
+        const result = validateStrictBoundTime(
+          '23:00',
+          midnightSpanningEndBound,
+        )
+
+        expect(result).toStrictEqual(invalidResult)
+      })
+
+      it('rejects 23:30 as it falls in the evening zone (after start time)', () => {
+        const result = validateStrictBoundTime(
+          '23:30',
+          midnightSpanningEndBound,
+        )
+
+        expect(result).toStrictEqual(invalidResult)
+      })
+
+      it('allows 22:00 as it is before start time (valid morning zone)', () => {
+        const result = validateStrictBoundTime(
+          '22:00',
+          midnightSpanningEndBound,
+        )
+
+        expect(result).toStrictEqual(validResult)
       })
     })
   })
@@ -187,6 +255,72 @@ describe('validateStrictBoundTime', () => {
 
       expect(validateStrictBoundTime('01:04', bound).isValid).toBe(false)
       expect(validateStrictBoundTime('01:06', bound).isValid).toBe(true)
+    })
+  })
+})
+
+describe('validateStrictModeTime', () => {
+  const validResult = { isValid: true }
+
+  describe('when strict mode is inactive', () => {
+    it('allows any time change', () => {
+      const result = validateStrictModeTime({
+        newTime: '23:00',
+        isStrictModeActive: false,
+        initialTime: '10:00',
+        direction: StrictBoundDirection.Earlier,
+      })
+
+      expect(result).toStrictEqual(validResult)
+    })
+  })
+
+  describe('when initialTime is null', () => {
+    it('allows any time change', () => {
+      const result = validateStrictModeTime({
+        newTime: '23:00',
+        isStrictModeActive: true,
+        initialTime: null,
+        direction: StrictBoundDirection.Earlier,
+      })
+
+      expect(result).toStrictEqual(validResult)
+    })
+  })
+
+  describe('when strict mode is active with initialTime', () => {
+    it('validates start time correctly', () => {
+      const result = validateStrictModeTime({
+        newTime: '11:00',
+        isStrictModeActive: true,
+        initialTime: '10:00',
+        direction: StrictBoundDirection.Earlier,
+      })
+
+      expect(result.isValid).toBe(false)
+    })
+
+    it('validates end time correctly', () => {
+      const result = validateStrictModeTime({
+        newTime: '17:00',
+        isStrictModeActive: true,
+        initialTime: '18:00',
+        direction: StrictBoundDirection.Later,
+      })
+
+      expect(result.isValid).toBe(false)
+    })
+
+    it('passes otherBound for midnight-spanning detection', () => {
+      const result = validateStrictModeTime({
+        newTime: '00:30',
+        isStrictModeActive: true,
+        initialTime: '23:00',
+        direction: StrictBoundDirection.Earlier,
+        otherBound: '04:00',
+      })
+
+      expect(result.isValid).toBe(false)
     })
   })
 })

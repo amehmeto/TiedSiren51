@@ -9,9 +9,8 @@ import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 import {
-  StrictBound,
   StrictBoundDirection,
-  validateStrictBoundTime,
+  validateStrictModeTime,
 } from '@/ui/screens/Home/shared/validateStrictBoundTime'
 import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
 
@@ -33,6 +32,8 @@ type SelectTimeProps = Readonly<{
   setFieldValue: (field: string, value: string) => void
   handleChange: (field: TimeField) => void
   initialTime?: string | null
+  /** The initial value of the other time field, for midnight-spanning session detection */
+  initialOtherTime?: string | null
 }>
 
 export function SelectTime({
@@ -43,6 +44,7 @@ export function SelectTime({
   setFieldValue,
   handleChange,
   initialTime,
+  initialOtherTime,
 }: SelectTimeProps) {
   const dispatch = useDispatch<AppDispatch>()
   const { dateProvider } = dependencies
@@ -56,14 +58,10 @@ export function SelectTime({
       ? (values.startedAt ?? localeNow)
       : (values.endedAt ?? localeNow)
 
-  const strictBound: StrictBound | undefined = (() => {
-    if (!isStrictModeActive || !initialTime) return undefined
-    const direction =
-      timeField === TimeField.StartedAt
-        ? StrictBoundDirection.Earlier
-        : StrictBoundDirection.Later
-    return { direction, limit: initialTime }
-  })()
+  const direction =
+    timeField === TimeField.StartedAt
+      ? StrictBoundDirection.Earlier
+      : StrictBoundDirection.Later
 
   const placeholder =
     timeField === TimeField.StartedAt
@@ -80,12 +78,17 @@ export function SelectTime({
   const handleTimeChange = (time: string) => {
     const formattedTime = formatTimeString(time)
 
-    if (strictBound) {
-      const validation = validateStrictBoundTime(formattedTime, strictBound)
-      if (!validation.isValid) {
-        dispatch(showToast(validation.errorMessage))
-        return
-      }
+    const validation = validateStrictModeTime({
+      newTime: formattedTime,
+      isStrictModeActive,
+      initialTime,
+      direction,
+      otherBound: initialOtherTime,
+    })
+
+    if (!validation.isValid) {
+      dispatch(showToast(validation.errorMessage))
+      return
     }
 
     setFieldValue(timeField, formattedTime)

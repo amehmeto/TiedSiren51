@@ -6,40 +6,109 @@ export enum StrictBoundDirection {
 export type StrictBound = Readonly<{
   direction: StrictBoundDirection
   limit: string
+  /** The other time boundary of the session, used to detect midnight spans */
+  otherBound?: string
 }>
 
 type ValidationResult = Readonly<
   { isValid: true } | { isValid: false; errorMessage: string }
 >
 
+export type StrictModeTimeValidationParams = Readonly<{
+  newTime: string
+  isStrictModeActive: boolean
+  initialTime?: string | null
+  direction: StrictBoundDirection
+  /** The other time boundary of the session, used to detect midnight spans */
+  otherBound?: string | null
+}>
+
 /**
- * Validates a time change against a strict bound constraint.
+ * Checks if a session spans midnight (e.g., 23:00 → 04:00)
+ */
+function sessionSpansMidnight(startTime: string, endTime: string): boolean {
+  return startTime > endTime
+}
+
+/**
+ * Validates a time change in strict mode context.
+ *
+ * Returns { isValid: true } if:
+ * - Strict mode is not active
+ * - No initial time to compare against
+ * - The new time is valid per strict mode rules
  *
  * During strict mode:
  * - Start times can only be moved earlier (not later)
  * - End times can only be moved later (not earlier)
  *
- * @param newTime - The new time in HH:mm format
- * @param strictBound - The bound constraint with direction and limit
- * @returns Discriminated union: { isValid: true } or { isValid: false, errorMessage: string }
- *
- * @note This uses lexicographic string comparison which works correctly for
- * HH:mm format within a single day. Sessions spanning midnight are not
- * currently supported and may produce unexpected results.
+ * For sessions spanning midnight (e.g., 23:00 → 04:00):
+ * - Start times must stay in the "evening zone" (after end time, up to limit)
+ * - End times must stay in the "morning zone" (from limit, before start time)
+ */
+export function validateStrictModeTime(
+  params: StrictModeTimeValidationParams,
+): ValidationResult {
+  const { newTime, isStrictModeActive, initialTime, direction, otherBound } =
+    params
+
+  // No validation needed if strict mode is inactive or no initial time
+  if (!isStrictModeActive || !initialTime) return { isValid: true }
+
+  const strictBound: StrictBound = {
+    direction,
+    limit: initialTime,
+    otherBound: otherBound ?? undefined,
+  }
+
+  return validateStrictBoundTime(newTime, strictBound)
+}
+
+/**
+ * Core validation logic for strict bound time constraints.
+ * Prefer using validateStrictModeTime for a simpler API.
  */
 export function validateStrictBoundTime(
   newTime: string,
   strictBound: StrictBound,
 ): ValidationResult {
-  const isInvalid =
-    strictBound.direction === StrictBoundDirection.Earlier
-      ? newTime > strictBound.limit
-      : newTime < strictBound.limit
+  const { direction, limit, otherBound } = strictBound
+
+  const isInvalid = (() => {
+    if (direction === StrictBoundDirection.Earlier) {
+      // Start time validation: can only move earlier
+      if (newTime > limit) return true
+
+      // If session spans midnight, reject times in the "morning zone"
+      // Session like 23:00 → 04:00: reject times between 00:00 and otherBound (04:00)
+      if (
+        otherBound &&
+        sessionSpansMidnight(limit, otherBound) &&
+        newTime <= otherBound
+      )
+        return true
+
+      return false
+    }
+    // End time validation: can only move later
+    if (newTime < limit) return true
+
+    // If session spans midnight, reject times in the "evening zone"
+    // Session like 23:00 → 04:00: reject times between otherBound (23:00) and 23:59
+    if (
+      otherBound &&
+      sessionSpansMidnight(otherBound, limit) &&
+      newTime >= otherBound
+    )
+      return true
+
+    return false
+  })()
 
   if (!isInvalid) return { isValid: true }
 
   const errorMessage =
-    strictBound.direction === StrictBoundDirection.Earlier
+    direction === StrictBoundDirection.Earlier
       ? 'Cannot set a later start time during strict mode'
       : 'Cannot set an earlier end time during strict mode'
 

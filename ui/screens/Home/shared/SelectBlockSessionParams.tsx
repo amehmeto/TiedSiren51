@@ -72,6 +72,7 @@ export function SelectBlockSessionParams({
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
           initialTime={form.initialValues.startedAt}
+          initialOtherTime={form.initialValues.endedAt}
         />
         {hasFieldError('startedAt') && (
           <FormError error={form.errors.startedAt} />
@@ -84,6 +85,7 @@ export function SelectBlockSessionParams({
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
           initialTime={form.initialValues.endedAt}
+          initialOtherTime={form.initialValues.startedAt}
         />
         {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
         <SelectBlockingCondition form={form} />
