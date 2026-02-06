@@ -21,8 +21,7 @@ type SelectBlockSessionParamsProps = {
 export function SelectBlockSessionParams({
   form,
 }: SelectBlockSessionParamsProps) {
-  const initialValues = form.initialValues
-  const initialDeviceIds = initialValues.devices.map((d) => d.id)
+  const initialDeviceIds = form.initialValues.devices.map((d) => d.id)
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
@@ -54,7 +53,7 @@ export function SelectBlockSessionParams({
         <SelectBlocklistsField
           values={form.values}
           setFieldValue={form.setFieldValue}
-          initialBlocklistIds={initialValues.blocklistIds}
+          initialBlocklistIds={form.initialValues.blocklistIds}
         />
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
@@ -75,7 +74,7 @@ export function SelectBlockSessionParams({
           isTimePickerVisible={isStartTimePickerVisible}
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
-          initialTime={initialValues.startedAt}
+          initialTime={form.initialValues.startedAt}
         />
         {hasFieldError('startedAt') && (
           <FormError error={form.errors.startedAt} />
@@ -87,7 +86,7 @@ export function SelectBlockSessionParams({
           isTimePickerVisible={isEndTimePickerVisible}
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
-          initialTime={initialValues.endedAt}
+          initialTime={form.initialValues.endedAt}
         />
         {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
         <SelectBlockingCondition form={form} />
