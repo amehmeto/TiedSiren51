@@ -1,6 +1,7 @@
 import React from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
+import { assertHHmmString } from '@/core/_ports_/date-provider'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { showToast } from '@/core/toast/toast.slice'
@@ -12,13 +13,6 @@ import {
   StrictBoundDirection,
   validateStrictModeTime,
 } from '@/ui/screens/Home/shared/validateStrictBoundTime'
-
-function parseTimeToDate(timeString: string): Date {
-  const [h, m] = timeString.split(':').map(Number)
-  const d = new Date()
-  d.setHours(h, m, 0, 0)
-  return d
-}
 
 export enum TimeField {
   StartedAt = 'startedAt',
@@ -69,7 +63,8 @@ export function SelectTime({
       ? (values.startedAt ?? `Select start time...`)
       : (values.endedAt ?? `Select end time...`)
 
-  const chosenTimeAsDate = parseTimeToDate(chosenTime)
+  assertHHmmString(chosenTime)
+  const chosenTimeAsDate = dateProvider.recoverDate(chosenTime)
 
   const handleTimeChange = (time: string) => {
     const validation = validateStrictModeTime({
