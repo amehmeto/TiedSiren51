@@ -104,6 +104,7 @@
       "Bash(git push:*)",
       "Bash(git remote:*)",
       "Bash(git rev-parse:*)",
+      "Bash(git rm:*)",
       "Bash(git show:*)",
       "Bash(git stash:*)",
       "Bash(git worktree:*)",

@@ -8,7 +8,7 @@ import {
   StyleSheet,
   Text,
 } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector, useStore } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
@@ -29,6 +29,7 @@ import {
 export default function LoginScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
+  const store = useStore<RootState>()
   const [credentials, setCredentials] = useState({ email: '', password: '' })
 
   const isUserAuthenticated = useSelector((state: RootState) =>
@@ -70,8 +71,14 @@ export default function LoginScreen() {
 
     if (validation.data) {
       const result = await dispatch(signInWithEmail(validation.data))
-      if (signInWithEmail.rejected.match(result))
-        setCredentials((prev) => ({ ...prev, password: '' }))
+      if (signInWithEmail.rejected.match(result)) {
+        const updatedViewModel = selectLoginViewModel(store.getState())
+        if (
+          updatedViewModel.type === LoginViewState.Error &&
+          updatedViewModel.shouldClearPassword
+        )
+          setCredentials((prev) => ({ ...prev, password: '' }))
+      }
     }
   }
 
