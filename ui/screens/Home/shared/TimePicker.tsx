@@ -1,6 +1,7 @@
 import React from 'react'
 import { Platform, StyleSheet } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
+import { HHmmString } from '@/core/_ports_/date-provider'
 import { T } from '@/ui/design-system/theme'
 import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
 
@@ -9,9 +10,9 @@ type TimePickerProps = Readonly<{
   chosenTimeAsDate: Date
   onConfirm: (date: Date) => void
   onCancel: () => void
-  chosenTime: string
+  chosenTime: HHmmString
   handleChange: () => void
-  setTime: (time: string) => void
+  setTime: (time: HHmmString) => void
   setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
 }>
 

@@ -1,3 +1,5 @@
+import { HHmmString } from '@/core/_ports_/date-provider'
+
 export enum StrictBoundDirection {
   Earlier = 'earlier',
   Later = 'later',
@@ -5,9 +7,10 @@ export enum StrictBoundDirection {
 
 export type StrictBound = Readonly<{
   direction: StrictBoundDirection
-  limit: string
+  /** The time limit to validate against (initial time before edit) */
+  initialTime: HHmmString
   /** The other time boundary of the session, used to detect midnight spans */
-  otherBound?: string
+  otherBound?: HHmmString
 }>
 
 type ValidationResult = Readonly<
@@ -15,18 +18,22 @@ type ValidationResult = Readonly<
 >
 
 export type StrictModeTimeValidationParams = Readonly<{
-  newTime: string
+  newTime: HHmmString
   isStrictModeActive: boolean
-  initialTime?: string | null
   direction: StrictBoundDirection
+  /** The time limit to validate against (initial time before edit) */
+  initialTime?: HHmmString | null
   /** The other time boundary of the session, used to detect midnight spans */
-  otherBound?: string | null
+  otherBound?: HHmmString | null
 }>
 
 /**
  * Checks if a session spans midnight (e.g., 23:00 → 04:00)
  */
-function sessionSpansMidnight(startTime: string, endTime: string): boolean {
+function sessionSpansMidnight(
+  startTime: HHmmString,
+  endTime: HHmmString,
+): boolean {
   return startTime > endTime
 }
 
@@ -57,7 +64,7 @@ export function validateStrictModeTime(
 
   const strictBound: StrictBound = {
     direction,
-    limit: initialTime,
+    initialTime,
     otherBound: otherBound ?? undefined,
   }
 
@@ -69,21 +76,21 @@ export function validateStrictModeTime(
  * Prefer using validateStrictModeTime for a simpler API.
  */
 export function validateStrictBoundTime(
-  newTime: string,
+  newTime: HHmmString,
   strictBound: StrictBound,
 ): ValidationResult {
-  const { direction, limit, otherBound } = strictBound
+  const { direction, initialTime, otherBound } = strictBound
 
   const isInvalid = (() => {
     if (direction === StrictBoundDirection.Earlier) {
       // Start time validation: can only move earlier
-      if (newTime > limit) return true
+      if (newTime > initialTime) return true
 
       // If session spans midnight, reject times in the "morning zone"
       // Session like 23:00 → 04:00: reject times between 00:00 and otherBound (04:00)
       if (
         otherBound &&
-        sessionSpansMidnight(limit, otherBound) &&
+        sessionSpansMidnight(initialTime, otherBound) &&
         newTime <= otherBound
       )
         return true
@@ -91,13 +98,13 @@ export function validateStrictBoundTime(
       return false
     }
     // End time validation: can only move later
-    if (newTime < limit) return true
+    if (newTime < initialTime) return true
 
     // If session spans midnight, reject times in the "evening zone"
     // Session like 23:00 → 04:00: reject times between otherBound (23:00) and 23:59
     if (
       otherBound &&
-      sessionSpansMidnight(otherBound, limit) &&
+      sessionSpansMidnight(otherBound, initialTime) &&
       newTime >= otherBound
     )
       return true

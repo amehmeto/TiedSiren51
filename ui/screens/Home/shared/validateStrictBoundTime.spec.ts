@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import { assertHHmmString, HHmmString } from '@/core/_ports_/date-provider'
 import {
   StrictBound,
   StrictBoundDirection,
@@ -6,11 +7,17 @@ import {
   validateStrictModeTime,
 } from './validateStrictBoundTime'
 
+/** Test helper to create HHmmString from string literal */
+function asHHmm(time: string): HHmmString {
+  assertHHmmString(time)
+  return time
+}
+
 describe('validateStrictBoundTime', () => {
   describe('Earlier direction (start time - can only move earlier)', () => {
     const earlierBound: StrictBound = {
       direction: StrictBoundDirection.Earlier,
-      limit: '10:00',
+      initialTime: asHHmm('10:00'),
     }
     const validResult = { isValid: true }
     const invalidResult = {
@@ -18,32 +25,32 @@ describe('validateStrictBoundTime', () => {
       errorMessage: 'Cannot set a later start time during strict mode',
     }
 
-    it('allows setting an earlier time than the limit', () => {
-      const result = validateStrictBoundTime('09:00', earlierBound)
+    it('allows setting an earlier time than the initialTime', () => {
+      const result = validateStrictBoundTime(asHHmm('09:00'), earlierBound)
 
       expect(result).toStrictEqual(validResult)
     })
 
-    it('allows setting the same time as the limit', () => {
-      const result = validateStrictBoundTime('10:00', earlierBound)
+    it('allows setting the same time as the initialTime', () => {
+      const result = validateStrictBoundTime(asHHmm('10:00'), earlierBound)
 
       expect(result).toStrictEqual(validResult)
     })
 
-    it('rejects setting a later time than the limit', () => {
-      const result = validateStrictBoundTime('11:00', earlierBound)
+    it('rejects setting a later time than the initialTime', () => {
+      const result = validateStrictBoundTime(asHHmm('11:00'), earlierBound)
 
       expect(result).toStrictEqual(invalidResult)
     })
 
     it('rejects setting even one minute later', () => {
-      const result = validateStrictBoundTime('10:01', earlierBound)
+      const result = validateStrictBoundTime(asHHmm('10:01'), earlierBound)
 
       expect(result).toStrictEqual(invalidResult)
     })
 
     it('allows setting one minute earlier', () => {
-      const result = validateStrictBoundTime('09:59', earlierBound)
+      const result = validateStrictBoundTime(asHHmm('09:59'), earlierBound)
 
       expect(result).toStrictEqual(validResult)
     })
@@ -52,7 +59,7 @@ describe('validateStrictBoundTime', () => {
   describe('Later direction (end time - can only move later)', () => {
     const laterBound: StrictBound = {
       direction: StrictBoundDirection.Later,
-      limit: '18:00',
+      initialTime: asHHmm('18:00'),
     }
     const validResult = { isValid: true }
     const invalidResult = {
@@ -60,32 +67,32 @@ describe('validateStrictBoundTime', () => {
       errorMessage: 'Cannot set an earlier end time during strict mode',
     }
 
-    it('allows setting a later time than the limit', () => {
-      const result = validateStrictBoundTime('19:00', laterBound)
+    it('allows setting a later time than the initialTime', () => {
+      const result = validateStrictBoundTime(asHHmm('19:00'), laterBound)
 
       expect(result).toStrictEqual(validResult)
     })
 
-    it('allows setting the same time as the limit', () => {
-      const result = validateStrictBoundTime('18:00', laterBound)
+    it('allows setting the same time as the initialTime', () => {
+      const result = validateStrictBoundTime(asHHmm('18:00'), laterBound)
 
       expect(result).toStrictEqual(validResult)
     })
 
-    it('rejects setting an earlier time than the limit', () => {
-      const result = validateStrictBoundTime('17:00', laterBound)
+    it('rejects setting an earlier time than the initialTime', () => {
+      const result = validateStrictBoundTime(asHHmm('17:00'), laterBound)
 
       expect(result).toStrictEqual(invalidResult)
     })
 
     it('rejects setting even one minute earlier', () => {
-      const result = validateStrictBoundTime('17:59', laterBound)
+      const result = validateStrictBoundTime(asHHmm('17:59'), laterBound)
 
       expect(result).toStrictEqual(invalidResult)
     })
 
     it('allows setting one minute later', () => {
-      const result = validateStrictBoundTime('18:01', laterBound)
+      const result = validateStrictBoundTime(asHHmm('18:01'), laterBound)
 
       expect(result).toStrictEqual(validResult)
     })
@@ -95,8 +102,8 @@ describe('validateStrictBoundTime', () => {
     describe('start time validation with otherBound', () => {
       const midnightSpanningStartBound: StrictBound = {
         direction: StrictBoundDirection.Earlier,
-        limit: '23:00',
-        otherBound: '04:00',
+        initialTime: asHHmm('23:00'),
+        otherBound: asHHmm('04:00'),
       }
       const validResult = { isValid: true }
       const invalidResult = {
@@ -106,7 +113,7 @@ describe('validateStrictBoundTime', () => {
 
       it('allows 22:00 as earlier start time (evening zone)', () => {
         const result = validateStrictBoundTime(
-          '22:00',
+          asHHmm('22:00'),
           midnightSpanningStartBound,
         )
 
@@ -115,7 +122,7 @@ describe('validateStrictBoundTime', () => {
 
       it('allows 21:00 as earlier start time (evening zone)', () => {
         const result = validateStrictBoundTime(
-          '21:00',
+          asHHmm('21:00'),
           midnightSpanningStartBound,
         )
 
@@ -124,7 +131,7 @@ describe('validateStrictBoundTime', () => {
 
       it('rejects 23:30 as later than 23:00', () => {
         const result = validateStrictBoundTime(
-          '23:30',
+          asHHmm('23:30'),
           midnightSpanningStartBound,
         )
 
@@ -133,7 +140,7 @@ describe('validateStrictBoundTime', () => {
 
       it('rejects 00:30 as it falls in the morning zone (after midnight)', () => {
         const result = validateStrictBoundTime(
-          '00:30',
+          asHHmm('00:30'),
           midnightSpanningStartBound,
         )
 
@@ -142,7 +149,7 @@ describe('validateStrictBoundTime', () => {
 
       it('rejects 03:00 as it falls in the morning zone (before end time)', () => {
         const result = validateStrictBoundTime(
-          '03:00',
+          asHHmm('03:00'),
           midnightSpanningStartBound,
         )
 
@@ -151,7 +158,7 @@ describe('validateStrictBoundTime', () => {
 
       it('rejects 04:00 as it equals the end time (boundary)', () => {
         const result = validateStrictBoundTime(
-          '04:00',
+          asHHmm('04:00'),
           midnightSpanningStartBound,
         )
 
@@ -160,7 +167,7 @@ describe('validateStrictBoundTime', () => {
 
       it('allows 05:00 as it is after the end time (valid evening zone)', () => {
         const result = validateStrictBoundTime(
-          '05:00',
+          asHHmm('05:00'),
           midnightSpanningStartBound,
         )
 
@@ -171,8 +178,8 @@ describe('validateStrictBoundTime', () => {
     describe('end time validation with otherBound', () => {
       const midnightSpanningEndBound: StrictBound = {
         direction: StrictBoundDirection.Later,
-        limit: '04:00',
-        otherBound: '23:00',
+        initialTime: asHHmm('04:00'),
+        otherBound: asHHmm('23:00'),
       }
       const validResult = { isValid: true }
       const invalidResult = {
@@ -182,7 +189,7 @@ describe('validateStrictBoundTime', () => {
 
       it('allows 05:00 as later end time (morning zone)', () => {
         const result = validateStrictBoundTime(
-          '05:00',
+          asHHmm('05:00'),
           midnightSpanningEndBound,
         )
 
@@ -191,7 +198,7 @@ describe('validateStrictBoundTime', () => {
 
       it('allows 06:00 as later end time (morning zone)', () => {
         const result = validateStrictBoundTime(
-          '06:00',
+          asHHmm('06:00'),
           midnightSpanningEndBound,
         )
 
@@ -200,7 +207,7 @@ describe('validateStrictBoundTime', () => {
 
       it('rejects 03:00 as earlier than 04:00', () => {
         const result = validateStrictBoundTime(
-          '03:00',
+          asHHmm('03:00'),
           midnightSpanningEndBound,
         )
 
@@ -209,7 +216,7 @@ describe('validateStrictBoundTime', () => {
 
       it('rejects 23:00 as it falls in the evening zone (at start time)', () => {
         const result = validateStrictBoundTime(
-          '23:00',
+          asHHmm('23:00'),
           midnightSpanningEndBound,
         )
 
@@ -218,7 +225,7 @@ describe('validateStrictBoundTime', () => {
 
       it('rejects 23:30 as it falls in the evening zone (after start time)', () => {
         const result = validateStrictBoundTime(
-          '23:30',
+          asHHmm('23:30'),
           midnightSpanningEndBound,
         )
 
@@ -227,7 +234,7 @@ describe('validateStrictBoundTime', () => {
 
       it('allows 22:00 as it is before start time (valid morning zone)', () => {
         const result = validateStrictBoundTime(
-          '22:00',
+          asHHmm('22:00'),
           midnightSpanningEndBound,
         )
 
@@ -240,21 +247,25 @@ describe('validateStrictBoundTime', () => {
     it('compares times with leading zeros correctly', () => {
       const bound: StrictBound = {
         direction: StrictBoundDirection.Earlier,
-        limit: '09:00',
+        initialTime: asHHmm('09:00'),
       }
 
-      expect(validateStrictBoundTime('08:59', bound).isValid).toBe(true)
-      expect(validateStrictBoundTime('09:01', bound).isValid).toBe(false)
+      expect(validateStrictBoundTime(asHHmm('08:59'), bound).isValid).toBe(true)
+      expect(validateStrictBoundTime(asHHmm('09:01'), bound).isValid).toBe(
+        false,
+      )
     })
 
     it('handles single-digit-looking times in HH:mm format', () => {
       const bound: StrictBound = {
         direction: StrictBoundDirection.Later,
-        limit: '01:05',
+        initialTime: asHHmm('01:05'),
       }
 
-      expect(validateStrictBoundTime('01:04', bound).isValid).toBe(false)
-      expect(validateStrictBoundTime('01:06', bound).isValid).toBe(true)
+      expect(validateStrictBoundTime(asHHmm('01:04'), bound).isValid).toBe(
+        false,
+      )
+      expect(validateStrictBoundTime(asHHmm('01:06'), bound).isValid).toBe(true)
     })
   })
 })
@@ -265,9 +276,9 @@ describe('validateStrictModeTime', () => {
   describe('when strict mode is inactive', () => {
     it('allows any time change', () => {
       const result = validateStrictModeTime({
-        newTime: '23:00',
+        newTime: asHHmm('23:00'),
         isStrictModeActive: false,
-        initialTime: '10:00',
+        initialTime: asHHmm('10:00'),
         direction: StrictBoundDirection.Earlier,
       })
 
@@ -278,7 +289,7 @@ describe('validateStrictModeTime', () => {
   describe('when initialTime is null', () => {
     it('allows any time change', () => {
       const result = validateStrictModeTime({
-        newTime: '23:00',
+        newTime: asHHmm('23:00'),
         isStrictModeActive: true,
         initialTime: null,
         direction: StrictBoundDirection.Earlier,
@@ -291,9 +302,9 @@ describe('validateStrictModeTime', () => {
   describe('when strict mode is active with initialTime', () => {
     it('validates start time correctly', () => {
       const result = validateStrictModeTime({
-        newTime: '11:00',
+        newTime: asHHmm('11:00'),
         isStrictModeActive: true,
-        initialTime: '10:00',
+        initialTime: asHHmm('10:00'),
         direction: StrictBoundDirection.Earlier,
       })
 
@@ -302,9 +313,9 @@ describe('validateStrictModeTime', () => {
 
     it('validates end time correctly', () => {
       const result = validateStrictModeTime({
-        newTime: '17:00',
+        newTime: asHHmm('17:00'),
         isStrictModeActive: true,
-        initialTime: '18:00',
+        initialTime: asHHmm('18:00'),
         direction: StrictBoundDirection.Later,
       })
 
@@ -313,11 +324,11 @@ describe('validateStrictModeTime', () => {
 
     it('passes otherBound for midnight-spanning detection', () => {
       const result = validateStrictModeTime({
-        newTime: '00:30',
+        newTime: asHHmm('00:30'),
         isStrictModeActive: true,
-        initialTime: '23:00',
+        initialTime: asHHmm('23:00'),
         direction: StrictBoundDirection.Earlier,
-        otherBound: '04:00',
+        otherBound: asHHmm('04:00'),
       })
 
       expect(result.isValid).toBe(false)

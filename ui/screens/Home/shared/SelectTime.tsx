@@ -1,7 +1,7 @@
 import React from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { assertHHmmString } from '@/core/_ports_/date-provider'
+import { assertHHmmString, HHmmString } from '@/core/_ports_/date-provider'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { showToast } from '@/core/toast/toast.slice'
@@ -26,9 +26,9 @@ type SelectTimeProps = Readonly<{
   isTimePickerVisible?: boolean
   setFieldValue: (field: string, value: string) => void
   handleChange: (field: TimeField) => void
-  initialTime?: string | null
+  initialTime?: HHmmString | null
   /** The initial value of the other time field, for midnight-spanning session detection */
-  initialOtherTime?: string | null
+  initialOtherTime?: HHmmString | null
 }>
 
 export function SelectTime({
@@ -66,7 +66,7 @@ export function SelectTime({
   assertHHmmString(chosenTime)
   const chosenTimeAsDate = dateProvider.recoverDate(chosenTime)
 
-  const handleTimeChange = (time: string) => {
+  const handleTimeChange = (time: HHmmString) => {
     const validation = validateStrictModeTime({
       newTime: time,
       isStrictModeActive,

@@ -37,7 +37,8 @@ export const TimerPickerModal = ({
   const { dateProvider } = dependencies
   const endDateTime = useMemo(
     () => formatEndFromOffsets({ ...duration, dateProvider }),
-    [duration, dateProvider],
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- dateProvider is a stable singleton
+    [duration],
   )
 
   const handleSave = () => {
