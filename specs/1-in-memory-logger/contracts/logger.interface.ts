@@ -7,7 +7,11 @@
  * Location: core/_ports_/logger.ts
  */
 
-export type LogLevel = 'info' | 'warn' | 'error'
+export enum LogLevel {
+  Info = 'info',
+  Warn = 'warn',
+  Error = 'error',
+}
 
 export interface LogEntry {
   timestamp: string // ISO 8601 format

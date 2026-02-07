@@ -17,10 +17,19 @@ type IconComponentProps = {
   style?: StyleProp<TextStyle>
 }
 
+export enum Platform {
+  Android = 'Android',
+  IOS = 'iOS',
+  Web = 'web',
+  MacOS = 'macOS',
+  Windows = 'Windows',
+  Linux = 'Linux',
+}
+
 type BlocksPreviewCardProps = Readonly<{
   IconTag: React.ComponentType<IconComponentProps>
   iconName: string
-  platform: 'Android' | 'iOS' | 'web' | 'macOS' | 'Windows' | 'Linux'
+  platform: Platform
   blocksNumber: number
   onPress: () => void
 }>

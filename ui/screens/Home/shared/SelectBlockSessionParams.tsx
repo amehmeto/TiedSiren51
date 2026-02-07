@@ -1,9 +1,6 @@
 import { FormikProps } from 'formik'
 import { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/core/_redux_/createStore'
-import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
 import { Device } from '@/core/device/device'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -15,7 +12,7 @@ import { FormError } from '@/ui/screens/Home/shared/FormError'
 import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlockingCondition'
 import { SelectBlocklistsField } from '@/ui/screens/Home/shared/SelectBlocklistsField'
 import { SelectDevicesField } from '@/ui/screens/Home/shared/SelectDevicesField'
-import { SelectTime } from '@/ui/screens/Home/shared/SelectTime'
+import { SelectTime, TimeField } from '@/ui/screens/Home/shared/SelectTime'
 
 type SelectBlockSessionParamsProps = {
   form: FormikProps<BlockSessionFormValues>
@@ -29,10 +26,6 @@ export function SelectBlockSessionParams({
     useState<boolean>(false)
   const [isEndTimePickerVisible, setIsEndTimePickerVisible] =
     useState<boolean>(false)
-
-  const blocklists = useSelector((state: RootState) =>
-    selectAllBlocklists(state),
-  )
 
   useEffect(() => {
     dependencies.deviceRepository.findAll().then((foundDevices) => {
@@ -57,39 +50,42 @@ export function SelectBlockSessionParams({
         />
         {hasFieldError('name') && <FormError error={form.errors.name} />}
         <SelectBlocklistsField
-          values={form.values}
+          blocklistIds={form.values.blocklistIds}
           setFieldValue={form.setFieldValue}
-          items={blocklists}
         />
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
         )}
         <SelectDevicesField
-          values={form.values}
+          selectedDevices={form.values.devices}
           setFieldValue={form.setFieldValue}
-          items={devices}
+          availableDevices={devices}
         />
         {hasFieldError('devices') && (
           <FieldErrors errors={form.errors} fieldName={'devices'} />
         )}
         <SelectTime
-          timeField={'startedAt'}
+          timeField={TimeField.StartedAt}
           setIsTimePickerVisible={setIsStartTimePickerVisible}
           values={form.values}
           isTimePickerVisible={isStartTimePickerVisible}
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
+          initialTime={form.initialValues.startedAt}
+          initialOtherTime={form.initialValues.endedAt}
         />
         {hasFieldError('startedAt') && (
           <FormError error={form.errors.startedAt} />
         )}
         <SelectTime
-          timeField={'endedAt'}
+          timeField={TimeField.EndedAt}
           setIsTimePickerVisible={setIsEndTimePickerVisible}
           values={form.values}
           isTimePickerVisible={isEndTimePickerVisible}
           setFieldValue={form.setFieldValue}
           handleChange={form.handleChange}
+          initialTime={form.initialValues.endedAt}
+          initialOtherTime={form.initialValues.startedAt}
         />
         {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
         <SelectBlockingCondition form={form} />

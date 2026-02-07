@@ -39,6 +39,7 @@ export interface DateProvider {
   recoverDate(timeInHHmm: HHmmString): Date
   recoverYesterdayDate(startedAt: HHmmString): Date
   toHHmm(date: Date): HHmmString
+  to12HourTime(date: Date): string
   getMinutesFromNow(minutes: number): Date
   getHHmmMinutesFromNow(minutes: number): HHmmString
   parseISOString(isoString: ISODateString): Date

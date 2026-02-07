@@ -1,5 +1,5 @@
-import { BlocklistForm } from '@/ui/screens/Blocklists/BlocklistForm'
+import { BlocklistForm, FormMode } from '@/ui/screens/Blocklists/BlocklistForm'
 
 export default function CreateBlocklistScreen() {
-  return <BlocklistForm mode="create" />
+  return <BlocklistForm mode={FormMode.Create} />
 }

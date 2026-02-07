@@ -1,34 +1,29 @@
-import { FormikErrors } from 'formik'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { Blocklist } from '@/core/blocklist/blocklist'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/core/_redux_/createStore'
+import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
 import { T } from '@/ui/design-system/theme'
 import { BlocklistsModal } from '@/ui/screens/Home/shared/BlocklistsModal'
-import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 
 type SelectBlocklistsFieldProps = Readonly<{
-  values: BlockSessionFormValues
-  setFieldValue: (
-    field: string,
-    value: string[],
-    shouldValidate?: boolean,
-  ) => Promise<void | FormikErrors<BlockSessionFormValues>>
-  items: Blocklist[]
+  blocklistIds: string[]
+  setFieldValue: (field: string, value: string[]) => void
 }>
 
 export function SelectBlocklistsField({
-  values,
+  blocklistIds,
   setFieldValue,
-  items,
 }: SelectBlocklistsFieldProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-
-  const selectedIds = values.blocklistIds
+  const blocklists = useSelector((state: RootState) =>
+    selectAllBlocklists(state),
+  )
   const displayText =
-    selectedIds.length === 0
+    blocklistIds.length === 0
       ? 'Select blocklists...'
-      : items
-          .filter((bl) => selectedIds.includes(bl.id))
+      : blocklists
+          .filter((bl) => blocklistIds.includes(bl.id))
           .map((bl) => bl.name)
           .join(', ')
 
@@ -42,10 +37,9 @@ export function SelectBlocklistsField({
       </View>
       <BlocklistsModal
         isVisible={isModalOpen}
-        currentSelections={selectedIds}
+        currentSelections={blocklistIds}
         onRequestClose={() => setIsModalOpen(false)}
         setFieldValue={setFieldValue}
-        items={items}
       />
     </>
   )

@@ -1,10 +1,11 @@
 import { useRouter } from 'expo-router'
 import { Formik } from 'formik'
 import uuid from 'react-native-uuid'
-import { useDispatch } from 'react-redux'
-import { assertHHmmString } from '@/core/_ports_/date-provider'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { useDispatch, useSelector } from 'react-redux'
+import { assertHHmmString, HHmmString } from '@/core/_ports_/date-provider'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { BlockingConditions } from '@/core/block-session/block-session'
+import { selectBlockSessionById } from '@/core/block-session/selectors/selectBlockSessionById'
 import { createBlockSession } from '@/core/block-session/usecases/create-block-session.usecase'
 import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
 import { Device } from '@/core/device/device'
@@ -17,8 +18,8 @@ export type BlockSessionFormValues = {
   name: string | null
   blocklistIds: string[]
   devices: Device[]
-  startedAt: string | null
-  endedAt: string | null
+  startedAt: HHmmString | null
+  endedAt: HHmmString | null
   blockingConditions: BlockingConditions[]
 }
 
@@ -32,17 +33,18 @@ const defaultFormValues: BlockSessionFormValues = {
   blockingConditions: [],
 }
 
-type BlockSessionFormProps = Readonly<{
-  mode: 'create' | 'edit'
-  initialValues?: BlockSessionFormValues
-}>
+type BlockSessionFormProps = Readonly<
+  { mode: 'create' } | { mode: 'edit'; sessionId: string }
+>
 
-export function BlockSessionForm({
-  initialValues = defaultFormValues,
-  mode,
-}: BlockSessionFormProps) {
+export function BlockSessionForm({ mode, ...rest }: BlockSessionFormProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const sessionId = 'sessionId' in rest ? rest.sessionId : undefined
+  const blockSession = useSelector((state: RootState) =>
+    sessionId ? selectBlockSessionById(state, sessionId) : undefined,
+  )
+  const initialValues = blockSession ?? defaultFormValues
 
   function saveBlockSession() {
     return (values: BlockSessionFormValues) => {

@@ -1,9 +1,10 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
+import { assertHHmmString, HHmmString } from '@/core/_ports_/date-provider'
 
 type WebTimePickerProps = Readonly<{
-  chosenTime: string
-  setTime: (chosenTime: string) => void
+  chosenTime: HHmmString
+  setTime: (chosenTime: HHmmString) => void
   handleChange: (field: string) => void
   setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
 }>
@@ -16,6 +17,7 @@ export function WebTimePicker({
 }: WebTimePickerProps) {
   const handleTimeChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const time = event.target.value
+    assertHHmmString(time)
     handleChange(time)
     setTime(time)
   }

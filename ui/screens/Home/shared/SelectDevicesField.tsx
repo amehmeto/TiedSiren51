@@ -1,29 +1,22 @@
-import { FormikErrors } from 'formik'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { Device } from '@/core/device/device'
 import { T } from '@/ui/design-system/theme'
-import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { DevicesModal } from '@/ui/screens/Home/shared/DevicesModal'
 
 type SelectDevicesFieldProps = Readonly<{
-  values: BlockSessionFormValues
-  setFieldValue: (
-    field: string,
-    value: Device[],
-    shouldValidate?: boolean,
-  ) => Promise<void | FormikErrors<BlockSessionFormValues>>
-  items: Device[]
+  selectedDevices: Device[]
+  setFieldValue: (field: string, value: Device[]) => void
+  availableDevices: Device[]
 }>
 
 export function SelectDevicesField({
-  values,
+  selectedDevices,
   setFieldValue,
-  items,
+  availableDevices,
 }: SelectDevicesFieldProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
-  const selectedDevices = values.devices
   const displayText =
     selectedDevices.length === 0
       ? 'Select devices...'
@@ -42,7 +35,7 @@ export function SelectDevicesField({
         currentSelections={selectedDevices}
         onRequestClose={() => setIsModalOpen(false)}
         setFieldValue={setFieldValue}
-        items={items}
+        devices={availableDevices}
       />
     </>
   )

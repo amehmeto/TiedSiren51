@@ -35,9 +35,9 @@ export function validateForgotPasswordInput(
 export function getForgotPasswordValidationError(email: string): string | null {
   const validation = validateForgotPasswordInput({ email })
 
-  if (!validation.isValid) return Object.values(validation.errors).join(', ')
-
-  return null
+  return !validation.isValid
+    ? Object.values(validation.errors).join(', ')
+    : null
 }
 
 function validateWithSchema<T>(

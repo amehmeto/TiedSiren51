@@ -8,15 +8,15 @@ export class InMemoryLogger implements Logger {
   }
 
   info(message: string): void {
-    this.log('info', message)
+    this.log(LogLevel.Info, message)
   }
 
   warn(message: string): void {
-    this.log('warn', message)
+    this.log(LogLevel.Warn, message)
   }
 
   error(message: string): void {
-    this.log('error', message)
+    this.log(LogLevel.Error, message)
   }
 
   getLogs(): LogEntry[] {

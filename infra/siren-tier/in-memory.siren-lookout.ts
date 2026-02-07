@@ -1,4 +1,8 @@
-import { AndroidSirenLookout, DetectedSiren } from '@core/_ports_/siren.lookout'
+import {
+  AndroidSirenLookout,
+  DetectedSiren,
+  DetectedSirenType,
+} from '@core/_ports_/siren.lookout'
 
 /**
  * In-memory implementation of SirenLookout for testing purposes.
@@ -42,7 +46,7 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
   simulateDetection(packageName: string): void {
     if (this.listener) {
       this.listener({
-        type: 'app',
+        type: DetectedSirenType.App,
         identifier: packageName,
         timestamp: Date.now(),
       })

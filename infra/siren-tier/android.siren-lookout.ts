@@ -1,7 +1,11 @@
 import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import type { AccessibilityEventSubscription } from '@amehmeto/expo-accessibility-service'
 import { Logger } from '@/core/_ports_/logger'
-import { AndroidSirenLookout, DetectedSiren } from '@core/_ports_/siren.lookout'
+import {
+  AndroidSirenLookout,
+  DetectedSiren,
+  DetectedSirenType,
+} from '@core/_ports_/siren.lookout'
 
 export class RealAndroidSirenLookout implements AndroidSirenLookout {
   private listener?: (siren: DetectedSiren) => void
@@ -81,7 +85,7 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
           // Notify the listener with DetectedSiren format
           if (this.listener) {
             this.listener({
-              type: 'app',
+              type: DetectedSirenType.App,
               identifier: packageName,
               timestamp: Date.now(),
             })
