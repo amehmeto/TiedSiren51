@@ -13,7 +13,7 @@ export type StrictBound = Readonly<{
   otherBound?: HHmmString
 }>
 
-type ValidationResult = Readonly<
+export type ValidationResult = Readonly<
   { isValid: true } | { isValid: false; errorMessage: string }
 >
 

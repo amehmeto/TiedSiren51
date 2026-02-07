@@ -5,7 +5,7 @@ import {
   StrictBoundDirection,
   validateStrictBoundTime,
   validateStrictModeTime,
-} from './validateStrictBoundTime'
+} from './validate-strict-bound-time'
 
 /** Test helper to create HHmmString from string literal */
 function asHHmm(time: string): HHmmString {

@@ -14,6 +14,7 @@
       "Bash(.claude/hooks/validate-edit.sh scripts/ci-watch.sh)",
       "Bash(/opt/homebrew/bin/shellcheck --version)",
       "Bash(/usr/local/bin/shellcheck:*)",
+      "Bash(GIT_DIR=/Users/arthurmehmetoglu/Development/tied-siren-project/TiedSiren51/.git/worktrees/258-feat-TS258-enforce-stricter-only-editing-of-block-sessions GIT_WORK_TREE=/Users/arthurmehmetoglu/Development/tied-siren-project/worktrees/258-feat-TS258-enforce-stricter-only-editing-of-block-sessions git status:*)",
       "Bash(OWNER=$(gh repo view --json owner -q '.owner.login') && gh project item-list:*)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(adb devices:*)",

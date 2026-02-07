@@ -4,15 +4,15 @@ import { useDispatch, useSelector } from 'react-redux'
 import { assertHHmmString, HHmmString } from '@/core/_ports_/date-provider'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import {
+  StrictBoundDirection,
+  validateStrictModeTime,
+} from '@/core/strict-mode/validate-strict-bound-time'
 import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { TimePicker } from '@/ui/screens/Home/shared/TimePicker'
-import {
-  StrictBoundDirection,
-  validateStrictModeTime,
-} from '@/ui/screens/Home/shared/validateStrictBoundTime'
 
 export enum TimeField {
   StartedAt = 'startedAt',
