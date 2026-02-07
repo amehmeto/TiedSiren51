@@ -20,6 +20,10 @@ import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSClos
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
+import {
+  SignUpViewState,
+  selectSignUpViewModel,
+} from '@/ui/screens/Auth/SignUp/signup.view-model'
 
 export default function SignUpScreen() {
   const router = useRouter()
@@ -29,7 +33,9 @@ export default function SignUpScreen() {
     password: '',
   })
 
-  const { isLoading, error } = useSelector((state: RootState) => state.auth)
+  const viewModel = useSelector((state: RootState) =>
+    selectSignUpViewModel(state),
+  )
 
   useEffect(() => {
     dispatch(clearAuthState())
@@ -62,14 +68,17 @@ export default function SignUpScreen() {
   const handleEmailChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, email: text }))
 
-    if (error) dispatch(clearError())
+    if (viewModel.type === SignUpViewState.Error) dispatch(clearError())
   }
 
   const handlePasswordChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, password: text }))
 
-    if (error) dispatch(clearError())
+    if (viewModel.type === SignUpViewState.Error) dispatch(clearError())
   }
+
+  const error =
+    viewModel.type === SignUpViewState.Error ? viewModel.error : undefined
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
@@ -117,8 +126,8 @@ export default function SignUpScreen() {
 
         <TiedSButton
           onPress={handleSignUp}
-          text={isLoading ? 'CREATING ACCOUNT...' : 'CREATE YOUR ACCOUNT'}
-          isDisabled={isLoading}
+          text={viewModel.buttonText}
+          isDisabled={viewModel.isInputDisabled}
         />
         {error && (
           <Text
