@@ -13,11 +13,6 @@ import {
   validateStrictModeTime,
 } from '@/ui/screens/Home/shared/validateStrictBoundTime'
 
-function formatTimeString(time: string): string {
-  const [hours, minutes] = time.split(':').map(Number)
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
-}
-
 function parseTimeToDate(timeString: string): Date {
   const [h, m] = timeString.split(':').map(Number)
   const d = new Date()
@@ -77,10 +72,8 @@ export function SelectTime({
   const chosenTimeAsDate = parseTimeToDate(chosenTime)
 
   const handleTimeChange = (time: string) => {
-    const formattedTime = formatTimeString(time)
-
     const validation = validateStrictModeTime({
-      newTime: formattedTime,
+      newTime: time,
       isStrictModeActive,
       initialTime,
       direction,
@@ -92,7 +85,7 @@ export function SelectTime({
       return
     }
 
-    setFieldValue(timeField, formattedTime)
+    setFieldValue(timeField, time)
   }
 
   return (
