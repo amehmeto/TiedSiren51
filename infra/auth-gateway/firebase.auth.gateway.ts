@@ -35,6 +35,7 @@ enum FirebaseAuthErrorCode {
   CancelledByUser = 'auth/cancelled-popup-request',
   UserNotFound = 'auth/user-not-found',
   TooManyRequests = 'auth/too-many-requests',
+  NetworkRequestFailed = 'auth/network-request-failed',
 }
 
 enum GoogleSignInError {
@@ -61,6 +62,8 @@ export class FirebaseAuthGateway implements AuthGateway {
     [FirebaseAuthErrorCode.UserNotFound]: 'No account found with this email.',
     [FirebaseAuthErrorCode.TooManyRequests]:
       'Too many requests. Please try again later.',
+    [FirebaseAuthErrorCode.NetworkRequestFailed]:
+      'No internet connection. Please check your network and try again.',
   }
 
   private static readonly GOOGLE_SIGN_IN_ERRORS: Record<

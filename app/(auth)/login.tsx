@@ -21,6 +21,10 @@ import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSClos
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
+import {
+  LoginViewState,
+  selectLoginViewModel,
+} from '@/ui/screens/Auth/Login/login.view-model'
 
 export default function LoginScreen() {
   const router = useRouter()
@@ -31,7 +35,9 @@ export default function LoginScreen() {
     selectIsUserAuthenticated(state),
   )
 
-  const { isLoading, error } = useSelector((state: RootState) => state.auth)
+  const viewModel = useSelector((state: RootState) =>
+    selectLoginViewModel(state),
+  )
 
   useEffect(() => {
     if (isUserAuthenticated) router.push('/')
@@ -62,20 +68,27 @@ export default function LoginScreen() {
       return
     }
 
-    if (validation.data) await dispatch(signInWithEmail(validation.data))
+    if (validation.data) {
+      const result = await dispatch(signInWithEmail(validation.data))
+      if (signInWithEmail.rejected.match(result))
+        setCredentials((prev) => ({ ...prev, password: '' }))
+    }
   }
 
   const handleEmailChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, email: text }))
 
-    if (error) dispatch(clearError())
+    if (viewModel.type === LoginViewState.Error) dispatch(clearError())
   }
 
   const handlePasswordChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, password: text }))
 
-    if (error) dispatch(clearError())
+    if (viewModel.type === LoginViewState.Error) dispatch(clearError())
   }
+
+  const error =
+    viewModel.type === LoginViewState.Error ? viewModel.error : undefined
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
@@ -124,9 +137,9 @@ export default function LoginScreen() {
 
         <TiedSButton
           onPress={handleSignIn}
-          text={isLoading ? 'LOGGING IN...' : 'LOG IN'}
+          text={viewModel.buttonText}
           style={styles.button}
-          isDisabled={isLoading}
+          isDisabled={viewModel.isInputDisabled}
         />
         {error && (
           <Text

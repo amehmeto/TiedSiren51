@@ -1,0 +1,92 @@
+import { describe, expect, it } from 'vitest'
+import { stateBuilder } from '@/core/_tests_/state-builder'
+import {
+  SignUpViewModel,
+  SignUpViewState,
+  selectSignUpViewModel,
+} from '@/ui/screens/Auth/SignUp/signup.view-model'
+
+describe('selectSignUpViewModel', () => {
+  describe('Idle state', () => {
+    it('should return idle view model when not loading and no error', () => {
+      const state = stateBuilder().build()
+      const expectedViewModel: SignUpViewModel = {
+        type: SignUpViewState.Idle,
+        buttonText: 'CREATE YOUR ACCOUNT',
+        isInputDisabled: false,
+      }
+
+      const viewModel = selectSignUpViewModel(state)
+
+      expect(viewModel).toStrictEqual(expectedViewModel)
+    })
+  })
+
+  describe('Loading state', () => {
+    it('should return loading view model when auth is loading', () => {
+      const state = stateBuilder().withAuthLoading(true).build()
+      const expectedViewModel: SignUpViewModel = {
+        type: SignUpViewState.Loading,
+        buttonText: 'CREATING ACCOUNT...',
+        isInputDisabled: true,
+      }
+
+      const viewModel = selectSignUpViewModel(state)
+
+      expect(viewModel).toStrictEqual(expectedViewModel)
+    })
+  })
+
+  describe('Error state', () => {
+    it('should return error view model for email already in use', () => {
+      const state = stateBuilder()
+        .withAuthError('This email is already in use.')
+        .build()
+      const expectedViewModel: SignUpViewModel = {
+        type: SignUpViewState.Error,
+        buttonText: 'CREATE YOUR ACCOUNT',
+        isInputDisabled: false,
+        error: 'This email is already in use.',
+      }
+
+      const viewModel = selectSignUpViewModel(state)
+
+      expect(viewModel).toStrictEqual(expectedViewModel)
+    })
+
+    it('should return error view model for weak password', () => {
+      const state = stateBuilder()
+        .withAuthError('Password must be at least 6 characters.')
+        .build()
+      const expectedViewModel: SignUpViewModel = {
+        type: SignUpViewState.Error,
+        buttonText: 'CREATE YOUR ACCOUNT',
+        isInputDisabled: false,
+        error: 'Password must be at least 6 characters.',
+      }
+
+      const viewModel = selectSignUpViewModel(state)
+
+      expect(viewModel).toStrictEqual(expectedViewModel)
+    })
+
+    it('should return error view model for network error', () => {
+      const state = stateBuilder()
+        .withAuthError(
+          'No internet connection. Please check your network and try again.',
+        )
+        .build()
+      const expectedViewModel: SignUpViewModel = {
+        type: SignUpViewState.Error,
+        buttonText: 'CREATE YOUR ACCOUNT',
+        isInputDisabled: false,
+        error:
+          'No internet connection. Please check your network and try again.',
+      }
+
+      const viewModel = selectSignUpViewModel(state)
+
+      expect(viewModel).toStrictEqual(expectedViewModel)
+    })
+  })
+})
