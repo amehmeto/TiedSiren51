@@ -69,6 +69,7 @@ export function selectStrictModeViewModel(
       days: timeLeft.days,
       hours: timeLeft.hours,
       minutes: timeLeft.minutes,
+      dateProvider,
     }),
     inlineRemaining: countdown,
     statusMessage: 'Your blockings are locked against any\nbypassing.',
