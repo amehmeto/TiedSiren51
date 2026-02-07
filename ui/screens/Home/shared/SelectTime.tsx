@@ -1,6 +1,5 @@
 import React from 'react'
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
-import DateTimePickerModal from 'react-native-modal-datetime-picker'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
@@ -8,11 +7,11 @@ import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
+import { TimePicker } from '@/ui/screens/Home/shared/TimePicker'
 import {
   StrictBoundDirection,
   validateStrictModeTime,
 } from '@/ui/screens/Home/shared/validateStrictBoundTime'
-import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
 
 function formatTimeString(time: string): string {
   const [hours, minutes] = time.split(':').map(Number)
@@ -24,57 +23,6 @@ function parseTimeToDate(timeString: string): Date {
   const d = new Date()
   d.setHours(h, m, 0, 0)
   return d
-}
-
-type TimePickerProps = Readonly<{
-  isVisible: boolean
-  chosenTimeAsDate: Date
-  onConfirm: (date: Date) => void
-  onCancel: () => void
-  chosenTime: string
-  handleChange: () => void
-  setTime: (time: string) => void
-  setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
-}>
-
-function renderTimePicker({
-  isVisible,
-  chosenTimeAsDate,
-  onConfirm,
-  onCancel,
-  chosenTime,
-  handleChange,
-  setTime,
-  setIsTimePickerVisible,
-}: TimePickerProps): React.ReactNode {
-  if (Platform.OS === 'web') {
-    if (!isVisible) return null
-    return (
-      <WebTimePicker
-        chosenTime={chosenTime}
-        handleChange={handleChange}
-        setTime={setTime}
-        setIsTimePickerVisible={setIsTimePickerVisible}
-      />
-    )
-  }
-  return (
-    <DateTimePickerModal
-      date={chosenTimeAsDate}
-      isVisible={isVisible}
-      is24Hour={true}
-      mode="time"
-      isDarkModeEnabled={true}
-      themeVariant="dark"
-      accentColor={T.color.lightBlue}
-      buttonTextColorIOS={T.color.lightBlue}
-      textColor={T.color.white}
-      pickerContainerStyleIOS={styles.pickerContainer}
-      modalStyleIOS={styles.modalStyle}
-      onConfirm={onConfirm}
-      onCancel={onCancel}
-    />
-  )
 }
 
 export enum TimeField {
@@ -147,20 +95,6 @@ export function SelectTime({
     setFieldValue(timeField, formattedTime)
   }
 
-  const timePicker = renderTimePicker({
-    isVisible: isTimePickerVisible,
-    chosenTimeAsDate,
-    onConfirm: (date) => {
-      handleTimeChange(dateProvider.toHHmm(date))
-      setIsTimePickerVisible(false)
-    },
-    onCancel: () => setIsTimePickerVisible(false),
-    chosenTime,
-    handleChange: () => handleChange(timeField),
-    setTime: handleTimeChange,
-    setIsTimePickerVisible,
-  })
-
   return (
     <>
       <View style={styles.param}>
@@ -171,7 +105,21 @@ export function SelectTime({
           <Text style={styles.option}>{placeholder}</Text>
         </Pressable>
       </View>
-      <View>{timePicker}</View>
+      <View>
+        <TimePicker
+          isVisible={isTimePickerVisible}
+          chosenTimeAsDate={chosenTimeAsDate}
+          onConfirm={(date) => {
+            handleTimeChange(dateProvider.toHHmm(date))
+            setIsTimePickerVisible(false)
+          }}
+          onCancel={() => setIsTimePickerVisible(false)}
+          chosenTime={chosenTime}
+          handleChange={() => handleChange(timeField)}
+          setTime={handleTimeChange}
+          setIsTimePickerVisible={setIsTimePickerVisible}
+        />
+      </View>
     </>
   )
 }
@@ -191,12 +139,5 @@ const styles = StyleSheet.create({
   option: {
     color: T.color.lightBlue,
     textAlign: 'right',
-  },
-  pickerContainer: {
-    borderRadius: T.border.radius.extraRounded,
-    overflow: 'hidden',
-  },
-  modalStyle: {
-    borderRadius: T.border.radius.extraRounded,
   },
 })
