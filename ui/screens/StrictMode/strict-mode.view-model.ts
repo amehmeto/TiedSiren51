@@ -1,8 +1,8 @@
-import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
 import { DateProvider } from '@/core/_ports_/date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
+import { formatEndFromOffsets } from '@/ui/utils/timeFormat'
 import { TimeLeft } from '@core/strict-mode/time-left'
 
 export enum StrictModeViewState {
@@ -43,26 +43,6 @@ function formatCountdown(timeLeft: TimeLeft): string {
   return parts.join(' ')
 }
 
-function formatEndDateTime(timeLeft: TimeLeft, now: Date): string {
-  const durationMs =
-    timeLeft.days * DAY +
-    timeLeft.hours * HOUR +
-    timeLeft.minutes * MINUTE +
-    timeLeft.seconds * SECOND
-  const endTime = new Date(now.getTime() + durationMs)
-
-  const day = endTime.getDate()
-  const month = endTime.getMonth() + 1
-  const hour = endTime.getHours()
-  const minute = endTime.getMinutes()
-
-  const hour12 = hour % 12 || 12
-  const minuteFormatted = minute.toString().padStart(2, '0')
-  const period = hour >= 12 ? 'p.m.' : 'a.m.'
-
-  return `Ends ${day}/${month}, ${hour12}:${minuteFormatted} ${period}`
-}
-
 export function selectStrictModeViewModel(
   state: RootState,
   dateProvider: DateProvider,
@@ -84,7 +64,12 @@ export function selectStrictModeViewModel(
   return {
     type: StrictModeViewState.Active,
     countdown,
-    endDateTime: formatEndDateTime(timeLeft, dateProvider.getNow()),
+    endDateTime: formatEndFromOffsets({
+      now: dateProvider.getNow(),
+      days: timeLeft.days,
+      hours: timeLeft.hours,
+      minutes: timeLeft.minutes,
+    }),
     inlineRemaining: countdown,
     statusMessage: 'Your blockings are locked against any\nbypassing.',
     buttonText: 'Extend Timer',
