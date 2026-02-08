@@ -11,6 +11,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { z } from 'zod'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { selectBlocklistIdsInActiveOrScheduledSessions } from '@/core/block-session/selectors/selectBlocklistIdsInActiveOrScheduledSessions'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { selectBlocklistById } from '@/core/blocklist/selectors/selectBlocklistById'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
@@ -19,6 +20,10 @@ import { AndroidSiren, Sirens, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
+import { showToast } from '@/core/toast/toast.slice'
+import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
@@ -28,6 +33,10 @@ import { AppsSelectionScene } from '@/ui/screens/Blocklists/AppsSelectionScene'
 import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/ChooseBlockTabBar'
 import { blocklistSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
 import { TextInputSelectionScene } from '@/ui/screens/Blocklists/TextInputSelectionScene'
+import { formatDuration } from '@/ui/screens/StrictMode/format-duration.helper'
+
+const LOCKED_SIREN_TOAST_MESSAGE = (timeLeft: string) =>
+  `Locked (${timeLeft} left)`
 
 export type BlocklistScreenProps = {
   mode: 'create' | 'edit'
@@ -49,6 +58,28 @@ export function BlocklistForm({
 
   const blocklistFromState = useSelector((state: RootState) =>
     blocklistId ? selectBlocklistById(state, blocklistId) : undefined,
+  )
+
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
+
+  const blocklistIdsInSessions = useSelector((state: RootState) =>
+    selectBlocklistIdsInActiveOrScheduledSessions(
+      state,
+      dependencies.dateProvider,
+    ),
+  )
+
+  const isBlocklistInSession =
+    mode === 'edit' && blocklistId
+      ? blocklistIdsInSessions.includes(blocklistId)
+      : false
+
+  const shouldLockSirens = isStrictModeActive && isBlocklistInSession
+
+  const strictModeTimeLeft = useSelector((state: RootState) =>
+    selectStrictModeTimeLeft(state, dependencies.dateProvider),
   )
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
@@ -132,6 +163,41 @@ export function BlocklistForm({
     [blocklist],
   )
 
+  const isSirenLocked = useCallback(
+    (sirenType: SirenType, sirenId: string) => {
+      if (!shouldLockSirens) return false
+      return isSirenSelected(sirenType, sirenId)
+    },
+    [shouldLockSirens, isSirenSelected],
+  )
+
+  const showLockedSirenToast = useCallback(() => {
+    const timeLeftFormatted = formatDuration(strictModeTimeLeft)
+    dispatch(showToast(LOCKED_SIREN_TOAST_MESSAGE(timeLeftFormatted)))
+  }, [dispatch, strictModeTimeLeft])
+
+  const handleToggleAppSiren = useCallback(
+    (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
+      if (isSirenLocked(sirenType, app.packageName)) {
+        showLockedSirenToast()
+        return
+      }
+      toggleAppSiren(sirenType, app)
+    },
+    [isSirenLocked, showLockedSirenToast, toggleAppSiren],
+  )
+
+  const handleToggleTextSiren = useCallback(
+    (sirenType: SirenType, sirenId: string) => {
+      if (isSirenLocked(sirenType, sirenId)) {
+        showLockedSirenToast()
+        return
+      }
+      toggleTextSiren(sirenType, sirenId)
+    },
+    [isSirenLocked, showLockedSirenToast, toggleTextSiren],
+  )
+
   const renderScene = useCallback(
     ({
       route,
@@ -145,8 +211,9 @@ export function BlocklistForm({
         apps: () => (
           <AppsSelectionScene
             androidApps={selectableSirens.android}
-            toggleAppSiren={toggleAppSiren}
+            toggleAppSiren={handleToggleAppSiren}
             isSirenSelected={isSirenSelected}
+            isSirenLocked={isSirenLocked}
           />
         ),
         websites: () => (
@@ -157,8 +224,9 @@ export function BlocklistForm({
             sirenType={SirenType.WEBSITES}
             placeholder={'Add websites...'}
             data={selectableSirens.websites}
-            toggleSiren={toggleTextSiren}
+            toggleSiren={handleToggleTextSiren}
             isSirenSelected={isSirenSelected}
+            isSirenLocked={isSirenLocked}
           />
         ),
         keywords: () => (
@@ -169,8 +237,9 @@ export function BlocklistForm({
             sirenType={SirenType.KEYWORDS}
             placeholder={'Add keywords...'}
             data={selectableSirens.keywords}
-            toggleSiren={toggleTextSiren}
+            toggleSiren={handleToggleTextSiren}
             isSirenSelected={isSirenSelected}
+            isSirenLocked={isSirenLocked}
           />
         ),
       }
@@ -180,9 +249,10 @@ export function BlocklistForm({
     [
       dispatch,
       selectableSirens,
-      toggleAppSiren,
-      toggleTextSiren,
+      handleToggleAppSiren,
+      handleToggleTextSiren,
       isSirenSelected,
+      isSirenLocked,
     ],
   )
 
