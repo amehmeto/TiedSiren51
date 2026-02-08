@@ -70,6 +70,16 @@ describe('selector-state-first-param', () => {
           code: 'const { selectFoo } = { selectFoo: (state) => state.foo }',
           filename: '/core/foo/selectors/selectFoo.ts',
         },
+        // AssignmentPattern state param with default value
+        {
+          code: 'export const selectFoo = (state = initialState) => state.foo',
+          filename: '/core/foo/selectors/selectFoo.ts',
+        },
+        // FunctionDeclaration not starting with select
+        {
+          code: 'export function getSomething(state) { return state.foo }',
+          filename: '/core/foo/selectors/getSomething.ts',
+        },
       ],
 
       invalid: [
@@ -125,6 +135,39 @@ describe('selector-state-first-param', () => {
             {
               messageId: 'stateFirstParam',
               data: { name: 'selectFoo', firstParam: 'id' },
+            },
+          ],
+        },
+        // AssignmentPattern non-state param - should flag
+        {
+          code: 'export const selectFoo = (id = "default", state) => state.foo',
+          filename: '/core/foo/selectors/selectFoo.ts',
+          errors: [
+            {
+              messageId: 'stateFirstParam',
+              data: { name: 'selectFoo', firstParam: 'id' },
+            },
+          ],
+        },
+        // Destructuring pattern as first param - unknown type
+        {
+          code: 'export const selectFoo = ({ id }, state) => state.foo[id]',
+          filename: '/core/foo/selectors/selectFoo.ts',
+          errors: [
+            {
+              messageId: 'stateFirstParam',
+              data: { name: 'selectFoo', firstParam: '<unknown>' },
+            },
+          ],
+        },
+        // Rest parameter as first param - unknown type
+        {
+          code: 'export const selectFoo = (...args) => args[0].foo',
+          filename: '/core/foo/selectors/selectFoo.ts',
+          errors: [
+            {
+              messageId: 'stateFirstParam',
+              data: { name: 'selectFoo', firstParam: '<unknown>' },
             },
           ],
         },

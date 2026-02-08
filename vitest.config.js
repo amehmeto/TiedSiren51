@@ -74,11 +74,14 @@ export default {
           functions: 100,
           lines: 100,
         },
+        // Note: Some eslint rules contain dead/unreachable code that cannot be covered:
+        // - expect-separate-act-assert.cjs: isGenericName function defined but never called
+        // - no-cross-layer-imports.cjs: Dynamic import handler uses outdated ESLint selector
         'eslint-rules/*.cjs': {
-          statements: 95,
-          branches: 85,
-          functions: 95,
-          lines: 95,
+          statements: 97,
+          branches: 92,
+          functions: 99,
+          lines: 97,
         },
       },
     },

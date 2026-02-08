@@ -82,6 +82,88 @@ describe('infra-logger-prefix', () => {
       `,
           filename: '/project/infra/auth/auth.test.ts',
         },
+        // Spec file - should not apply
+        {
+          code: `
+        class TestClass {
+          test() {
+            this.logger.info('No prefix needed in specs')
+          }
+        }
+      `,
+          filename: '/project/infra/auth/auth.spec.ts',
+        },
+        // Fixture file - should not apply
+        {
+          code: `
+        class TestClass {
+          test() {
+            this.logger.info('No prefix needed in fixtures')
+          }
+        }
+      `,
+          filename: '/project/infra/auth/auth.fixture.ts',
+        },
+        // ClassExpression with id - should track class name
+        {
+          code: `
+        const MyClass = class MyClass {
+          method() {
+            this.logger.info('[MyClass] Message')
+          }
+        }
+      `,
+        },
+        // Variable as argument (can't determine) - allowed to avoid false positives
+        {
+          code: `
+        class MyService {
+          method() {
+            this.logger.info(message)
+          }
+        }
+      `,
+        },
+        // Non-log method call - should not apply
+        {
+          code: `
+        class MyService {
+          method() {
+            this.logger.trace('No prefix needed')
+          }
+        }
+      `,
+        },
+        // No first argument - should not apply
+        {
+          code: `
+        class MyService {
+          method() {
+            this.logger.info()
+          }
+        }
+      `,
+        },
+        // Not this.logger - some other object's logger
+        {
+          code: `
+        class MyService {
+          method() {
+            other.logger.info('No prefix needed')
+          }
+        }
+      `,
+        },
+        // Not a MemberExpression for object
+        {
+          code: `
+        class MyService {
+          method() {
+            getLogger().info('No prefix needed')
+          }
+        }
+      `,
+        },
       ],
 
       invalid: [
@@ -180,6 +262,75 @@ describe('infra-logger-prefix', () => {
             {
               messageId: 'missingPrefix',
               data: { method: 'warn', className: 'MyService' },
+            },
+          ],
+        },
+        // ClassExpression with missing prefix - NOT OK
+        {
+          code: `
+        const Service = class MyService {
+          method() {
+            this.logger.info('Message')
+          }
+        }
+      `,
+          output: `
+        const Service = class MyService {
+          method() {
+            this.logger.info('[MyService] Message')
+          }
+        }
+      `,
+          errors: [
+            {
+              messageId: 'missingPrefix',
+              data: { method: 'info', className: 'MyService' },
+            },
+          ],
+        },
+        // Missing prefix with double quotes - NOT OK
+        {
+          code: `
+        class MyService {
+          method() {
+            this.logger.info("Message")
+          }
+        }
+      `,
+          output: `
+        class MyService {
+          method() {
+            this.logger.info("[MyService] Message")
+          }
+        }
+      `,
+          errors: [
+            {
+              messageId: 'missingPrefix',
+              data: { method: 'info', className: 'MyService' },
+            },
+          ],
+        },
+        // debug method missing prefix - NOT OK
+        {
+          code: `
+        class MyService {
+          method() {
+            this.logger.debug('Debug message')
+          }
+        }
+      `,
+          output: `
+        class MyService {
+          method() {
+            this.logger.debug('[MyService] Debug message')
+          }
+        }
+      `,
+          errors: [
+            {
+              messageId: 'missingPrefix',
+              data: { method: 'debug', className: 'MyService' },
             },
           ],
         },

@@ -65,6 +65,36 @@ describe('no-cross-layer-imports', () => {
           code: `import { createSlice } from '@reduxjs/toolkit'`,
           filename: '/project/core/auth/auth.slice.ts',
         },
+        // File not in a recognized layer - should skip
+        {
+          code: `import { something } from '@infra/auth'`,
+          filename: '/project/app/index.ts',
+        },
+        // Spec file - should not apply
+        {
+          code: `import { FirebaseAuthGateway } from '@infra/auth-gateway'`,
+          filename: '/project/core/auth/auth.spec.ts',
+        },
+        // Path alias without slash - should detect layer
+        {
+          code: `import { something } from '@core'`,
+          filename: '/project/infra/gateway/some.gateway.ts',
+        },
+        // Path alias @infra without slash - should detect layer
+        {
+          code: `import { something } from '@infra'`,
+          filename: '/project/infra/gateway/some.gateway.ts',
+        },
+        // Path alias @ui without slash - should detect layer
+        {
+          code: `import { something } from '@ui'`,
+          filename: '/project/ui/screens/Home.tsx',
+        },
+        // Dynamic import with non-literal - should not apply
+        {
+          code: `import(dynamicPath)`,
+          filename: '/project/core/auth/auth.slice.ts',
+        },
       ],
 
       invalid: [
@@ -112,9 +142,17 @@ describe('no-cross-layer-imports', () => {
             },
           ],
         },
-        // Note: Dynamic imports are not currently supported by this rule
-        // (the rule uses CallExpression[callee.type="Import"] but ESLint parses
-        // dynamic imports as ImportExpression nodes)
+        // Relative import to ui from core - NOT OK
+        {
+          code: `import { component } from '../../ui/components/Button'`,
+          filename: '/project/core/auth/auth.slice.ts',
+          errors: [
+            {
+              messageId: 'forbiddenImport',
+              data: { fromLayer: 'core', toLayer: 'ui' },
+            },
+          ],
+        },
       ],
     })
   })

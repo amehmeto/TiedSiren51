@@ -75,6 +75,56 @@ describe('no-stylesheet-magic-numbers', () => {
         })
       `,
         },
+        // Nested object with non-restricted property - OK
+        {
+          code: `
+        const styles = StyleSheet.create({
+          container: {
+            shadowOffset: {
+              width: T.spacing.small,
+              height: T.spacing.small,
+            },
+          }
+        })
+      `,
+        },
+        // Spread element in style object - OK
+        {
+          code: `
+        const styles = StyleSheet.create({
+          container: {
+            ...baseStyles,
+            flex: 1,
+          }
+        })
+      `,
+        },
+        // Computed property key - OK
+        {
+          code: `
+        const styles = StyleSheet.create({
+          container: {
+            ['flex']: 1,
+          }
+        })
+      `,
+        },
+        // No arguments to StyleSheet.create - OK
+        {
+          code: `StyleSheet.create()`,
+        },
+        // Non-object argument to StyleSheet.create - OK
+        {
+          code: `StyleSheet.create(someVariable)`,
+        },
+        // Style property with non-object value - OK
+        {
+          code: `
+        const styles = StyleSheet.create({
+          container: someStyleObject,
+        })
+      `,
+        },
       ],
 
       invalid: [
@@ -202,6 +252,45 @@ describe('no-stylesheet-magic-numbers', () => {
             {
               messageId: 'noMagicNumber',
               data: { value: 50, property: 'height' },
+            },
+          ],
+        },
+        // Nested object with magic number - shadowOffset
+        {
+          code: `
+        const styles = StyleSheet.create({
+          container: {
+            shadowOffset: {
+              width: 10,
+              height: 5,
+            },
+          }
+        })
+      `,
+          errors: [
+            {
+              messageId: 'noMagicNumber',
+              data: { value: 10, property: 'width' },
+            },
+            {
+              messageId: 'noMagicNumber',
+              data: { value: 5, property: 'height' },
+            },
+          ],
+        },
+        // Computed property key with magic number
+        {
+          code: `
+        const styles = StyleSheet.create({
+          box: {
+            ['padding']: 16,
+          }
+        })
+      `,
+          errors: [
+            {
+              messageId: 'noMagicNumber',
+              data: { value: 16, property: 'padding' },
             },
           ],
         },

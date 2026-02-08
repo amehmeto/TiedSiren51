@@ -247,6 +247,83 @@ describe('infra-public-method-try-catch', () => {
       `,
           filename: '/project/infra/auth-gateway/firebase.auth.gateway.ts',
         },
+        // ESNext private method (# syntax) - OK
+        {
+          code: `
+        class FirebaseAuthGateway {
+          async #fetchData() {
+            await this.api.get()
+          }
+        }
+      `,
+          filename: '/project/infra/auth-gateway/firebase.auth.gateway.ts',
+        },
+        // ClassExpression with try-catch - OK
+        {
+          code: `
+        const Gateway = class {
+          async fetch() {
+            try {
+              await this.api.get()
+            } catch (error) {
+              throw error
+            }
+          }
+        }
+      `,
+          filename: '/project/infra/auth-gateway/firebase.auth.gateway.ts',
+        },
+        // Method not inside a class - OK
+        {
+          code: `
+        async function fetch() {
+          await api.get()
+        }
+      `,
+          filename: '/project/infra/auth-gateway/firebase.auth.gateway.ts',
+        },
+        // fake- prefix in filename - OK
+        {
+          code: `
+        class FakeAuthGateway {
+          async login() {
+            return this.user
+          }
+        }
+      `,
+          filename: '/project/infra/auth-gateway/fake-auth.gateway.ts',
+        },
+        // fake-data in filename - OK
+        {
+          code: `
+        class FakeDataService {
+          async getData() {
+            return this.data
+          }
+        }
+      `,
+          filename: '/project/infra/auth-gateway/fake-data.gateway.ts',
+        },
+        // stub in filename - OK
+        {
+          code: `
+        class StubAuthGateway {
+          async login() {
+            return this.user
+          }
+        }
+      `,
+          filename: '/project/infra/auth-gateway/stub.auth.gateway.ts',
+        },
+        // Method without body (abstract) - OK
+        {
+          code: `
+        abstract class BaseGateway {
+          abstract async fetch(): Promise<void>
+        }
+      `,
+          filename: '/project/infra/auth-gateway/firebase.auth.gateway.ts',
+        },
       ],
 
       invalid: [
@@ -308,6 +385,40 @@ describe('infra-public-method-try-catch', () => {
           ],
           output:
             'class PrismaBlocklistRepository {\n  async findAll() {\n    try {\n      return await this.prisma.blocklist.findMany()\n  \n    } catch (error) {\n      this.logger.error(`[PrismaBlocklistRepository] Failed to findAll: ${error}`)\n      throw error\n    }\n  }\n}',
+        },
+        // ClassExpression without try-catch - NOT OK
+        {
+          code: `const Gateway = class FirebaseGateway {
+  async fetch() {
+    await this.api.get()
+  }
+}`,
+          filename: '/project/infra/auth-gateway/firebase.auth.gateway.ts',
+          errors: [
+            {
+              messageId: 'publicMethodNeedsTryCatch',
+              data: { methodName: 'fetch' },
+            },
+          ],
+          output:
+            'const Gateway = class FirebaseGateway {\n  async fetch() {\n    try {\n      await this.api.get()\n  \n    } catch (error) {\n      this.logger.error(`[FirebaseGateway] Failed to fetch: ${error}`)\n      throw error\n    }\n  }\n}',
+        },
+        // Anonymous ClassExpression without try-catch - NOT OK
+        {
+          code: `const Gateway = class {
+  async fetch() {
+    await this.api.get()
+  }
+}`,
+          filename: '/project/infra/auth-gateway/firebase.auth.gateway.ts',
+          errors: [
+            {
+              messageId: 'publicMethodNeedsTryCatch',
+              data: { methodName: 'fetch' },
+            },
+          ],
+          output:
+            'const Gateway = class {\n  async fetch() {\n    try {\n      await this.api.get()\n  \n    } catch (error) {\n      this.logger.error(`[UnknownClass] Failed to fetch: ${error}`)\n      throw error\n    }\n  }\n}',
         },
       ],
     })
