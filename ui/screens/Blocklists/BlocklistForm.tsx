@@ -29,12 +29,21 @@ import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/ChooseBlockTabBar'
 import { blocklistSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
 import { TextInputSelectionScene } from '@/ui/screens/Blocklists/TextInputSelectionScene'
 
+export enum FormMode {
+  Create = 'create',
+  Edit = 'edit',
+}
+
 export type BlocklistScreenProps = {
-  mode: 'create' | 'edit'
+  mode: FormMode
   blocklistId?: string
 }
 
-type BlocklistTabKey = 'apps' | 'websites' | 'keywords'
+enum BlocklistTabKey {
+  Apps = 'apps',
+  Websites = 'websites',
+  Keywords = 'keywords',
+}
 
 export function BlocklistForm({
   mode,
@@ -70,15 +79,16 @@ export function BlocklistForm({
   const [index, setIndex] = useState(0)
 
   const routes: { key: BlocklistTabKey; title: string }[] = [
-    { key: 'apps', title: 'Apps' },
-    { key: 'websites', title: 'Websites' },
-    { key: 'keywords', title: 'Keywords' },
+    { key: BlocklistTabKey.Apps, title: 'Apps' },
+    { key: BlocklistTabKey.Websites, title: 'Websites' },
+    { key: BlocklistTabKey.Keywords, title: 'Keywords' },
   ]
 
   useEffect(() => {
     dispatch(fetchAvailableSirens())
-    // eslint-disable-next-line react-hooks/set-state-in-effect
-    if (mode === 'edit' && blocklistFromState) setBlocklist(blocklistFromState)
+    if (mode === FormMode.Edit && blocklistFromState)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setBlocklist(blocklistFromState)
   }, [mode, blocklistFromState, dispatch])
 
   const toggleTextSiren = useCallback(
@@ -210,7 +220,7 @@ export function BlocklistForm({
   const saveBlocklist = useCallback(async () => {
     if (!validateForm(blocklist)) return
 
-    await (mode === 'edit' && 'id' in blocklist
+    await (mode === FormMode.Edit && 'id' in blocklist
       ? dispatch(updateBlocklist(blocklist))
       : dispatch(createBlocklist(blocklist)))
 

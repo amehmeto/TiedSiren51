@@ -2,6 +2,7 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import { FirebaseError } from 'firebase/app'
 import * as firebaseAuth from 'firebase/auth'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { AuthMethod } from '@/core/auth/auth.type'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { FirebaseAuthGateway } from './firebase.auth.gateway'
 
@@ -76,37 +77,37 @@ describe('FirebaseAuthGateway - Error Translation', () => {
     it.each<{
       code: string
       expected: string
-      method: 'signInWithEmail' | 'signUpWithEmail'
+      method: AuthMethod
     }>([
       {
         code: 'auth/email-already-in-use',
         expected: 'This email is already in use.',
-        method: 'signUpWithEmail',
+        method: AuthMethod.SignUpWithEmail,
       },
       {
         code: 'auth/invalid-email',
         expected: 'Invalid email address.',
-        method: 'signInWithEmail',
+        method: AuthMethod.SignInWithEmail,
       },
       {
         code: 'auth/weak-password',
         expected: 'Password must be at least 6 characters.',
-        method: 'signUpWithEmail',
+        method: AuthMethod.SignUpWithEmail,
       },
       {
         code: 'auth/invalid-credential',
         expected: 'Invalid email or password.',
-        method: 'signInWithEmail',
+        method: AuthMethod.SignInWithEmail,
       },
       {
         code: 'auth/popup-closed-by-user',
         expected: 'Sign-in cancelled.',
-        method: 'signInWithEmail',
+        method: AuthMethod.SignInWithEmail,
       },
       {
         code: 'auth/cancelled-popup-request',
         expected: 'Sign-in cancelled.',
-        method: 'signInWithEmail',
+        method: AuthMethod.SignInWithEmail,
       },
     ])(
       'should translate $code to "$expected"',
@@ -114,7 +115,7 @@ describe('FirebaseAuthGateway - Error Translation', () => {
         const mockError = new FirebaseError(code, `Firebase: Error (${code}).`)
 
         const authMethod =
-          method === 'signUpWithEmail'
+          method === AuthMethod.SignUpWithEmail
             ? firebaseAuth.createUserWithEmailAndPassword
             : firebaseAuth.signInWithEmailAndPassword
 

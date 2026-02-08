@@ -61,6 +61,15 @@ export class RealDateProvider implements DateProvider {
     return result
   }
 
+  to12HourTime(date: Date): string {
+    const hour = date.getHours()
+    const minute = date.getMinutes()
+    const hour12 = hour % 12 || 12
+    const minuteFormatted = String(minute).padStart(2, '0')
+    const period = hour >= 12 ? 'p.m.' : 'a.m.'
+    return `${hour12}:${minuteFormatted} ${period}`
+  }
+
   parseISOString(isoString: ISODateString): Date {
     return new Date(isoString)
   }

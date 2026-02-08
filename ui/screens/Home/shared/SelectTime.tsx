@@ -1,97 +1,113 @@
 import React from 'react'
-import { Platform, Pressable, StyleSheet, Text, View } from 'react-native'
-import DateTimePickerModal from 'react-native-modal-datetime-picker'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import { assertHHmmString, HHmmString } from '@/core/_ports_/date-provider'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import {
+  StrictBoundDirection,
+  validateStrictModeTime,
+} from '@/core/strict-mode/validate-strict-bound-time'
+import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
-import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
+import { TimePicker } from '@/ui/screens/Home/shared/TimePicker'
 
-function formatTimeString(time: string): string {
-  const [hours, minutes] = time.split(':').map(Number)
-  return `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`
+export enum TimeField {
+  StartedAt = 'startedAt',
+  EndedAt = 'endedAt',
 }
 
 type SelectTimeProps = Readonly<{
-  timeField?: 'startedAt' | 'endedAt'
+  timeField?: TimeField
   setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
   values: BlockSessionFormValues
   isTimePickerVisible?: boolean
   setFieldValue: (field: string, value: string) => void
-  handleChange: (field: 'startedAt' | 'endedAt') => void
+  handleChange: (field: TimeField) => void
+  initialTime?: HHmmString | null
+  /** The initial value of the other time field, for midnight-spanning session detection */
+  initialOtherTime?: HHmmString | null
 }>
 
 export function SelectTime({
-  timeField = 'startedAt',
+  timeField = TimeField.StartedAt,
   setIsTimePickerVisible,
   values,
   isTimePickerVisible = false,
   setFieldValue,
   handleChange,
+  initialTime,
+  initialOtherTime,
 }: SelectTimeProps) {
+  const dispatch = useDispatch<AppDispatch>()
   const { dateProvider } = dependencies
   const localeNow = dateProvider.getHHmmNow()
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dateProvider),
+  )
 
   const chosenTime =
-    timeField === 'startedAt'
+    timeField === TimeField.StartedAt
       ? (values.startedAt ?? localeNow)
       : (values.endedAt ?? localeNow)
 
+  const direction =
+    timeField === TimeField.StartedAt
+      ? StrictBoundDirection.Earlier
+      : StrictBoundDirection.Later
+
   const placeholder =
-    timeField === 'startedAt'
+    timeField === TimeField.StartedAt
       ? (values.startedAt ?? `Select start time...`)
       : (values.endedAt ?? `Select end time...`)
 
-  const handleTimeChange = (time: string) => {
-    const formattedTime = formatTimeString(time)
-    setFieldValue(timeField, formattedTime)
-  }
+  assertHHmmString(chosenTime)
+  const chosenTimeAsDate = dateProvider.recoverDate(chosenTime)
 
-  let timePicker: React.ReactNode = null
+  const handleTimeChange = (time: HHmmString) => {
+    const validation = validateStrictModeTime({
+      newTime: time,
+      isStrictModeActive,
+      initialTime,
+      direction,
+      otherBound: initialOtherTime,
+    })
 
-  if (Platform.OS === 'web') {
-    if (isTimePickerVisible) {
-      timePicker = (
-        <WebTimePicker
-          chosenTime={chosenTime}
-          handleChange={() => handleChange(timeField)}
-          setTime={handleTimeChange}
-          setIsTimePickerVisible={setIsTimePickerVisible}
-        />
-      )
+    if (!validation.isValid) {
+      dispatch(showToast(validation.errorMessage))
+      return
     }
-  } else {
-    timePicker = (
-      <DateTimePickerModal
-        isVisible={isTimePickerVisible}
-        is24Hour={true}
-        mode="time"
-        isDarkModeEnabled={true}
-        themeVariant="dark"
-        accentColor={T.color.lightBlue}
-        buttonTextColorIOS={T.color.lightBlue}
-        textColor={T.color.white}
-        pickerContainerStyleIOS={styles.pickerContainer}
-        modalStyleIOS={styles.modalStyle}
-        onConfirm={(date) => {
-          handleTimeChange(dateProvider.toHHmm(date))
-          setIsTimePickerVisible(false)
-        }}
-        onCancel={() => setIsTimePickerVisible(false)}
-      />
-    )
+
+    setFieldValue(timeField, time)
   }
 
   return (
     <>
       <View style={styles.param}>
         <Text style={styles.label}>
-          {timeField === 'startedAt' ? 'Start Time' : 'End Time'}
+          {timeField === TimeField.StartedAt ? 'Start Time' : 'End Time'}
         </Text>
         <Pressable onPress={() => setIsTimePickerVisible(true)}>
           <Text style={styles.option}>{placeholder}</Text>
         </Pressable>
       </View>
-      <View>{timePicker}</View>
+      <View>
+        <TimePicker
+          isVisible={isTimePickerVisible}
+          chosenTimeAsDate={chosenTimeAsDate}
+          onConfirm={(date) => {
+            handleTimeChange(dateProvider.toHHmm(date))
+            setIsTimePickerVisible(false)
+          }}
+          onCancel={() => setIsTimePickerVisible(false)}
+          chosenTime={chosenTime}
+          handleChange={() => handleChange(timeField)}
+          setTime={handleTimeChange}
+          setIsTimePickerVisible={setIsTimePickerVisible}
+        />
+      </View>
     </>
   )
 }
@@ -111,12 +127,5 @@ const styles = StyleSheet.create({
   option: {
     color: T.color.lightBlue,
     textAlign: 'right',
-  },
-  pickerContainer: {
-    borderRadius: T.border.radius.extraRounded,
-    overflow: 'hidden',
-  },
-  modalStyle: {
-    borderRadius: T.border.radius.extraRounded,
   },
 })

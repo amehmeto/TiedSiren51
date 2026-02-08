@@ -89,9 +89,10 @@ export class FirebaseAuthGateway implements AuthGateway {
   private isFirebaseAuthError(
     error: unknown,
   ): error is FirebaseError & { code: FirebaseAuthErrorCode } {
-    if (!this.isFirebaseError(error)) return false
-
-    return error.code in FirebaseAuthGateway.FIREBASE_ERRORS
+    return (
+      this.isFirebaseError(error) &&
+      error.code in FirebaseAuthGateway.FIREBASE_ERRORS
+    )
   }
 
   private getGoogleSignInErrorPattern(error: Error): GoogleSignInError | null {

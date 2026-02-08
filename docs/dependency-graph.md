@@ -3,17 +3,17 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2026-02-02
+> Last updated: 2026-02-07
 
 ## Graph Statistics
 
 | Metric | Value |
 |--------|-------|
-| Total Nodes | 80 |
+| Total Nodes | 85 |
 | Total Edges | 43 |
-| Root Nodes (no dependencies) | 51 |
-| Leaf Nodes (nothing depends on them) | 58 |
-| Orphan Nodes (isolated) | 39 |
+| Root Nodes (no dependencies) | 56 |
+| Leaf Nodes (nothing depends on them) | 63 |
+| Orphan Nodes (isolated) | 44 |
 | Critical Path Length | 5 |
 
 ### Critical Path
@@ -56,7 +56,7 @@ The longest dependency chain in the graph:
 | #80 | [Bug] Logout redirects to /login modal instead of /home, requires double close | - | medium | - |
 
 
-### Features - Other (22)
+### Features - Other (27)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #1 | Add ability to filter between system apps and user-installed apps on Android | - | - | - |
@@ -81,6 +81,11 @@ The longest dependency chain in the graph:
 | #248 | Add initial delay to CI watch before polling | - | - | - |
 | #250 | Fix FlatList scroll cutoff on selection scenes | - | - | - |
 | #252 | Refactor CLAUDE.md using progressive disclosure | - | - | - |
+| #255 | feat(strict-mode): disable edit and delete actions on sessions and blocklists during strict mode | - | - | - |
+| #257 | Achieve 100% code coverage for custom ESLint rules | - | - | - |
+| #258 | feat: enforce stricter-only editing of block sessions during strict mode | - | - | - |
+| #260 | refactor(ui): redesign time picker with consistent design system primitives | - | - | - |
+| #264 | perf: Add caching for installed apps list | - | - | - |
 
 
 ### Features - Blocking Architecture (29)
@@ -253,8 +258,9 @@ flowchart LR
     end
     subgraph Epic_57["TS#57 Strict Mode"]
         direction TB
+        T_TS_255["✅ TS#255 strict-mode: disable edit and<br/>delete actions on sessions and<br/>blocklists during strict mode"]:::blocking0_done
         T_TS_213["✅ TS#213 confirmation modal before<br/>setting strict mode timer [2sp]"]:::blocking0_done
-        T_TS_200["📝 TS#200 strict-mode: block blocklist<br/>deletion during active strict<br/>mode sessions"]:::blocking0_todo
+        T_TS_200["✅ TS#200 strict-mode: block blocklist<br/>deletion during active strict<br/>mode sessions"]:::blocking0_done
     end
     subgraph Epic_55["TS#55 Blocking Apps on Android"]
         direction TB
@@ -283,6 +289,10 @@ flowchart LR
     end
     subgraph Ungrouped
         direction TB
+        T_TS_264["📝 TS#264 : Add caching for installed<br/>apps list"]:::other0_todo
+        T_TS_260["✅ TS#260 ui: redesign time picker with<br/>consistent design system<br/>primitives"]:::other0_done
+        T_TS_258["🔄 TS#258 : enforce stricter-only<br/>editing of block sessions<br/>during strict mode"]:::blocking0_in_progress
+        T_TS_257["📝 TS#257 100% code coverage for custom<br/>ESLint rules"]:::other0_todo
         T_TS_252["✅ TS#252 CLAUDE.md using progressive<br/>disclosure"]:::other0_done
         T_TS_250["✅ TS#250 FlatList scroll cutoff on<br/>selection scenes"]:::other0_done
         T_TS_248["✅ TS#248 initial delay to CI watch<br/>before polling"]:::other0_done
@@ -428,4 +438,4 @@ Quick reference showing what blocks what:
 
 ---
 
-*Auto-generated on 2026-02-02 from GitHub issue metadata*
+*Auto-generated on 2026-02-07 from GitHub issue metadata*
