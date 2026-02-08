@@ -1,4 +1,8 @@
-export type LogLevel = 'info' | 'warn' | 'error'
+export enum LogLevel {
+  Info = 'info',
+  Warn = 'warn',
+  Error = 'error',
+}
 
 export interface LogEntry {
   level: LogLevel

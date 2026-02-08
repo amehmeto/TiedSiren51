@@ -1,7 +1,12 @@
 import * as ExpoDevice from 'expo-device'
 import { useState } from 'react'
 import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { Device } from '@/core/device/device'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import { showToast } from '@/core/toast/toast.slice'
+import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
@@ -26,7 +31,7 @@ type DevicesModalProps = Readonly<{
   currentSelections: Device[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: Device[]) => void
-  items: Device[]
+  devices: Device[]
 }>
 
 export function DevicesModal({
@@ -34,15 +39,22 @@ export function DevicesModal({
   currentSelections,
   onRequestClose,
   setFieldValue,
-  items,
+  devices,
 }: DevicesModalProps) {
+  const dispatch = useDispatch<AppDispatch>()
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
   const [wasVisible, setWasVisible] = useState(isVisible)
   const [selectedIds, setSelectedIds] = useState<string[]>(
     currentSelections.map((d) => d.id),
   )
+  const lockedDeviceIds = isStrictModeActive
+    ? currentSelections.map((d) => d.id)
+    : []
 
-  const availableItems = [
-    ...new Map([currentDevice, ...items].map((d) => [d.id, d])).values(),
+  const availableDevices = [
+    ...new Map([currentDevice, ...devices].map((d) => [d.id, d])).values(),
   ]
 
   if (isVisible && !wasVisible) {
@@ -52,17 +64,21 @@ export function DevicesModal({
   if (!isVisible && wasVisible) setWasVisible(false)
 
   const saveList = () => {
-    const selectedDevices = availableItems.filter((d) =>
+    const selectedDevices = availableDevices.filter((d) =>
       selectedIds.includes(d.id),
     )
     setFieldValue('devices', selectedDevices)
     onRequestClose()
   }
 
-  function toggleItem(itemId: string, isNowSelected: boolean) {
+  function toggleDevice(deviceId: string, isNowSelected: boolean) {
+    if (!isNowSelected && lockedDeviceIds.includes(deviceId)) {
+      dispatch(showToast('Cannot remove device during strict mode'))
+      return
+    }
     const newSelections = isNowSelected
-      ? [...selectedIds, itemId]
-      : selectedIds.filter((id) => id !== itemId)
+      ? [...selectedIds, deviceId]
+      : selectedIds.filter((id) => id !== deviceId)
     setSelectedIds(newSelections)
   }
 
@@ -70,19 +86,19 @@ export function DevicesModal({
     <TiedSModal isVisible={isVisible} onRequestClose={onRequestClose}>
       <View>
         <FlatList
-          data={availableItems}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => {
-            const isItemSelected = selectedIds.includes(item.id)
+          data={availableDevices}
+          keyExtractor={(device) => device.id}
+          renderItem={({ item: device }) => {
+            const isDeviceSelected = selectedIds.includes(device.id)
             return (
-              <View style={styles.item}>
-                <Text style={styles.itemText}>{item.name}</Text>
+              <View style={styles.device}>
+                <Text style={styles.deviceText}>{device.name}</Text>
                 <Switch
-                  accessibilityLabel={`Toggle ${item.name}`}
-                  style={styles.itemSelector}
-                  value={isItemSelected}
+                  accessibilityLabel={`Toggle ${device.name}`}
+                  style={styles.deviceSelector}
+                  value={isDeviceSelected}
                   onValueChange={(isNowSelected) =>
-                    toggleItem(item.id, isNowSelected)
+                    toggleDevice(device.id, isNowSelected)
                   }
                 />
               </View>
@@ -96,16 +112,16 @@ export function DevicesModal({
 }
 
 const styles = StyleSheet.create({
-  item: {
+  device: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     flex: 1,
     padding: T.spacing.small,
   },
-  itemText: { color: T.color.text },
+  deviceText: { color: T.color.text },
   button: {
     alignSelf: 'center',
     marginTop: T.spacing.medium,
   },
-  itemSelector: { marginLeft: T.spacing.medium },
+  deviceSelector: { marginLeft: T.spacing.medium },
 })
