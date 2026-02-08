@@ -1,6 +1,7 @@
-# Type Guards for Branded Types
+# Type Guards and Type Safety Conventions
 
 Date: 2026-01-02
+Updated: 2026-02-07
 
 ## Status
 
@@ -156,6 +157,71 @@ Rejected: Comments are not enforced, assertions bypass type checking, scattered 
 - `infra/date-provider/real.date-provider.ts` - Replace assertions
 - `infra/date-provider/stub.date-provider.ts` - Replace assertions
 - `infra/block-session-repository/prisma.block-session.repository.ts` - Replace assertions
+
+---
+
+## Related: Prefer Enums Over String Literal Unions
+
+**Added 2026-02-07**
+
+In addition to branded types, prefer TypeScript enums over string literal unions for type-safe value constraints.
+
+### Convention
+
+```typescript
+// Avoid: String literal unions
+type Direction = 'earlier' | 'later'
+type LogLevel = 'info' | 'warn' | 'error'
+
+// Prefer: Enums
+enum StrictBoundDirection {
+  Earlier = 'earlier',
+  Later = 'later',
+}
+
+enum LogLevel {
+  Info = 'info',
+  Warn = 'warn',
+  Error = 'error',
+}
+```
+
+### Enforcement
+
+ESLint rule `local-rules/prefer-enum-over-string-union` flags string literal unions:
+
+```javascript
+// .eslintrc.cjs
+'local-rules/prefer-enum-over-string-union': [
+  'error',
+  { ignoredPatterns: ['-outline$', '^logo-', '^add-', '^remove-'] },
+]
+```
+
+### Exceptions
+
+The rule skips:
+- Unions containing `null` or `undefined` (e.g., `string | null`)
+- Unions inside utility types (`Pick`, `Omit`, `Record`, `Extract`, `Exclude`)
+- Patterns matching `ignoredPatterns` (e.g., icon names from external libraries)
+
+### Rationale
+
+1. **Autocomplete**: IDEs suggest `LogLevel.` with all options
+2. **Refactoring**: Renaming enum values updates all usages
+3. **Documentation**: Enum name describes the concept (`StrictBoundDirection` vs `'earlier' | 'later'`)
+4. **Consistency**: Values defined in one place
+
+### Examples in Codebase
+
+| Enum | Location | Values |
+|------|----------|--------|
+| `LogLevel` | `core/_ports_/logger.ts` | Info, Warn, Error |
+| `DetectedSirenType` | `core/_ports_/siren.lookout.ts` | App, Website, Keyword |
+| `AuthMethod` | `core/auth/auth.type.ts` | SignInWithEmail, SignUpWithEmail |
+| `StrictBoundDirection` | `ui/screens/Home/shared/validateStrictBoundTime.ts` | Earlier, Later |
+| `TimeField` | `ui/screens/Home/shared/SelectTime.tsx` | StartedAt, EndedAt |
+| `FormMode` | `ui/screens/Blocklists/BlocklistForm.tsx` | Create, Edit |
 
 ## References
 

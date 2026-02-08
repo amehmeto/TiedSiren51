@@ -39,10 +39,8 @@ export class PrismaTimerRepository
         where: { id: userId },
       })
 
-      if (!timer) return null
-
       // eslint-disable-next-line @typescript-eslint/consistent-type-assertions -- Prisma stores ISO strings
-      return timer.endedAt as ISODateString
+      return timer ? (timer.endedAt as ISODateString) : null
     } catch (error) {
       this.logger.error(`[PrismaTimerRepository] Failed to loadTimer: ${error}`)
       throw error

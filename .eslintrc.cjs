@@ -142,6 +142,26 @@ module.exports = {
     'local-rules/prefer-named-selector': 'warn',
     // Enforce state as first parameter in selectors
     'local-rules/selector-state-first-param': 'error',
+    // Prevent passing useSelector results as props - child should call useSelector itself
+    'local-rules/no-selector-prop-drilling': [
+      'error',
+      {
+        ignoredComponents: [
+          'FlatList',
+          'SectionList',
+          'VirtualizedList',
+          'TiedSButton',
+          'CircularTimerDisplay',
+        ],
+      },
+    ],
+    // Prefer ternary over if-return followed by return
+    'local-rules/prefer-ternary-return': ['error', { skipJsx: true }],
+    // Prefer enum over string literal unions
+    'local-rules/prefer-enum-over-string-union': [
+      'error',
+      { ignoredPatterns: ['-outline$', '^logo-', '^add-', '^remove-'] },
+    ],
   },
   overrides: [
     {

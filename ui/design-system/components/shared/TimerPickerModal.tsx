@@ -1,5 +1,6 @@
 import React, { useMemo } from 'react'
 import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { formatEndFromOffsets } from '@/ui/utils/timeFormat'
 import { TiedSButton } from './TiedSButton'
@@ -33,7 +34,12 @@ export const TimerPickerModal = ({
   const isZeroDuration =
     duration.days === 0 && duration.hours === 0 && duration.minutes === 0
 
-  const endDateTime = useMemo(() => formatEndFromOffsets(duration), [duration])
+  const { dateProvider } = dependencies
+  const endDateTime = useMemo(
+    () => formatEndFromOffsets({ ...duration, dateProvider }),
+    // eslint-disable-next-line react-hooks/exhaustive-deps -- dateProvider is a stable singleton
+    [duration],
+  )
 
   const handleSave = () => {
     if (isZeroDuration) return
