@@ -174,10 +174,8 @@ export function BlocklistForm({
   )
 
   const isSirenLocked = useCallback(
-    (sirenType: SirenType, sirenId: string) => {
-      if (!shouldLockSirens) return false
-      return isSirenSelected(sirenType, sirenId)
-    },
+    (sirenType: SirenType, sirenId: string) =>
+      !shouldLockSirens ? false : isSirenSelected(sirenType, sirenId),
     [shouldLockSirens, isSirenSelected],
   )
 
