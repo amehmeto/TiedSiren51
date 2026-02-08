@@ -15,7 +15,6 @@ export default {
     exclude: [
       'infra/**/prisma.*.test.ts',
       '**/node_modules/**',
-      'eslint-rules/**',
       '.worktrees/**',
     ],
     coverage: {
@@ -23,7 +22,12 @@ export default {
       reporter: ['text', 'json-summary', 'html'],
       reportsDirectory: './coverage',
       all: true,
-      include: ['core/**/*.ts', 'infra/**/*.ts', 'ui/**/*.ts'],
+      include: [
+        'core/**/*.ts',
+        'infra/**/*.ts',
+        'ui/**/*.ts',
+        'eslint-rules/*.cjs',
+      ],
       exclude: [
         '**/*.test.ts',
         '**/*.spec.ts',
@@ -69,6 +73,12 @@ export default {
           branches: 100,
           functions: 100,
           lines: 100,
+        },
+        'eslint-rules/*.cjs': {
+          statements: 95,
+          branches: 85,
+          functions: 95,
+          lines: 95,
         },
       },
     },

@@ -37,7 +37,7 @@ module.exports = {
     const basename = path.basename(filename)
 
     // Only check kebab-case.schema.ts files (not tests)
-    const schemaMatch = basename.match(/^([a-z][a-z0-9-]*)\\.schema\\.ts$/)
+    const schemaMatch = basename.match(/^([a-z][a-z0-9-]*)\.schema\.ts$/)
     if (!schemaMatch) return {}
 
     // Skip test files

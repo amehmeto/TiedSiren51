@@ -40,7 +40,7 @@ module.exports = {
     const basename = path.basename(filename)
 
     // Only check kebab-case.listener.ts files (not tests)
-    const listenerMatch = basename.match(/^([a-z][a-z0-9-]*)\\.listener\\.ts$/)
+    const listenerMatch = basename.match(/^([a-z][a-z0-9-]*)\.listener\.ts$/)
     if (!listenerMatch) return {}
 
     const kebabName = listenerMatch[1]

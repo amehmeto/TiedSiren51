@@ -160,6 +160,7 @@
       "Bash(wc:*)",
       "Bash(which:*)",
       "Bash(xargs cloc:*)",
+      "Bash(xxd:*)",
       "Edit",
       "Read",
       "Skill(commit-push)",

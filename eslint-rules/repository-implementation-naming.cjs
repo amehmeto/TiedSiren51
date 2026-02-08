@@ -43,7 +43,7 @@ module.exports = {
     const basename = path.basename(filename)
 
     // Only check prefix.domain.repository.ts files (not tests)
-    const repoMatch = basename.match(/^([a-z][a-z0-9-]*)\\.([a-z][a-z0-9-]*)\\.repository\\.ts$/)
+    const repoMatch = basename.match(/^([a-z][a-z0-9-]*)\.([a-z][a-z0-9-]*)\.repository\.ts$/)
     if (!repoMatch) return {}
 
     // Skip test files
