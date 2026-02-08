@@ -1,9 +1,5 @@
-import {
-  FontAwesome6,
-  Ionicons,
-  MaterialCommunityIcons,
-} from '@expo/vector-icons'
-import { Image, Pressable, StyleSheet, Text, View } from 'react-native'
+import { FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
+import { Image, Pressable, StyleSheet, Text } from 'react-native'
 import { CheckBox } from 'react-native-elements'
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -21,7 +17,6 @@ type SelectableSirenCardProps = Readonly<{
   siren: AndroidSiren | string
   onPress: () => void
   isSelected: boolean
-  isLocked?: boolean
 }>
 
 export function SelectableSirenCard({
@@ -29,7 +24,6 @@ export function SelectableSirenCard({
   siren,
   onPress,
   isSelected,
-  isLocked = false,
 }: SelectableSirenCardProps) {
   const iconElement =
     // eslint-disable-next-line no-nested-ternary
@@ -68,7 +62,6 @@ export function SelectableSirenCard({
           styles.container,
           { marginVertical: T.spacing.extraExtraSmall },
           isSelected ? styles.selected : null,
-          isLocked ? styles.locked : null,
         ]}
       >
         {iconElement}
@@ -81,25 +74,14 @@ export function SelectableSirenCard({
           {sirenName}
         </Text>
 
-        {isLocked && (
-          <View style={styles.lockIconContainer} testID={`${baseTestId}-lock`}>
-            <Ionicons
-              name="lock-closed"
-              size={T.icon.size.large}
-              color={T.color.grey}
-            />
-          </View>
-        )}
-        {!isLocked && (
-          <CheckBox
-            style={styles.checkbox}
-            containerStyle={styles.checkboxContainer}
-            checked={isSelected}
-            checkedColor={T.color.lightBlue}
-            onPress={onPress}
-            testID={`${baseTestId}-checkbox`}
-          />
-        )}
+        <CheckBox
+          style={styles.checkbox}
+          containerStyle={styles.checkboxContainer}
+          checked={isSelected}
+          checkedColor={T.color.lightBlue}
+          onPress={onPress}
+          testID={`${baseTestId}-checkbox`}
+        />
       </TiedSCard>
     </Pressable>
   )
@@ -134,11 +116,5 @@ const styles = StyleSheet.create({
   selected: {
     borderColor: T.color.lightBlue,
     borderWidth: T.border.width.medium,
-  },
-  locked: {
-    opacity: 0.7,
-  },
-  lockIconContainer: {
-    padding: T.spacing.small,
   },
 })

@@ -14,7 +14,6 @@ type TextInputSelectionSceneProps = Readonly<{
   data: string[]
   toggleSiren: (sirenType: SirenType, sirenId: string) => void
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
-  isSirenLocked?: (sirenType: SirenType, sirenId: string) => boolean
 }>
 
 export function TextInputSelectionScene({
@@ -24,7 +23,6 @@ export function TextInputSelectionScene({
   data,
   toggleSiren,
   isSirenSelected,
-  isSirenLocked,
 }: TextInputSelectionSceneProps) {
   const [isFocused, setIsFocused] = useState(false)
   const insets = useSafeAreaInsets()
@@ -47,14 +45,12 @@ export function TextInputSelectionScene({
         keyExtractor={(item) => item}
         renderItem={({ item }) => {
           const isSelected = isSirenSelected(sirenType, item)
-          const isLocked = isSirenLocked?.(sirenType, item) ?? false
           return (
             <SelectableSirenCard
               sirenType={sirenType}
               siren={item}
               onPress={() => toggleSiren(sirenType, item)}
               isSelected={isSelected}
-              isLocked={isLocked}
             />
           )
         }}
