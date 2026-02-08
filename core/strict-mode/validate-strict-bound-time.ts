@@ -8,6 +8,7 @@ export enum StrictBoundDirection {
 export type StrictBound = Readonly<{
   direction: StrictBoundDirection
   initialTime: HHmmString
+  /** The opposite boundary (end time when validating start, start time when validating end) for midnight-spanning detection */
   otherBound?: HHmmString
 }>
 
@@ -20,6 +21,7 @@ export type StrictModeTimeValidationParams = Readonly<{
   isStrictModeActive: boolean
   direction: StrictBoundDirection
   initialTime?: HHmmString | null
+  /** The opposite boundary (end time when validating start, start time when validating end) for midnight-spanning detection */
   otherBound?: HHmmString | null
 }>
 
