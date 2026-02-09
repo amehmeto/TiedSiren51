@@ -10,12 +10,14 @@ type AppsSelectionSceneProps = Readonly<{
   androidApps: AndroidSiren[]
   toggleAppSiren: (sirenType: SirenType.ANDROID, app: AndroidSiren) => void
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
+  isSirenLocked?: (sirenType: SirenType, sirenId: string) => boolean
 }>
 
 export function AppsSelectionScene({
   androidApps,
   toggleAppSiren,
   isSirenSelected,
+  isSirenLocked,
 }: AppsSelectionSceneProps) {
   const insets = useSafeAreaInsets()
 
@@ -25,12 +27,15 @@ export function AppsSelectionScene({
       keyExtractor={(item) => item.packageName}
       renderItem={({ item }) => {
         const isSelected = isSirenSelected(SirenType.ANDROID, item.packageName)
+        const isLocked =
+          isSirenLocked?.(SirenType.ANDROID, item.packageName) ?? false
         return (
           <SelectableSirenCard
             sirenType={SirenType.ANDROID}
             siren={item}
             onPress={() => toggleAppSiren(SirenType.ANDROID, item)}
             isSelected={isSelected}
+            isLocked={isLocked}
           />
         )
       }}
