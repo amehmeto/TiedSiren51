@@ -157,6 +157,8 @@ module.exports = {
     ],
     // Prefer ternary over if-return followed by return
     'local-rules/prefer-ternary-return': ['error', { skipJsx: true }],
+    // Names with "And"/"Or" at word boundaries suggest multiple responsibilities
+    'local-rules/no-and-or-in-names': 'warn',
     // Prefer enum over string literal unions
     'local-rules/prefer-enum-over-string-union': [
       'error',
@@ -251,6 +253,7 @@ module.exports = {
         // Test structure rules
         'local-rules/no-new-in-test-body': 'error',
         'local-rules/use-data-builders': 'error',
+        'local-rules/no-generic-result-variable': 'warn',
       },
     },
     // No data builders in production code

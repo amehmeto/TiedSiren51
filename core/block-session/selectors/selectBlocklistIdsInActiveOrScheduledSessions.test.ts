@@ -14,12 +14,12 @@ describe('selectBlocklistIdsInActiveOrScheduledSessions', () => {
   test('returns empty array when there are no sessions', () => {
     const state = stateBuilder().build()
 
-    const result = selectBlocklistIdsInActiveOrScheduledSessions(
+    const retrievedBlocklistIds = selectBlocklistIdsInActiveOrScheduledSessions(
       state,
       dateProvider,
     )
 
-    expect(result).toStrictEqual([])
+    expect(retrievedBlocklistIds).toStrictEqual([])
   })
 
   test('returns blocklist ids from active sessions', () => {
@@ -31,13 +31,13 @@ describe('selectBlocklistIdsInActiveOrScheduledSessions', () => {
     })
     const state = stateBuilder().withBlockSessions([activeSession]).build()
 
-    const result = selectBlocklistIdsInActiveOrScheduledSessions(
+    const retrievedBlocklistIds = selectBlocklistIdsInActiveOrScheduledSessions(
       state,
       dateProvider,
     )
 
-    expect(result).toContain('blocklist-1')
-    expect(result).toContain('blocklist-2')
+    expect(retrievedBlocklistIds).toContain('blocklist-1')
+    expect(retrievedBlocklistIds).toContain('blocklist-2')
   })
 
   test('returns blocklist ids from scheduled sessions', () => {
@@ -49,12 +49,36 @@ describe('selectBlocklistIdsInActiveOrScheduledSessions', () => {
     })
     const state = stateBuilder().withBlockSessions([scheduledSession]).build()
 
-    const result = selectBlocklistIdsInActiveOrScheduledSessions(
+    const retrievedBlocklistIds = selectBlocklistIdsInActiveOrScheduledSessions(
       state,
       dateProvider,
     )
 
-    expect(result).toContain('blocklist-3')
+    expect(retrievedBlocklistIds).toContain('blocklist-3')
+  })
+
+  test('returns blocklist ids from both active and scheduled sessions', () => {
+    dateProvider.now.setHours(10, 0, 0, 0)
+    const activeSession = buildBlockSession({
+      startedAt: '09:00',
+      endedAt: '11:00',
+      blocklistIds: ['blocklist-1'],
+    })
+    const scheduledSession = buildBlockSession({
+      startedAt: '14:00',
+      endedAt: '16:00',
+      blocklistIds: ['blocklist-2'],
+    })
+    const state = stateBuilder()
+      .withBlockSessions([activeSession, scheduledSession])
+      .build()
+
+    const retrievedBlocklistIds = selectBlocklistIdsInActiveOrScheduledSessions(
+      state,
+      dateProvider,
+    )
+
+    expect(retrievedBlocklistIds).toStrictEqual(['blocklist-1', 'blocklist-2'])
   })
 
   test('returns unique blocklist ids when same blocklist is used in multiple sessions', () => {
@@ -73,14 +97,14 @@ describe('selectBlocklistIdsInActiveOrScheduledSessions', () => {
       .withBlockSessions([activeSession, scheduledSession])
       .build()
 
-    const result = selectBlocklistIdsInActiveOrScheduledSessions(
+    const retrievedBlocklistIds = selectBlocklistIdsInActiveOrScheduledSessions(
       state,
       dateProvider,
     )
 
-    expect(result).toHaveLength(3)
-    expect(result).toContain('blocklist-shared')
-    expect(result).toContain('blocklist-1')
-    expect(result).toContain('blocklist-2')
+    expect(retrievedBlocklistIds).toHaveLength(3)
+    expect(retrievedBlocklistIds).toContain('blocklist-shared')
+    expect(retrievedBlocklistIds).toContain('blocklist-1')
+    expect(retrievedBlocklistIds).toContain('blocklist-2')
   })
 })

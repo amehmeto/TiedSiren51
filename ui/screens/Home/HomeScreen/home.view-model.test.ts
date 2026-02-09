@@ -286,7 +286,7 @@ describe('Home View Model', () => {
         ])
         .build(),
       {
-        type: HomeViewModel.WithActiveAndScheduledSessions,
+        type: HomeViewModel.WithAllSessionTypes,
         greetings: Greetings.GoodAfternoon,
         activeSessions: {
           title: 'ACTIVE SESSIONS',

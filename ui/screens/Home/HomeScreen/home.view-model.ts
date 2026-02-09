@@ -144,7 +144,7 @@ export const selectHomeViewModel = createSelector(
     }
 
     return {
-      type: HomeViewModel.WithActiveAndScheduledSessions,
+      type: HomeViewModel.WithAllSessionTypes,
       greetings,
       activeSessions: {
         title: SessionBoardTitle.ACTIVE_SESSIONS as const,

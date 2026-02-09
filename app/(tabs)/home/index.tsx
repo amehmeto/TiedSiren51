@@ -61,7 +61,7 @@ export default function HomeScreen() {
             type={SessionType.SCHEDULED}
           />,
         ]
-      case HomeViewModel.WithActiveAndScheduledSessions:
+      case HomeViewModel.WithAllSessionTypes:
         return [
           <SessionsBoard
             key={0}

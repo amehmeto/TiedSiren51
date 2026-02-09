@@ -1,8 +1,8 @@
 import { RootState } from '@/core/_redux_/createStore'
-import { selectAuthUserIdOrNull } from './selectAuthUserIdOrNull'
+import { selectNullableAuthUserId } from './selectNullableAuthUserId'
 
 export const selectAuthUserId = (state: RootState): string => {
-  const userId = selectAuthUserIdOrNull(state)
+  const userId = selectNullableAuthUserId(state)
   if (!userId) throw new Error('User not authenticated')
   return userId
 }
