@@ -26,7 +26,7 @@ import { T } from '@/ui/design-system/theme'
 import { ErrorMessages } from '@/ui/error-messages.type'
 import { AppsSelectionScene } from '@/ui/screens/Blocklists/AppsSelectionScene'
 import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/ChooseBlockTabBar'
-import { blocklistSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
+import { blocklistFormSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
 import { TextInputSelectionScene } from '@/ui/screens/Blocklists/TextInputSelectionScene'
 
 export enum FormMode {
@@ -199,7 +199,7 @@ export function BlocklistForm({
   const validateForm = useCallback(
     (submittedBlocklistForm: typeof blocklist) => {
       try {
-        blocklistSchema.parse(submittedBlocklistForm)
+        blocklistFormSchema.parse(submittedBlocklistForm)
         setErrors({})
         return true
       } catch (e) {
