@@ -99,7 +99,7 @@
       "Bash(git fetch:*)",
       "Bash(git log:*)",
       "Bash(git merge main:*)",
-      "Bash(git merge origin/*:*)",
+      "Bash(git merge origin/main:*)",
       "Bash(git merge-tree:*)",
       "Bash(git mv:*)",
       "Bash(git pull:*)",
