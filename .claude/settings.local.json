@@ -149,6 +149,7 @@
       "Bash(pgrep:*)",
       "Bash(printf:*)",
       "Bash(pwd:*)",
+      "Bash(rm .claude/ralph-loop.local.md)",
       "Bash(rm:*)",
       "Bash(sed:*)",
       "Bash(shellcheck:*)",
