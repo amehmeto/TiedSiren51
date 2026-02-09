@@ -271,6 +271,20 @@ describe('try-catch-isolation', () => {
       `,
           errors: [{ messageId: 'multipleTryCatch' }],
         },
+        // Multiple try-catch inside else-if consequent block - NOT OK
+        {
+          code: `
+        function foo() {
+          if (a) {
+            return
+          } else if (b) {
+            try { doA() } catch (e) {}
+            try { doB() } catch (e) {}
+          }
+        }
+      `,
+          errors: [{ messageId: 'multipleTryCatch' }],
+        },
       ],
     })
   })

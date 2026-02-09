@@ -135,6 +135,17 @@ describe('no-call-expression-in-jsx-props', () => {
             },
           ],
         },
+        // IIFE in JSX prop (callee is FunctionExpression) - INVALID
+        {
+          code: '<Component value={(function() { return 1 })()} />',
+          options: [{ allowNoArguments: false }],
+          errors: [
+            {
+              messageId: 'extractCallExpression',
+              data: { call: '...()', prop: 'value' },
+            },
+          ],
+        },
       ],
     })
   })

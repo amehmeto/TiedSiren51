@@ -146,6 +146,16 @@ describe('no-entire-state-selector', () => {
       `,
           errors: [{ messageId: 'noEntireState' }],
         },
+        // Variable reference with hoisting (via scope analysis fallback) - NOT OK
+        {
+          code: `
+        function Component() {
+          useSelector(selectAll)
+          var selectAll = (s) => s
+        }
+      `,
+          errors: [{ messageId: 'noEntireState' }],
+        },
       ],
     })
   })
