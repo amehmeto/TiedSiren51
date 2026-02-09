@@ -18,7 +18,7 @@ Fix all pending review comments on PR #$ARGUMENTS.
    gh pr view $ARGUMENTS --comments
    gh api repos/$REPO_NWO/pulls/$ARGUMENTS/comments
    ```
-   Focus ONLY on comments from me (the repo owner). Ignore bot comments, CI status comments, and comments from other users.
+   Focus ONLY on comments from $OWNER. Ignore bot comments, CI status comments, and comments from other users.
 
 3. **Ensure you are on the correct branch** for this PR:
    ```bash
