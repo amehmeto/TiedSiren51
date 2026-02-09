@@ -8,9 +8,9 @@ Fix all pending review comments on PR #$ARGUMENTS.
 
 1. **Determine repo and current user:**
    ```bash
-   REPO_NWO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
-   OWNER=$(gh repo view --json owner --jq '.owner.login')
-   gh api user --jq '.login'
+   REPO_INFO=$(gh repo view --json nameWithOwner,owner)
+   REPO_NWO=$(echo "$REPO_INFO" | jq -r '.nameWithOwner')
+   OWNER=$(echo "$REPO_INFO" | jq -r '.owner.login')
    ```
 
 2. **Fetch all review comments from the PR:**

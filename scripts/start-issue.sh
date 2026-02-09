@@ -221,7 +221,7 @@ list_worktrees() {
     if [ -n "$branch" ] && [ "$branch" != "main" ]; then
       local pr_info
       # Use --state all to show merged/closed PRs too
-      pr_info=$(gh pr list --head "$branch" --state all --json number,state,title --jq '.[0] // empty' 2>&1) || true
+      pr_info=$(gh pr list --head "$branch" --state all --json number,state,title --jq '.[0] // empty') || true
 
       if [ -n "$pr_info" ]; then
         pr_number=$(echo "$pr_info" | jq -r '.number')
@@ -328,8 +328,8 @@ create_from_issue() {
   print_info "Fetching issue #$issue_number details..."
 
   local issue_info
-  if ! issue_info=$(gh issue view "$issue_number" --json title,body,labels 2>&1); then
-    print_error "Failed to fetch issue #$issue_number: $issue_info"
+  if ! issue_info=$(gh issue view "$issue_number" --json title,body,labels); then
+    print_error "Failed to fetch issue #$issue_number"
     exit "$EXIT_ISSUE_NOT_FOUND"
   fi
 
@@ -389,8 +389,8 @@ create_from_issue() {
 
   # Check if PR exists for this branch
   local existing_pr_info existing_pr existing_pr_url
-  if ! existing_pr_info=$(gh pr list --head "$branch" --json number,url --jq '.[0] // empty' 2>&1); then
-    print_error "Failed to check for existing PRs: $existing_pr_info"
+  if ! existing_pr_info=$(gh pr list --head "$branch" --json number,url --jq '.[0] // empty'); then
+    print_error "Failed to check for existing PRs"
     exit "$EXIT_GIT_FAILED"
   fi
   if [ -n "$existing_pr_info" ]; then
