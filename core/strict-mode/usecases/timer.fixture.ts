@@ -5,7 +5,7 @@ import { createTestStore } from '@/core/_tests_/createTestStore'
 import { Fixture } from '@/core/_tests_/fixture.type'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { AuthUser } from '@/core/auth/auth-user'
-import { selectAuthUserIdOrNull } from '@/core/auth/selectors/selectAuthUserIdOrNull'
+import { selectNullableAuthUserId } from '@/core/auth/selectors/selectNullableAuthUserId'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
 import { extendTimer, ExtendTimerPayload } from './extend-timer.usecase'
@@ -92,7 +92,7 @@ export function timerFixture(
       },
       async timerShouldBePersisted(expectedEndedAt: string) {
         const userId =
-          selectAuthUserIdOrNull(store.getState()) ?? DEFAULT_USER_ID
+          selectNullableAuthUserId(store.getState()) ?? DEFAULT_USER_ID
         const endedAt = await timerRepository.loadTimer(userId)
         expect(endedAt).toStrictEqual(expectedEndedAt)
       },
