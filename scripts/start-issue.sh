@@ -143,6 +143,7 @@ print_summary() {
   local branch="$2"
   local pr_number="$3"
   local pr_url="$4"
+  local issue_number="$5"
 
   echo ""
   echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -152,6 +153,9 @@ print_summary() {
   echo "BRANCH=$branch"
   echo "PR_NUMBER=${pr_number:-none}"
   echo "PR_URL=${pr_url:-none}"
+  echo "ISSUE_CONTENT_START"
+  gh issue view "$issue_number" --comments
+  echo "ISSUE_CONTENT_END"
   echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 }
 
@@ -488,7 +492,7 @@ PREOF
   print_success "Worktree created at: $wt_path"
   print_info "To navigate: cd $wt_path"
 
-  print_summary "$wt_path" "$branch" "$pr_number" "$pr_url"
+  print_summary "$wt_path" "$branch" "$pr_number" "$pr_url" "$issue_number"
   exit "$EXIT_SUCCESS"
 }
 

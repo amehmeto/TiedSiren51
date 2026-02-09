@@ -12,26 +12,26 @@ After the script completes:
 
 1. **Change to the worktree directory** using the WORKTREE_PATH from the script's SUMMARY output:
    ```bash
-   cd .worktrees/<worktree-name>
+   cd <WORKTREE_PATH>
    ```
    This is critical - all work must happen in the worktree, not the main repo.
 
-2. Fetch the issue details with `gh issue view <issue-number>`
+2. Extract the full issue content between `ISSUE_CONTENT_START` and `ISSUE_CONTENT_END` from the SUMMARY output.
 
-3. Launch a ralph loop to implement the issue:
+3. Launch a ralph loop to implement the issue, injecting the extracted issue content:
 
 ```
-/ralph-loop "Implement issue #<issue-number>.
+/ralph-loop "Implement the following GitHub issue in this worktree.
 
-Read the issue acceptance criteria and implement them fully.
+{ISSUE_CONTENT between ISSUE_CONTENT_START and ISSUE_CONTENT_END}
 
 Completion checklist:
-- All acceptance criteria from the ticket are met
+- ALL acceptance criteria from the issue are met
 - All unit tests pass (npm test)
 - Lint passes (npm run lint)
-- PR created with /commit-push
+- Changes committed and pushed with /commit-push
 - CI passes on the PR
-- No merge conflicts with main branch
+- No merge conflicts with main
 
 When ALL criteria are met, output: <promise>COMPLETE</promise>" --completion-promise "COMPLETE" --max-iterations 5
 ```
