@@ -98,6 +98,26 @@ describe('prefer-ternary-return', () => {
           `,
           options: [{ skipJsx: true }],
         },
+        // Nested JSX in array with skipJsx enabled (tests array traversal path)
+        {
+          code: `
+            function Comp(props) {
+              if (props.loading) return [<A key="a" />, <B key="b" />]
+              return []
+            }
+          `,
+          options: [{ skipJsx: true }],
+        },
+        // JSX in function call argument with skipJsx enabled (tests object traversal path)
+        {
+          code: `
+            function Comp(props) {
+              if (props.loading) return wrap(<Loading />)
+              return wrap(<Content />)
+            }
+          `,
+          options: [{ skipJsx: true }],
+        },
         // Multi-line return expression (complex)
         {
           code: `

@@ -90,16 +90,9 @@ module.exports = {
      */
     function checkSelector(node, name, params) {
       // Only check functions starting with "select"
+      // Note: createSelector calls are filtered out before reaching this function
+      // in the VariableDeclarator visitor (lines 140-144)
       if (!name || !name.startsWith('select')) {
-        return
-      }
-
-      // Skip createSelector calls (they use a different pattern)
-      if (
-        node.type === 'CallExpression' &&
-        node.callee.type === 'Identifier' &&
-        node.callee.name === 'createSelector'
-      ) {
         return
       }
 
