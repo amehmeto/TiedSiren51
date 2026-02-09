@@ -65,6 +65,12 @@ jq '.dependencies' package.json   # View dependencies (alias: jqd)
 jq '.devDependencies' package.json  # View devDependencies (alias: jqdd)
 ```
 
+## Branch & PR Hygiene
+
+- Each GitHub issue gets its own branch and PR. Never combine features from different issues into one PR.
+- Before committing, verify you are on the correct branch for the current task.
+- Never bypass or disable git hooks without explicit user permission.
+
 ## Workflow
 
 1. **When you believe you're done with a task, run `/commit-push`** to commit all changes and push to remote. Do not ask for permission—just do it.

@@ -143,6 +143,7 @@ print_summary() {
   local branch="$2"
   local pr_number="$3"
   local pr_url="$4"
+  local issue_number="$5"
 
   echo ""
   echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
@@ -152,6 +153,11 @@ print_summary() {
   echo "BRANCH=$branch"
   echo "PR_NUMBER=${pr_number:-none}"
   echo "PR_URL=${pr_url:-none}"
+  echo "ISSUE_CONTENT_START"
+  if ! gh issue view "$issue_number" --comments; then
+    echo "[ERROR] Failed to fetch issue #$issue_number content"
+  fi
+  echo "ISSUE_CONTENT_END"
   echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 }
 
@@ -169,7 +175,10 @@ cleanup_merged_worktrees() {
 
     # Check if there's a PR for this branch (must use --state all to find merged/closed PRs)
     local pr_info
-    pr_info=$(gh pr list --head "$branch" --state all --json number,state --jq '.[0] // empty' 2>/dev/null || true)
+    pr_info=$(gh pr list --head "$branch" --state all --json number,state --jq '.[0] // empty') || {
+      print_warning "Failed to check PR status for branch '$branch', skipping"
+      continue
+    }
 
     if [ -n "$pr_info" ]; then
       local pr_state pr_number
@@ -212,7 +221,7 @@ list_worktrees() {
     if [ -n "$branch" ] && [ "$branch" != "main" ]; then
       local pr_info
       # Use --state all to show merged/closed PRs too
-      pr_info=$(gh pr list --head "$branch" --state all --json number,state,title --jq '.[0] // empty' 2>/dev/null || true)
+      pr_info=$(gh pr list --head "$branch" --state all --json number,state,title --jq '.[0] // empty') || true
 
       if [ -n "$pr_info" ]; then
         pr_number=$(echo "$pr_info" | jq -r '.number')
@@ -259,7 +268,10 @@ remove_worktree() {
   if [ -n "$branch" ] && [ "$branch" != "main" ]; then
     local pr_info
     # Use --state all to find merged/closed PRs too
-    pr_info=$(gh pr list --head "$branch" --state all --json number,state --jq '.[0] // empty' 2>/dev/null || true)
+    if ! pr_info=$(gh pr list --head "$branch" --state all --json number,state --jq '.[0] // empty'); then
+      print_error "Failed to check PR status for branch '$branch' (gh CLI error)"
+      exit "$EXIT_GIT_FAILED"
+    fi
 
     if [ -n "$pr_info" ]; then
       local pr_state pr_number
@@ -302,10 +314,24 @@ sanitize_for_dirname() {
 create_from_issue() {
   local issue_number="$1"
 
+  print_info "Ensuring local main is up to date..."
+  if ! git diff-index --quiet HEAD 2>/dev/null; then
+    print_error "Working tree has uncommitted changes. Commit or stash them before starting a new issue."
+    exit "$EXIT_GIT_FAILED"
+  fi
+  git checkout main
+  if ! git pull origin main; then
+    print_error "Failed to pull latest main"
+    exit "$EXIT_GIT_FAILED"
+  fi
+
   print_info "Fetching issue #$issue_number details..."
 
   local issue_info
-  issue_info=$(gh issue view "$issue_number" --json title,body,labels 2>/dev/null || true)
+  if ! issue_info=$(gh issue view "$issue_number" --json title,body,labels); then
+    print_error "Failed to fetch issue #$issue_number"
+    exit "$EXIT_ISSUE_NOT_FOUND"
+  fi
 
   if [ -z "$issue_info" ]; then
     print_error "Issue #$issue_number not found"
@@ -335,6 +361,21 @@ create_from_issue() {
 
   mkdir -p "$WORKTREES_DIR"
 
+  # Check if a worktree already exists for this branch (regardless of directory name)
+  local existing_wt_for_branch=""
+  while IFS=$'\t' read -r wt_path wt_branch; do
+    if [ "$wt_branch" = "$branch" ]; then
+      existing_wt_for_branch="$wt_path"
+      break
+    fi
+  done < <(parse_worktree_list)
+
+  if [ -n "$existing_wt_for_branch" ]; then
+    print_error "A worktree for branch '$branch' already exists at: $existing_wt_for_branch"
+    print_info "To navigate: cd $existing_wt_for_branch"
+    exit "$EXIT_WORKTREE_EXISTS"
+  fi
+
   # Check if branch exists locally or remotely
   local branch_exists=false
   if git show-ref --verify --quiet "refs/heads/$branch" 2>/dev/null; then
@@ -348,7 +389,10 @@ create_from_issue() {
 
   # Check if PR exists for this branch
   local existing_pr_info existing_pr existing_pr_url
-  existing_pr_info=$(gh pr list --head "$branch" --json number,url --jq '.[0] // empty' 2>/dev/null || true)
+  if ! existing_pr_info=$(gh pr list --head "$branch" --json number,url --jq '.[0] // empty'); then
+    print_error "Failed to check for existing PRs"
+    exit "$EXIT_GIT_FAILED"
+  fi
   if [ -n "$existing_pr_info" ]; then
     existing_pr=$(echo "$existing_pr_info" | jq -r '.number')
     existing_pr_url=$(echo "$existing_pr_info" | jq -r '.url')
@@ -397,7 +441,6 @@ create_from_issue() {
     # No PR yet - create branch, push, create PR, then create worktree with PR number
     if [ "$branch_exists" = false ]; then
       print_info "Creating new branch '$branch' from main..."
-      git fetch origin main
       if ! git branch "$branch" origin/main; then
         print_error "Failed to create branch"
         exit "$EXIT_GIT_FAILED"
@@ -488,7 +531,7 @@ PREOF
   print_success "Worktree created at: $wt_path"
   print_info "To navigate: cd $wt_path"
 
-  print_summary "$wt_path" "$branch" "$pr_number" "$pr_url"
+  print_summary "$wt_path" "$branch" "$pr_number" "$pr_url" "$issue_number"
   exit "$EXIT_SUCCESS"
 }
 
