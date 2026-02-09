@@ -2,9 +2,9 @@ import { beforeEach, describe, expect, test } from 'vitest'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
-import { selectBlocklistIdsInActiveOrScheduledSessions } from './selectBlocklistIdsInActiveOrScheduledSessions'
+import { selectLockedBlocklistIds } from './selectLockedBlocklistIds'
 
-describe('selectBlocklistIdsInActiveOrScheduledSessions', () => {
+describe('selectLockedBlocklistIds', () => {
   let dateProvider: StubDateProvider
 
   beforeEach(() => {
@@ -14,10 +14,7 @@ describe('selectBlocklistIdsInActiveOrScheduledSessions', () => {
   test('returns empty array when there are no sessions', () => {
     const state = stateBuilder().build()
 
-    const retrievedBlocklistIds = selectBlocklistIdsInActiveOrScheduledSessions(
-      state,
-      dateProvider,
-    )
+    const retrievedBlocklistIds = selectLockedBlocklistIds(state, dateProvider)
 
     expect(retrievedBlocklistIds).toStrictEqual([])
   })
@@ -31,10 +28,7 @@ describe('selectBlocklistIdsInActiveOrScheduledSessions', () => {
     })
     const state = stateBuilder().withBlockSessions([activeSession]).build()
 
-    const retrievedBlocklistIds = selectBlocklistIdsInActiveOrScheduledSessions(
-      state,
-      dateProvider,
-    )
+    const retrievedBlocklistIds = selectLockedBlocklistIds(state, dateProvider)
 
     expect(retrievedBlocklistIds).toContain('blocklist-1')
     expect(retrievedBlocklistIds).toContain('blocklist-2')
@@ -49,10 +43,7 @@ describe('selectBlocklistIdsInActiveOrScheduledSessions', () => {
     })
     const state = stateBuilder().withBlockSessions([scheduledSession]).build()
 
-    const retrievedBlocklistIds = selectBlocklistIdsInActiveOrScheduledSessions(
-      state,
-      dateProvider,
-    )
+    const retrievedBlocklistIds = selectLockedBlocklistIds(state, dateProvider)
 
     expect(retrievedBlocklistIds).toContain('blocklist-3')
   })
@@ -73,10 +64,7 @@ describe('selectBlocklistIdsInActiveOrScheduledSessions', () => {
       .withBlockSessions([activeSession, scheduledSession])
       .build()
 
-    const retrievedBlocklistIds = selectBlocklistIdsInActiveOrScheduledSessions(
-      state,
-      dateProvider,
-    )
+    const retrievedBlocklistIds = selectLockedBlocklistIds(state, dateProvider)
 
     expect(retrievedBlocklistIds).toStrictEqual(['blocklist-1', 'blocklist-2'])
   })
@@ -97,10 +85,7 @@ describe('selectBlocklistIdsInActiveOrScheduledSessions', () => {
       .withBlockSessions([activeSession, scheduledSession])
       .build()
 
-    const retrievedBlocklistIds = selectBlocklistIdsInActiveOrScheduledSessions(
-      state,
-      dateProvider,
-    )
+    const retrievedBlocklistIds = selectLockedBlocklistIds(state, dateProvider)
 
     expect(retrievedBlocklistIds).toHaveLength(3)
     expect(retrievedBlocklistIds).toContain('blocklist-shared')

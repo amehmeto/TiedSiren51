@@ -11,7 +11,7 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { z } from 'zod'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
-import { selectBlocklistIdsInActiveOrScheduledSessions } from '@/core/block-session/selectors/selectBlocklistIdsInActiveOrScheduledSessions'
+import { selectLockedBlocklistIds } from '@/core/block-session/selectors/selectLockedBlocklistIds'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { selectBlocklistById } from '@/core/blocklist/selectors/selectBlocklistById'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
@@ -74,10 +74,7 @@ export function BlocklistForm({
   )
 
   const blocklistIdsInSessions = useSelector((state: RootState) =>
-    selectBlocklistIdsInActiveOrScheduledSessions(
-      state,
-      dependencies.dateProvider,
-    ),
+    selectLockedBlocklistIds(state, dependencies.dateProvider),
   )
 
   const isBlocklistInSession =

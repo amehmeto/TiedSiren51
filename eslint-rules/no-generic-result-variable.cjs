@@ -28,11 +28,12 @@ module.exports = {
     return {
       VariableDeclarator(node) {
         if (node.id.type !== 'Identifier') return
-        if (node.id.name === 'result')
+        if (node.id.name === 'result') {
           context.report({
             node: node.id,
             messageId: 'noGenericResult',
           })
+        }
       },
     }
   },

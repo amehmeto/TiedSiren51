@@ -37,15 +37,15 @@ describe('selectLockedSirensForBlocklist', () => {
       .withStrictModeEndedAt(null)
       .build()
 
-    const result = selectLockedSirensForBlocklist(
+    const retrievedLockedSirens = selectLockedSirensForBlocklist(
       state,
       dateProvider,
       'blocklist-1',
     )
 
-    const androidSize = result.android.size
-    const websitesSize = result.websites.size
-    const keywordsSize = result.keywords.size
+    const androidSize = retrievedLockedSirens.android.size
+    const websitesSize = retrievedLockedSirens.websites.size
+    const keywordsSize = retrievedLockedSirens.keywords.size
     expect(androidSize).toBe(0)
     expect(websitesSize).toBe(0)
     expect(keywordsSize).toBe(0)
@@ -72,15 +72,15 @@ describe('selectLockedSirensForBlocklist', () => {
       .withStrictModeEndedAt('2024-01-01T12:00:00.000Z')
       .build()
 
-    const result = selectLockedSirensForBlocklist(
+    const retrievedLockedSirens = selectLockedSirensForBlocklist(
       state,
       dateProvider,
       'blocklist-1',
     )
 
-    const androidSize = result.android.size
-    const websitesSize = result.websites.size
-    const keywordsSize = result.keywords.size
+    const androidSize = retrievedLockedSirens.android.size
+    const websitesSize = retrievedLockedSirens.websites.size
+    const keywordsSize = retrievedLockedSirens.keywords.size
     expect(androidSize).toBe(0)
     expect(websitesSize).toBe(0)
     expect(keywordsSize).toBe(0)
@@ -110,18 +110,18 @@ describe('selectLockedSirensForBlocklist', () => {
       .withStrictModeEndedAt('2024-01-01T12:00:00.000Z')
       .build()
 
-    const result = selectLockedSirensForBlocklist(
+    const retrievedLockedSirens = selectLockedSirensForBlocklist(
       state,
       dateProvider,
       'blocklist-1',
     )
 
-    const hasApp1 = result.android.has('com.app1')
-    const hasApp2 = result.android.has('com.app2')
-    const hasExampleCom = result.websites.has('example.com')
-    const hasTestOrg = result.websites.has('test.org')
-    const hasSocial = result.keywords.has('social')
-    const hasGaming = result.keywords.has('gaming')
+    const hasApp1 = retrievedLockedSirens.android.has('com.app1')
+    const hasApp2 = retrievedLockedSirens.android.has('com.app2')
+    const hasExampleCom = retrievedLockedSirens.websites.has('example.com')
+    const hasTestOrg = retrievedLockedSirens.websites.has('test.org')
+    const hasSocial = retrievedLockedSirens.keywords.has('social')
+    const hasGaming = retrievedLockedSirens.keywords.has('gaming')
     expect(hasApp1).toBe(true)
     expect(hasApp2).toBe(true)
     expect(hasExampleCom).toBe(true)
@@ -151,15 +151,15 @@ describe('selectLockedSirensForBlocklist', () => {
       .withStrictModeEndedAt('2024-01-01T12:00:00.000Z')
       .build()
 
-    const result = selectLockedSirensForBlocklist(
+    const retrievedLockedSirens = selectLockedSirensForBlocklist(
       state,
       dateProvider,
       'blocklist-1',
     )
 
-    const hasApp1 = result.android.has('com.app1')
-    const hasExampleCom = result.websites.has('example.com')
-    const hasSocial = result.keywords.has('social')
+    const hasApp1 = retrievedLockedSirens.android.has('com.app1')
+    const hasExampleCom = retrievedLockedSirens.websites.has('example.com')
+    const hasSocial = retrievedLockedSirens.keywords.has('social')
     expect(hasApp1).toBe(true)
     expect(hasExampleCom).toBe(true)
     expect(hasSocial).toBe(true)
@@ -170,15 +170,15 @@ describe('selectLockedSirensForBlocklist', () => {
       .withStrictModeEndedAt('2024-01-01T12:00:00.000Z')
       .build()
 
-    const result = selectLockedSirensForBlocklist(
+    const retrievedLockedSirens = selectLockedSirensForBlocklist(
       state,
       dateProvider,
       'non-existent',
     )
 
-    const androidSize = result.android.size
-    const websitesSize = result.websites.size
-    const keywordsSize = result.keywords.size
+    const androidSize = retrievedLockedSirens.android.size
+    const websitesSize = retrievedLockedSirens.websites.size
+    const keywordsSize = retrievedLockedSirens.keywords.size
     expect(androidSize).toBe(0)
     expect(websitesSize).toBe(0)
     expect(keywordsSize).toBe(0)

@@ -3,7 +3,7 @@ import { RootState } from '@/core/_redux_/createStore'
 import { selectActiveSessions } from './selectActiveSessions'
 import { selectScheduledSessions } from './selectScheduledSessions'
 
-export const selectBlocklistIdsInActiveOrScheduledSessions = (
+export const selectLockedBlocklistIds = (
   state: RootState,
   dateProvider: DateProvider,
 ): string[] => {

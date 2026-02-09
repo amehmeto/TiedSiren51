@@ -14,19 +14,21 @@ const orPattern = /[a-z0-9]Or[A-Z]/
 function checkName(context, node, name) {
   if (!name) return
 
-  if (andPattern.test(name))
+  if (andPattern.test(name)) {
     context.report({
       node,
       messageId: 'noAndOrInNames',
       data: { name, conjunction: 'And' },
     })
+  }
 
-  if (orPattern.test(name))
+  if (orPattern.test(name)) {
     context.report({
       node,
       messageId: 'noAndOrInNames',
       data: { name, conjunction: 'Or' },
     })
+  }
 }
 
 module.exports = {
