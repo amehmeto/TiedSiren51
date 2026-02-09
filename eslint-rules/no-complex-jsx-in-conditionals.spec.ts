@@ -132,6 +132,43 @@ describe('no-complex-jsx-in-conditionals', () => {
         }
       `,
         },
+        // Map callback with block that returns non-JSX
+        {
+          code: `
+        function Component() {
+          return items.map(item => {
+            return item.toString()
+          })
+        }
+      `,
+        },
+        // Non-JSXElement return value
+        {
+          code: `
+        function Component() {
+          if (loading) {
+            return null
+          }
+          return <div>Done</div>
+        }
+      `,
+        },
+        // Ternary with non-JSX consequent
+        {
+          code: `
+        function Component() {
+          return loading ? null : <div>Done</div>
+        }
+      `,
+        },
+        // Ternary with non-JSX alternate
+        {
+          code: `
+        function Component() {
+          return loading ? <div>Loading</div> : null
+        }
+      `,
+        },
       ],
 
       invalid: [
