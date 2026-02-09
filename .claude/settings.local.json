@@ -168,6 +168,7 @@
       "Edit",
       "Read",
       "Skill(commit-push)",
+      "Skill(create-pr)",
       "Skill(ralph-wiggum:cancel-ralph)",
       "Skill(ralph-wiggum:help)",
       "Skill(ralph-wiggum:ralph-loop)",
