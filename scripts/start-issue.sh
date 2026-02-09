@@ -308,6 +308,13 @@ sanitize_for_dirname() {
 create_from_issue() {
   local issue_number="$1"
 
+  print_info "Ensuring local main is up to date..."
+  git checkout main
+  if ! git pull origin main; then
+    print_error "Failed to pull latest main"
+    exit "$EXIT_GIT_FAILED"
+  fi
+
   print_info "Fetching issue #$issue_number details..."
 
   local issue_info
@@ -403,7 +410,6 @@ create_from_issue() {
     # No PR yet - create branch, push, create PR, then create worktree with PR number
     if [ "$branch_exists" = false ]; then
       print_info "Creating new branch '$branch' from main..."
-      git fetch origin main
       if ! git branch "$branch" origin/main; then
         print_error "Failed to create branch"
         exit "$EXIT_GIT_FAILED"
