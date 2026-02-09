@@ -7,10 +7,10 @@ import { T } from '@/ui/design-system/theme'
 
 import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
-
-type ListItem =
-  | { type: 'siren'; siren: string }
-  | { type: 'divider'; id: string }
+import {
+  SortedListItem,
+  sortWithSelectedFirst,
+} from '@/ui/screens/Blocklists/sort-with-selected-first'
 
 type TextInputSelectionSceneProps = Readonly<{
   onSubmitEditing: (event: { nativeEvent: { text: string } }) => void
@@ -21,6 +21,8 @@ type TextInputSelectionSceneProps = Readonly<{
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
   savedSelectedSirens: string[]
 }>
+
+const identity = (s: string) => s
 
 export function TextInputSelectionScene({
   onSubmitEditing,
@@ -34,28 +36,10 @@ export function TextInputSelectionScene({
   const [isFocused, setIsFocused] = useState(false)
   const insets = useSafeAreaInsets()
 
-  const sortedListItems = useMemo(() => {
-    const savedSet = new Set(savedSelectedSirens)
-
-    const selectedSirens = data
-      .filter((siren) => savedSet.has(siren))
-      .sort((a, b) => a.localeCompare(b))
-
-    const unselectedSirens = data
-      .filter((siren) => !savedSet.has(siren))
-      .sort((a, b) => a.localeCompare(b))
-
-    const items: ListItem[] = []
-
-    selectedSirens.forEach((siren) => items.push({ type: 'siren', siren }))
-
-    if (selectedSirens.length > 0 && unselectedSirens.length > 0)
-      items.push({ type: 'divider', id: 'divider-available' })
-
-    unselectedSirens.forEach((siren) => items.push({ type: 'siren', siren }))
-
-    return items
-  }, [data, savedSelectedSirens])
+  const sortedListItems: SortedListItem<string>[] = useMemo(
+    () => sortWithSelectedFirst(data, savedSelectedSirens, identity, identity),
+    [data, savedSelectedSirens],
+  )
 
   return (
     <>
@@ -72,19 +56,17 @@ export function TextInputSelectionScene({
       />
       <FlatList
         data={sortedListItems}
-        keyExtractor={(item) =>
-          item.type === 'divider' ? item.id : item.siren
-        }
+        keyExtractor={(item) => (item.type === 'divider' ? item.id : item.item)}
         renderItem={({ item }) => {
           if (item.type === 'divider')
-            return <SectionDivider label="Available" />
+            return <SectionDivider label={item.label} />
 
-          const isSelected = isSirenSelected(sirenType, item.siren)
+          const isSelected = isSirenSelected(sirenType, item.item)
           return (
             <SelectableSirenCard
               sirenType={sirenType}
-              siren={item.siren}
-              onPress={() => toggleSiren(sirenType, item.siren)}
+              siren={item.item}
+              onPress={() => toggleSiren(sirenType, item.item)}
               isSelected={isSelected}
             />
           )

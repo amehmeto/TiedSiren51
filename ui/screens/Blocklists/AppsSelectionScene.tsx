@@ -7,10 +7,10 @@ import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { T } from '@/ui/design-system/theme'
 import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
-
-type ListItem =
-  | { type: 'app'; app: AndroidSiren }
-  | { type: 'divider'; id: string }
+import {
+  SortedListItem,
+  sortWithSelectedFirst,
+} from '@/ui/screens/Blocklists/sort-with-selected-first'
 
 type AppsSelectionSceneProps = Readonly<{
   androidApps: AndroidSiren[]
@@ -27,47 +27,36 @@ export function AppsSelectionScene({
 }: AppsSelectionSceneProps) {
   const insets = useSafeAreaInsets()
 
-  const sortedListItems = useMemo(() => {
-    const savedSet = new Set(savedSelectedPackageNames)
-
-    const selectedApps = androidApps
-      .filter((app) => savedSet.has(app.packageName))
-      .sort((a, b) => a.appName.localeCompare(b.appName))
-
-    const unselectedApps = androidApps
-      .filter((app) => !savedSet.has(app.packageName))
-      .sort((a, b) => a.appName.localeCompare(b.appName))
-
-    const items: ListItem[] = []
-
-    selectedApps.forEach((app) => items.push({ type: 'app', app }))
-
-    if (selectedApps.length > 0 && unselectedApps.length > 0)
-      items.push({ type: 'divider', id: 'divider-available' })
-
-    unselectedApps.forEach((app) => items.push({ type: 'app', app }))
-
-    return items
-  }, [androidApps, savedSelectedPackageNames])
+  const sortedListItems: SortedListItem<AndroidSiren>[] = useMemo(
+    () =>
+      sortWithSelectedFirst(
+        androidApps,
+        savedSelectedPackageNames,
+        (app) => app.packageName,
+        (app) => app.appName,
+      ),
+    [androidApps, savedSelectedPackageNames],
+  )
 
   return (
     <FlatList
       data={sortedListItems}
       keyExtractor={(item) =>
-        item.type === 'divider' ? item.id : item.app.packageName
+        item.type === 'divider' ? item.id : item.item.packageName
       }
       renderItem={({ item }) => {
-        if (item.type === 'divider') return <SectionDivider label="Available" />
+        if (item.type === 'divider')
+          return <SectionDivider label={item.label} />
 
         const isSelected = isSirenSelected(
           SirenType.ANDROID,
-          item.app.packageName,
+          item.item.packageName,
         )
         return (
           <SelectableSirenCard
             sirenType={SirenType.ANDROID}
-            siren={item.app}
-            onPress={() => toggleAppSiren(SirenType.ANDROID, item.app)}
+            siren={item.item}
+            onPress={() => toggleAppSiren(SirenType.ANDROID, item.item)}
             isSelected={isSelected}
           />
         )
