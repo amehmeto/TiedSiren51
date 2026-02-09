@@ -188,6 +188,27 @@ export function Modal({ visible }: ModalProps) {
             },
           ],
         },
+        // Bad: function inside IIFE (nested parent traversal) - with fix
+        {
+          code: `(function() {
+  function Button(props: { label: string }) {
+    return <button>{props.label}</button>
+  }
+})()`,
+          output: `type ButtonProps = { label: string }
+
+(function() {
+  function Button({ label }: ButtonProps) {
+    return <button>{label}</button>
+  }
+})()`,
+          errors: [
+            {
+              messageId: 'destructureProps',
+              data: { componentName: 'Button', suggestedProps: 'label' },
+            },
+          ],
+        },
       ],
     })
   })

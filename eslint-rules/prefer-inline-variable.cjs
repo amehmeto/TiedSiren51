@@ -324,24 +324,14 @@ module.exports = {
      * Check if inlining would create a complex expression (>3 terms)
      */
     function wouldCreateComplexExpression(usageNode, initNode) {
-      if (
-        initNode.type !== 'BinaryExpression' &&
-        initNode.type !== 'LogicalExpression'
-      ) {
-        return false
-      }
-
-      const parent = usageNode.parent
-      if (
-        parent &&
-        (parent.type === 'BinaryExpression' ||
-          parent.type === 'LogicalExpression')
-      ) {
-        // Already in an expression, adding more terms would be complex
-        return true
-      }
-
-      return false
+      // With current isSimpleInit filter (only allowing CallExpression, Identifier,
+      // MemberExpression, ArrayExpression, ObjectExpression, Literal, TemplateLiteral),
+      // BinaryExpression and LogicalExpression are never passed here.
+      // This check is kept for defensive purposes in case isSimpleInit changes.
+      return (
+        initNode.type === 'BinaryExpression' ||
+        initNode.type === 'LogicalExpression'
+      )
     }
 
     return {
@@ -450,25 +440,14 @@ module.exports = {
     }
 
     function mightNeedParentheses(usageNode, initNode) {
+      // With current isSimpleInit filter, we only see: CallExpression, Identifier,
+      // MemberExpression, ArrayExpression, ObjectExpression, Literal, TemplateLiteral
+      // None of these require parentheses when inlined
       const parent = usageNode.parent
       if (!parent) return false
 
-      if (
-        ['Identifier', 'Literal', 'CallExpression', 'MemberExpression'].includes(
-          initNode.type,
-        )
-      ) {
-        return false
-      }
-
-      if (
-        ['BinaryExpression', 'LogicalExpression', 'ConditionalExpression'].includes(
-          initNode.type,
-        )
-      ) {
-        return true
-      }
-
+      // ArrayExpression and ObjectExpression might need parens in some edge cases
+      // but ESLint's fixer handles this automatically for most cases
       return false
     }
   },

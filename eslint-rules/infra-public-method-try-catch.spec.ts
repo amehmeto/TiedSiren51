@@ -420,6 +420,23 @@ describe('infra-public-method-try-catch', () => {
           output:
             'const Gateway = class {\n  async fetch() {\n    try {\n      await this.api.get()\n  \n    } catch (error) {\n      this.logger.error(`[UnknownClass] Failed to fetch: ${error}`)\n      throw error\n    }\n  }\n}',
         },
+        // Computed property method with literal key - NOT OK (key is Literal, not Identifier)
+        {
+          code: `class Gateway {
+  async ['fetch']() {
+    await this.api.get()
+  }
+}`,
+          filename: '/project/infra/auth-gateway/firebase.auth.gateway.ts',
+          errors: [
+            {
+              messageId: 'publicMethodNeedsTryCatch',
+              data: { methodName: '<anonymous>' },
+            },
+          ],
+          output:
+            "class Gateway {\n  async ['fetch']() {\n    try {\n      await this.api.get()\n  \n    } catch (error) {\n      this.logger.error(`[Gateway] Failed to <anonymous>: ${error}`)\n      throw error\n    }\n  }\n}",
+        },
       ],
     })
   })
