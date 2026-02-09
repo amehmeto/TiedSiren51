@@ -154,7 +154,9 @@ print_summary() {
   echo "PR_NUMBER=${pr_number:-none}"
   echo "PR_URL=${pr_url:-none}"
   echo "ISSUE_CONTENT_START"
-  gh issue view "$issue_number" --comments
+  if ! gh issue view "$issue_number" --comments; then
+    echo "[ERROR] Failed to fetch issue #$issue_number content"
+  fi
   echo "ISSUE_CONTENT_END"
   echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 }

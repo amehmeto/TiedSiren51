@@ -6,24 +6,25 @@ Fix all pending review comments on PR #$ARGUMENTS.
 
 ## Steps
 
-1. **Determine repo owner and current user:**
+1. **Determine repo and current user:**
    ```bash
-   gh repo view --json owner --jq '.owner.login'
+   REPO_NWO=$(gh repo view --json nameWithOwner --jq '.nameWithOwner')
+   OWNER=$(gh repo view --json owner --jq '.owner.login')
    gh api user --jq '.login'
    ```
 
 2. **Fetch all review comments from the PR:**
    ```bash
    gh pr view $ARGUMENTS --comments
-   gh api repos/{owner}/{repo}/pulls/$ARGUMENTS/comments
+   gh api repos/$REPO_NWO/pulls/$ARGUMENTS/comments
    ```
    Focus ONLY on comments from me (the repo owner). Ignore bot comments, CI status comments, and comments from other users.
 
-3. **Ensure you are in the correct worktree** for this PR's branch:
+3. **Ensure you are on the correct branch** for this PR:
    ```bash
    gh pr view $ARGUMENTS --json headRefName --jq '.headRefName'
    ```
-   Find the worktree that has this branch checked out and `cd` into it. If no worktree exists, error and stop.
+   Find the worktree that has this branch checked out and `cd` into it. If no worktree exists, check out the branch directly with `git checkout <branch>`.
 
 4. **Parse each review comment** to extract:
    - The file path and line number it's attached to
@@ -39,7 +40,8 @@ Fix all pending review comments on PR #$ARGUMENTS.
 7. **After all fixes are applied:**
    - Run `npm run lint` and fix any violations
    - Run `npm test` and fix any test failures
-   - Commit and push with `/commit-push` using message: `fix: address PR review feedback`
+   - Stage all changed files and commit with message: `fix: address PR review feedback`
+   - Push with `/commit-push`
 
 8. **After push, summarize on the PR:**
    ```bash
@@ -51,4 +53,4 @@ Fix all pending review comments on PR #$ARGUMENTS.
 - Do NOT modify files that weren't mentioned in review comments unless lint/test requires it
 - Do NOT over-engineer fixes — apply the minimal change that addresses each comment
 - If a comment is ambiguous, make the most reasonable interpretation and note it in the PR summary comment
-- Work from the correct worktree for this PR branch
+- Work from the correct worktree or branch for this PR
