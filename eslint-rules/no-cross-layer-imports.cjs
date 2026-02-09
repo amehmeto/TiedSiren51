@@ -102,10 +102,10 @@ module.exports = {
         }
       },
 
-      // Also check dynamic imports
-      'CallExpression[callee.type="Import"]'(node) {
-        if (node.arguments[0] && node.arguments[0].type === 'Literal') {
-          const importPath = node.arguments[0].value
+      // Check dynamic imports (import() expressions)
+      ImportExpression(node) {
+        if (node.source && node.source.type === 'Literal') {
+          const importPath = node.source.value
           const importLayer = getImportLayer(importPath)
 
           if (importLayer && forbidden.includes(importLayer)) {

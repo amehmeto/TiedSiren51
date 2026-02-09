@@ -45,7 +45,7 @@ module.exports = {
     const basename = path.basename(filename)
 
     // Only check kebab-case.fixture.ts files
-    const fixtureMatch = basename.match(/^([a-z][a-z0-9-]*)\\.fixture\\.ts$/)
+    const fixtureMatch = basename.match(/^([a-z][a-z0-9-]*)\.fixture\.ts$/)
     if (!fixtureMatch) return {}
 
     const kebabName = fixtureMatch[1]

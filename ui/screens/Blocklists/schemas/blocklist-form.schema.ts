@@ -1,6 +1,6 @@
 import { z } from 'zod'
 
-export const blocklistSchema = z.object({
+export const blocklistFormSchema = z.object({
   name: z.string().refine((val) => val.trim() !== '', {
     message: 'Blocklist name must be provided',
   }),
