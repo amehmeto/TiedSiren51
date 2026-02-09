@@ -221,6 +221,56 @@ describe('try-catch-isolation', () => {
       `,
           errors: [{ messageId: 'multipleTryCatch' }],
         },
+        // Try as direct if consequent (no block) - NOT OK (multiple try-catch)
+        {
+          code: `
+        function foo() {
+          if (a)
+            try { doA() } catch (e) {}
+          else if (b)
+            try { doB() } catch (e) {}
+        }
+      `,
+          errors: [{ messageId: 'multipleTryCatch' }],
+        },
+        // Try as direct else (no block) - counted with try in if block
+        {
+          code: `
+        function foo() {
+          if (a) {
+            try { doA() } catch (e) {}
+          } else
+            try { doB() } catch (e) {}
+        }
+      `,
+          errors: [{ messageId: 'multipleTryCatch' }],
+        },
+        // Multiple try-catch inside a single if block - NOT OK
+        {
+          code: `
+        function foo() {
+          if (condition) {
+            try { doA() } catch (e) {}
+            try { doB() } catch (e) {}
+          }
+        }
+      `,
+          errors: [{ messageId: 'multipleTryCatch' }],
+        },
+        // Multiple try-catch inside else block - NOT OK
+        {
+          code: `
+        function foo() {
+          if (condition) {
+            return
+          } else {
+            try { doA() } catch (e) {}
+            try { doB() } catch (e) {}
+          }
+        }
+      `,
+          errors: [{ messageId: 'multipleTryCatch' }],
+        },
       ],
     })
   })

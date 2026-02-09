@@ -121,6 +121,20 @@ describe('no-nested-call-expressions', () => {
             { messageId: 'noNestedCalls', data: { innerCall: 'inner(...)' } },
           ],
         },
+        // Computed property access on inner call - SHOULD report with '...'
+        {
+          code: `outer(obj['method'](x))`,
+          errors: [
+            { messageId: 'noNestedCalls', data: { innerCall: '...(...)' } },
+          ],
+        },
+        // Computed property access on outer call - SHOULD report inner
+        {
+          code: `obj['method'](inner(x))`,
+          errors: [
+            { messageId: 'noNestedCalls', data: { innerCall: 'inner(...)' } },
+          ],
+        },
         // allowNoArguments: still reports when inner call HAS arguments (non-dispatch)
         {
           code: `process(createAction(payload))`,

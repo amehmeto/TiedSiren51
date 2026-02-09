@@ -341,6 +341,24 @@ describe('file-naming-convention', () => {
           filename: '/project/core/__utils__/BadName.utils.ts',
           errors: [{ messageId: 'coreUtilsNaming' }],
         },
+        // Bad core utils test naming
+        {
+          code: `describe('test', () => {})`,
+          filename: '/project/core/__utils__/BadName.utils.test.ts',
+          errors: [{ messageId: 'coreUtilsNaming' }],
+        },
+        // Bad UI fixture naming
+        {
+          code: `export const fixture = {}`,
+          filename: '/project/ui/screens/Home/BadName.fixture.ts',
+          errors: [{ messageId: 'coreFixtureNaming' }],
+        },
+        // Bad core selector test naming
+        {
+          code: `describe('test', () => {})`,
+          filename: '/project/core/auth/selectors/BadName.test.ts',
+          errors: [{ messageId: 'coreSelectorTestNaming' }],
+        },
         // Bad port naming
         {
           code: `export interface Gateway {}`,
@@ -376,6 +394,30 @@ describe('file-naming-convention', () => {
           code: `export const helper = () => {}`,
           filename: '/project/ui/utils/My_Helper.ts',
           errors: [{ messageId: 'uiUtilityNaming' }],
+        },
+        // Bad UI helper test naming
+        {
+          code: `describe('test', () => {})`,
+          filename: '/project/ui/utils/BadName.helper.test.ts',
+          errors: [{ messageId: 'uiHelperNaming' }],
+        },
+        // Bad UI .ts file naming (not a type, view-model, schema, or test)
+        {
+          code: `export const something = {}`,
+          filename: '/project/ui/screens/Home/My_Bad_File.ts',
+          errors: [{ messageId: 'uiUtilityNaming' }],
+        },
+        // Bad UI view-model test naming
+        {
+          code: `describe('test', () => {})`,
+          filename: '/project/ui/screens/Home/BadName.view-model.test.ts',
+          errors: [{ messageId: 'uiViewModelNaming' }],
+        },
+        // Bad UI schema test naming
+        {
+          code: `describe('test', () => {})`,
+          filename: '/project/ui/schemas/BadName.schema.test.ts',
+          errors: [{ messageId: 'uiSchemaNaming' }],
         },
       ],
     })

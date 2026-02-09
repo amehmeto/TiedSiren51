@@ -211,6 +211,16 @@ describe('prefer-inline-variable', () => {
         applyRules(validationRules)
       `,
         },
+        // Inside expect() call with call result - should NOT report (nested call heuristic)
+        {
+          code: `const res = calculate(x)
+expect(res).toBe(42)`,
+        },
+        // Inside expect() call with simple value - should NOT report (test assertion context)
+        {
+          code: `const val = x
+expect(val).toBe(42)`,
+        },
       ],
 
       invalid: [

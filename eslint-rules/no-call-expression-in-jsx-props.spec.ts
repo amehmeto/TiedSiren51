@@ -125,6 +125,16 @@ describe('no-call-expression-in-jsx-props', () => {
             },
           ],
         },
+        // Computed property access method call - INVALID
+        {
+          code: '<Component value={obj["method"](x)} />',
+          errors: [
+            {
+              messageId: 'extractCallExpression',
+              data: { call: '...(...)', prop: 'value' },
+            },
+          ],
+        },
       ],
     })
   })

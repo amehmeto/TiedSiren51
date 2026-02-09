@@ -106,6 +106,41 @@ describe('no-module-level-constants', () => {
           code: `const config = {}`,
           filename: '/project/scripts/build.js',
         },
+        // CJS files - OK
+        {
+          code: `const config = {}`,
+          filename: '/project/eslint-rules/my-rule.cjs',
+        },
+        // MJS files - OK
+        {
+          code: `const config = {}`,
+          filename: '/project/scripts/build.mjs',
+        },
+        // dependencies.ts files (DI containers) - OK
+        {
+          code: `const container = {}`,
+          filename: '/project/core/dependencies.ts',
+        },
+        // var declarations - OK (skipped, only const/let are checked)
+        {
+          code: `var legacy = 'old'`,
+          filename: '/project/infra/auth/auth.gateway.ts',
+        },
+        // styles constant in non-TSX file - OK
+        {
+          code: `const styles = { container: {} }`,
+          filename: '/project/infra/auth/auth.gateway.ts',
+        },
+        // Constant inside a function (not module-level) - OK
+        {
+          code: `function foo() { const LOCAL = 'value' }`,
+          filename: '/project/infra/auth/auth.gateway.ts',
+        },
+        // _REGEX pattern constants - OK
+        {
+          code: `const PHONE_REGEX = /^\\d{10}$/`,
+          filename: '/project/core/auth/validators.ts',
+        },
       ],
 
       invalid: [

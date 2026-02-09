@@ -160,6 +160,7 @@
       "Bash(type:*)",
       "Bash(wc:*)",
       "Bash(which:*)",
+      "Bash(while read f)",
       "Bash(xargs cloc:*)",
       "Bash(xxd:*)",
       "Edit",

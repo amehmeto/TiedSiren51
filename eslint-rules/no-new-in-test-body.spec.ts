@@ -143,6 +143,21 @@ describe('no-new-in-test-body', () => {
             },
           ],
         },
+        // Namespaced class (MemberExpression callee) - NOT OK
+        {
+          code: `
+        it('should work', () => {
+          const service = new Auth.Service()
+        })
+      `,
+          filename: '/project/core/auth/auth.test.ts',
+          errors: [
+            {
+              messageId: 'noNewInTestBody',
+              data: { className: 'Service' },
+            },
+          ],
+        },
       ],
     })
   })
