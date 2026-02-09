@@ -1,11 +1,16 @@
 import * as React from 'react'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { FlatList, StyleSheet, TextInput } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SirenType } from '@/core/siren/sirens'
 import { T } from '@/ui/design-system/theme'
 
+import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
+
+type ListItem =
+  | { type: 'siren'; siren: string }
+  | { type: 'divider'; id: string }
 
 type TextInputSelectionSceneProps = Readonly<{
   onSubmitEditing: (event: { nativeEvent: { text: string } }) => void
@@ -14,6 +19,7 @@ type TextInputSelectionSceneProps = Readonly<{
   data: string[]
   toggleSiren: (sirenType: SirenType, sirenId: string) => void
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
+  savedSelectedSirens: string[]
 }>
 
 export function TextInputSelectionScene({
@@ -23,9 +29,33 @@ export function TextInputSelectionScene({
   data,
   toggleSiren,
   isSirenSelected,
+  savedSelectedSirens,
 }: TextInputSelectionSceneProps) {
   const [isFocused, setIsFocused] = useState(false)
   const insets = useSafeAreaInsets()
+
+  const sortedListItems = useMemo(() => {
+    const savedSet = new Set(savedSelectedSirens)
+
+    const selectedSirens = data
+      .filter((siren) => savedSet.has(siren))
+      .sort((a, b) => a.localeCompare(b))
+
+    const unselectedSirens = data
+      .filter((siren) => !savedSet.has(siren))
+      .sort((a, b) => a.localeCompare(b))
+
+    const items: ListItem[] = []
+
+    selectedSirens.forEach((siren) => items.push({ type: 'siren', siren }))
+
+    if (selectedSirens.length > 0 && unselectedSirens.length > 0)
+      items.push({ type: 'divider', id: 'divider-available' })
+
+    unselectedSirens.forEach((siren) => items.push({ type: 'siren', siren }))
+
+    return items
+  }, [data, savedSelectedSirens])
 
   return (
     <>
@@ -41,15 +71,20 @@ export function TextInputSelectionScene({
         onSubmitEditing={onSubmitEditing}
       />
       <FlatList
-        data={data}
-        keyExtractor={(item) => item}
+        data={sortedListItems}
+        keyExtractor={(item) =>
+          item.type === 'divider' ? item.id : item.siren
+        }
         renderItem={({ item }) => {
-          const isSelected = isSirenSelected(sirenType, item)
+          if (item.type === 'divider')
+            return <SectionDivider label="Available" />
+
+          const isSelected = isSirenSelected(sirenType, item.siren)
           return (
             <SelectableSirenCard
               sirenType={sirenType}
-              siren={item}
-              onPress={() => toggleSiren(sirenType, item)}
+              siren={item.siren}
+              onPress={() => toggleSiren(sirenType, item.siren)}
               isSelected={isSelected}
             />
           )

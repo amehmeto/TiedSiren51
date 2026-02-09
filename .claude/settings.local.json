@@ -4,6 +4,7 @@
   },
   "permissions": {
     "allow": [
+      "Bash(\"/Users/arthurmehmetoglu/.claude/plugins/cache/claude-code-plugins/ralph-wiggum/1.0.0/scripts/setup-ralph-loop.sh\" \"Work on issue 272 - Display selected apps at top of blocklist screen. Selected apps should be sorted alphabetically at top, with a visual divider separating them from unselected apps. Reordering should only happen on save/confirm, not immediately. Applies to both create and edit blocklist screens.\" --completion-promise \"Issue 272 is complete with all acceptance criteria met\" --max-iterations 50)",
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
       "Bash(./node_modules/.bin/vitest run:*)",

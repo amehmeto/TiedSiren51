@@ -75,6 +75,16 @@ export function BlocklistForm({
     },
   )
 
+  const [savedSelection, setSavedSelection] = useState<{
+    androidPackageNames: string[]
+    websites: string[]
+    keywords: string[]
+  }>({
+    androidPackageNames: [],
+    websites: [],
+    keywords: [],
+  })
+
   const [errors, setErrors] = useState<ErrorMessages>({})
   const [index, setIndex] = useState(0)
 
@@ -86,9 +96,18 @@ export function BlocklistForm({
 
   useEffect(() => {
     dispatch(fetchAvailableSirens())
-    if (mode === FormMode.Edit && blocklistFromState)
+    if (mode === FormMode.Edit && blocklistFromState) {
       // eslint-disable-next-line react-hooks/set-state-in-effect
       setBlocklist(blocklistFromState)
+      // eslint-disable-next-line react-hooks/set-state-in-effect
+      setSavedSelection({
+        androidPackageNames: blocklistFromState.sirens.android.map(
+          (app) => app.packageName,
+        ),
+        websites: blocklistFromState.sirens.websites,
+        keywords: blocklistFromState.sirens.keywords,
+      })
+    }
   }, [mode, blocklistFromState, dispatch])
 
   const toggleTextSiren = useCallback(
@@ -157,6 +176,7 @@ export function BlocklistForm({
             androidApps={selectableSirens.android}
             toggleAppSiren={toggleAppSiren}
             isSirenSelected={isSirenSelected}
+            savedSelectedPackageNames={savedSelection.androidPackageNames}
           />
         ),
         websites: () => (
@@ -169,6 +189,7 @@ export function BlocklistForm({
             data={selectableSirens.websites}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
+            savedSelectedSirens={savedSelection.websites}
           />
         ),
         keywords: () => (
@@ -181,6 +202,7 @@ export function BlocklistForm({
             data={selectableSirens.keywords}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
+            savedSelectedSirens={savedSelection.keywords}
           />
         ),
       }
@@ -193,6 +215,7 @@ export function BlocklistForm({
       toggleAppSiren,
       toggleTextSiren,
       isSirenSelected,
+      savedSelection,
     ],
   )
 
