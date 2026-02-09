@@ -102,6 +102,22 @@ describe('prefer-inline-variable', () => {
         const hasSessions = sessions.length > 0
       `,
         },
+        // Variable used as callee in assignment with call init - should NOT report
+        // Inlining would create: const result = getHandler()() which is a chained call
+        {
+          code: `
+        const handler = getHandler()
+        const result = handler()
+      `,
+        },
+        // Variable used as callee in standalone call (ExpressionStatement) - should NOT report
+        // Inlining would create: getCallback()() which is a chained call
+        {
+          code: `
+        const callback = getCallback()
+        callback()
+      `,
+        },
         // Multi-line initialization - should NOT report (hurts readability)
         {
           code: `

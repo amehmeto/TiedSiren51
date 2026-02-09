@@ -320,20 +320,6 @@ module.exports = {
       return false
     }
 
-    /**
-     * Check if inlining would create a complex expression (>3 terms)
-     */
-    function wouldCreateComplexExpression(usageNode, initNode) {
-      // With current isSimpleInit filter (only allowing CallExpression, Identifier,
-      // MemberExpression, ArrayExpression, ObjectExpression, Literal, TemplateLiteral),
-      // BinaryExpression and LogicalExpression are never passed here.
-      // This check is kept for defensive purposes in case isSimpleInit changes.
-      return (
-        initNode.type === 'BinaryExpression' ||
-        initNode.type === 'LogicalExpression'
-      )
-    }
-
     return {
       VariableDeclaration(node) {
         if (node.declarations.length !== 1) return
@@ -369,7 +355,6 @@ module.exports = {
         // JetBrains-style heuristics: don't inline if it would create complexity
         if (wouldCreateNestedCall(usage.identifier, decl.init)) return
         if (wouldCreateChainedAccess(usage.identifier, decl.init)) return
-        if (wouldCreateComplexExpression(usage.identifier, decl.init)) return
 
         // Don't inline into expect() calls - conflicts with expect-separate-act-assert
         if (isInsideExpectCall(usage.identifier)) return

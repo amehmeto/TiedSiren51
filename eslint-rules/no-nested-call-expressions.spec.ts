@@ -135,6 +135,13 @@ describe('no-nested-call-expressions', () => {
             { messageId: 'noNestedCalls', data: { innerCall: 'inner(...)' } },
           ],
         },
+        // IIFE as inner call (callee is FunctionExpression) - SHOULD report with '...'
+        {
+          code: `outer((function() { return 1 })(x))`,
+          errors: [
+            { messageId: 'noNestedCalls', data: { innerCall: '...(...)' } },
+          ],
+        },
         // allowNoArguments: still reports when inner call HAS arguments (non-dispatch)
         {
           code: `process(createAction(payload))`,

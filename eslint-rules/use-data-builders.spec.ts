@@ -36,6 +36,11 @@ describe('use-data-builders', () => {
           code: `const user: User = { name: 'John' }`,
           filename: '/project/core/auth/auth.test.ts',
         },
+        // Union type - OK (not tracked, getTypeName returns null)
+        {
+          code: `const value: BlockSession | null = null`,
+          filename: '/project/core/auth/auth.test.ts',
+        },
         // Non-test file - should not apply
         {
           code: `const session: BlockSession = { id: '123' }`,

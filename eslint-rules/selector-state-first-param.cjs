@@ -89,12 +89,8 @@ module.exports = {
      * @param {Array} params
      */
     function checkSelector(node, name, params) {
-      // Only check functions starting with "select"
-      // Note: createSelector calls are filtered out before reaching this function
-      // in the VariableDeclarator visitor (lines 140-144)
-      if (!name || !name.startsWith('select')) {
-        return
-      }
+      // Note: Functions are filtered by name prefix in VariableDeclarator (line 126)
+      // and FunctionDeclaration (line 156) visitors before reaching this function.
 
       // Must have at least one parameter
       if (!params || params.length === 0) {

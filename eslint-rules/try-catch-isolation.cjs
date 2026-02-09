@@ -57,22 +57,15 @@ module.exports = {
     }
 
     // Check a block of statements for try-catch violations
+    // Note: Multiple try-catch detection is handled globally by checkFunctionBody
+    // before this function is called, so we only check rules 2 and 3 here.
     function checkBlockStatements(statements, reportNode) {
       if (!statements || statements.length === 0) return
 
-      // Find all try statements at this level only (not nested)
+      // Find try statement at this level (at most 1, since multiple is caught globally)
       const tryStatementsAtThisLevel = statements.filter(
         (stmt) => stmt.type === 'TryStatement',
       )
-
-      // Rule 1: No multiple try-catch blocks at the same level
-      if (tryStatementsAtThisLevel.length > 1) {
-        context.report({
-          node: reportNode,
-          messageId: 'multipleTryCatch',
-        })
-        return // If there are multiple, don't check other rules for this block
-      }
 
       if (tryStatementsAtThisLevel.length === 0) return
 

@@ -75,10 +75,10 @@ export default {
           lines: 100,
         },
         'eslint-rules/*.cjs': {
-          statements: 98,
-          branches: 92,
+          statements: 99,
+          branches: 94,
           functions: 100,
-          lines: 98,
+          lines: 99,
         },
       },
     },
