@@ -95,6 +95,16 @@ describe('no-cross-layer-imports', () => {
           code: `import(dynamicPath)`,
           filename: '/project/core/auth/auth.slice.ts',
         },
+        // Dynamic import from same layer - OK
+        {
+          code: `import('@core/auth/auth-user')`,
+          filename: '/project/core/blocklist/blocklist.slice.ts',
+        },
+        // Dynamic import in UI from infra - OK
+        {
+          code: `import('@infra/auth-gateway')`,
+          filename: '/project/ui/screens/Home/HomeScreen.tsx',
+        },
       ],
 
       invalid: [
@@ -150,6 +160,17 @@ describe('no-cross-layer-imports', () => {
             {
               messageId: 'forbiddenImport',
               data: { fromLayer: 'core', toLayer: 'ui' },
+            },
+          ],
+        },
+        // Dynamic import crossing boundaries - NOT OK
+        {
+          code: `import('@infra/auth-gateway')`,
+          filename: '/project/core/auth/auth.slice.ts',
+          errors: [
+            {
+              messageId: 'forbiddenImport',
+              data: { fromLayer: 'core', toLayer: 'infra' },
             },
           ],
         },
