@@ -8,32 +8,39 @@ Run the start-issue script with the provided arguments:
 ./scripts/start-issue.sh $ARGUMENTS
 ```
 
-After the script completes:
+**If the script exits with a non-zero code, stop and report the error to the user. Do NOT proceed to the steps below.**
+
+After the script completes successfully:
 
 1. **Change to the worktree directory** using the WORKTREE_PATH from the script's SUMMARY output:
    ```bash
-   cd .worktrees/<worktree-name>
+   cd <WORKTREE_PATH>
    ```
    This is critical - all work must happen in the worktree, not the main repo.
 
-2. Fetch the issue details with `gh issue view <issue-number>`
+2. Extract the following from the SUMMARY output:
+   - The full issue content between `ISSUE_CONTENT_START` and `ISSUE_CONTENT_END`
+   - The `PR_URL` value
 
-3. Launch a ralph loop to implement the issue:
+3. Launch a ralph loop to implement the issue, injecting the extracted values:
 
 ```
-/ralph-loop "Implement issue #<issue-number>.
+/ralph-loop "Implement the following GitHub issue in this worktree.
 
-Read the issue acceptance criteria and implement them fully.
+PR: {PR_URL from SUMMARY}
+
+{ISSUE_CONTENT between ISSUE_CONTENT_START and ISSUE_CONTENT_END}
+
+Before making structural changes, read /docs/adr/README.md for architectural decisions that must be followed.
 
 Completion checklist:
-- All acceptance criteria from the ticket are met
+- ALL acceptance criteria from the issue are met
 - All unit tests pass (npm test)
 - Lint passes (npm run lint)
-- PR created with /commit-push
+- Changes committed and pushed with /commit-push
 - CI passes on the PR
-- No merge conflicts with main branch
+- No merge conflicts with main
+- PR description updated to reflect ALL changes made
 
 When ALL criteria are met, output: <promise>COMPLETE</promise>" --completion-promise "COMPLETE" --max-iterations 5
 ```
-
-4. After PR is created, update the PR description to accurately reflect ALL changes made (not just the original issue scope)
