@@ -37,13 +37,26 @@ Fix all pending review comments on PR #$ARGUMENTS.
    - Do NOT modify files that weren't mentioned in review comments unless lint/test fixes require it
    - If a comment is ambiguous, make the most reasonable interpretation and note it for the summary
 
-7. **After all fixes are applied:**
+7. **Reply to each review comment** on the PR:
+   - For each comment you fixed: reply with a concise summary of what you changed (e.g., "Fixed — extracted to variable" or "Moved `isSirenLocked` to `is-siren-locked.ts`")
+   - For questions from the reviewer: reply with a direct answer to their question
+   - Use the GitHub API to reply in-thread:
+     ```bash
+     gh api repos/$REPO_NWO/pulls/$PR_NUMBER/comments \
+       -F body="Your reply" \
+       -F commit_id="$(git rev-parse HEAD)" \
+       -F path="file.ts" \
+       -F line=1 \
+       -F in_reply_to=COMMENT_ID
+     ```
+
+8. **After all fixes are applied:**
    - Run `npm run lint` and fix any violations
    - Run `npm test` and fix any test failures
    - Stage all changed files and commit with message: `fix: address PR review feedback`
    - Push with `/commit-push`
 
-8. **After push, summarize on the PR:**
+9. **After push, summarize on the PR:**
    ```bash
    gh pr comment $ARGUMENTS --body "Review feedback addressed: [summary of all changes made, one bullet per comment addressed]"
    ```

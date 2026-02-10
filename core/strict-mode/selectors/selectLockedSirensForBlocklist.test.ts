@@ -2,11 +2,9 @@ import { beforeEach, describe, expect, test } from 'vitest'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { stateBuilder } from '@/core/_tests_/state-builder'
+import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
-import {
-  isSirenLocked,
-  selectLockedSirensForBlocklist,
-} from './selectLockedSirensForBlocklist'
+import { selectLockedSirensForBlocklist } from './selectLockedSirensForBlocklist'
 
 describe('selectLockedSirensForBlocklist', () => {
   let dateProvider: StubDateProvider

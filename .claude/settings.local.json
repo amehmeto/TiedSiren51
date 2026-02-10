@@ -15,7 +15,6 @@
       "Bash(.claude/hooks/validate-edit.sh scripts/ci-watch.sh)",
       "Bash(/opt/homebrew/bin/shellcheck --version)",
       "Bash(/usr/local/bin/shellcheck:*)",
-      "Bash(1 <<'ESLINTCONFIG'\n{\n  \"parserOptions\": {\n    \"ecmaVersion\": 2020,\n    \"sourceType\": \"module\",\n    \"ecmaFeatures\": { \"jsx\": true }\n  },\n  \"plugins\": [\"local-rules\"],\n  \"rules\": {\n    \"local-rules/no-complex-jsx-in-conditionals\": \"warn\"\n  }\n}\nESLINTCONFIG)",
       "Bash(OWNER=$(gh repo view --json owner -q '.owner.login') && gh project item-list:*)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(adb devices:*)",

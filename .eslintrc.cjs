@@ -612,13 +612,34 @@ module.exports = {
     //     'local-rules/no-nested-call-expressions': 'error',
     //   },
     // },
-    // {
-    //   files: ['ui/**/*.ts', 'ui/**/*.tsx'],
-    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
-    //   rules: {
-    //     'local-rules/no-nested-call-expressions': 'error',
-    //   },
-    // },
+    {
+      files: ['ui/**/*.ts', 'ui/**/*.tsx'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
+        'local-rules/no-nested-call-expressions': [
+          'error',
+          {
+            allowNoArguments: true,
+            allowedPatterns: [
+              // Array methods
+              '^map$',
+              '^filter$',
+              '^flatMap$',
+              '^find$',
+              '^some$',
+              '^every$',
+              // Zod fluent API
+              '^object$',
+              '^string$',
+              '^number$',
+              '^array$',
+              // Date helpers
+              '^toHHmm$',
+            ],
+          },
+        ],
+      },
+    },
     // {
     //   files: ['app/**/*.ts', 'app/**/*.tsx'],
     //   rules: {

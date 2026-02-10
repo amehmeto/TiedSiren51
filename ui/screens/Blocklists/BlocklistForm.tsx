@@ -119,45 +119,6 @@ export function BlocklistForm({
       setBlocklist(blocklistFromState)
   }, [mode, blocklistFromState, dispatch])
 
-  const toggleTextSiren = useCallback(
-    (sirenType: keyof Sirens, sirenId: string) => {
-      setBlocklist((prevBlocklist) => {
-        const updatedSirens = { ...prevBlocklist.sirens }
-        if (
-          sirenType !== SirenType.WEBSITES &&
-          sirenType !== SirenType.KEYWORDS
-        )
-          return prevBlocklist
-
-        updatedSirens[sirenType] = updatedSirens[sirenType].includes(sirenId)
-          ? updatedSirens[sirenType].filter(
-              (selectedSiren) => selectedSiren !== sirenId,
-            )
-          : [...updatedSirens[sirenType], sirenId]
-
-        return { ...prevBlocklist, sirens: updatedSirens }
-      })
-    },
-    [setBlocklist],
-  )
-
-  const toggleAppSiren = useCallback(
-    (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
-      setBlocklist((prevBlocklist) => {
-        const updatedSirens = { ...prevBlocklist.sirens }
-
-        updatedSirens[sirenType] = updatedSirens[sirenType].includes(app)
-          ? updatedSirens[sirenType].filter(
-              (selectedSiren) => selectedSiren.packageName !== app.packageName,
-            )
-          : [...updatedSirens[sirenType], app]
-
-        return { ...prevBlocklist, sirens: updatedSirens }
-      })
-    },
-    [setBlocklist],
-  )
-
   const isSirenSelected = useCallback(
     (sirenType: SirenType, sirenId: string) => {
       if (sirenType === SirenType.ANDROID) {
@@ -178,29 +139,55 @@ export function BlocklistForm({
 
   const showLockedSirenToast = useCallback(() => {
     const timeLeftFormatted = formatDuration(strictModeTimeLeft)
-    dispatch(showToast(LOCKED_SIREN_TOAST_MESSAGE(timeLeftFormatted)))
+    const message = LOCKED_SIREN_TOAST_MESSAGE(timeLeftFormatted)
+    dispatch(showToast(message))
   }, [dispatch, strictModeTimeLeft])
 
-  const handleToggleAppSiren = useCallback(
-    (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
-      if (isSirenLocked(sirenType, app.packageName)) {
-        showLockedSirenToast()
-        return
-      }
-      toggleAppSiren(sirenType, app)
-    },
-    [isSirenLocked, showLockedSirenToast, toggleAppSiren],
-  )
-
-  const handleToggleTextSiren = useCallback(
+  const toggleTextSiren = useCallback(
     (sirenType: SirenType, sirenId: string) => {
       if (isSirenLocked(sirenType, sirenId)) {
         showLockedSirenToast()
         return
       }
-      toggleTextSiren(sirenType, sirenId)
+      setBlocklist((prevBlocklist) => {
+        const updatedSirens = { ...prevBlocklist.sirens }
+        if (
+          sirenType !== SirenType.WEBSITES &&
+          sirenType !== SirenType.KEYWORDS
+        )
+          return prevBlocklist
+
+        updatedSirens[sirenType] = updatedSirens[sirenType].includes(sirenId)
+          ? updatedSirens[sirenType].filter(
+              (selectedSiren) => selectedSiren !== sirenId,
+            )
+          : [...updatedSirens[sirenType], sirenId]
+
+        return { ...prevBlocklist, sirens: updatedSirens }
+      })
     },
-    [isSirenLocked, showLockedSirenToast, toggleTextSiren],
+    [isSirenLocked, showLockedSirenToast, setBlocklist],
+  )
+
+  const toggleAppSiren = useCallback(
+    (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
+      if (isSirenLocked(sirenType, app.packageName)) {
+        showLockedSirenToast()
+        return
+      }
+      setBlocklist((prevBlocklist) => {
+        const updatedSirens = { ...prevBlocklist.sirens }
+
+        updatedSirens[sirenType] = updatedSirens[sirenType].includes(app)
+          ? updatedSirens[sirenType].filter(
+              (selectedSiren) => selectedSiren.packageName !== app.packageName,
+            )
+          : [...updatedSirens[sirenType], app]
+
+        return { ...prevBlocklist, sirens: updatedSirens }
+      })
+    },
+    [isSirenLocked, showLockedSirenToast, setBlocklist],
   )
 
   const renderScene = useCallback(
@@ -216,7 +203,7 @@ export function BlocklistForm({
         apps: () => (
           <AppsSelectionScene
             androidApps={selectableSirens.android}
-            toggleAppSiren={handleToggleAppSiren}
+            toggleAppSiren={toggleAppSiren}
             isSirenSelected={isSirenSelected}
             isSirenLocked={isSirenLocked}
           />
@@ -229,7 +216,7 @@ export function BlocklistForm({
             sirenType={SirenType.WEBSITES}
             placeholder={'Add websites...'}
             data={selectableSirens.websites}
-            toggleSiren={handleToggleTextSiren}
+            toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
             isSirenLocked={isSirenLocked}
           />
@@ -242,7 +229,7 @@ export function BlocklistForm({
             sirenType={SirenType.KEYWORDS}
             placeholder={'Add keywords...'}
             data={selectableSirens.keywords}
-            toggleSiren={handleToggleTextSiren}
+            toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
             isSirenLocked={isSirenLocked}
           />
@@ -254,8 +241,8 @@ export function BlocklistForm({
     [
       dispatch,
       selectableSirens,
-      handleToggleAppSiren,
-      handleToggleTextSiren,
+      toggleAppSiren,
+      toggleTextSiren,
       isSirenSelected,
       isSirenLocked,
     ],
