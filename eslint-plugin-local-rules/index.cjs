@@ -44,6 +44,7 @@ const preferObjectDestructuring = require('../eslint-rules/prefer-object-destruc
 const noEnumValueAsStringLiteral = require('../eslint-rules/no-enum-value-as-string-literal.cjs')
 const preferEnumOverStringUnion = require('../eslint-rules/prefer-enum-over-string-union.cjs')
 const preferInlineVariable = require('../eslint-rules/prefer-inline-variable.cjs')
+const preferJumpTable = require('../eslint-rules/prefer-jump-table.cjs')
 const preferNamedSelector = require('../eslint-rules/prefer-named-selector.cjs')
 const preferTernaryJsx = require('../eslint-rules/prefer-ternary-jsx.cjs')
 const preferTernaryReturn = require('../eslint-rules/prefer-ternary-return.cjs')
@@ -106,6 +107,7 @@ module.exports = {
     'prefer-array-destructuring': preferArrayDestructuring,
     'prefer-object-destructuring': preferObjectDestructuring,
     'prefer-inline-variable': preferInlineVariable,
+    'prefer-jump-table': preferJumpTable,
     'react-props-destructuring': reactPropsDestructuring,
     'no-call-expression-in-jsx-props': noCallExpressionInJsxProps,
     'one-component-per-file': oneComponentPerFile,

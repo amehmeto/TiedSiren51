@@ -163,6 +163,8 @@ module.exports = {
     'local-rules/prefer-ternary-return': ['error', { skipJsx: true }],
     // Names with "And"/"Or" at word boundaries suggest multiple responsibilities
     'local-rules/no-and-or-in-names': 'warn',
+    // Prefer object map over 3+ sequential ifs testing the same variable
+    'local-rules/prefer-jump-table': 'warn',
     // Flag string literals in comparisons when a matching enum value exists
     'local-rules/no-enum-value-as-string-literal': 'error',
     // Prefer ternary over complementary && conditions in JSX
