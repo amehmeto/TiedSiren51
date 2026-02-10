@@ -18,6 +18,23 @@ const EMPTY_LOCKED_SIRENS: LockedSirens = {
   keywords: new Set(),
 }
 
+const sirenLookup: Partial<
+  Record<keyof Sirens, (lockedSirens: LockedSirens) => Set<string>>
+> = {
+  android: (lockedSirens) => lockedSirens.android,
+  websites: (lockedSirens) => lockedSirens.websites,
+  keywords: (lockedSirens) => lockedSirens.keywords,
+}
+
+export function isSirenLocked(
+  lockedSirens: LockedSirens,
+  sirenType: keyof Sirens,
+  sirenId: string,
+): boolean {
+  const lookup = sirenLookup[sirenType]
+  return lookup ? lookup(lockedSirens).has(sirenId) : false
+}
+
 export function selectLockedSirensForBlocklist(
   state: RootState,
   dateProvider: DateProvider,
@@ -35,22 +52,11 @@ export function selectLockedSirensForBlocklist(
   )
   if (!isBlocklistInUse) return EMPTY_LOCKED_SIRENS
 
-  const blocklist = selectBlocklistById(state, blocklistId)
+  const { sirens } = selectBlocklistById(state, blocklistId)
 
   return {
-    android: new Set(blocklist.sirens.android.map((app) => app.packageName)),
-    websites: new Set(blocklist.sirens.websites),
-    keywords: new Set(blocklist.sirens.keywords),
+    android: new Set(sirens.android.map((app) => app.packageName)),
+    websites: new Set(sirens.websites),
+    keywords: new Set(sirens.keywords),
   }
-}
-
-export function isSirenLocked(
-  lockedSirens: LockedSirens,
-  sirenType: keyof Sirens,
-  sirenId: string,
-): boolean {
-  if (sirenType === 'android') return lockedSirens.android.has(sirenId)
-  if (sirenType === 'websites') return lockedSirens.websites.has(sirenId)
-  if (sirenType === 'keywords') return lockedSirens.keywords.has(sirenId)
-  return false
 }
