@@ -25,7 +25,7 @@ const styles = StyleSheet.create({
   closeIconContainer: {
     position: 'absolute',
     right: T.component.size.small,
-    zIndex: 1,
+    zIndex: T.elevation.low,
     backgroundColor: T.color.transparent,
     padding: T.component.size.tiny,
   },

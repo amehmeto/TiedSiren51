@@ -78,8 +78,9 @@ export function SelectableSirenCard({
           {sirenName}
         </Text>
 
-        {isLocked && <LockIcon testID={`${baseTestId}-lock`} />}
-        {!isLocked && (
+        {isLocked ? (
+          <LockIcon testID={`${baseTestId}-lock`} />
+        ) : (
           <CheckBox
             style={styles.checkbox}
             containerStyle={styles.checkboxContainer}

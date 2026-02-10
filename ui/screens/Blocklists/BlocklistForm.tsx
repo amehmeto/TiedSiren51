@@ -78,7 +78,7 @@ export function BlocklistForm({
   )
 
   const isBlocklistInSession =
-    mode === 'edit' && blocklistId
+    mode === FormMode.Edit && blocklistId
       ? blocklistIdsInSessions.includes(blocklistId)
       : false
 
@@ -172,7 +172,7 @@ export function BlocklistForm({
 
   const isSirenLocked = useCallback(
     (sirenType: SirenType, sirenId: string) =>
-      !shouldLockSirens ? false : isSirenSelected(sirenType, sirenId),
+      shouldLockSirens && isSirenSelected(sirenType, sirenId),
     [shouldLockSirens, isSirenSelected],
   )
 

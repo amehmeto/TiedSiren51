@@ -40,9 +40,12 @@ const oneSelectorPerFile = require('../eslint-rules/one-selector-per-file.cjs')
 const oneUsecasePerFile = require('../eslint-rules/one-usecase-per-file.cjs')
 const oneViewModelPerFile = require('../eslint-rules/one-view-model-per-file.cjs')
 const preferArrayDestructuring = require('../eslint-rules/prefer-array-destructuring.cjs')
+const preferObjectDestructuring = require('../eslint-rules/prefer-object-destructuring.cjs')
+const noEnumValueAsStringLiteral = require('../eslint-rules/no-enum-value-as-string-literal.cjs')
 const preferEnumOverStringUnion = require('../eslint-rules/prefer-enum-over-string-union.cjs')
 const preferInlineVariable = require('../eslint-rules/prefer-inline-variable.cjs')
 const preferNamedSelector = require('../eslint-rules/prefer-named-selector.cjs')
+const preferTernaryJsx = require('../eslint-rules/prefer-ternary-jsx.cjs')
 const preferTernaryReturn = require('../eslint-rules/prefer-ternary-return.cjs')
 const reactPropsDestructuring = require('../eslint-rules/react-props-destructuring.cjs')
 const reducerInDomainFolder = require('../eslint-rules/reducer-in-domain-folder.cjs')
@@ -101,6 +104,7 @@ module.exports = {
     'require-named-regex': requireNamedRegex,
     'no-nested-call-expressions': noNestedCallExpressions,
     'prefer-array-destructuring': preferArrayDestructuring,
+    'prefer-object-destructuring': preferObjectDestructuring,
     'prefer-inline-variable': preferInlineVariable,
     'react-props-destructuring': reactPropsDestructuring,
     'no-call-expression-in-jsx-props': noCallExpressionInJsxProps,
@@ -113,7 +117,9 @@ module.exports = {
     'prefer-named-selector': preferNamedSelector,
     'selector-state-first-param': selectorStateFirstParam,
     'no-selector-prop-drilling': noSelectorPropDrilling,
+    'prefer-ternary-jsx': preferTernaryJsx,
     'prefer-ternary-return': preferTernaryReturn,
+    'no-enum-value-as-string-literal': noEnumValueAsStringLiteral,
     'prefer-enum-over-string-union': preferEnumOverStringUnion,
     'no-and-or-in-names': noConjunctionInNames,
     'no-generic-result-variable': noGenericResultVariable,

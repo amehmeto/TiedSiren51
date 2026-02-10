@@ -105,6 +105,26 @@ module.exports = {
       return elementName === 'Fragment' ? 'Component' : elementName
     }
 
+    function isComplexJSXOrFragment(node) {
+      return (
+        (node.type === 'JSXElement' && isComplexJSX(node)) ||
+        node.type === 'JSXFragment'
+      )
+    }
+
+    function findContainingFunction(node) {
+      let functionNode = node.parent
+      while (
+        functionNode &&
+        functionNode.type !== 'FunctionDeclaration' &&
+        functionNode.type !== 'FunctionExpression' &&
+        functionNode.type !== 'ArrowFunctionExpression'
+      ) {
+        functionNode = functionNode.parent
+      }
+      return functionNode
+    }
+
     function checkConditionalReturn(node) {
       // Check if this is a return statement
       if (node.type !== 'ReturnStatement') return
@@ -113,32 +133,24 @@ module.exports = {
       const returnValue = node.argument
       if (!returnValue) return
 
-      // Check if we should report this
-      const shouldReport =
-        (returnValue.type === 'JSXElement' && isComplexJSX(returnValue)) ||
-        returnValue.type === 'JSXFragment'
+      if (!isComplexJSXOrFragment(returnValue)) return
 
-      if (!shouldReport) return
-
-      // Find parent if statement
+      // Find parent if statement or switch case
       let parent = node.parent
-      while (parent && parent.type !== 'IfStatement') {
+      while (
+        parent &&
+        parent.type !== 'IfStatement' &&
+        parent.type !== 'SwitchCase'
+      ) {
         parent = parent.parent
         if (!parent || parent.type === 'FunctionDeclaration') break
       }
 
-      if (parent && parent.type === 'IfStatement') {
-        // Find the containing function
-        let functionNode = node.parent
-        while (
-          functionNode &&
-          functionNode.type !== 'FunctionDeclaration' &&
-          functionNode.type !== 'FunctionExpression' &&
-          functionNode.type !== 'ArrowFunctionExpression'
-        ) {
-          functionNode = functionNode.parent
-        }
-
+      if (
+        parent &&
+        (parent.type === 'IfStatement' || parent.type === 'SwitchCase')
+      ) {
+        const functionNode = findContainingFunction(node)
         const suggestedName = generateSuggestedName(returnValue, functionNode)
 
         context.report({
@@ -152,57 +164,27 @@ module.exports = {
     }
 
     function checkTernaryExpression(node) {
-      // Check if this is a conditional expression (ternary)
       if (node.type !== 'ConditionalExpression') return
 
-      // Check consequent (the "true" branch)
-      if (
-        node.consequent.type === 'JSXElement' &&
-        isComplexJSX(node.consequent)
-      ) {
-        // Find the containing function to generate a better name
-        let functionNode = node.parent
-        while (
-          functionNode &&
-          functionNode.type !== 'FunctionDeclaration' &&
-          functionNode.type !== 'FunctionExpression' &&
-          functionNode.type !== 'ArrowFunctionExpression'
-        ) {
-          functionNode = functionNode.parent
-        }
-
+      if (isComplexJSXOrFragment(node.consequent)) {
+        const functionNode = findContainingFunction(node)
         const suggestedName = generateSuggestedName(node.consequent, functionNode)
 
         context.report({
           node: node.consequent,
           messageId: 'extractComponent',
-          data: {
-            suggestedName,
-          },
+          data: { suggestedName },
         })
       }
 
-      // Check alternate (the "false" branch)
-      if (node.alternate.type === 'JSXElement' && isComplexJSX(node.alternate)) {
-        // Find the containing function
-        let functionNode = node.parent
-        while (
-          functionNode &&
-          functionNode.type !== 'FunctionDeclaration' &&
-          functionNode.type !== 'FunctionExpression' &&
-          functionNode.type !== 'ArrowFunctionExpression'
-        ) {
-          functionNode = functionNode.parent
-        }
-
+      if (isComplexJSXOrFragment(node.alternate)) {
+        const functionNode = findContainingFunction(node)
         const suggestedName = generateSuggestedName(node.alternate, functionNode)
 
         context.report({
           node: node.alternate,
           messageId: 'extractComponent',
-          data: {
-            suggestedName,
-          },
+          data: { suggestedName },
         })
       }
     }
@@ -268,6 +250,19 @@ module.exports = {
       }
     }
 
+    function checkLogicalExpression(node) {
+      if (!isComplexJSXOrFragment(node.right)) return
+
+      const functionNode = findContainingFunction(node)
+      const suggestedName = generateSuggestedName(node.right, functionNode)
+
+      context.report({
+        node: node.right,
+        messageId: 'extractComponent',
+        data: { suggestedName },
+      })
+    }
+
     return {
       ReturnStatement(node) {
         checkConditionalReturn(node)
@@ -277,6 +272,9 @@ module.exports = {
       },
       CallExpression(node) {
         checkMapCallback(node)
+      },
+      LogicalExpression(node) {
+        checkLogicalExpression(node)
       },
     }
   },

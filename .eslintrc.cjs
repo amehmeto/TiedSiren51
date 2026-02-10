@@ -121,6 +121,10 @@ module.exports = {
     // See: docs/adr/conventions/no-nested-call-expressions.md
     'local-rules/no-nested-call-expressions': 'off',
     'local-rules/prefer-array-destructuring': 'error',
+    'local-rules/prefer-object-destructuring': [
+      'warn',
+      { ignoredObjects: ['T', 'styles'] },
+    ],
     // Warn-only: many valid patterns use named variables for self-documentation
     'local-rules/prefer-inline-variable': 'warn',
     'local-rules/react-props-destructuring': 'error',
@@ -159,6 +163,10 @@ module.exports = {
     'local-rules/prefer-ternary-return': ['error', { skipJsx: true }],
     // Names with "And"/"Or" at word boundaries suggest multiple responsibilities
     'local-rules/no-and-or-in-names': 'warn',
+    // Flag string literals in comparisons when a matching enum value exists
+    'local-rules/no-enum-value-as-string-literal': 'error',
+    // Prefer ternary over complementary && conditions in JSX
+    'local-rules/prefer-ternary-jsx': 'error',
     // Prefer enum over string literal unions
     'local-rules/prefer-enum-over-string-union': [
       'error',

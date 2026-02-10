@@ -52,11 +52,13 @@ export function selectLockedSirensForBlocklist(
   )
   if (!isBlocklistInUse) return EMPTY_LOCKED_SIRENS
 
-  const { sirens } = selectBlocklistById(state, blocklistId)
+  const {
+    sirens: { android, websites, keywords },
+  } = selectBlocklistById(state, blocklistId)
 
   return {
-    android: new Set(sirens.android.map((app) => app.packageName)),
-    websites: new Set(sirens.websites),
-    keywords: new Set(sirens.keywords),
+    android: new Set(android.map((app) => app.packageName)),
+    websites: new Set(websites),
+    keywords: new Set(keywords),
   }
 }
