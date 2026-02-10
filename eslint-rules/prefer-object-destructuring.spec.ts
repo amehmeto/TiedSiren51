@@ -183,6 +183,20 @@ describe('prefer-object-destructuring', () => {
             },
           ],
         },
+        // Function expression scope
+        {
+          code: `
+        const f = function() {
+          return params.x + params.y
+        }
+      `,
+          errors: [
+            {
+              messageId: 'preferDestructuring',
+              data: { object: 'params', properties: 'x, y' },
+            },
+          ],
+        },
         // Module-level scope
         {
           code: `
