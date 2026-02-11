@@ -124,13 +124,8 @@ module.exports = {
     'local-rules/prefer-object-destructuring': [
       'warn',
       {
-        ignoredObjects: [
-          'T',
-          'styles',
-          'viewModel',
-          'BlocklistViewModel',
-          'HomeViewModel',
-        ],
+        threshold: 3,
+        ignoredObjects: ['T', 'styles'],
       },
     ],
     // Warn-only: many valid patterns use named variables for self-documentation

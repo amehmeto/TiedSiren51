@@ -30,20 +30,62 @@ describe('no-generic-result-variable', () => {
         // "result" as part of a longer name is fine
         { code: 'const searchResults = search(query)' },
         { code: 'const resultCount = getCount()' },
+        // "response" is not in the default forbidden list
+        { code: 'const response = await fetch(url)' },
+        // Custom forbidden list: "result" is fine when not in custom list
+        {
+          code: 'const result = doSomething()',
+          options: [{ forbidden: ['data'] }],
+        },
       ],
 
       invalid: [
         {
           code: 'const result = selectBlocklistIds(state)',
-          errors: [{ messageId: 'noGenericResult' }],
+          errors: [
+            {
+              messageId: 'noGenericResult',
+              data: { name: 'result' },
+            },
+          ],
         },
         {
-          code: 'const result = blockCats()',
-          errors: [{ messageId: 'noGenericResult' }],
+          code: 'const res = blockCats()',
+          errors: [
+            {
+              messageId: 'noGenericResult',
+              data: { name: 'res' },
+            },
+          ],
         },
         {
-          code: 'let result = await fetchUser()',
-          errors: [{ messageId: 'noGenericResult' }],
+          code: 'const ret = getValue()',
+          errors: [
+            {
+              messageId: 'noGenericResult',
+              data: { name: 'ret' },
+            },
+          ],
+        },
+        {
+          code: 'let output = await fetchUser()',
+          errors: [
+            {
+              messageId: 'noGenericResult',
+              data: { name: 'output' },
+            },
+          ],
+        },
+        // Custom forbidden list
+        {
+          code: 'const data = fetchData()',
+          options: [{ forbidden: ['data'] }],
+          errors: [
+            {
+              messageId: 'noGenericResult',
+              data: { name: 'data' },
+            },
+          ],
         },
       ],
     })

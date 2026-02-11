@@ -102,7 +102,7 @@ export enum HomeViewModel {
   WithoutActiveNorScheduledSessions = 'WITHOUT_ACTIVE_NOR_SCHEDULED_SESSIONS',
   WithActiveWithoutScheduledSessions = 'WITH_ACTIVE_WITHOUT_SCHEDULED_SESSIONS',
   WithoutActiveWithScheduledSessions = 'WITHOUT_ACTIVE_WITH_SCHEDULED_SESSIONS',
-  WithAllSessionTypes = 'WITH_ALL_SESSION_TYPES',
+  WithBothSessionTypes = 'WITH_BOTH_SESSION_TYPES',
 }
 
 // Each state type has different structure
@@ -113,8 +113,8 @@ type WithoutActiveNorScheduledSessions = {
   scheduledSessions: { title: string; message: string }   // Empty state
 }
 
-type WithAllSessionTypes = {
-  type: HomeViewModel.WithAllSessionTypes
+type WithBothSessionTypes = {
+  type: HomeViewModel.WithBothSessionTypes
   greetings: Greetings
   activeSessions: { title: string; blockSessions: ViewModelBlockSession[] }
   scheduledSessions: { title: string; blockSessions: ViewModelBlockSession[] }
@@ -125,7 +125,7 @@ export type HomeViewModelType =
   | WithoutActiveNorScheduledSessions
   | WithActiveWithoutScheduledSessions
   | WithoutActiveWithScheduledSessions
-  | WithAllSessionTypes
+  | WithBothSessionTypes
 ```
 
 **3. Component Usage with Exhaustive Switch**

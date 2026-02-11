@@ -10,7 +10,7 @@ export enum HomeViewModel {
   WithoutActiveNorScheduledSessions = 'WITHOUT_ACTIVE_NOR_SCHEDULED_SESSIONS',
   WithActiveWithoutScheduledSessions = 'WITH_ACTIVE_WITHOUT_SCHEDULED_SESSIONS',
   WithoutActiveWithScheduledSessions = 'WITHOUT_ACTIVE_WITH_SCHEDULED_SESSIONS',
-  WithAllSessionTypes = 'WITH_ALL_SESSION_TYPES',
+  WithBothSessionTypes = 'WITH_BOTH_SESSION_TYPES',
 }
 
 export enum Greetings {
@@ -71,8 +71,8 @@ export type WithoutActiveWithScheduledSessions = {
   }
 }
 
-export type WithAllSessionTypes = {
-  type: HomeViewModel.WithAllSessionTypes
+export type WithBothSessionTypes = {
+  type: HomeViewModel.WithBothSessionTypes
   greetings: Greetings
   activeSessions: {
     title: SessionBoardTitle.ACTIVE_SESSIONS
@@ -88,4 +88,4 @@ export type HomeViewModelType =
   | WithoutActiveNorScheduledSessions
   | WithActiveWithoutScheduledSessions
   | WithoutActiveWithScheduledSessions
-  | WithAllSessionTypes
+  | WithBothSessionTypes

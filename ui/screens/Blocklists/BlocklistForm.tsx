@@ -8,10 +8,9 @@ import {
   TabBarProps,
   TabView,
 } from 'react-native-tab-view'
-import { useDispatch, useSelector } from 'react-redux'
+import { useDispatch, useSelector, useStore } from 'react-redux'
 import { z } from 'zod'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
-import { selectLockedBlocklistIds } from '@/core/block-session/selectors/selectLockedBlocklistIds'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { selectBlocklistById } from '@/core/blocklist/selectors/selectBlocklistById'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
@@ -20,7 +19,8 @@ import { AndroidSiren, Sirens, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
-import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import { isSirenLocked as checkSirenLocked } from '@/core/strict-mode/is-siren-locked'
+import { selectLockedSirensForBlocklist } from '@/core/strict-mode/selectors/selectLockedSirensForBlocklist'
 import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
 import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
@@ -60,6 +60,7 @@ export function BlocklistForm({
 }: Readonly<BlocklistScreenProps>) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const store = useStore<RootState>()
 
   const selectableSirens: Sirens = useSelector(
     (state: RootState) => state.siren.availableSirens,
@@ -69,23 +70,14 @@ export function BlocklistForm({
     blocklistId ? selectBlocklistById(state, blocklistId) : undefined,
   )
 
-  const isStrictModeActive = useSelector((state: RootState) =>
-    selectIsStrictModeActive(state, dependencies.dateProvider),
-  )
-
-  const blocklistIdsInSessions = useSelector((state: RootState) =>
-    selectLockedBlocklistIds(state, dependencies.dateProvider),
-  )
-
-  const isBlocklistInSession =
+  const lockedSirens = useSelector((state: RootState) =>
     mode === FormMode.Edit && blocklistId
-      ? blocklistIdsInSessions.includes(blocklistId)
-      : false
-
-  const shouldLockSirens = isStrictModeActive && isBlocklistInSession
-
-  const strictModeTimeLeft = useSelector((state: RootState) =>
-    selectStrictModeTimeLeft(state, dependencies.dateProvider),
+      ? selectLockedSirensForBlocklist(
+          state,
+          dependencies.dateProvider,
+          blocklistId,
+        )
+      : undefined,
   )
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
@@ -132,24 +124,20 @@ export function BlocklistForm({
   )
 
   const isSirenLocked = useCallback(
-    (sirenType: SirenType, sirenId: string) => {
-      if (!shouldLockSirens || !blocklistFromState) return false
-      if (sirenType === SirenType.ANDROID) {
-        return blocklistFromState.sirens.android
-          .map((app) => app.packageName)
-          .includes(sirenId)
-      }
-
-      return blocklistFromState.sirens[sirenType].includes(sirenId)
-    },
-    [shouldLockSirens, blocklistFromState],
+    (sirenType: SirenType, sirenId: string) =>
+      lockedSirens ? checkSirenLocked(lockedSirens, sirenType, sirenId) : false,
+    [lockedSirens],
   )
 
   const showLockedSirenToast = useCallback(() => {
-    const timeLeftFormatted = formatDuration(strictModeTimeLeft)
+    const freshTimeLeft = selectStrictModeTimeLeft(
+      store.getState(),
+      dependencies.dateProvider,
+    )
+    const timeLeftFormatted = formatDuration(freshTimeLeft)
     const message = LOCKED_SIREN_TOAST_MESSAGE(timeLeftFormatted)
     dispatch(showToast(message))
-  }, [dispatch, strictModeTimeLeft])
+  }, [dispatch, store])
 
   const toggleTextSiren = useCallback(
     (sirenType: SirenType, sirenId: string) => {
