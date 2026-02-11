@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["react", "typescript", "unicorn", "jest", "vitest", "import"],
+  "jsPlugins": ["./oxlint-plugin-local-rules.js"],
   "categories": {
     "correctness": "off"
   },
@@ -9,6 +10,8 @@
     "eqeqeq": "error",
     "no-nested-ternary": "error",
     "no-else-return": "warn",
+    "prefer-const": "error",
+    "complexity": ["warn", { "max": 10 }],
     "no-unused-vars": [
       "error",
       { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
@@ -19,96 +22,76 @@
 
     "typescript/no-explicit-any": "error",
 
-    "unicorn/no-nested-ternary": "error"
-  },
-  "overrides": [
-    {
-      "files": ["core/**/*.ts", "!**/*.test.ts", "!**/*.spec.ts"],
-      "rules": {
-        "no-restricted-globals": [
-          "error",
-          {
-            "name": "Date",
-            "message": "Non-deterministic: Use DateProvider dependency instead of Date in core."
-          },
-          {
-            "name": "performance",
-            "message": "Non-deterministic: Use DateProvider dependency instead of performance in core."
-          },
-          {
-            "name": "setTimeout",
-            "message": "Non-deterministic: Use TimerProvider dependency instead of setTimeout in core."
-          },
-          {
-            "name": "setInterval",
-            "message": "Non-deterministic: Use TimerProvider dependency instead of setInterval in core."
-          },
-          {
-            "name": "crypto",
-            "message": "Non-deterministic: Use UuidProvider dependency instead of crypto in core."
-          },
-          {
-            "name": "fetch",
-            "message": "Non-deterministic: Use a Repository/Gateway dependency instead of fetch in core."
-          },
-          {
-            "name": "XMLHttpRequest",
-            "message": "Non-deterministic: Use a Repository/Gateway dependency instead of XMLHttpRequest in core."
-          },
-          {
-            "name": "localStorage",
-            "message": "Non-deterministic: Use a Repository dependency instead of localStorage in core."
-          },
-          {
-            "name": "sessionStorage",
-            "message": "Non-deterministic: Use a Repository dependency instead of sessionStorage in core."
-          },
-          {
-            "name": "navigator",
-            "message": "Non-deterministic: Use a DeviceProvider dependency instead of navigator in core."
-          },
-          {
-            "name": "location",
-            "message": "Non-deterministic: Use a RouterProvider dependency instead of location in core."
-          }
-        ],
-        "no-restricted-imports": [
-          "error",
-          {
-            "paths": [
-              {
-                "name": "uuid",
-                "message": "Non-deterministic: Use UuidProvider dependency instead of uuid in core."
-              },
-              {
-                "name": "react-native-uuid",
-                "message": "Non-deterministic: Use UuidProvider dependency instead of react-native-uuid in core."
-              },
-              {
-                "name": "crypto",
-                "message": "Non-deterministic: Use UuidProvider dependency instead of crypto in core."
-              },
-              {
-                "name": "@faker-js/faker",
-                "message": "Non-deterministic: Use data builders with injected dependencies instead of faker in core."
-              }
-            ]
-          }
+    "unicorn/no-nested-ternary": "error",
+
+    "local-rules/no-icon-size-magic-numbers": "error",
+    "local-rules/no-stylesheet-magic-numbers": "error",
+    "local-rules/no-complex-jsx-in-conditionals": [
+      "error",
+      { "maxProps": 2, "allowSimpleElements": true }
+    ],
+    "local-rules/one-selector-per-file": "error",
+    "local-rules/one-usecase-per-file": "error",
+    "local-rules/core-test-file-naming": "error",
+    "local-rules/require-colocated-test": "error",
+    "local-rules/time-constant-multiplication": "error",
+    "local-rules/try-catch-isolation": "error",
+    "local-rules/inline-single-statement-handlers": "error",
+    "local-rules/no-try-catch-in-core": "error",
+    "local-rules/listener-error-handling": "error",
+    "local-rules/infra-must-rethrow": "error",
+    "local-rules/infra-public-method-try-catch": "error",
+    "local-rules/infra-logger-prefix": "error",
+    "local-rules/file-naming-convention": "error",
+    "local-rules/no-index-in-core": "error",
+    "local-rules/selector-matches-filename": "error",
+    "local-rules/usecase-matches-filename": "error",
+    "local-rules/no-cross-layer-imports": "error",
+    "local-rules/listener-matches-filename": "error",
+    "local-rules/view-model-matches-filename": "error",
+    "local-rules/builder-matches-filename": "error",
+    "local-rules/fixture-matches-filename": "error",
+    "local-rules/one-listener-per-file": "error",
+    "local-rules/slice-matches-folder": "error",
+    "local-rules/repository-implementation-naming": "error",
+    "local-rules/gateway-implementation-naming": "error",
+    "local-rules/schema-matches-filename": "error",
+    "local-rules/one-view-model-per-file": "error",
+    "local-rules/reducer-in-domain-folder": "error",
+    "local-rules/no-module-level-constants": "error",
+    "local-rules/require-named-regex": "error",
+    "local-rules/prefer-array-destructuring": "error",
+    "local-rules/prefer-inline-variable": "warn",
+    "local-rules/react-props-destructuring": "error",
+    "local-rules/no-call-expression-in-jsx-props": "error",
+    "local-rules/one-component-per-file": "error",
+    "local-rules/no-else-if": "error",
+    "local-rules/no-adapter-in-ui": "error",
+    "local-rules/no-entire-state-selector": "error",
+    "local-rules/no-complex-inline-arguments": "error",
+    "local-rules/no-usecallback-selector-wrapper": "warn",
+    "local-rules/prefer-named-selector": "warn",
+    "local-rules/selector-state-first-param": "error",
+    "local-rules/no-selector-prop-drilling": [
+      "error",
+      {
+        "ignoredComponents": [
+          "FlatList",
+          "SectionList",
+          "VirtualizedList",
+          "TiedSButton",
+          "CircularTimerDisplay"
         ]
       }
-    },
-    {
-      "files": ["core/**/*.builder.ts"],
-      "rules": {
-        "no-restricted-imports": "off"
-      }
-    },
-    {
-      "files": ["core/_ports_/**/*.ts", "core/**/*.fixture.ts"],
-      "rules": {
-        "no-restricted-globals": "off"
-      }
-    },
+    ],
+    "local-rules/prefer-ternary-return": ["error", { "skipJsx": true }],
+    "local-rules/prefer-enum-over-string-union": [
+      "error",
+      { "ignoredPatterns": ["-outline$", "^logo-", "^add-", "^remove-"] }
+    ],
+    "local-rules/no-i-prefix-in-imports": "error"
+  },
+  "overrides": [
     {
       "files": ["**/*.spec.ts", "**/*.test.ts"],
       "rules": {
@@ -121,9 +104,17 @@
         "jest/prefer-each": "error",
         "jest/prefer-hooks-in-order": "error",
         "jest/prefer-hooks-on-top": "error",
-        "jest/prefer-strict-equal": "error"
+        "jest/prefer-strict-equal": "error",
+        "local-rules/expect-separate-act-assert": "error",
+        "local-rules/no-new-in-test-body": "error",
+        "local-rules/use-data-builders": "error"
       }
     }
   ],
-  "ignorePatterns": ["node_modules", "!.claude", "eslint-rules/*.spec.ts"]
+  "ignorePatterns": [
+    "node_modules",
+    "!.claude",
+    "eslint-rules/",
+    "oxlint-plugin-local-rules.js"
+  ]
 }
