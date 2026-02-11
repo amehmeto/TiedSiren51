@@ -7,6 +7,7 @@ module.exports = {
     'prettier',
     'plugin:no-switch-statements/recommended',
     'plugin:jsonc/recommended-with-json',
+    'plugin:oxlint/recommended',
   ],
   plugins: [
     'prettier',
@@ -18,6 +19,7 @@ module.exports = {
     'unicorn',
     'local-rules',
     'jsonc',
+    'oxlint',
   ],
   rules: {
     'import/order': [
@@ -37,9 +39,6 @@ module.exports = {
     'object-shorthand': ['error', 'always'],
     'lines-between-class-members': ['error', 'always'],
     'max-statements-per-line': ['error', { max: 1 }],
-    'no-console': 'error',
-    'no-else-return': 'warn',
-    'no-nested-ternary': 'error',
     'no-switch-statements/no-switch': 'error',
     'prefer-const': 'error',
     'sonarjs/no-collapsible-if': 'error',
@@ -59,7 +58,6 @@ module.exports = {
     'prettier/prettier': 'error',
     complexity: ['warn', { max: 10 }],
     curly: ['error', 'multi-or-nest'],
-    eqeqeq: ['error', 'always'],
     'padding-line-between-statements': [
       'error',
       { blankLine: 'always', prev: 'block-like', next: 'block-like' },
@@ -67,9 +65,6 @@ module.exports = {
     // React rules
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
-    // React Hooks rules
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'off',
     // React Native rules
     'react-native/no-color-literals': 'error',
     'react-native/no-inline-styles': 'error',
@@ -170,11 +165,6 @@ module.exports = {
         project: './tsconfig.json',
       },
       rules: {
-        '@typescript-eslint/no-unused-vars': [
-          'error',
-          { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
-        ],
-        '@typescript-eslint/no-explicit-any': 'error',
         '@typescript-eslint/no-unnecessary-condition': 'error',
         '@typescript-eslint/prefer-optional-chain': 'error',
         '@typescript-eslint/prefer-nullish-coalescing': 'error',
@@ -226,27 +216,10 @@ module.exports = {
       env: {
         node: true,
       },
-      rules: {
-        'no-unused-vars': [
-          'error',
-          { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
-        ],
-      },
     },
     {
       files: ['**/*.spec.ts', '**/*.test.ts'],
-      plugins: ['vitest'],
       rules: {
-        'vitest/no-commented-out-tests': 'error',
-        'vitest/no-conditional-expect': 'error',
-        'vitest/no-conditional-in-test': 'error',
-        'vitest/no-disabled-tests': 'error',
-        'vitest/no-focused-tests': 'error',
-        'vitest/no-identical-title': 'error',
-        'vitest/prefer-each': 'error',
-        'vitest/prefer-hooks-in-order': 'error',
-        'vitest/prefer-hooks-on-top': 'error',
-        'vitest/prefer-strict-equal': 'error',
         'local-rules/expect-separate-act-assert': 'error',
         // Test structure rules
         'local-rules/no-new-in-test-body': 'error',
@@ -273,75 +246,12 @@ module.exports = {
         'local-rules/no-data-builders-in-production': 'error',
       },
     },
-    // No non-deterministic values in core (use injected dependencies)
+    // no-restricted-properties not supported by OxLint - keep in ESLint
+    // No non-deterministic property access in core
     {
       files: ['core/**/*.ts'],
       excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
       rules: {
-        'no-restricted-globals': [
-          'error',
-          // Time
-          {
-            name: 'Date',
-            message:
-              'Non-deterministic: Use DateProvider dependency instead of Date in core.',
-          },
-          {
-            name: 'performance',
-            message:
-              'Non-deterministic: Use DateProvider dependency instead of performance in core.',
-          },
-          // Async timing
-          {
-            name: 'setTimeout',
-            message:
-              'Non-deterministic: Use TimerProvider dependency instead of setTimeout in core.',
-          },
-          {
-            name: 'setInterval',
-            message:
-              'Non-deterministic: Use TimerProvider dependency instead of setInterval in core.',
-          },
-          // Randomness
-          {
-            name: 'crypto',
-            message:
-              'Non-deterministic: Use UuidProvider dependency instead of crypto in core.',
-          },
-          // Network I/O
-          {
-            name: 'fetch',
-            message:
-              'Non-deterministic: Use a Repository/Gateway dependency instead of fetch in core.',
-          },
-          {
-            name: 'XMLHttpRequest',
-            message:
-              'Non-deterministic: Use a Repository/Gateway dependency instead of XMLHttpRequest in core.',
-          },
-          // External state
-          {
-            name: 'localStorage',
-            message:
-              'Non-deterministic: Use a Repository dependency instead of localStorage in core.',
-          },
-          {
-            name: 'sessionStorage',
-            message:
-              'Non-deterministic: Use a Repository dependency instead of sessionStorage in core.',
-          },
-          // Environment/device info
-          {
-            name: 'navigator',
-            message:
-              'Non-deterministic: Use a DeviceProvider dependency instead of navigator in core.',
-          },
-          {
-            name: 'location',
-            message:
-              'Non-deterministic: Use a RouterProvider dependency instead of location in core.',
-          },
-        ],
         'no-restricted-properties': [
           'error',
           {
@@ -373,33 +283,6 @@ module.exports = {
             property: 'sessionStorage',
             message:
               'Non-deterministic: Use a Repository dependency instead of window.sessionStorage in core.',
-          },
-        ],
-        'no-restricted-imports': [
-          'error',
-          {
-            paths: [
-              {
-                name: 'uuid',
-                message:
-                  'Non-deterministic: Use UuidProvider dependency instead of uuid in core.',
-              },
-              {
-                name: 'react-native-uuid',
-                message:
-                  'Non-deterministic: Use UuidProvider dependency instead of react-native-uuid in core.',
-              },
-              {
-                name: 'crypto',
-                message:
-                  'Non-deterministic: Use UuidProvider dependency instead of crypto in core.',
-              },
-              {
-                name: '@faker-js/faker',
-                message:
-                  'Non-deterministic: Use data builders with injected dependencies instead of faker in core.',
-              },
-            ],
           },
         ],
       },
@@ -447,20 +330,6 @@ module.exports = {
               'Use dependency injection (fakes/stubs) instead of jest.spyOn() in core tests.',
           },
         ],
-      },
-    },
-    // Allow faker in data builders (they generate test data)
-    {
-      files: ['core/**/*.builder.ts'],
-      rules: {
-        'no-restricted-imports': 'off',
-      },
-    },
-    // Allow Date in port type definitions and test fixtures
-    {
-      files: ['core/_ports_/**/*.ts', 'core/**/*.fixture.ts'],
-      rules: {
-        'no-restricted-globals': 'off',
       },
     },
     // Enforce boolean naming convention on type properties in core (our domain types)

@@ -1,0 +1,129 @@
+{
+  "$schema": "./node_modules/oxlint/configuration_schema.json",
+  "plugins": ["react", "typescript", "unicorn", "jest", "vitest", "import"],
+  "categories": {
+    "correctness": "off"
+  },
+  "rules": {
+    "no-console": "error",
+    "eqeqeq": "error",
+    "no-nested-ternary": "error",
+    "no-else-return": "warn",
+    "no-unused-vars": [
+      "error",
+      { "argsIgnorePattern": "^_", "varsIgnorePattern": "^_" }
+    ],
+
+    "react/rules-of-hooks": "error",
+    "react/exhaustive-deps": "off",
+
+    "typescript/no-explicit-any": "error",
+
+    "unicorn/no-nested-ternary": "error"
+  },
+  "overrides": [
+    {
+      "files": ["core/**/*.ts", "!**/*.test.ts", "!**/*.spec.ts"],
+      "rules": {
+        "no-restricted-globals": [
+          "error",
+          {
+            "name": "Date",
+            "message": "Non-deterministic: Use DateProvider dependency instead of Date in core."
+          },
+          {
+            "name": "performance",
+            "message": "Non-deterministic: Use DateProvider dependency instead of performance in core."
+          },
+          {
+            "name": "setTimeout",
+            "message": "Non-deterministic: Use TimerProvider dependency instead of setTimeout in core."
+          },
+          {
+            "name": "setInterval",
+            "message": "Non-deterministic: Use TimerProvider dependency instead of setInterval in core."
+          },
+          {
+            "name": "crypto",
+            "message": "Non-deterministic: Use UuidProvider dependency instead of crypto in core."
+          },
+          {
+            "name": "fetch",
+            "message": "Non-deterministic: Use a Repository/Gateway dependency instead of fetch in core."
+          },
+          {
+            "name": "XMLHttpRequest",
+            "message": "Non-deterministic: Use a Repository/Gateway dependency instead of XMLHttpRequest in core."
+          },
+          {
+            "name": "localStorage",
+            "message": "Non-deterministic: Use a Repository dependency instead of localStorage in core."
+          },
+          {
+            "name": "sessionStorage",
+            "message": "Non-deterministic: Use a Repository dependency instead of sessionStorage in core."
+          },
+          {
+            "name": "navigator",
+            "message": "Non-deterministic: Use a DeviceProvider dependency instead of navigator in core."
+          },
+          {
+            "name": "location",
+            "message": "Non-deterministic: Use a RouterProvider dependency instead of location in core."
+          }
+        ],
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "uuid",
+                "message": "Non-deterministic: Use UuidProvider dependency instead of uuid in core."
+              },
+              {
+                "name": "react-native-uuid",
+                "message": "Non-deterministic: Use UuidProvider dependency instead of react-native-uuid in core."
+              },
+              {
+                "name": "crypto",
+                "message": "Non-deterministic: Use UuidProvider dependency instead of crypto in core."
+              },
+              {
+                "name": "@faker-js/faker",
+                "message": "Non-deterministic: Use data builders with injected dependencies instead of faker in core."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["core/**/*.builder.ts"],
+      "rules": {
+        "no-restricted-imports": "off"
+      }
+    },
+    {
+      "files": ["core/_ports_/**/*.ts", "core/**/*.fixture.ts"],
+      "rules": {
+        "no-restricted-globals": "off"
+      }
+    },
+    {
+      "files": ["**/*.spec.ts", "**/*.test.ts"],
+      "rules": {
+        "jest/no-commented-out-tests": "error",
+        "jest/no-conditional-expect": "error",
+        "jest/no-conditional-in-test": "error",
+        "jest/no-disabled-tests": "error",
+        "jest/no-focused-tests": "error",
+        "jest/no-identical-title": "error",
+        "jest/prefer-each": "error",
+        "jest/prefer-hooks-in-order": "error",
+        "jest/prefer-hooks-on-top": "error",
+        "jest/prefer-strict-equal": "error"
+      }
+    }
+  ],
+  "ignorePatterns": ["node_modules", "!.claude", "eslint-rules/*.spec.ts"]
+}
