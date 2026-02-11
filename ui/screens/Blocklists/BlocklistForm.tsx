@@ -132,9 +132,17 @@ export function BlocklistForm({
   )
 
   const isSirenLocked = useCallback(
-    (sirenType: SirenType, sirenId: string) =>
-      shouldLockSirens && isSirenSelected(sirenType, sirenId),
-    [shouldLockSirens, isSirenSelected],
+    (sirenType: SirenType, sirenId: string) => {
+      if (!shouldLockSirens || !blocklistFromState) return false
+      if (sirenType === SirenType.ANDROID) {
+        return blocklistFromState.sirens.android
+          .map((app) => app.packageName)
+          .includes(sirenId)
+      }
+
+      return blocklistFromState.sirens[sirenType].includes(sirenId)
+    },
+    [shouldLockSirens, blocklistFromState],
   )
 
   const showLockedSirenToast = useCallback(() => {

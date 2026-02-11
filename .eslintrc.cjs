@@ -123,7 +123,15 @@ module.exports = {
     'local-rules/prefer-array-destructuring': 'error',
     'local-rules/prefer-object-destructuring': [
       'warn',
-      { ignoredObjects: ['T', 'styles', 'viewModel'] },
+      {
+        ignoredObjects: [
+          'T',
+          'styles',
+          'viewModel',
+          'BlocklistViewModel',
+          'HomeViewModel',
+        ],
+      },
     ],
     // Warn-only: many valid patterns use named variables for self-documentation
     'local-rules/prefer-inline-variable': 'warn',
@@ -143,7 +151,7 @@ module.exports = {
     // Warn when useCallback is unnecessarily wrapping a selector for useSelector
     'local-rules/no-usecallback-selector-wrapper': 'error',
     // Prefer named selectors over inline state slice access
-    'local-rules/prefer-named-selector': 'warn',
+    'local-rules/prefer-named-selector': 'error',
     // Enforce state as first parameter in selectors
     'local-rules/selector-state-first-param': 'error',
     // Prevent passing useSelector results as props - child should call useSelector itself
@@ -162,7 +170,7 @@ module.exports = {
     // Prefer ternary over if-return followed by return
     'local-rules/prefer-ternary-return': ['error', { skipJsx: true }],
     // Names with "And"/"Or" at word boundaries suggest multiple responsibilities
-    'local-rules/no-and-or-in-names': 'warn',
+    'local-rules/no-and-or-in-names': 'error',
     // Prefer object map over 3+ sequential ifs testing the same variable
     'local-rules/prefer-jump-table': 'error',
     // Flag string literals in comparisons when a matching enum value exists
@@ -563,13 +571,6 @@ module.exports = {
           'error',
           {
             allowedPatterns: [
-              // Array methods
-              '^map$',
-              '^filter$',
-              '^flatMap$',
-              '^find$',
-              '^some$',
-              '^every$',
               // Entity adapter
               '^selectAll$',
               '^selectById$',
@@ -620,15 +621,6 @@ module.exports = {
           'error',
           {
             allowNoArguments: true,
-            allowedPatterns: [
-              // Array methods
-              '^map$',
-              '^filter$',
-              '^flatMap$',
-              '^find$',
-              '^some$',
-              '^every$',
-            ],
           },
         ],
       },

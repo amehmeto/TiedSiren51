@@ -9,8 +9,9 @@ import {
   Text,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { AppDispatch } from '@/core/_redux_/createStore'
 import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
+import { selectAuthStatus } from '@/core/auth/selectors/selectAuthStatus'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
@@ -27,11 +28,9 @@ export default function LoginScreen() {
   const dispatch = useDispatch<AppDispatch>()
   const [credentials, setCredentials] = useState({ email: '', password: '' })
 
-  const isUserAuthenticated = useSelector((state: RootState) =>
-    selectIsUserAuthenticated(state),
-  )
+  const isUserAuthenticated = useSelector(selectIsUserAuthenticated)
 
-  const { isLoading, error } = useSelector((state: RootState) => state.auth)
+  const { isLoading, error } = useSelector(selectAuthStatus)
 
   useEffect(() => {
     if (isUserAuthenticated) router.push('/')
