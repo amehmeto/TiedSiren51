@@ -36,7 +36,6 @@ export default function HomeScreen() {
   )
 
   const [activeSessionsNode, scheduledSessionsNode]: ReactNode[] = (() => {
-    // eslint-disable-next-line no-switch-statements/no-switch
     switch (viewModel.type) {
       case HomeViewModel.WithoutActiveNorScheduledSessions:
         return [
