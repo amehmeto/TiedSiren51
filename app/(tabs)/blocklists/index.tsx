@@ -1,4 +1,3 @@
-/* eslint-disable no-switch-statements/no-switch */
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import React, { ReactNode } from 'react'

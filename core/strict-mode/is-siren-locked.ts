@@ -6,12 +6,6 @@ export type LockedSirens = {
   keywords: Set<string>
 }
 
-export const EMPTY_LOCKED_SIRENS: LockedSirens = {
-  android: new Set(),
-  websites: new Set(),
-  keywords: new Set(),
-}
-
 export function isSirenLocked(
   lockedSirens: LockedSirens,
   sirenType: keyof Sirens,

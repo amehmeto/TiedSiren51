@@ -4,9 +4,7 @@ sh .husky/scripts/branch-name-check.sh
 sh .husky/scripts/uncommitted-files-check.sh
 
 npx expo-doctor
-npm run test:cov
-echo ""
-node scripts/compare-coverage.cjs
+npm run test:affected
 
 sh .husky/scripts/check-conflicts-with-main.sh
 

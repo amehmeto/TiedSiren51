@@ -51,5 +51,5 @@ export async function preloadedStateForManualTesting() {
   (preloadedState) => createStore(dependencies, preloadedState.getState()),
 )*/
 
-// eslint-disable-next-line local-rules/no-nested-call-expressions
-export const storePromise = Promise.resolve(createStore(dependencies))
+export const store = createStore(dependencies)
+export const storePromise = Promise.resolve(store)

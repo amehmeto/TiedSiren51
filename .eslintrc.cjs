@@ -633,8 +633,6 @@ module.exports = {
               '^string$',
               '^number$',
               '^array$',
-              // Date helpers
-              '^toHHmm$',
             ],
           },
         ],
@@ -646,6 +644,13 @@ module.exports = {
     //     'local-rules/no-nested-call-expressions': 'error',
     //   },
     // },
+    // Allow switch statements in app routes for viewModel discriminated unions
+    {
+      files: ['app/**/*.tsx'],
+      rules: {
+        'no-switch-statements/no-switch': 'off',
+      },
+    },
     // JSONC files (tsconfig allows comments)
     {
       files: ['tsconfig.json', 'tsconfig.*.json'],

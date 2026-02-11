@@ -98,7 +98,8 @@ export function SelectTime({
           isVisible={isTimePickerVisible}
           chosenTimeAsDate={chosenTimeAsDate}
           onConfirm={(date) => {
-            handleTimeChange(dateProvider.toHHmm(date))
+            const timeHHmm = dateProvider.toHHmm(date)
+            handleTimeChange(timeHHmm)
             setIsTimePickerVisible(false)
           }}
           onCancel={() => setIsTimePickerVisible(false)}

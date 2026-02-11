@@ -176,6 +176,7 @@
       "Skill(sync-project)",
       "Skill(worktree)",
       "WebFetch(domain:docs.expo.dev)",
+      "WebFetch(domain:expo.dev)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:raw.githubusercontent.com)",
       "WebFetch(domain:stackoverflow.com)",
