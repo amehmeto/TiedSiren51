@@ -201,7 +201,7 @@ export function BlocklistForm({
             androidApps={selectableSirens.android}
             toggleAppSiren={toggleAppSiren}
             isSirenSelected={isSirenSelected}
-            isSirenLocked={isSirenLocked}
+            blocklistId={blocklistId}
           />
         ),
         websites: () => (
@@ -214,7 +214,7 @@ export function BlocklistForm({
             data={selectableSirens.websites}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
-            isSirenLocked={isSirenLocked}
+            blocklistId={blocklistId}
           />
         ),
         keywords: () => (
@@ -227,7 +227,7 @@ export function BlocklistForm({
             data={selectableSirens.keywords}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
-            isSirenLocked={isSirenLocked}
+            blocklistId={blocklistId}
           />
         ),
       }
@@ -240,7 +240,7 @@ export function BlocklistForm({
       toggleAppSiren,
       toggleTextSiren,
       isSirenSelected,
-      isSirenLocked,
+      blocklistId,
     ],
   )
 

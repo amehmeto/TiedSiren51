@@ -2,7 +2,12 @@ import * as React from 'react'
 import { useState } from 'react'
 import { FlatList, StyleSheet, TextInput } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/core/_redux_/createStore'
 import { SirenType } from '@/core/siren/sirens'
+import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
+import { selectLockedSirensForBlocklist } from '@/core/strict-mode/selectors/selectLockedSirensForBlocklist'
+import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
@@ -14,7 +19,7 @@ type TextInputSelectionSceneProps = Readonly<{
   data: string[]
   toggleSiren: (sirenType: SirenType, sirenId: string) => void
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
-  isSirenLocked?: (sirenType: SirenType, sirenId: string) => boolean
+  blocklistId?: string
 }>
 
 export function TextInputSelectionScene({
@@ -24,10 +29,20 @@ export function TextInputSelectionScene({
   data,
   toggleSiren,
   isSirenSelected,
-  isSirenLocked,
+  blocklistId,
 }: TextInputSelectionSceneProps) {
   const [isFocused, setIsFocused] = useState(false)
   const insets = useSafeAreaInsets()
+
+  const lockedSirens = useSelector((state: RootState) =>
+    blocklistId
+      ? selectLockedSirensForBlocklist(
+          state,
+          dependencies.dateProvider,
+          blocklistId,
+        )
+      : undefined,
+  )
 
   return (
     <>
@@ -47,7 +62,9 @@ export function TextInputSelectionScene({
         keyExtractor={(item) => item}
         renderItem={({ item }) => {
           const isSelected = isSirenSelected(sirenType, item)
-          const isLocked = isSirenLocked?.(sirenType, item) ?? false
+          const isLocked = lockedSirens
+            ? isSirenLocked(lockedSirens, sirenType, item)
+            : false
           return (
             <SelectableSirenCard
               sirenType={sirenType}
