@@ -3,6 +3,7 @@ import { ScrollView, StyleSheet, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { SECOND } from '@/core/__constants__/time'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { formatDuration } from '@/core/strict-mode/format-duration'
 import { selectIsStrictModeLoading } from '@/core/strict-mode/selectors/selectIsStrictModeLoading'
 import { extendTimer } from '@/core/strict-mode/usecases/extend-timer.usecase'
 import { loadTimer } from '@/core/strict-mode/usecases/load-timer.usecase'
@@ -19,7 +20,6 @@ import {
 import { T } from '@/ui/design-system/theme'
 import { useAppForeground } from '@/ui/hooks/useAppForeground'
 import { useTick } from '@/ui/hooks/useTick'
-import { formatDuration } from '@ui/screens/StrictMode/format-duration.helper'
 import {
   selectStrictModeViewModel,
   StrictModeViewState,

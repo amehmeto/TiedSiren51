@@ -1,5 +1,5 @@
 import { describe, expect, test } from 'vitest'
-import { formatDuration } from './format-duration.helper'
+import { formatDuration } from './format-duration'
 
 describe('formatDuration', () => {
   test('should return "0 minutes" for all zeros', () => {
