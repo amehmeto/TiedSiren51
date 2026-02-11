@@ -38,7 +38,7 @@ module.exports = {
     'lines-between-class-members': ['error', 'always'],
     'max-statements-per-line': ['error', { max: 1 }],
     'no-console': 'error',
-    'no-else-return': 'warn',
+    'no-else-return': 'error',
     'no-nested-ternary': 'error',
     'no-switch-statements/no-switch': 'error',
     'prefer-const': 'error',
@@ -123,7 +123,7 @@ module.exports = {
     'local-rules/prefer-array-destructuring': 'error',
     'local-rules/prefer-object-destructuring': [
       'warn',
-      { ignoredObjects: ['T', 'styles'] },
+      { ignoredObjects: ['T', 'styles', 'viewModel'] },
     ],
     // Warn-only: many valid patterns use named variables for self-documentation
     'local-rules/prefer-inline-variable': 'warn',
@@ -141,7 +141,7 @@ module.exports = {
     // Extract complex expressions with long strings to variables
     'local-rules/no-complex-inline-arguments': 'error',
     // Warn when useCallback is unnecessarily wrapping a selector for useSelector
-    'local-rules/no-usecallback-selector-wrapper': 'warn',
+    'local-rules/no-usecallback-selector-wrapper': 'error',
     // Prefer named selectors over inline state slice access
     'local-rules/prefer-named-selector': 'warn',
     // Enforce state as first parameter in selectors
@@ -164,7 +164,7 @@ module.exports = {
     // Names with "And"/"Or" at word boundaries suggest multiple responsibilities
     'local-rules/no-and-or-in-names': 'warn',
     // Prefer object map over 3+ sequential ifs testing the same variable
-    'local-rules/prefer-jump-table': 'warn',
+    'local-rules/prefer-jump-table': 'error',
     // Flag string literals in comparisons when a matching enum value exists
     'local-rules/no-enum-value-as-string-literal': 'error',
     // Prefer ternary over complementary && conditions in JSX
@@ -628,11 +628,6 @@ module.exports = {
               '^find$',
               '^some$',
               '^every$',
-              // Zod fluent API
-              '^object$',
-              '^string$',
-              '^number$',
-              '^array$',
             ],
           },
         ],
@@ -644,13 +639,6 @@ module.exports = {
     //     'local-rules/no-nested-call-expressions': 'error',
     //   },
     // },
-    // Allow switch statements in app routes for viewModel discriminated unions
-    {
-      files: ['app/**/*.tsx'],
-      rules: {
-        'no-switch-statements/no-switch': 'off',
-      },
-    },
     // JSONC files (tsconfig allows comments)
     {
       files: ['tsconfig.json', 'tsconfig.*.json'],
