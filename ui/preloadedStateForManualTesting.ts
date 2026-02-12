@@ -51,4 +51,5 @@ export async function preloadedStateForManualTesting() {
   (preloadedState) => createStore(dependencies, preloadedState.getState()),
 )*/
 
-export const storePromise = Promise.resolve(createStore(dependencies))
+export const store = createStore(dependencies)
+export const storePromise = Promise.resolve(store)

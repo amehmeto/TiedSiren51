@@ -6,6 +6,11 @@ function isValidTimeFormat(time: string): boolean {
   return timeRegex.test(time)
 }
 
+const deviceSchema = z.object({
+  id: z.string(),
+  name: z.string(),
+})
+
 export const blockSessionSchema = z.object({
   id: z.string(),
   name: z
@@ -18,12 +23,7 @@ export const blockSessionSchema = z.object({
     .array(z.string())
     .min(1, { message: 'At least one blocklist must be selected' }),
   devices: z
-    .array(
-      z.object({
-        id: z.string(),
-        name: z.string(),
-      }),
-    )
+    .array(deviceSchema)
     .min(1, { message: 'At least one device must be selected' }),
   startedAt: z
     .string()

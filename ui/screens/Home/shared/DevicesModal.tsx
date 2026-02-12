@@ -46,9 +46,8 @@ export function DevicesModal({
     selectIsStrictModeActive(state, dependencies.dateProvider),
   )
   const [wasVisible, setWasVisible] = useState(isVisible)
-  const [selectedIds, setSelectedIds] = useState<string[]>(
-    currentSelections.map((d) => d.id),
-  )
+  const currentSelectionIds = currentSelections.map((d) => d.id)
+  const [selectedIds, setSelectedIds] = useState<string[]>(currentSelectionIds)
   const lockedDeviceIds = isStrictModeActive
     ? currentSelections.map((d) => d.id)
     : []
@@ -59,7 +58,7 @@ export function DevicesModal({
 
   if (isVisible && !wasVisible) {
     setWasVisible(true)
-    setSelectedIds(currentSelections.map((d) => d.id))
+    setSelectedIds(currentSelectionIds)
   }
   if (!isVisible && wasVisible) setWasVisible(false)
 

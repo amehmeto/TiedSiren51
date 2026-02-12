@@ -19,6 +19,10 @@ import { AndroidSiren, Sirens, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
+import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
+import { selectLockedSirensForBlocklist } from '@/core/strict-mode/selectors/selectLockedSirensForBlocklist'
+import { notifyLockedSiren } from '@/core/strict-mode/usecases/notify-locked-siren.usecase'
+import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
@@ -57,7 +61,15 @@ export function BlocklistForm({
   )
 
   const blocklistFromState = useSelector((state: RootState) =>
-    blocklistId ? selectBlocklistById(state, blocklistId) : undefined,
+    selectBlocklistById(state, blocklistId),
+  )
+
+  const lockedSirens = useSelector((state: RootState) =>
+    selectLockedSirensForBlocklist(
+      state,
+      dependencies.dateProvider,
+      mode === FormMode.Edit ? blocklistId : undefined,
+    ),
   )
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
@@ -91,8 +103,28 @@ export function BlocklistForm({
       setBlocklist(blocklistFromState)
   }, [mode, blocklistFromState, dispatch])
 
+  const isSirenSelected = useCallback(
+    (sirenType: SirenType, sirenId: string) =>
+      sirenType === SirenType.ANDROID
+        ? blocklist.sirens.android
+            .map((app) => app.packageName)
+            .includes(sirenId)
+        : blocklist.sirens[sirenType].includes(sirenId),
+    [blocklist],
+  )
+
+  const guardLockedSiren = useCallback(
+    (sirenType: SirenType, sirenId: string): boolean => {
+      if (!isSirenLocked(lockedSirens, sirenType, sirenId)) return false
+      dispatch(notifyLockedSiren())
+      return true
+    },
+    [lockedSirens, dispatch],
+  )
+
   const toggleTextSiren = useCallback(
-    (sirenType: keyof Sirens, sirenId: string) => {
+    (sirenType: SirenType, sirenId: string) => {
+      if (guardLockedSiren(sirenType, sirenId)) return
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
         if (
@@ -110,11 +142,12 @@ export function BlocklistForm({
         return { ...prevBlocklist, sirens: updatedSirens }
       })
     },
-    [setBlocklist],
+    [guardLockedSiren, setBlocklist],
   )
 
   const toggleAppSiren = useCallback(
     (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
+      if (guardLockedSiren(sirenType, app.packageName)) return
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
 
@@ -127,19 +160,7 @@ export function BlocklistForm({
         return { ...prevBlocklist, sirens: updatedSirens }
       })
     },
-    [setBlocklist],
-  )
-
-  const isSirenSelected = useCallback(
-    (sirenType: SirenType, sirenId: string) => {
-      if (sirenType === SirenType.ANDROID) {
-        return blocklist.sirens.android
-          .map((app) => app.packageName)
-          .includes(sirenId)
-      }
-      return blocklist.sirens[sirenType].includes(sirenId)
-    },
-    [blocklist],
+    [guardLockedSiren, setBlocklist],
   )
 
   const renderScene = useCallback(
@@ -157,6 +178,7 @@ export function BlocklistForm({
             androidApps={selectableSirens.android}
             toggleAppSiren={toggleAppSiren}
             isSirenSelected={isSirenSelected}
+            blocklistId={blocklistId}
           />
         ),
         websites: () => (
@@ -169,6 +191,7 @@ export function BlocklistForm({
             data={selectableSirens.websites}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
+            blocklistId={blocklistId}
           />
         ),
         keywords: () => (
@@ -181,6 +204,7 @@ export function BlocklistForm({
             data={selectableSirens.keywords}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
+            blocklistId={blocklistId}
           />
         ),
       }
@@ -193,6 +217,7 @@ export function BlocklistForm({
       toggleAppSiren,
       toggleTextSiren,
       isSirenSelected,
+      blocklistId,
     ],
   )
 

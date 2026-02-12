@@ -37,8 +37,18 @@ describe('no-stylesheet-magic-numbers', () => {
         const styles = StyleSheet.create({
           container: {
             flex: 1,
-            opacity: 0.5,
-            zIndex: 10,
+          }
+        })
+      `,
+        },
+        // Theme constants for opacity, shadowOpacity, zIndex - OK
+        {
+          code: `
+        const styles = StyleSheet.create({
+          container: {
+            opacity: T.opacity.disabled,
+            shadowOpacity: T.shadow.opacity,
+            zIndex: T.elevation.high,
           }
         })
       `,
@@ -291,6 +301,54 @@ describe('no-stylesheet-magic-numbers', () => {
             {
               messageId: 'noMagicNumber',
               data: { value: 16, property: 'padding' },
+            },
+          ],
+        },
+        // Opacity magic number
+        {
+          code: `
+        const styles = StyleSheet.create({
+          container: {
+            opacity: 0.5,
+          }
+        })
+      `,
+          errors: [
+            {
+              messageId: 'noMagicNumber',
+              data: { value: 0.5, property: 'opacity' },
+            },
+          ],
+        },
+        // shadowOpacity magic number
+        {
+          code: `
+        const styles = StyleSheet.create({
+          container: {
+            shadowOpacity: 0.1,
+          }
+        })
+      `,
+          errors: [
+            {
+              messageId: 'noMagicNumber',
+              data: { value: 0.1, property: 'shadowOpacity' },
+            },
+          ],
+        },
+        // zIndex magic number
+        {
+          code: `
+        const styles = StyleSheet.create({
+          modal: {
+            zIndex: 10,
+          }
+        })
+      `,
+          errors: [
+            {
+              messageId: 'noMagicNumber',
+              data: { value: 10, property: 'zIndex' },
             },
           ],
         },

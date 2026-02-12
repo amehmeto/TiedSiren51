@@ -78,8 +78,11 @@ module.exports = {
       'end',
       // Shadow and elevation
       'shadowRadius',
+      'shadowOpacity',
       'elevation',
-      // Note: shadowOpacity is intentionally excluded - it's contextual to the specific shadow effect
+      'zIndex',
+      // Opacity
+      'opacity',
     ])
 
     // No magic numbers are allowed - all values must come from theme
