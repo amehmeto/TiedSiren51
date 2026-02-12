@@ -2,9 +2,6 @@
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["react", "typescript", "unicorn", "jest", "vitest", "import"],
   "jsPlugins": ["./oxlint-plugin-local-rules.js"],
-  "categories": {
-    "correctness": "off"
-  },
   "rules": {
     "no-console": "error",
     "eqeqeq": "error",
@@ -23,6 +20,10 @@
     "typescript/no-explicit-any": "error",
 
     "unicorn/no-nested-ternary": "off",
+    "unicorn/no-thenable": "off",
+
+    "jest/expect-expect": "off",
+    "jest/require-to-throw-message": "off",
 
     "local-rules/no-icon-size-magic-numbers": "error",
     "local-rules/no-stylesheet-magic-numbers": "error",

@@ -82,7 +82,14 @@ kebab_to_camel() {
 
 echo "  Generated $PLUGIN_FILE with ${#rules[@]} rules."
 
-# --- Step 3: Format generated files ---
+# --- Step 3: Verify no unconverted require() calls ---
+
+if grep -l "require(" "$RULES_DIR"/*.js 2>/dev/null; then
+  echo "ERROR: Unconverted require() found in generated files!" >&2
+  exit 1
+fi
+
+# --- Step 4: Format generated files ---
 
 echo "Formatting generated files..."
 npx prettier --write "$RULES_DIR"/*.js "$PLUGIN_FILE" --log-level warn

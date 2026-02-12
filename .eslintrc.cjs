@@ -5,11 +5,20 @@
 // cannot: sonarjs, react-native, jsonc, naming-convention, curly multi-or-nest,
 // import/order, and rules needing excludedFiles override scoping.
 //
-// eslint-plugin-oxlint/recommended disables ESLint rules that OxLint handles,
-// preventing double-reporting. The plugin version should match oxlint version.
+// buildFromOxlintConfigFile reads .oxlintrc.json to compute exactly which rules
+// OxLint handles, then disables them in ESLint — no double-reporting, no gaps.
+// The plugin version should match oxlint version.
 //
 // OxLint uses jest/* rules which also understand vitest syntax.
 // unicorn/no-nested-ternary is off in OxLint (auto-fix conflicts with Prettier).
+
+const { buildFromOxlintConfigFile } = require('eslint-plugin-oxlint')
+const oxlintConfigs = buildFromOxlintConfigFile('.oxlintrc.json')
+const oxlintDisableRules = {}
+oxlintConfigs.forEach((item) => {
+  if (item.rules) Object.assign(oxlintDisableRules, item.rules)
+})
+
 module.exports = {
   ignorePatterns: ['node_modules', '!.claude', 'eslint-rules/', 'oxlint-plugin-local-rules.js'],
   extends: [
@@ -17,7 +26,6 @@ module.exports = {
     'prettier',
     'plugin:no-switch-statements/recommended',
     'plugin:jsonc/recommended-with-json',
-    'plugin:oxlint/recommended',
   ],
   plugins: [
     'prettier',
@@ -29,9 +37,10 @@ module.exports = {
     'unicorn',
     'local-rules',
     'jsonc',
-    'oxlint',
   ],
   rules: {
+    // Disable all rules that OxLint handles (computed from .oxlintrc.json)
+    ...oxlintDisableRules,
     // Rules kept in ESLint due to OxLint override scoping bugs
     'local-rules/no-nested-call-expressions': 'off',
     'import/order': [
