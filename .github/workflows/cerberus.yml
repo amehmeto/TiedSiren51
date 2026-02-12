@@ -57,7 +57,7 @@ jobs:
         run: npm ci
 
       - name: Install platform-specific binaries
-        run: npm install --no-save @oxlint/binding-linux-x64-gnu
+        run: npm install --no-save @oxlint/binding-linux-x64-gnu@1.46.0
 
       - name: Lint
         run: npm run lint
@@ -84,7 +84,7 @@ jobs:
         run: npm ci
 
       - name: Install platform-specific binaries
-        run: npm install --no-save @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu @oxlint/binding-linux-x64-gnu
+        run: npm install --no-save @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu @oxlint/binding-linux-x64-gnu@1.46.0
 
       - name: Cache Prisma Client
         uses: actions/cache@v4

@@ -117,7 +117,6 @@
     "!.claude",
     "eslint-rules/",
     "oxlint-plugin-local-rules.js",
-    "scripts/",
-    "*.d.ts"
+    "scripts/"
   ]
 }
