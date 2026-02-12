@@ -181,6 +181,41 @@ describe('selectLockedSirensForBlocklist', () => {
     expect(keywordsSize).toBe(0)
   })
 
+  test('should return cached result when blocklist sirens reference is unchanged', () => {
+    const blocklist = buildBlocklist({
+      id: 'blocklist-1',
+      sirens: {
+        android: [{ packageName: 'com.app1', appName: 'App1', icon: '' }],
+        websites: ['example.com'],
+        keywords: ['social'],
+      },
+    })
+    const session = buildBlockSession({
+      id: 'session-1',
+      blocklistIds: ['blocklist-1'],
+      startedAt: '09:00',
+      endedAt: '11:00',
+    })
+    const state = stateBuilder()
+      .withBlocklists([blocklist])
+      .withBlockSessions([session])
+      .withStrictModeEndedAt('2024-01-01T12:00:00.000Z')
+      .build()
+
+    const firstCall = selectLockedSirensForBlocklist(
+      state,
+      dateProvider,
+      'blocklist-1',
+    )
+    const secondCall = selectLockedSirensForBlocklist(
+      state,
+      dateProvider,
+      'blocklist-1',
+    )
+
+    expect(secondCall).toBe(firstCall)
+  })
+
   test('should return empty when blocklist does not exist in state', () => {
     const session = buildBlockSession({
       id: 'session-1',
