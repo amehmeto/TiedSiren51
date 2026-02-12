@@ -163,6 +163,25 @@ describe('selectLockedSirensForBlocklist', () => {
     expect(hasSocial).toBe(true)
   })
 
+  test('should return empty locked sirens when blocklistId is undefined', () => {
+    const state = stateBuilder()
+      .withStrictModeEndedAt('2024-01-01T12:00:00.000Z')
+      .build()
+
+    const retrievedLockedSirens = selectLockedSirensForBlocklist(
+      state,
+      dateProvider,
+      undefined,
+    )
+
+    const androidSize = retrievedLockedSirens.android.size
+    const websitesSize = retrievedLockedSirens.websites.size
+    const keywordsSize = retrievedLockedSirens.keywords.size
+    expect(androidSize).toBe(0)
+    expect(websitesSize).toBe(0)
+    expect(keywordsSize).toBe(0)
+  })
+
   test('should return empty when blocklist does not exist', () => {
     const state = stateBuilder()
       .withStrictModeEndedAt('2024-01-01T12:00:00.000Z')
@@ -228,6 +247,12 @@ describe('isSirenLocked', () => {
 
     expect(isSocialLocked).toBe(true)
     expect(isOtherLocked).toBe(false)
+  })
+
+  test('should return false when lockedSirens is undefined', () => {
+    const isLocked = isSirenLocked(undefined, 'android', 'com.app1')
+
+    expect(isLocked).toBe(false)
   })
 
   test('should return false for unsupported siren types', () => {
