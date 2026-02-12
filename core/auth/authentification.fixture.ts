@@ -6,6 +6,8 @@ import {
   stateBuilder,
   stateBuilderProvider,
 } from '@/core/_tests_/state-builder'
+import { AuthError } from '@/core/auth/auth-error'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
@@ -41,7 +43,7 @@ export function authentificationFixture(
         _password: string,
       ) {
         authGateway.willResultWith = Promise.reject(
-          new Error('Invalid credentials'),
+          new AuthError('Invalid credentials', AuthErrorType.Credential),
         )
       },
       authUserIs(authUser: AuthUser) {
@@ -49,8 +51,13 @@ export function authentificationFixture(
           stateBuilder.withAuthUser(authUser),
         )
       },
-      authGatewayWillRejectWith(errorMessage: string) {
-        authGateway.willResultWith = Promise.reject(new Error(errorMessage))
+      authGatewayWillRejectWith(
+        errorMessage: string,
+        errorType: AuthErrorType = AuthErrorType.Unknown,
+      ) {
+        authGateway.willResultWith = Promise.reject(
+          new AuthError(errorMessage, errorType),
+        )
       },
     },
     when: {
@@ -89,6 +96,10 @@ export function authentificationFixture(
       authenticationErrorsShouldBe(expectedError: string) {
         const state = store.getState()
         expect(state.auth.error).toBe(expectedError)
+      },
+      authErrorTypeShouldBe(expected: AuthErrorType) {
+        const state = store.getState()
+        expect(state.auth.errorType).toBe(expected)
       },
       authShouldBeLoading(isLoading: boolean) {
         const state = store.getState()

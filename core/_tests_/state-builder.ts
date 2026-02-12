@@ -4,6 +4,7 @@ import {
   createReducer,
 } from '@reduxjs/toolkit'
 import { ISODateString } from '@/core/_ports_/date-provider'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
 import { RootState } from '../_redux_/createStore'
 import { rootReducer } from '../_redux_/rootReducer'
@@ -22,6 +23,7 @@ const withAvailableSirens = createAction<Sirens>('withAvailableSirens')
 const withAuthUser = createAction<AuthUser>('withAuthUser')
 const withoutAuthUser = createAction<{}>('withoutAuthUser')
 const withAuthError = createAction<string>('withAuthError')
+const withAuthErrorType = createAction<AuthErrorType>('withAuthErrorType')
 const withAuthLoading = createAction<boolean>('withAuthLoading')
 const withStrictModeEndedAt = createAction<ISODateString | null>(
   'withStrictModeEndedAt',
@@ -47,6 +49,9 @@ const reducer = createReducer(initialState, (builder) => {
     })
     .addCase(withAuthError, (state, action) => {
       state.auth.error = action.payload
+    })
+    .addCase(withAuthErrorType, (state, action) => {
+      state.auth.errorType = action.payload
     })
     .addCase(withAuthLoading, (state, action) => {
       state.auth.isLoading = action.payload
@@ -75,6 +80,7 @@ export const stateBuilder = (baseState = initialState) => {
     withBlocklists: reduce(withBlocklists),
     withAvailableSirens: reduce(withAvailableSirens),
     withAuthError: reduce(withAuthError),
+    withAuthErrorType: reduce(withAuthErrorType),
     withAuthLoading: reduce(withAuthLoading),
     withStrictModeEndedAt: reduce(withStrictModeEndedAt),
     withPasswordResetSent: reduce(withPasswordResetSent),

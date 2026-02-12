@@ -23,6 +23,8 @@ import {
 } from 'firebase/auth'
 import { AuthGateway } from '@/core/_ports_/auth.gateway'
 import { Logger } from '@/core/_ports_/logger'
+import { AuthError } from '@/core/auth/auth-error'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
 import { firebaseConfig } from './firebaseConfig'
 
@@ -48,6 +50,21 @@ enum GoogleSignInError {
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
 
+  private static readonly FIREBASE_ERROR_TYPES: Record<
+    FirebaseAuthErrorCode,
+    AuthErrorType
+  > = {
+    [FirebaseAuthErrorCode.EmailAlreadyInUse]: AuthErrorType.Validation,
+    [FirebaseAuthErrorCode.InvalidEmail]: AuthErrorType.Validation,
+    [FirebaseAuthErrorCode.WeakPassword]: AuthErrorType.Validation,
+    [FirebaseAuthErrorCode.InvalidCredential]: AuthErrorType.Credential,
+    [FirebaseAuthErrorCode.PopupClosedByUser]: AuthErrorType.Cancelled,
+    [FirebaseAuthErrorCode.CancelledByUser]: AuthErrorType.Cancelled,
+    [FirebaseAuthErrorCode.UserNotFound]: AuthErrorType.Credential,
+    [FirebaseAuthErrorCode.TooManyRequests]: AuthErrorType.RateLimit,
+    [FirebaseAuthErrorCode.NetworkRequestFailed]: AuthErrorType.Network,
+  }
+
   private static readonly FIREBASE_ERRORS: Record<
     FirebaseAuthErrorCode,
     string
@@ -64,6 +81,16 @@ export class FirebaseAuthGateway implements AuthGateway {
       'Too many requests. Please try again later.',
     [FirebaseAuthErrorCode.NetworkRequestFailed]:
       'No internet connection. Please check your network and try again.',
+  }
+
+  private static readonly GOOGLE_ERROR_TYPES: Record<
+    GoogleSignInError,
+    AuthErrorType
+  > = {
+    [GoogleSignInError.SignInCancelled]: AuthErrorType.Cancelled,
+    [GoogleSignInError.InProgress]: AuthErrorType.Unknown,
+    [GoogleSignInError.PlayServicesNotAvailable]: AuthErrorType.Unknown,
+    [GoogleSignInError.MissingIdToken]: AuthErrorType.Unknown,
   }
 
   private static readonly GOOGLE_SIGN_IN_ERRORS: Record<
@@ -160,18 +187,29 @@ export class FirebaseAuthGateway implements AuthGateway {
     })
   }
 
-  private translateFirebaseError(error: unknown): string {
-    if (this.isFirebaseAuthError(error))
-      return FirebaseAuthGateway.FIREBASE_ERRORS[error.code]
+  private toAuthError(error: unknown): AuthError {
+    if (this.isFirebaseAuthError(error)) {
+      return new AuthError(
+        FirebaseAuthGateway.FIREBASE_ERRORS[error.code],
+        FirebaseAuthGateway.FIREBASE_ERROR_TYPES[error.code],
+      )
+    }
 
     if (this.isGoogleSignInError(error)) {
       const pattern = this.getGoogleSignInErrorPattern(error)
-      if (pattern) return FirebaseAuthGateway.GOOGLE_SIGN_IN_ERRORS[pattern]
+      if (pattern) {
+        return new AuthError(
+          FirebaseAuthGateway.GOOGLE_SIGN_IN_ERRORS[pattern],
+          FirebaseAuthGateway.GOOGLE_ERROR_TYPES[pattern],
+        )
+      }
     }
 
-    return error && error instanceof Error
-      ? error.message
-      : 'Unknown error occurred.'
+    const message =
+      error && error instanceof Error
+        ? error.message
+        : 'Unknown error occurred.'
+    return new AuthError(message, AuthErrorType.Unknown)
   }
 
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
@@ -186,7 +224,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         email: result.user.email ?? '',
       }
     } catch (error) {
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -202,7 +240,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         email: result.user.email ?? '',
       }
     } catch (error) {
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -227,7 +265,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         profilePicture: credential.user.photoURL ?? undefined,
       }
     } catch (error) {
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -246,7 +284,7 @@ export class FirebaseAuthGateway implements AuthGateway {
     try {
       await sendPasswordResetEmail(this.auth, email)
     } catch (error) {
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -263,7 +301,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut()
       await signOut(this.auth)
     } catch (error) {
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 }

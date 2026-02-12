@@ -16,6 +16,7 @@
       "Bash(.claude/hooks/validate-edit.sh scripts/ci-watch.sh)",
       "Bash(/opt/homebrew/bin/shellcheck --version)",
       "Bash(/usr/local/bin/shellcheck:*)",
+      "Bash(1)",
       "Bash(OWNER=$(gh repo view --json owner -q '.owner.login') && gh project item-list:*)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(adb devices:*)",

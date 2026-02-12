@@ -1,4 +1,5 @@
 import { RootState } from '@/core/_redux_/createStore'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 
 export enum LoginViewState {
   Idle = 'IDLE',
@@ -28,20 +29,8 @@ type ErrorViewModel = {
 
 export type LoginViewModel = IdleViewModel | LoadingViewModel | ErrorViewModel
 
-const CREDENTIAL_ERRORS = [
-  'Invalid email or password',
-  'Invalid credentials',
-  'No account found with this email',
-]
-
-function isCredentialError(error: string): boolean {
-  return CREDENTIAL_ERRORS.some((credError) =>
-    error.toLowerCase().includes(credError.toLowerCase()),
-  )
-}
-
 export function selectLoginViewModel(state: RootState): LoginViewModel {
-  const { isLoading, error } = state.auth
+  const { isLoading, error, errorType } = state.auth
   const { Loading, Error, Idle } = LoginViewState
 
   if (isLoading) {
@@ -58,7 +47,7 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
       buttonText: 'LOG IN',
       isInputDisabled: false,
       error,
-      shouldClearPassword: isCredentialError(error),
+      shouldClearPassword: errorType === AuthErrorType.Credential,
     }
   }
 
