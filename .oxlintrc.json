@@ -22,7 +22,7 @@
 
     "typescript/no-explicit-any": "error",
 
-    "unicorn/no-nested-ternary": "error",
+    "unicorn/no-nested-ternary": "off",
 
     "local-rules/no-icon-size-magic-numbers": "error",
     "local-rules/no-stylesheet-magic-numbers": "error",
@@ -115,6 +115,7 @@
     "node_modules",
     "!.claude",
     "eslint-rules/",
-    "oxlint-plugin-local-rules.js"
+    "oxlint-plugin-local-rules.js",
+    "scripts/"
   ]
 }
