@@ -1,5 +1,15 @@
 // https://docs.expo.dev/guides/using-eslint/
-// ESM configuration file
+//
+// This is the ESLint-only config. Most rules (including 50+ custom rules) run
+// in OxLint for speed — see .oxlintrc.json. ESLint handles rules that OxLint
+// cannot: sonarjs, react-native, jsonc, naming-convention, curly multi-or-nest,
+// import/order, and rules needing excludedFiles override scoping.
+//
+// eslint-plugin-oxlint/recommended disables ESLint rules that OxLint handles,
+// preventing double-reporting. The plugin version should match oxlint version.
+//
+// OxLint uses jest/* rules which also understand vitest syntax.
+// unicorn/no-nested-ternary is off in OxLint (auto-fix conflicts with Prettier).
 module.exports = {
   ignorePatterns: ['node_modules', '!.claude', 'eslint-rules/', 'oxlint-plugin-local-rules.js'],
   extends: [
@@ -409,6 +419,50 @@ module.exports = {
         ],
       },
     },
+    // Progressive enablement of no-nested-call-expressions rule
+    // Uncomment each block as violations are fixed
+    // See: docs/adr/conventions/no-nested-call-expressions.md
+    //
+    // {
+    //   files: ['**/*.fixture.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['core/**/listeners/*.ts'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['core/**/usecases/*.ts'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['infra/**/*.ts'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['ui/**/*.ts', 'ui/**/*.tsx'],
+    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
+    // {
+    //   files: ['app/**/*.ts', 'app/**/*.tsx'],
+    //   rules: {
+    //     'local-rules/no-nested-call-expressions': 'error',
+    //   },
+    // },
     // JSON files linting
     {
       files: ['*.json', '**/*.json'],
