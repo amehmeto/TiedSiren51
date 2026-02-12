@@ -40,16 +40,17 @@ export function selectForgotPasswordViewModel(
   state: RootState,
 ): ForgotPasswordViewModel {
   const { isLoading, error, isPasswordResetSent } = state.auth
+  const { Success, Loading, Error, Idle } = ForgotPasswordViewState
 
   if (isPasswordResetSent) {
     return {
-      type: ForgotPasswordViewState.Success,
+      type: Success,
     }
   }
 
   if (isLoading) {
     return {
-      type: ForgotPasswordViewState.Loading,
+      type: Loading,
       buttonText: 'SENDING...',
       isInputDisabled: true,
     }
@@ -57,7 +58,7 @@ export function selectForgotPasswordViewModel(
 
   if (error) {
     return {
-      type: ForgotPasswordViewState.Error,
+      type: Error,
       buttonText: 'SEND RESET LINK',
       isInputDisabled: false,
       error,
@@ -65,7 +66,7 @@ export function selectForgotPasswordViewModel(
   }
 
   return {
-    type: ForgotPasswordViewState.Idle,
+    type: Idle,
     buttonText: 'SEND RESET LINK',
     isInputDisabled: false,
   }

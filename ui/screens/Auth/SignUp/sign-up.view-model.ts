@@ -29,10 +29,11 @@ export type SignUpViewModel = IdleViewModel | LoadingViewModel | ErrorViewModel
 
 export function selectSignUpViewModel(state: RootState): SignUpViewModel {
   const { isLoading, error } = state.auth
+  const { Loading, Error, Idle } = SignUpViewState
 
   if (isLoading) {
     return {
-      type: SignUpViewState.Loading,
+      type: Loading,
       buttonText: 'CREATING ACCOUNT...',
       isInputDisabled: true,
     }
@@ -40,7 +41,7 @@ export function selectSignUpViewModel(state: RootState): SignUpViewModel {
 
   if (error) {
     return {
-      type: SignUpViewState.Error,
+      type: Error,
       buttonText: 'CREATE YOUR ACCOUNT',
       isInputDisabled: false,
       error,
@@ -48,7 +49,7 @@ export function selectSignUpViewModel(state: RootState): SignUpViewModel {
   }
 
   return {
-    type: SignUpViewState.Idle,
+    type: Idle,
     buttonText: 'CREATE YOUR ACCOUNT',
     isInputDisabled: false,
   }

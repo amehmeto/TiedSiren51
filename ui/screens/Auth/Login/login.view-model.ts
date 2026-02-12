@@ -42,10 +42,11 @@ function isCredentialError(error: string): boolean {
 
 export function selectLoginViewModel(state: RootState): LoginViewModel {
   const { isLoading, error } = state.auth
+  const { Loading, Error, Idle } = LoginViewState
 
   if (isLoading) {
     return {
-      type: LoginViewState.Loading,
+      type: Loading,
       buttonText: 'LOGGING IN...',
       isInputDisabled: true,
     }
@@ -53,7 +54,7 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
 
   if (error) {
     return {
-      type: LoginViewState.Error,
+      type: Error,
       buttonText: 'LOG IN',
       isInputDisabled: false,
       error,
@@ -62,7 +63,7 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
   }
 
   return {
-    type: LoginViewState.Idle,
+    type: Idle,
     buttonText: 'LOG IN',
     isInputDisabled: false,
   }

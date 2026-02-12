@@ -4,7 +4,7 @@ import {
   SignUpViewModel,
   SignUpViewState,
   selectSignUpViewModel,
-} from '@/ui/screens/Auth/SignUp/signup.view-model'
+} from '@/ui/screens/Auth/SignUp/sign-up.view-model'
 
 describe('selectSignUpViewModel', () => {
   describe('Idle state', () => {
