@@ -19,6 +19,7 @@ const noConjunctionInNames = require('../eslint-rules/no-and-or-in-names.cjs')
 const noCallExpressionInJsxProps = require('../eslint-rules/no-call-expression-in-jsx-props.cjs')
 const noComplexInlineArguments = require('../eslint-rules/no-complex-inline-arguments.cjs')
 const noComplexJsxInConditionals = require('../eslint-rules/no-complex-jsx-in-conditionals.cjs')
+const noConsecutiveDuplicateReturns = require('../eslint-rules/no-consecutive-duplicate-returns.cjs')
 const noCrossLayerImports = require('../eslint-rules/no-cross-layer-imports.cjs')
 const noDataBuildersInProduction = require('../eslint-rules/no-data-builders-in-production.cjs')
 const noElseIf = require('../eslint-rules/no-else-if.cjs')
@@ -73,6 +74,7 @@ module.exports = {
     'expect-separate-act-assert': expectSeparateActAssert,
     'inline-single-statement-handlers': inlineSingleStatementHandlers,
     'no-complex-jsx-in-conditionals': noComplexJsxInConditionals,
+    'no-consecutive-duplicate-returns': noConsecutiveDuplicateReturns,
     'no-icon-size-magic-numbers': noIconSizeMagicNumbers,
     'no-i-prefix-in-imports': noIPrefixInImports,
     'no-stylesheet-magic-numbers': noStylesheetMagicNumbers,

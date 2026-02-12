@@ -17,8 +17,8 @@ export function selectLockedSirensForBlocklist(
   dateProvider: DateProvider,
   blocklistId: string | undefined,
 ): LockedSirens {
-  if (!blocklistId) return EMPTY_LOCKED_SIRENS
-  if (!selectIsStrictModeActive(state, dateProvider)) return EMPTY_LOCKED_SIRENS
+  if (!blocklistId || !selectIsStrictModeActive(state, dateProvider))
+    return EMPTY_LOCKED_SIRENS
 
   const allRelevantSessions = [
     ...selectActiveSessions(state, dateProvider),
@@ -30,9 +30,10 @@ export function selectLockedSirensForBlocklist(
   )
   if (!isBlocklistInUse) return EMPTY_LOCKED_SIRENS
 
-  const {
-    sirens: { android, websites, keywords },
-  } = selectBlocklistById(state, blocklistId)
+  const blocklist = selectBlocklistById(state, blocklistId)
+  if (!blocklist) return EMPTY_LOCKED_SIRENS
+
+  const { android, websites, keywords } = blocklist.sirens
 
   return {
     android: new Set(android.map((app) => app.packageName)),

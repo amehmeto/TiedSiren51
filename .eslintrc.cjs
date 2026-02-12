@@ -119,6 +119,7 @@ module.exports = {
     'local-rules/require-named-regex': 'error',
     // Disabled globally - too many valid patterns. Enable per-file as needed.
     // See: docs/adr/conventions/no-nested-call-expressions.md
+    'local-rules/no-consecutive-duplicate-returns': 'warn',
     'local-rules/no-nested-call-expressions': 'off',
     'local-rules/no-redundant-nullish-ternary': 'warn',
     'local-rules/prefer-array-destructuring': 'error',

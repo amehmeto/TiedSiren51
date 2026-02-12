@@ -14,8 +14,8 @@ describe('selectBlocklistById', () => {
     const result = selectBlocklistById(state, 'blocklist-1')
 
     expect(result).toBeDefined()
-    expect(result.id).toBe('blocklist-1')
-    expect(result.name).toBe('Test Blocklist')
+    expect(result?.id).toBe('blocklist-1')
+    expect(result?.name).toBe('Test Blocklist')
   })
 
   test('should return undefined when blocklist does not exist', () => {

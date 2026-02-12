@@ -19,6 +19,6 @@ export function isSirenLocked(
     websites: (locked) => locked.websites,
     keywords: (locked) => locked.keywords,
   }
-  const lookup = sirenLookup[sirenType]
-  return lookup ? lookup(lockedSirens).has(sirenId) : false
+
+  return sirenLookup[sirenType]?.(lockedSirens).has(sirenId) ?? false
 }

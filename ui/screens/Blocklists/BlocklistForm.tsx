@@ -61,7 +61,7 @@ export function BlocklistForm({
   )
 
   const blocklistFromState = useSelector((state: RootState) =>
-    blocklistId ? selectBlocklistById(state, blocklistId) : undefined,
+    selectBlocklistById(state, blocklistId),
   )
 
   const lockedSirens = useSelector((state: RootState) =>
@@ -104,26 +104,18 @@ export function BlocklistForm({
   }, [mode, blocklistFromState, dispatch])
 
   const isSirenSelected = useCallback(
-    (sirenType: SirenType, sirenId: string) => {
-      if (sirenType === SirenType.ANDROID) {
-        return blocklist.sirens.android
-          .map((app) => app.packageName)
-          .includes(sirenId)
-      }
-      return blocklist.sirens[sirenType].includes(sirenId)
-    },
-    [blocklist],
-  )
-
-  const isSirenLocked = useCallback(
     (sirenType: SirenType, sirenId: string) =>
-      checkSirenLocked(lockedSirens, sirenType, sirenId),
-    [lockedSirens],
+      sirenType === SirenType.ANDROID
+        ? blocklist.sirens.android
+            .map((app) => app.packageName)
+            .includes(sirenId)
+        : blocklist.sirens[sirenType].includes(sirenId),
+    [blocklist],
   )
 
   const toggleTextSiren = useCallback(
     (sirenType: SirenType, sirenId: string) => {
-      if (isSirenLocked(sirenType, sirenId)) {
+      if (checkSirenLocked(lockedSirens, sirenType, sirenId)) {
         dispatch(notifyLockedSiren())
         return
       }
@@ -144,12 +136,12 @@ export function BlocklistForm({
         return { ...prevBlocklist, sirens: updatedSirens }
       })
     },
-    [isSirenLocked, dispatch, setBlocklist],
+    [lockedSirens, dispatch, setBlocklist],
   )
 
   const toggleAppSiren = useCallback(
     (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
-      if (isSirenLocked(sirenType, app.packageName)) {
+      if (checkSirenLocked(lockedSirens, sirenType, app.packageName)) {
         dispatch(notifyLockedSiren())
         return
       }
@@ -165,7 +157,7 @@ export function BlocklistForm({
         return { ...prevBlocklist, sirens: updatedSirens }
       })
     },
-    [isSirenLocked, dispatch, setBlocklist],
+    [lockedSirens, dispatch, setBlocklist],
   )
 
   const renderScene = useCallback(
