@@ -8,6 +8,7 @@
       "Bash(./gradlew:*)",
       "Bash(./node_modules/.bin/vitest run:*)",
       "Bash(./scripts/*.sh:*)",
+      "Bash(./scripts/fetch-pr-comments.sh:*)",
       "Bash(./scripts/start-issue.sh:*)",
       "Bash(./scripts/worktree.sh prune:*)",
       "Bash(./scripts/worktree.sh:*)",

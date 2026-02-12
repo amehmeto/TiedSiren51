@@ -52,9 +52,14 @@ print_info "Updating PR #$pr_number description..."
 # Get the base branch for this PR
 base_branch=$(gh pr view "$pr_number" --json baseRefName --jq '.baseRefName')
 
+# Get the current PR body
+existing_body=$(gh pr view "$pr_number" --json body --jq '.body // ""')
+
 # Generate summary from commits
 commits=$(git log "$base_branch..HEAD" --pretty=format:"- %s" --reverse)
 commit_count=$(git rev-list --count "$base_branch..HEAD")
+timestamp=$(date -u +"%Y-%m-%d %H:%M UTC")
+short_sha=$(git rev-parse --short HEAD)
 
 # Get linked issues from branch name (e.g., fix/TS248-description -> #248)
 issue_number=""
@@ -62,33 +67,40 @@ if [[ "$branch" =~ TS([0-9]+) ]]; then
   issue_number="${BASH_REMATCH[1]}"
 fi
 
-# Build the PR body
-body="## Summary
-$commits
+# Build the update section
+update_section="---
 
-## Changes
-- $commit_count commit(s) in this PR
+### Update ($timestamp, $short_sha)
+$commits
+- $commit_count commit(s) total"
+
+# If no existing body, create the initial structure
+if [[ -z "$existing_body" ]]; then
+  body="## Summary
 
 ## Test plan
 - [ ] Verified changes work as expected
 - [ ] Tests pass locally
 "
 
-# Add closes line if we found an issue number
-if [[ -n "$issue_number" ]]; then
-  body+="
+  if [[ -n "$issue_number" ]]; then
+    body+="
 Closes #$issue_number
 "
-fi
+  fi
 
-body+="
----
-*This description was auto-generated from commit messages.*
-"
+  body+="
+$update_section"
+else
+  # Append the update to the existing body
+  body="$existing_body
+
+$update_section"
+fi
 
 # Update the PR
 if gh pr edit "$pr_number" --body "$body" >/dev/null 2>&1; then
-  print_success "PR #$pr_number description updated"
+  print_success "PR #$pr_number description updated (appended)"
 else
   print_warning "Failed to update PR description (non-fatal)"
 fi

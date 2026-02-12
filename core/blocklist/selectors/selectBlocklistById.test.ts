@@ -18,6 +18,14 @@ describe('selectBlocklistById', () => {
     expect(result?.name).toBe('Test Blocklist')
   })
 
+  test('should return undefined when blocklistId is undefined', () => {
+    const state = stateBuilder().build()
+
+    const result = selectBlocklistById(state, undefined)
+
+    expect(result).toBeUndefined()
+  })
+
   test('should return undefined when blocklist does not exist', () => {
     const state = stateBuilder().build()
 
