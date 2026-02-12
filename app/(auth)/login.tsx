@@ -32,13 +32,9 @@ export default function LoginScreen() {
   const store = useStore<RootState>()
   const [credentials, setCredentials] = useState({ email: '', password: '' })
 
-  const isUserAuthenticated = useSelector((state: RootState) =>
-    selectIsUserAuthenticated(state),
-  )
+  const isUserAuthenticated = useSelector(selectIsUserAuthenticated)
 
-  const viewModel = useSelector((state: RootState) =>
-    selectLoginViewModel(state),
-  )
+  const viewModel = useSelector(selectLoginViewModel)
 
   useEffect(() => {
     if (isUserAuthenticated) router.push('/')
@@ -61,16 +57,16 @@ export default function LoginScreen() {
   const handleSignIn = async () => {
     dispatch(clearError())
 
-    const validation = validateSignInInput(credentials)
+    const { isValid, errors, data } = validateSignInInput(credentials)
 
-    if (!validation.isValid) {
-      const errorMessage = Object.values(validation.errors).join(', ')
+    if (!isValid) {
+      const errorMessage = Object.values(errors).join(', ')
       dispatch(setError(errorMessage))
       return
     }
 
-    if (validation.data) {
-      const result = await dispatch(signInWithEmail(validation.data))
+    if (data) {
+      const result = await dispatch(signInWithEmail(data))
       if (signInWithEmail.rejected.match(result)) {
         const updatedViewModel = selectLoginViewModel(store.getState())
         if (

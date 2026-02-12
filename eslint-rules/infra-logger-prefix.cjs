@@ -136,13 +136,11 @@ module.exports = {
       }
 
       // Handle string literal: 'message' -> '[ClassName] message'
-      if (arg.type === 'Literal' && typeof arg.value === 'string') {
-        const quote = sourceCode.getText(arg)[0] // Get the quote character (' or ")
-        const newValue = expectedPrefix + ' ' + arg.value
-        return fixer.replaceText(arg, quote + newValue + quote)
-      }
-
-      return null
+      // Note: This is the only other case that triggers an error (since messageStartsWithPrefix
+      // returns true for non-string/template arguments to avoid false positives)
+      const quote = sourceCode.getText(arg)[0] // Get the quote character (' or ")
+      const newValue = expectedPrefix + ' ' + arg.value
+      return fixer.replaceText(arg, quote + newValue + quote)
     }
   },
 }

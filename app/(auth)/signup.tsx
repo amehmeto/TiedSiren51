@@ -9,7 +9,7 @@ import {
   Text,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { AppDispatch } from '@/core/_redux_/createStore'
 import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
@@ -33,9 +33,7 @@ export default function SignUpScreen() {
     password: '',
   })
 
-  const viewModel = useSelector((state: RootState) =>
-    selectSignUpViewModel(state),
-  )
+  const viewModel = useSelector(selectSignUpViewModel)
 
   useEffect(() => {
     dispatch(clearAuthState())
@@ -54,15 +52,15 @@ export default function SignUpScreen() {
   const handleSignUp = async () => {
     dispatch(clearError())
 
-    const validation = validateSignUpInput(credentials)
+    const { isValid, errors, data } = validateSignUpInput(credentials)
 
-    if (!validation.isValid) {
-      const errorMessage = Object.values(validation.errors).join(', ')
+    if (!isValid) {
+      const errorMessage = Object.values(errors).join(', ')
       dispatch(setError(errorMessage))
       return
     }
 
-    if (validation.data) await dispatch(signUpWithEmail(validation.data))
+    if (data) await dispatch(signUpWithEmail(data))
   }
 
   const handleEmailChange = (text: string) => {

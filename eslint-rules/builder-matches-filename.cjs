@@ -40,7 +40,7 @@ module.exports = {
     const basename = path.basename(filename)
 
     // Only check kebab-case.builder.ts files
-    const builderMatch = basename.match(/^([a-z][a-z0-9-]*)\\.builder\\.ts$/)
+    const builderMatch = basename.match(/^([a-z][a-z0-9-]*)\.builder\.ts$/)
     if (!builderMatch) return {}
 
     const kebabName = builderMatch[1]

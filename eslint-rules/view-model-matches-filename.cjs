@@ -40,7 +40,7 @@ module.exports = {
     const basename = path.basename(filename)
 
     // Only check kebab-case.view-model.ts files (not tests)
-    const viewModelMatch = basename.match(/^([a-z][a-z0-9-]*)\\.view-model\\.ts$/)
+    const viewModelMatch = basename.match(/^([a-z][a-z0-9-]*)\.view-model\.ts$/)
     if (!viewModelMatch) return {}
 
     const kebabName = viewModelMatch[1]

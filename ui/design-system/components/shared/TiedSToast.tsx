@@ -40,7 +40,7 @@ const styles = StyleSheet.create({
     paddingHorizontal: T.spacing.medium,
     borderRadius: T.border.radius.roundedMedium,
     alignItems: 'center',
-    zIndex: 9999,
+    zIndex: T.elevation.overlay,
     elevation: T.elevation.highest,
   },
   message: {

@@ -320,30 +320,6 @@ module.exports = {
       return false
     }
 
-    /**
-     * Check if inlining would create a complex expression (>3 terms)
-     */
-    function wouldCreateComplexExpression(usageNode, initNode) {
-      if (
-        initNode.type !== 'BinaryExpression' &&
-        initNode.type !== 'LogicalExpression'
-      ) {
-        return false
-      }
-
-      const parent = usageNode.parent
-      if (
-        parent &&
-        (parent.type === 'BinaryExpression' ||
-          parent.type === 'LogicalExpression')
-      ) {
-        // Already in an expression, adding more terms would be complex
-        return true
-      }
-
-      return false
-    }
-
     return {
       VariableDeclaration(node) {
         if (node.declarations.length !== 1) return
@@ -379,7 +355,6 @@ module.exports = {
         // JetBrains-style heuristics: don't inline if it would create complexity
         if (wouldCreateNestedCall(usage.identifier, decl.init)) return
         if (wouldCreateChainedAccess(usage.identifier, decl.init)) return
-        if (wouldCreateComplexExpression(usage.identifier, decl.init)) return
 
         // Don't inline into expect() calls - conflicts with expect-separate-act-assert
         if (isInsideExpectCall(usage.identifier)) return
@@ -450,25 +425,14 @@ module.exports = {
     }
 
     function mightNeedParentheses(usageNode, initNode) {
+      // With current isSimpleInit filter, we only see: CallExpression, Identifier,
+      // MemberExpression, ArrayExpression, ObjectExpression, Literal, TemplateLiteral
+      // None of these require parentheses when inlined
       const parent = usageNode.parent
       if (!parent) return false
 
-      if (
-        ['Identifier', 'Literal', 'CallExpression', 'MemberExpression'].includes(
-          initNode.type,
-        )
-      ) {
-        return false
-      }
-
-      if (
-        ['BinaryExpression', 'LogicalExpression', 'ConditionalExpression'].includes(
-          initNode.type,
-        )
-      ) {
-        return true
-      }
-
+      // ArrayExpression and ObjectExpression might need parens in some edge cases
+      // but ESLint's fixer handles this automatically for most cases
       return false
     }
   },

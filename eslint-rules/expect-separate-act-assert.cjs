@@ -220,13 +220,6 @@ module.exports = {
       'toBeCloseTo',
     ]
 
-    // Generic names that should not be used alone
-    const forbiddenGenericNames = ['expected', 'result']
-
-    function isGenericName(name) {
-      return forbiddenGenericNames.includes(name)
-    }
-
     return {
       // Check for generic variable names like "expected" or "result"
       VariableDeclarator(node) {

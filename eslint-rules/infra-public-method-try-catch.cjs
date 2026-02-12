@@ -115,9 +115,8 @@ module.exports = {
       if (node.key?.type === 'Identifier') {
         return node.key.name
       }
-      if (node.key?.type === 'PrivateIdentifier') {
-        return `#${node.key.name}`
-      }
+      // PrivateIdentifier (# syntax) is handled by isPrivateMethod before we get here,
+      // so we only need to handle Identifier and computed property names
       return '<anonymous>'
     }
 

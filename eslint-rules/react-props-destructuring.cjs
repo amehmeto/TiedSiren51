@@ -163,7 +163,6 @@ module.exports = {
       if (isPropsParameter(firstParam)) {
         const propNames = getPropertyNames(firstParam.typeAnnotation)
         const suggestedProps = propNames.length > 0 ? propNames.join(', ') : '...'
-        const hasInlineType = isInlineType(firstParam.typeAnnotation)
         const typeText = getTypeText(firstParam.typeAnnotation)
 
         context.report({
@@ -180,19 +179,11 @@ module.exports = {
             if (propNames.length > 0) {
               const destructuredPattern = `{ ${propNames.join(', ')} }`
 
-              if (hasInlineType && typeText) {
-                // Need to: 1) Add type declaration, 2) Replace param with destructured + type ref
-                const insertPoint = findTypeInsertionPoint(node)
-                fixes.push(fixer.insertTextBeforeRange([insertPoint, insertPoint], generateTypeDeclaration(componentName, typeText)))
-                fixes.push(fixer.replaceText(firstParam, `${destructuredPattern}: ${propsTypeName}`))
-              } else if (firstParam.typeAnnotation) {
-                // Has a type reference, just destructure
-                const existingType = sourceCode.getText(firstParam.typeAnnotation)
-                fixes.push(fixer.replaceText(firstParam, `${destructuredPattern}${existingType}`))
-              } else {
-                // No type annotation, just destructure
-                fixes.push(fixer.replaceText(firstParam, destructuredPattern))
-              }
+              // propNames.length > 0 implies hasInlineType is true (since getPropertyNames
+              // only returns non-empty for TSTypeLiteral types)
+              const insertPoint = findTypeInsertionPoint(node)
+              fixes.push(fixer.insertTextBeforeRange([insertPoint, insertPoint], generateTypeDeclaration(componentName, typeText)))
+              fixes.push(fixer.replaceText(firstParam, `${destructuredPattern}: ${propsTypeName}`))
 
               // Also fix props.X usages in the function body
               const bodyFixes = findPropsUsagesInBody(fixer, node, propNames)

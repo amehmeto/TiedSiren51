@@ -4,6 +4,7 @@ import { CheckBox } from 'react-native-elements'
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
+import { LockIcon } from '@/ui/screens/Blocklists/LockIcon'
 
 function isAndroidSiren(
   sirenType: SirenType,
@@ -17,6 +18,7 @@ type SelectableSirenCardProps = Readonly<{
   siren: AndroidSiren | string
   onPress: () => void
   isSelected: boolean
+  isLocked?: boolean
 }>
 
 export function SelectableSirenCard({
@@ -24,6 +26,7 @@ export function SelectableSirenCard({
   siren,
   onPress,
   isSelected,
+  isLocked = false,
 }: SelectableSirenCardProps) {
   const iconElement =
     // eslint-disable-next-line no-nested-ternary
@@ -62,6 +65,7 @@ export function SelectableSirenCard({
           styles.container,
           { marginVertical: T.spacing.extraExtraSmall },
           isSelected ? styles.selected : null,
+          isLocked ? styles.locked : null,
         ]}
       >
         {iconElement}
@@ -74,14 +78,18 @@ export function SelectableSirenCard({
           {sirenName}
         </Text>
 
-        <CheckBox
-          style={styles.checkbox}
-          containerStyle={styles.checkboxContainer}
-          checked={isSelected}
-          checkedColor={T.color.lightBlue}
-          onPress={onPress}
-          testID={`${baseTestId}-checkbox`}
-        />
+        {isLocked ? (
+          <LockIcon testID={`${baseTestId}-lock`} />
+        ) : (
+          <CheckBox
+            style={styles.checkbox}
+            containerStyle={styles.checkboxContainer}
+            checked={isSelected}
+            checkedColor={T.color.lightBlue}
+            onPress={onPress}
+            testID={`${baseTestId}-checkbox`}
+          />
+        )}
       </TiedSCard>
     </Pressable>
   )
@@ -116,5 +124,8 @@ const styles = StyleSheet.create({
   selected: {
     borderColor: T.color.lightBlue,
     borderWidth: T.border.width.medium,
+  },
+  locked: {
+    opacity: T.opacity.disabled,
   },
 })

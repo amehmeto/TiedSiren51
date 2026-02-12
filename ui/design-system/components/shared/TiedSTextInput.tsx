@@ -1,13 +1,6 @@
-import { Ionicons } from '@expo/vector-icons'
 import { useState } from 'react'
-import {
-  StyleSheet,
-  TextInput,
-  TextInputProps,
-  View,
-  Text,
-  Pressable,
-} from 'react-native'
+import { StyleSheet, TextInput, TextInputProps, View, Text } from 'react-native'
+import { PasswordToggle } from '@/ui/design-system/components/shared/PasswordToggle'
 import { T } from '@/ui/design-system/theme'
 
 interface TiedSTextInputProps extends TextInputProps {
@@ -48,16 +41,10 @@ export function TiedSTextInput({
           {...props}
         />
         {hasPasswordToggle && (
-          <Pressable
-            style={styles.iconContainer}
-            onPress={() => setIsPasswordShown(!isPasswordShown)}
-          >
-            <Ionicons
-              name={isPasswordShown ? 'eye-outline' : 'eye-off-outline'}
-              size={T.icon.size.large}
-              color={T.color.grey}
-            />
-          </Pressable>
+          <PasswordToggle
+            isPasswordShown={isPasswordShown}
+            onToggle={() => setIsPasswordShown(!isPasswordShown)}
+          />
         )}
       </View>
       {error && (
@@ -95,11 +82,6 @@ const styles = StyleSheet.create({
   text: {
     color: T.color.white,
     marginBottom: T.spacing.medium,
-  },
-  iconContainer: {
-    position: 'absolute',
-    right: T.spacing.small,
-    top: T.spacing.small,
   },
   errorText: {
     color: T.color.red,

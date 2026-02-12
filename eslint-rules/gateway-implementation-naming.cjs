@@ -43,7 +43,7 @@ module.exports = {
     const basename = path.basename(filename)
 
     // Only check prefix.domain.gateway.ts files (not tests)
-    const gatewayMatch = basename.match(/^([a-z][a-z0-9-]*)\\.([a-z][a-z0-9-]*)\\.gateway\\.ts$/)
+    const gatewayMatch = basename.match(/^([a-z][a-z0-9-]*)\.([a-z][a-z0-9-]*)\.gateway\.ts$/)
     if (!gatewayMatch) return {}
 
     // Skip test files
