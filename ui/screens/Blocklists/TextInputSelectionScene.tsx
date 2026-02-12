@@ -35,13 +35,11 @@ export function TextInputSelectionScene({
   const insets = useSafeAreaInsets()
 
   const lockedSirens = useSelector((state: RootState) =>
-    blocklistId
-      ? selectLockedSirensForBlocklist(
-          state,
-          dependencies.dateProvider,
-          blocklistId,
-        )
-      : undefined,
+    selectLockedSirensForBlocklist(
+      state,
+      dependencies.dateProvider,
+      blocklistId,
+    ),
   )
 
   return (
@@ -62,9 +60,7 @@ export function TextInputSelectionScene({
         keyExtractor={(item) => item}
         renderItem={({ item }) => {
           const isSelected = isSirenSelected(sirenType, item)
-          const isLocked = lockedSirens
-            ? isSirenLocked(lockedSirens, sirenType, item)
-            : false
+          const isLocked = isSirenLocked(lockedSirens, sirenType, item)
           return (
             <SelectableSirenCard
               sirenType={sirenType}

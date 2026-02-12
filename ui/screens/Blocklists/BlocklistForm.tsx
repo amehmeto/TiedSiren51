@@ -65,13 +65,11 @@ export function BlocklistForm({
   )
 
   const lockedSirens = useSelector((state: RootState) =>
-    mode === FormMode.Edit && blocklistId
-      ? selectLockedSirensForBlocklist(
-          state,
-          dependencies.dateProvider,
-          blocklistId,
-        )
-      : undefined,
+    selectLockedSirensForBlocklist(
+      state,
+      dependencies.dateProvider,
+      mode === FormMode.Edit ? blocklistId : undefined,
+    ),
   )
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
@@ -119,7 +117,7 @@ export function BlocklistForm({
 
   const isSirenLocked = useCallback(
     (sirenType: SirenType, sirenId: string) =>
-      lockedSirens ? checkSirenLocked(lockedSirens, sirenType, sirenId) : false,
+      checkSirenLocked(lockedSirens, sirenType, sirenId),
     [lockedSirens],
   )
 

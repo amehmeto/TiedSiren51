@@ -125,7 +125,15 @@ module.exports = {
       'warn',
       {
         threshold: 3,
-        ignoredObjects: ['T', 'styles'],
+        ignoredObjects: [
+          'T',
+          'styles',
+          'fixture',
+          'viewModel',
+          'BlocklistViewModel',
+          'HomeViewModel',
+          'BlocklistTabKey',
+        ],
       },
     ],
     // Warn-only: many valid patterns use named variables for self-documentation

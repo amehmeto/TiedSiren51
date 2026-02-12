@@ -27,13 +27,11 @@ export function AppsSelectionScene({
   const insets = useSafeAreaInsets()
 
   const lockedSirens = useSelector((state: RootState) =>
-    blocklistId
-      ? selectLockedSirensForBlocklist(
-          state,
-          dependencies.dateProvider,
-          blocklistId,
-        )
-      : undefined,
+    selectLockedSirensForBlocklist(
+      state,
+      dependencies.dateProvider,
+      blocklistId,
+    ),
   )
 
   return (
@@ -42,9 +40,11 @@ export function AppsSelectionScene({
       keyExtractor={(item) => item.packageName}
       renderItem={({ item }) => {
         const isSelected = isSirenSelected(SirenType.ANDROID, item.packageName)
-        const isLocked = lockedSirens
-          ? isSirenLocked(lockedSirens, SirenType.ANDROID, item.packageName)
-          : false
+        const isLocked = isSirenLocked(
+          lockedSirens,
+          SirenType.ANDROID,
+          item.packageName,
+        )
         return (
           <SelectableSirenCard
             sirenType={SirenType.ANDROID}

@@ -7,10 +7,11 @@ export type LockedSirens = {
 }
 
 export function isSirenLocked(
-  lockedSirens: LockedSirens,
+  lockedSirens: LockedSirens | undefined,
   sirenType: keyof Sirens,
   sirenId: string,
 ): boolean {
+  if (!lockedSirens) return false
   const sirenLookup: Partial<
     Record<keyof Sirens, (locked: LockedSirens) => Set<string>>
   > = {

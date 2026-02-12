@@ -10,6 +10,7 @@ import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
 import { extendTimer, ExtendTimerPayload } from './extend-timer.usecase'
 import { loadTimer } from './load-timer.usecase'
+import { notifyLockedSiren } from './notify-locked-siren.usecase'
 import { startTimer, StartTimerPayload } from './start-timer.usecase'
 
 const DEFAULT_USER_ID = 'test-user-id'
@@ -78,8 +79,19 @@ export function timerFixture(
         )
         return store.dispatch(extendTimer(payload))
       },
+      notifyingLockedSiren: async () => {
+        store = createTestStore(
+          { timerRepository, dateProvider },
+          testStateBuilderProvider.getState(),
+        )
+        return store.dispatch(notifyLockedSiren())
+      },
     },
     then: {
+      toastShouldShow(expectedMessage: string) {
+        const message = store.getState().toast.message
+        expect(message).toBe(expectedMessage)
+      },
       timerShouldBeLoadedAs(expectedEndedAt: string | null) {
         expect(store.getState().strictMode.endedAt).toStrictEqual(
           expectedEndedAt,

@@ -15,8 +15,9 @@ const EMPTY_LOCKED_SIRENS: LockedSirens = {
 export function selectLockedSirensForBlocklist(
   state: RootState,
   dateProvider: DateProvider,
-  blocklistId: string,
+  blocklistId: string | undefined,
 ): LockedSirens {
+  if (!blocklistId) return EMPTY_LOCKED_SIRENS
   if (!selectIsStrictModeActive(state, dateProvider)) return EMPTY_LOCKED_SIRENS
 
   const allRelevantSessions = [
