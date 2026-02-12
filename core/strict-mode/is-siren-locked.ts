@@ -6,19 +6,18 @@ export type LockedSirens = {
   keywords: Set<string>
 }
 
+function isLockedSirenKey(key: keyof Sirens): key is keyof LockedSirens {
+  return key === 'android' || key === 'websites' || key === 'keywords'
+}
+
 export function isSirenLocked(
   lockedSirens: LockedSirens | undefined,
   sirenType: keyof Sirens,
   sirenId: string,
 ): boolean {
-  if (!lockedSirens) return false
-  const sirenLookup: Partial<
-    Record<keyof Sirens, (locked: LockedSirens) => Set<string>>
-  > = {
-    android: (locked) => locked.android,
-    websites: (locked) => locked.websites,
-    keywords: (locked) => locked.keywords,
-  }
-
-  return sirenLookup[sirenType]?.(lockedSirens).has(sirenId) ?? false
+  return (
+    !!lockedSirens &&
+    isLockedSirenKey(sirenType) &&
+    lockedSirens[sirenType].has(sirenId)
+  )
 }

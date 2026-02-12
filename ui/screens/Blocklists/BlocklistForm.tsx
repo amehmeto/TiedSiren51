@@ -19,7 +19,7 @@ import { AndroidSiren, Sirens, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
-import { isSirenLocked as checkSirenLocked } from '@/core/strict-mode/is-siren-locked'
+import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
 import { selectLockedSirensForBlocklist } from '@/core/strict-mode/selectors/selectLockedSirensForBlocklist'
 import { notifyLockedSiren } from '@/core/strict-mode/usecases/notify-locked-siren.usecase'
 import { dependencies } from '@/ui/dependencies'
@@ -113,12 +113,18 @@ export function BlocklistForm({
     [blocklist],
   )
 
+  const guardLockedSiren = useCallback(
+    (sirenType: SirenType, sirenId: string): boolean => {
+      if (!isSirenLocked(lockedSirens, sirenType, sirenId)) return false
+      dispatch(notifyLockedSiren())
+      return true
+    },
+    [lockedSirens, dispatch],
+  )
+
   const toggleTextSiren = useCallback(
     (sirenType: SirenType, sirenId: string) => {
-      if (checkSirenLocked(lockedSirens, sirenType, sirenId)) {
-        dispatch(notifyLockedSiren())
-        return
-      }
+      if (guardLockedSiren(sirenType, sirenId)) return
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
         if (
@@ -136,15 +142,12 @@ export function BlocklistForm({
         return { ...prevBlocklist, sirens: updatedSirens }
       })
     },
-    [lockedSirens, dispatch, setBlocklist],
+    [guardLockedSiren, setBlocklist],
   )
 
   const toggleAppSiren = useCallback(
     (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
-      if (checkSirenLocked(lockedSirens, sirenType, app.packageName)) {
-        dispatch(notifyLockedSiren())
-        return
-      }
+      if (guardLockedSiren(sirenType, app.packageName)) return
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
 
@@ -157,7 +160,7 @@ export function BlocklistForm({
         return { ...prevBlocklist, sirens: updatedSirens }
       })
     },
-    [lockedSirens, dispatch, setBlocklist],
+    [guardLockedSiren, setBlocklist],
   )
 
   const renderScene = useCallback(

@@ -9,6 +9,7 @@
  *
  * BAD:
  *   const isLocked = lockedSirens ? isSirenLocked(lockedSirens, type, id) : false
+ *   const isLocked = !lockedSirens ? false : isSirenLocked(lockedSirens, type, id)
  *
  * GOOD:
  *   const isLocked = isSirenLocked(lockedSirens, type, id)
@@ -63,25 +64,52 @@ module.exports = {
       return 'function'
     }
 
+    /**
+     * Extract the guarded identifier name from a test node.
+     * Handles both `x` (Identifier) and `!x` (negated Identifier).
+     */
+    function getGuardedName(testNode, isFalsyConsequent) {
+      if (!isFalsyConsequent && testNode.type === 'Identifier')
+        return testNode.name
+
+      if (
+        isFalsyConsequent &&
+        testNode.type === 'UnaryExpression' &&
+        testNode.operator === '!' &&
+        testNode.argument.type === 'Identifier'
+      )
+        return testNode.argument.name
+
+      return null
+    }
+
     return {
       ConditionalExpression(node) {
         const { test, consequent, alternate } = node
 
-        if (test.type !== 'Identifier') return
+        // Pattern A: x ? fn(x) : falsy
+        // Pattern B: !x ? falsy : fn(x)
+        const isFalsyConsequent = isDefaultFalsyValue(consequent)
+        const isFalsyAlternate = isDefaultFalsyValue(alternate)
 
-        if (consequent.type !== 'CallExpression') return
+        if (!isFalsyConsequent && !isFalsyAlternate) return
+        if (isFalsyConsequent && isFalsyAlternate) return
 
-        if (!isDefaultFalsyValue(alternate)) return
+        const callExpr = isFalsyConsequent ? alternate : consequent
+        if (callExpr.type !== 'CallExpression') return
 
-        const hasGuardedArg = consequent.arguments.some(
-          (arg) => arg.type === 'Identifier' && arg.name === test.name,
+        const guardedName = getGuardedName(test, isFalsyConsequent)
+        if (!guardedName) return
+
+        const hasGuardedArg = callExpr.arguments.some(
+          (arg) => arg.type === 'Identifier' && arg.name === guardedName,
         )
         if (!hasGuardedArg) return
 
         context.report({
           node,
           messageId: 'noRedundantNullishTernary',
-          data: { functionName: getFunctionName(consequent) },
+          data: { functionName: getFunctionName(callExpr) },
         })
       },
     }

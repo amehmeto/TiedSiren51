@@ -60,6 +60,18 @@ describe('no-redundant-nullish-ternary', () => {
         {
           code: `const result = x ? fn(x) : [1, 2]`,
         },
+        // Flipped: negated condition but consequent is not falsy
+        {
+          code: `const result = !x ? doA() : doB()`,
+        },
+        // Flipped: condition variable not passed to function
+        {
+          code: `const result = !x ? false : fn(other)`,
+        },
+        // Flipped: non-negated test with falsy consequent (test is not !identifier)
+        {
+          code: `const result = x ? false : fn(x)`,
+        },
       ],
 
       invalid: [
@@ -106,6 +118,26 @@ describe('no-redundant-nullish-ternary', () => {
         // Variable among multiple arguments
         {
           code: `const result = data ? process(a, data, b) : null`,
+          errors: [{ messageId: 'noRedundantNullishTernary' }],
+        },
+        // Flipped: !x ? false : fn(x)
+        {
+          code: `const isLocked = !x ? false : fn(x)`,
+          errors: [{ messageId: 'noRedundantNullishTernary' }],
+        },
+        // Flipped: !x ? null : fn(x, a, b)
+        {
+          code: `const result = !x ? null : fn(x, a, b)`,
+          errors: [{ messageId: 'noRedundantNullishTernary' }],
+        },
+        // Flipped: !x ? undefined : obj.method(x)
+        {
+          code: `const result = !x ? undefined : obj.method(x)`,
+          errors: [{ messageId: 'noRedundantNullishTernary' }],
+        },
+        // Flipped real-world case
+        {
+          code: `const isLocked = !lockedSirens ? false : isSirenLocked(lockedSirens, type, id)`,
           errors: [{ messageId: 'noRedundantNullishTernary' }],
         },
       ],
