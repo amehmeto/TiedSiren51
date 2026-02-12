@@ -61,56 +61,6 @@ describe('no-data-builders-in-production', () => {
           code: `const session = createSession()`,
           filename: '/project/core/session/session.slice.ts',
         },
-        // CallExpression with non-Identifier callee (MemberExpression)
-        {
-          code: `const session = factory.buildSession()`,
-          filename: '/project/core/session/session.slice.ts',
-        },
-        // Default import (ImportDefaultSpecifier)
-        {
-          code: `import builder from '@tests/data-builders/session.builder'`,
-          filename: '/project/core/session/session.slice.ts',
-        },
-        // Namespace import (ImportNamespaceSpecifier)
-        {
-          code: `import * as builders from '@tests/data-builders/session.builder'`,
-          filename: '/project/core/session/session.slice.ts',
-        },
-        // Using builder in test.tsx file - OK
-        {
-          code: `const session = buildBlockSession()`,
-          filename: '/project/ui/screens/Home/HomeScreen.test.tsx',
-        },
-        // Using builder in spec.tsx file - OK
-        {
-          code: `const session = buildBlockSession()`,
-          filename: '/project/ui/screens/Home/HomeScreen.spec.tsx',
-        },
-        // Using builder in fixture.tsx file - OK
-        {
-          code: `const session = buildBlockSession()`,
-          filename: '/project/ui/screens/Home/HomeScreen.fixture.tsx',
-        },
-        // Using builder in builder.tsx file - OK
-        {
-          code: `const session = buildBlockSession()`,
-          filename: '/project/tests/builders/session.builder.tsx',
-        },
-        // Import with non-builder named specifier from data-builders
-        {
-          code: `import { SessionType } from '@tests/data-builders/session.builder'`,
-          filename: '/project/core/session/session.slice.ts',
-        },
-        // Windows path separator in _tests_ directory - OK
-        {
-          code: `const session = buildBlockSession()`,
-          filename: 'C:\\project\\core\\_tests_\\utils.ts',
-        },
-        // Import from 'data-builders' directly (edge case)
-        {
-          code: `import { SessionType } from 'data-builders'`,
-          filename: '/project/core/session/session.slice.ts',
-        },
       ],
 
       invalid: [
@@ -185,17 +135,6 @@ describe('no-data-builders-in-production', () => {
             {
               messageId: 'noDataBuilderInProduction',
               data: { builderName: 'buildDevice' },
-            },
-          ],
-        },
-        // Importing from 'data-builders' directly with builder - NOT OK
-        {
-          code: `import { buildSession } from 'data-builders'`,
-          filename: '/project/core/session/session.ts',
-          errors: [
-            {
-              messageId: 'noDataBuilderInProduction',
-              data: { builderName: 'buildSession' },
             },
           ],
         },

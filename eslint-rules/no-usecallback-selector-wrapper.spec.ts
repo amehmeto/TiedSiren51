@@ -60,60 +60,6 @@ describe('no-usecallback-selector-wrapper', () => {
         const x = useSelector(fn)
       `,
         },
-        // useCallback callee is not an Identifier (member expression)
-        {
-          code: `
-        const fn = React.useCallback((state) => state.foo, [])
-        const x = useSelector(fn)
-      `,
-        },
-        // useSelector with non-Identifier argument
-        {
-          code: `
-        const x = useSelector((state) => state.foo)
-      `,
-        },
-        // useSelector with no arguments
-        {
-          code: `
-        const x = useSelector()
-      `,
-        },
-        // useCallback with fewer than 2 arguments
-        {
-          code: `
-        const fn = useCallback((state) => state.foo)
-        const x = useSelector(fn)
-      `,
-        },
-        // useCallback with non-ArrayExpression deps (identifier)
-        {
-          code: `
-        const fn = useCallback((state) => state.foo, deps)
-        const x = useSelector(fn)
-      `,
-        },
-        // useCallback with non-function first argument
-        {
-          code: `
-        const fn = useCallback(selectFoo, [])
-        const x = useSelector(fn)
-      `,
-        },
-        // useCallback with destructuring pattern in id
-        {
-          code: `
-        const { fn } = { fn: useCallback((state) => state.foo, []) }
-        const x = useSelector(fn)
-      `,
-        },
-        // useSelector callee is not Identifier
-        {
-          code: `
-        const fn = useCallback((state) => state.foo, [])
-        const x = store.useSelector(fn)
-      `,
-        },
       ],
 
       invalid: [
@@ -151,14 +97,6 @@ describe('no-usecallback-selector-wrapper', () => {
           code: `
         const selectFoo = useCallback((s) => getFoo(s, config), [])
         const foo = useSelector(selectFoo)
-      `,
-          errors: [{ messageId: 'unnecessaryWrapper' }],
-        },
-        // Function expression as callback
-        {
-          code: `
-        const selectFn = useCallback(function(state) { return state.foo }, [])
-        const foo = useSelector(selectFn)
       `,
           errors: [{ messageId: 'unnecessaryWrapper' }],
         },

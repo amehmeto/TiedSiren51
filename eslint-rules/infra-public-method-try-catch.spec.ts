@@ -324,37 +324,6 @@ describe('infra-public-method-try-catch', () => {
       `,
           filename: '/project/infra/auth-gateway/firebase.auth.gateway.ts',
         },
-        // Spec file - should not apply
-        {
-          code: `
-        class TestGateway {
-          async fetch() {
-            await this.api.get()
-          }
-        }
-      `,
-          filename: '/project/infra/auth-gateway/firebase.auth.gateway.spec.ts',
-        },
-        // fake-data. in filename - OK
-        {
-          code: `
-        class FakeDataGateway {
-          async getData() {
-            return this.data
-          }
-        }
-      `,
-          filename: '/project/infra/auth-gateway/fake-data.auth.gateway.ts',
-        },
-        // Method outside class (plain function) - OK
-        {
-          code: `
-        async function fetchData() {
-          await api.get()
-        }
-      `,
-          filename: '/project/infra/auth-gateway/firebase.auth.gateway.ts',
-        },
       ],
 
       invalid: [

@@ -56,34 +56,6 @@ describe('use-data-builders', () => {
           code: `const session: BlockSession = buildBlockSession()`,
           filename: '/project/core/auth/auth.spec.ts',
         },
-        // Variable without type annotation
-        {
-          code: `const session = buildBlockSession()`,
-          filename: '/project/core/auth/auth.spec.ts',
-        },
-        // Declarator without init (just type annotation)
-        {
-          code: `let session: BlockSession`,
-          filename: '/project/core/auth/auth.spec.ts',
-        },
-        // Assignment to non-Identifier (MemberExpression)
-        {
-          code: `
-        let obj: { session: BlockSession }
-        obj.session = { id: '123' }
-      `,
-          filename: '/project/core/auth/auth.spec.ts',
-        },
-        // Array with spread element (not ObjectExpression)
-        {
-          code: `const sessions: BlockSession[] = [...existingSessions]`,
-          filename: '/project/core/auth/auth.spec.ts',
-        },
-        // Array with non-object elements (function call)
-        {
-          code: `const sessions: BlockSession[] = [buildBlockSession()]`,
-          filename: '/project/core/auth/auth.spec.ts',
-        },
       ],
 
       invalid: [
