@@ -1,52 +1,59 @@
 import { describe, expect, test } from 'vitest'
+import { buildLockedSirens } from '@/core/_tests_/data-builders/locked-sirens.builder'
 import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
 
 describe('isSirenLocked', () => {
-  test('should return true when android siren is locked', () => {
-    const lockedSirens = {
-      android: new Set(['com.app1']),
-      websites: new Set<string>(),
-      keywords: new Set<string>(),
-    }
+  test.each([
+    {
+      scenario: 'android siren is locked',
+      lockedSirens: buildLockedSirens({ android: new Set(['com.app1']) }),
+      sirenType: 'android' as const,
+      sirenId: 'com.app1',
+      isExpectedLocked: true,
+    },
+    {
+      scenario: 'android siren is not locked',
+      lockedSirens: buildLockedSirens({ android: new Set(['com.app1']) }),
+      sirenType: 'android' as const,
+      sirenId: 'com.app2',
+      isExpectedLocked: false,
+    },
+    {
+      scenario: 'website siren is locked',
+      lockedSirens: buildLockedSirens({ websites: new Set(['example.com']) }),
+      sirenType: 'websites' as const,
+      sirenId: 'example.com',
+      isExpectedLocked: true,
+    },
+    {
+      scenario: 'website siren is not locked',
+      lockedSirens: buildLockedSirens({ websites: new Set(['example.com']) }),
+      sirenType: 'websites' as const,
+      sirenId: 'other.com',
+      isExpectedLocked: false,
+    },
+    {
+      scenario: 'keyword siren is locked',
+      lockedSirens: buildLockedSirens({ keywords: new Set(['social']) }),
+      sirenType: 'keywords' as const,
+      sirenId: 'social',
+      isExpectedLocked: true,
+    },
+    {
+      scenario: 'keyword siren is not locked',
+      lockedSirens: buildLockedSirens({ keywords: new Set(['social']) }),
+      sirenType: 'keywords' as const,
+      sirenId: 'other',
+      isExpectedLocked: false,
+    },
+  ])(
+    'should return $isExpectedLocked when $scenario',
+    ({ lockedSirens, sirenType, sirenId, isExpectedLocked }) => {
+      const isLocked = isSirenLocked(lockedSirens, sirenType, sirenId)
 
-    const isApp1Locked = isSirenLocked(lockedSirens, 'android', 'com.app1')
-    const isApp2Locked = isSirenLocked(lockedSirens, 'android', 'com.app2')
-
-    expect(isApp1Locked).toBe(true)
-    expect(isApp2Locked).toBe(false)
-  })
-
-  test('should return true when website siren is locked', () => {
-    const lockedSirens = {
-      android: new Set<string>(),
-      websites: new Set(['example.com']),
-      keywords: new Set<string>(),
-    }
-
-    const isExampleLocked = isSirenLocked(
-      lockedSirens,
-      'websites',
-      'example.com',
-    )
-    const isOtherLocked = isSirenLocked(lockedSirens, 'websites', 'other.com')
-
-    expect(isExampleLocked).toBe(true)
-    expect(isOtherLocked).toBe(false)
-  })
-
-  test('should return true when keyword siren is locked', () => {
-    const lockedSirens = {
-      android: new Set<string>(),
-      websites: new Set<string>(),
-      keywords: new Set(['social']),
-    }
-
-    const isSocialLocked = isSirenLocked(lockedSirens, 'keywords', 'social')
-    const isOtherLocked = isSirenLocked(lockedSirens, 'keywords', 'other')
-
-    expect(isSocialLocked).toBe(true)
-    expect(isOtherLocked).toBe(false)
-  })
+      expect(isLocked).toBe(isExpectedLocked)
+    },
+  )
 
   test('should return false when lockedSirens is undefined', () => {
     const isLocked = isSirenLocked(undefined, 'android', 'com.app1')
@@ -54,17 +61,14 @@ describe('isSirenLocked', () => {
     expect(isLocked).toBe(false)
   })
 
-  test('should return false for unsupported siren types', () => {
-    const lockedSirens = {
-      android: new Set<string>(),
-      websites: new Set<string>(),
-      keywords: new Set<string>(),
-    }
+  test.each([{ sirenType: 'ios' as const }, { sirenType: 'windows' as const }])(
+    'should return false for unsupported siren type $sirenType',
+    ({ sirenType }) => {
+      const lockedSirens = buildLockedSirens()
 
-    const isIosLocked = isSirenLocked(lockedSirens, 'ios', 'something')
-    const isWindowsLocked = isSirenLocked(lockedSirens, 'windows', 'something')
+      const isLocked = isSirenLocked(lockedSirens, sirenType, 'something')
 
-    expect(isIosLocked).toBe(false)
-    expect(isWindowsLocked).toBe(false)
-  })
+      expect(isLocked).toBe(false)
+    },
+  )
 })
