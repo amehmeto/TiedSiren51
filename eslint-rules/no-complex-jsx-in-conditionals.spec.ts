@@ -169,6 +169,43 @@ describe('no-complex-jsx-in-conditionals', () => {
         }
       `,
         },
+        // Simple && with leaf element - OK
+        {
+          code: `
+        function Component() {
+          return <div>{isVisible && <span>Hello</span>}</div>
+        }
+      `,
+        },
+        // Simple || with leaf element - OK
+        {
+          code: `
+        function Component() {
+          return <div>{fallback || <span>Default</span>}</div>
+        }
+      `,
+        },
+        // Simple ?? with leaf element - OK
+        {
+          code: `
+        function Component() {
+          return <div>{data ?? <span>No data</span>}</div>
+        }
+      `,
+        },
+        // Simple switch case return - OK
+        {
+          code: `
+        function Component() {
+          switch (status) {
+            case 'loading':
+              return <Spinner />
+            default:
+              return <div>Done</div>
+          }
+        }
+      `,
+        },
       ],
 
       invalid: [
@@ -351,6 +388,95 @@ describe('no-complex-jsx-in-conditionals', () => {
         function Component() {
           if (loading) {
             return <Input a={1} b={2} c={3} d={4} e={5} f={6} g={7} h={8} i={9} j={10} k={11} />
+          }
+          return <div>Done</div>
+        }
+      `,
+          errors: [{ messageId: 'extractComponent' }],
+        },
+        // Complex JSX in && expression (nested children)
+        {
+          code: `
+        function Component() {
+          return <div>{isVisible && <View><Text>Hello</Text></View>}</div>
+        }
+      `,
+          errors: [{ messageId: 'extractComponent' }],
+        },
+        // Fragment in && expression
+        {
+          code: `
+        function Component() {
+          return <div>{isVisible && <><span>A</span><span>B</span></>}</div>
+        }
+      `,
+          errors: [{ messageId: 'extractComponent' }],
+        },
+        // Complex JSX in || expression (fallback)
+        {
+          code: `
+        function Component() {
+          return <div>{fallback || <div><span>Default</span></div>}</div>
+        }
+      `,
+          errors: [{ messageId: 'extractComponent' }],
+        },
+        // Complex JSX in ?? expression (nullish coalescing)
+        {
+          code: `
+        function Component() {
+          return <div>{data ?? <div><span>No data</span></div>}</div>
+        }
+      `,
+          errors: [{ messageId: 'extractComponent' }],
+        },
+        // Complex JSX in switch case
+        {
+          code: `
+        function Component() {
+          switch (status) {
+            case 'loading':
+              return (
+                <div>
+                  <span>Loading...</span>
+                </div>
+              )
+            default:
+              return <div>Done</div>
+          }
+        }
+      `,
+          errors: [{ messageId: 'extractComponent' }],
+        },
+        // Complex JSX in else block
+        {
+          code: `
+        function Component() {
+          if (loading) {
+            return <div>Loading</div>
+          } else {
+            return (
+              <div>
+                <span>Content</span>
+              </div>
+            )
+          }
+        }
+      `,
+          errors: [{ messageId: 'extractComponent' }],
+        },
+        // Complex JSX in else-if block
+        {
+          code: `
+        function Component() {
+          if (loading) {
+            return <div>Loading</div>
+          } else if (error) {
+            return (
+              <div>
+                <span>Error occurred</span>
+              </div>
+            )
           }
           return <div>Done</div>
         }

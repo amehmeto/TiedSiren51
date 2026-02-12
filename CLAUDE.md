@@ -71,12 +71,35 @@ jq '.devDependencies' package.json  # View devDependencies (alias: jqdd)
 - Before committing, verify you are on the correct branch for the current task.
 - Never bypass or disable git hooks without explicit user permission.
 
+## Git Hooks
+
+Three Husky hooks run automatically during the commit-push cycle:
+
+**Pre-commit** (`git commit`):
+- Blocks commits to `main`/`demo` branches
+- Runs `tsc --noEmit` (full project type check)
+- Runs lint-staged: ESLint fix + Prettier fix on staged `.ts/.tsx/.js/.json` files, remark on `.md`, shell linter on `.sh`, Prisma validation on `schema.prisma`
+
+**Pre-push** (`git push`):
+- Prompts for e2e test confirmation (skip with `SKIP_E2E_CHECK=true`)
+- Blocks direct push to `main`/`demo`
+- Validates branch naming convention (e.g. `feat/TS267-description`)
+- Checks for uncommitted files
+- Runs `expo doctor`
+- Runs `npm run test:affected` (vitest on changed files only)
+- Detects merge conflicts with `main` via `git merge-tree`
+
+**Post-push** (after successful push):
+- Polls GitHub Actions CI status via `scripts/ci-watch.sh` (mandatory when `CLAUDE_CODE=1`)
+- Auto-updates PR description on CI success
+- See [docs/CI-WATCH.md](./docs/CI-WATCH.md) for env var configuration
+
 ## Workflow
 
 1. **When you believe you're done with a task, run `/commit-push`** to commit all changes and push to remote. Do not ask for permission—just do it.
 2. **After CI passes, update the PR description** to accurately reflect all changes made.
 
-After each push, CI status is automatically monitored via Husky hooks. See [docs/CI-WATCH.md](./docs/CI-WATCH.md) for configuration options and Claude Code behavior.
+**Efficiency:** All tests and lint rules run in CI regardless. Use linter and unit tests **surgically** on modified files only to validate changes quickly — avoid running the full suite locally. After pushing, always wait for the CI result before considering the task complete.
 
 ## Anti-patterns
 

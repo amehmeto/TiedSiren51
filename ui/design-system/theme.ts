@@ -148,6 +148,7 @@ export const T = {
     medium: 3,
     high: 5,
     highest: 8,
+    overlay: 9999,
   },
   layout: {
     width: {

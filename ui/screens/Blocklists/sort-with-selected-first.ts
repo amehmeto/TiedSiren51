@@ -10,13 +10,22 @@ export function sortWithSelectedFirst<T>(
 ): SortedListItem<T>[] {
   const savedSet = new Set(savedSelectedKeys)
 
-  const selectedItems = items
-    .filter((item) => savedSet.has(getKey(item)))
-    .sort((a, b) => getName(a).localeCompare(getName(b)))
+  const selectedItems: T[] = []
+  const unselectedItems: T[] = []
 
-  const unselectedItems = items
-    .filter((item) => !savedSet.has(getKey(item)))
-    .sort((a, b) => getName(a).localeCompare(getName(b)))
+  for (const item of items) {
+    const key = getKey(item)
+    if (savedSet.has(key)) selectedItems.push(item)
+    else unselectedItems.push(item)
+  }
+
+  const compareName = (a: T, b: T) => {
+    const nameA = getName(a)
+    const nameB = getName(b)
+    return nameA.localeCompare(nameB)
+  }
+  selectedItems.sort(compareName)
+  unselectedItems.sort(compareName)
 
   const result: SortedListItem<T>[] = []
 

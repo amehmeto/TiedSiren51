@@ -38,7 +38,7 @@ module.exports = {
     'lines-between-class-members': ['error', 'always'],
     'max-statements-per-line': ['error', { max: 1 }],
     'no-console': 'error',
-    'no-else-return': 'warn',
+    'no-else-return': 'error',
     'no-nested-ternary': 'error',
     'no-switch-statements/no-switch': 'error',
     'prefer-const': 'error',
@@ -119,8 +119,25 @@ module.exports = {
     'local-rules/require-named-regex': 'error',
     // Disabled globally - too many valid patterns. Enable per-file as needed.
     // See: docs/adr/conventions/no-nested-call-expressions.md
+    'local-rules/no-consecutive-duplicate-returns': 'warn',
     'local-rules/no-nested-call-expressions': 'off',
+    'local-rules/no-redundant-nullish-ternary': 'warn',
     'local-rules/prefer-array-destructuring': 'error',
+    'local-rules/prefer-object-destructuring': [
+      'warn',
+      {
+        threshold: 3,
+        ignoredObjects: [
+          'T',
+          'styles',
+          'fixture',
+          'viewModel',
+          'BlocklistViewModel',
+          'HomeViewModel',
+          'BlocklistTabKey',
+        ],
+      },
+    ],
     // Warn-only: many valid patterns use named variables for self-documentation
     'local-rules/prefer-inline-variable': 'warn',
     'local-rules/react-props-destructuring': 'error',
@@ -137,9 +154,9 @@ module.exports = {
     // Extract complex expressions with long strings to variables
     'local-rules/no-complex-inline-arguments': 'error',
     // Warn when useCallback is unnecessarily wrapping a selector for useSelector
-    'local-rules/no-usecallback-selector-wrapper': 'warn',
+    'local-rules/no-usecallback-selector-wrapper': 'error',
     // Prefer named selectors over inline state slice access
-    'local-rules/prefer-named-selector': 'warn',
+    'local-rules/prefer-named-selector': 'error',
     // Enforce state as first parameter in selectors
     'local-rules/selector-state-first-param': 'error',
     // Prevent passing useSelector results as props - child should call useSelector itself
@@ -157,6 +174,14 @@ module.exports = {
     ],
     // Prefer ternary over if-return followed by return
     'local-rules/prefer-ternary-return': ['error', { skipJsx: true }],
+    // Names with "And"/"Or" at word boundaries suggest multiple responsibilities
+    'local-rules/no-and-or-in-names': 'error',
+    // Prefer object map over 3+ sequential ifs testing the same variable
+    'local-rules/prefer-jump-table': 'error',
+    // Flag string literals in comparisons when a matching enum value exists
+    'local-rules/no-enum-value-as-string-literal': 'error',
+    // Prefer ternary over complementary && conditions in JSX
+    'local-rules/prefer-ternary-jsx': 'error',
     // Prefer enum over string literal unions
     'local-rules/prefer-enum-over-string-union': [
       'error',
@@ -251,6 +276,7 @@ module.exports = {
         // Test structure rules
         'local-rules/no-new-in-test-body': 'error',
         'local-rules/use-data-builders': 'error',
+        'local-rules/no-generic-result-variable': 'warn',
       },
     },
     // No data builders in production code
@@ -550,13 +576,6 @@ module.exports = {
           'error',
           {
             allowedPatterns: [
-              // Array methods
-              '^map$',
-              '^filter$',
-              '^flatMap$',
-              '^find$',
-              '^some$',
-              '^every$',
               // Entity adapter
               '^selectAll$',
               '^selectById$',
@@ -599,13 +618,18 @@ module.exports = {
     //     'local-rules/no-nested-call-expressions': 'error',
     //   },
     // },
-    // {
-    //   files: ['ui/**/*.ts', 'ui/**/*.tsx'],
-    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
-    //   rules: {
-    //     'local-rules/no-nested-call-expressions': 'error',
-    //   },
-    // },
+    {
+      files: ['ui/**/*.ts', 'ui/**/*.tsx'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
+        'local-rules/no-nested-call-expressions': [
+          'error',
+          {
+            allowNoArguments: true,
+          },
+        ],
+      },
+    },
     // {
     //   files: ['app/**/*.ts', 'app/**/*.tsx'],
     //   rules: {

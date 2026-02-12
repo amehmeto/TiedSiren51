@@ -9,8 +9,9 @@ import {
   Text,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { AppDispatch } from '@/core/_redux_/createStore'
 import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
+import { selectAuthStatus } from '@/core/auth/selectors/selectAuthStatus'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
@@ -29,7 +30,7 @@ export default function SignUpScreen() {
     password: '',
   })
 
-  const { isLoading, error } = useSelector((state: RootState) => state.auth)
+  const { isLoading, error } = useSelector(selectAuthStatus)
 
   useEffect(() => {
     dispatch(clearAuthState())
