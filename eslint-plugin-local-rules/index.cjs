@@ -30,6 +30,7 @@ const noLameNaming = require('../eslint-rules/no-lame-naming.cjs')
 const noIPrefixInImports = require('../eslint-rules/no-i-prefix-in-imports.cjs')
 const noIconSizeMagicNumbers = require('../eslint-rules/no-icon-size-magic-numbers.cjs')
 const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
+const noInlineImportType = require('../eslint-rules/no-inline-import-type.cjs')
 const noModuleLevelConstants = require('../eslint-rules/no-module-level-constants.cjs')
 const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressions.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
@@ -71,6 +72,7 @@ module.exports = {
     'core-test-file-naming': coreTestFileNaming,
     'file-naming-convention': fileNamingConvention,
     'no-index-in-core': noIndexInCore,
+    'no-inline-import-type': noInlineImportType,
     'selector-matches-filename': selectorMatchesFilename,
     'expect-separate-act-assert': expectSeparateActAssert,
     'inline-single-statement-handlers': inlineSingleStatementHandlers,

@@ -4,7 +4,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
 
 import { RootState } from '@/core/_redux_/createStore'
-import { SirenType } from '@/core/siren/sirens'
+import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
@@ -16,10 +16,7 @@ import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
 
 type AppsSelectionSceneProps = Readonly<{
-  toggleAppSiren: (
-    sirenType: SirenType.ANDROID,
-    app: import('@/core/siren/sirens').AndroidSiren,
-  ) => void
+  toggleAppSiren: (sirenType: SirenType.ANDROID, app: AndroidSiren) => void
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
   mode: FormMode
   blocklistId?: string

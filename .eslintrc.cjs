@@ -102,6 +102,7 @@ module.exports = {
     'local-rules/infra-logger-prefix': 'error',
     'local-rules/file-naming-convention': 'error',
     'local-rules/no-index-in-core': 'error',
+    'local-rules/no-inline-import-type': 'error',
     'local-rules/selector-matches-filename': 'error',
     'local-rules/usecase-matches-filename': 'error',
     'local-rules/no-cross-layer-imports': 'error',
