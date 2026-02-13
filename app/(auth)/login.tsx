@@ -26,10 +26,7 @@ import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSClos
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
-import {
-  LoginViewState,
-  selectLoginViewModel,
-} from '@/ui/screens/Auth/Login/login.view-model'
+import { selectLoginViewModel } from '@/ui/screens/Auth/Login/login.view-model'
 
 export default function LoginScreen() {
   const router = useRouter()
@@ -48,8 +45,8 @@ export default function LoginScreen() {
     dispatch(clearAuthState())
   }, [dispatch])
 
-  const shouldClearPassword =
-    viewModel.type === LoginViewState.Error && viewModel.shouldClearPassword
+  const { shouldClearPassword } = viewModel
+  const displayedPassword = shouldClearPassword ? '' : credentials.password
 
   const handleClose = () => {
     dispatch(clearAuthState())
@@ -70,35 +67,37 @@ export default function LoginScreen() {
     }
 
     const password = shouldClearPassword ? '' : credentials.password
-    const { isValid, errors, data } = validateSignInInput({
+    const {
+      isValid,
+      errorMessage,
+      data: validCredentials,
+    } = validateSignInInput({
       email: credentials.email,
       password,
     })
 
-    if (!isValid) {
-      const errorMessage = Object.values(errors).join(', ')
+    if (!isValid && errorMessage) {
       dispatch(setError(errorMessage))
       return
     }
 
-    if (data) await dispatch(signInWithEmail(data))
+    if (validCredentials) await dispatch(signInWithEmail(validCredentials))
   }
 
   const handleEmailChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, email: text }))
 
-    if (viewModel.type === LoginViewState.Error) dispatch(clearError())
+    if (viewModel.error) dispatch(clearError())
   }
 
   const handlePasswordChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, password: text }))
 
     if (shouldClearPassword) dispatch(acknowledgePasswordClear())
-    if (viewModel.type === LoginViewState.Error) dispatch(clearError())
+    if (viewModel.error) dispatch(clearError())
   }
 
-  const error =
-    viewModel.type === LoginViewState.Error ? viewModel.error : undefined
+  const { error } = viewModel
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
@@ -137,7 +136,7 @@ export default function LoginScreen() {
           placeholder="Enter Your Password"
           accessibilityLabel="Password"
           placeholderTextColor={T.color.grey}
-          value={shouldClearPassword ? '' : credentials.password}
+          value={displayedPassword}
           hasPasswordToggle={true}
           onChangeText={handlePasswordChange}
           textContentType="password"

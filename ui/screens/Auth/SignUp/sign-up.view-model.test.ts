@@ -14,6 +14,7 @@ describe('selectSignUpViewModel', () => {
         type: SignUpViewState.Idle,
         buttonText: 'CREATE YOUR ACCOUNT',
         isInputDisabled: false,
+        error: null,
       }
 
       const viewModel = selectSignUpViewModel(state)
@@ -29,6 +30,7 @@ describe('selectSignUpViewModel', () => {
         type: SignUpViewState.Loading,
         buttonText: 'CREATING ACCOUNT...',
         isInputDisabled: true,
+        error: null,
       }
 
       const viewModel = selectSignUpViewModel(state)
@@ -40,7 +42,7 @@ describe('selectSignUpViewModel', () => {
   describe('Error state', () => {
     it('should return error view model for email already in use', () => {
       const state = stateBuilder()
-        .withAuthError('This email is already in use.')
+        .withAuthError({ message: 'This email is already in use.' })
         .build()
       const expectedViewModel: SignUpViewModel = {
         type: SignUpViewState.Error,
@@ -56,7 +58,7 @@ describe('selectSignUpViewModel', () => {
 
     it('should return error view model for weak password', () => {
       const state = stateBuilder()
-        .withAuthError('Password must be at least 6 characters.')
+        .withAuthError({ message: 'Password must be at least 6 characters.' })
         .build()
       const expectedViewModel: SignUpViewModel = {
         type: SignUpViewState.Error,
@@ -72,9 +74,10 @@ describe('selectSignUpViewModel', () => {
 
     it('should return error view model for network error', () => {
       const state = stateBuilder()
-        .withAuthError(
-          'No internet connection. Please check your network and try again.',
-        )
+        .withAuthError({
+          message:
+            'No internet connection. Please check your network and try again.',
+        })
         .build()
       const expectedViewModel: SignUpViewModel = {
         type: SignUpViewState.Error,

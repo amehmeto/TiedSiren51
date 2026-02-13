@@ -39,7 +39,9 @@ describe('selectForgotPasswordViewModel', () => {
 
   describe('Error state', () => {
     it('should return error view model when error is present', () => {
-      const state = stateBuilder().withAuthError('No account found').build()
+      const state = stateBuilder()
+        .withAuthError({ message: 'No account found' })
+        .build()
       const expectedViewModel: ForgotPasswordViewModel = {
         type: ForgotPasswordViewState.Error,
         buttonText: 'SEND RESET LINK',

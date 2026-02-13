@@ -20,10 +20,7 @@ import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSClos
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
-import {
-  SignUpViewState,
-  selectSignUpViewModel,
-} from '@/ui/screens/Auth/SignUp/sign-up.view-model'
+import { selectSignUpViewModel } from '@/ui/screens/Auth/SignUp/sign-up.view-model'
 
 export default function SignUpScreen() {
   const router = useRouter()
@@ -52,31 +49,33 @@ export default function SignUpScreen() {
   const handleSignUp = async () => {
     dispatch(clearError())
 
-    const { isValid, errors, data } = validateSignUpInput(credentials)
+    const {
+      isValid,
+      errorMessage,
+      data: validCredentials,
+    } = validateSignUpInput(credentials)
 
-    if (!isValid) {
-      const errorMessage = Object.values(errors).join(', ')
+    if (!isValid && errorMessage) {
       dispatch(setError(errorMessage))
       return
     }
 
-    if (data) await dispatch(signUpWithEmail(data))
+    if (validCredentials) await dispatch(signUpWithEmail(validCredentials))
   }
 
   const handleEmailChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, email: text }))
 
-    if (viewModel.type === SignUpViewState.Error) dispatch(clearError())
+    if (viewModel.error) dispatch(clearError())
   }
 
   const handlePasswordChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, password: text }))
 
-    if (viewModel.type === SignUpViewState.Error) dispatch(clearError())
+    if (viewModel.error) dispatch(clearError())
   }
 
-  const error =
-    viewModel.type === SignUpViewState.Error ? viewModel.error : undefined
+  const { error } = viewModel
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>

@@ -1,8 +1,5 @@
 import { RootState } from '@/core/_redux_/createStore'
-import {
-  AuthBaseViewModel,
-  AuthErrorViewModel,
-} from '@/ui/screens/Auth/auth-view-model-base'
+import { AuthBaseViewModel } from '@/ui/screens/Auth/auth-view-model-base'
 
 export enum SignUpViewState {
   Idle = 'IDLE',
@@ -10,10 +7,9 @@ export enum SignUpViewState {
   Error = 'ERROR',
 }
 
-export type SignUpViewModel =
-  | AuthBaseViewModel<SignUpViewState.Idle>
-  | AuthBaseViewModel<SignUpViewState.Loading>
-  | AuthErrorViewModel<SignUpViewState.Error>
+export type SignUpViewModel = AuthBaseViewModel<SignUpViewState> & {
+  error: string | null
+}
 
 export function selectSignUpViewModel(state: RootState): SignUpViewModel {
   const { isLoading, error } = state.auth
@@ -24,6 +20,7 @@ export function selectSignUpViewModel(state: RootState): SignUpViewModel {
       type: Loading,
       buttonText: 'CREATING ACCOUNT...',
       isInputDisabled: true,
+      error: null,
     }
   }
 
@@ -40,5 +37,6 @@ export function selectSignUpViewModel(state: RootState): SignUpViewModel {
     type: Idle,
     buttonText: 'CREATE YOUR ACCOUNT',
     isInputDisabled: false,
+    error: null,
   }
 }

@@ -14,6 +14,8 @@ describe('selectLoginViewModel', () => {
         type: LoginViewState.Idle,
         buttonText: 'LOG IN',
         isInputDisabled: false,
+        error: null,
+        shouldClearPassword: false,
       }
 
       const viewModel = selectLoginViewModel(state)
@@ -29,6 +31,8 @@ describe('selectLoginViewModel', () => {
         type: LoginViewState.Loading,
         buttonText: 'LOGGING IN...',
         isInputDisabled: true,
+        error: null,
+        shouldClearPassword: false,
       }
 
       const viewModel = selectLoginViewModel(state)
@@ -40,7 +44,7 @@ describe('selectLoginViewModel', () => {
   describe('Error state', () => {
     it('should return error view model with shouldClearPassword true when password clear requested', () => {
       const state = stateBuilder()
-        .withAuthError('Invalid email or password.')
+        .withAuthError({ message: 'Invalid email or password.' })
         .withPasswordClearRequested(true)
         .build()
       const expectedViewModel: LoginViewModel = {
@@ -58,9 +62,10 @@ describe('selectLoginViewModel', () => {
 
     it('should return error view model with shouldClearPassword false when no password clear requested', () => {
       const state = stateBuilder()
-        .withAuthError(
-          'No internet connection. Please check your network and try again.',
-        )
+        .withAuthError({
+          message:
+            'No internet connection. Please check your network and try again.',
+        })
         .build()
       const expectedViewModel: LoginViewModel = {
         type: LoginViewState.Error,

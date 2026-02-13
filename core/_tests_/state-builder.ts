@@ -22,8 +22,10 @@ const withBlocklists = createAction<Blocklist[]>('withBlocklists')
 const withAvailableSirens = createAction<Sirens>('withAvailableSirens')
 const withAuthUser = createAction<AuthUser>('withAuthUser')
 const withoutAuthUser = createAction<{}>('withoutAuthUser')
-const withAuthError = createAction<string>('withAuthError')
-const withAuthErrorType = createAction<AuthErrorType>('withAuthErrorType')
+const withAuthError = createAction<{
+  message: string
+  errorType?: AuthErrorType
+}>('withAuthError')
 const withAuthLoading = createAction<boolean>('withAuthLoading')
 const withStrictModeEndedAt = createAction<ISODateString | null>(
   'withStrictModeEndedAt',
@@ -51,10 +53,8 @@ const reducer = createReducer(initialState, (builder) => {
       state.siren.availableSirens = action.payload
     })
     .addCase(withAuthError, (state, action) => {
-      state.auth.error = action.payload
-    })
-    .addCase(withAuthErrorType, (state, action) => {
-      state.auth.errorType = action.payload
+      state.auth.error = action.payload.message
+      state.auth.errorType = action.payload.errorType ?? null
     })
     .addCase(withAuthLoading, (state, action) => {
       state.auth.isLoading = action.payload
@@ -86,7 +86,6 @@ export const stateBuilder = (baseState = initialState) => {
     withBlocklists: reduce(withBlocklists),
     withAvailableSirens: reduce(withAvailableSirens),
     withAuthError: reduce(withAuthError),
-    withAuthErrorType: reduce(withAuthErrorType),
     withAuthLoading: reduce(withAuthLoading),
     withStrictModeEndedAt: reduce(withStrictModeEndedAt),
     withPasswordResetSent: reduce(withPasswordResetSent),

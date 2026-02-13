@@ -1,8 +1,5 @@
 import { RootState } from '@/core/_redux_/createStore'
-import {
-  AuthBaseViewModel,
-  AuthErrorViewModel,
-} from '@/ui/screens/Auth/auth-view-model-base'
+import { AuthBaseViewModel } from '@/ui/screens/Auth/auth-view-model-base'
 
 export enum LoginViewState {
   Idle = 'IDLE',
@@ -10,14 +7,10 @@ export enum LoginViewState {
   Error = 'ERROR',
 }
 
-type LoginErrorViewModel = AuthErrorViewModel<LoginViewState.Error> & {
+export type LoginViewModel = AuthBaseViewModel<LoginViewState> & {
+  error: string | null
   shouldClearPassword: boolean
 }
-
-export type LoginViewModel =
-  | AuthBaseViewModel<LoginViewState.Idle>
-  | AuthBaseViewModel<LoginViewState.Loading>
-  | LoginErrorViewModel
 
 export function selectLoginViewModel(state: RootState): LoginViewModel {
   const { isLoading, error, isPasswordClearRequested } = state.auth
@@ -28,6 +21,8 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
       type: Loading,
       buttonText: 'LOGGING IN...',
       isInputDisabled: true,
+      error: null,
+      shouldClearPassword: false,
     }
   }
 
@@ -45,5 +40,7 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
     type: Idle,
     buttonText: 'LOG IN',
     isInputDisabled: false,
+    error: null,
+    shouldClearPassword: false,
   }
 }
