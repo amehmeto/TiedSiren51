@@ -2,12 +2,8 @@ import * as React from 'react'
 import { useMemo, useState } from 'react'
 import { FlatList, StyleSheet, TextInput } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useSelector } from 'react-redux'
-import { RootState } from '@/core/_redux_/createStore'
 import { SirenType } from '@/core/siren/sirens'
-import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
-import { selectLockedSirensForBlocklist } from '@/core/strict-mode/selectors/selectLockedSirensForBlocklist'
-import { dependencies } from '@/ui/dependencies'
+import { isSirenLocked, LockedSirens } from '@/core/strict-mode/is-siren-locked'
 import { T } from '@/ui/design-system/theme'
 
 import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
@@ -25,7 +21,7 @@ type TextInputSelectionSceneProps = Readonly<{
   toggleSiren: (sirenType: SirenType, sirenId: string) => void
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
   savedSelectedSirens: string[]
-  blocklistId?: string
+  lockedSirens: LockedSirens
 }>
 
 const identity = (s: string) => s
@@ -38,7 +34,7 @@ export function TextInputSelectionScene({
   toggleSiren,
   isSirenSelected,
   savedSelectedSirens,
-  blocklistId,
+  lockedSirens,
 }: TextInputSelectionSceneProps) {
   const [isFocused, setIsFocused] = useState(false)
   const insets = useSafeAreaInsets()
@@ -46,14 +42,6 @@ export function TextInputSelectionScene({
   const sortedListItems: SortedListItem<string>[] = useMemo(
     () => sortWithSelectedFirst(data, savedSelectedSirens, identity, identity),
     [data, savedSelectedSirens],
-  )
-
-  const lockedSirens = useSelector((state: RootState) =>
-    selectLockedSirensForBlocklist(
-      state,
-      dependencies.dateProvider,
-      blocklistId,
-    ),
   )
 
   return (

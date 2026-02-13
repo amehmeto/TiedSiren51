@@ -2,13 +2,9 @@ import * as React from 'react'
 import { useMemo } from 'react'
 import { FlatList, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
-import { useSelector } from 'react-redux'
 
-import { RootState } from '@/core/_redux_/createStore'
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
-import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
-import { selectLockedSirensForBlocklist } from '@/core/strict-mode/selectors/selectLockedSirensForBlocklist'
-import { dependencies } from '@/ui/dependencies'
+import { isSirenLocked, LockedSirens } from '@/core/strict-mode/is-siren-locked'
 import { T } from '@/ui/design-system/theme'
 import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
@@ -22,7 +18,7 @@ type AppsSelectionSceneProps = Readonly<{
   toggleAppSiren: (sirenType: SirenType.ANDROID, app: AndroidSiren) => void
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
   savedSelectedPackageNames: string[]
-  blocklistId?: string
+  lockedSirens: LockedSirens
 }>
 
 export function AppsSelectionScene({
@@ -30,7 +26,7 @@ export function AppsSelectionScene({
   toggleAppSiren,
   isSirenSelected,
   savedSelectedPackageNames,
-  blocklistId,
+  lockedSirens,
 }: AppsSelectionSceneProps) {
   const insets = useSafeAreaInsets()
 
@@ -43,14 +39,6 @@ export function AppsSelectionScene({
         (app) => app.appName,
       ),
     [androidApps, savedSelectedPackageNames],
-  )
-
-  const lockedSirens = useSelector((state: RootState) =>
-    selectLockedSirensForBlocklist(
-      state,
-      dependencies.dateProvider,
-      blocklistId,
-    ),
   )
 
   return (
