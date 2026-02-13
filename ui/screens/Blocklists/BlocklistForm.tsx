@@ -36,8 +36,6 @@ import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/ChooseBlockTabBar'
 import { blocklistFormSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
 import { TextInputSelectionScene } from '@/ui/screens/Blocklists/TextInputSelectionScene'
 
-export { FormMode } from '@/ui/screens/Blocklists/blocklist-form.view-model'
-
 export type BlocklistScreenProps = {
   mode: FormMode
   blocklistId?: string

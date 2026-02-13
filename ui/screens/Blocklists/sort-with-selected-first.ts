@@ -1,6 +1,6 @@
-type SectionDivider = { type: 'divider'; id: string; label: string }
+type SortedListDivider = { type: 'divider'; id: string; label: string }
 
-export type SortedListItem<T> = { type: 'siren'; siren: T } | SectionDivider
+export type SortedListItem<T> = { type: 'siren'; siren: T } | SortedListDivider
 
 export function sortWithSelectedFirst<T>(
   items: T[],

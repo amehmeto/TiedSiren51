@@ -5,7 +5,10 @@ import { selectBlocklistById } from '@/core/blocklist/selectors/selectBlocklistB
 import { AndroidSiren, Sirens } from '@/core/siren/sirens'
 import { formatDuration } from '@/core/strict-mode/format-duration'
 import { LockedSirens } from '@/core/strict-mode/is-siren-locked'
-import { selectLockedSirensForBlocklist } from '@/core/strict-mode/selectors/selectLockedSirensForBlocklist'
+import {
+  EMPTY_LOCKED_SIRENS,
+  selectLockedSirensForBlocklist,
+} from '@/core/strict-mode/selectors/selectLockedSirensForBlocklist'
 import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
 import {
   SortedListItem,
@@ -21,12 +24,6 @@ export enum BlocklistFormViewState {
   Creating = 'CREATING',
   Editing = 'EDITING',
   EditingWithLockedSirens = 'EDITING_WITH_LOCKED_SIRENS',
-}
-
-const EMPTY_LOCKED_SIRENS: LockedSirens = {
-  android: new Set(),
-  websites: new Set(),
-  keywords: new Set(),
 }
 
 type SortedSirens = {

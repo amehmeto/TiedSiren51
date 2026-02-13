@@ -7,7 +7,7 @@ import { Sirens } from '@/core/siren/sirens'
 import { LockedSirens } from '@/core/strict-mode/is-siren-locked'
 import { selectIsStrictModeActive } from './selectIsStrictModeActive'
 
-const EMPTY_LOCKED_SIRENS: LockedSirens = {
+export const EMPTY_LOCKED_SIRENS: LockedSirens = {
   android: new Set(),
   websites: new Set(),
   keywords: new Set(),
