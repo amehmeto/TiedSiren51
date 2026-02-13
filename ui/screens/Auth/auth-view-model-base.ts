@@ -3,8 +3,3 @@ export type AuthBaseViewModel<TState extends string> = {
   buttonText: string
   isInputDisabled: boolean
 }
-
-export type AuthErrorViewModel<TState extends string> =
-  AuthBaseViewModel<TState> & {
-    error: string
-  }

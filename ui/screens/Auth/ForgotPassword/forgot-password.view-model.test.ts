@@ -14,6 +14,7 @@ describe('selectForgotPasswordViewModel', () => {
         type: ForgotPasswordViewState.Idle,
         buttonText: 'SEND RESET LINK',
         isInputDisabled: false,
+        error: null,
       }
 
       const viewModel = selectForgotPasswordViewModel(state)
@@ -29,6 +30,7 @@ describe('selectForgotPasswordViewModel', () => {
         type: ForgotPasswordViewState.Loading,
         buttonText: 'SENDING...',
         isInputDisabled: true,
+        error: null,
       }
 
       const viewModel = selectForgotPasswordViewModel(state)

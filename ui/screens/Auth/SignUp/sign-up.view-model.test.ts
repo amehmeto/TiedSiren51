@@ -15,6 +15,8 @@ describe('selectSignUpViewModel', () => {
         buttonText: 'CREATE YOUR ACCOUNT',
         isInputDisabled: false,
         error: null,
+        email: '',
+        password: '',
       }
 
       const viewModel = selectSignUpViewModel(state)
@@ -31,6 +33,8 @@ describe('selectSignUpViewModel', () => {
         buttonText: 'CREATING ACCOUNT...',
         isInputDisabled: true,
         error: null,
+        email: '',
+        password: '',
       }
 
       const viewModel = selectSignUpViewModel(state)
@@ -49,6 +53,8 @@ describe('selectSignUpViewModel', () => {
         buttonText: 'CREATE YOUR ACCOUNT',
         isInputDisabled: false,
         error: 'This email is already in use.',
+        email: '',
+        password: '',
       }
 
       const viewModel = selectSignUpViewModel(state)
@@ -65,6 +71,8 @@ describe('selectSignUpViewModel', () => {
         buttonText: 'CREATE YOUR ACCOUNT',
         isInputDisabled: false,
         error: 'Password must be at least 6 characters.',
+        email: '',
+        password: '',
       }
 
       const viewModel = selectSignUpViewModel(state)
@@ -85,6 +93,8 @@ describe('selectSignUpViewModel', () => {
         isInputDisabled: false,
         error:
           'No internet connection. Please check your network and try again.',
+        email: '',
+        password: '',
       }
 
       const viewModel = selectSignUpViewModel(state)

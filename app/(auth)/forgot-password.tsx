@@ -91,8 +91,7 @@ export default function ForgotPasswordScreen() {
           value={email}
           onChangeText={(text) => {
             setEmail(text)
-            if (viewModel.type === ForgotPasswordViewState.Error)
-              dispatch(clearError())
+            if (viewModel.error) dispatch(clearError())
           }}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -105,9 +104,7 @@ export default function ForgotPasswordScreen() {
           style={styles.button}
           isDisabled={viewModel.isInputDisabled}
         />
-        {viewModel.type === ForgotPasswordViewState.Error && (
-          <FormError error={viewModel.error} />
-        )}
+        {viewModel.error && <FormError error={viewModel.error} />}
         <Text style={styles.backText} onPress={handleBackToLogin}>
           {'Back to Login'}
         </Text>

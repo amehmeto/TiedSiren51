@@ -115,6 +115,9 @@ export function authentificationFixture(
       passwordResetShouldNotBeSent() {
         expect(authGateway.lastResetPasswordEmail).toBeNull()
       },
+      passwordShouldBeCleared() {
+        expect(store.getState().auth.password).toBe('')
+      },
     },
   }
 }

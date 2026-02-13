@@ -9,10 +9,12 @@ export enum SignUpViewState {
 
 export type SignUpViewModel = AuthBaseViewModel<SignUpViewState> & {
   error: string | null
+  email: string
+  password: string
 }
 
 export function selectSignUpViewModel(state: RootState): SignUpViewModel {
-  const { isLoading, error } = state.auth
+  const { isLoading, error, email, password } = state.auth
   const { Loading, Error, Idle } = SignUpViewState
 
   if (isLoading) {
@@ -21,6 +23,8 @@ export function selectSignUpViewModel(state: RootState): SignUpViewModel {
       buttonText: 'CREATING ACCOUNT...',
       isInputDisabled: true,
       error: null,
+      email,
+      password,
     }
   }
 
@@ -30,6 +34,8 @@ export function selectSignUpViewModel(state: RootState): SignUpViewModel {
       buttonText: 'CREATE YOUR ACCOUNT',
       isInputDisabled: false,
       error,
+      email,
+      password,
     }
   }
 
@@ -38,5 +44,7 @@ export function selectSignUpViewModel(state: RootState): SignUpViewModel {
     buttonText: 'CREATE YOUR ACCOUNT',
     isInputDisabled: false,
     error: null,
+    email,
+    password,
   }
 }

@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -11,10 +11,11 @@ import {
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import {
-  acknowledgePasswordClear,
   clearAuthState,
   clearError,
+  setEmail,
   setError,
+  setPassword,
 } from '@/core/auth/reducer'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
@@ -31,7 +32,6 @@ import { selectLoginViewModel } from '@/ui/screens/Auth/Login/login.view-model'
 export default function LoginScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const [credentials, setCredentials] = useState({ email: '', password: '' })
 
   const isUserAuthenticated = useSelector(selectIsUserAuthenticated)
 
@@ -44,9 +44,6 @@ export default function LoginScreen() {
   useEffect(() => {
     dispatch(clearAuthState())
   }, [dispatch])
-
-  const { shouldClearPassword } = viewModel
-  const displayedPassword = shouldClearPassword ? '' : credentials.password
 
   const handleClose = () => {
     dispatch(clearAuthState())
@@ -61,22 +58,12 @@ export default function LoginScreen() {
   const handleSignIn = async () => {
     dispatch(clearError())
 
-    if (shouldClearPassword) {
-      setCredentials((prev) => ({ ...prev, password: '' }))
-      dispatch(acknowledgePasswordClear())
-    }
-
-    const password = shouldClearPassword ? '' : credentials.password
-    const {
-      isValid,
-      errorMessage,
-      data: validCredentials,
-    } = validateSignInInput({
-      email: credentials.email,
-      password,
+    const { errorMessage, data: validCredentials } = validateSignInInput({
+      email: viewModel.email,
+      password: viewModel.password,
     })
 
-    if (!isValid && errorMessage) {
+    if (errorMessage) {
       dispatch(setError(errorMessage))
       return
     }
@@ -85,15 +72,14 @@ export default function LoginScreen() {
   }
 
   const handleEmailChange = (text: string) => {
-    setCredentials((prev) => ({ ...prev, email: text }))
+    dispatch(setEmail(text))
 
     if (viewModel.error) dispatch(clearError())
   }
 
   const handlePasswordChange = (text: string) => {
-    setCredentials((prev) => ({ ...prev, password: text }))
+    dispatch(setPassword(text))
 
-    if (shouldClearPassword) dispatch(acknowledgePasswordClear())
     if (viewModel.error) dispatch(clearError())
   }
 
@@ -126,7 +112,7 @@ export default function LoginScreen() {
           placeholder="Your Email"
           accessibilityLabel="Email"
           placeholderTextColor={T.color.grey}
-          value={credentials.email}
+          value={viewModel.email}
           onChangeText={handleEmailChange}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -136,7 +122,7 @@ export default function LoginScreen() {
           placeholder="Enter Your Password"
           accessibilityLabel="Password"
           placeholderTextColor={T.color.grey}
-          value={displayedPassword}
+          value={viewModel.password}
           hasPasswordToggle={true}
           onChangeText={handlePasswordChange}
           textContentType="password"

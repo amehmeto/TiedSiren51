@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -10,7 +10,13 @@ import {
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
-import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
+import {
+  clearAuthState,
+  clearError,
+  setEmail,
+  setError,
+  setPassword,
+} from '@/core/auth/reducer'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
@@ -25,10 +31,6 @@ import { selectSignUpViewModel } from '@/ui/screens/Auth/SignUp/sign-up.view-mod
 export default function SignUpScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const [credentials, setCredentials] = useState({
-    email: '',
-    password: '',
-  })
 
   const viewModel = useSelector(selectSignUpViewModel)
 
@@ -49,13 +51,12 @@ export default function SignUpScreen() {
   const handleSignUp = async () => {
     dispatch(clearError())
 
-    const {
-      isValid,
-      errorMessage,
-      data: validCredentials,
-    } = validateSignUpInput(credentials)
+    const { errorMessage, data: validCredentials } = validateSignUpInput({
+      email: viewModel.email,
+      password: viewModel.password,
+    })
 
-    if (!isValid && errorMessage) {
+    if (errorMessage) {
       dispatch(setError(errorMessage))
       return
     }
@@ -64,13 +65,13 @@ export default function SignUpScreen() {
   }
 
   const handleEmailChange = (text: string) => {
-    setCredentials((prev) => ({ ...prev, email: text }))
+    dispatch(setEmail(text))
 
     if (viewModel.error) dispatch(clearError())
   }
 
   const handlePasswordChange = (text: string) => {
-    setCredentials((prev) => ({ ...prev, password: text }))
+    dispatch(setPassword(text))
 
     if (viewModel.error) dispatch(clearError())
   }
@@ -104,7 +105,7 @@ export default function SignUpScreen() {
           placeholder="Your Email"
           accessibilityLabel="Email"
           placeholderTextColor={T.color.grey}
-          value={credentials.email}
+          value={viewModel.email}
           onChangeText={handleEmailChange}
           keyboardType="email-address"
           autoCapitalize="none"
@@ -114,7 +115,7 @@ export default function SignUpScreen() {
           accessibilityLabel="Password"
           placeholderTextColor={T.color.grey}
           hasPasswordToggle={true}
-          value={credentials.password}
+          value={viewModel.password}
           onChangeText={handlePasswordChange}
           textContentType="newPassword"
           autoComplete="new-password"

@@ -39,6 +39,7 @@ describe('Feature: Authenticate with Email', () => {
 
     fixture.then.authenticationErrorsShouldBe('Invalid credentials')
     fixture.then.authErrorTypeShouldBe(AuthErrorType.Credential)
+    fixture.then.passwordShouldBeCleared()
     fixture.then.authShouldNotBeLoading()
   })
 

@@ -9,11 +9,12 @@ export enum LoginViewState {
 
 export type LoginViewModel = AuthBaseViewModel<LoginViewState> & {
   error: string | null
-  shouldClearPassword: boolean
+  email: string
+  password: string
 }
 
 export function selectLoginViewModel(state: RootState): LoginViewModel {
-  const { isLoading, error, isPasswordClearRequested } = state.auth
+  const { isLoading, error, email, password } = state.auth
   const { Loading, Error, Idle } = LoginViewState
 
   if (isLoading) {
@@ -22,7 +23,8 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
       buttonText: 'LOGGING IN...',
       isInputDisabled: true,
       error: null,
-      shouldClearPassword: false,
+      email,
+      password,
     }
   }
 
@@ -32,7 +34,8 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
       buttonText: 'LOG IN',
       isInputDisabled: false,
       error,
-      shouldClearPassword: isPasswordClearRequested,
+      email,
+      password,
     }
   }
 
@@ -41,6 +44,7 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
     buttonText: 'LOG IN',
     isInputDisabled: false,
     error: null,
-    shouldClearPassword: false,
+    email,
+    password,
   }
 }

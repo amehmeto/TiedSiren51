@@ -20,7 +20,8 @@ export type AuthState = {
   error: string | null
   errorType: AuthErrorType | null
   isPasswordResetSent: boolean
-  isPasswordClearRequested: boolean
+  email: string
+  password: string
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -33,13 +34,9 @@ export const clearError = createAction('auth/clearError')
 
 export const setError = createAction<string>('auth/setError')
 
-export const passwordClearRequested = createAction(
-  'auth/passwordClearRequested',
-)
+export const setEmail = createAction<string>('auth/setEmail')
 
-export const acknowledgePasswordClear = createAction(
-  'auth/acknowledgePasswordClear',
-)
+export const setPassword = createAction<string>('auth/setPassword')
 
 export const reducer = createReducer<AuthState>(
   {
@@ -48,7 +45,8 @@ export const reducer = createReducer<AuthState>(
     error: null,
     errorType: null,
     isPasswordResetSent: false,
-    isPasswordClearRequested: false,
+    email: '',
+    password: '',
   },
   (builder) => {
     const authThunks = [
@@ -75,11 +73,11 @@ export const reducer = createReducer<AuthState>(
         state.error = action.payload
         state.errorType = null
       })
-      .addCase(passwordClearRequested, (state) => {
-        state.isPasswordClearRequested = true
+      .addCase(setEmail, (state, action) => {
+        state.email = action.payload
       })
-      .addCase(acknowledgePasswordClear, (state) => {
-        state.isPasswordClearRequested = false
+      .addCase(setPassword, (state, action) => {
+        state.password = action.payload
       })
       .addCase(signInWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
@@ -101,7 +99,8 @@ export const reducer = createReducer<AuthState>(
         state.error = null
         state.errorType = null
         state.isPasswordResetSent = false
-        state.isPasswordClearRequested = false
+        state.email = ''
+        state.password = ''
       })
       .addCase(resetPassword.pending, (state) => {
         state.isPasswordResetSent = false
@@ -125,6 +124,7 @@ export const reducer = createReducer<AuthState>(
         state.errorType = isAuthErrorType(action.error.code)
           ? action.error.code
           : null
+        if (state.errorType === AuthErrorType.Credential) state.password = ''
       })
   },
 )

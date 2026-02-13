@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import { stateBuilder } from '@/core/_tests_/state-builder'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 import {
   LoginViewModel,
   LoginViewState,
@@ -15,7 +16,8 @@ describe('selectLoginViewModel', () => {
         buttonText: 'LOG IN',
         isInputDisabled: false,
         error: null,
-        shouldClearPassword: false,
+        email: '',
+        password: '',
       }
 
       const viewModel = selectLoginViewModel(state)
@@ -32,7 +34,8 @@ describe('selectLoginViewModel', () => {
         buttonText: 'LOGGING IN...',
         isInputDisabled: true,
         error: null,
-        shouldClearPassword: false,
+        email: '',
+        password: '',
       }
 
       const viewModel = selectLoginViewModel(state)
@@ -42,17 +45,21 @@ describe('selectLoginViewModel', () => {
   })
 
   describe('Error state', () => {
-    it('should return error view model with shouldClearPassword true when password clear requested', () => {
+    it('should return error view model with email preserved and password cleared on credential error', () => {
       const state = stateBuilder()
-        .withAuthError({ message: 'Invalid email or password.' })
-        .withPasswordClearRequested(true)
+        .withAuthError({
+          message: 'Invalid email or password.',
+          errorType: AuthErrorType.Credential,
+        })
+        .withEmail('user@test.com')
         .build()
       const expectedViewModel: LoginViewModel = {
         type: LoginViewState.Error,
         buttonText: 'LOG IN',
         isInputDisabled: false,
         error: 'Invalid email or password.',
-        shouldClearPassword: true,
+        email: 'user@test.com',
+        password: '',
       }
 
       const viewModel = selectLoginViewModel(state)
@@ -60,12 +67,14 @@ describe('selectLoginViewModel', () => {
       expect(viewModel).toStrictEqual(expectedViewModel)
     })
 
-    it('should return error view model with shouldClearPassword false when no password clear requested', () => {
+    it('should return error view model with email and password preserved on network error', () => {
       const state = stateBuilder()
         .withAuthError({
           message:
             'No internet connection. Please check your network and try again.',
         })
+        .withEmail('user@test.com')
+        .withPassword('mypassword')
         .build()
       const expectedViewModel: LoginViewModel = {
         type: LoginViewState.Error,
@@ -73,7 +82,8 @@ describe('selectLoginViewModel', () => {
         isInputDisabled: false,
         error:
           'No internet connection. Please check your network and try again.',
-        shouldClearPassword: false,
+        email: 'user@test.com',
+        password: 'mypassword',
       }
 
       const viewModel = selectLoginViewModel(state)

@@ -1,8 +1,5 @@
 import { RootState } from '@/core/_redux_/createStore'
-import {
-  AuthBaseViewModel,
-  AuthErrorViewModel,
-} from '@/ui/screens/Auth/auth-view-model-base'
+import { AuthBaseViewModel } from '@/ui/screens/Auth/auth-view-model-base'
 
 export enum ForgotPasswordViewState {
   Idle = 'IDLE',
@@ -15,11 +12,11 @@ type SuccessViewModel = {
   type: ForgotPasswordViewState.Success
 }
 
-export type ForgotPasswordViewModel =
-  | AuthBaseViewModel<ForgotPasswordViewState.Idle>
-  | AuthBaseViewModel<ForgotPasswordViewState.Loading>
-  | AuthErrorViewModel<ForgotPasswordViewState.Error>
-  | SuccessViewModel
+type FormViewModel = AuthBaseViewModel<ForgotPasswordViewState> & {
+  error: string | null
+}
+
+export type ForgotPasswordViewModel = FormViewModel | SuccessViewModel
 
 export function selectForgotPasswordViewModel(
   state: RootState,
@@ -38,6 +35,7 @@ export function selectForgotPasswordViewModel(
       type: Loading,
       buttonText: 'SENDING...',
       isInputDisabled: true,
+      error: null,
     }
   }
 
@@ -54,5 +52,6 @@ export function selectForgotPasswordViewModel(
     type: Idle,
     buttonText: 'SEND RESET LINK',
     isInputDisabled: false,
+    error: null,
   }
 }

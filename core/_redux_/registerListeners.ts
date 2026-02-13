@@ -1,4 +1,3 @@
-import { onCredentialErrorListener } from '@/core/auth/listeners/on-credential-error.listener'
 import { onUserLoggedInListener } from '@/core/auth/listeners/on-user-logged-in.listener'
 import { onUserLoggedOutListener } from '@/core/auth/listeners/on-user-logged-out.listener'
 import { onBlockingScheduleChangedListener } from '@/core/siren/listeners/on-blocking-schedule-changed.listener'
@@ -27,11 +26,6 @@ export const registerListeners = (
   onUserLoggedOutListener({
     store,
     authGateway,
-    logger,
-  })
-
-  onCredentialErrorListener({
-    store,
     logger,
   })
 
