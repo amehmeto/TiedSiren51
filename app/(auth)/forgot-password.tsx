@@ -9,7 +9,7 @@ import {
   Text,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { AppDispatch } from '@/core/_redux_/createStore'
 import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
 import { getForgotPasswordValidationError } from '@/ui/auth-schemas/validation.helper'
@@ -29,9 +29,7 @@ export default function ForgotPasswordScreen() {
   const dispatch = useDispatch<AppDispatch>()
   const [email, setEmail] = useState('')
 
-  const viewModel = useSelector((state: RootState) =>
-    selectForgotPasswordViewModel(state),
-  )
+  const viewModel = useSelector(selectForgotPasswordViewModel)
 
   useEffect(() => {
     dispatch(clearAuthState())
