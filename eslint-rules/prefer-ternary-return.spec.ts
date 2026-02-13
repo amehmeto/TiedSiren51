@@ -136,6 +136,39 @@ describe('prefer-ternary-return', () => {
             const foo = (x) => x ? 1 : 2
           `,
         },
+        // Multi-line alternate expression
+        {
+          code: `
+            function foo(x) {
+              if (x) return 1
+              return {
+                a: 1,
+                b: 2
+              }
+            }
+          `,
+        },
+        // JSXText in return with skipJsx enabled
+        {
+          code: `
+            function Comp() {
+              if (loading) return <>Loading...</>
+              return <>Done</>
+            }
+          `,
+          options: [{ skipJsx: true }],
+        },
+        // Not a valid return in consequent (block with multiple statements)
+        {
+          code: `
+            function foo(x) {
+              if (x) {
+                console.log('log')
+              }
+              return 2
+            }
+          `,
+        },
       ],
       invalid: [
         // Basic: simple if-return followed by return
