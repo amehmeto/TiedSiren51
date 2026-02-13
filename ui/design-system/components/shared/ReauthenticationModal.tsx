@@ -29,8 +29,10 @@ export function ReauthenticationModal({
 
   const handleConfirm = async () => {
     const result = await dispatch(reauthenticate({ password }))
-    setPassword('')
-    if (reauthenticate.fulfilled.match(result)) onSuccess()
+    if (reauthenticate.fulfilled.match(result)) {
+      setPassword('')
+      onSuccess()
+    }
   }
 
   const handleClose = () => {
