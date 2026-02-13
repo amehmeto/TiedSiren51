@@ -81,6 +81,9 @@ export const reducer = createReducer<AuthState>(
         state.authUser = null
         state.error = null
         state.isLoading = false
+        state.lastReauthenticatedAt = null
+        state.isReauthenticating = false
+        state.reauthError = null
       })
 
       .addCase(clearAuthState, (state) => {

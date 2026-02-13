@@ -42,6 +42,22 @@ describe('selectNeedsReauthentication', () => {
     expect(shouldReauthenticate).toBe(false)
   })
 
+  test('should return true at exactly 5 minutes', () => {
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder()
+        .withLastReauthenticatedAt('2024-01-15T10:00:00.000Z')
+        .build(),
+    )
+
+    const shouldReauthenticate = selectNeedsReauthentication(
+      store.getState(),
+      dateProvider,
+    )
+
+    expect(shouldReauthenticate).toBe(true)
+  })
+
   test('should return true after 5 minutes have elapsed', () => {
     const store = createTestStore(
       { dateProvider },
