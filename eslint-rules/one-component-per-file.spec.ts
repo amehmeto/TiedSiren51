@@ -79,6 +79,49 @@ describe('one-component-per-file', () => {
         }
       `,
         },
+        // VariableDeclarator with non-Identifier id (destructuring)
+        {
+          code: `
+        const { Component } = createComponents()
+        function Main() {
+          return <div>Main</div>
+        }
+      `,
+        },
+        // VariableDeclarator without init
+        {
+          code: `
+        let Component
+        function Main() {
+          return <div>Main</div>
+        }
+      `,
+        },
+        // FunctionDeclaration without id (edge case)
+        {
+          code: `
+        export default function() {
+          return <div>Anonymous</div>
+        }
+      `,
+        },
+        // Arrow function without body (implicit return of non-JSX)
+        {
+          code: `
+        const getValue = () => 42
+        function Main() {
+          return <div>Main</div>
+        }
+      `,
+        },
+        // Function expression assigned to variable
+        {
+          code: `
+        const MyComponent = function() {
+          return <div>Hello</div>
+        }
+      `,
+        },
       ],
 
       invalid: [
@@ -175,6 +218,27 @@ describe('one-component-per-file', () => {
               data: {
                 components: 'MenuOption, ThreeDotMenu',
                 extra: 'ThreeDotMenu',
+              },
+            },
+          ],
+        },
+        // Two function expression components - INVALID
+        {
+          code: `
+        const Header = function() {
+          return <header>Title</header>
+        }
+
+        const Footer = function() {
+          return <footer>Bottom</footer>
+        }
+      `,
+          errors: [
+            {
+              messageId: 'multipleComponents',
+              data: {
+                components: 'Header, Footer',
+                extra: 'Footer',
               },
             },
           ],

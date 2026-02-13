@@ -237,6 +237,33 @@ expect(res).toBe(42)`,
           code: `const val = x
 expect(val).toBe(42)`,
         },
+        // Declaration not in BlockStatement or Program - inside switch
+        {
+          code: `switch (x) { case 1: const y = getValue(); console.log(y); break }`,
+        },
+        // Declaration with undefined init (no initializer)
+        {
+          code: `let x; x = getValue()`,
+        },
+        // Complex init like BinaryExpression - not in isSimpleInit
+        {
+          code: `const x = a + b + c
+console.log(x)`,
+        },
+        // Usage not in immediately following statement (same statement)
+        {
+          code: `const x = getValue(), y = x`,
+        },
+        // Member expression with computed property as callee
+        {
+          code: `const result = obj['method']()
+console.log(result)`,
+        },
+        // Call expression with no callee name extraction possible
+        {
+          code: `const result = (getFunc())()
+console.log(result)`,
+        },
       ],
 
       invalid: [
