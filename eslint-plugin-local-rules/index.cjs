@@ -26,6 +26,7 @@ const noElseIf = require('../eslint-rules/no-else-if.cjs')
 const noEntireStateSelector = require('../eslint-rules/no-entire-state-selector.cjs')
 const noEnumValueAsStringLiteral = require('../eslint-rules/no-enum-value-as-string-literal.cjs')
 const noGenericResultVariable = require('../eslint-rules/no-generic-result-variable.cjs')
+const noLameNaming = require('../eslint-rules/no-lame-naming.cjs')
 const noIPrefixInImports = require('../eslint-rules/no-i-prefix-in-imports.cjs')
 const noIconSizeMagicNumbers = require('../eslint-rules/no-icon-size-magic-numbers.cjs')
 const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
@@ -129,5 +130,6 @@ module.exports = {
     'prefer-enum-over-string-union': preferEnumOverStringUnion,
     'no-and-or-in-names': noConjunctionInNames,
     'no-generic-result-variable': noGenericResultVariable,
+    'no-lame-naming': noLameNaming,
   },
 }

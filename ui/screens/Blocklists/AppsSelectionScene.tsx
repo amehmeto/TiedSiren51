@@ -1,53 +1,73 @@
 import * as React from 'react'
 import { FlatList, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { useSelector } from 'react-redux'
 
-import { AndroidSiren, SirenType } from '@/core/siren/sirens'
-import { isSirenLocked, LockedSirens } from '@/core/strict-mode/is-siren-locked'
+import { RootState } from '@/core/_redux_/createStore'
+import { SirenType } from '@/core/siren/sirens'
+import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
+import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
+import {
+  FormMode,
+  selectBlocklistFormViewModel,
+} from '@/ui/screens/Blocklists/blocklist-form.view-model'
 import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
-import { SortedListItem } from '@/ui/screens/Blocklists/sort-with-selected-first'
 
 type AppsSelectionSceneProps = Readonly<{
-  sortedApps: SortedListItem<AndroidSiren>[]
-  toggleAppSiren: (sirenType: SirenType.ANDROID, app: AndroidSiren) => void
+  toggleAppSiren: (
+    sirenType: SirenType.ANDROID,
+    app: import('@/core/siren/sirens').AndroidSiren,
+  ) => void
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
-  lockedSirens: LockedSirens
+  mode: FormMode
+  blocklistId?: string
 }>
 
 export function AppsSelectionScene({
-  sortedApps,
   toggleAppSiren,
   isSirenSelected,
-  lockedSirens,
+  mode,
+  blocklistId,
 }: AppsSelectionSceneProps) {
   const insets = useSafeAreaInsets()
 
+  const viewModel = useSelector((state: RootState) =>
+    selectBlocklistFormViewModel(
+      state,
+      dependencies.dateProvider,
+      mode,
+      blocklistId,
+    ),
+  )
+
+  const { sortedAndroidApps, lockedSirens } = viewModel
+
   return (
     <FlatList
-      data={sortedApps}
-      keyExtractor={(item) =>
-        item.type === 'divider' ? item.id : item.item.packageName
+      data={sortedAndroidApps}
+      keyExtractor={(listItem) =>
+        listItem.type === 'divider' ? listItem.id : listItem.siren.packageName
       }
-      renderItem={({ item }) => {
-        if (item.type === 'divider')
-          return <SectionDivider label={item.label} />
+      renderItem={({ item: listItem }) => {
+        if (listItem.type === 'divider')
+          return <SectionDivider label={listItem.label} />
 
         const isSelected = isSirenSelected(
           SirenType.ANDROID,
-          item.item.packageName,
+          listItem.siren.packageName,
         )
         const isLocked = isSirenLocked(
           lockedSirens,
           SirenType.ANDROID,
-          item.item.packageName,
+          listItem.siren.packageName,
         )
         return (
           <SelectableSirenCard
             sirenType={SirenType.ANDROID}
-            siren={item.item}
-            onPress={() => toggleAppSiren(SirenType.ANDROID, item.item)}
+            siren={listItem.siren}
+            onPress={() => toggleAppSiren(SirenType.ANDROID, listItem.siren)}
             isSelected={isSelected}
             isLocked={isLocked}
           />

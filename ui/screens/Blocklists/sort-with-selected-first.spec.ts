@@ -12,9 +12,9 @@ describe('sortWithSelectedFirst', () => {
       { id: '3', name: 'Cherry' },
     ]
     const savedSelectedKeys = ['2']
-    const expectedFirstItem = {
-      type: 'item',
-      item: { id: '2', name: 'Banana' },
+    const expectedFirstSiren = {
+      type: 'siren',
+      siren: { id: '2', name: 'Banana' },
     }
 
     const result = sortWithSelectedFirst(
@@ -24,8 +24,8 @@ describe('sortWithSelectedFirst', () => {
       getName,
     )
 
-    const itemsOnly = result.filter((r) => r.type === 'item')
-    expect(itemsOnly[0]).toStrictEqual(expectedFirstItem)
+    const itemsOnly = result.filter((r) => r.type === 'siren')
+    expect(itemsOnly[0]).toStrictEqual(expectedFirstSiren)
   })
 
   it('should sort selected items alphabetically', () => {
@@ -46,10 +46,10 @@ describe('sortWithSelectedFirst', () => {
 
     const itemsOnly = result
       .filter(
-        (r): r is { type: 'item'; item: { id: string; name: string } } =>
-          r.type === 'item',
+        (r): r is { type: 'siren'; siren: { id: string; name: string } } =>
+          r.type === 'siren',
       )
-      .map((r) => r.item.name)
+      .map((r) => r.siren.name)
 
     expect(itemsOnly).toStrictEqual(expectedNames)
   })
@@ -72,10 +72,10 @@ describe('sortWithSelectedFirst', () => {
 
     const itemsOnly = result
       .filter(
-        (r): r is { type: 'item'; item: { id: string; name: string } } =>
-          r.type === 'item',
+        (r): r is { type: 'siren'; siren: { id: string; name: string } } =>
+          r.type === 'siren',
       )
-      .map((r) => r.item.name)
+      .map((r) => r.siren.name)
 
     expect(itemsOnly).toStrictEqual(expectedNames)
   })
@@ -175,8 +175,8 @@ describe('sortWithSelectedFirst', () => {
     const savedSelectedKeys: string[] = []
     const expectedResult = [
       { type: 'divider', id: 'divider-available', label: 'Available' },
-      { type: 'item', item: { id: '1', name: 'Apple' } },
-      { type: 'item', item: { id: '2', name: 'Banana' } },
+      { type: 'siren', siren: { id: '1', name: 'Apple' } },
+      { type: 'siren', siren: { id: '2', name: 'Banana' } },
     ]
 
     const result = sortWithSelectedFirst(
@@ -203,8 +203,8 @@ describe('sortWithSelectedFirst', () => {
     )
 
     const itemsOnly = result
-      .filter((r): r is { type: 'item'; item: string } => r.type === 'item')
-      .map((r) => r.item)
+      .filter((r): r is { type: 'siren'; siren: string } => r.type === 'siren')
+      .map((r) => r.siren)
 
     expect(itemsOnly).toStrictEqual(expectedNames)
   })
@@ -225,10 +225,10 @@ describe('sortWithSelectedFirst', () => {
     )
 
     const selectedItems = result.filter(
-      (r): r is { type: 'item'; item: { id: string; name: string } } =>
-        r.type === 'item',
+      (r): r is { type: 'siren'; siren: { id: string; name: string } } =>
+        r.type === 'siren',
     )
-    const firstSelectedId = selectedItems[0].item.id
+    const firstSelectedId = selectedItems[0].siren.id
     expect(selectedItems).toHaveLength(2)
     expect(firstSelectedId).toBe(expectedFirstSelectedId)
   })

@@ -183,6 +183,8 @@ module.exports = {
     'local-rules/no-enum-value-as-string-literal': 'error',
     // Prefer ternary over complementary && conditions in JSX
     'local-rules/prefer-ternary-jsx': 'error',
+    // Disallow overly generic variable and function names
+    'local-rules/no-lame-naming': 'warn',
     // Prefer enum over string literal unions
     'local-rules/prefer-enum-over-string-union': [
       'error',

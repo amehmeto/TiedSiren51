@@ -178,10 +178,10 @@ export function BlocklistForm({
       const scenes: Record<BlocklistTabKey, () => React.JSX.Element> = {
         apps: () => (
           <AppsSelectionScene
-            sortedApps={viewModel.sortedApps}
             toggleAppSiren={toggleAppSiren}
             isSirenSelected={isSirenSelected}
-            lockedSirens={lockedSirens}
+            mode={mode}
+            blocklistId={blocklistId}
           />
         ),
         websites: () => (
@@ -191,10 +191,10 @@ export function BlocklistForm({
             }
             sirenType={SirenType.WEBSITES}
             placeholder={'Add websites...'}
-            sortedItems={viewModel.sortedWebsites}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
-            lockedSirens={lockedSirens}
+            mode={mode}
+            blocklistId={blocklistId}
           />
         ),
         keywords: () => (
@@ -204,10 +204,10 @@ export function BlocklistForm({
             }
             sirenType={SirenType.KEYWORDS}
             placeholder={'Add keywords...'}
-            sortedItems={viewModel.sortedKeywords}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
-            lockedSirens={lockedSirens}
+            mode={mode}
+            blocklistId={blocklistId}
           />
         ),
       }
@@ -216,13 +216,11 @@ export function BlocklistForm({
     },
     [
       dispatch,
-      viewModel.sortedApps,
-      viewModel.sortedWebsites,
-      viewModel.sortedKeywords,
+      mode,
+      blocklistId,
       toggleAppSiren,
       toggleTextSiren,
       isSirenSelected,
-      lockedSirens,
     ],
   )
 

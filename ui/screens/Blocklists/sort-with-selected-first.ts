@@ -1,6 +1,6 @@
 type SectionDivider = { type: 'divider'; id: string; label: string }
 
-export type SortedListItem<T> = { type: 'item'; item: T } | SectionDivider
+export type SortedListItem<T> = { type: 'siren'; siren: T } | SectionDivider
 
 export function sortWithSelectedFirst<T>(
   items: T[],
@@ -31,7 +31,7 @@ export function sortWithSelectedFirst<T>(
 
   if (selectedItems.length > 0) {
     result.push({ type: 'divider', id: 'divider-selected', label: 'Selected' })
-    selectedItems.forEach((item) => result.push({ type: 'item', item }))
+    selectedItems.forEach((siren) => result.push({ type: 'siren', siren }))
   }
 
   if (unselectedItems.length > 0) {
@@ -40,7 +40,7 @@ export function sortWithSelectedFirst<T>(
       id: 'divider-available',
       label: 'Available',
     })
-    unselectedItems.forEach((item) => result.push({ type: 'item', item }))
+    unselectedItems.forEach((siren) => result.push({ type: 'siren', siren }))
   }
 
   return result

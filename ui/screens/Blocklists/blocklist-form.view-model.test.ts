@@ -36,7 +36,7 @@ describe('selectBlocklistFormViewModel', () => {
     )
 
     expect(viewModel.type).toBe(BlocklistFormViewState.Creating)
-    expect(viewModel.sortedApps).toStrictEqual([])
+    expect(viewModel.sortedAndroidApps).toStrictEqual([])
     expect(viewModel.sortedWebsites).toStrictEqual([])
     expect(viewModel.sortedKeywords).toStrictEqual([])
   })
@@ -59,11 +59,11 @@ describe('selectBlocklistFormViewModel', () => {
       undefined,
     )
 
-    const appNames = viewModel.sortedApps
+    const appNames = viewModel.sortedAndroidApps
       .filter(
-        (i): i is { type: 'item'; item: AndroidSiren } => i.type === 'item',
+        (i): i is { type: 'siren'; siren: AndroidSiren } => i.type === 'siren',
       )
-      .map((i) => i.item.appName)
+      .map((i) => i.siren.appName)
     const expectedAppNames = ['Facebook', 'Instagram']
     expect(appNames).toStrictEqual(expectedAppNames)
   })
@@ -201,22 +201,22 @@ describe('selectBlocklistFormViewModel', () => {
       'blocklist-1',
     )
 
-    const appItems = viewModel.sortedApps.filter(
-      (i): i is { type: 'item'; item: AndroidSiren } => i.type === 'item',
+    const appItems = viewModel.sortedAndroidApps.filter(
+      (i): i is { type: 'siren'; siren: AndroidSiren } => i.type === 'siren',
     )
-    const firstAppName = appItems[0].item.appName
+    const firstAppName = appItems[0].siren.appName
     expect(firstAppName).toBe(instagramAndroidSiren.appName)
 
     const websiteItems = viewModel.sortedWebsites.filter(
-      (i): i is { type: 'item'; item: string } => i.type === 'item',
+      (i): i is { type: 'siren'; siren: string } => i.type === 'siren',
     )
-    const firstWebsite = websiteItems[0].item
+    const firstWebsite = websiteItems[0].siren
     expect(firstWebsite).toBe('twitter.com')
 
     const keywordItems = viewModel.sortedKeywords.filter(
-      (i): i is { type: 'item'; item: string } => i.type === 'item',
+      (i): i is { type: 'siren'; siren: string } => i.type === 'siren',
     )
-    const firstKeyword = keywordItems[0].item
+    const firstKeyword = keywordItems[0].siren
     expect(firstKeyword).toBe('gaming')
   })
 
