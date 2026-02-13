@@ -83,6 +83,21 @@ describe('inline-single-statement-handlers', () => {
           code: `const handleClick = () => {}`,
           filename: 'Component.tsx',
         },
+        // Destructuring pattern in declarator (non-Identifier) - should not report
+        {
+          code: `const { handleClick } = useHandlers()`,
+          filename: 'Component.tsx',
+        },
+        // Handler with regular function expression (not arrow) - should not report
+        {
+          code: `const handleClick = function() { doSomething() }`,
+          filename: 'Component.tsx',
+        },
+        // Handler without init - declarator with undefined init
+        {
+          code: `let handleClick`,
+          filename: 'Component.tsx',
+        },
       ],
 
       invalid: [
