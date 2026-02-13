@@ -222,6 +222,27 @@ describe('one-component-per-file', () => {
             },
           ],
         },
+        // Two function expression components - INVALID
+        {
+          code: `
+        const Header = function() {
+          return <header>Title</header>
+        }
+
+        const Footer = function() {
+          return <footer>Bottom</footer>
+        }
+      `,
+          errors: [
+            {
+              messageId: 'multipleComponents',
+              data: {
+                components: 'Header, Footer',
+                extra: 'Footer',
+              },
+            },
+          ],
+        },
       ],
     })
   })

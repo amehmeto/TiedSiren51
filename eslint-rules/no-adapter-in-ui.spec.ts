@@ -127,6 +127,17 @@ describe('no-adapter-in-ui', () => {
             },
           ],
         },
+        // Adapter method call via MemberExpression in app layer - NOT OK
+        {
+          code: `const selectors = sirenAdapter.getSelectors()`,
+          filename: '/project/app/(tabs)/home.tsx',
+          errors: [
+            {
+              messageId: 'noAdapterInUi',
+              data: { adapterName: 'sirenAdapter' },
+            },
+          ],
+        },
       ],
     })
   })

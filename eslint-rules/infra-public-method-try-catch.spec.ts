@@ -346,7 +346,7 @@ describe('infra-public-method-try-catch', () => {
       `,
           filename: '/project/infra/auth-gateway/fake-data.auth.gateway.ts',
         },
-        // Method outside class (plain function) - OK
+        // Standalone async function - not a class method, rule only applies to MethodDefinitions
         {
           code: `
         async function fetchData() {

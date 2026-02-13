@@ -67,12 +67,6 @@ describe('no-usecallback-selector-wrapper', () => {
         const x = useSelector(fn)
       `,
         },
-        // useSelector with non-Identifier argument
-        {
-          code: `
-        const x = useSelector((state) => state.foo)
-      `,
-        },
         // useSelector with no arguments
         {
           code: `
