@@ -1,4 +1,4 @@
-import { REAUTH_COOLDOWN_MS } from '@/core/__constants__/time'
+import { MINUTE } from '@/core/__constants__/time'
 import { DateProvider } from '@/core/_ports_/date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 
@@ -12,5 +12,5 @@ export function selectNeedsReauthentication(
   const reauthTime = dateProvider
     .parseISOString(lastReauthenticatedAt)
     .getTime()
-  return dateProvider.getNowMs() - reauthTime >= REAUTH_COOLDOWN_MS
+  return dateProvider.getNowMs() - reauthTime >= 5 * MINUTE
 }

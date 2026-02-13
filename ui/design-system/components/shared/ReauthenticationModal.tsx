@@ -26,6 +26,7 @@ export function ReauthenticationModal({
     selectReauthStatus(state),
   )
   const [password, setPassword] = useState('')
+  const isPasswordEmpty = password.length === 0
 
   const handleConfirm = async () => {
     const result = await dispatch(reauthenticate({ password }))
@@ -54,13 +55,12 @@ export function ReauthenticationModal({
           value={password}
           onChangeText={setPassword}
           placeholder="Enter your password"
-          testID="reauth-password-input"
         />
         {reauthError && <Text style={styles.error}>{reauthError}</Text>}
         <TiedSButton
           onPress={handleConfirm}
           text="Confirm"
-          isDisabled={isReauthenticating || password.length === 0}
+          isDisabled={isReauthenticating || isPasswordEmpty}
         />
       </View>
     </TiedSModal>

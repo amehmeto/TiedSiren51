@@ -1,8 +1,17 @@
 import { beforeEach, describe, expect, test } from 'vitest'
+import {
+  assertISODateString,
+  ISODateString,
+} from '@/core/_ports_/date-provider'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { selectNeedsReauthentication } from './selectNeedsReauthentication'
+
+function isoDate(value: string): ISODateString {
+  assertISODateString(value)
+  return value
+}
 
 describe('selectNeedsReauthentication', () => {
   let dateProvider: StubDateProvider
@@ -26,51 +35,38 @@ describe('selectNeedsReauthentication', () => {
     expect(shouldReauthenticate).toBe(true)
   })
 
-  test('should return false within 5 minutes of re-authentication', () => {
-    const store = createTestStore(
-      { dateProvider },
-      stateBuilder()
-        .withLastReauthenticatedAt('2024-01-15T10:01:00.000Z')
-        .build(),
-    )
+  test.each([
+    {
+      scenario: 'within 5 minutes',
+      lastReauthenticatedAt: '2024-01-15T10:01:00.000Z',
+      shouldNeedReauth: false,
+    },
+    {
+      scenario: 'at exactly 5 minutes',
+      lastReauthenticatedAt: '2024-01-15T10:00:00.000Z',
+      shouldNeedReauth: true,
+    },
+    {
+      scenario: 'after 5 minutes',
+      lastReauthenticatedAt: '2024-01-15T09:59:59.000Z',
+      shouldNeedReauth: true,
+    },
+  ])(
+    'should return $shouldNeedReauth $scenario of re-authentication',
+    ({ lastReauthenticatedAt, shouldNeedReauth }) => {
+      const store = createTestStore(
+        { dateProvider },
+        stateBuilder()
+          .withLastReauthenticatedAt(isoDate(lastReauthenticatedAt))
+          .build(),
+      )
 
-    const shouldReauthenticate = selectNeedsReauthentication(
-      store.getState(),
-      dateProvider,
-    )
+      const shouldReauthenticate = selectNeedsReauthentication(
+        store.getState(),
+        dateProvider,
+      )
 
-    expect(shouldReauthenticate).toBe(false)
-  })
-
-  test('should return true at exactly 5 minutes', () => {
-    const store = createTestStore(
-      { dateProvider },
-      stateBuilder()
-        .withLastReauthenticatedAt('2024-01-15T10:00:00.000Z')
-        .build(),
-    )
-
-    const shouldReauthenticate = selectNeedsReauthentication(
-      store.getState(),
-      dateProvider,
-    )
-
-    expect(shouldReauthenticate).toBe(true)
-  })
-
-  test('should return true after 5 minutes have elapsed', () => {
-    const store = createTestStore(
-      { dateProvider },
-      stateBuilder()
-        .withLastReauthenticatedAt('2024-01-15T09:59:59.000Z')
-        .build(),
-    )
-
-    const shouldReauthenticate = selectNeedsReauthentication(
-      store.getState(),
-      dateProvider,
-    )
-
-    expect(shouldReauthenticate).toBe(true)
-  })
+      expect(shouldReauthenticate).toBe(shouldNeedReauth)
+    },
+  )
 })

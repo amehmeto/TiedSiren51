@@ -44,9 +44,8 @@ export function authentificationFixture(
         _authUser: AuthUser,
         _password: string,
       ) {
-        authGateway.willResultWith = Promise.reject(
-          new Error('Invalid credentials'),
-        )
+        const error = new Error('Invalid credentials')
+        authGateway.willResultWith = Promise.reject(error)
       },
       authUserIs(authUser: AuthUser) {
         testStateBuilderProvider.setState((stateBuilder) =>
@@ -54,15 +53,15 @@ export function authentificationFixture(
         )
       },
       authGatewayWillRejectWith(errorMessage: string) {
-        authGateway.willResultWith = Promise.reject(new Error(errorMessage))
+        const error = new Error(errorMessage)
+        authGateway.willResultWith = Promise.reject(error)
       },
       reauthenticationWillSucceed() {
         authGateway.willReauthenticateWith = Promise.resolve()
       },
       reauthenticationWillFailWith(errorMessage: string) {
-        authGateway.willReauthenticateWith = Promise.reject(
-          new Error(errorMessage),
-        )
+        const error = new Error(errorMessage)
+        authGateway.willReauthenticateWith = Promise.reject(error)
       },
       nowIs(isoDate: ISODateString) {
         dateProvider.now = new Date(isoDate)
@@ -122,17 +121,17 @@ export function authentificationFixture(
       passwordResetShouldNotBeSent() {
         expect(authGateway.lastResetPasswordEmail).toBeNull()
       },
-      lastReauthenticatedAtShouldBe(expected: ISODateString | null) {
+      lastReauthenticatedAtShouldBe(isoTimestamp: ISODateString | null) {
         const state = store.getState()
-        expect(state.auth.lastReauthenticatedAt).toBe(expected)
+        expect(state.auth.lastReauthenticatedAt).toBe(isoTimestamp)
       },
       reauthShouldNotBeLoading() {
         const state = store.getState()
         expect(state.auth.isReauthenticating).toBe(false)
       },
-      reauthErrorShouldBe(expected: string) {
+      reauthErrorShouldBe(errorMessage: string) {
         const state = store.getState()
-        expect(state.auth.reauthError).toBe(expected)
+        expect(state.auth.reauthError).toBe(errorMessage)
       },
       reauthErrorShouldBeNull() {
         const state = store.getState()

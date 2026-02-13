@@ -186,6 +186,9 @@ export class FirebaseAuthGateway implements AuthGateway {
       const credential = EmailAuthProvider.credential(user.email, password)
       await reauthenticateWithCredential(user, credential)
     } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to reauthenticate: ${error}`,
+      )
       throw new Error(this.translateFirebaseError(error))
     }
   }

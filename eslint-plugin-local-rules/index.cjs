@@ -31,6 +31,7 @@ const noIconSizeMagicNumbers = require('../eslint-rules/no-icon-size-magic-numbe
 const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
 const noModuleLevelConstants = require('../eslint-rules/no-module-level-constants.cjs')
 const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressions.cjs')
+const noUnusedTestId = require('../eslint-rules/no-unused-test-id.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
 const noRedundantNullishTernary = require('../eslint-rules/no-redundant-nullish-ternary.cjs')
 const noSelectorPropDrilling = require('../eslint-rules/no-selector-prop-drilling.cjs')
@@ -107,6 +108,7 @@ module.exports = {
     'no-module-level-constants': noModuleLevelConstants,
     'require-named-regex': requireNamedRegex,
     'no-nested-call-expressions': noNestedCallExpressions,
+    'no-unused-test-id': noUnusedTestId,
     'no-redundant-nullish-ternary': noRedundantNullishTernary,
     'prefer-array-destructuring': preferArrayDestructuring,
     'prefer-object-destructuring': preferObjectDestructuring,
