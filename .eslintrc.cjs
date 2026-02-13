@@ -1,6 +1,7 @@
 // https://docs.expo.dev/guides/using-eslint/
 // ESM configuration file
 module.exports = {
+  root: true,
   ignorePatterns: ['node_modules', '!.claude', 'eslint-rules/*.spec.ts'],
   extends: [
     'expo',
