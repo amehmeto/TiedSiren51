@@ -1,5 +1,8 @@
 import { RootState } from '@/core/_redux_/createStore'
-import { AuthErrorType } from '@/core/auth/auth-error-type'
+import {
+  AuthBaseViewModel,
+  AuthErrorViewModel,
+} from '@/ui/screens/Auth/auth-view-model-base'
 
 export enum LoginViewState {
   Idle = 'IDLE',
@@ -7,30 +10,17 @@ export enum LoginViewState {
   Error = 'ERROR',
 }
 
-type IdleViewModel = {
-  type: LoginViewState.Idle
-  buttonText: string
-  isInputDisabled: boolean
-}
-
-type LoadingViewModel = {
-  type: LoginViewState.Loading
-  buttonText: string
-  isInputDisabled: boolean
-}
-
-type ErrorViewModel = {
-  type: LoginViewState.Error
-  buttonText: string
-  isInputDisabled: boolean
-  error: string
+type LoginErrorViewModel = AuthErrorViewModel<LoginViewState.Error> & {
   shouldClearPassword: boolean
 }
 
-export type LoginViewModel = IdleViewModel | LoadingViewModel | ErrorViewModel
+export type LoginViewModel =
+  | AuthBaseViewModel<LoginViewState.Idle>
+  | AuthBaseViewModel<LoginViewState.Loading>
+  | LoginErrorViewModel
 
 export function selectLoginViewModel(state: RootState): LoginViewModel {
-  const { isLoading, error, errorType } = state.auth
+  const { isLoading, error, isPasswordClearRequested } = state.auth
   const { Loading, Error, Idle } = LoginViewState
 
   if (isLoading) {
@@ -47,7 +37,7 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
       buttonText: 'LOG IN',
       isInputDisabled: false,
       error,
-      shouldClearPassword: errorType === AuthErrorType.Credential,
+      shouldClearPassword: isPasswordClearRequested,
     }
   }
 

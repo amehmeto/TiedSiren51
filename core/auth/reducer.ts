@@ -20,6 +20,7 @@ export type AuthState = {
   error: string | null
   errorType: AuthErrorType | null
   isPasswordResetSent: boolean
+  isPasswordClearRequested: boolean
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -32,6 +33,14 @@ export const clearError = createAction('auth/clearError')
 
 export const setError = createAction<string>('auth/setError')
 
+export const passwordClearRequested = createAction(
+  'auth/passwordClearRequested',
+)
+
+export const acknowledgePasswordClear = createAction(
+  'auth/acknowledgePasswordClear',
+)
+
 export const reducer = createReducer<AuthState>(
   {
     authUser: null,
@@ -39,6 +48,7 @@ export const reducer = createReducer<AuthState>(
     error: null,
     errorType: null,
     isPasswordResetSent: false,
+    isPasswordClearRequested: false,
   },
   (builder) => {
     const authThunks = [
@@ -65,6 +75,12 @@ export const reducer = createReducer<AuthState>(
         state.error = action.payload
         state.errorType = null
       })
+      .addCase(passwordClearRequested, (state) => {
+        state.isPasswordClearRequested = true
+      })
+      .addCase(acknowledgePasswordClear, (state) => {
+        state.isPasswordClearRequested = false
+      })
       .addCase(signInWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
       })
@@ -85,6 +101,7 @@ export const reducer = createReducer<AuthState>(
         state.error = null
         state.errorType = null
         state.isPasswordResetSent = false
+        state.isPasswordClearRequested = false
       })
       .addCase(resetPassword.pending, (state) => {
         state.isPasswordResetSent = false

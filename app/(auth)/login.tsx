@@ -10,8 +10,12 @@ import {
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
-import { AuthErrorType, isAuthErrorType } from '@/core/auth/auth-error-type'
-import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
+import {
+  acknowledgePasswordClear,
+  clearAuthState,
+  clearError,
+  setError,
+} from '@/core/auth/reducer'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
@@ -44,6 +48,9 @@ export default function LoginScreen() {
     dispatch(clearAuthState())
   }, [dispatch])
 
+  const shouldClearPassword =
+    viewModel.type === LoginViewState.Error && viewModel.shouldClearPassword
+
   const handleClose = () => {
     dispatch(clearAuthState())
     if (router.canGoBack()) {
@@ -57,7 +64,16 @@ export default function LoginScreen() {
   const handleSignIn = async () => {
     dispatch(clearError())
 
-    const { isValid, errors, data } = validateSignInInput(credentials)
+    if (shouldClearPassword) {
+      setCredentials((prev) => ({ ...prev, password: '' }))
+      dispatch(acknowledgePasswordClear())
+    }
+
+    const password = shouldClearPassword ? '' : credentials.password
+    const { isValid, errors, data } = validateSignInInput({
+      email: credentials.email,
+      password,
+    })
 
     if (!isValid) {
       const errorMessage = Object.values(errors).join(', ')
@@ -65,15 +81,7 @@ export default function LoginScreen() {
       return
     }
 
-    if (data) {
-      const result = await dispatch(signInWithEmail(data))
-      if (
-        signInWithEmail.rejected.match(result) &&
-        isAuthErrorType(result.error.code) &&
-        result.error.code === AuthErrorType.Credential
-      )
-        setCredentials((prev) => ({ ...prev, password: '' }))
-    }
+    if (data) await dispatch(signInWithEmail(data))
   }
 
   const handleEmailChange = (text: string) => {
@@ -85,6 +93,7 @@ export default function LoginScreen() {
   const handlePasswordChange = (text: string) => {
     setCredentials((prev) => ({ ...prev, password: text }))
 
+    if (shouldClearPassword) dispatch(acknowledgePasswordClear())
     if (viewModel.type === LoginViewState.Error) dispatch(clearError())
   }
 
@@ -128,7 +137,7 @@ export default function LoginScreen() {
           placeholder="Enter Your Password"
           accessibilityLabel="Password"
           placeholderTextColor={T.color.grey}
-          value={credentials.password}
+          value={shouldClearPassword ? '' : credentials.password}
           hasPasswordToggle={true}
           onChangeText={handlePasswordChange}
           textContentType="password"

@@ -1,6 +1,5 @@
 import { describe, expect, it } from 'vitest'
 import { stateBuilder } from '@/core/_tests_/state-builder'
-import { AuthErrorType } from '@/core/auth/auth-error-type'
 import {
   LoginViewModel,
   LoginViewState,
@@ -39,10 +38,10 @@ describe('selectLoginViewModel', () => {
   })
 
   describe('Error state', () => {
-    it('should return error view model with shouldClearPassword true for credential error', () => {
+    it('should return error view model with shouldClearPassword true when password clear requested', () => {
       const state = stateBuilder()
         .withAuthError('Invalid email or password.')
-        .withAuthErrorType(AuthErrorType.Credential)
+        .withPasswordClearRequested(true)
         .build()
       const expectedViewModel: LoginViewModel = {
         type: LoginViewState.Error,
@@ -57,30 +56,11 @@ describe('selectLoginViewModel', () => {
       expect(viewModel).toStrictEqual(expectedViewModel)
     })
 
-    it('should return error view model with shouldClearPassword true for user not found', () => {
-      const state = stateBuilder()
-        .withAuthError('No account found with this email.')
-        .withAuthErrorType(AuthErrorType.Credential)
-        .build()
-      const expectedViewModel: LoginViewModel = {
-        type: LoginViewState.Error,
-        buttonText: 'LOG IN',
-        isInputDisabled: false,
-        error: 'No account found with this email.',
-        shouldClearPassword: true,
-      }
-
-      const viewModel = selectLoginViewModel(state)
-
-      expect(viewModel).toStrictEqual(expectedViewModel)
-    })
-
-    it('should return error view model with shouldClearPassword false for network error', () => {
+    it('should return error view model with shouldClearPassword false when no password clear requested', () => {
       const state = stateBuilder()
         .withAuthError(
           'No internet connection. Please check your network and try again.',
         )
-        .withAuthErrorType(AuthErrorType.Network)
         .build()
       const expectedViewModel: LoginViewModel = {
         type: LoginViewState.Error,
@@ -88,24 +68,6 @@ describe('selectLoginViewModel', () => {
         isInputDisabled: false,
         error:
           'No internet connection. Please check your network and try again.',
-        shouldClearPassword: false,
-      }
-
-      const viewModel = selectLoginViewModel(state)
-
-      expect(viewModel).toStrictEqual(expectedViewModel)
-    })
-
-    it('should return error view model with shouldClearPassword false for too many requests', () => {
-      const state = stateBuilder()
-        .withAuthError('Too many requests. Please try again later.')
-        .withAuthErrorType(AuthErrorType.RateLimit)
-        .build()
-      const expectedViewModel: LoginViewModel = {
-        type: LoginViewState.Error,
-        buttonText: 'LOG IN',
-        isInputDisabled: false,
-        error: 'Too many requests. Please try again later.',
         shouldClearPassword: false,
       }
 
