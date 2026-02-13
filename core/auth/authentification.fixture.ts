@@ -122,20 +122,20 @@ export function authentificationFixture(
         expect(authGateway.lastResetPasswordEmail).toBeNull()
       },
       lastReauthenticatedAtShouldBe(isoTimestamp: ISODateString | null) {
-        const state = store.getState()
-        expect(state.auth.lastReauthenticatedAt).toBe(isoTimestamp)
+        const { lastReauthenticatedAt } = store.getState().auth
+        expect(lastReauthenticatedAt).toBe(isoTimestamp)
       },
       reauthShouldNotBeLoading() {
-        const state = store.getState()
-        expect(state.auth.isReauthenticating).toBe(false)
+        const { isReauthenticating } = store.getState().auth
+        expect(isReauthenticating).toBe(false)
       },
       reauthErrorShouldBe(errorMessage: string) {
-        const state = store.getState()
-        expect(state.auth.reauthError).toBe(errorMessage)
+        const { reauthError } = store.getState().auth
+        expect(reauthError).toBe(errorMessage)
       },
       reauthErrorShouldBeNull() {
-        const state = store.getState()
-        expect(state.auth.reauthError).toBeNull()
+        const { reauthError } = store.getState().auth
+        expect(reauthError).toBeNull()
       },
     },
   }

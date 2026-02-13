@@ -1,17 +1,9 @@
 import { beforeEach, describe, expect, test } from 'vitest'
-import {
-  assertISODateString,
-  ISODateString,
-} from '@/core/_ports_/date-provider'
+import { assertISODateString } from '@/core/_ports_/date-provider'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { selectNeedsReauthentication } from './selectNeedsReauthentication'
-
-function isoDate(value: string): ISODateString {
-  assertISODateString(value)
-  return value
-}
 
 describe('selectNeedsReauthentication', () => {
   let dateProvider: StubDateProvider
@@ -54,11 +46,10 @@ describe('selectNeedsReauthentication', () => {
   ])(
     'should return $shouldNeedReauth $scenario of re-authentication',
     ({ lastReauthenticatedAt, shouldNeedReauth }) => {
+      assertISODateString(lastReauthenticatedAt)
       const store = createTestStore(
         { dateProvider },
-        stateBuilder()
-          .withLastReauthenticatedAt(isoDate(lastReauthenticatedAt))
-          .build(),
+        stateBuilder().withLastReauthenticatedAt(lastReauthenticatedAt).build(),
       )
 
       const shouldReauthenticate = selectNeedsReauthentication(

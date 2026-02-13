@@ -634,7 +634,7 @@ module.exports = {
             allowNoArguments: true,
           },
         ],
-        'local-rules/no-unused-test-id': 'warn',
+        'local-rules/no-unused-test-id': 'error',
       },
     },
     // {
