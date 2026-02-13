@@ -42,49 +42,10 @@ const tabs: Tab[] = [
   },
 ]
 
-function handleTabBarIcon({
-  route,
-  color,
-  size,
-  focused: isFocused,
-  strictModeIcon,
-}: {
-  route: { name: string }
-  color: string
-  size: number
-  focused: boolean
-  strictModeIcon: React.ComponentProps<typeof Ionicons>['name']
-}) {
-  const tab = tabs.find((t) => t.name === route.name)
-  if (!tab) return null
-
-  const resolvedTab: Tab =
-    tab.name === 'strict-mode/index'
-      ? {
-          name: tab.name,
-          title: tab.title,
-          icon: strictModeIcon,
-          IconType: Ionicons,
-        }
-      : tab
-
-  return (
-    <AnimatedTabBarIcon
-      tab={resolvedTab}
-      color={color}
-      size={size}
-      isFocused={isFocused}
-    />
-  )
-}
-
 export default function TabLayout() {
   const isStrictModeActive = useSelector((state: RootState) =>
     selectIsStrictModeActive(state, dependencies.dateProvider),
   )
-
-  const strictModeIcon: React.ComponentProps<typeof Ionicons>['name'] =
-    isStrictModeActive ? 'lock-closed-outline' : 'lock-open-outline'
 
   const handleTabBarButton = (
     props: PressableProps,
@@ -106,8 +67,31 @@ export default function TabLayout() {
         tabBarActiveTintColor: T.color.lightBlue,
         tabBarInactiveTintColor: T.color.inactive,
         headerShown: false,
-        tabBarIcon: (props) =>
-          handleTabBarIcon({ ...props, route, strictModeIcon }),
+        tabBarIcon: ({ color, size, focused: isFocused }) => {
+          const tab = tabs.find((t) => t.name === route.name)
+          if (!tab) return null
+
+          const resolvedTab: Tab =
+            tab.name === 'strict-mode/index'
+              ? {
+                  name: tab.name,
+                  title: tab.title,
+                  icon: isStrictModeActive
+                    ? 'lock-closed-outline'
+                    : 'lock-open-outline',
+                  IconType: Ionicons,
+                }
+              : tab
+
+          return (
+            <AnimatedTabBarIcon
+              tab={resolvedTab}
+              color={color}
+              size={size}
+              isFocused={isFocused}
+            />
+          )
+        },
         tabBarButton: (props) =>
           handleTabBarButton(props, { route, navigation }),
       })}
