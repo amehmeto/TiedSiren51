@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
-import { isAuthErrorType } from '@/core/auth/auth-error-type'
+import { AuthErrorType, isAuthErrorType } from '@/core/auth/auth-error-type'
 import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
@@ -70,7 +70,7 @@ export default function LoginScreen() {
       if (
         signInWithEmail.rejected.match(result) &&
         isAuthErrorType(result.error.code) &&
-        result.error.code === 'CREDENTIAL'
+        result.error.code === AuthErrorType.Credential
       )
         setCredentials((prev) => ({ ...prev, password: '' }))
     }

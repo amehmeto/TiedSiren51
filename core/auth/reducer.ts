@@ -1,4 +1,10 @@
-import { createAction, createReducer } from '@reduxjs/toolkit'
+import {
+  createAction,
+  createReducer,
+  isFulfilled,
+  isPending,
+  isRejected,
+} from '@reduxjs/toolkit'
 import { AuthUser } from '@/core/auth/auth-user'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
@@ -35,6 +41,15 @@ export const reducer = createReducer<AuthState>(
     isPasswordResetSent: false,
   },
   (builder) => {
+    const authThunks = [
+      signInWithEmail,
+      signUpWithEmail,
+      signInWithGoogle,
+      signInWithApple,
+      resetPassword,
+      logOut,
+    ] as const
+
     builder
       .addCase(userAuthenticated, (state, action) => {
         state.authUser = action.payload
@@ -52,35 +67,19 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(signInWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
-        state.error = null
-        state.errorType = null
-        state.isLoading = false
       })
       .addCase(signUpWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
-        state.error = null
-        state.errorType = null
-        state.isLoading = false
       })
       .addCase(signInWithGoogle.fulfilled, (state, action) => {
         state.authUser = action.payload
-        state.error = null
-        state.errorType = null
-        state.isLoading = false
       })
       .addCase(signInWithApple.fulfilled, (state, action) => {
         state.authUser = action.payload
-        state.error = null
-        state.errorType = null
-        state.isLoading = false
       })
       .addCase(logOut.fulfilled, (state) => {
         state.authUser = null
-        state.error = null
-        state.errorType = null
-        state.isLoading = false
       })
-
       .addCase(clearAuthState, (state) => {
         state.isLoading = false
         state.error = null
@@ -88,64 +87,22 @@ export const reducer = createReducer<AuthState>(
         state.isPasswordResetSent = false
       })
       .addCase(resetPassword.pending, (state) => {
-        state.isLoading = true
-        state.error = null
-        state.errorType = null
         state.isPasswordResetSent = false
       })
       .addCase(resetPassword.fulfilled, (state) => {
-        state.isLoading = false
         state.isPasswordResetSent = true
       })
-      .addCase(resetPassword.rejected, (state, action) => {
-        state.isLoading = false
-        state.error = action.error.message ?? null
-        state.errorType = isAuthErrorType(action.error.code)
-          ? action.error.code
-          : null
-      })
-      .addCase(signInWithEmail.pending, (state) => {
+      .addMatcher(isPending(...authThunks), (state) => {
         state.isLoading = true
         state.error = null
         state.errorType = null
       })
-      .addCase(signUpWithEmail.pending, (state) => {
-        state.isLoading = true
+      .addMatcher(isFulfilled(...authThunks), (state) => {
         state.error = null
         state.errorType = null
-      })
-      .addCase(signInWithGoogle.pending, (state) => {
-        state.isLoading = true
-        state.error = null
-        state.errorType = null
-      })
-      .addCase(signInWithApple.pending, (state) => {
-        state.isLoading = true
-        state.error = null
-        state.errorType = null
-      })
-      .addCase(signInWithEmail.rejected, (state, action) => {
         state.isLoading = false
-        state.error = action.error.message ?? null
-        state.errorType = isAuthErrorType(action.error.code)
-          ? action.error.code
-          : null
       })
-      .addCase(signUpWithEmail.rejected, (state, action) => {
-        state.isLoading = false
-        state.error = action.error.message ?? null
-        state.errorType = isAuthErrorType(action.error.code)
-          ? action.error.code
-          : null
-      })
-      .addCase(signInWithGoogle.rejected, (state, action) => {
-        state.isLoading = false
-        state.error = action.error.message ?? null
-        state.errorType = isAuthErrorType(action.error.code)
-          ? action.error.code
-          : null
-      })
-      .addCase(signInWithApple.rejected, (state, action) => {
+      .addMatcher(isRejected(...authThunks), (state, action) => {
         state.isLoading = false
         state.error = action.error.message ?? null
         state.errorType = isAuthErrorType(action.error.code)
