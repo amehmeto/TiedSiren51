@@ -65,23 +65,6 @@ export function BlocklistForm({
     ),
   )
 
-  const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
-    {
-      name: '',
-      sirens: {
-        android: [],
-        ios: [],
-        windows: [],
-        macos: [],
-        linux: [],
-        websites: [],
-        keywords: [],
-      },
-    },
-  )
-
-  const [savedSelection] = useState(() => viewModel.savedSelection)
-
   const existingBlocklist =
     viewModel.type !== BlocklistFormViewState.Creating
       ? viewModel.existingBlocklist
@@ -94,6 +77,22 @@ export function BlocklistForm({
       ? viewModel.lockedToastMessage
       : undefined
 
+  const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
+    () =>
+      existingBlocklist ?? {
+        name: '',
+        sirens: {
+          android: [],
+          ios: [],
+          windows: [],
+          macos: [],
+          linux: [],
+          websites: [],
+          keywords: [],
+        },
+      },
+  )
+
   const [errors, setErrors] = useState<ErrorMessages>({})
   const [index, setIndex] = useState(0)
 
@@ -105,10 +104,7 @@ export function BlocklistForm({
 
   useEffect(() => {
     dispatch(fetchAvailableSirens())
-    if (mode === FormMode.Edit && existingBlocklist)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setBlocklist(existingBlocklist)
-  }, [mode, existingBlocklist, dispatch])
+  }, [dispatch])
 
   const isSirenSelected = useCallback(
     (sirenType: SirenType, sirenId: string) =>
@@ -182,10 +178,9 @@ export function BlocklistForm({
       const scenes: Record<BlocklistTabKey, () => React.JSX.Element> = {
         apps: () => (
           <AppsSelectionScene
-            androidApps={viewModel.availableSirens.android}
+            sortedApps={viewModel.sortedApps}
             toggleAppSiren={toggleAppSiren}
             isSirenSelected={isSirenSelected}
-            savedSelectedPackageNames={savedSelection.androidPackageNames}
             lockedSirens={lockedSirens}
           />
         ),
@@ -196,10 +191,9 @@ export function BlocklistForm({
             }
             sirenType={SirenType.WEBSITES}
             placeholder={'Add websites...'}
-            data={viewModel.availableSirens.websites}
+            sortedItems={viewModel.sortedWebsites}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
-            savedSelectedSirens={savedSelection.websites}
             lockedSirens={lockedSirens}
           />
         ),
@@ -210,10 +204,9 @@ export function BlocklistForm({
             }
             sirenType={SirenType.KEYWORDS}
             placeholder={'Add keywords...'}
-            data={viewModel.availableSirens.keywords}
+            sortedItems={viewModel.sortedKeywords}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
-            savedSelectedSirens={savedSelection.keywords}
             lockedSirens={lockedSirens}
           />
         ),
@@ -223,11 +216,12 @@ export function BlocklistForm({
     },
     [
       dispatch,
-      viewModel.availableSirens,
+      viewModel.sortedApps,
+      viewModel.sortedWebsites,
+      viewModel.sortedKeywords,
       toggleAppSiren,
       toggleTextSiren,
       isSirenSelected,
-      savedSelection,
       lockedSirens,
     ],
   )

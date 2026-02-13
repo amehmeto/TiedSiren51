@@ -9,6 +9,7 @@ import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.bu
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { buildSirens } from '@/core/_tests_/data-builders/sirens.builder'
 import { stateBuilder } from '@/core/_tests_/state-builder'
+import { AndroidSiren } from '@/core/siren/sirens'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import {
   BlocklistFormViewState,
@@ -24,16 +25,8 @@ describe('selectBlocklistFormViewModel', () => {
     dateProvider.now = new Date('2024-01-01T10:00:00.000Z')
   })
 
-  test('Creating mode returns Creating variant with empty savedSelection', () => {
+  test('Creating mode returns Creating variant with empty sorted lists', () => {
     const store = createTestStore({ dateProvider })
-    const expectedViewModel = {
-      type: BlocklistFormViewState.Creating,
-      savedSelection: {
-        androidPackageNames: [],
-        websites: [],
-        keywords: [],
-      },
-    }
 
     const viewModel = selectBlocklistFormViewModel(
       store.getState(),
@@ -42,18 +35,21 @@ describe('selectBlocklistFormViewModel', () => {
       undefined,
     )
 
-    expect(viewModel).toMatchObject(expectedViewModel)
+    expect(viewModel.type).toBe(BlocklistFormViewState.Creating)
+    expect(viewModel.sortedApps).toStrictEqual([])
+    expect(viewModel.sortedWebsites).toStrictEqual([])
+    expect(viewModel.sortedKeywords).toStrictEqual([])
   })
 
-  test('Creating mode includes available sirens from state', () => {
-    const expectedAvailableSirens = buildSirens({
+  test('Creating mode returns sorted available sirens', () => {
+    const availableSirens = buildSirens({
       android: [instagramAndroidSiren, facebookAndroidSiren],
       websites: ['youtube.com'],
       keywords: ['gaming'],
     })
     const store = createTestStore(
       { dateProvider },
-      stateBuilder().withAvailableSirens(expectedAvailableSirens).build(),
+      stateBuilder().withAvailableSirens(availableSirens).build(),
     )
 
     const viewModel = selectBlocklistFormViewModel(
@@ -63,7 +59,13 @@ describe('selectBlocklistFormViewModel', () => {
       undefined,
     )
 
-    expect(viewModel.availableSirens).toStrictEqual(expectedAvailableSirens)
+    const appNames = viewModel.sortedApps
+      .filter(
+        (i): i is { type: 'item'; item: AndroidSiren } => i.type === 'item',
+      )
+      .map((i) => i.item.appName)
+    const expectedAppNames = ['Facebook', 'Instagram']
+    expect(appNames).toStrictEqual(expectedAppNames)
   })
 
   test('Editing without strict mode returns Editing variant with empty lockedSirens', () => {
@@ -79,13 +81,10 @@ describe('selectBlocklistFormViewModel', () => {
       { dateProvider },
       stateBuilder().withBlocklists([blocklist]).build(),
     )
-    const expectedViewModel = {
-      type: BlocklistFormViewState.Editing,
-      lockedSirens: {
-        android: new Set(),
-        websites: new Set(),
-        keywords: new Set(),
-      },
+    const expectedLockedSirens = {
+      android: new Set(),
+      websites: new Set(),
+      keywords: new Set(),
     }
 
     const viewModel = selectBlocklistFormViewModel(
@@ -95,7 +94,8 @@ describe('selectBlocklistFormViewModel', () => {
       'blocklist-1',
     )
 
-    expect(viewModel).toMatchObject(expectedViewModel)
+    expect(viewModel.type).toBe(BlocklistFormViewState.Editing)
+    expect(viewModel.lockedSirens).toStrictEqual(expectedLockedSirens)
   })
 
   test('Editing with strict mode but blocklist not in session returns Editing variant', () => {
@@ -172,27 +172,27 @@ describe('selectBlocklistFormViewModel', () => {
     expect(viewModel).toMatchObject(expectedViewModel)
   })
 
-  test('savedSelection correctly maps packageNames, websites, and keywords', () => {
+  test('Editing mode places selected sirens first in sorted lists', () => {
+    const availableSirens = buildSirens({
+      android: [facebookAndroidSiren, instagramAndroidSiren],
+      websites: ['reddit.com', 'twitter.com', 'youtube.com'],
+      keywords: ['news', 'politics', 'gaming'],
+    })
     const blocklist = buildBlocklist({
       id: 'blocklist-1',
       sirens: {
-        android: [instagramAndroidSiren, facebookAndroidSiren],
-        websites: ['reddit.com', 'twitter.com'],
-        keywords: ['news', 'politics'],
+        android: [instagramAndroidSiren],
+        websites: ['twitter.com'],
+        keywords: ['gaming'],
       },
     })
     const store = createTestStore(
       { dateProvider },
-      stateBuilder().withBlocklists([blocklist]).build(),
+      stateBuilder()
+        .withAvailableSirens(availableSirens)
+        .withBlocklists([blocklist])
+        .build(),
     )
-    const expectedSavedSelection = {
-      androidPackageNames: [
-        instagramAndroidSiren.packageName,
-        facebookAndroidSiren.packageName,
-      ],
-      websites: ['reddit.com', 'twitter.com'],
-      keywords: ['news', 'politics'],
-    }
 
     const viewModel = selectBlocklistFormViewModel(
       store.getState(),
@@ -201,7 +201,23 @@ describe('selectBlocklistFormViewModel', () => {
       'blocklist-1',
     )
 
-    expect(viewModel.savedSelection).toStrictEqual(expectedSavedSelection)
+    const appItems = viewModel.sortedApps.filter(
+      (i): i is { type: 'item'; item: AndroidSiren } => i.type === 'item',
+    )
+    const firstAppName = appItems[0].item.appName
+    expect(firstAppName).toBe(instagramAndroidSiren.appName)
+
+    const websiteItems = viewModel.sortedWebsites.filter(
+      (i): i is { type: 'item'; item: string } => i.type === 'item',
+    )
+    const firstWebsite = websiteItems[0].item
+    expect(firstWebsite).toBe('twitter.com')
+
+    const keywordItems = viewModel.sortedKeywords.filter(
+      (i): i is { type: 'item'; item: string } => i.type === 'item',
+    )
+    const firstKeyword = keywordItems[0].item
+    expect(firstKeyword).toBe('gaming')
   })
 
   test('Non-existent blocklistId falls back to Creating', () => {

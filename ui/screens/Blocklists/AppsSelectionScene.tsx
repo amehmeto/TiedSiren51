@@ -1,5 +1,4 @@
 import * as React from 'react'
-import { useMemo } from 'react'
 import { FlatList, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 
@@ -8,42 +7,26 @@ import { isSirenLocked, LockedSirens } from '@/core/strict-mode/is-siren-locked'
 import { T } from '@/ui/design-system/theme'
 import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
-import {
-  SortedListItem,
-  sortWithSelectedFirst,
-} from '@/ui/screens/Blocklists/sort-with-selected-first'
+import { SortedListItem } from '@/ui/screens/Blocklists/sort-with-selected-first'
 
 type AppsSelectionSceneProps = Readonly<{
-  androidApps: AndroidSiren[]
+  sortedApps: SortedListItem<AndroidSiren>[]
   toggleAppSiren: (sirenType: SirenType.ANDROID, app: AndroidSiren) => void
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
-  savedSelectedPackageNames: string[]
   lockedSirens: LockedSirens
 }>
 
 export function AppsSelectionScene({
-  androidApps,
+  sortedApps,
   toggleAppSiren,
   isSirenSelected,
-  savedSelectedPackageNames,
   lockedSirens,
 }: AppsSelectionSceneProps) {
   const insets = useSafeAreaInsets()
 
-  const sortedListItems: SortedListItem<AndroidSiren>[] = useMemo(
-    () =>
-      sortWithSelectedFirst(
-        androidApps,
-        savedSelectedPackageNames,
-        (app) => app.packageName,
-        (app) => app.appName,
-      ),
-    [androidApps, savedSelectedPackageNames],
-  )
-
   return (
     <FlatList
-      data={sortedListItems}
+      data={sortedApps}
       keyExtractor={(item) =>
         item.type === 'divider' ? item.id : item.item.packageName
       }

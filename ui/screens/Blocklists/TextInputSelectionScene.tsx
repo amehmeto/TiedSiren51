@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useMemo, useState } from 'react'
+import { useState } from 'react'
 import { FlatList, StyleSheet, TextInput } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { SirenType } from '@/core/siren/sirens'
@@ -8,41 +8,29 @@ import { T } from '@/ui/design-system/theme'
 
 import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
-import {
-  SortedListItem,
-  sortWithSelectedFirst,
-} from '@/ui/screens/Blocklists/sort-with-selected-first'
+import { SortedListItem } from '@/ui/screens/Blocklists/sort-with-selected-first'
 
 type TextInputSelectionSceneProps = Readonly<{
   onSubmitEditing: (event: { nativeEvent: { text: string } }) => void
   placeholder: string
   sirenType: SirenType.WEBSITES | SirenType.KEYWORDS
-  data: string[]
+  sortedItems: SortedListItem<string>[]
   toggleSiren: (sirenType: SirenType, sirenId: string) => void
   isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
-  savedSelectedSirens: string[]
   lockedSirens: LockedSirens
 }>
-
-const identity = (s: string) => s
 
 export function TextInputSelectionScene({
   onSubmitEditing,
   placeholder,
   sirenType,
-  data,
+  sortedItems,
   toggleSiren,
   isSirenSelected,
-  savedSelectedSirens,
   lockedSirens,
 }: TextInputSelectionSceneProps) {
   const [isFocused, setIsFocused] = useState(false)
   const insets = useSafeAreaInsets()
-
-  const sortedListItems: SortedListItem<string>[] = useMemo(
-    () => sortWithSelectedFirst(data, savedSelectedSirens, identity, identity),
-    [data, savedSelectedSirens],
-  )
 
   return (
     <>
@@ -58,7 +46,7 @@ export function TextInputSelectionScene({
         onSubmitEditing={onSubmitEditing}
       />
       <FlatList
-        data={sortedListItems}
+        data={sortedItems}
         keyExtractor={(item) => (item.type === 'divider' ? item.id : item.item)}
         renderItem={({ item }) => {
           if (item.type === 'divider')

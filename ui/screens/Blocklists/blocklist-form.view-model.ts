@@ -2,11 +2,15 @@ import { DateProvider } from '@/core/_ports_/date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { selectBlocklistById } from '@/core/blocklist/selectors/selectBlocklistById'
-import { Sirens } from '@/core/siren/sirens'
+import { AndroidSiren } from '@/core/siren/sirens'
 import { formatDuration } from '@/core/strict-mode/format-duration'
 import { LockedSirens } from '@/core/strict-mode/is-siren-locked'
 import { selectLockedSirensForBlocklist } from '@/core/strict-mode/selectors/selectLockedSirensForBlocklist'
 import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
+import {
+  SortedListItem,
+  sortWithSelectedFirst,
+} from '@/ui/screens/Blocklists/sort-with-selected-first'
 
 export enum FormMode {
   Create = 'create',
@@ -19,18 +23,6 @@ export enum BlocklistFormViewState {
   EditingWithLockedSirens = 'EDITING_WITH_LOCKED_SIRENS',
 }
 
-export type SavedSelection = {
-  androidPackageNames: string[]
-  websites: string[]
-  keywords: string[]
-}
-
-const EMPTY_SAVED_SELECTION: SavedSelection = {
-  androidPackageNames: [],
-  websites: [],
-  keywords: [],
-}
-
 const EMPTY_LOCKED_SIRENS: LockedSirens = {
   android: new Set(),
   websites: new Set(),
@@ -39,24 +31,27 @@ const EMPTY_LOCKED_SIRENS: LockedSirens = {
 
 type CreatingViewModel = {
   type: BlocklistFormViewState.Creating
-  availableSirens: Sirens
-  savedSelection: SavedSelection
+  sortedApps: SortedListItem<AndroidSiren>[]
+  sortedWebsites: SortedListItem<string>[]
+  sortedKeywords: SortedListItem<string>[]
   lockedSirens: LockedSirens
 }
 
 type EditingViewModel = {
   type: BlocklistFormViewState.Editing
-  availableSirens: Sirens
   existingBlocklist: Blocklist
-  savedSelection: SavedSelection
+  sortedApps: SortedListItem<AndroidSiren>[]
+  sortedWebsites: SortedListItem<string>[]
+  sortedKeywords: SortedListItem<string>[]
   lockedSirens: LockedSirens
 }
 
 type EditingWithLockedSirensViewModel = {
   type: BlocklistFormViewState.EditingWithLockedSirens
-  availableSirens: Sirens
   existingBlocklist: Blocklist
-  savedSelection: SavedSelection
+  sortedApps: SortedListItem<AndroidSiren>[]
+  sortedWebsites: SortedListItem<string>[]
+  sortedKeywords: SortedListItem<string>[]
   lockedSirens: LockedSirens
   lockedToastMessage: string
 }
@@ -66,11 +61,35 @@ export type BlocklistFormViewModel =
   | EditingViewModel
   | EditingWithLockedSirensViewModel
 
-function computeSavedSelection(blocklist: Blocklist): SavedSelection {
+const identity = (s: string) => s
+
+function computeSortedLists(
+  availableAndroid: AndroidSiren[],
+  availableWebsites: string[],
+  availableKeywords: string[],
+  savedPackageNames: string[],
+  savedWebsites: string[],
+  savedKeywords: string[],
+) {
   return {
-    androidPackageNames: blocklist.sirens.android.map((app) => app.packageName),
-    websites: blocklist.sirens.websites,
-    keywords: blocklist.sirens.keywords,
+    sortedApps: sortWithSelectedFirst(
+      availableAndroid,
+      savedPackageNames,
+      (app) => app.packageName,
+      (app) => app.appName,
+    ),
+    sortedWebsites: sortWithSelectedFirst(
+      availableWebsites,
+      savedWebsites,
+      identity,
+      identity,
+    ),
+    sortedKeywords: sortWithSelectedFirst(
+      availableKeywords,
+      savedKeywords,
+      identity,
+      identity,
+    ),
   }
 }
 
@@ -86,13 +105,12 @@ export function selectBlocklistFormViewModel(
   blocklistId: string | undefined,
 ): BlocklistFormViewModel {
   const { Creating, Editing, EditingWithLockedSirens } = BlocklistFormViewState
-  const availableSirens = state.siren.availableSirens
+  const { android, websites, keywords } = state.siren.availableSirens
 
   if (mode === FormMode.Create) {
     return {
       type: Creating,
-      availableSirens,
-      savedSelection: EMPTY_SAVED_SELECTION,
+      ...computeSortedLists(android, websites, keywords, [], [], []),
       lockedSirens: EMPTY_LOCKED_SIRENS,
     }
   }
@@ -102,11 +120,23 @@ export function selectBlocklistFormViewModel(
   if (!existingBlocklist) {
     return {
       type: Creating,
-      availableSirens,
-      savedSelection: EMPTY_SAVED_SELECTION,
+      ...computeSortedLists(android, websites, keywords, [], [], []),
       lockedSirens: EMPTY_LOCKED_SIRENS,
     }
   }
+
+  const savedPackageNames = existingBlocklist.sirens.android.map(
+    (app) => app.packageName,
+  )
+
+  const sorted = computeSortedLists(
+    android,
+    websites,
+    keywords,
+    savedPackageNames,
+    existingBlocklist.sirens.websites,
+    existingBlocklist.sirens.keywords,
+  )
 
   const lockedSirens = selectLockedSirensForBlocklist(
     state,
@@ -120,9 +150,8 @@ export function selectBlocklistFormViewModel(
 
     return {
       type: EditingWithLockedSirens,
-      availableSirens,
       existingBlocklist,
-      savedSelection: computeSavedSelection(existingBlocklist),
+      ...sorted,
       lockedSirens,
       lockedToastMessage: `Locked (${timeLeftFormatted} left)`,
     }
@@ -130,9 +159,8 @@ export function selectBlocklistFormViewModel(
 
   return {
     type: Editing,
-    availableSirens,
     existingBlocklist,
-    savedSelection: computeSavedSelection(existingBlocklist),
+    ...sorted,
     lockedSirens: EMPTY_LOCKED_SIRENS,
   }
 }
