@@ -15,58 +15,62 @@ type TabBarButtonProps = {
   navigation: { navigate: (name: string) => void }
 }
 
-function useTabs(): Tab[] {
-  const isStrictModeActive = useSelector((state: RootState) =>
-    selectIsStrictModeActive(state, dependencies.dateProvider),
-  )
-
-  return [
-    {
-      name: 'home',
-      title: TabScreens.HOME,
-      icon: 'light-up',
-      IconType: Entypo,
-    },
-    {
-      name: 'strict-mode/index',
-      title: TabScreens.STRICT_MODE,
-      icon: isStrictModeActive ? 'lock-closed-outline' : 'lock-open-outline',
-      IconType: Ionicons,
-    },
-    {
-      name: 'blocklists',
-      title: TabScreens.BLOCKLIST,
-      icon: 'shield',
-      IconType: Entypo,
-    },
-    {
-      name: 'settings/index',
-      title: TabScreens.SETTINGS,
-      icon: 'settings-outline',
-      IconType: Ionicons,
-    },
-  ]
-}
+const tabs: Tab[] = [
+  {
+    name: 'home',
+    title: TabScreens.HOME,
+    icon: 'light-up',
+    IconType: Entypo,
+  },
+  {
+    name: 'strict-mode/index',
+    title: TabScreens.STRICT_MODE,
+    icon: 'lock-open-outline',
+    IconType: Ionicons,
+  },
+  {
+    name: 'blocklists',
+    title: TabScreens.BLOCKLIST,
+    icon: 'shield',
+    IconType: Entypo,
+  },
+  {
+    name: 'settings/index',
+    title: TabScreens.SETTINGS,
+    icon: 'settings-outline',
+    IconType: Ionicons,
+  },
+]
 
 function handleTabBarIcon({
-  tabs,
   route,
   color,
   size,
   focused: isFocused,
+  strictModeIcon,
 }: {
-  tabs: Tab[]
   route: { name: string }
   color: string
   size: number
   focused: boolean
+  strictModeIcon: React.ComponentProps<typeof Ionicons>['name']
 }) {
   const tab = tabs.find((t) => t.name === route.name)
   if (!tab) return null
 
+  const resolvedTab: Tab =
+    tab.name === 'strict-mode/index'
+      ? {
+          name: tab.name,
+          title: tab.title,
+          icon: strictModeIcon,
+          IconType: Ionicons,
+        }
+      : tab
+
   return (
     <AnimatedTabBarIcon
-      tab={tab}
+      tab={resolvedTab}
       color={color}
       size={size}
       isFocused={isFocused}
@@ -75,7 +79,12 @@ function handleTabBarIcon({
 }
 
 export default function TabLayout() {
-  const tabs = useTabs()
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
+
+  const strictModeIcon: React.ComponentProps<typeof Ionicons>['name'] =
+    isStrictModeActive ? 'lock-closed-outline' : 'lock-open-outline'
 
   const handleTabBarButton = (
     props: PressableProps,
@@ -97,7 +106,8 @@ export default function TabLayout() {
         tabBarActiveTintColor: T.color.lightBlue,
         tabBarInactiveTintColor: T.color.inactive,
         headerShown: false,
-        tabBarIcon: (props) => handleTabBarIcon({ tabs, ...props, route }),
+        tabBarIcon: (props) =>
+          handleTabBarIcon({ ...props, route, strictModeIcon }),
         tabBarButton: (props) =>
           handleTabBarButton(props, { route, navigation }),
       })}
