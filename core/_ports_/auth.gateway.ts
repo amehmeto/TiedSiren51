@@ -7,6 +7,7 @@ export interface AuthGateway {
   signInWithApple(): Promise<AuthUser>
   signUpWithEmail(email: string, password: string): Promise<AuthUser>
   signInWithEmail(email: string, password: string): Promise<AuthUser>
+  reauthenticate(password: string): Promise<void>
   resetPassword(email: string): Promise<void>
   logOut(): Promise<void>
 }

@@ -10,11 +10,13 @@ import {
 import {
   Auth,
   createUserWithEmailAndPassword,
+  EmailAuthProvider,
   getAuth,
   getReactNativePersistence,
   GoogleAuthProvider,
   initializeAuth,
   onAuthStateChanged,
+  reauthenticateWithCredential,
   sendPasswordResetEmail,
   signInWithCredential,
   signInWithEmailAndPassword,
@@ -35,6 +37,8 @@ enum FirebaseAuthErrorCode {
   CancelledByUser = 'auth/cancelled-popup-request',
   UserNotFound = 'auth/user-not-found',
   TooManyRequests = 'auth/too-many-requests',
+  WrongPassword = 'auth/wrong-password',
+  RequiresRecentLogin = 'auth/requires-recent-login',
 }
 
 enum GoogleSignInError {
@@ -61,6 +65,9 @@ export class FirebaseAuthGateway implements AuthGateway {
     [FirebaseAuthErrorCode.UserNotFound]: 'No account found with this email.',
     [FirebaseAuthErrorCode.TooManyRequests]:
       'Too many requests. Please try again later.',
+    [FirebaseAuthErrorCode.WrongPassword]: 'Incorrect password.',
+    [FirebaseAuthErrorCode.RequiresRecentLogin]:
+      'Please re-authenticate to perform this action.',
   }
 
   private static readonly GOOGLE_SIGN_IN_ERRORS: Record<
@@ -169,6 +176,18 @@ export class FirebaseAuthGateway implements AuthGateway {
     return error && error instanceof Error
       ? error.message
       : 'Unknown error occurred.'
+  }
+
+  async reauthenticate(password: string): Promise<void> {
+    try {
+      const user = this.auth.currentUser
+      if (!user?.email) throw new Error('No authenticated user found.')
+
+      const credential = EmailAuthProvider.credential(user.email, password)
+      await reauthenticateWithCredential(user, credential)
+    } catch (error) {
+      throw new Error(this.translateFirebaseError(error))
+    }
   }
 
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
