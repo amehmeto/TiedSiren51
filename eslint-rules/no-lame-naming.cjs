@@ -60,24 +60,10 @@ module.exports = {
 
     function isCallbackParameter(node) {
       const parent = node.parent
-      if (!parent) return false
+      if (parent?.type !== 'ArrowFunctionExpression') return false
 
-      if (parent.type === 'ArrowFunctionExpression') {
-        const grandparent = parent.parent
-        if (!grandparent) return false
-
-        // Array method callbacks: .map((item) => ...), .filter((item) => ...)
-        if (
-          grandparent.type === 'CallExpression' &&
-          grandparent.callee.type === 'MemberExpression'
-        )
-          return true
-
-        // Passed as argument: someFunction((item) => ...)
-        if (grandparent.type === 'CallExpression') return true
-      }
-
-      return false
+      const grandparent = parent.parent
+      return grandparent?.type === 'CallExpression'
     }
 
     return {
@@ -99,6 +85,20 @@ module.exports = {
             messageId: 'noLameVariableName',
             data: { name: node.name },
           })
+      },
+
+      // Check arrow function parameters (but not callback params)
+      ArrowFunctionExpression(node) {
+        for (const param of node.params) {
+          if (param.type !== 'Identifier') continue
+          if (!forbiddenVariables.has(param.name)) continue
+          if (isCallbackParameter(param)) continue
+          context.report({
+            node: param,
+            messageId: 'noLameVariableName',
+            data: { name: param.name },
+          })
+        }
       },
 
       FunctionDeclaration(node) {

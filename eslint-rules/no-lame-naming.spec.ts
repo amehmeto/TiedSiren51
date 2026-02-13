@@ -43,6 +43,18 @@ describe('no-lame-naming', () => {
           code: 'const data = fetchData()',
           options: [{ forbiddenVariables: ['foo'] }],
         },
+        // Object method with descriptive name is fine
+        { code: 'const obj = { sortSirens() { return [] } }' },
+        // Arrow function param with allowed name is fine
+        { code: 'const fn = (user) => user.name' },
+        // Destructuring variable declarator (not Identifier)
+        { code: 'const { data } = getResponse()' },
+        // Arrow function with destructured param (not Identifier)
+        { code: 'const fn = ({ data }) => data.toString()' },
+        // Export default anonymous function (no id)
+        { code: 'export default function() {}' },
+        // Destructuring in arrow function variable declarator (id is not Identifier)
+        { code: 'const { length } = () => {}' },
       ],
 
       invalid: [
@@ -125,6 +137,26 @@ describe('no-lame-naming', () => {
             {
               messageId: 'noLameFunctionName',
               data: { name: 'processData' },
+            },
+          ],
+        },
+        // Object method with forbidden function pattern
+        {
+          code: 'const obj = { computeTotal() { return 42 } }',
+          errors: [
+            {
+              messageId: 'noLameFunctionName',
+              data: { name: 'computeTotal' },
+            },
+          ],
+        },
+        // Arrow function parameter with forbidden name (not a callback)
+        {
+          code: 'const fn = (data) => data.toString()',
+          errors: [
+            {
+              messageId: 'noLameVariableName',
+              data: { name: 'data' },
             },
           ],
         },
