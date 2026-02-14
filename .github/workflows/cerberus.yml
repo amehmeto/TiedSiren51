@@ -1,3 +1,25 @@
+# ──────────────────────────────────────────────────────────────
+#
+#                     ╱▔▔╲       ╱▔▔╲       ╱▔▔╲
+#                    │ ◉◉ │     │ ◉◉ │     │ ◉◉ │
+#                     ╲▂▂╱  ╲   │╱  ╲│   ╱  ╲▂▂╱
+#                       ╲    ╲▁▁▁▁▁▁▁╱    ╱
+#                        ╲▁▁▁▁▁▁▁▁▁▁▁▁▁▁╱
+#                           │ CERBERUS │
+#                           │▓▓▓▓▓▓▓▓▓▓│
+#                          ╱│          │╲
+#                         ╱ │          │ ╲
+#                        ╱  │          │  ╲
+#                      ╱▔╲ ╱▔╲        ╱▔╲ ╱▔╲
+#                     │░░│ │░░│      │░░│ │░░│
+#                      ▔▔   ▔▔        ▔▔   ▔▔
+#
+#           « None shall merge without passing all three heads »
+#
+#              HEAD 1: Lint  │  HEAD 2: Test  │  HEAD 3: Build
+#
+# ──────────────────────────────────────────────────────────────
+
 # Cerberus (Κέρβερος) - Three-headed guardian of the underworld
 # https://www.wikiwand.com/en/articles/Cerberus
 #
