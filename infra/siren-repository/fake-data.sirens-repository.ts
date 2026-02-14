@@ -51,4 +51,17 @@ export class FakeDataSirensRepository implements SirensRepository {
     ]
     return Promise.resolve()
   }
+
+  deleteAllSirens(): Promise<void> {
+    this.selectableSirens = {
+      android: [],
+      ios: [],
+      windows: [],
+      macos: [],
+      linux: [],
+      websites: [],
+      keywords: [],
+    }
+    return Promise.resolve()
+  }
 }

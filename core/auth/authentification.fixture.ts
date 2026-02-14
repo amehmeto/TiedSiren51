@@ -7,7 +7,10 @@ import {
   stateBuilder,
   stateBuilderProvider,
 } from '@/core/_tests_/state-builder'
+import { AuthError } from '@/core/auth/auth-error'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
+import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
@@ -44,7 +47,10 @@ export function authentificationFixture(
         _authUser: AuthUser,
         _password: string,
       ) {
-        const error = new Error('Invalid credentials')
+        const error = new AuthError(
+          'Invalid credentials',
+          AuthErrorType.Credential,
+        )
         authGateway.willResultWith = Promise.reject(error)
       },
       authUserIs(authUser: AuthUser) {
@@ -52,8 +58,11 @@ export function authentificationFixture(
           stateBuilder.withAuthUser(authUser),
         )
       },
-      authGatewayWillRejectWith(errorMessage: string) {
-        const error = new Error(errorMessage)
+      authGatewayWillRejectWith(
+        errorMessage: string,
+        errorType: AuthErrorType = AuthErrorType.Unknown,
+      ) {
+        const error = new AuthError(errorMessage, errorType)
         authGateway.willResultWith = Promise.reject(error)
       },
       reauthenticationWillSucceed() {
@@ -62,6 +71,13 @@ export function authentificationFixture(
       reauthenticationWillFailWith(errorMessage: string) {
         const error = new Error(errorMessage)
         authGateway.willReauthenticateWith = Promise.reject(error)
+      },
+      accountDeletionWillSucceed() {
+        authGateway.willDeleteAccountWith = Promise.resolve()
+      },
+      accountDeletionWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willDeleteAccountWith = Promise.reject(error)
       },
       nowIs(isoDate: ISODateString) {
         dateProvider.now = new Date(isoDate)
@@ -93,6 +109,13 @@ export function authentificationFixture(
       reauthenticate(password: string) {
         return store.dispatch(reauthenticate({ password }))
       },
+      deleteAccount() {
+        store = createTestStore(
+          { authGateway, dateProvider },
+          testStateBuilderProvider.getState(),
+        )
+        return store.dispatch(deleteAccount())
+      },
     },
     then: {
       userShouldBeAuthenticated(authUser: AuthUser) {
@@ -107,6 +130,10 @@ export function authentificationFixture(
         const state = store.getState()
         expect(state.auth.error).toBe(expectedError)
       },
+      authErrorTypeShouldBe(expected: AuthErrorType) {
+        const state = store.getState()
+        expect(state.auth.errorType).toBe(expected)
+      },
       authShouldBeLoading(isLoading: boolean) {
         const state = store.getState()
         expect(state.auth.isLoading).toBe(isLoading)
@@ -120,6 +147,9 @@ export function authentificationFixture(
       },
       passwordResetShouldNotBeSent() {
         expect(authGateway.lastResetPasswordEmail).toBeNull()
+      },
+      passwordShouldBeCleared() {
+        expect(store.getState().auth.password).toBe('')
       },
       lastReauthenticatedAtShouldBe(expectedDate: ISODateString | null) {
         const { lastReauthenticatedAt } = store.getState().auth
@@ -136,6 +166,14 @@ export function authentificationFixture(
       reauthErrorShouldBeNull() {
         const { reauthError } = store.getState().auth
         expect(reauthError).toBeNull()
+      },
+      accountDeletionShouldNotBeLoading() {
+        const { isDeletingAccount } = store.getState().auth
+        expect(isDeletingAccount).toBe(false)
+      },
+      deleteAccountErrorShouldBe(errorMessage: string) {
+        const { deleteAccountError } = store.getState().auth
+        expect(deleteAccountError).toBe(errorMessage)
       },
     },
   }

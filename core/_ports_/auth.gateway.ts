@@ -10,4 +10,5 @@ export interface AuthGateway {
   reauthenticate(password: string): Promise<void>
   resetPassword(email: string): Promise<void>
   logOut(): Promise<void>
+  deleteAccount(): Promise<void>
 }

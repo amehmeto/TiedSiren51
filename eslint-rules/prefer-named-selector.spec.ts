@@ -76,6 +76,14 @@ describe('prefer-named-selector', () => {
         {
           code: `useSelector((state) => {})`,
         },
+        // Selector with extra args - OK (not a passthrough)
+        {
+          code: `useSelector((state) => selectFiltered(state, filter))`,
+        },
+        // Selector with no args - OK (different call pattern)
+        {
+          code: `useSelector((state) => selectAll())`,
+        },
       ],
 
       invalid: [
@@ -126,6 +134,39 @@ describe('prefer-named-selector', () => {
             {
               messageId: 'preferNamedSelector',
               data: { sliceName: 'blocklist', SliceName: 'Blocklist' },
+            },
+          ],
+        },
+        // Redundant wrapper around named selector
+        {
+          code: `useSelector((state) => selectLoginViewModel(state))`,
+          output: `useSelector(selectLoginViewModel)`,
+          errors: [
+            {
+              messageId: 'redundantSelectorWrapper',
+              data: { selectorName: 'selectLoginViewModel' },
+            },
+          ],
+        },
+        // Redundant wrapper with different param name
+        {
+          code: `useSelector((s) => selectFoo(s))`,
+          output: `useSelector(selectFoo)`,
+          errors: [
+            {
+              messageId: 'redundantSelectorWrapper',
+              data: { selectorName: 'selectFoo' },
+            },
+          ],
+        },
+        // Redundant wrapper in block body
+        {
+          code: `useSelector((state) => { return selectBar(state) })`,
+          output: `useSelector(selectBar)`,
+          errors: [
+            {
+              messageId: 'redundantSelectorWrapper',
+              data: { selectorName: 'selectBar' },
             },
           ],
         },

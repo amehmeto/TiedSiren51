@@ -26,9 +26,7 @@ export function BlocklistsModal({
 }: BlocklistsModalProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
-  const blocklists = useSelector((state: RootState) =>
-    selectAllBlocklists(state),
-  )
+  const blocklists = useSelector(selectAllBlocklists)
   const isStrictModeActive = useSelector((state: RootState) =>
     selectIsStrictModeActive(state, dependencies.dateProvider),
   )

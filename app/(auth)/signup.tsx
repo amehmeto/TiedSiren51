@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -10,8 +10,13 @@ import {
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
-import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
-import { selectAuthStatus } from '@/core/auth/selectors/selectAuthStatus'
+import {
+  clearAuthState,
+  clearError,
+  setEmail,
+  setError,
+  setPassword,
+} from '@/core/auth/reducer'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
@@ -21,16 +26,14 @@ import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSClos
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
+import { selectSignUpViewModel } from '@/ui/screens/Auth/SignUp/sign-up.view-model'
 
 export default function SignUpScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const [credentials, setCredentials] = useState({
-    email: '',
-    password: '',
-  })
 
-  const { isLoading, error } = useSelector(selectAuthStatus)
+  const viewModel = useSelector(selectSignUpViewModel)
+  const { error } = viewModel
 
   useEffect(() => {
     dispatch(clearAuthState())
@@ -49,27 +52,17 @@ export default function SignUpScreen() {
   const handleSignUp = async () => {
     dispatch(clearError())
 
-    const validation = validateSignUpInput(credentials)
+    const { errorMessage, data: validCredentials } = validateSignUpInput({
+      email: viewModel.email,
+      password: viewModel.password,
+    })
 
-    if (!validation.isValid) {
-      const errorMessage = Object.values(validation.errors).join(', ')
+    if (errorMessage) {
       dispatch(setError(errorMessage))
       return
     }
 
-    if (validation.data) await dispatch(signUpWithEmail(validation.data))
-  }
-
-  const handleEmailChange = (text: string) => {
-    setCredentials((prev) => ({ ...prev, email: text }))
-
-    if (error) dispatch(clearError())
-  }
-
-  const handlePasswordChange = (text: string) => {
-    setCredentials((prev) => ({ ...prev, password: text }))
-
-    if (error) dispatch(clearError())
+    if (validCredentials) await dispatch(signUpWithEmail(validCredentials))
   }
 
   return (
@@ -99,8 +92,11 @@ export default function SignUpScreen() {
           placeholder="Your Email"
           accessibilityLabel="Email"
           placeholderTextColor={T.color.grey}
-          value={credentials.email}
-          onChangeText={handleEmailChange}
+          value={viewModel.email}
+          onChangeText={(text) => {
+            dispatch(setEmail(text))
+            if (error) dispatch(clearError())
+          }}
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -109,8 +105,11 @@ export default function SignUpScreen() {
           accessibilityLabel="Password"
           placeholderTextColor={T.color.grey}
           hasPasswordToggle={true}
-          value={credentials.password}
-          onChangeText={handlePasswordChange}
+          value={viewModel.password}
+          onChangeText={(text) => {
+            dispatch(setPassword(text))
+            if (error) dispatch(clearError())
+          }}
           textContentType="newPassword"
           autoComplete="new-password"
           autoCapitalize="none"
@@ -118,8 +117,8 @@ export default function SignUpScreen() {
 
         <TiedSButton
           onPress={handleSignUp}
-          text={isLoading ? 'CREATING ACCOUNT...' : 'CREATE YOUR ACCOUNT'}
-          isDisabled={isLoading}
+          text={viewModel.buttonText}
+          isDisabled={viewModel.isInputDisabled}
         />
         {error && (
           <Text

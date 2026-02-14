@@ -38,6 +38,11 @@ export class InMemoryRepository<T extends { id: string }> {
     return Promise.resolve()
   }
 
+  async deleteAll(): Promise<void> {
+    this.entities.clear()
+    return Promise.resolve()
+  }
+
   update(updatePayload: UpdatePayload<T>) {
     const entity = this.entities.get(updatePayload.id)
     if (!entity)

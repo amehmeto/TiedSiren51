@@ -8,4 +8,5 @@ export interface BlockSessionRepository {
   findById(sessionId: string): Promise<BlockSession>
   update(session: UpdatePayload<BlockSession>): Promise<void>
   delete(sessionId: string): Promise<void>
+  deleteAll(): Promise<void>
 }

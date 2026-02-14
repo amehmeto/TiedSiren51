@@ -15,8 +15,7 @@ describe('validateSignInInput', () => {
 
     const result = validateSignInInput(expectedData)
 
-    expect(result.isValid).toBe(true)
-    expect(result.errors).toStrictEqual({})
+    expect(result.errorMessage).toBeNull()
     expect(result.data).toStrictEqual(expectedData)
   })
 
@@ -25,10 +24,8 @@ describe('validateSignInInput', () => {
       email: '',
       password: 'password123',
     })
-    const emailError = result.errors.email
 
-    expect(result.isValid).toBe(false)
-    expect(emailError).toBeDefined()
+    expect(result.errorMessage).not.toBeNull()
   })
 
   it('should return invalid result for missing password', () => {
@@ -36,10 +33,8 @@ describe('validateSignInInput', () => {
       email: 'user@example.com',
       password: '',
     })
-    const passwordError = result.errors.password
 
-    expect(result.isValid).toBe(false)
-    expect(passwordError).toBeDefined()
+    expect(result.errorMessage).not.toBeNull()
   })
 })
 
@@ -52,8 +47,7 @@ describe('validateSignUpInput', () => {
 
     const result = validateSignUpInput(expectedData)
 
-    expect(result.isValid).toBe(true)
-    expect(result.errors).toStrictEqual({})
+    expect(result.errorMessage).toBeNull()
     expect(result.data).toStrictEqual(expectedData)
   })
 
@@ -62,10 +56,8 @@ describe('validateSignUpInput', () => {
       email: 'user@example.com',
       password: 'weak',
     })
-    const passwordError = result.errors.password
 
-    expect(result.isValid).toBe(false)
-    expect(passwordError).toBeDefined()
+    expect(result.errorMessage).not.toBeNull()
   })
 })
 
@@ -75,17 +67,14 @@ describe('validateForgotPasswordInput', () => {
 
     const result = validateForgotPasswordInput(expectedData)
 
-    expect(result.isValid).toBe(true)
-    expect(result.errors).toStrictEqual({})
+    expect(result.errorMessage).toBeNull()
     expect(result.data).toStrictEqual(expectedData)
   })
 
   it('should return invalid result for empty email', () => {
     const result = validateForgotPasswordInput({ email: '' })
-    const emailError = result.errors.email
 
-    expect(result.isValid).toBe(false)
-    expect(emailError).toBeDefined()
+    expect(result.errorMessage).not.toBeNull()
   })
 })
 

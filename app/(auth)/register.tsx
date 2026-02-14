@@ -2,7 +2,6 @@ import { useRouter } from 'expo-router'
 import React, { useEffect } from 'react'
 import { View, Text, StyleSheet, Image } from 'react-native'
 import { useSelector } from 'react-redux'
-import { RootState } from '@/core/_redux_/createStore'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
@@ -10,9 +9,7 @@ import { T } from '@/ui/design-system/theme'
 const logoSource = require('@/assets/tiedsirenlogo.png')
 
 export default function RegisterScreen() {
-  const isUserAuthenticated = useSelector((state: RootState) =>
-    selectIsUserAuthenticated(state),
-  )
+  const isUserAuthenticated = useSelector(selectIsUserAuthenticated)
   const router = useRouter()
 
   useEffect(() => {

@@ -91,4 +91,27 @@ export class PouchdbSirensRepository implements SirensRepository {
       throw error
     }
   }
+
+  async deleteAllSirens(): Promise<void> {
+    try {
+      const doc = await this.db.get('sirens')
+      await this.db.put({
+        ...doc,
+        _id: 'sirens',
+        _rev: doc._rev,
+        android: [],
+        ios: [],
+        windows: [],
+        macos: [],
+        linux: [],
+        websites: [],
+        keywords: [],
+      })
+    } catch (error) {
+      this.logger.error(
+        `[PouchdbSirensRepository] Failed to deleteAllSirens: ${error}`,
+      )
+      throw error
+    }
+  }
 }

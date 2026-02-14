@@ -18,6 +18,7 @@ import {
   onAuthStateChanged,
   reauthenticateWithCredential,
   sendPasswordResetEmail,
+  deleteUser,
   signInWithCredential,
   signInWithEmailAndPassword,
   signOut,
@@ -25,6 +26,8 @@ import {
 } from 'firebase/auth'
 import { AuthGateway } from '@/core/_ports_/auth.gateway'
 import { Logger } from '@/core/_ports_/logger'
+import { AuthError } from '@/core/auth/auth-error'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
 import { firebaseConfig } from './firebaseConfig'
 
@@ -37,6 +40,7 @@ enum FirebaseAuthErrorCode {
   CancelledByUser = 'auth/cancelled-popup-request',
   UserNotFound = 'auth/user-not-found',
   TooManyRequests = 'auth/too-many-requests',
+  NetworkRequestFailed = 'auth/network-request-failed',
   WrongPassword = 'auth/wrong-password',
   RequiresRecentLogin = 'auth/requires-recent-login',
 }
@@ -50,6 +54,23 @@ enum GoogleSignInError {
 
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
+
+  private static readonly FIREBASE_ERROR_TYPES: Record<
+    FirebaseAuthErrorCode,
+    AuthErrorType
+  > = {
+    [FirebaseAuthErrorCode.EmailAlreadyInUse]: AuthErrorType.Validation,
+    [FirebaseAuthErrorCode.InvalidEmail]: AuthErrorType.Validation,
+    [FirebaseAuthErrorCode.WeakPassword]: AuthErrorType.Validation,
+    [FirebaseAuthErrorCode.InvalidCredential]: AuthErrorType.Credential,
+    [FirebaseAuthErrorCode.PopupClosedByUser]: AuthErrorType.Cancelled,
+    [FirebaseAuthErrorCode.CancelledByUser]: AuthErrorType.Cancelled,
+    [FirebaseAuthErrorCode.UserNotFound]: AuthErrorType.Credential,
+    [FirebaseAuthErrorCode.TooManyRequests]: AuthErrorType.RateLimit,
+    [FirebaseAuthErrorCode.NetworkRequestFailed]: AuthErrorType.Network,
+    [FirebaseAuthErrorCode.WrongPassword]: AuthErrorType.Credential,
+    [FirebaseAuthErrorCode.RequiresRecentLogin]: AuthErrorType.Unknown,
+  }
 
   private static readonly FIREBASE_ERRORS: Record<
     FirebaseAuthErrorCode,
@@ -65,9 +86,21 @@ export class FirebaseAuthGateway implements AuthGateway {
     [FirebaseAuthErrorCode.UserNotFound]: 'No account found with this email.',
     [FirebaseAuthErrorCode.TooManyRequests]:
       'Too many requests. Please try again later.',
+    [FirebaseAuthErrorCode.NetworkRequestFailed]:
+      'No internet connection. Please check your network and try again.',
     [FirebaseAuthErrorCode.WrongPassword]: 'Incorrect password.',
     [FirebaseAuthErrorCode.RequiresRecentLogin]:
       'Please re-authenticate to perform this action.',
+  }
+
+  private static readonly GOOGLE_ERROR_TYPES: Record<
+    GoogleSignInError,
+    AuthErrorType
+  > = {
+    [GoogleSignInError.SignInCancelled]: AuthErrorType.Cancelled,
+    [GoogleSignInError.InProgress]: AuthErrorType.Unknown,
+    [GoogleSignInError.PlayServicesNotAvailable]: AuthErrorType.Unknown,
+    [GoogleSignInError.MissingIdToken]: AuthErrorType.Unknown,
   }
 
   private static readonly GOOGLE_SIGN_IN_ERRORS: Record<
@@ -171,18 +204,29 @@ export class FirebaseAuthGateway implements AuthGateway {
     })
   }
 
-  private translateFirebaseError(error: unknown): string {
-    if (this.isFirebaseAuthError(error))
-      return FirebaseAuthGateway.FIREBASE_ERRORS[error.code]
+  private toAuthError(error: unknown): AuthError {
+    if (this.isFirebaseAuthError(error)) {
+      return new AuthError(
+        FirebaseAuthGateway.FIREBASE_ERRORS[error.code],
+        FirebaseAuthGateway.FIREBASE_ERROR_TYPES[error.code],
+      )
+    }
 
     if (this.isGoogleSignInError(error)) {
       const pattern = this.getGoogleSignInErrorPattern(error)
-      if (pattern) return FirebaseAuthGateway.GOOGLE_SIGN_IN_ERRORS[pattern]
+      if (pattern) {
+        return new AuthError(
+          FirebaseAuthGateway.GOOGLE_SIGN_IN_ERRORS[pattern],
+          FirebaseAuthGateway.GOOGLE_ERROR_TYPES[pattern],
+        )
+      }
     }
 
-    return error && error instanceof Error
-      ? error.message
-      : 'Unknown error occurred.'
+    const message =
+      error && error instanceof Error
+        ? error.message
+        : 'Unknown error occurred.'
+    return new AuthError(message, AuthErrorType.Unknown)
   }
 
   async reauthenticate(password: string): Promise<void> {
@@ -196,7 +240,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to reauthenticate: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -215,7 +259,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to signInWithEmail: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -234,7 +278,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to signUpWithEmail: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -262,7 +306,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to signInWithGoogle: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -273,7 +317,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to signInWithApple: ${error}`,
       )
-      throw error
+      throw this.toAuthError(error)
     }
   }
 
@@ -284,7 +328,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to resetPassword: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -296,13 +340,27 @@ export class FirebaseAuthGateway implements AuthGateway {
     this.onUserLoggedOutListener = listener
   }
 
+  async deleteAccount(): Promise<void> {
+    try {
+      const user = this.auth.currentUser
+      if (!user) throw new Error('No authenticated user found.')
+
+      await deleteUser(user)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to delete account: ${error}`,
+      )
+      throw this.toAuthError(error)
+    }
+  }
+
   async logOut(): Promise<void> {
     try {
       if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut()
       await signOut(this.auth)
     } catch (error) {
       this.logger.error(`[FirebaseAuthGateway] Failed to logOut: ${error}`)
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 }

@@ -9,8 +9,7 @@ import {
 } from './auth.schema'
 
 export interface ValidationResult<T = SignInInput | SignUpInput> {
-  isValid: boolean
-  errors: Record<string, string>
+  errorMessage: string | null
   data?: T
 }
 
@@ -33,11 +32,9 @@ export function validateForgotPasswordInput(
 }
 
 export function getForgotPasswordValidationError(email: string): string | null {
-  const validation = validateForgotPasswordInput({ email })
+  const { errorMessage } = validateForgotPasswordInput({ email })
 
-  return !validation.isValid
-    ? Object.values(validation.errors).join(', ')
-    : null
+  return errorMessage
 }
 
 function validateWithSchema<T>(
@@ -54,14 +51,12 @@ function validateWithSchema<T>(
     })
 
     return {
-      isValid: false,
-      errors: fieldErrors,
+      errorMessage: Object.values(fieldErrors).join(', '),
     }
   }
 
   return {
-    isValid: true,
-    errors: {},
+    errorMessage: null,
     data: validation.data,
   }
 }

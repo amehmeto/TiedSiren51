@@ -194,4 +194,16 @@ export class PrismaBlockSessionRepository
       throw error
     }
   }
+
+  async deleteAll(): Promise<void> {
+    try {
+      const sessions = await this.baseClient.blockSession.findMany()
+      for (const session of sessions) await this.delete(session.id)
+    } catch (error) {
+      this.logger.error(
+        `[PrismaBlockSessionRepository] Failed to delete all block sessions: ${error}`,
+      )
+      throw error
+    }
+  }
 }

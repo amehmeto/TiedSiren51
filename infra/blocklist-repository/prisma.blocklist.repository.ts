@@ -99,6 +99,17 @@ export class PrismaBlocklistRepository
     }
   }
 
+  async deleteAll(): Promise<void> {
+    try {
+      await this.baseClient.blocklist.deleteMany()
+    } catch (error) {
+      this.logger.error(
+        `[PrismaBlocklistRepository] Failed to delete all blocklists: ${error}`,
+      )
+      throw error
+    }
+  }
+
   private mapToBlocklist(dbBlocklist: DbBlocklist): Blocklist {
     return {
       id: dbBlocklist.id,

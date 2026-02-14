@@ -52,6 +52,11 @@ export class FakeStorageAuthGateway implements AuthGateway {
     this.fakeAuthGateway.onUserLoggedOut(listener)
   }
 
+  async deleteAccount(): Promise<void> {
+    await AsyncStorage.removeItem('fake-auth-user')
+    return this.fakeAuthGateway.deleteAccount()
+  }
+
   async logOut(): Promise<void> {
     await AsyncStorage.removeItem('fake-auth-user')
     return this.fakeAuthGateway.logOut()
