@@ -11,105 +11,24 @@ Unified command that:
 
 ---
 
-## Phase 1: Gather All Data
+## Phase 1-3: Fetch Data, Parse Dependencies, Compute Status, Show Kanban
 
-### 1.1 Fetch All Issues (with bodies for dependency parsing)
-
-```bash
-gh issue list --limit 100 --state all --json number,title,body,labels,state,closedAt
-```
-
-### 1.2 Fetch Recent PRs
+All data gathering, dependency parsing, status computation, and Kanban output are handled by a single script:
 
 ```bash
-gh pr list --limit 20 --state all --json number,title,state,mergedAt,headRefName,labels
+./scripts/sync-project-data.sh
 ```
 
-### 1.3 Fetch GitHub Project State
+This script:
+1. **Fetches in parallel**: main repo issues, PRs, project board state, cross-repo issues (blocking-overlay, expo-foreground-service, expo-accessibility-service)
+2. **Parses dependencies** from issue bodies (YAML `depends_on`/`blocks` + inline patterns like "Depends on #X", "Blocked by #X")
+3. **Computes statuses**: done (closed), in-progress (has open PR), blocked (open dep), ready (all deps closed)
+4. **Outputs Kanban board** (markdown) with In Progress, Ready, Blocked, Recently Done sections
+5. **Detects board mismatches** (board status vs computed status)
 
-```bash
-gh project item-list 1 --owner $(gh repo view --json owner -q '.owner.login') --format json
-```
+Use `--json` for raw JSON output: `./scripts/sync-project-data.sh --json`
 
-### 1.4 Fetch Issues from Related Repositories
-
-For cross-repo dependency tracking:
-
-```bash
-# tied-siren-blocking-overlay
-gh issue list --repo amehmeto/tied-siren-blocking-overlay --state all --json number,title,body,state --limit 50
-
-# expo-foreground-service
-gh issue list --repo amehmeto/expo-foreground-service --state all --json number,title,body,state --limit 20
-
-# expo-accessibility-service
-gh issue list --repo amehmeto/expo-accessibility-service --state all --json number,title,body,state --limit 20
-```
-
-> **Fallback handling**: If a repository is inaccessible (permissions, network, deleted), log a warning and continue with available repos. Cross-repo dependencies pointing to inaccessible repos should be marked as "unknown" rather than causing sync failure.
-
----
-
-## Phase 2: Parse Dependencies from Issue Bodies
-
-### 2.1 Dependency Patterns to Detect
-
-Parse the issue body for these patterns (case-insensitive):
-
-| Pattern | Example | Extracted |
-|---------|---------|-----------|
-| YAML frontmatter | `depends_on: [177, 178]` | `[177, 178]` |
-| Inline depends | `Depends on #123` | `[123]` |
-| Blocked by | `Blocked by #123, #124` | `[123, 124]` |
-| After | `After #123` | `[123]` |
-| Requires | `Requires #123` | `[123]` |
-| Blocks | `blocks: [184, 185]` | reverse dep |
-
-### 2.2 Parsing Algorithm
-
-```
-For each issue:
-  1. Check for YAML frontmatter block (```yaml ... ```)
-  2. Extract `depends_on: [...]` array
-  3. Extract `blocks: [...]` array (reverse dependencies)
-  4. Scan body for inline patterns: "depends on #X", "blocked by #X"
-  5. Store: { number, title, repo, state, depends_on[], blocks[] }
-```
-
-### 2.3 Build Dependency Graph
-
-```
-dependencies = {}
-for each issue:
-  dependencies[issue.number] = {
-    title: issue.title,
-    repo: issue.repo,
-    state: issue.state,
-    depends_on: parsed_depends_on,
-    blocks: parsed_blocks,
-    status: null  # computed next
-  }
-```
-
----
-
-## Phase 3: Compute Issue Status
-
-For each issue, determine status based on dependencies:
-
-| Status | Criteria |
-|--------|----------|
-| `done` | Issue state is CLOSED |
-| `ready` | All `depends_on` issues are CLOSED |
-| `blocked` | At least one `depends_on` issue is OPEN |
-| `in-progress` | Has `in-progress` label OR has open PR |
-
-### 3.1 Topological Sort
-
-Sort issues by dependency order to identify:
-- **Phase 1**: Issues with no dependencies (can start now)
-- **Phase 2**: Issues whose deps are all in Phase 1
-- **Phase 3+**: Subsequent phases
+Display the Kanban output to the user, then proceed to Phase 4.
 
 ---
 
@@ -142,9 +61,9 @@ Compare computed status with project board status:
 - [ ] #XXX - Not in project, should be added as "Todo"
 ```
 
-### 4.3 Confirmation Gate
+### 4.3 Execute Updates Automatically
 
-**Ask user before making changes** using AskUserQuestion tool.
+**Do NOT ask for confirmation.** Apply all board updates immediately (add missing issues, fix status mismatches). This is a core responsibility of /sync-project.
 
 ---
 
@@ -392,6 +311,9 @@ gh issue list --state all --json number,title,body,labels,state,closedAt --limit
 
 # Fetch from other repos
 gh issue list --repo amehmeto/tied-siren-blocking-overlay --state all --json number,title,body,state
+
+# Fetch project board state (wraps gh project item-list with owner resolution)
+./scripts/fetch-project-board.sh
 
 # Update project item status (requires item ID)
 gh project item-edit --project-id PROJECT_ID --id ITEM_ID --field-id FIELD_ID --single-select-option-id OPTION_ID
