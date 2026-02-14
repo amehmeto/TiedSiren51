@@ -49,6 +49,9 @@ export const reducer = createReducer<AuthState>(
     password: '',
   },
   (builder) => {
+    // All auth thunks share the same pending/fulfilled/rejected state transitions
+    // (loading, error, errorType). The addMatcher calls below handle this shared
+    // logic, while thunk-specific behavior (e.g. setting authUser) stays in addCase.
     const authThunks = [
       signInWithEmail,
       signUpWithEmail,

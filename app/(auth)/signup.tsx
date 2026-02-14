@@ -64,18 +64,6 @@ export default function SignUpScreen() {
     if (validCredentials) await dispatch(signUpWithEmail(validCredentials))
   }
 
-  const handleEmailChange = (text: string) => {
-    dispatch(setEmail(text))
-
-    if (viewModel.error) dispatch(clearError())
-  }
-
-  const handlePasswordChange = (text: string) => {
-    dispatch(setPassword(text))
-
-    if (viewModel.error) dispatch(clearError())
-  }
-
   const { error } = viewModel
 
   return (
@@ -106,7 +94,10 @@ export default function SignUpScreen() {
           accessibilityLabel="Email"
           placeholderTextColor={T.color.grey}
           value={viewModel.email}
-          onChangeText={handleEmailChange}
+          onChangeText={(text) => {
+            dispatch(setEmail(text))
+            if (error) dispatch(clearError())
+          }}
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -116,7 +107,10 @@ export default function SignUpScreen() {
           placeholderTextColor={T.color.grey}
           hasPasswordToggle={true}
           value={viewModel.password}
-          onChangeText={handlePasswordChange}
+          onChangeText={(text) => {
+            dispatch(setPassword(text))
+            if (error) dispatch(clearError())
+          }}
           textContentType="newPassword"
           autoComplete="new-password"
           autoCapitalize="none"
