@@ -1,5 +1,5 @@
 import { useRouter } from 'expo-router'
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import {
   Keyboard,
   KeyboardAvoidingView,
@@ -10,9 +10,13 @@ import {
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
-import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
-import { selectAuthStatus } from '@/core/auth/selectors/selectAuthStatus'
-import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
+import {
+  clearAuthState,
+  clearError,
+  setEmail,
+  setError,
+  setPassword,
+} from '@/core/auth/reducer'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
@@ -22,15 +26,14 @@ import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSClos
 import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
+import { selectLoginViewModel } from '@/ui/screens/Auth/Login/login.view-model'
 
 export default function LoginScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const [credentials, setCredentials] = useState({ email: '', password: '' })
 
-  const isUserAuthenticated = useSelector(selectIsUserAuthenticated)
-
-  const { isLoading, error } = useSelector(selectAuthStatus)
+  const viewModel = useSelector(selectLoginViewModel)
+  const { error, isUserAuthenticated } = viewModel
 
   useEffect(() => {
     if (isUserAuthenticated) router.push('/')
@@ -53,27 +56,17 @@ export default function LoginScreen() {
   const handleSignIn = async () => {
     dispatch(clearError())
 
-    const validation = validateSignInInput(credentials)
+    const { errorMessage, data: validCredentials } = validateSignInInput({
+      email: viewModel.email,
+      password: viewModel.password,
+    })
 
-    if (!validation.isValid) {
-      const errorMessage = Object.values(validation.errors).join(', ')
+    if (errorMessage) {
       dispatch(setError(errorMessage))
       return
     }
 
-    if (validation.data) await dispatch(signInWithEmail(validation.data))
-  }
-
-  const handleEmailChange = (text: string) => {
-    setCredentials((prev) => ({ ...prev, email: text }))
-
-    if (error) dispatch(clearError())
-  }
-
-  const handlePasswordChange = (text: string) => {
-    setCredentials((prev) => ({ ...prev, password: text }))
-
-    if (error) dispatch(clearError())
+    if (validCredentials) await dispatch(signInWithEmail(validCredentials))
   }
 
   return (
@@ -103,8 +96,11 @@ export default function LoginScreen() {
           placeholder="Your Email"
           accessibilityLabel="Email"
           placeholderTextColor={T.color.grey}
-          value={credentials.email}
-          onChangeText={handleEmailChange}
+          value={viewModel.email}
+          onChangeText={(text) => {
+            dispatch(setEmail(text))
+            if (error) dispatch(clearError())
+          }}
           keyboardType="email-address"
           autoCapitalize="none"
         />
@@ -113,9 +109,12 @@ export default function LoginScreen() {
           placeholder="Enter Your Password"
           accessibilityLabel="Password"
           placeholderTextColor={T.color.grey}
-          value={credentials.password}
+          value={viewModel.password}
           hasPasswordToggle={true}
-          onChangeText={handlePasswordChange}
+          onChangeText={(text) => {
+            dispatch(setPassword(text))
+            if (error) dispatch(clearError())
+          }}
           textContentType="password"
           autoComplete="current-password"
           autoCapitalize="none"
@@ -123,9 +122,9 @@ export default function LoginScreen() {
 
         <TiedSButton
           onPress={handleSignIn}
-          text={isLoading ? 'LOGGING IN...' : 'LOG IN'}
+          text={viewModel.buttonText}
           style={styles.button}
-          isDisabled={isLoading}
+          isDisabled={viewModel.isInputDisabled}
         />
         {error && (
           <Text
