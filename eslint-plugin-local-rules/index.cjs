@@ -45,6 +45,7 @@ const oneUsecasePerFile = require('../eslint-rules/one-usecase-per-file.cjs')
 const oneViewModelPerFile = require('../eslint-rules/one-view-model-per-file.cjs')
 const preferArrayDestructuring = require('../eslint-rules/prefer-array-destructuring.cjs')
 const preferEnumOverStringUnion = require('../eslint-rules/prefer-enum-over-string-union.cjs')
+const preferExtractedLongParams = require('../eslint-rules/prefer-extracted-long-params.cjs')
 const preferInlineVariable = require('../eslint-rules/prefer-inline-variable.cjs')
 const preferJumpTable = require('../eslint-rules/prefer-jump-table.cjs')
 const preferNamedSelector = require('../eslint-rules/prefer-named-selector.cjs')
@@ -133,5 +134,6 @@ module.exports = {
     'prefer-enum-over-string-union': preferEnumOverStringUnion,
     'no-and-or-in-names': noConjunctionInNames,
     'no-generic-result-variable': noGenericResultVariable,
+    'prefer-extracted-long-params': preferExtractedLongParams,
   },
 }

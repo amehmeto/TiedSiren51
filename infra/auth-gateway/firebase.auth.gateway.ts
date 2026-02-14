@@ -205,19 +205,17 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   private toAuthError(error: unknown): AuthError {
     if (this.isFirebaseAuthError(error)) {
-      return new AuthError(
-        FirebaseAuthGateway.FIREBASE_ERRORS[error.code],
-        FirebaseAuthGateway.FIREBASE_ERROR_TYPES[error.code],
-      )
+      const errorMessage = FirebaseAuthGateway.FIREBASE_ERRORS[error.code]
+      const errorType = FirebaseAuthGateway.FIREBASE_ERROR_TYPES[error.code]
+      return new AuthError(errorMessage, errorType)
     }
 
     if (this.isGoogleSignInError(error)) {
       const pattern = this.getGoogleSignInErrorPattern(error)
       if (pattern) {
-        return new AuthError(
-          FirebaseAuthGateway.GOOGLE_SIGN_IN_ERRORS[pattern],
-          FirebaseAuthGateway.GOOGLE_ERROR_TYPES[pattern],
-        )
+        const errorMessage = FirebaseAuthGateway.GOOGLE_SIGN_IN_ERRORS[pattern]
+        const errorType = FirebaseAuthGateway.GOOGLE_ERROR_TYPES[pattern]
+        return new AuthError(errorMessage, errorType)
       }
     }
 

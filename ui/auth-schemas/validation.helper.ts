@@ -50,9 +50,9 @@ function validateWithSchema<T>(
       if (typeof key === 'string') fieldErrors[key] = error.message
     })
 
-    return {
-      errorMessage: Object.values(fieldErrors).join(', '),
-    }
+    const errorMessage = Object.values(fieldErrors).join(', ')
+
+    return { errorMessage }
   }
 
   return {

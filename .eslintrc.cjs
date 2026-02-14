@@ -184,6 +184,8 @@ module.exports = {
     'local-rules/no-enum-value-as-string-literal': 'error',
     // Prefer ternary over complementary && conditions in JSX
     'local-rules/prefer-ternary-jsx': 'error',
+    // Extract long function arguments into named variables for readability
+    'local-rules/prefer-extracted-long-params': 'error',
     // Prefer enum over string literal unions
     'local-rules/prefer-enum-over-string-union': [
       'error',
