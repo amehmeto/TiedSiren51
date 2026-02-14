@@ -7,11 +7,17 @@ export class FakeAuthGateway implements AuthGateway {
     email: 'fake-user@gmail.com',
   })
 
+  willReauthenticateWith: Promise<void> = Promise.resolve()
+
   lastResetPasswordEmail: string | null = null
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
   private onUserLoggedOutListener: (() => void) | null = null
+
+  reauthenticate(_password: string): Promise<void> {
+    return this.willReauthenticateWith
+  }
 
   signInWithGoogle(): Promise<AuthUser> {
     return this.willResultWith

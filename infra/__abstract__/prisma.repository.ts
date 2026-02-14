@@ -48,6 +48,9 @@ export abstract class PrismaRepository {
       await this.loadInitialData()
       this._isInitialized = true
     } catch (error) {
+      this.logger.error(
+        `[PrismaRepository] Failed to initialize database: ${error}`,
+      )
       throw new Error(`Failed to initialize database: ${error}`)
     }
   }
