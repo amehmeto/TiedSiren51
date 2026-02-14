@@ -27,6 +27,16 @@
 #
 # ──────────────────────────────────────────────────────────────
 
+# Hephaestus (Ἥφαιστος) - God of the forge in Greek mythology
+# https://www.wikiwand.com/en/articles/Hephaestus
+#
+# The divine blacksmith who crafts weapons and tools for the gods.
+# He receives orders and transforms raw material into finished work.
+#
+# This workflow triggers when an issue is labeled 'ready'. It sets up
+# the forge (worktree, branch, prompt) and puts Claude to work,
+# hammering code until the PR is ready.
+
 name: Hephaestus
 
 on:

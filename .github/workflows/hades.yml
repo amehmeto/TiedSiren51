@@ -22,6 +22,14 @@
 #
 # ──────────────────────────────────────────────────────────────
 
+# Hades (ᾍδης) - Ruler of the underworld
+# https://www.wikiwand.com/en/articles/Hades
+#
+# Named after the ruler of the underworld who judges souls.
+# Once code passes Cerberus's inspection, it enters Hades's domain
+# for internal testing and review, not yet ready for public release
+# but under careful scrutiny in this preview/testing realm.
+
 name: Hades
 
 on:
