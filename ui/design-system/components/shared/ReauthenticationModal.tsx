@@ -26,7 +26,6 @@ export function ReauthenticationModal({
     selectReauthStatus(state),
   )
   const [password, setPassword] = useState('')
-  const isPasswordEmpty = password.length === 0
 
   const handleConfirm = async () => {
     const result = await dispatch(reauthenticate({ password }))
@@ -57,11 +56,18 @@ export function ReauthenticationModal({
           placeholder="Enter your password"
         />
         {reauthError && <Text style={styles.error}>{reauthError}</Text>}
-        <TiedSButton
-          onPress={handleConfirm}
-          text="Confirm"
-          isDisabled={isReauthenticating || isPasswordEmpty}
-        />
+        <View style={styles.buttonContainer}>
+          <TiedSButton
+            style={styles.cancelButton}
+            onPress={handleClose}
+            text="Cancel"
+          />
+          <TiedSButton
+            onPress={handleConfirm}
+            text="Confirm"
+            isDisabled={isReauthenticating || password.length === 0}
+          />
+        </View>
       </View>
     </TiedSModal>
   )
@@ -90,5 +96,14 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.small,
     textAlign: 'center',
     marginTop: T.spacing.small,
+  },
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    width: T.layout.width.full,
+    marginTop: T.spacing.medium,
+  },
+  cancelButton: {
+    marginRight: T.spacing.small,
   },
 })
