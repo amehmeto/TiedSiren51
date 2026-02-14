@@ -287,7 +287,7 @@ flowchart LR
         T_TS_167["📝 TS#167 auth: brute force protection<br/>on login [2sp]"]:::auth0_todo
         T_TS_166["📝 TS#166 auth: invalidate sessions<br/>after password reset [3sp]"]:::auth1_todo
         T_TS_165["📝 TS#165 auth: resend password reset<br/>email [1sp]"]:::auth0_todo
-        T_TS_164["📝 TS#164 auth: re-authentication for<br/>sensitive operations [2sp]"]:::auth0_todo
+        T_TS_164["🔄 TS#164 auth: re-authentication for<br/>sensitive operations [2sp]"]:::auth0_in_progress
         T_TS_163["📝 TS#163 auth: account deletion GDPR<br/>compliance [5sp]"]:::auth1_todo
         T_TS_162["📝 TS#162 auth: change password when<br/>logged in [2sp]"]:::auth1_todo
         T_TS_161["📝 TS#161 auth: implement email<br/>verification flow [3sp]"]:::auth0_todo
