@@ -4,14 +4,11 @@ import { selectActiveSessions } from '@/core/block-session/selectors/selectActiv
 import { selectScheduledSessions } from '@/core/block-session/selectors/selectScheduledSessions'
 import { selectBlocklistById } from '@/core/blocklist/selectors/selectBlocklistById'
 import { Sirens } from '@/core/siren/sirens'
-import { LockedSirens } from '@/core/strict-mode/is-siren-locked'
+import {
+  EMPTY_LOCKED_SIRENS,
+  LockedSirens,
+} from '@/core/strict-mode/is-siren-locked'
 import { selectIsStrictModeActive } from './selectIsStrictModeActive'
-
-const EMPTY_LOCKED_SIRENS: LockedSirens = {
-  android: new Set(),
-  websites: new Set(),
-  keywords: new Set(),
-}
 
 let lastSirensRef: Sirens | null = null
 let lastResult: LockedSirens = EMPTY_LOCKED_SIRENS

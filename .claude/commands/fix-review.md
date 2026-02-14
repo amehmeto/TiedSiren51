@@ -6,21 +6,20 @@ Fix all pending review comments on PR #$ARGUMENTS.
 
 ## Steps
 
-1. **Fetch all PR comments using the dedicated script:**
+1. **Fetch actionable PR comments using the dedicated script:**
    ```bash
-   ./scripts/fetch-pr-comments.sh $ARGUMENTS --owner-only
+   ./scripts/fetch-pr-comments.sh $ARGUMENTS --needs-action
    ```
-   This returns structured JSON with:
+   This returns structured JSON pre-filtered to only actionable threads:
    - `repo` / `owner` — repo metadata (use for API calls in later steps)
-   - `issue_comments` — top-level PR comments
-   - `reviews` — review bodies and states (APPROVED, CHANGES_REQUESTED, etc.)
-   - `review_comment_threads` — file/line-level comments grouped into threads
+   - `issue_comments` — top-level PR comments from the owner
+   - `reviews` — review bodies and states from the owner
+   - `review_comment_threads` — only threads that need action (unresolved, no bot reply as last comment, from owner)
 
    **Interpreting the output:**
-   - Each thread in `review_comment_threads` groups a root comment with its replies via `in_reply_to_id`
-   - Threads with `"is_resolved": true` have been marked as resolved on GitHub — skip them
+   - All returned threads need action — no further filtering required
    - Comments with `"outdated": true` refer to code that has since changed — verify if the feedback still applies
-   - Focus on **unresolved** threads where the latest comment is from the owner and hasn't been addressed yet
+   - `has_bot_reply` indicates a previous bot response exists in the thread (but was followed by a new owner comment)
 
 2. **Ensure you are on the correct branch** for this PR:
    ```bash
@@ -43,14 +42,9 @@ Fix all pending review comments on PR #$ARGUMENTS.
    - **Always prefix replies with `🤖 Claude's answer:` ** so they're distinguishable from the repo owner's own comments
    - For each comment you fixed: reply with a concise summary of what you changed (e.g., "🤖 Claude's answer: Fixed — extracted to variable")
    - For questions from the reviewer: reply with a direct answer to their question
-   - Use the `repo` field from step 1 output as REPO_NWO. Reply in-thread via:
+   - Reply in-thread using the wrapper script:
      ```bash
-     gh api repos/REPO_NWO/pulls/$PR_NUMBER/comments \
-       -F body="🤖 Claude's answer: Your reply" \
-       -F commit_id="$(git rev-parse HEAD)" \
-       -F path="file.ts" \
-       -F line=1 \
-       -F in_reply_to=COMMENT_ID
+     ./scripts/reply-pr-comment.sh $ARGUMENTS COMMENT_ID "🤖 Claude's answer: Your reply"
      ```
 
 7. **After all fixes are applied:**

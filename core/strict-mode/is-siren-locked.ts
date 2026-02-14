@@ -6,6 +6,12 @@ export type LockedSirens = {
   keywords: Set<string>
 }
 
+export const EMPTY_LOCKED_SIRENS: LockedSirens = {
+  android: new Set(),
+  websites: new Set(),
+  keywords: new Set(),
+}
+
 function isLockedSirenKey(key: keyof Sirens): key is keyof LockedSirens {
   return key === 'android' || key === 'websites' || key === 'keywords'
 }

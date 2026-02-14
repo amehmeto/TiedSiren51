@@ -99,6 +99,17 @@ These are configured in `ignoredComponents`.
 - **Bundle size**: No impact (same hooks regardless of location)
 - **Type safety**: Props still typed for non-Redux data
 
+## Performance: Multiple Selector Calls Are Not a Problem
+
+A common concern is that multiple child components calling the same selector "wastes computation." In practice, this is negligible:
+
+- **Selectors are plain functions** that run synchronously. Filtering and sorting small arrays (installed apps, a few websites) takes microseconds. React's render cycle (diffing, layout, painting) is orders of magnitude more expensive.
+- **`useSelector` already prevents unnecessary re-renders** via `===` equality. The cost is running the function N times — not re-rendering N times.
+- **`createSelector` (reselect) has a cache size of 1.** When multiple components call the same selector with the same arguments in the same render cycle, the first call computes and subsequent calls hit the cache. Memory bloat is not a concern — it's one extra reference per selector.
+- **When to optimize**: Only if a profiler shows a selector as a bottleneck (1000+ items, complex graph traversal). Not preemptively.
+
+Props drilling avoids redundant selector calls but **rigidifies the component tree** and **scatters data-fetching logic** across parents and children. The maintainability cost far outweighs the microseconds saved.
+
 ## Alternatives Considered
 
 ### 1. Allow Prop Drilling with Memoization

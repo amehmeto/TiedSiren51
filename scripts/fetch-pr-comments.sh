@@ -5,14 +5,15 @@ set -euo pipefail
 # Fetches all comments from a GitHub PR (issue comments, review comments, reviews)
 # and outputs them as structured JSON to stdout.
 #
-# Usage: ./scripts/fetch-pr-comments.sh <PR_NUMBER> [--owner-only]
+# Usage: ./scripts/fetch-pr-comments.sh <PR_NUMBER> [--owner-only | --needs-action]
 #
 # Options:
-#   --owner-only  Filter to only show comments from the repo owner
+#   --owner-only    Filter to threads where the root comment is from the repo owner (keeps all replies)
+#   --needs-action  Filter to only actionable threads (unresolved, last comment is not a bot reply, root from owner)
 #
 # Output: JSON object with arrays: issue_comments, reviews, review_comment_threads
 #   review_comments are grouped into threads via in_reply_to_id
-#   each thread includes an is_resolved field from the GraphQL API
+#   each thread includes is_resolved, has_bot_reply, and needs_action fields
 
 # Source shared colors
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -33,23 +34,31 @@ fi
 # Parse arguments
 PR_NUMBER=""
 OWNER_ONLY=false
+NEEDS_ACTION=false
 
 for arg in "$@"; do
   if [[ "$arg" == "--owner-only" ]]; then
     OWNER_ONLY=true
+  elif [[ "$arg" == "--needs-action" ]]; then
+    NEEDS_ACTION=true
   elif [[ -z "$PR_NUMBER" && "$arg" =~ ^[0-9]+$ ]]; then
     PR_NUMBER="$arg"
   else
     print_error "Unknown argument: $arg"
-    echo "Usage: $0 <PR_NUMBER> [--owner-only]" >&2
+    echo "Usage: $0 <PR_NUMBER> [--owner-only | --needs-action]" >&2
     exit 1
   fi
 done
 
 if [[ -z "$PR_NUMBER" ]]; then
   print_error "PR number is required"
-  echo "Usage: $0 <PR_NUMBER> [--owner-only]" >&2
+  echo "Usage: $0 <PR_NUMBER> [--owner-only | --needs-action]" >&2
   exit 1
+fi
+
+# --needs-action wins if both flags are passed
+if [[ "$NEEDS_ACTION" == true ]]; then
+  OWNER_ONLY=false
 fi
 
 # Detect repo info
@@ -141,6 +150,7 @@ reviews=$(echo "$reviews_raw" | jq '[.[] | {
 
 # Transform review comments (file/line-level)
 # position null means the comment is outdated (code has changed since)
+# is_bot_reply detects comments starting with the Claude bot prefix
 review_comments=$(echo "$review_comments_raw" | jq '[.[] | {
   id: .id,
   user: .user.login,
@@ -153,32 +163,45 @@ review_comments=$(echo "$review_comments_raw" | jq '[.[] | {
   created_at: .created_at,
   updated_at: .updated_at,
   html_url: .html_url,
-  outdated: (.position == null)
+  outdated: (.position == null),
+  is_bot_reply: (.body | test("^🤖 Claude"))
 }]')
-
-# Apply owner-only filter if requested
-if [[ "$OWNER_ONLY" == true ]]; then
-  print_info "Filtering to owner comments only ($OWNER)..." >&2
-  issue_comments=$(echo "$issue_comments" | jq --arg owner "$OWNER" '[.[] | select(.user == $owner)]')
-  reviews=$(echo "$reviews" | jq --arg owner "$OWNER" '[.[] | select(.user == $owner)]')
-  review_comments=$(echo "$review_comments" | jq --arg owner "$OWNER" '[.[] | select(.user == $owner)]')
-fi
 
 # Group review comments into threads using in_reply_to_id
 # Thread roots are comments without in_reply_to_id
 # Replies are grouped under their root
-# Merge is_resolved from GraphQL resolved_map
+# Merge is_resolved from GraphQL resolved_map, add has_bot_reply and needs_action
 review_comment_threads=$(jq -n \
   --argjson comments "$review_comments" \
   --argjson resolved "$resolved_map" \
+  --arg owner "$OWNER" \
   '$comments
   | group_by(.in_reply_to_id // .id)
   | map({
       thread_id: (.[0].in_reply_to_id // .[0].id),
       is_resolved: ($resolved[(.[0].in_reply_to_id // .[0].id) | tostring] // false),
+      has_bot_reply: (any(.[]; .is_bot_reply)),
+      needs_action: (
+        (($resolved[(.[0].in_reply_to_id // .[0].id) | tostring] // false) | not)
+        and ((.[-1].is_bot_reply) | not)
+        and ((.[0].user) == $owner)
+      ),
       comments: .
     })
 ')
+
+# Apply thread-level filtering if requested
+if [[ "$NEEDS_ACTION" == true ]]; then
+  print_info "Filtering to actionable threads only..." >&2
+  issue_comments=$(echo "$issue_comments" | jq --arg owner "$OWNER" '[.[] | select(.user == $owner)]')
+  reviews=$(echo "$reviews" | jq --arg owner "$OWNER" '[.[] | select(.user == $owner)]')
+  review_comment_threads=$(echo "$review_comment_threads" | jq '[.[] | select(.needs_action)]')
+elif [[ "$OWNER_ONLY" == true ]]; then
+  print_info "Filtering to owner threads ($OWNER)..." >&2
+  issue_comments=$(echo "$issue_comments" | jq --arg owner "$OWNER" '[.[] | select(.user == $owner)]')
+  reviews=$(echo "$reviews" | jq --arg owner "$OWNER" '[.[] | select(.user == $owner)]')
+  review_comment_threads=$(echo "$review_comment_threads" | jq --arg owner "$OWNER" '[.[] | select(.comments[0].user == $owner)]')
+fi
 
 # Build final output (include repo metadata for downstream consumers)
 jq -n \
@@ -200,4 +223,5 @@ review_count=$(echo "$reviews" | jq 'length')
 thread_count=$(echo "$review_comment_threads" | jq 'length')
 resolved_count=$(echo "$review_comment_threads" | jq '[.[] | select(.is_resolved)] | length')
 unresolved_count=$(echo "$review_comment_threads" | jq '[.[] | select(.is_resolved | not)] | length')
-print_success "Fetched $issue_count issue comments, $review_count reviews, $thread_count threads ($resolved_count resolved, $unresolved_count unresolved)" >&2
+needs_action_count=$(echo "$review_comment_threads" | jq '[.[] | select(.needs_action)] | length')
+print_success "Fetched $issue_count issue comments, $review_count reviews, $thread_count threads ($resolved_count resolved, $unresolved_count unresolved, $needs_action_count needs action)" >&2
