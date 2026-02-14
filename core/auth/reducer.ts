@@ -109,6 +109,8 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(logOut.fulfilled, (state) => {
         state.authUser = null
+        state.email = ''
+        state.password = ''
         state.lastReauthenticatedAt = null
         state.isReauthenticating = false
         state.reauthError = null
@@ -149,6 +151,7 @@ export const reducer = createReducer<AuthState>(
         state.error = null
         state.errorType = null
         state.isLoading = false
+        state.password = ''
       })
       .addMatcher(isRejected(...authThunks), (state, action) => {
         state.isLoading = false

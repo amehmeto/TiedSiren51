@@ -316,7 +316,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to signInWithApple: ${error}`,
       )
-      throw error
+      throw this.toAuthError(error)
     }
   }
 
