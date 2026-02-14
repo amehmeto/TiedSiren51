@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Alert, Pressable, StyleSheet, Text, View } from 'react-native'
 import { useDispatch } from 'react-redux'
@@ -8,6 +9,7 @@ import { T } from '@/ui/design-system/theme'
 
 export default function SettingsScreen() {
   const dispatch = useDispatch<AppDispatch>()
+  const router = useRouter()
   const [isReauthVisible, setShowReauth] = useState(false)
 
   return (
@@ -21,6 +23,12 @@ export default function SettingsScreen() {
       </Pressable>
       <Pressable onPress={() => dispatch(logOut())} style={styles.logoutButton}>
         <Text style={styles.logoutText}>Logout</Text>
+      </Pressable>
+      <Pressable
+        onPress={() => router.push('/(tabs)/settings/delete-account')}
+        style={styles.deleteAccountButton}
+      >
+        <Text style={styles.deleteAccountText}>Delete Account</Text>
       </Pressable>
       <ReauthenticationModal
         isVisible={isReauthVisible}
@@ -58,5 +66,14 @@ const styles = StyleSheet.create({
   logoutText: {
     color: T.color.red,
     fontSize: T.font.size.base,
+  },
+  deleteAccountButton: {
+    padding: T.spacing.smallMedium,
+    marginTop: T.spacing.large,
+  },
+  deleteAccountText: {
+    color: T.color.red,
+    fontSize: T.font.size.base,
+    fontWeight: T.font.weight.bold,
   },
 })

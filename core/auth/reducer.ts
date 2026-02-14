@@ -7,6 +7,7 @@ import {
 } from '@reduxjs/toolkit'
 import { ISODateString } from '@/core/_ports_/date-provider'
 import { AuthUser } from '@/core/auth/auth-user'
+import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
@@ -27,6 +28,8 @@ export type AuthState = {
   lastReauthenticatedAt: ISODateString | null
   isReauthenticating: boolean
   reauthError: string | null
+  isDeletingAccount: boolean
+  deleteAccountError: string | null
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -45,6 +48,10 @@ export const setPassword = createAction<string>('auth/setPassword')
 
 export const clearReauthError = createAction('auth/clearReauthError')
 
+export const clearDeleteAccountError = createAction(
+  'auth/clearDeleteAccountError',
+)
+
 export const reducer = createReducer<AuthState>(
   {
     authUser: null,
@@ -57,6 +64,8 @@ export const reducer = createReducer<AuthState>(
     lastReauthenticatedAt: null,
     isReauthenticating: false,
     reauthError: null,
+    isDeletingAccount: false,
+    deleteAccountError: null,
   },
   (builder) => {
     // All auth thunks share the same pending/fulfilled/rejected state transitions
@@ -141,6 +150,31 @@ export const reducer = createReducer<AuthState>(
       .addCase(reauthenticate.rejected, (state, action) => {
         state.isReauthenticating = false
         state.reauthError = action.error.message ?? null
+      })
+
+      .addCase(clearDeleteAccountError, (state) => {
+        state.deleteAccountError = null
+      })
+      .addCase(deleteAccount.pending, (state) => {
+        state.isDeletingAccount = true
+        state.deleteAccountError = null
+      })
+      .addCase(deleteAccount.fulfilled, (state) => {
+        state.authUser = null
+        state.error = null
+        state.errorType = null
+        state.isLoading = false
+        state.email = ''
+        state.password = ''
+        state.lastReauthenticatedAt = null
+        state.isReauthenticating = false
+        state.reauthError = null
+        state.isDeletingAccount = false
+        state.deleteAccountError = null
+      })
+      .addCase(deleteAccount.rejected, (state, action) => {
+        state.isDeletingAccount = false
+        state.deleteAccountError = action.error.message ?? null
       })
       .addMatcher(isPending(...authThunks), (state) => {
         state.isLoading = true

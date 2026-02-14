@@ -18,6 +18,7 @@ import {
   onAuthStateChanged,
   reauthenticateWithCredential,
   sendPasswordResetEmail,
+  deleteUser,
   signInWithCredential,
   signInWithEmailAndPassword,
   signOut,
@@ -337,6 +338,20 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   onUserLoggedOut(listener: () => void): void {
     this.onUserLoggedOutListener = listener
+  }
+
+  async deleteAccount(): Promise<void> {
+    try {
+      const user = this.auth.currentUser
+      if (!user) throw new Error('No authenticated user found.')
+
+      await deleteUser(user)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to delete account: ${error}`,
+      )
+      throw this.toAuthError(error)
+    }
   }
 
   async logOut(): Promise<void> {

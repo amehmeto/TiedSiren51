@@ -5,4 +5,5 @@ export interface SirensRepository {
   addKeywordToSirens(keyword: string): Promise<void>
   addWebsiteToSirens(website: string): Promise<void>
   addAndroidSirenToSirens(androidSiren: AndroidSiren): Promise<void>
+  deleteAllSirens(): Promise<void>
 }
