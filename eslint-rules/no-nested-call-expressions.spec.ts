@@ -78,6 +78,16 @@ describe('no-nested-call-expressions', () => {
         {
           code: `foo({ a: 1 }, [1, 2, 3])`,
         },
+        // NewExpression with allowed pattern - should NOT report
+        {
+          code: `foo(new Error(msg))`,
+          options: [{ allowedPatterns: ['^Error$'] }],
+        },
+        // NewExpression with no arguments when allowNoArguments - should NOT report
+        {
+          code: `foo(new Error())`,
+          options: [{ allowNoArguments: true }],
+        },
       ],
 
       invalid: [
@@ -150,6 +160,27 @@ describe('no-nested-call-expressions', () => {
             {
               messageId: 'noNestedCalls',
               data: { innerCall: 'createAction(...)' },
+            },
+          ],
+        },
+        // NewExpression as argument - SHOULD report
+        {
+          code: `Promise.reject(new Error(msg))`,
+          errors: [
+            {
+              messageId: 'noNestedCalls',
+              data: { innerCall: 'new Error(...)' },
+            },
+          ],
+        },
+        // NewExpression with allowNoArguments but HAS arguments - SHOULD report
+        {
+          code: `foo(new Error(msg))`,
+          options: [{ allowNoArguments: true }],
+          errors: [
+            {
+              messageId: 'noNestedCalls',
+              data: { innerCall: 'new Error(...)' },
             },
           ],
         },

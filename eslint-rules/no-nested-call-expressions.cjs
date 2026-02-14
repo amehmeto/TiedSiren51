@@ -88,6 +88,20 @@ module.exports = {
               data: { innerCall: `${innerName}(...)` },
             })
           }
+
+          if (arg.type === 'NewExpression') {
+            const innerName =
+              arg.callee.type === 'Identifier' ? arg.callee.name : '...'
+            if (isAllowed(innerName)) continue
+
+            if (allowNoArguments && arg.arguments.length === 0) continue
+
+            context.report({
+              node: arg,
+              messageId: 'noNestedCalls',
+              data: { innerCall: `new ${innerName}(...)` },
+            })
+          }
         }
       },
     }

@@ -96,9 +96,9 @@ export function blocklistFixture(
         const retrievedBlocklists = blocklistAdapter
           .getSelectors()
           .selectAll(state.blocklist)
-        expect(retrievedBlocklists).toEqual(
-          expect.arrayContaining(expectedBlocklists),
-        )
+        const containingExpectedBlocklists =
+          expect.arrayContaining(expectedBlocklists)
+        expect(retrievedBlocklists).toEqual(containingExpectedBlocklists)
       },
       blocklistShouldNotBeInStore(deletedSessionId: string) {
         const retrievedBlocklist = selectBlocklistById(

@@ -33,6 +33,11 @@ const withStrictModeEndedAt = createAction<ISODateString | null>(
 const withPasswordResetSent = createAction<boolean>('withPasswordResetSent')
 const withEmail = createAction<string>('withEmail')
 const withPassword = createAction<string>('withPassword')
+const withLastReauthenticatedAt = createAction<ISODateString | null>(
+  'withLastReauthenticatedAt',
+)
+const withReauthenticating = createAction<boolean>('withReauthenticating')
+const withReauthError = createAction<string | null>('withReauthError')
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -70,6 +75,15 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withPassword, (state, action) => {
       state.auth.password = action.payload
     })
+    .addCase(withLastReauthenticatedAt, (state, action) => {
+      state.auth.lastReauthenticatedAt = action.payload
+    })
+    .addCase(withReauthenticating, (state, action) => {
+      state.auth.isReauthenticating = action.payload
+    })
+    .addCase(withReauthError, (state, action) => {
+      state.auth.reauthError = action.payload
+    })
 })
 
 export const stateBuilder = (baseState = initialState) => {
@@ -93,6 +107,9 @@ export const stateBuilder = (baseState = initialState) => {
     withPasswordResetSent: reduce(withPasswordResetSent),
     withEmail: reduce(withEmail),
     withPassword: reduce(withPassword),
+    withLastReauthenticatedAt: reduce(withLastReauthenticatedAt),
+    withReauthenticating: reduce(withReauthenticating),
+    withReauthError: reduce(withReauthError),
   }
 }
 

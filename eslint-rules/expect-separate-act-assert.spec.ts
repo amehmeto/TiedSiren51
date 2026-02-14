@@ -74,6 +74,14 @@ describe('expect-separate-act-assert', () => {
           code: `expect(calculate(input)).toBe(expected)`,
           filename: '/project/core/auth/auth.ts',
         },
+        // Fixture file with separated act/assert - OK
+        {
+          code: `
+            const { lastReauthenticatedAt } = store.getState().auth
+            expect(lastReauthenticatedAt).toBe(expectedDate)
+          `,
+          filename: '/project/core/auth/authentification.fixture.ts',
+        },
         // Empty array matcher argument - OK
         {
           code: `expect(result).toEqual([])`,
@@ -312,6 +320,12 @@ describe('expect-separate-act-assert', () => {
           code: `expect(await computeResult()).toBe(expected)`,
           filename: '/project/core/auth/auth.test.ts',
           errors: [{ messageId: 'separateActAssert' }],
+        },
+        // Fixture file with deep property access - NOT OK
+        {
+          code: `expect(state.auth.lastReauthenticatedAt).toBe(expectedDate)`,
+          filename: '/project/core/auth/authentification.fixture.ts',
+          errors: [{ messageId: 'extractDeepProperty' }],
         },
       ],
     })

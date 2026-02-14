@@ -129,9 +129,9 @@ export function timerFixture(
           )
         }
 
-        expect(isRejectedAction(action)).toBe(true)
-        if (isRejectedAction(action))
-          expect(action.error.message).toBe(expectedErrorMessage)
+        const isRejected = isRejectedAction(action)
+        expect(isRejected).toBe(true)
+        if (isRejected) expect(action.error.message).toBe(expectedErrorMessage)
       },
     },
     dateProvider,

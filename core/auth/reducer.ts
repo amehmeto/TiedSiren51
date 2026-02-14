@@ -5,12 +5,14 @@ import {
   isPending,
   isRejected,
 } from '@reduxjs/toolkit'
+import { ISODateString } from '@/core/_ports_/date-provider'
 import { AuthUser } from '@/core/auth/auth-user'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
 import { AuthErrorType, isAuthErrorType } from './auth-error-type'
+import { reauthenticate } from './usecases/reauthenticate.usecase'
 import { resetPassword } from './usecases/reset-password.usecase'
 import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
 
@@ -22,6 +24,9 @@ export type AuthState = {
   isPasswordResetSent: boolean
   email: string
   password: string
+  lastReauthenticatedAt: ISODateString | null
+  isReauthenticating: boolean
+  reauthError: string | null
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -38,6 +43,8 @@ export const setEmail = createAction<string>('auth/setEmail')
 
 export const setPassword = createAction<string>('auth/setPassword')
 
+export const clearReauthError = createAction('auth/clearReauthError')
+
 export const reducer = createReducer<AuthState>(
   {
     authUser: null,
@@ -47,6 +54,9 @@ export const reducer = createReducer<AuthState>(
     isPasswordResetSent: false,
     email: '',
     password: '',
+    lastReauthenticatedAt: null,
+    isReauthenticating: false,
+    reauthError: null,
   },
   (builder) => {
     // All auth thunks share the same pending/fulfilled/rejected state transitions
@@ -82,6 +92,9 @@ export const reducer = createReducer<AuthState>(
       .addCase(setPassword, (state, action) => {
         state.password = action.payload
       })
+      .addCase(clearReauthError, (state) => {
+        state.reauthError = null
+      })
       .addCase(signInWithEmail.fulfilled, (state, action) => {
         state.authUser = action.payload
       })
@@ -96,6 +109,9 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(logOut.fulfilled, (state) => {
         state.authUser = null
+        state.lastReauthenticatedAt = null
+        state.isReauthenticating = false
+        state.reauthError = null
       })
       .addCase(clearAuthState, (state) => {
         state.isLoading = false
@@ -110,6 +126,19 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(resetPassword.fulfilled, (state) => {
         state.isPasswordResetSent = true
+      })
+      .addCase(reauthenticate.pending, (state) => {
+        state.isReauthenticating = true
+        state.reauthError = null
+      })
+      .addCase(reauthenticate.fulfilled, (state, action) => {
+        state.isReauthenticating = false
+        state.lastReauthenticatedAt = action.payload
+        state.reauthError = null
+      })
+      .addCase(reauthenticate.rejected, (state, action) => {
+        state.isReauthenticating = false
+        state.reauthError = action.error.message ?? null
       })
       .addMatcher(isPending(...authThunks), (state) => {
         state.isLoading = true

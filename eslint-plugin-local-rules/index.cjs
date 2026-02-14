@@ -31,6 +31,7 @@ const noIconSizeMagicNumbers = require('../eslint-rules/no-icon-size-magic-numbe
 const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
 const noModuleLevelConstants = require('../eslint-rules/no-module-level-constants.cjs')
 const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressions.cjs')
+const noUnusedTestId = require('../eslint-rules/no-unused-test-id.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
 const noRedundantNullishTernary = require('../eslint-rules/no-redundant-nullish-ternary.cjs')
 const noSelectorPropDrilling = require('../eslint-rules/no-selector-prop-drilling.cjs')
@@ -54,6 +55,7 @@ const reactPropsDestructuring = require('../eslint-rules/react-props-destructuri
 const reducerInDomainFolder = require('../eslint-rules/reducer-in-domain-folder.cjs')
 const repositoryImplementationNaming = require('../eslint-rules/repository-implementation-naming.cjs')
 const requireColocatedTest = require('../eslint-rules/require-colocated-test.cjs')
+const requireLoggerInCatch = require('../eslint-rules/require-logger-in-catch.cjs')
 const requireNamedRegex = require('../eslint-rules/require-named-regex.cjs')
 const schemaMatchesFilename = require('../eslint-rules/schema-matches-filename.cjs')
 const selectorMatchesFilename = require('../eslint-rules/selector-matches-filename.cjs')
@@ -89,6 +91,7 @@ module.exports = {
     'no-try-catch-in-core': noTryCatchInCore,
     'no-new-in-test-body': noNewInTestBody,
     'require-colocated-test': requireColocatedTest,
+    'require-logger-in-catch': requireLoggerInCatch,
     'use-data-builders': useDataBuilders,
     'no-data-builders-in-production': noDataBuildersInProduction,
     'usecase-matches-filename': usecaseMatchesFilename,
@@ -107,6 +110,7 @@ module.exports = {
     'no-module-level-constants': noModuleLevelConstants,
     'require-named-regex': requireNamedRegex,
     'no-nested-call-expressions': noNestedCallExpressions,
+    'no-unused-test-id': noUnusedTestId,
     'no-redundant-nullish-ternary': noRedundantNullishTernary,
     'prefer-array-destructuring': preferArrayDestructuring,
     'prefer-object-destructuring': preferObjectDestructuring,
