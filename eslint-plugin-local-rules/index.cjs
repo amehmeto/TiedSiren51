@@ -55,6 +55,7 @@ const reactPropsDestructuring = require('../eslint-rules/react-props-destructuri
 const reducerInDomainFolder = require('../eslint-rules/reducer-in-domain-folder.cjs')
 const repositoryImplementationNaming = require('../eslint-rules/repository-implementation-naming.cjs')
 const requireColocatedTest = require('../eslint-rules/require-colocated-test.cjs')
+const requireLoggerInCatch = require('../eslint-rules/require-logger-in-catch.cjs')
 const requireNamedRegex = require('../eslint-rules/require-named-regex.cjs')
 const schemaMatchesFilename = require('../eslint-rules/schema-matches-filename.cjs')
 const selectorMatchesFilename = require('../eslint-rules/selector-matches-filename.cjs')
@@ -90,6 +91,7 @@ module.exports = {
     'no-try-catch-in-core': noTryCatchInCore,
     'no-new-in-test-body': noNewInTestBody,
     'require-colocated-test': requireColocatedTest,
+    'require-logger-in-catch': requireLoggerInCatch,
     'use-data-builders': useDataBuilders,
     'no-data-builders-in-production': noDataBuildersInProduction,
     'usecase-matches-filename': usecaseMatchesFilename,

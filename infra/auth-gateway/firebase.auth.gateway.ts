@@ -137,9 +137,16 @@ export class FirebaseAuthGateway implements AuthGateway {
       if (
         this.isFirebaseError(error) &&
         error.code === 'auth/already-initialized'
-      )
+      ) {
+        this.logger.warn(
+          `[FirebaseAuthGateway] Auth already initialized, using existing instance`,
+        )
         return getAuth(app)
+      }
 
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to initialize auth: ${error}`,
+      )
       throw error
     }
   }
@@ -205,6 +212,9 @@ export class FirebaseAuthGateway implements AuthGateway {
         email: result.user.email ?? '',
       }
     } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to signInWithEmail: ${error}`,
+      )
       throw new Error(this.translateFirebaseError(error))
     }
   }
@@ -221,6 +231,9 @@ export class FirebaseAuthGateway implements AuthGateway {
         email: result.user.email ?? '',
       }
     } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to signUpWithEmail: ${error}`,
+      )
       throw new Error(this.translateFirebaseError(error))
     }
   }
@@ -246,6 +259,9 @@ export class FirebaseAuthGateway implements AuthGateway {
         profilePicture: credential.user.photoURL ?? undefined,
       }
     } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to signInWithGoogle: ${error}`,
+      )
       throw new Error(this.translateFirebaseError(error))
     }
   }
@@ -265,6 +281,9 @@ export class FirebaseAuthGateway implements AuthGateway {
     try {
       await sendPasswordResetEmail(this.auth, email)
     } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to resetPassword: ${error}`,
+      )
       throw new Error(this.translateFirebaseError(error))
     }
   }
@@ -282,6 +301,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut()
       await signOut(this.auth)
     } catch (error) {
+      this.logger.error(`[FirebaseAuthGateway] Failed to logOut: ${error}`)
       throw new Error(this.translateFirebaseError(error))
     }
   }

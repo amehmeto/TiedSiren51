@@ -121,9 +121,9 @@ export function authentificationFixture(
       passwordResetShouldNotBeSent() {
         expect(authGateway.lastResetPasswordEmail).toBeNull()
       },
-      lastReauthenticatedAtShouldBe(isoTimestamp: ISODateString | null) {
+      lastReauthenticatedAtShouldBe(expectedDate: ISODateString | null) {
         const { lastReauthenticatedAt } = store.getState().auth
-        expect(lastReauthenticatedAt).toBe(isoTimestamp)
+        expect(lastReauthenticatedAt).toBe(expectedDate)
       },
       reauthShouldNotBeLoading() {
         const { isReauthenticating } = store.getState().auth
