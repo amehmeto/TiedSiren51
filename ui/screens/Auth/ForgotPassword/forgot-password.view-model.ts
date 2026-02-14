@@ -12,7 +12,9 @@ type SuccessViewModel = {
   type: ForgotPasswordViewState.Success
 }
 
-type FormViewModel = AuthBaseViewModel<ForgotPasswordViewState> & {
+type FormViewModel = AuthBaseViewModel<
+  Exclude<ForgotPasswordViewState, ForgotPasswordViewState.Success>
+> & {
   error: string | null
 }
 

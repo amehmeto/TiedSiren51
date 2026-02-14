@@ -9,7 +9,6 @@ import {
 } from './auth.schema'
 
 export interface ValidationResult<T = SignInInput | SignUpInput> {
-  errors: Record<string, string>
   errorMessage: string | null
   data?: T
 }
@@ -52,13 +51,11 @@ function validateWithSchema<T>(
     })
 
     return {
-      errors: fieldErrors,
       errorMessage: Object.values(fieldErrors).join(', '),
     }
   }
 
   return {
-    errors: {},
     errorMessage: null,
     data: validation.data,
   }

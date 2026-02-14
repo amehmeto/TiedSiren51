@@ -16,7 +16,6 @@ describe('validateSignInInput', () => {
     const result = validateSignInInput(expectedData)
 
     expect(result.errorMessage).toBeNull()
-    expect(result.errors).toStrictEqual({})
     expect(result.data).toStrictEqual(expectedData)
   })
 
@@ -25,10 +24,8 @@ describe('validateSignInInput', () => {
       email: '',
       password: 'password123',
     })
-    const emailError = result.errors.email
 
     expect(result.errorMessage).not.toBeNull()
-    expect(emailError).toBeDefined()
   })
 
   it('should return invalid result for missing password', () => {
@@ -36,10 +33,8 @@ describe('validateSignInInput', () => {
       email: 'user@example.com',
       password: '',
     })
-    const passwordError = result.errors.password
 
     expect(result.errorMessage).not.toBeNull()
-    expect(passwordError).toBeDefined()
   })
 })
 
@@ -53,7 +48,6 @@ describe('validateSignUpInput', () => {
     const result = validateSignUpInput(expectedData)
 
     expect(result.errorMessage).toBeNull()
-    expect(result.errors).toStrictEqual({})
     expect(result.data).toStrictEqual(expectedData)
   })
 
@@ -62,10 +56,8 @@ describe('validateSignUpInput', () => {
       email: 'user@example.com',
       password: 'weak',
     })
-    const passwordError = result.errors.password
 
     expect(result.errorMessage).not.toBeNull()
-    expect(passwordError).toBeDefined()
   })
 })
 
@@ -76,16 +68,13 @@ describe('validateForgotPasswordInput', () => {
     const result = validateForgotPasswordInput(expectedData)
 
     expect(result.errorMessage).toBeNull()
-    expect(result.errors).toStrictEqual({})
     expect(result.data).toStrictEqual(expectedData)
   })
 
   it('should return invalid result for empty email', () => {
     const result = validateForgotPasswordInput({ email: '' })
-    const emailError = result.errors.email
 
     expect(result.errorMessage).not.toBeNull()
-    expect(emailError).toBeDefined()
   })
 })
 
