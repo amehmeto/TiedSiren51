@@ -34,23 +34,24 @@ type SortedSirens = {
   sortedKeywords: SectionedSiren<string>[]
 }
 
+type CommonFields = {
+  existingBlocklist: Blocklist | null
+  lockedSirens: LockedSirens
+  lockedToastMessage: string | null
+  blocklistNamePlaceholder: string
+} & SortedSirens
+
 type CreatingViewModel = {
   type: BlocklistFormViewState.Creating
-  lockedSirens: LockedSirens
-} & SortedSirens
+} & CommonFields
 
 type EditingViewModel = {
   type: BlocklistFormViewState.Editing
-  existingBlocklist: Blocklist
-  lockedSirens: LockedSirens
-} & SortedSirens
+} & CommonFields
 
 type EditingWithLockedSirensViewModel = {
   type: BlocklistFormViewState.EditingWithLockedSirens
-  existingBlocklist: Blocklist
-  lockedSirens: LockedSirens
-  lockedToastMessage: string
-} & SortedSirens
+} & CommonFields
 
 export type BlocklistFormViewModel =
   | CreatingViewModel
@@ -166,11 +167,16 @@ export function selectBlocklistFormViewModel(
   const { Creating, Editing, EditingWithLockedSirens } = BlocklistFormViewState
   const availableSirens = state.siren.availableSirens
 
+  const defaultPlaceholder = 'Blocklist name'
+
   if (mode === FormMode.Create) {
     return {
       type: Creating,
       ...sortSirens(availableSirens, EMPTY_SIRENS),
+      existingBlocklist: null,
       lockedSirens: EMPTY_LOCKED_SIRENS,
+      lockedToastMessage: null,
+      blocklistNamePlaceholder: defaultPlaceholder,
     }
   }
 
@@ -180,11 +186,15 @@ export function selectBlocklistFormViewModel(
     return {
       type: Creating,
       ...sortSirens(availableSirens, EMPTY_SIRENS),
+      existingBlocklist: null,
       lockedSirens: EMPTY_LOCKED_SIRENS,
+      lockedToastMessage: null,
+      blocklistNamePlaceholder: defaultPlaceholder,
     }
   }
 
   const sorted = sortSirens(availableSirens, existingBlocklist.sirens)
+  const blocklistNamePlaceholder = existingBlocklist.name || defaultPlaceholder
 
   const lockedSirens = selectLockedSirensForBlocklist(
     state,
@@ -202,6 +212,7 @@ export function selectBlocklistFormViewModel(
       ...sorted,
       lockedSirens,
       lockedToastMessage: `Locked (${timeLeftFormatted} left)`,
+      blocklistNamePlaceholder,
     }
   }
 
@@ -210,5 +221,7 @@ export function selectBlocklistFormViewModel(
     existingBlocklist,
     ...sorted,
     lockedSirens: EMPTY_LOCKED_SIRENS,
+    lockedToastMessage: null,
+    blocklistNamePlaceholder,
   }
 }

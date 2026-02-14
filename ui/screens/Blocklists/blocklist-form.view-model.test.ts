@@ -45,6 +45,9 @@ describe('selectBlocklistFormViewModel', () => {
     )
 
     expect(viewModel.type).toBe(BlocklistFormViewState.Creating)
+    expect(viewModel.existingBlocklist).toBeNull()
+    expect(viewModel.lockedToastMessage).toBeNull()
+    expect(viewModel.blocklistNamePlaceholder).toBe('Blocklist name')
     expect(viewModel.sortedAndroidApps).toStrictEqual([])
     expect(viewModel.sortedWebsites).toStrictEqual([])
     expect(viewModel.sortedKeywords).toStrictEqual([])
@@ -102,6 +105,9 @@ describe('selectBlocklistFormViewModel', () => {
     )
 
     expect(viewModel.type).toBe(BlocklistFormViewState.Editing)
+    expect(viewModel.existingBlocklist).toBe(blocklist)
+    expect(viewModel.lockedToastMessage).toBeNull()
+    expect(viewModel.blocklistNamePlaceholder).toBe(blocklist.name)
     expect(viewModel.lockedSirens).toStrictEqual(expectedLockedSirens)
   })
 
@@ -161,12 +167,14 @@ describe('selectBlocklistFormViewModel', () => {
     )
     const expectedViewModel = {
       type: BlocklistFormViewState.EditingWithLockedSirens,
+      existingBlocklist: blocklist,
       lockedSirens: {
         android: new Set([instagramAndroidSiren.packageName]),
         websites: new Set(['reddit.com']),
         keywords: new Set(['news']),
       },
       lockedToastMessage: 'Locked (2 hours, 30 minutes left)',
+      blocklistNamePlaceholder: blocklist.name,
     }
 
     const viewModel = selectBlocklistFormViewModel(
@@ -235,5 +243,7 @@ describe('selectBlocklistFormViewModel', () => {
     )
 
     expect(viewModel.type).toBe(BlocklistFormViewState.Creating)
+    expect(viewModel.existingBlocklist).toBeNull()
+    expect(viewModel.blocklistNamePlaceholder).toBe('Blocklist name')
   })
 })

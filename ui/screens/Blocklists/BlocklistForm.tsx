@@ -28,7 +28,6 @@ import { T } from '@/ui/design-system/theme'
 import { ErrorMessages } from '@/ui/error-messages.type'
 import { AppsSelectionScene } from '@/ui/screens/Blocklists/AppsSelectionScene'
 import {
-  BlocklistFormViewState,
   FormMode,
   selectBlocklistFormViewModel,
 } from '@/ui/screens/Blocklists/blocklist-form.view-model'
@@ -63,14 +62,12 @@ export function BlocklistForm({
     ),
   )
 
-  const isEditing = viewModel.type !== BlocklistFormViewState.Creating
-  const existingBlocklist = isEditing ? viewModel.existingBlocklist : null
-
-  const { lockedSirens } = viewModel
-
-  const isLocked =
-    viewModel.type === BlocklistFormViewState.EditingWithLockedSirens
-  const lockedToastMessage = isLocked ? viewModel.lockedToastMessage : null
+  const {
+    existingBlocklist,
+    lockedSirens,
+    lockedToastMessage,
+    blocklistNamePlaceholder,
+  } = viewModel
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
     () =>
@@ -265,7 +262,7 @@ export function BlocklistForm({
       <Text style={styles.title}>Name</Text>
       <TiedSCard>
         <TiedSTextInput
-          placeholder={existingBlocklist?.name ?? 'Blocklist name'}
+          placeholder={blocklistNamePlaceholder}
           onChangeText={(text) => setBlocklist({ ...blocklist, name: text })}
         />
       </TiedSCard>
