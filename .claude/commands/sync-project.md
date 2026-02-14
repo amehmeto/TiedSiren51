@@ -123,101 +123,13 @@ node scripts/ticket-graph/generate-dependency-graph.mjs --json > graph.json
 
 ## Phase 5.5: Categorize Orphan Tickets
 
-Before generating the final graph, identify tickets that are not assigned to any Epic.
+**Handled automatically by `./scripts/sync-project-data.sh`.**
 
-### 5.5.1 Detect Orphan Tickets
+The script detects orphan tickets (open, non-epic, no hierarchy section) and:
+1. **High confidence (≥2 keyword matches)**: auto-assigns to matching Epic (adds hierarchy section to issue body)
+2. **No/low match**: auto-adds a label based on title keywords (tooling, auth, blocking, android, enhancement, etc.)
 
-An orphan ticket is one that:
-- Is NOT an initiative or epic (type is feature, bug, or task)
-- Does NOT have a parent epic in its hierarchy section (`🏔️ Epic | [#XX`)
-- Is still OPEN (closed tickets can be ignored)
-
-### 5.5.2 Fetch Open Epics Dynamically
-
-First, fetch the current list of open epics:
-
-```bash
-gh issue list --label epic --state open --json number,title,url --limit 50
-```
-
-For each epic, extract keywords from its title by:
-1. Removing common prefixes like `[Epic]`, `Epic:`, etc.
-2. Splitting the remaining title into significant words (ignore articles, prepositions)
-3. Including any domain-specific terms (e.g., "auth", "blocking", "android")
-
-Example keyword extraction:
-- `[Epic] User Authentication` → keywords: `auth, authentication, user, sign-in, password, login`
-- `[Epic] Blocking Apps on Android` → keywords: `blocking, apps, android, block`
-
-### 5.5.3 Match Orphan Tickets to Epics
-
-For each orphan ticket, analyze its title and body against the dynamically-fetched epic keywords:
-
-1. **Score each epic** based on keyword matches in the ticket title/body
-2. **High confidence (≥2 keyword matches)**: Auto-assign to that epic
-3. **Low confidence (1 match or tie)**: Ask user to confirm
-
-If a match is found, update the ticket's body to add the hierarchy section:
-
-```markdown
-## Hierarchy
-| Level | Link |
-|-------|------|
-| 🏔️ Epic | [#XX - Epic Name](url) |
-```
-
-### 5.5.4 Handle Tickets That Don't Match Any Epic
-
-If an orphan ticket doesn't match any existing epic, use `AskUserQuestion` to ask the user:
-
-```
-Ticket #XXX "Some ticket title" doesn't match any existing Epic.
-
-Options:
-1. Assign to existing Epic: [list epics as options]
-2. Create new Epic for this ticket
-3. Leave as orphan (no parent Epic)
-```
-
-If the user chooses to create a new Epic:
-1. Ask for the new Epic's title (suggest based on ticket keywords)
-2. Create the Epic issue with the `epic` label:
-   ```bash
-   gh issue create --title "[Epic] New Epic Name" --label epic --body "Epic description..."
-   ```
-3. Assign the orphan ticket to the newly created Epic
-
-### 5.5.5 Report Orphan Tickets
-
-Display a summary of actions taken:
-
-```markdown
-## Orphan Tickets Report
-
-### Auto-Categorized (High Confidence)
-| Ticket | Assigned To | Matched Keywords |
-|--------|-------------|------------------|
-| #XXX | Epic #YY | auth, login |
-
-### User-Assigned
-| Ticket | Assigned To | Action |
-|--------|-------------|--------|
-| #XXX | Epic #YY | User selected |
-| #ZZZ | Epic #NEW | Created new Epic |
-
-### Left as Orphan
-| Ticket | Title | Reason |
-|--------|-------|--------|
-| #XXX | Some title | User chose to skip |
-```
-
-### 5.5.6 Update Tickets
-
-For categorized tickets, update the issue body to add the hierarchy section:
-
-```bash
-gh issue edit <number> --body "$(updated_body_with_hierarchy)"
-```
+**No user confirmation needed.** Every orphan gets either an Epic parent or a label — never left unlabeled.
 
 ---
 
