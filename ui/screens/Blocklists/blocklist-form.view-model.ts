@@ -10,10 +10,6 @@ import {
 } from '@/core/strict-mode/is-siren-locked'
 import { selectLockedSirensForBlocklist } from '@/core/strict-mode/selectors/selectLockedSirensForBlocklist'
 import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
-import {
-  SortedListItem,
-  sortWithSelectedFirst,
-} from '@/ui/screens/Blocklists/sort-with-selected-first'
 
 export enum FormMode {
   Create = 'create',
@@ -26,10 +22,16 @@ export enum BlocklistFormViewState {
   EditingWithLockedSirens = 'EDITING_WITH_LOCKED_SIRENS',
 }
 
+type SectionedSirenDivider = { type: 'divider'; id: string; label: string }
+
+export type SectionedSiren<T> =
+  | { type: 'siren'; siren: T }
+  | SectionedSirenDivider
+
 type SortedSirens = {
-  sortedAndroidApps: SortedListItem<AndroidSiren>[]
-  sortedWebsites: SortedListItem<string>[]
-  sortedKeywords: SortedListItem<string>[]
+  sortedAndroidApps: SectionedSiren<AndroidSiren>[]
+  sortedWebsites: SectionedSiren<string>[]
+  sortedKeywords: SectionedSiren<string>[]
 }
 
 type CreatingViewModel = {
@@ -55,27 +57,87 @@ export type BlocklistFormViewModel =
   | EditingViewModel
   | EditingWithLockedSirensViewModel
 
+function sortWithSelectedFirst<T>(
+  sirens: T[],
+  savedSelectedKeys: string[],
+  getKey: (siren: T) => string,
+  getName: (siren: T) => string,
+): SectionedSiren<T>[] {
+  const savedSet = new Set(savedSelectedKeys)
+
+  const selectedSirens: T[] = []
+  const unselectedSirens: T[] = []
+
+  for (const siren of sirens) {
+    const key = getKey(siren)
+    if (savedSet.has(key)) selectedSirens.push(siren)
+    else unselectedSirens.push(siren)
+  }
+
+  const compareName = (a: T, b: T) => {
+    const nameA = getName(a)
+    const nameB = getName(b)
+    return nameA.localeCompare(nameB)
+  }
+  selectedSirens.sort(compareName)
+  unselectedSirens.sort(compareName)
+
+  const sectioned: SectionedSiren<T>[] = []
+
+  if (selectedSirens.length > 0) {
+    sectioned.push({
+      type: 'divider',
+      id: 'divider-selected',
+      label: 'Selected',
+    })
+    selectedSirens.forEach((siren) => sectioned.push({ type: 'siren', siren }))
+  }
+
+  if (unselectedSirens.length > 0) {
+    sectioned.push({
+      type: 'divider',
+      id: 'divider-available',
+      label: 'Available',
+    })
+    unselectedSirens.forEach((siren) =>
+      sectioned.push({ type: 'siren', siren }),
+    )
+  }
+
+  return sectioned
+}
+
 function sortSirens(available: Sirens, selected: Sirens): SortedSirens {
-  const selectedPackageNames = selected.android.map((app) => app.packageName)
+  const {
+    android: selectedAndroid,
+    websites: selectedWebsites,
+    keywords: selectedKeywords,
+  } = selected
+  const {
+    android: availableAndroid,
+    websites: availableWebsites,
+    keywords: availableKeywords,
+  } = available
+  const selectedPackageNames = selectedAndroid.map((app) => app.packageName)
 
   return {
     sortedAndroidApps: sortWithSelectedFirst(
-      available.android,
+      availableAndroid,
       selectedPackageNames,
       (app) => app.packageName,
       (app) => app.appName,
     ),
     sortedWebsites: sortWithSelectedFirst(
-      available.websites,
-      selected.websites,
-      (s) => s,
-      (s) => s,
+      availableWebsites,
+      selectedWebsites,
+      (website) => website,
+      (website) => website,
     ),
     sortedKeywords: sortWithSelectedFirst(
-      available.keywords,
-      selected.keywords,
-      (s) => s,
-      (s) => s,
+      availableKeywords,
+      selectedKeywords,
+      (keyword) => keyword,
+      (keyword) => keyword,
     ),
   }
 }

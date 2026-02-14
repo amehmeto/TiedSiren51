@@ -69,24 +69,24 @@ export function TextInputSelectionScene({
       />
       <FlatList
         data={sortedSirens}
-        keyExtractor={(listItem) =>
-          listItem.type === 'divider' ? listItem.id : listItem.siren
+        keyExtractor={(sectionEntry) =>
+          sectionEntry.type === 'divider' ? sectionEntry.id : sectionEntry.siren
         }
-        renderItem={({ item: listItem }) => {
-          if (listItem.type === 'divider')
-            return <SectionDivider label={listItem.label} />
+        renderItem={({ item: sectionEntry }) => {
+          if (sectionEntry.type === 'divider')
+            return <SectionDivider label={sectionEntry.label} />
 
-          const isSelected = isSirenSelected(sirenType, listItem.siren)
+          const isSelected = isSirenSelected(sirenType, sectionEntry.siren)
           const isLocked = isSirenLocked(
             lockedSirens,
             sirenType,
-            listItem.siren,
+            sectionEntry.siren,
           )
           return (
             <SelectableSirenCard
               sirenType={sirenType}
-              siren={listItem.siren}
-              onPress={() => toggleSiren(sirenType, listItem.siren)}
+              siren={sectionEntry.siren}
+              onPress={() => toggleSiren(sirenType, sectionEntry.siren)}
               isSelected={isSelected}
               isLocked={isLocked}
             />

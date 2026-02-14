@@ -44,27 +44,31 @@ export function AppsSelectionScene({
   return (
     <FlatList
       data={sortedAndroidApps}
-      keyExtractor={(listItem) =>
-        listItem.type === 'divider' ? listItem.id : listItem.siren.packageName
+      keyExtractor={(sectionEntry) =>
+        sectionEntry.type === 'divider'
+          ? sectionEntry.id
+          : sectionEntry.siren.packageName
       }
-      renderItem={({ item: listItem }) => {
-        if (listItem.type === 'divider')
-          return <SectionDivider label={listItem.label} />
+      renderItem={({ item: sectionEntry }) => {
+        if (sectionEntry.type === 'divider')
+          return <SectionDivider label={sectionEntry.label} />
 
         const isSelected = isSirenSelected(
           SirenType.ANDROID,
-          listItem.siren.packageName,
+          sectionEntry.siren.packageName,
         )
         const isLocked = isSirenLocked(
           lockedSirens,
           SirenType.ANDROID,
-          listItem.siren.packageName,
+          sectionEntry.siren.packageName,
         )
         return (
           <SelectableSirenCard
             sirenType={SirenType.ANDROID}
-            siren={listItem.siren}
-            onPress={() => toggleAppSiren(SirenType.ANDROID, listItem.siren)}
+            siren={sectionEntry.siren}
+            onPress={() =>
+              toggleAppSiren(SirenType.ANDROID, sectionEntry.siren)
+            }
             isSelected={isSelected}
             isLocked={isLocked}
           />

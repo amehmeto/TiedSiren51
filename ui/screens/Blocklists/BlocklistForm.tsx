@@ -63,17 +63,14 @@ export function BlocklistForm({
     ),
   )
 
-  const existingBlocklist =
-    viewModel.type !== BlocklistFormViewState.Creating
-      ? viewModel.existingBlocklist
-      : undefined
+  const isEditing = viewModel.type !== BlocklistFormViewState.Creating
+  const existingBlocklist = isEditing ? viewModel.existingBlocklist : null
 
   const { lockedSirens } = viewModel
 
-  const lockedToastMessage =
+  const isLocked =
     viewModel.type === BlocklistFormViewState.EditingWithLockedSirens
-      ? viewModel.lockedToastMessage
-      : undefined
+  const lockedToastMessage = isLocked ? viewModel.lockedToastMessage : null
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
     () =>

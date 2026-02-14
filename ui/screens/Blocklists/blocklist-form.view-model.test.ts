@@ -14,8 +14,17 @@ import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import {
   BlocklistFormViewState,
   FormMode,
+  SectionedSiren,
   selectBlocklistFormViewModel,
 } from './blocklist-form.view-model'
+
+function sirenEntries<T>(
+  sectioned: SectionedSiren<T>[],
+): { type: 'siren'; siren: T }[] {
+  return sectioned.filter(
+    (entry): entry is { type: 'siren'; siren: T } => entry.type === 'siren',
+  )
+}
 
 describe('selectBlocklistFormViewModel', () => {
   let dateProvider: StubDateProvider
@@ -59,11 +68,9 @@ describe('selectBlocklistFormViewModel', () => {
       undefined,
     )
 
-    const appNames = viewModel.sortedAndroidApps
-      .filter(
-        (i): i is { type: 'siren'; siren: AndroidSiren } => i.type === 'siren',
-      )
-      .map((i) => i.siren.appName)
+    const appNames = sirenEntries(viewModel.sortedAndroidApps).map(
+      (entry) => entry.siren.appName,
+    )
     const expectedAppNames = ['Facebook', 'Instagram']
     expect(appNames).toStrictEqual(expectedAppNames)
   })
@@ -201,23 +208,18 @@ describe('selectBlocklistFormViewModel', () => {
       'blocklist-1',
     )
 
-    const appItems = viewModel.sortedAndroidApps.filter(
-      (i): i is { type: 'siren'; siren: AndroidSiren } => i.type === 'siren',
-    )
-    const firstAppName = appItems[0].siren.appName
+    const androidApps = sirenEntries<AndroidSiren>(viewModel.sortedAndroidApps)
+    const [firstApp] = androidApps
+    const firstAppName = firstApp.siren.appName
     expect(firstAppName).toBe(instagramAndroidSiren.appName)
 
-    const websiteItems = viewModel.sortedWebsites.filter(
-      (i): i is { type: 'siren'; siren: string } => i.type === 'siren',
-    )
-    const firstWebsite = websiteItems[0].siren
-    expect(firstWebsite).toBe('twitter.com')
+    const websiteEntries = sirenEntries(viewModel.sortedWebsites)
+    const [firstWebsite] = websiteEntries
+    expect(firstWebsite.siren).toBe('twitter.com')
 
-    const keywordItems = viewModel.sortedKeywords.filter(
-      (i): i is { type: 'siren'; siren: string } => i.type === 'siren',
-    )
-    const firstKeyword = keywordItems[0].siren
-    expect(firstKeyword).toBe('gaming')
+    const keywordEntries = sirenEntries(viewModel.sortedKeywords)
+    const [firstKeyword] = keywordEntries
+    expect(firstKeyword.siren).toBe('gaming')
   })
 
   test('Non-existent blocklistId falls back to Creating', () => {

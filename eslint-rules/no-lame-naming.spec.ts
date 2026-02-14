@@ -34,10 +34,6 @@ describe('no-lame-naming', () => {
         // Descriptive function names
         { code: 'function sortSirens() {}' },
         { code: 'const fetchApps = () => {}' },
-        // Callback parameters are allowed (e.g., .map, .filter)
-        { code: 'list.map((item) => item.name)' },
-        { code: 'list.filter((item) => item.active)' },
-        { code: 'someFunction((item) => item.id)' },
         // Custom forbidden list: "data" is fine when not in custom list
         {
           code: 'const data = fetchData()',
@@ -157,6 +153,34 @@ describe('no-lame-naming', () => {
             {
               messageId: 'noLameVariableName',
               data: { name: 'data' },
+            },
+          ],
+        },
+        // Callback parameters with forbidden names are also flagged
+        {
+          code: 'list.map((item) => item.name)',
+          errors: [
+            {
+              messageId: 'noLameVariableName',
+              data: { name: 'item' },
+            },
+          ],
+        },
+        {
+          code: 'list.filter((item) => item.active)',
+          errors: [
+            {
+              messageId: 'noLameVariableName',
+              data: { name: 'item' },
+            },
+          ],
+        },
+        {
+          code: 'someFunction((item) => item.id)',
+          errors: [
+            {
+              messageId: 'noLameVariableName',
+              data: { name: 'item' },
             },
           ],
         },
