@@ -28,18 +28,24 @@ import { Logger } from '@/core/_ports_/logger'
 import { AuthError } from '@/core/auth/auth-error'
 import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
-import {
-  FIREBASE_ERROR_TYPES,
-  FIREBASE_ERRORS,
-  FirebaseAuthErrorCode,
-  GOOGLE_ERROR_TYPES,
-  GOOGLE_SIGN_IN_ERRORS,
-  GoogleSignInError,
-} from './firebase.auth-error-maps'
+import { FirebaseAuthErrorCode } from './firebase.auth-error-code'
+import { FIREBASE_ERROR_TYPES } from './firebase.auth-error-types'
+import { FIREBASE_ERRORS } from './firebase.auth-errors'
+import { GOOGLE_ERROR_TYPES } from './firebase.google-error-types'
+import { GoogleSignInError } from './firebase.google-sign-in-error'
+import { GOOGLE_SIGN_IN_ERRORS } from './firebase.google-sign-in-errors'
 import { firebaseConfig } from './firebaseConfig'
 
 export class FirebaseAuthGateway implements AuthGateway {
   private static readonly FIREBASE_CONFIG = firebaseConfig
+
+  private static readonly FIREBASE_ERRORS = FIREBASE_ERRORS
+
+  private static readonly FIREBASE_ERROR_TYPES = FIREBASE_ERROR_TYPES
+
+  private static readonly GOOGLE_SIGN_IN_ERRORS = GOOGLE_SIGN_IN_ERRORS
+
+  private static readonly GOOGLE_ERROR_TYPES = GOOGLE_ERROR_TYPES
 
   private readonly firebaseConfig: typeof firebaseConfig
 
@@ -56,7 +62,10 @@ export class FirebaseAuthGateway implements AuthGateway {
   private isFirebaseAuthError(
     error: unknown,
   ): error is FirebaseError & { code: FirebaseAuthErrorCode } {
-    return this.isFirebaseError(error) && error.code in FIREBASE_ERRORS
+    return (
+      this.isFirebaseError(error) &&
+      error.code in FirebaseAuthGateway.FIREBASE_ERRORS
+    )
   }
 
   private getGoogleSignInErrorPattern(error: Error): GoogleSignInError | null {
@@ -131,8 +140,8 @@ export class FirebaseAuthGateway implements AuthGateway {
   private toAuthError(error: unknown): AuthError {
     if (this.isFirebaseAuthError(error)) {
       return new AuthError(
-        FIREBASE_ERRORS[error.code],
-        FIREBASE_ERROR_TYPES[error.code],
+        FirebaseAuthGateway.FIREBASE_ERRORS[error.code],
+        FirebaseAuthGateway.FIREBASE_ERROR_TYPES[error.code],
       )
     }
 
@@ -140,8 +149,8 @@ export class FirebaseAuthGateway implements AuthGateway {
       const pattern = this.getGoogleSignInErrorPattern(error)
       if (pattern) {
         return new AuthError(
-          GOOGLE_SIGN_IN_ERRORS[pattern],
-          GOOGLE_ERROR_TYPES[pattern],
+          FirebaseAuthGateway.GOOGLE_SIGN_IN_ERRORS[pattern],
+          FirebaseAuthGateway.GOOGLE_ERROR_TYPES[pattern],
         )
       }
     }
