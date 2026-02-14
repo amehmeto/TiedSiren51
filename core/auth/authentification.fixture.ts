@@ -64,6 +64,12 @@ export function authentificationFixture(
         const error = new AuthError(errorMessage, errorType)
         authGateway.willResultWith = Promise.reject(error)
       },
+      logOutWillRejectWith(
+        errorMessage: string,
+        errorType: AuthErrorType = AuthErrorType.Unknown,
+      ) {
+        authGateway.logOutError = new AuthError(errorMessage, errorType)
+      },
       reauthenticationWillSucceed() {
         authGateway.willReauthenticateWith = Promise.resolve()
       },

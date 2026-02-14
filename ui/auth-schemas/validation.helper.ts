@@ -8,10 +8,9 @@ import {
   SignUpInput,
 } from './auth.schema'
 
-export interface ValidationResult<T = SignInInput | SignUpInput> {
-  errorMessage: string | null
-  data?: T
-}
+export type ValidationResult<T = SignInInput | SignUpInput> =
+  | { errorMessage: string; data?: never }
+  | { errorMessage: null; data: T }
 
 export function validateSignInInput(
   input: SignInInput,

@@ -37,18 +37,6 @@ import { GOOGLE_SIGN_IN_ERRORS } from './firebase.google-sign-in-errors'
 import { firebaseConfig } from './firebaseConfig'
 
 export class FirebaseAuthGateway implements AuthGateway {
-  private static readonly FIREBASE_CONFIG = firebaseConfig
-
-  private static readonly FIREBASE_ERRORS = FIREBASE_ERRORS
-
-  private static readonly FIREBASE_ERROR_TYPES = FIREBASE_ERROR_TYPES
-
-  private static readonly GOOGLE_SIGN_IN_ERRORS = GOOGLE_SIGN_IN_ERRORS
-
-  private static readonly GOOGLE_ERROR_TYPES = GOOGLE_ERROR_TYPES
-
-  private readonly firebaseConfig: typeof firebaseConfig
-
   private readonly auth: Auth
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
@@ -62,10 +50,7 @@ export class FirebaseAuthGateway implements AuthGateway {
   private isFirebaseAuthError(
     error: unknown,
   ): error is FirebaseError & { code: FirebaseAuthErrorCode } {
-    return (
-      this.isFirebaseError(error) &&
-      error.code in FirebaseAuthGateway.FIREBASE_ERRORS
-    )
+    return this.isFirebaseError(error) && error.code in FIREBASE_ERRORS
   }
 
   private getGoogleSignInErrorPattern(error: Error): GoogleSignInError | null {
@@ -83,7 +68,6 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   public constructor(private readonly logger: Logger) {
-    this.firebaseConfig = FirebaseAuthGateway.FIREBASE_CONFIG
     const app = this.initializeApp()
     this.auth = this.initializeAuth(app)
     this.setupAuthStateListener()
@@ -91,7 +75,7 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   private initializeApp(): FirebaseApp {
-    return getApps().length ? getApp() : initializeApp(this.firebaseConfig)
+    return getApps().length ? getApp() : initializeApp(firebaseConfig)
   }
 
   private initializeAuth(app: FirebaseApp): Auth {
@@ -133,15 +117,15 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   private configureGoogleSignIn(): void {
     GoogleSignin.configure({
-      webClientId: this.firebaseConfig.webClientId,
+      webClientId: firebaseConfig.webClientId,
     })
   }
 
   private toAuthError(error: unknown): AuthError {
     if (this.isFirebaseAuthError(error)) {
       return new AuthError(
-        FirebaseAuthGateway.FIREBASE_ERRORS[error.code],
-        FirebaseAuthGateway.FIREBASE_ERROR_TYPES[error.code],
+        FIREBASE_ERRORS[error.code],
+        FIREBASE_ERROR_TYPES[error.code],
       )
     }
 
@@ -149,8 +133,8 @@ export class FirebaseAuthGateway implements AuthGateway {
       const pattern = this.getGoogleSignInErrorPattern(error)
       if (pattern) {
         return new AuthError(
-          FirebaseAuthGateway.GOOGLE_SIGN_IN_ERRORS[pattern],
-          FirebaseAuthGateway.GOOGLE_ERROR_TYPES[pattern],
+          GOOGLE_SIGN_IN_ERRORS[pattern],
+          GOOGLE_ERROR_TYPES[pattern],
         )
       }
     }
