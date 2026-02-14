@@ -69,20 +69,21 @@ export function BlocklistForm({
     blocklistNamePlaceholder,
   } = viewModel
 
+  const emptyBlocklist: Omit<Blocklist, 'id'> = {
+    name: '',
+    sirens: {
+      android: [],
+      ios: [],
+      windows: [],
+      macos: [],
+      linux: [],
+      websites: [],
+      keywords: [],
+    },
+  }
+
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
-    () =>
-      existingBlocklist ?? {
-        name: '',
-        sirens: {
-          android: [],
-          ios: [],
-          windows: [],
-          macos: [],
-          linux: [],
-          websites: [],
-          keywords: [],
-        },
-      },
+    () => existingBlocklist ?? emptyBlocklist,
   )
 
   const [errors, setErrors] = useState<ErrorMessages>({})

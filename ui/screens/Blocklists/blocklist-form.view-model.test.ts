@@ -37,6 +37,15 @@ describe('selectBlocklistFormViewModel', () => {
 
   test('Creating mode returns Creating variant with empty sorted lists', () => {
     const store = createTestStore({ dateProvider })
+    const expectedViewModel = {
+      type: BlocklistFormViewState.Creating,
+      existingBlocklist: null,
+      lockedToastMessage: null,
+      blocklistNamePlaceholder: 'Blocklist name',
+      sortedAndroidApps: [],
+      sortedWebsites: [],
+      sortedKeywords: [],
+    }
 
     const viewModel = selectBlocklistFormViewModel(
       store.getState(),
@@ -45,13 +54,7 @@ describe('selectBlocklistFormViewModel', () => {
       undefined,
     )
 
-    expect(viewModel.type).toBe(BlocklistFormViewState.Creating)
-    expect(viewModel.existingBlocklist).toBeNull()
-    expect(viewModel.lockedToastMessage).toBeNull()
-    expect(viewModel.blocklistNamePlaceholder).toBe('Blocklist name')
-    expect(viewModel.sortedAndroidApps).toStrictEqual([])
-    expect(viewModel.sortedWebsites).toStrictEqual([])
-    expect(viewModel.sortedKeywords).toStrictEqual([])
+    expect(viewModel).toMatchObject(expectedViewModel)
   })
 
   test('Creating mode returns sorted available sirens', () => {
@@ -92,10 +95,16 @@ describe('selectBlocklistFormViewModel', () => {
       { dateProvider },
       stateBuilder().withBlocklists([blocklist]).build(),
     )
-    const expectedLockedSirens = {
-      android: new Set(),
-      websites: new Set(),
-      keywords: new Set(),
+    const expectedViewModel = {
+      type: BlocklistFormViewState.Editing,
+      existingBlocklist: blocklist,
+      lockedToastMessage: null,
+      blocklistNamePlaceholder: blocklist.name,
+      lockedSirens: {
+        android: new Set(),
+        websites: new Set(),
+        keywords: new Set(),
+      },
     }
 
     const viewModel = selectBlocklistFormViewModel(
@@ -105,11 +114,7 @@ describe('selectBlocklistFormViewModel', () => {
       'blocklist-1',
     )
 
-    expect(viewModel.type).toBe(BlocklistFormViewState.Editing)
-    expect(viewModel.existingBlocklist).toBe(blocklist)
-    expect(viewModel.lockedToastMessage).toBeNull()
-    expect(viewModel.blocklistNamePlaceholder).toBe(blocklist.name)
-    expect(viewModel.lockedSirens).toStrictEqual(expectedLockedSirens)
+    expect(viewModel).toMatchObject(expectedViewModel)
   })
 
   test('Editing with strict mode but blocklist not in session returns Editing variant', () => {
@@ -252,6 +257,11 @@ describe('selectBlocklistFormViewModel', () => {
 
   test('Non-existent blocklistId falls back to Creating', () => {
     const store = createTestStore({ dateProvider })
+    const expectedViewModel = {
+      type: BlocklistFormViewState.Creating,
+      existingBlocklist: null,
+      blocklistNamePlaceholder: 'Blocklist name',
+    }
 
     const viewModel = selectBlocklistFormViewModel(
       store.getState(),
@@ -260,8 +270,6 @@ describe('selectBlocklistFormViewModel', () => {
       'non-existent-id',
     )
 
-    expect(viewModel.type).toBe(BlocklistFormViewState.Creating)
-    expect(viewModel.existingBlocklist).toBeNull()
-    expect(viewModel.blocklistNamePlaceholder).toBe('Blocklist name')
+    expect(viewModel).toMatchObject(expectedViewModel)
   })
 })

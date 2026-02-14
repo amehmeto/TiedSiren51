@@ -57,7 +57,7 @@ export type BlocklistFormViewModel =
   | EditingViewModel
   | EditingWithLockedSirensViewModel
 
-function sortWithSelectedFirst<T>(
+function sortSirensSelectedFirst<T>(
   sirens: T[],
   savedSelectedKeys: string[],
   getKey: (siren: T) => string,
@@ -121,19 +121,19 @@ function sortSirens(available: Sirens, selected: Sirens): SortedSirens {
   const selectedPackageNames = selectedAndroid.map((app) => app.packageName)
 
   return {
-    sortedAndroidApps: sortWithSelectedFirst(
+    sortedAndroidApps: sortSirensSelectedFirst(
       availableAndroid,
       selectedPackageNames,
       (app) => app.packageName,
       (app) => app.appName,
     ),
-    sortedWebsites: sortWithSelectedFirst(
+    sortedWebsites: sortSirensSelectedFirst(
       availableWebsites,
       selectedWebsites,
       (website) => website,
       (website) => website,
     ),
-    sortedKeywords: sortWithSelectedFirst(
+    sortedKeywords: sortSirensSelectedFirst(
       availableKeywords,
       selectedKeywords,
       (keyword) => keyword,
