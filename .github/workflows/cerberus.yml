@@ -1,10 +1,24 @@
-# Cerberus (Κέρβερος) - Three-headed guardian of the underworld
-# https://www.wikiwand.com/en/articles/Cerberus
+# ──────────────────────────────────────────────────────────────
 #
-# Named after the three-headed hound guarding the gates of the underworld.
-# Like its mythological counterpart, this workflow acts as a guardian,
-# ensuring code quality through multiple checks (tests, builds, lint)
-# before allowing passage to the next stage.
+#                     ╱▔▔╲       ╱▔▔╲       ╱▔▔╲
+#                    │ ◉◉ │     │ ◉◉ │     │ ◉◉ │
+#                     ╲▂▂╱  ╲   │╱  ╲│   ╱  ╲▂▂╱
+#                       ╲    ╲▁▁▁▁▁▁▁╱    ╱
+#                        ╲▁▁▁▁▁▁▁▁▁▁▁▁▁▁╱
+#                           │ CERBERUS │
+#                           │▓▓▓▓▓▓▓▓▓▓│
+#                          ╱│          │╲
+#                         ╱ │          │ ╲
+#                        ╱  │          │  ╲
+#                      ╱▔╲ ╱▔╲        ╱▔╲ ╱▔╲
+#                     │░░│ │░░│      │░░│ │░░│
+#                      ▔▔   ▔▔        ▔▔   ▔▔
+#
+#           « None shall merge without passing all three heads »
+#
+#              HEAD 1: Lint  │  HEAD 2: Test  │  HEAD 3: Build
+#
+# ──────────────────────────────────────────────────────────────
 
 name: Cerberus
 

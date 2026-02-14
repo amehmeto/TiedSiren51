@@ -1,12 +1,31 @@
-# Hephaestus (Ἥφαιστος) - God of the forge in Greek mythology
-# https://www.wikiwand.com/en/articles/Hephaestus
+# ──────────────────────────────────────────────────────────────
 #
-# The divine blacksmith who crafts weapons and tools for the gods.
-# He receives orders and transforms raw material into finished work.
+#                         ╱╲      ╱╲
+#                        ╱░░╲    ╱░░╲
+#                       ╱░░░░╲  ╱░░░░╲
+#                      ╱░░░░░░╲╱░░░░░░╲
+#                     ╱░░░ FLAMES ░░░░░╲
+#                    ╱░░░░░░░░░░░░░░░░░░╲
+#                   ┌────────────────────────┐
+#                   │ ╔══════════════════╗   │
+#                   │ ║   HEPHAESTUS     ║   │
+#                   │ ║                  ║   │
+#                   │ ║  ⚒  THE FORGE  ⚒ ║   │
+#                   │ ║                  ║   │
+#                   │ ║  > claude code _ ║   │
+#                   │ ║  > building...   ║   │
+#                   │ ║  > ███████░ 89%  ║   │
+#                   │ ╚══════════════════╝   │
+#                   │  ▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓  │
+#                   └────────────────────────┘
+#                      ╲▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓▓╱
+#                       ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀
 #
-# This workflow triggers when an issue is labeled 'ready'. It sets up
-# the forge (worktree, branch, prompt) and puts Claude to work,
-# hammering code until the PR is ready.
+#              « In the divine forge, code is shaped by AI »
+#
+#                   VPS  │  Claude Code  │  Build
+#
+# ──────────────────────────────────────────────────────────────
 
 name: Hephaestus
 
