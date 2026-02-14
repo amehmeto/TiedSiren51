@@ -232,6 +232,23 @@ describe('selectBlocklistFormViewModel', () => {
     expect(firstKeyword.siren).toBe('gaming')
   })
 
+  test('Editing mode with empty blocklist name falls back to default placeholder', () => {
+    const blocklist = buildBlocklist({ id: 'blocklist-1', name: '' })
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withBlocklists([blocklist]).build(),
+    )
+
+    const viewModel = selectBlocklistFormViewModel(
+      store.getState(),
+      dateProvider,
+      FormMode.Edit,
+      'blocklist-1',
+    )
+
+    expect(viewModel.blocklistNamePlaceholder).toBe('Blocklist name')
+  })
+
   test('Non-existent blocklistId falls back to Creating', () => {
     const store = createTestStore({ dateProvider })
 
