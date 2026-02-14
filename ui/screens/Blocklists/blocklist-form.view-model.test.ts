@@ -15,14 +15,15 @@ import {
   BlocklistFormViewState,
   FormMode,
   SectionedSiren,
+  SectionedSirenEntry,
   selectBlocklistFormViewModel,
 } from './blocklist-form.view-model'
 
 function withoutDividers<T>(
   sectioned: SectionedSiren<T>[],
-): { type: 'siren'; siren: T }[] {
+): SectionedSirenEntry<T>[] {
   return sectioned.filter(
-    (entry): entry is { type: 'siren'; siren: T } => entry.type === 'siren',
+    (entry): entry is SectionedSirenEntry<T> => entry.type === 'siren',
   )
 }
 

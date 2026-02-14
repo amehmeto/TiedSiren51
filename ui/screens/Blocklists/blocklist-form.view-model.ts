@@ -23,10 +23,9 @@ export enum BlocklistFormViewState {
 }
 
 type SectionedSirenDivider = { type: 'divider'; id: string; label: string }
+export type SectionedSirenEntry<T> = { type: 'siren'; siren: T }
 
-export type SectionedSiren<T> =
-  | { type: 'siren'; siren: T }
-  | SectionedSirenDivider
+export type SectionedSiren<T> = SectionedSirenEntry<T> | SectionedSirenDivider
 
 type SortedSirens = {
   sortedAndroidApps: SectionedSiren<AndroidSiren>[]
