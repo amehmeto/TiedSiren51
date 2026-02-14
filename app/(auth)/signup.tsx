@@ -33,6 +33,7 @@ export default function SignUpScreen() {
   const dispatch = useDispatch<AppDispatch>()
 
   const viewModel = useSelector(selectSignUpViewModel)
+  const { error } = viewModel
 
   useEffect(() => {
     dispatch(clearAuthState())
@@ -63,8 +64,6 @@ export default function SignUpScreen() {
 
     if (validCredentials) await dispatch(signUpWithEmail(validCredentials))
   }
-
-  const { error } = viewModel
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>

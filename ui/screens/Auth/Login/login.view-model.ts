@@ -11,10 +11,12 @@ export type LoginViewModel = AuthBaseViewModel<LoginViewState> & {
   error: string | null
   email: string
   password: string
+  isUserAuthenticated: boolean
 }
 
 export function selectLoginViewModel(state: RootState): LoginViewModel {
-  const { isLoading, error, email, password } = state.auth
+  const { isLoading, error, email, password, authUser } = state.auth
+  const isUserAuthenticated = authUser !== null
   const { Loading, Error, Idle } = LoginViewState
 
   if (isLoading) {
@@ -25,6 +27,7 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
       error: null,
       email,
       password,
+      isUserAuthenticated,
     }
   }
 
@@ -36,6 +39,7 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
       error,
       email,
       password,
+      isUserAuthenticated,
     }
   }
 
@@ -46,5 +50,6 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
     error: null,
     email,
     password,
+    isUserAuthenticated,
   }
 }

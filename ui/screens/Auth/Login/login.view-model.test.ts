@@ -18,6 +18,7 @@ describe('selectLoginViewModel', () => {
         error: null,
         email: '',
         password: '',
+        isUserAuthenticated: false,
       }
 
       const viewModel = selectLoginViewModel(state)
@@ -36,6 +37,7 @@ describe('selectLoginViewModel', () => {
         error: null,
         email: '',
         password: '',
+        isUserAuthenticated: false,
       }
 
       const viewModel = selectLoginViewModel(state)
@@ -60,6 +62,7 @@ describe('selectLoginViewModel', () => {
         error: 'Invalid email or password.',
         email: 'user@test.com',
         password: '',
+        isUserAuthenticated: false,
       }
 
       const viewModel = selectLoginViewModel(state)
@@ -84,6 +87,7 @@ describe('selectLoginViewModel', () => {
           'No internet connection. Please check your network and try again.',
         email: 'user@test.com',
         password: 'mypassword',
+        isUserAuthenticated: false,
       }
 
       const viewModel = selectLoginViewModel(state)

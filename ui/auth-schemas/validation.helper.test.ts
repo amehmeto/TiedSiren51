@@ -15,7 +15,7 @@ describe('validateSignInInput', () => {
 
     const result = validateSignInInput(expectedData)
 
-    expect(result.isValid).toBe(true)
+    expect(result.errorMessage).toBeNull()
     expect(result.errors).toStrictEqual({})
     expect(result.data).toStrictEqual(expectedData)
   })
@@ -27,7 +27,7 @@ describe('validateSignInInput', () => {
     })
     const emailError = result.errors.email
 
-    expect(result.isValid).toBe(false)
+    expect(result.errorMessage).not.toBeNull()
     expect(emailError).toBeDefined()
   })
 
@@ -38,7 +38,7 @@ describe('validateSignInInput', () => {
     })
     const passwordError = result.errors.password
 
-    expect(result.isValid).toBe(false)
+    expect(result.errorMessage).not.toBeNull()
     expect(passwordError).toBeDefined()
   })
 })
@@ -52,7 +52,7 @@ describe('validateSignUpInput', () => {
 
     const result = validateSignUpInput(expectedData)
 
-    expect(result.isValid).toBe(true)
+    expect(result.errorMessage).toBeNull()
     expect(result.errors).toStrictEqual({})
     expect(result.data).toStrictEqual(expectedData)
   })
@@ -64,7 +64,7 @@ describe('validateSignUpInput', () => {
     })
     const passwordError = result.errors.password
 
-    expect(result.isValid).toBe(false)
+    expect(result.errorMessage).not.toBeNull()
     expect(passwordError).toBeDefined()
   })
 })
@@ -75,7 +75,7 @@ describe('validateForgotPasswordInput', () => {
 
     const result = validateForgotPasswordInput(expectedData)
 
-    expect(result.isValid).toBe(true)
+    expect(result.errorMessage).toBeNull()
     expect(result.errors).toStrictEqual({})
     expect(result.data).toStrictEqual(expectedData)
   })
@@ -84,7 +84,7 @@ describe('validateForgotPasswordInput', () => {
     const result = validateForgotPasswordInput({ email: '' })
     const emailError = result.errors.email
 
-    expect(result.isValid).toBe(false)
+    expect(result.errorMessage).not.toBeNull()
     expect(emailError).toBeDefined()
   })
 })

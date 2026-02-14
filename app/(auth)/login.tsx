@@ -17,7 +17,6 @@ import {
   setError,
   setPassword,
 } from '@/core/auth/reducer'
-import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
@@ -33,9 +32,8 @@ export default function LoginScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
 
-  const isUserAuthenticated = useSelector(selectIsUserAuthenticated)
-
   const viewModel = useSelector(selectLoginViewModel)
+  const { error, isUserAuthenticated } = viewModel
 
   useEffect(() => {
     if (isUserAuthenticated) router.push('/')
@@ -70,8 +68,6 @@ export default function LoginScreen() {
 
     if (validCredentials) await dispatch(signInWithEmail(validCredentials))
   }
-
-  const { error } = viewModel
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
