@@ -29,14 +29,15 @@ const noGenericResultVariable = require('../eslint-rules/no-generic-result-varia
 const noIPrefixInImports = require('../eslint-rules/no-i-prefix-in-imports.cjs')
 const noIconSizeMagicNumbers = require('../eslint-rules/no-icon-size-magic-numbers.cjs')
 const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
+const noInlineObjectType = require('../eslint-rules/no-inline-object-type.cjs')
 const noModuleLevelConstants = require('../eslint-rules/no-module-level-constants.cjs')
 const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressions.cjs')
-const noUnusedTestId = require('../eslint-rules/no-unused-test-id.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
 const noRedundantNullishTernary = require('../eslint-rules/no-redundant-nullish-ternary.cjs')
 const noSelectorPropDrilling = require('../eslint-rules/no-selector-prop-drilling.cjs')
 const noStylesheetMagicNumbers = require('../eslint-rules/no-stylesheet-magic-numbers.cjs')
 const noTryCatchInCore = require('../eslint-rules/no-try-catch-in-core.cjs')
+const noUnusedTestId = require('../eslint-rules/no-unused-test-id.cjs')
 const noUsecallbackSelectorWrapper = require('../eslint-rules/no-usecallback-selector-wrapper.cjs')
 const oneComponentPerFile = require('../eslint-rules/one-component-per-file.cjs')
 const oneListenerPerFile = require('../eslint-rules/one-listener-per-file.cjs')
@@ -58,6 +59,7 @@ const repositoryImplementationNaming = require('../eslint-rules/repository-imple
 const requireColocatedTest = require('../eslint-rules/require-colocated-test.cjs')
 const requireLoggerInCatch = require('../eslint-rules/require-logger-in-catch.cjs')
 const requireNamedRegex = require('../eslint-rules/require-named-regex.cjs')
+const requireTypedEach = require('../eslint-rules/require-typed-each.cjs')
 const schemaMatchesFilename = require('../eslint-rules/schema-matches-filename.cjs')
 const selectorMatchesFilename = require('../eslint-rules/selector-matches-filename.cjs')
 const selectorStateFirstParam = require('../eslint-rules/selector-state-first-param.cjs')
@@ -135,5 +137,7 @@ module.exports = {
     'no-and-or-in-names': noConjunctionInNames,
     'no-generic-result-variable': noGenericResultVariable,
     'prefer-extracted-long-params': preferExtractedLongParams,
+    'require-typed-each': requireTypedEach,
+    'no-inline-object-type': noInlineObjectType,
   },
 }
