@@ -18,7 +18,7 @@ import {
   selectBlocklistFormViewModel,
 } from './blocklist-form.view-model'
 
-function sirensOnly<T>(
+function withoutDividers<T>(
   sectioned: SectionedSiren<T>[],
 ): { type: 'siren'; siren: T }[] {
   return sectioned.filter(
@@ -68,7 +68,7 @@ describe('selectBlocklistFormViewModel', () => {
       undefined,
     )
 
-    const appNames = sirensOnly(viewModel.sortedAndroidApps).map(
+    const appNames = withoutDividers(viewModel.sortedAndroidApps).map(
       (entry) => entry.siren.appName,
     )
     const expectedAppNames = ['Facebook', 'Instagram']
@@ -208,16 +208,18 @@ describe('selectBlocklistFormViewModel', () => {
       'blocklist-1',
     )
 
-    const androidApps = sirensOnly<AndroidSiren>(viewModel.sortedAndroidApps)
+    const androidApps = withoutDividers<AndroidSiren>(
+      viewModel.sortedAndroidApps,
+    )
     const [firstApp] = androidApps
     const firstAppName = firstApp.siren.appName
     expect(firstAppName).toBe(instagramAndroidSiren.appName)
 
-    const websites = sirensOnly(viewModel.sortedWebsites)
+    const websites = withoutDividers(viewModel.sortedWebsites)
     const [firstWebsite] = websites
     expect(firstWebsite.siren).toBe('twitter.com')
 
-    const keywords = sirensOnly(viewModel.sortedKeywords)
+    const keywords = withoutDividers(viewModel.sortedKeywords)
     const [firstKeyword] = keywords
     expect(firstKeyword.siren).toBe('gaming')
   })
