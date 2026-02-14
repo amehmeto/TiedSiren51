@@ -100,6 +100,7 @@ module.exports = {
     'local-rules/infra-must-rethrow': 'error',
     'local-rules/infra-public-method-try-catch': 'error',
     'local-rules/infra-logger-prefix': 'error',
+    'local-rules/require-logger-in-catch': 'error',
     'local-rules/file-naming-convention': 'error',
     'local-rules/no-index-in-core': 'error',
     'local-rules/selector-matches-filename': 'error',
@@ -592,12 +593,17 @@ module.exports = {
     // Uncomment each block as violations are fixed
     // See: docs/adr/conventions/no-nested-call-expressions.md
     //
-    // {
-    //   files: ['**/*.fixture.ts'],
-    //   rules: {
-    //     'local-rules/no-nested-call-expressions': 'error',
-    //   },
-    // },
+    {
+      files: ['**/*.fixture.ts'],
+      rules: {
+        'local-rules/no-nested-call-expressions': [
+          'error',
+          {
+            allowNoArguments: true,
+          },
+        ],
+      },
+    },
     // {
     //   files: ['core/**/listeners/*.ts'],
     //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
@@ -629,6 +635,7 @@ module.exports = {
             allowNoArguments: true,
           },
         ],
+        'local-rules/no-unused-test-id': 'error',
       },
     },
     // {

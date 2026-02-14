@@ -59,10 +59,11 @@ module.exports = {
   create(context) {
     const filename = context.getFilename()
 
-    // Only apply to test files
+    // Only apply to test and fixture files
     if (
       !filename.includes('.test.') &&
       !filename.includes('.spec.') &&
+      !filename.includes('.fixture.') &&
       !filename.includes('__tests__')
     ) {
       return {}

@@ -10,11 +10,13 @@ import {
 import {
   Auth,
   createUserWithEmailAndPassword,
+  EmailAuthProvider,
   getAuth,
   getReactNativePersistence,
   GoogleAuthProvider,
   initializeAuth,
   onAuthStateChanged,
+  reauthenticateWithCredential,
   sendPasswordResetEmail,
   signInWithCredential,
   signInWithEmailAndPassword,
@@ -35,6 +37,8 @@ enum FirebaseAuthErrorCode {
   CancelledByUser = 'auth/cancelled-popup-request',
   UserNotFound = 'auth/user-not-found',
   TooManyRequests = 'auth/too-many-requests',
+  WrongPassword = 'auth/wrong-password',
+  RequiresRecentLogin = 'auth/requires-recent-login',
 }
 
 enum GoogleSignInError {
@@ -61,6 +65,9 @@ export class FirebaseAuthGateway implements AuthGateway {
     [FirebaseAuthErrorCode.UserNotFound]: 'No account found with this email.',
     [FirebaseAuthErrorCode.TooManyRequests]:
       'Too many requests. Please try again later.',
+    [FirebaseAuthErrorCode.WrongPassword]: 'Incorrect password.',
+    [FirebaseAuthErrorCode.RequiresRecentLogin]:
+      'Please re-authenticate to perform this action.',
   }
 
   private static readonly GOOGLE_SIGN_IN_ERRORS: Record<
@@ -130,9 +137,16 @@ export class FirebaseAuthGateway implements AuthGateway {
       if (
         this.isFirebaseError(error) &&
         error.code === 'auth/already-initialized'
-      )
+      ) {
+        this.logger.warn(
+          `[FirebaseAuthGateway] Auth already initialized, using existing instance`,
+        )
         return getAuth(app)
+      }
 
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to initialize auth: ${error}`,
+      )
       throw error
     }
   }
@@ -171,6 +185,21 @@ export class FirebaseAuthGateway implements AuthGateway {
       : 'Unknown error occurred.'
   }
 
+  async reauthenticate(password: string): Promise<void> {
+    try {
+      const user = this.auth.currentUser
+      if (!user?.email) throw new Error('No authenticated user found.')
+
+      const credential = EmailAuthProvider.credential(user.email, password)
+      await reauthenticateWithCredential(user, credential)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to reauthenticate: ${error}`,
+      )
+      throw new Error(this.translateFirebaseError(error))
+    }
+  }
+
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
     try {
       const result = await signInWithEmailAndPassword(
@@ -183,6 +212,9 @@ export class FirebaseAuthGateway implements AuthGateway {
         email: result.user.email ?? '',
       }
     } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to signInWithEmail: ${error}`,
+      )
       throw new Error(this.translateFirebaseError(error))
     }
   }
@@ -199,6 +231,9 @@ export class FirebaseAuthGateway implements AuthGateway {
         email: result.user.email ?? '',
       }
     } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to signUpWithEmail: ${error}`,
+      )
       throw new Error(this.translateFirebaseError(error))
     }
   }
@@ -224,6 +259,9 @@ export class FirebaseAuthGateway implements AuthGateway {
         profilePicture: credential.user.photoURL ?? undefined,
       }
     } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to signInWithGoogle: ${error}`,
+      )
       throw new Error(this.translateFirebaseError(error))
     }
   }
@@ -243,6 +281,9 @@ export class FirebaseAuthGateway implements AuthGateway {
     try {
       await sendPasswordResetEmail(this.auth, email)
     } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to resetPassword: ${error}`,
+      )
       throw new Error(this.translateFirebaseError(error))
     }
   }
@@ -260,6 +301,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut()
       await signOut(this.auth)
     } catch (error) {
+      this.logger.error(`[FirebaseAuthGateway] Failed to logOut: ${error}`)
       throw new Error(this.translateFirebaseError(error))
     }
   }

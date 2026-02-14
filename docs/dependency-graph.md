@@ -3,17 +3,17 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2026-02-07
+> Last updated: 2026-02-13
 
 ## Graph Statistics
 
 | Metric | Value |
 |--------|-------|
-| Total Nodes | 85 |
+| Total Nodes | 93 |
 | Total Edges | 43 |
-| Root Nodes (no dependencies) | 56 |
-| Leaf Nodes (nothing depends on them) | 63 |
-| Orphan Nodes (isolated) | 44 |
+| Root Nodes (no dependencies) | 64 |
+| Leaf Nodes (nothing depends on them) | 71 |
+| Orphan Nodes (isolated) | 52 |
 | Critical Path Length | 5 |
 
 ### Critical Path
@@ -56,7 +56,7 @@ The longest dependency chain in the graph:
 | #80 | [Bug] Logout redirects to /login modal instead of /home, requires double close | - | medium | - |
 
 
-### Features - Other (27)
+### Features - Other (32)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #1 | Add ability to filter between system apps and user-installed apps on Android | - | - | - |
@@ -86,9 +86,14 @@ The longest dependency chain in the graph:
 | #258 | feat: enforce stricter-only editing of block sessions during strict mode | - | - | - |
 | #260 | refactor(ui): redesign time picker with consistent design system primitives | - | - | - |
 | #264 | perf: Add caching for installed apps list | - | - | - |
+| #268 | feat(strict-mode): show closed lock icon in tab bar when strict mode is active | - | - | - |
+| #270 | feat: add review-fix command, enhance start-issue with issue content, and add branch hygiene rules | - | - | - |
+| #272 | Display selected apps at top of blocklist screen | - | - | - |
+| #276 | Migrate from ESLint to OxLint | - | - | - |
+| #278 | Refactor: Extract BlocklistForm view model selector | - | - | - |
 
 
-### Features - Blocking Architecture (29)
+### Features - Blocking Architecture (30)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #5 | Implement BlockingScheduler with schedule storage | - | - | #8, #7, #6 |
@@ -120,9 +125,10 @@ The longest dependency chain in the graph:
 | #185 | Remove legacy updateBlockedApps calls and related code | 🟢 2 | #180, #182, #184 | - |
 | #208 | feat(listener): Re-evaluate blocking schedule on periodic tick | 🟠 5 | #180 | - |
 | #213 | Add confirmation modal before setting strict mode timer | 🟢 2 | - | - |
+| #267 | feat(strict-mode): prevent siren deselection from blocklists during strict mode | - | - | - |
 
 
-### Features - Authentication (14)
+### Features - Authentication (16)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #85 | Setup Firebase Authentication Infrastructure | - | - | - |
@@ -137,8 +143,10 @@ The longest dependency chain in the graph:
 | #165 | feat(auth): resend password reset email | 🔵 1 | - | - |
 | #166 | feat(auth): invalidate sessions after password reset | 🟢 3 | #160 | - |
 | #167 | feat(auth): brute force protection on login | 🟢 2 | - | - |
-| #168 | feat(auth): security notification emails | 🟢 3 | - | - |
+| #168 | feat(auth): security notification emails | 🟠 5 | - | - |
 | #169 | feat(auth): deep link to email app after signup | 🟢 2 | - | - |
+| #281 | feat(auth): change password | - | - | - |
+| #282 | feat(auth): account deletion | - | - | - |
 
 
 ---
@@ -275,11 +283,11 @@ flowchart LR
     subgraph Epic_54["TS#54 User Authentification"]
         direction TB
         T_TS_169["📝 TS#169 auth: deep link to email app<br/>after signup [2sp]"]:::auth0_todo
-        T_TS_168["📝 TS#168 auth: security notification<br/>emails [3sp]"]:::auth0_todo
+        T_TS_168["📝 TS#168 auth: security notification<br/>emails [5sp]"]:::auth0_todo
         T_TS_167["📝 TS#167 auth: brute force protection<br/>on login [2sp]"]:::auth0_todo
         T_TS_166["📝 TS#166 auth: invalidate sessions<br/>after password reset [3sp]"]:::auth1_todo
         T_TS_165["📝 TS#165 auth: resend password reset<br/>email [1sp]"]:::auth0_todo
-        T_TS_164["📝 TS#164 auth: re-authentication for<br/>sensitive operations [2sp]"]:::auth0_todo
+        T_TS_164["🔄 TS#164 auth: re-authentication for<br/>sensitive operations [2sp]"]:::auth0_in_progress
         T_TS_163["📝 TS#163 auth: account deletion GDPR<br/>compliance [5sp]"]:::auth1_todo
         T_TS_162["📝 TS#162 auth: change password when<br/>logged in [2sp]"]:::auth1_todo
         T_TS_161["📝 TS#161 auth: implement email<br/>verification flow [3sp]"]:::auth0_todo
@@ -289,10 +297,18 @@ flowchart LR
     end
     subgraph Ungrouped
         direction TB
+        T_TS_282["📝 TS#282 auth: account deletion"]:::auth0_todo
+        T_TS_281["📝 TS#281 auth: change password"]:::auth0_todo
+        T_TS_278["📝 TS#278 : Extract BlocklistForm view<br/>model selector"]:::other0_todo
+        T_TS_276["📝 TS#276 from ESLint to OxLint"]:::other0_todo
+        T_TS_272["✅ TS#272 selected apps at top of<br/>blocklist screen"]:::other0_done
+        T_TS_270["✅ TS#270 : add review-fix command,<br/>enhance start-issue with issue<br/>content, and add branch hyg..."]:::other0_done
+        T_TS_268["✅ TS#268 strict-mode: show closed lock<br/>icon in tab bar when strict<br/>mode is active"]:::blocking0_done
+        T_TS_267["✅ TS#267 strict-mode: prevent siren<br/>deselection from blocklists<br/>during strict mode"]:::blocking0_done
         T_TS_264["📝 TS#264 : Add caching for installed<br/>apps list"]:::other0_todo
         T_TS_260["✅ TS#260 ui: redesign time picker with<br/>consistent design system<br/>primitives"]:::other0_done
-        T_TS_258["🔄 TS#258 : enforce stricter-only<br/>editing of block sessions<br/>during strict mode"]:::blocking0_in_progress
-        T_TS_257["📝 TS#257 100% code coverage for custom<br/>ESLint rules"]:::other0_todo
+        T_TS_258["✅ TS#258 : enforce stricter-only<br/>editing of block sessions<br/>during strict mode"]:::blocking0_done
+        T_TS_257["✅ TS#257 100% code coverage for custom<br/>ESLint rules"]:::other0_done
         T_TS_252["✅ TS#252 CLAUDE.md using progressive<br/>disclosure"]:::other0_done
         T_TS_250["✅ TS#250 FlatList scroll cutoff on<br/>selection scenes"]:::other0_done
         T_TS_248["✅ TS#248 initial delay to CI watch<br/>before polling"]:::other0_done
@@ -438,4 +454,4 @@ Quick reference showing what blocks what:
 
 ---
 
-*Auto-generated on 2026-02-07 from GitHub issue metadata*
+*Auto-generated on 2026-02-13 from GitHub issue metadata*

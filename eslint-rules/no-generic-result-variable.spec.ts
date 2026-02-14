@@ -37,6 +37,17 @@ describe('no-generic-result-variable', () => {
           code: 'const result = doSomething()',
           options: [{ forbidden: ['data'] }],
         },
+        // Descriptive parameter name - should NOT report
+        { code: 'function check(errorMessage) {}' },
+        // "expected" as part of a longer name is fine
+        { code: 'function check(expectedError) {}' },
+        // Arrow function with descriptive param
+        { code: 'const fn = (isoTimestamp) => isoTimestamp' },
+        // Custom forbidden params: "expected" is fine when not in custom list
+        {
+          code: 'function check(expected) {}',
+          options: [{ forbiddenParams: ['stuff'] }],
+        },
       ],
 
       invalid: [
@@ -84,6 +95,47 @@ describe('no-generic-result-variable', () => {
             {
               messageId: 'noGenericResult',
               data: { name: 'data' },
+            },
+          ],
+        },
+        // Generic parameter name in function declaration - SHOULD report
+        {
+          code: 'function check(expected) {}',
+          errors: [
+            {
+              messageId: 'noGenericParam',
+              data: { name: 'expected' },
+            },
+          ],
+        },
+        // Generic parameter name in arrow function - SHOULD report
+        {
+          code: 'const fn = (value) => value',
+          errors: [
+            {
+              messageId: 'noGenericParam',
+              data: { name: 'value' },
+            },
+          ],
+        },
+        // Generic parameter name in function expression - SHOULD report
+        {
+          code: 'const fn = function(data) { return data }',
+          errors: [
+            {
+              messageId: 'noGenericParam',
+              data: { name: 'data' },
+            },
+          ],
+        },
+        // Custom forbidden params
+        {
+          code: 'function check(stuff) {}',
+          options: [{ forbiddenParams: ['stuff'] }],
+          errors: [
+            {
+              messageId: 'noGenericParam',
+              data: { name: 'stuff' },
             },
           ],
         },
