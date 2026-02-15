@@ -103,6 +103,7 @@ module.exports = {
     'local-rules/require-logger-in-catch': 'error',
     'local-rules/file-naming-convention': 'error',
     'local-rules/no-index-in-core': 'error',
+    'local-rules/no-inline-import-type': 'error',
     'local-rules/selector-matches-filename': 'error',
     'local-rules/usecase-matches-filename': 'error',
     'local-rules/no-cross-layer-imports': 'error',
@@ -188,6 +189,8 @@ module.exports = {
     'local-rules/prefer-extracted-long-params': 'warn',
     // Extract inline object types into named type aliases
     'local-rules/no-inline-object-type': 'warn',
+    // Disallow overly generic variable and function names
+    'local-rules/no-lame-naming': 'warn',
     // Prefer enum over string literal unions
     'local-rules/prefer-enum-over-string-union': [
       'error',
