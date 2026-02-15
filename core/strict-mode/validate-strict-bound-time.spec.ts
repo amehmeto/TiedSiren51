@@ -20,7 +20,7 @@ describe('validateStrictBoundTime', () => {
       initialTime: asHHmm('10:00'),
     }
 
-    it.each([
+    it.each<[string, string]>([
       ['09:00', 'earlier time'],
       ['10:00', 'same time'],
       ['09:59', 'one minute earlier'],
@@ -30,7 +30,7 @@ describe('validateStrictBoundTime', () => {
       expect(result.isValid).toBe(true)
     })
 
-    it.each([
+    it.each<[string, string]>([
       ['11:00', 'later time'],
       ['10:01', 'one minute later'],
     ])('%s is invalid (%s)', (time) => {
@@ -50,7 +50,7 @@ describe('validateStrictBoundTime', () => {
       initialTime: asHHmm('18:00'),
     }
 
-    it.each([
+    it.each<[string, string]>([
       ['19:00', 'later time'],
       ['18:00', 'same time'],
       ['18:01', 'one minute later'],
@@ -60,7 +60,7 @@ describe('validateStrictBoundTime', () => {
       expect(result.isValid).toBe(true)
     })
 
-    it.each([
+    it.each<[string, string]>([
       ['17:00', 'earlier time'],
       ['17:59', 'one minute earlier'],
     ])('%s is invalid (%s)', (time) => {
@@ -82,7 +82,7 @@ describe('validateStrictBoundTime', () => {
         otherBound: asHHmm('04:00'),
       }
 
-      it.each([
+      it.each<[string, string]>([
         ['22:00', 'earlier in evening zone'],
         ['21:00', 'earlier in evening zone'],
         ['05:00', 'after end time (valid evening zone)'],
@@ -95,7 +95,7 @@ describe('validateStrictBoundTime', () => {
         expect(result.isValid).toBe(true)
       })
 
-      it.each([
+      it.each<[string, string]>([
         ['23:30', 'later than 23:00'],
         ['00:30', 'morning zone (after midnight)'],
         ['03:00', 'morning zone (before end time)'],
@@ -117,7 +117,7 @@ describe('validateStrictBoundTime', () => {
         otherBound: asHHmm('23:00'),
       }
 
-      it.each([
+      it.each<[string, string]>([
         ['05:00', 'later in morning zone'],
         ['06:00', 'later in morning zone'],
         ['22:00', 'before start time (valid morning zone)'],
@@ -130,7 +130,7 @@ describe('validateStrictBoundTime', () => {
         expect(result.isValid).toBe(true)
       })
 
-      it.each([
+      it.each<[string, string]>([
         ['03:00', 'earlier than 04:00'],
         ['23:00', 'evening zone (at start time)'],
         ['23:30', 'evening zone (after start time)'],
@@ -146,7 +146,7 @@ describe('validateStrictBoundTime', () => {
   })
 
   describe('time format consistency', () => {
-    it.each([
+    it.each<[string, string, StrictBoundDirection]>([
       ['08:59', '09:00', StrictBoundDirection.Earlier],
       ['01:06', '01:05', StrictBoundDirection.Later],
     ])('%s against %s (%s) is valid', (newTime, initialTime, direction) => {
@@ -158,7 +158,7 @@ describe('validateStrictBoundTime', () => {
       expect(validateStrictBoundTime(asHHmm(newTime), bound).isValid).toBe(true)
     })
 
-    it.each([
+    it.each<[string, string, StrictBoundDirection]>([
       ['09:01', '09:00', StrictBoundDirection.Earlier],
       ['01:04', '01:05', StrictBoundDirection.Later],
     ])('%s against %s (%s) is invalid', (newTime, initialTime, direction) => {
@@ -200,7 +200,7 @@ describe('validateStrictModeTime', () => {
   })
 
   describe('when strict mode is active with initialTime', () => {
-    it.each([
+    it.each<[string, string, StrictBoundDirection, string]>([
       ['09:00', '10:00', StrictBoundDirection.Earlier, 'earlier start time'],
       ['19:00', '18:00', StrictBoundDirection.Later, 'later end time'],
     ])(
@@ -217,7 +217,7 @@ describe('validateStrictModeTime', () => {
       },
     )
 
-    it.each([
+    it.each<[string, string, StrictBoundDirection, string]>([
       ['11:00', '10:00', StrictBoundDirection.Earlier, 'later start time'],
       ['17:00', '18:00', StrictBoundDirection.Later, 'earlier end time'],
     ])(
