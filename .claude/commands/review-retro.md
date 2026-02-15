@@ -64,7 +64,13 @@ Run a retrospective on PR #$ARGUMENTS to identify what caused excessive review r
    Produce a prioritized list of concrete next steps, ordered by impact.
    Each item should be a specific, implementable action (not vague advice).
 
-5. **Output the retrospective** directly in the conversation. Do NOT post it on the PR.
+5. **Write the retrospective to a markdown file:**
+   - Save to `docs/retrospective/PR-{number}-{short-desc}-review-retro.md`
+   - Derive `{short-desc}` from the PR title (lowercase, kebab-case, max 5 words)
+   - Follow the format of existing retrospectives in `docs/retrospective/`
+   - Example: PR #273 "feat(blocklist): display selected apps at top" → `PR-273-selected-apps-on-top-review-retro.md`
+
+6. **Output a summary** in the conversation with the file path and key stats (rounds, threads, top categories).
 
 ## Constraints
 
