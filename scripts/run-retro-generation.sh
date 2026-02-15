@@ -20,12 +20,12 @@ RETRO_JSON=$(bash "$SCRIPT_DIR/generate-retro.sh" "$PR_NUMBER")
 RETRO_PATH=$(echo "$RETRO_JSON" | jq -r '.retro_path')
 IS_MINIMAL=$(echo "$RETRO_JSON" | jq -r '.is_minimal')
 
-# Use delimiter syntax for multiline JSON value
-DELIMITER="EOF_$(date +%s)"
+# Write JSON to file to avoid env var size limits (48KB max)
+RETRO_JSON_FILE="${GITHUB_WORKSPACE:-.}/.retro-summary.json"
+printf '%s\n' "$RETRO_JSON" > "$RETRO_JSON_FILE"
+
 {
-  echo "retro_json<<${DELIMITER}"
-  echo "$RETRO_JSON"
-  echo "$DELIMITER"
+  echo "retro_json_file=$RETRO_JSON_FILE"
   echo "retro_path=$RETRO_PATH"
   echo "is_minimal=$IS_MINIMAL"
 } >> "$GITHUB_OUTPUT"

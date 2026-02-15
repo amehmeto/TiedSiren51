@@ -31,7 +31,11 @@ for attempt in $(seq 1 "$MAX_RETRIES"); do
     exit 0
   fi
   print_warning "Push failed (attempt $attempt/$MAX_RETRIES), rebasing and retrying..." >&2
-  git pull --rebase origin main
+  if ! git pull --rebase origin main; then
+    print_error "Rebase failed (likely conflict), aborting rebase" >&2
+    git rebase --abort 2>/dev/null || true
+    exit 1
+  fi
 done
 
 print_error "Failed to push after $MAX_RETRIES attempts"

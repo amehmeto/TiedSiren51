@@ -250,5 +250,4 @@ jobs:
           SLACK_RETRO_WEBHOOK_URL: ${{ secrets.SLACK_RETRO_WEBHOOK_URL }}
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-          RETRO_JSON: ${{ steps.retro.outputs.retro_json }}
-        run: bash scripts/send-retro-slack-notification.sh "$RETRO_JSON"
+        run: bash scripts/send-retro-slack-notification.sh "${{ steps.retro.outputs.retro_json_file }}"

@@ -3,9 +3,9 @@ set -euo pipefail
 
 # Send a review retrospective summary to Slack #retro channel.
 #
-# Usage: ./scripts/send-retro-slack-notification.sh <retro_summary_json>
+# Usage: ./scripts/send-retro-slack-notification.sh <retro_summary_json_file>
 #
-# Input: JSON from generate-retro.sh stdout, e.g.:
+# Input: Path to a JSON file from generate-retro.sh, e.g.:
 #   { "pr_number": "283", "pr_title": "...", "pr_url": "...",
 #     "retro_path": "docs/retrospective/...", "retro_filename": "...",
 #     "rounds": 3, "threads": 13, "top_category": "Naming/Style",
@@ -18,12 +18,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
 source "$SCRIPT_DIR/lib/colors.sh"
 
-RETRO_JSON="${1:-}"
-if [[ -z "$RETRO_JSON" ]]; then
-  print_error "Retro summary JSON is required"
-  echo "Usage: $0 '<retro_summary_json>'" >&2
+RETRO_JSON_FILE="${1:-}"
+if [[ -z "$RETRO_JSON_FILE" || ! -f "$RETRO_JSON_FILE" ]]; then
+  print_error "Retro summary JSON file is required and must exist"
+  echo "Usage: $0 <retro_summary_json_file>" >&2
   exit 1
 fi
+
+RETRO_JSON=$(cat "$RETRO_JSON_FILE")
 
 if [[ -z "${SLACK_RETRO_WEBHOOK_URL:-}" ]]; then
   print_error "SLACK_RETRO_WEBHOOK_URL environment variable is required"

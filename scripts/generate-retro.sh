@@ -85,7 +85,7 @@ $(cat "$example")
 
 "
     ((++EXAMPLE_COUNT))
-  done < <(find "$RETRO_DIR" -maxdepth 1 -name '*.md' -print0 | sort -rz)
+  done < <(find "$RETRO_DIR" -maxdepth 1 -name '*.md' -printf '%T@\t%p\0' | sort -rzn | cut -z -f2-)
 fi
 
 PROMPT=$(cat <<'PROMPT_END'
@@ -205,6 +205,8 @@ printf '%s\n' "$RETRO_CONTENT" > "$RETRO_PATH"
 print_success "Retrospective written to $RETRO_PATH" >&2
 
 # --- Extract summary stats for Slack ---
+# Best-effort extraction: assumes Claude follows the example format exactly.
+# Falls back to 0/"Unknown" if the generated markdown uses different formatting.
 # Count review rounds (lines starting with | **R in the Timeline table)
 ROUNDS=$(grep -c '| \*\*R' "$RETRO_PATH" 2>/dev/null || echo "0")
 # Count total threads mentioned
