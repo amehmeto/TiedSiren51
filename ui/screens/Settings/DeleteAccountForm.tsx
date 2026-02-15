@@ -1,27 +1,26 @@
-import { useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
-import { useDispatch } from 'react-redux'
-import { AppDispatch } from '@/core/_redux_/createStore'
-import { clearDeleteAccountError } from '@/core/auth/reducer'
-import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
 
 const DELETE_CONFIRMATION = 'DELETE'
 
 type DeleteAccountFormProps = Readonly<{
-  isDeletingAccount: boolean
+  confirmText: string
+  isDeleteDisabled: boolean
+  buttonText: string
   deleteAccountError: string | null
+  onConfirmTextChange: (text: string) => void
+  onDeleteAccount: () => void
 }>
 
 export function DeleteAccountForm({
-  isDeletingAccount,
+  confirmText,
+  isDeleteDisabled,
+  buttonText,
   deleteAccountError,
+  onConfirmTextChange,
+  onDeleteAccount,
 }: DeleteAccountFormProps) {
-  const dispatch = useDispatch<AppDispatch>()
-  const [confirmText, setConfirmText] = useState('')
-  const isConfirmed = confirmText === DELETE_CONFIRMATION
-
   return (
     <View style={styles.content}>
       <Text style={styles.title}>Delete Account</Text>
@@ -36,10 +35,7 @@ export function DeleteAccountForm({
       <TextInput
         style={styles.input}
         value={confirmText}
-        onChangeText={(text) => {
-          setConfirmText(text)
-          if (deleteAccountError) dispatch(clearDeleteAccountError())
-        }}
+        onChangeText={onConfirmTextChange}
         placeholder={DELETE_CONFIRMATION}
         placeholderTextColor={T.color.grey}
         autoCapitalize="characters"
@@ -48,9 +44,9 @@ export function DeleteAccountForm({
         <Text style={styles.error}>{deleteAccountError}</Text>
       )}
       <TiedSButton
-        onPress={() => dispatch(deleteAccount())}
-        text={isDeletingAccount ? 'Deleting...' : 'Delete My Account'}
-        isDisabled={!isConfirmed || isDeletingAccount}
+        onPress={onDeleteAccount}
+        text={buttonText}
+        isDisabled={isDeleteDisabled}
       />
     </View>
   )

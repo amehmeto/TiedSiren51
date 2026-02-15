@@ -173,6 +173,10 @@ export function authentificationFixture(
         const { reauthError } = store.getState().auth
         expect(reauthError).toBeNull()
       },
+      authUserShouldBe(expectedUser: AuthUser) {
+        const { authUser } = store.getState().auth
+        expect(authUser).toEqual(expectedUser)
+      },
       accountDeletionShouldNotBeLoading() {
         const { isDeletingAccount } = store.getState().auth
         expect(isDeletingAccount).toBe(false)

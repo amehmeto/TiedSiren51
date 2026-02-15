@@ -1,7 +1,9 @@
-import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { StyleSheet, Text, View } from 'react-native'
-import { useSelector } from 'react-redux'
+import { StyleSheet, View } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch } from '@/core/_redux_/createStore'
+import { setDeleteConfirmText } from '@/core/auth/reducer'
+import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { ReauthenticationModal } from '@/ui/design-system/components/shared/ReauthenticationModal'
 import { T } from '@/ui/design-system/theme'
 import {
@@ -9,35 +11,37 @@ import {
   selectDeleteAccountViewModel,
 } from '@/ui/screens/Settings/delete-account.view-model'
 import { DeleteAccountForm } from '@/ui/screens/Settings/DeleteAccountForm'
+import { ReauthPrompt } from '@/ui/screens/Settings/ReauthPrompt'
 
 export default function DeleteAccountScreen() {
   const viewModel = useSelector(selectDeleteAccountViewModel)
-  const router = useRouter()
+  const dispatch = useDispatch<AppDispatch>()
   const [isReauthVisible, setIsReauthVisible] = useState(true)
   const [isReauthenticated, setIsReauthenticated] = useState(false)
 
-  // When deleted, Firebase's onAuthStateChanged(null) triggers the existing
-  // logout flow which redirects to the login screen.
   if (viewModel.type === DeleteAccountViewState.Deleted) return null
 
-  const { isDeletingAccount, deleteAccountError } = viewModel
+  const { confirmText, isDeleteDisabled, buttonText, deleteAccountError } =
+    viewModel
 
   return (
     <View style={styles.container}>
       {isReauthenticated ? (
         <DeleteAccountForm
-          isDeletingAccount={isDeletingAccount}
+          confirmText={confirmText}
+          isDeleteDisabled={isDeleteDisabled}
+          buttonText={buttonText}
           deleteAccountError={deleteAccountError}
+          onConfirmTextChange={(text) => dispatch(setDeleteConfirmText(text))}
+          onDeleteAccount={() => dispatch(deleteAccount())}
         />
       ) : (
-        <Text style={styles.info}>
-          Please re-authenticate to delete your account.
-        </Text>
+        <ReauthPrompt onReauthenticate={() => setIsReauthVisible(true)} />
       )}
 
       <ReauthenticationModal
         isVisible={isReauthVisible}
-        onRequestClose={() => router.back()}
+        onRequestClose={() => setIsReauthVisible(false)}
         onSuccess={() => {
           setIsReauthVisible(false)
           setIsReauthenticated(true)
@@ -53,10 +57,5 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     padding: T.spacing.medium,
-  },
-  info: {
-    color: T.color.text,
-    fontSize: T.font.size.base,
-    textAlign: 'center',
   },
 })

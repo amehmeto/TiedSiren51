@@ -30,6 +30,7 @@ export type AuthState = {
   reauthError: string | null
   isDeletingAccount: boolean
   deleteAccountError: string | null
+  deleteConfirmText: string
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -52,6 +53,10 @@ export const clearDeleteAccountError = createAction(
   'auth/clearDeleteAccountError',
 )
 
+export const setDeleteConfirmText = createAction<string>(
+  'auth/setDeleteConfirmText',
+)
+
 function createInitialAuthState(): AuthState {
   return {
     authUser: null,
@@ -66,6 +71,7 @@ function createInitialAuthState(): AuthState {
     reauthError: null,
     isDeletingAccount: false,
     deleteAccountError: null,
+    deleteConfirmText: '',
   }
 }
 
@@ -159,13 +165,15 @@ export const reducer = createReducer<AuthState>(
       .addCase(clearDeleteAccountError, (state) => {
         state.deleteAccountError = null
       })
+      .addCase(setDeleteConfirmText, (state, action) => {
+        state.deleteConfirmText = action.payload
+        state.deleteAccountError = null
+      })
       .addCase(deleteAccount.pending, (state) => {
         state.isDeletingAccount = true
         state.deleteAccountError = null
       })
-      .addCase(deleteAccount.fulfilled, (state) => {
-        Object.assign(state, createInitialAuthState())
-      })
+      .addCase(deleteAccount.fulfilled, () => createInitialAuthState())
       .addCase(deleteAccount.rejected, (state, action) => {
         state.isDeletingAccount = false
         state.deleteAccountError = action.error.message ?? null

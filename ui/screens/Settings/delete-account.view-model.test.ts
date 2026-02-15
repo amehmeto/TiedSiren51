@@ -10,10 +10,19 @@ describe('selectDeleteAccountViewModel', () => {
     const state = stateBuilder()
       .withAuthUser({ id: 'user-id', email: 'user@test.com' })
       .build()
+    const expectedViewModel = {
+      type: DeleteAccountViewState.Form,
+      isDeletingAccount: false,
+      deleteAccountError: null,
+      confirmText: '',
+      isConfirmed: false,
+      buttonText: 'Delete My Account',
+      isDeleteDisabled: true,
+    }
 
     const viewModel = selectDeleteAccountViewModel(state)
 
-    expect(viewModel.type).toBe(DeleteAccountViewState.Form)
+    expect(viewModel).toStrictEqual(expectedViewModel)
   })
 
   it('should return Deleted state when user is null', () => {
@@ -32,6 +41,8 @@ describe('selectDeleteAccountViewModel', () => {
     const expectedViewModel = {
       type: DeleteAccountViewState.Form,
       isDeletingAccount: true,
+      buttonText: 'Deleting...',
+      isDeleteDisabled: true,
     }
 
     const viewModel = selectDeleteAccountViewModel(state)
@@ -47,6 +58,58 @@ describe('selectDeleteAccountViewModel', () => {
     const expectedViewModel = {
       type: DeleteAccountViewState.Form,
       deleteAccountError: 'Please re-authenticate to perform this action.',
+    }
+
+    const viewModel = selectDeleteAccountViewModel(state)
+
+    expect(viewModel).toMatchObject(expectedViewModel)
+  })
+
+  it('should enable delete button when confirmation text matches', () => {
+    const state = stateBuilder()
+      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withDeleteConfirmText('DELETE')
+      .build()
+    const expectedViewModel = {
+      type: DeleteAccountViewState.Form,
+      confirmText: 'DELETE',
+      isConfirmed: true,
+      isDeleteDisabled: false,
+    }
+
+    const viewModel = selectDeleteAccountViewModel(state)
+
+    expect(viewModel).toMatchObject(expectedViewModel)
+  })
+
+  it('should keep delete button disabled when confirmation text does not match', () => {
+    const state = stateBuilder()
+      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withDeleteConfirmText('DELE')
+      .build()
+    const expectedViewModel = {
+      type: DeleteAccountViewState.Form,
+      confirmText: 'DELE',
+      isConfirmed: false,
+      isDeleteDisabled: true,
+    }
+
+    const viewModel = selectDeleteAccountViewModel(state)
+
+    expect(viewModel).toMatchObject(expectedViewModel)
+  })
+
+  it('should keep delete button disabled while deleting even if confirmed', () => {
+    const state = stateBuilder()
+      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withDeleteConfirmText('DELETE')
+      .withDeletingAccount(true)
+      .build()
+    const expectedViewModel = {
+      type: DeleteAccountViewState.Form,
+      isConfirmed: true,
+      isDeleteDisabled: true,
+      buttonText: 'Deleting...',
     }
 
     const viewModel = selectDeleteAccountViewModel(state)
