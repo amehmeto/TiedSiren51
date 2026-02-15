@@ -16,7 +16,9 @@ if [[ -z "$PR_NUMBER" ]]; then
   exit 1
 fi
 
-RETRO_FILE=$(find docs/retrospective -name "PR-${PR_NUMBER}-*-review-retro.md" -type f 2>/dev/null | head -1)
+RETRO_DIR="docs/retrospective"
+mkdir -p "$RETRO_DIR"
+RETRO_FILE=$(find "$RETRO_DIR" -name "PR-${PR_NUMBER}-*-review-retro.md" -type f 2>/dev/null | head -1)
 
 if [[ -z "$RETRO_FILE" ]]; then
   print_warning "No retro file found for PR #$PR_NUMBER — skipping commit and Slack"

@@ -30,6 +30,9 @@ for attempt in $(seq 1 "$MAX_RETRIES"); do
     print_success "Retrospective committed to main" >&2
     exit 0
   fi
+  if [[ "$attempt" -eq "$MAX_RETRIES" ]]; then
+    break
+  fi
   print_warning "Push failed (attempt $attempt/$MAX_RETRIES), rebasing and retrying..." >&2
   if ! git pull --rebase origin main; then
     print_error "Rebase failed (likely conflict), aborting rebase" >&2
