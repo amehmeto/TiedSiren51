@@ -236,6 +236,7 @@ jobs:
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ github.token }}
           prompt: '/retro ${{ github.event.pull_request.number }}'
           claude_args: '--allowedTools Bash,Read,Write,Glob,Grep,Edit --max-turns 30'
 

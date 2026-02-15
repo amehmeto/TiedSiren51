@@ -41,7 +41,9 @@ PR_TITLE=$(head -1 "$RETRO_PATH" | sed 's/^# PR #[0-9]* Review Retrospective —
 # Extract stats from the retro markdown (best-effort, falls back to defaults)
 ROUNDS=$(grep -c '| \*\*R' "$RETRO_PATH" 2>/dev/null || echo "0")
 THREADS=$(grep -oE '[0-9]+ threads' "$RETRO_PATH" | head -1 | grep -oE '[0-9]+' || echo "0")
-TOP_CATEGORY=$(grep -A1 '|-------' "$RETRO_PATH" | tail -1 | sed 's/|//g' | awk '{print $1, $2}' | sed 's/^ *//;s/ *$//' | head -1 || echo "Unknown")
+# Extract top category from Root Cause Classification table (first data row, second column)
+TOP_CATEGORY=$(awk '/^## Root Cause Classification/,/^## [^R]/{if(/\|-------/){getline; split($0, a, "|"); gsub(/^ +| +$/, "", a[2]); gsub(/\*/, "", a[2]); print a[2]; exit}}' "$RETRO_PATH" || echo "Unknown")
+TOP_CATEGORY="${TOP_CATEGORY:-Unknown}"
 
 # Build links
 SERVER_URL="${GITHUB_SERVER_URL:-https://github.com}"
