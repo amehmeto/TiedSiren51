@@ -3,13 +3,10 @@ set -euo pipefail
 
 # Send a review retrospective summary to Slack #retro channel.
 #
-# Usage: ./scripts/send-retro-slack-notification.sh <retro_summary_json_file>
+# Usage: ./scripts/send-retro-slack-notification.sh <retro_md_path> <pr_number>
 #
-# Input: Path to a JSON file from generate-retro.sh, e.g.:
-#   { "pr_number": "283", "pr_title": "...", "pr_url": "...",
-#     "retro_path": "docs/retrospective/...", "retro_filename": "...",
-#     "rounds": 3, "threads": 13, "top_category": "Naming/Style",
-#     "is_minimal": false }
+# Input: Path to the generated retro markdown file and the PR number.
+#        Extracts stats (rounds, threads, top category) from the markdown content.
 #
 # Env: SLACK_RETRO_WEBHOOK_URL (required)
 #      GITHUB_SERVER_URL, GITHUB_REPOSITORY (optional, for file link)
@@ -18,40 +15,39 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
 source "$SCRIPT_DIR/lib/colors.sh"
 
-RETRO_JSON_FILE="${1:-}"
-if [[ -z "$RETRO_JSON_FILE" || ! -f "$RETRO_JSON_FILE" ]]; then
-  print_error "Retro summary JSON file is required and must exist"
-  echo "Usage: $0 <retro_summary_json_file>" >&2
+RETRO_PATH="${1:-}"
+PR_NUMBER="${2:-}"
+
+if [[ -z "$RETRO_PATH" || ! -f "$RETRO_PATH" ]]; then
+  print_error "Retro markdown file is required and must exist"
+  echo "Usage: $0 <retro_md_path> <pr_number>" >&2
   exit 1
 fi
 
-RETRO_JSON=$(cat "$RETRO_JSON_FILE")
+if [[ -z "$PR_NUMBER" ]]; then
+  print_error "PR number is required"
+  echo "Usage: $0 <retro_md_path> <pr_number>" >&2
+  exit 1
+fi
 
 if [[ -z "${SLACK_RETRO_WEBHOOK_URL:-}" ]]; then
   print_error "SLACK_RETRO_WEBHOOK_URL environment variable is required"
   exit 1
 fi
 
-# Extract fields from JSON
-PR_NUMBER=$(echo "$RETRO_JSON" | jq -r '.pr_number')
-PR_TITLE=$(echo "$RETRO_JSON" | jq -r '.pr_title')
-PR_URL=$(echo "$RETRO_JSON" | jq -r '.pr_url')
-RETRO_PATH=$(echo "$RETRO_JSON" | jq -r '.retro_path')
-ROUNDS=$(echo "$RETRO_JSON" | jq -r '.rounds')
-THREADS=$(echo "$RETRO_JSON" | jq -r '.threads')
-TOP_CATEGORY=$(echo "$RETRO_JSON" | jq -r '.top_category')
-IS_MINIMAL=$(echo "$RETRO_JSON" | jq -r '.is_minimal')
+# Extract PR title from the retro file header (# PR #NNN Review Retrospective — TITLE)
+PR_TITLE=$(head -1 "$RETRO_PATH" | sed 's/^# PR #[0-9]* Review Retrospective — //')
 
-# Build link to retro file in the repo
+# Extract stats from the retro markdown (best-effort, falls back to defaults)
+ROUNDS=$(grep -c '| \*\*R' "$RETRO_PATH" 2>/dev/null || echo "0")
+THREADS=$(grep -oE '[0-9]+ threads' "$RETRO_PATH" | head -1 | grep -oE '[0-9]+' || echo "0")
+TOP_CATEGORY=$(grep -A1 '|-------' "$RETRO_PATH" | tail -1 | sed 's/|//g' | awk '{print $1, $2}' | sed 's/^ *//;s/ *$//' | head -1 || echo "Unknown")
+
+# Build links
 SERVER_URL="${GITHUB_SERVER_URL:-https://github.com}"
 REPOSITORY="${GITHUB_REPOSITORY:-amehmeto/TiedSiren51}"
+PR_URL="${SERVER_URL}/${REPOSITORY}/pull/${PR_NUMBER}"
 RETRO_FILE_URL="${SERVER_URL}/${REPOSITORY}/blob/main/${RETRO_PATH}"
-
-# Skip Slack for minimal retros
-if [[ "$IS_MINIMAL" == "true" ]]; then
-  print_info "Minimal review activity — skipping Slack notification" >&2
-  exit 0
-fi
 
 # Build Slack payload
 PAYLOAD=$(jq -n \

@@ -199,7 +199,7 @@
 | `speckit.taskstoissues` | `.claude/commands/speckit.taskstoissues.md` | 🟢 TEMPLATE | Conversion tâches → issues |
 | `commit-push` | `.claude/commands/commit-push.md` | 🟢 TEMPLATE | Commit + push |
 | `fix-review` | `.claude/commands/fix-review.md` | 🟢 TEMPLATE | Fix review comments |
-| `review-retro` | `.claude/commands/review-retro.md` | 🟢 TEMPLATE | Analyse reviews |
+| `retro` | `.claude/commands/retro.md` | 🟢 TEMPLATE | Analyse reviews |
 | `review-claude-settings` | `.claude/commands/review-claude-settings.md` | 🟢 TEMPLATE | Audit sécurité settings |
 | `create-pr` | `.claude/commands/create-pr.md` | 🟡 ADAPTABLE | Changer ticket prefix TS→projet |
 | `start-issue` | `.claude/commands/start-issue.md` | 🟡 ADAPTABLE | Changer refs ADR |

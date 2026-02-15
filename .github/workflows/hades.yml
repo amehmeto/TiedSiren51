@@ -224,6 +224,7 @@ jobs:
       cancel-in-progress: false
     permissions:
       contents: write
+      pull-requests: write
     steps:
       - name: Checkout main
         uses: actions/checkout@v4
@@ -232,22 +233,27 @@ jobs:
 
       - name: Generate retrospective
         id: retro
-        env:
-          GH_TOKEN: ${{ github.token }}
-          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
-        run: bash scripts/run-retro-generation.sh "${{ github.event.pull_request.number }}"
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          prompt: '/retro ${{ github.event.pull_request.number }}'
+          claude_args: '--allowedTools Bash,Read,Write,Glob,Grep,Edit --max-turns 30'
+
+      - name: Detect retro file
+        id: detect
+        run: bash scripts/detect-retro-file.sh "${{ github.event.pull_request.number }}"
 
       - name: Commit retrospective to main
-        if: steps.retro.outputs.is_minimal != 'true'
+        if: steps.detect.outputs.retro_path != ''
         env:
           GH_TOKEN: ${{ github.token }}
-        run: bash scripts/commit-retro.sh "${{ steps.retro.outputs.retro_path }}" "${{ github.event.pull_request.number }}"
+        run: bash scripts/commit-retro.sh "${{ steps.detect.outputs.retro_path }}" "${{ github.event.pull_request.number }}"
 
       - name: Post to Slack
-        if: steps.retro.outputs.is_minimal != 'true'
+        if: steps.detect.outputs.retro_path != ''
         continue-on-error: true
         env:
           SLACK_RETRO_WEBHOOK_URL: ${{ secrets.SLACK_RETRO_WEBHOOK_URL }}
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: bash scripts/send-retro-slack-notification.sh "${{ steps.retro.outputs.retro_json_file }}"
+        run: bash scripts/send-retro-slack-notification.sh "${{ steps.detect.outputs.retro_path }}" "${{ github.event.pull_request.number }}"
