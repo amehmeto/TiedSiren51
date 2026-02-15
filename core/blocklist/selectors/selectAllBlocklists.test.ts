@@ -19,10 +19,10 @@ describe('selectAllBlocklists', () => {
       name: 'Social Media',
     })
 
-    const stateWithBlocklist = stateBuilder()
-      .withBlocklists([blocklist])
-      .build()
-    const store = createTestStore({}, stateWithBlocklist)
+    const store = createTestStore(
+      {},
+      stateBuilder().withBlocklists([blocklist]).build(),
+    )
 
     const blocklists = selectAllBlocklists(store.getState())
 
@@ -43,10 +43,12 @@ describe('selectAllBlocklists', () => {
       name: 'Work',
     })
 
-    const stateWithMultipleBlocklists = stateBuilder()
-      .withBlocklists([blocklist1, blocklist2, blocklist3])
-      .build()
-    const store = createTestStore({}, stateWithMultipleBlocklists)
+    const store = createTestStore(
+      {},
+      stateBuilder()
+        .withBlocklists([blocklist1, blocklist2, blocklist3])
+        .build(),
+    )
 
     const blocklists = selectAllBlocklists(store.getState())
 

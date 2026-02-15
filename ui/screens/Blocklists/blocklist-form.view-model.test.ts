@@ -63,10 +63,10 @@ describe('selectBlocklistFormViewModel', () => {
       websites: ['youtube.com'],
       keywords: ['gaming'],
     })
-    const stateWithAvailableSirens = stateBuilder()
-      .withAvailableSirens(availableSirens)
-      .build()
-    const store = createTestStore({ dateProvider }, stateWithAvailableSirens)
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withAvailableSirens(availableSirens).build(),
+    )
 
     const viewModel = selectBlocklistFormViewModel(
       store.getState(),
@@ -91,10 +91,10 @@ describe('selectBlocklistFormViewModel', () => {
         keywords: ['news'],
       },
     })
-    const stateWithBlocklists = stateBuilder()
-      .withBlocklists([blocklist])
-      .build()
-    const store = createTestStore({ dateProvider }, stateWithBlocklists)
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withBlocklists([blocklist]).build(),
+    )
     const expectedViewModel = {
       type: BlocklistFormViewState.Editing,
       existingBlocklist: blocklist,
@@ -125,12 +125,14 @@ describe('selectBlocklistFormViewModel', () => {
       dateProvider.getNowMs() + 1 * HOUR,
     )
 
-    const stateWithStrictMode = stateBuilder()
-      .withBlocklists([blocklist])
-      .withBlockSessions([session])
-      .withStrictModeEndedAt(endedAt)
-      .build()
-    const store = createTestStore({ dateProvider }, stateWithStrictMode)
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder()
+        .withBlocklists([blocklist])
+        .withBlockSessions([session])
+        .withStrictModeEndedAt(endedAt)
+        .build(),
+    )
 
     const viewModel = selectBlocklistFormViewModel(
       store.getState(),
@@ -157,15 +159,17 @@ describe('selectBlocklistFormViewModel', () => {
       endedAt: '23:00',
     })
 
-    const strictModeEndOffset = dateProvider.getNowMs() + 2 * HOUR + 30 * MINUTE
-    const endedAt = dateProvider.msToISOString(strictModeEndOffset)
+    const expirationMs = dateProvider.getNowMs() + 2 * HOUR + 30 * MINUTE
+    const endedAt = dateProvider.msToISOString(expirationMs)
 
-    const stateWithLockedSirens = stateBuilder()
-      .withBlocklists([blocklist])
-      .withBlockSessions([session])
-      .withStrictModeEndedAt(endedAt)
-      .build()
-    const store = createTestStore({ dateProvider }, stateWithLockedSirens)
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder()
+        .withBlocklists([blocklist])
+        .withBlockSessions([session])
+        .withStrictModeEndedAt(endedAt)
+        .build(),
+    )
     const expectedViewModel = {
       type: BlocklistFormViewState.EditingWithLockedSirens,
       existingBlocklist: blocklist,
@@ -202,11 +206,13 @@ describe('selectBlocklistFormViewModel', () => {
         keywords: ['gaming'],
       },
     })
-    const stateWithSirensBlocklists = stateBuilder()
-      .withAvailableSirens(availableSirens)
-      .withBlocklists([blocklist])
-      .build()
-    const store = createTestStore({ dateProvider }, stateWithSirensBlocklists)
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder()
+        .withAvailableSirens(availableSirens)
+        .withBlocklists([blocklist])
+        .build(),
+    )
 
     const viewModel = selectBlocklistFormViewModel(
       store.getState(),
@@ -233,10 +239,10 @@ describe('selectBlocklistFormViewModel', () => {
 
   test('Editing mode with empty blocklist name falls back to default placeholder', () => {
     const blocklist = buildBlocklist({ id: 'blocklist-1', name: '' })
-    const stateWithEmptyBlocklist = stateBuilder()
-      .withBlocklists([blocklist])
-      .build()
-    const store = createTestStore({ dateProvider }, stateWithEmptyBlocklist)
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withBlocklists([blocklist]).build(),
+    )
 
     const viewModel = selectBlocklistFormViewModel(
       store.getState(),

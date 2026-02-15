@@ -5,10 +5,10 @@ import { selectIsStrictModeLoading } from './selectIsStrictModeLoading'
 
 describe('selectIsStrictModeLoading', () => {
   test('should return loading state from strict mode slice', () => {
-    const stateWithNullStrictMode = stateBuilder()
-      .withStrictModeEndedAt(null)
-      .build()
-    const store = createTestStore({}, stateWithNullStrictMode)
+    const store = createTestStore(
+      {},
+      stateBuilder().withStrictModeEndedAt(null).build(),
+    )
 
     const isLoading = selectIsStrictModeLoading(store.getState())
 

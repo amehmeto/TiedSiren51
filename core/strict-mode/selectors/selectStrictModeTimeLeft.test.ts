@@ -16,10 +16,10 @@ describe('selectStrictModeTimeLeft', () => {
   })
 
   test('should return empty time when strict mode is not active', () => {
-    const stateWithNullStrictMode = stateBuilder()
-      .withStrictModeEndedAt(null)
-      .build()
-    const store = createTestStore({ dateProvider }, stateWithNullStrictMode)
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withStrictModeEndedAt(null).build(),
+    )
     const expectedTimeLeft = {
       days: 0,
       hours: 0,
@@ -35,10 +35,10 @@ describe('selectStrictModeTimeLeft', () => {
 
   test('should return empty time when strict mode has expired', () => {
     const expiredDate = dateProvider.msToISOString(nowMs - 1 * SECOND)
-    const stateWithExpiredStrictMode = stateBuilder()
-      .withStrictModeEndedAt(expiredDate)
-      .build()
-    const store = createTestStore({ dateProvider }, stateWithExpiredStrictMode)
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withStrictModeEndedAt(expiredDate).build(),
+    )
     const expectedTimeLeft = {
       days: 0,
       hours: 0,
@@ -156,12 +156,9 @@ describe('selectStrictModeTimeLeft', () => {
     'should calculate remaining time correctly for $description',
     ({ remainingMs, expected }) => {
       const endedAt = dateProvider.msToISOString(nowMs + remainingMs)
-      const stateWithStrictModeEndedAt = stateBuilder()
-        .withStrictModeEndedAt(endedAt)
-        .build()
       const store = createTestStore(
         { dateProvider },
-        stateWithStrictModeEndedAt,
+        stateBuilder().withStrictModeEndedAt(endedAt).build(),
       )
 
       const timeLeft = selectStrictModeTimeLeft(store.getState(), dateProvider)

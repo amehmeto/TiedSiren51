@@ -186,7 +186,10 @@ module.exports = {
     // Prefer ternary over complementary && conditions in JSX
     'local-rules/prefer-ternary-jsx': 'error',
     // Extract long function arguments into named variables for readability
-    'local-rules/prefer-extracted-long-params': 'error',
+    'local-rules/prefer-extracted-long-params': [
+      'error',
+      { exemptFunctions: ['createTestStore', 'dispatch'] },
+    ],
     // Extract inline object types into named type aliases
     'local-rules/no-inline-object-type': 'warn',
     // Disallow overly generic variable and function names

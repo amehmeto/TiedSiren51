@@ -47,6 +47,12 @@ module.exports = {
             description:
               'AST node types that are always allowed as arguments (default: Identifier, Literal, TemplateLiteral, SpreadElement)',
           },
+          exemptFunctions: {
+            type: 'array',
+            items: { type: 'string' },
+            description:
+              'Function names whose arguments are exempt from this rule (matches the final identifier in the callee)',
+          },
         },
         additionalProperties: false,
       },
@@ -70,6 +76,7 @@ module.exports = {
       ],
     )
 
+    const exemptFunctions = new Set(options.exemptFunctions || [])
     const sourceCode = context.getSourceCode()
 
     return {
@@ -77,8 +84,19 @@ module.exports = {
       NewExpression: checkCallExpression,
     }
 
+    function getCalleeName(node) {
+      const callee = node.callee
+      if (callee.type === 'Identifier') return callee.name
+      if (callee.type === 'MemberExpression' && callee.property.type === 'Identifier')
+        return callee.property.name
+      return null
+    }
+
     function checkCallExpression(node) {
       if (node.arguments.length === 0) return
+
+      const calleeName = getCalleeName(node)
+      if (calleeName && exemptFunctions.has(calleeName)) return
 
       for (const arg of node.arguments) {
         if (allowedNodeTypes.has(arg.type)) continue

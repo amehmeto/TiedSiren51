@@ -14,10 +14,10 @@ describe('selectNeedsReauthentication', () => {
   })
 
   test('should return true when user has never re-authenticated', () => {
-    const stateWithNullReauth = stateBuilder()
-      .withLastReauthenticatedAt(null)
-      .build()
-    const store = createTestStore({ dateProvider }, stateWithNullReauth)
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withLastReauthenticatedAt(null).build(),
+    )
 
     const shouldReauthenticate = selectNeedsReauthentication(
       store.getState(),
@@ -47,10 +47,10 @@ describe('selectNeedsReauthentication', () => {
     'should return $shouldNeedReauth $scenario of re-authentication',
     ({ lastReauthenticatedAt, shouldNeedReauth }) => {
       assertISODateString(lastReauthenticatedAt)
-      const stateWithReauthAt = stateBuilder()
-        .withLastReauthenticatedAt(lastReauthenticatedAt)
-        .build()
-      const store = createTestStore({ dateProvider }, stateWithReauthAt)
+      const store = createTestStore(
+        { dateProvider },
+        stateBuilder().withLastReauthenticatedAt(lastReauthenticatedAt).build(),
+      )
 
       const shouldReauthenticate = selectNeedsReauthentication(
         store.getState(),

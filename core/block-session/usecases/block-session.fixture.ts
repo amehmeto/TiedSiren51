@@ -67,8 +67,7 @@ export function blockSessionFixture(
           },
           testStateBuilderProvider.getState(),
         )
-        const duplicateAction = duplicateBlockSession(toBeDuplicatedPayload)
-        await store.dispatch(duplicateAction)
+        await store.dispatch(duplicateBlockSession(toBeDuplicatedPayload))
       },
       renamingBlockSession: async (toBeRenamedPayload: {
         name: string
@@ -80,8 +79,7 @@ export function blockSessionFixture(
           },
           testStateBuilderProvider.getState(),
         )
-        const renameAction = renameBlockSession(toBeRenamedPayload)
-        await store.dispatch(renameAction)
+        await store.dispatch(renameBlockSession(toBeRenamedPayload))
       },
       deletingBlockSession: async (blockSessionId: string) => {
         store = createTestStore(
@@ -105,8 +103,7 @@ export function blockSessionFixture(
           },
           testStateBuilderProvider.getState(),
         )
-        const updateAction = updateBlockSession(updateBlockSessionPayload)
-        await store.dispatch(updateAction)
+        await store.dispatch(updateBlockSession(updateBlockSessionPayload))
       },
     },
     then: {
