@@ -30,7 +30,8 @@ export function DeleteAccountForm({
         block sessions, blocklists, and sirens will be permanently deleted.
       </Text>
       <Text style={styles.instruction}>
-        Type {DELETE_CONFIRMATION} to confirm:
+        Type <Text style={styles.confirmKeyword}>{DELETE_CONFIRMATION}</Text> to
+        confirm:
       </Text>
       <TextInput
         style={styles.input}
@@ -76,6 +77,9 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontSize: T.font.size.base,
     marginBottom: T.spacing.small,
+  },
+  confirmKeyword: {
+    fontWeight: T.font.weight.bold,
   },
   input: {
     width: '100%',

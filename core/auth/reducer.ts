@@ -52,8 +52,8 @@ export const clearDeleteAccountError = createAction(
   'auth/clearDeleteAccountError',
 )
 
-export const reducer = createReducer<AuthState>(
-  {
+function createInitialAuthState(): AuthState {
+  return {
     authUser: null,
     isLoading: false,
     error: null,
@@ -66,7 +66,11 @@ export const reducer = createReducer<AuthState>(
     reauthError: null,
     isDeletingAccount: false,
     deleteAccountError: null,
-  },
+  }
+}
+
+export const reducer = createReducer<AuthState>(
+  createInitialAuthState(),
   (builder) => {
     // All auth thunks share the same pending/fulfilled/rejected state transitions
     // (loading, error, errorType). The addMatcher calls below handle this shared
@@ -160,17 +164,7 @@ export const reducer = createReducer<AuthState>(
         state.deleteAccountError = null
       })
       .addCase(deleteAccount.fulfilled, (state) => {
-        state.authUser = null
-        state.error = null
-        state.errorType = null
-        state.isLoading = false
-        state.email = ''
-        state.password = ''
-        state.lastReauthenticatedAt = null
-        state.isReauthenticating = false
-        state.reauthError = null
-        state.isDeletingAccount = false
-        state.deleteAccountError = null
+        Object.assign(state, createInitialAuthState())
       })
       .addCase(deleteAccount.rejected, (state, action) => {
         state.isDeletingAccount = false

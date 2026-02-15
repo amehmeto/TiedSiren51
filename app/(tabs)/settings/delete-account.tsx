@@ -1,3 +1,4 @@
+import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { useSelector } from 'react-redux'
@@ -11,9 +12,12 @@ import { DeleteAccountForm } from '@/ui/screens/Settings/DeleteAccountForm'
 
 export default function DeleteAccountScreen() {
   const viewModel = useSelector(selectDeleteAccountViewModel)
+  const router = useRouter()
   const [isReauthVisible, setIsReauthVisible] = useState(true)
   const [isReauthenticated, setIsReauthenticated] = useState(false)
 
+  // When deleted, Firebase's onAuthStateChanged(null) triggers the existing
+  // logout flow which redirects to the login screen.
   if (viewModel.type === DeleteAccountViewState.Deleted) return null
 
   const { isDeletingAccount, deleteAccountError } = viewModel
@@ -33,7 +37,7 @@ export default function DeleteAccountScreen() {
 
       <ReauthenticationModal
         isVisible={isReauthVisible}
-        onRequestClose={() => setIsReauthVisible(false)}
+        onRequestClose={() => router.back()}
         onSuccess={() => {
           setIsReauthVisible(false)
           setIsReauthenticated(true)

@@ -35,7 +35,7 @@ const tabs: Tab[] = [
     IconType: Entypo,
   },
   {
-    name: 'settings/index',
+    name: 'settings',
     title: TabScreens.SETTINGS,
     icon: 'settings-outline',
     IconType: Ionicons,
