@@ -188,7 +188,10 @@ module.exports = {
     // Extract long function arguments into named variables for readability
     'local-rules/prefer-extracted-long-params': [
       'error',
-      { exemptFunctions: ['createTestStore', 'dispatch'] },
+      {
+        exemptFunctions: ['createTestStore'],
+        transparentWrappers: ['dispatch'],
+      },
     ],
     // Extract inline object types into named type aliases
     'local-rules/no-inline-object-type': 'warn',

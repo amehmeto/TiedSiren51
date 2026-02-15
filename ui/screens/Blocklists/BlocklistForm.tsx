@@ -180,10 +180,8 @@ export function BlocklistForm({
         websites: () => (
           <TextInputSelectionScene
             onSubmitEditing={(event) => {
-              const addWebsiteAction = addWebsiteToSirens(
-                event.nativeEvent.text,
-              )
-              dispatch(addWebsiteAction)
+              const website = event.nativeEvent.text
+              dispatch(addWebsiteToSirens(website))
             }}
             sirenType={SirenType.WEBSITES}
             placeholder={'Add websites...'}
@@ -196,10 +194,8 @@ export function BlocklistForm({
         keywords: () => (
           <TextInputSelectionScene
             onSubmitEditing={(event) => {
-              const addKeywordAction = addKeywordToSirens(
-                event.nativeEvent.text,
-              )
-              dispatch(addKeywordAction)
+              const keyword = event.nativeEvent.text
+              dispatch(addKeywordToSirens(keyword))
             }}
             sirenType={SirenType.KEYWORDS}
             placeholder={'Add keywords...'}

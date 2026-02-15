@@ -53,6 +53,12 @@ module.exports = {
             description:
               'Function names whose arguments are exempt from this rule (matches the final identifier in the callee)',
           },
+          transparentWrappers: {
+            type: 'array',
+            items: { type: 'string' },
+            description:
+              'Function names that are treated as transparent wrappers (e.g. dispatch). The rule skips the wrapper itself but checks inner call arguments, ignoring allowedNodeTypes for those inner args.',
+          },
         },
         additionalProperties: false,
       },
@@ -77,7 +83,16 @@ module.exports = {
     )
 
     const exemptFunctions = new Set(options.exemptFunctions || [])
+    const transparentWrappers = new Set(options.transparentWrappers || [])
     const sourceCode = context.getSourceCode()
+    const wrappedCalls = new Set()
+    const simpleNodeTypes = new Set([
+      'Identifier',
+      'Literal',
+      'TemplateLiteral',
+      'SpreadElement',
+      'UnaryExpression',
+    ])
 
     return {
       CallExpression: checkCallExpression,
@@ -94,9 +109,23 @@ module.exports = {
 
     function checkCallExpression(node) {
       if (node.arguments.length === 0) return
+      if (wrappedCalls.has(node)) return
 
       const calleeName = getCalleeName(node)
       if (calleeName && exemptFunctions.has(calleeName)) return
+
+      if (calleeName && transparentWrappers.has(calleeName)) {
+        for (const arg of node.arguments) {
+          if (arg.type === 'CallExpression' && arg.arguments.length > 0) {
+            const innerCallText = sourceCode.getText(arg)
+            wrappedCalls.add(arg)
+            if (innerCallText.length > maxArgumentLength) {
+              checkInnerArgs(arg.arguments)
+            }
+          }
+        }
+        return
+      }
 
       for (const arg of node.arguments) {
         if (allowedNodeTypes.has(arg.type)) continue
@@ -108,6 +137,16 @@ module.exports = {
             messageId: 'extractParam',
           })
         }
+      }
+    }
+
+    function checkInnerArgs(args) {
+      for (const arg of args) {
+        if (simpleNodeTypes.has(arg.type)) continue
+        context.report({
+          node: arg,
+          messageId: 'extractParam',
+        })
       }
     }
   },

@@ -69,6 +69,26 @@ describe('prefer-extracted-long-params', () => {
         {
           code: `fn(!someVeryLongVariableNameThatExceedsTheThreshold)`,
         },
+        // Transparent wrapper with extracted inner arg - OK
+        {
+          code: `const payload = { id: blocklist.id, name: inputText }; dispatch(duplicateBlocklist(payload))`,
+          options: [{ transparentWrappers: ['dispatch'] }],
+        },
+        // Transparent wrapper with short inner arg - OK
+        {
+          code: `dispatch(addWebsite(shortArg))`,
+          options: [{ transparentWrappers: ['dispatch'] }],
+        },
+        // Transparent wrapper with no inner call - OK
+        {
+          code: `dispatch(someAction)`,
+          options: [{ transparentWrappers: ['dispatch'] }],
+        },
+        // Transparent wrapper via member expression - OK
+        {
+          code: `const payload = { id: blocklist.id, name: inputText }; store.dispatch(duplicateBlocklist(payload))`,
+          options: [{ transparentWrappers: ['dispatch'] }],
+        },
       ],
 
       invalid: [
@@ -104,6 +124,24 @@ describe('prefer-extracted-long-params', () => {
         // new expression with long argument - NOT OK
         {
           code: `new SomeConstructor(SomeLongClassName.SOME_LONG_PROPERTY[code])`,
+          errors: [{ messageId: 'extractParam' }],
+        },
+        // Transparent wrapper flags long inner args (ignores allowedNodeTypes)
+        {
+          code: `dispatch(duplicateBlocklist({ id: blocklist.id, name: inputText, extra: somethingElse }))`,
+          options: [{ transparentWrappers: ['dispatch'] }],
+          errors: [{ messageId: 'extractParam' }],
+        },
+        // Transparent wrapper with long inner member expression arg
+        {
+          code: `dispatch(addWebsite(event.nativeEvent.text.something.veryLong))`,
+          options: [{ transparentWrappers: ['dispatch'] }],
+          errors: [{ messageId: 'extractParam' }],
+        },
+        // Transparent wrapper via member expression with long inner arg
+        {
+          code: `store.dispatch(duplicateBlocklist({ id: blocklist.id, name: inputText, extra: somethingElse }))`,
+          options: [{ transparentWrappers: ['dispatch'] }],
           errors: [{ messageId: 'extractParam' }],
         },
       ],
