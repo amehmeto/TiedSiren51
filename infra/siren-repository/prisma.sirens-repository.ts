@@ -80,6 +80,17 @@ export class PrismaSirensRepository
     }
   }
 
+  async deleteAllSirens(): Promise<void> {
+    try {
+      await this.baseClient.siren.deleteMany()
+    } catch (error) {
+      this.logger.error(
+        `[PrismaSirensRepository] Failed to delete all sirens: ${error}`,
+      )
+      throw error
+    }
+  }
+
   async addAndroidSirenToSirens(androidSiren: AndroidSiren): Promise<void> {
     try {
       await this.baseClient.siren.create({

@@ -88,6 +88,7 @@
       "Bash(git --version:*)",
       "Bash(git -c core.hooksPath=/dev/null worktree add .worktrees/*)",
       "Bash(git add:*)",
+      "Bash(git apply:*)",
       "Bash(git blame:*)",
       "Bash(git branch:*)",
       "Bash(git check-ignore:*)",

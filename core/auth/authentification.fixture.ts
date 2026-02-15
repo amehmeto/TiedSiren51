@@ -8,7 +8,9 @@ import {
   stateBuilderProvider,
 } from '@/core/_tests_/state-builder'
 import { AuthUser } from '@/core/auth/auth-user'
+import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
+import { reauthenticateWithGoogle } from '@/core/auth/usecases/reauthenticate-with-google.usecase'
 import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
@@ -63,6 +65,20 @@ export function authentificationFixture(
         const error = new Error(errorMessage)
         authGateway.willReauthenticateWith = Promise.reject(error)
       },
+      reauthenticationWithGoogleWillSucceed() {
+        authGateway.willReauthenticateWithGoogleWith = Promise.resolve()
+      },
+      reauthenticationWithGoogleWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willReauthenticateWithGoogleWith = Promise.reject(error)
+      },
+      accountDeletionWillSucceed() {
+        authGateway.willDeleteAccountWith = Promise.resolve()
+      },
+      accountDeletionWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willDeleteAccountWith = Promise.reject(error)
+      },
       nowIs(isoDate: ISODateString) {
         dateProvider.now = new Date(isoDate)
       },
@@ -92,6 +108,12 @@ export function authentificationFixture(
       },
       reauthenticate(password: string) {
         return store.dispatch(reauthenticate({ password }))
+      },
+      reauthenticateWithGoogle() {
+        return store.dispatch(reauthenticateWithGoogle())
+      },
+      deleteAccount() {
+        return store.dispatch(deleteAccount())
       },
     },
     then: {
@@ -136,6 +158,14 @@ export function authentificationFixture(
       reauthErrorShouldBeNull() {
         const { reauthError } = store.getState().auth
         expect(reauthError).toBeNull()
+      },
+      accountDeletionShouldNotBeLoading() {
+        const { isDeletingAccount } = store.getState().auth
+        expect(isDeletingAccount).toBe(false)
+      },
+      deleteAccountErrorShouldBe(errorMessage: string) {
+        const { deleteAccountError } = store.getState().auth
+        expect(deleteAccountError).toBe(errorMessage)
       },
     },
   }

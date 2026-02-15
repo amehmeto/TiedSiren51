@@ -91,6 +91,10 @@ export class FakeDataBlockSessionRepository
     return super.delete(sessionId)
   }
 
+  deleteAll(): Promise<void> {
+    return super.deleteAll()
+  }
+
   findById(sessionId: string): Promise<BlockSession> {
     return super.findById(sessionId)
   }

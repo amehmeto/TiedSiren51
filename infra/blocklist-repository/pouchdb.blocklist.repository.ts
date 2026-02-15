@@ -81,4 +81,18 @@ export class PouchdbBlocklistRepository implements BlocklistRepository {
       throw error
     }
   }
+
+  async deleteAll(): Promise<void> {
+    try {
+      const result = await this.db.allDocs()
+      await Promise.all(
+        result.rows.map((row) => this.db.remove(row.id, row.value.rev)),
+      )
+    } catch (error) {
+      this.logger.error(
+        `[PouchdbBlocklistRepository] Failed to delete all: ${error}`,
+      )
+      throw error
+    }
+  }
 }

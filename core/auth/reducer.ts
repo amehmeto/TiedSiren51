@@ -5,6 +5,8 @@ import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
+import { deleteAccount } from './usecases/delete-account.usecase'
+import { reauthenticateWithGoogle } from './usecases/reauthenticate-with-google.usecase'
 import { reauthenticate } from './usecases/reauthenticate.usecase'
 import { resetPassword } from './usecases/reset-password.usecase'
 import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
@@ -17,6 +19,8 @@ export type AuthState = {
   lastReauthenticatedAt: ISODateString | null
   isReauthenticating: boolean
   reauthError: string | null
+  isDeletingAccount: boolean
+  deleteAccountError: string | null
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -31,6 +35,10 @@ export const setError = createAction<string>('auth/setError')
 
 export const clearReauthError = createAction('auth/clearReauthError')
 
+export const clearDeleteAccountError = createAction(
+  'auth/clearDeleteAccountError',
+)
+
 export const reducer = createReducer<AuthState>(
   {
     authUser: null,
@@ -40,6 +48,8 @@ export const reducer = createReducer<AuthState>(
     lastReauthenticatedAt: null,
     isReauthenticating: false,
     reauthError: null,
+    isDeletingAccount: false,
+    deleteAccountError: null,
   },
   (builder) => {
     builder
@@ -149,6 +159,37 @@ export const reducer = createReducer<AuthState>(
       .addCase(reauthenticate.rejected, (state, action) => {
         state.isReauthenticating = false
         state.reauthError = action.error.message ?? null
+      })
+
+      .addCase(reauthenticateWithGoogle.pending, (state) => {
+        state.isReauthenticating = true
+        state.reauthError = null
+      })
+      .addCase(reauthenticateWithGoogle.fulfilled, (state, action) => {
+        state.isReauthenticating = false
+        state.lastReauthenticatedAt = action.payload
+        state.reauthError = null
+      })
+      .addCase(reauthenticateWithGoogle.rejected, (state, action) => {
+        state.isReauthenticating = false
+        state.reauthError = action.error.message ?? null
+      })
+
+      .addCase(clearDeleteAccountError, (state) => {
+        state.deleteAccountError = null
+      })
+      .addCase(deleteAccount.pending, (state) => {
+        state.isDeletingAccount = true
+        state.deleteAccountError = null
+      })
+      .addCase(deleteAccount.fulfilled, (state) => {
+        state.authUser = null
+        state.isDeletingAccount = false
+        state.deleteAccountError = null
+      })
+      .addCase(deleteAccount.rejected, (state, action) => {
+        state.isDeletingAccount = false
+        state.deleteAccountError = action.error.message ?? null
       })
   },
 )

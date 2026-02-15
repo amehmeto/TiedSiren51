@@ -65,6 +65,20 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
     }
   }
 
+  async deleteAll(): Promise<void> {
+    try {
+      const result = await this.db.allDocs()
+      await Promise.all(
+        result.rows.map((row) => this.db.remove(row.id, row.value.rev)),
+      )
+    } catch (error) {
+      this.logger.error(
+        `[PouchdbBlockSessionRepository] Failed to delete all block sessions: ${error}`,
+      )
+      throw error
+    }
+  }
+
   async findById(sessionId: string): Promise<BlockSession> {
     try {
       const retrievedSession = await this.db.get(sessionId)
