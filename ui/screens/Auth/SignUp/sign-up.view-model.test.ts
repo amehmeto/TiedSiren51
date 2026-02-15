@@ -46,13 +46,13 @@ describe('selectSignUpViewModel', () => {
   describe('Error state', () => {
     it('should return error view model for email already in use', () => {
       const state = stateBuilder()
-        .withAuthError({ message: 'This email is already in use.' })
+        .withAuthError({ message: 'Invalid email or password.' })
         .build()
       const expectedViewModel: SignUpViewModel = {
         type: SignUpViewState.Error,
         buttonText: 'CREATE YOUR ACCOUNT',
         isInputDisabled: false,
-        error: 'This email is already in use.',
+        error: 'Invalid email or password.',
         email: '',
         password: '',
       }

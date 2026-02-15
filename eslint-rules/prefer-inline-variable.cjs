@@ -264,6 +264,25 @@ module.exports = {
     }
 
     /**
+     * Check if inlining would create a long argument in a function/constructor call
+     * This conflicts with prefer-extracted-long-params which requires extracting
+     * long arguments into named variables
+     */
+    function wouldCreateLongCallArgument(usageNode, initNode) {
+      const parent = usageNode.parent
+      if (!parent) return false
+
+      const isCallArgument =
+        (parent.type === 'CallExpression' || parent.type === 'NewExpression') &&
+        parent.arguments.includes(usageNode)
+
+      if (!isCallArgument) return false
+
+      const initText = sourceCode.getText(initNode)
+      return initText.length > 40
+    }
+
+    /**
      * Check if the usage is deeply nested in JSX (more than 1 level from return)
      * with sibling elements before it at any level. In such cases, the variable
      * serves as documentation for what the expression represents.
@@ -358,6 +377,9 @@ module.exports = {
 
         // Don't inline into expect() calls - conflicts with expect-separate-act-assert
         if (isInsideExpectCall(usage.identifier)) return
+
+        // Don't inline when it would create a long call argument (conflicts with prefer-extracted-long-params)
+        if (wouldCreateLongCallArgument(usage.identifier, decl.init)) return
 
         // Don't inline when deeply nested in JSX with siblings - variable documents the value
         if (isDeeplyNestedInJsxWithSiblings(usage.identifier)) return

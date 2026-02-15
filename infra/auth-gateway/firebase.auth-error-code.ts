@@ -1,0 +1,13 @@
+export enum FirebaseAuthErrorCode {
+  EmailAlreadyInUse = 'auth/email-already-in-use',
+  InvalidEmail = 'auth/invalid-email',
+  WeakPassword = 'auth/weak-password',
+  InvalidCredential = 'auth/invalid-credential',
+  PopupClosedByUser = 'auth/popup-closed-by-user',
+  CancelledByUser = 'auth/cancelled-popup-request',
+  UserNotFound = 'auth/user-not-found',
+  TooManyRequests = 'auth/too-many-requests',
+  NetworkRequestFailed = 'auth/network-request-failed',
+  WrongPassword = 'auth/wrong-password',
+  RequiresRecentLogin = 'auth/requires-recent-login',
+}

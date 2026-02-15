@@ -81,7 +81,7 @@ describe('FirebaseAuthGateway - Error Translation', () => {
     }>([
       {
         code: 'auth/email-already-in-use',
-        expected: 'This email is already in use.',
+        expected: 'Invalid email or password.',
         method: AuthMethod.SignUpWithEmail,
       },
       {
