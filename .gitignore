@@ -47,6 +47,7 @@ yarn-error.*
 
 # Coverage - generated files, base coverage is cached via GitHub Actions
 coverage/*
+**/coverage/*
 coverage-history.json
 
 # Android

@@ -26,17 +26,20 @@ const noElseIf = require('../eslint-rules/no-else-if.cjs')
 const noEntireStateSelector = require('../eslint-rules/no-entire-state-selector.cjs')
 const noEnumValueAsStringLiteral = require('../eslint-rules/no-enum-value-as-string-literal.cjs')
 const noGenericResultVariable = require('../eslint-rules/no-generic-result-variable.cjs')
+const noLameNaming = require('../eslint-rules/no-lame-naming.cjs')
 const noIPrefixInImports = require('../eslint-rules/no-i-prefix-in-imports.cjs')
 const noIconSizeMagicNumbers = require('../eslint-rules/no-icon-size-magic-numbers.cjs')
 const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
+const noInlineImportType = require('../eslint-rules/no-inline-import-type.cjs')
+const noInlineObjectType = require('../eslint-rules/no-inline-object-type.cjs')
 const noModuleLevelConstants = require('../eslint-rules/no-module-level-constants.cjs')
 const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressions.cjs')
-const noUnusedTestId = require('../eslint-rules/no-unused-test-id.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
 const noRedundantNullishTernary = require('../eslint-rules/no-redundant-nullish-ternary.cjs')
 const noSelectorPropDrilling = require('../eslint-rules/no-selector-prop-drilling.cjs')
 const noStylesheetMagicNumbers = require('../eslint-rules/no-stylesheet-magic-numbers.cjs')
 const noTryCatchInCore = require('../eslint-rules/no-try-catch-in-core.cjs')
+const noUnusedTestId = require('../eslint-rules/no-unused-test-id.cjs')
 const noUsecallbackSelectorWrapper = require('../eslint-rules/no-usecallback-selector-wrapper.cjs')
 const oneComponentPerFile = require('../eslint-rules/one-component-per-file.cjs')
 const oneListenerPerFile = require('../eslint-rules/one-listener-per-file.cjs')
@@ -45,6 +48,7 @@ const oneUsecasePerFile = require('../eslint-rules/one-usecase-per-file.cjs')
 const oneViewModelPerFile = require('../eslint-rules/one-view-model-per-file.cjs')
 const preferArrayDestructuring = require('../eslint-rules/prefer-array-destructuring.cjs')
 const preferEnumOverStringUnion = require('../eslint-rules/prefer-enum-over-string-union.cjs')
+const preferExtractedLongParams = require('../eslint-rules/prefer-extracted-long-params.cjs')
 const preferInlineVariable = require('../eslint-rules/prefer-inline-variable.cjs')
 const preferJumpTable = require('../eslint-rules/prefer-jump-table.cjs')
 const preferNamedSelector = require('../eslint-rules/prefer-named-selector.cjs')
@@ -57,6 +61,7 @@ const repositoryImplementationNaming = require('../eslint-rules/repository-imple
 const requireColocatedTest = require('../eslint-rules/require-colocated-test.cjs')
 const requireLoggerInCatch = require('../eslint-rules/require-logger-in-catch.cjs')
 const requireNamedRegex = require('../eslint-rules/require-named-regex.cjs')
+const requireTypedEach = require('../eslint-rules/require-typed-each.cjs')
 const schemaMatchesFilename = require('../eslint-rules/schema-matches-filename.cjs')
 const selectorMatchesFilename = require('../eslint-rules/selector-matches-filename.cjs')
 const selectorStateFirstParam = require('../eslint-rules/selector-state-first-param.cjs')
@@ -72,6 +77,7 @@ module.exports = {
     'core-test-file-naming': coreTestFileNaming,
     'file-naming-convention': fileNamingConvention,
     'no-index-in-core': noIndexInCore,
+    'no-inline-import-type': noInlineImportType,
     'selector-matches-filename': selectorMatchesFilename,
     'expect-separate-act-assert': expectSeparateActAssert,
     'inline-single-statement-handlers': inlineSingleStatementHandlers,
@@ -133,5 +139,9 @@ module.exports = {
     'prefer-enum-over-string-union': preferEnumOverStringUnion,
     'no-and-or-in-names': noConjunctionInNames,
     'no-generic-result-variable': noGenericResultVariable,
+    'prefer-extracted-long-params': preferExtractedLongParams,
+    'require-typed-each': requireTypedEach,
+    'no-inline-object-type': noInlineObjectType,
+    'no-lame-naming': noLameNaming,
   },
 }

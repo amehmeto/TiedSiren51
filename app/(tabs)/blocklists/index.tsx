@@ -4,7 +4,6 @@ import { useRouter } from 'expo-router'
 import React, { ReactNode } from 'react'
 import { FlatList, Platform, Pressable, StyleSheet } from 'react-native'
 import { useSelector } from 'react-redux'
-import { RootState } from '@/core/_redux_/createStore'
 import { BlocklistViewModel } from '@/core/blocklist/selectors/blocklist-view-model.type'
 import { selectBlocklistViewModel } from '@/core/blocklist/selectors/blocklist.view-model'
 import { T } from '@/ui/design-system/theme'
@@ -13,10 +12,7 @@ import { BlocklistCard } from '@/ui/screens/Blocklists/BlocklistCard'
 import { NoBlocklistMessage } from '@/ui/screens/Blocklists/NoBlocklistMessage'
 
 export default function BlocklistScreen() {
-  const viewModel = useSelector<
-    RootState,
-    ReturnType<typeof selectBlocklistViewModel>
-  >((rootState) => selectBlocklistViewModel(rootState))
+  const viewModel = useSelector(selectBlocklistViewModel)
 
   const router = useRouter()
 

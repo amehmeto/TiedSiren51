@@ -103,6 +103,7 @@ module.exports = {
     'local-rules/require-logger-in-catch': 'error',
     'local-rules/file-naming-convention': 'error',
     'local-rules/no-index-in-core': 'error',
+    'local-rules/no-inline-import-type': 'error',
     'local-rules/selector-matches-filename': 'error',
     'local-rules/usecase-matches-filename': 'error',
     'local-rules/no-cross-layer-imports': 'error',
@@ -184,6 +185,12 @@ module.exports = {
     'local-rules/no-enum-value-as-string-literal': 'error',
     // Prefer ternary over complementary && conditions in JSX
     'local-rules/prefer-ternary-jsx': 'error',
+    // Extract long function arguments into named variables for readability
+    'local-rules/prefer-extracted-long-params': 'warn',
+    // Extract inline object types into named type aliases
+    'local-rules/no-inline-object-type': 'warn',
+    // Disallow overly generic variable and function names
+    'local-rules/no-lame-naming': 'warn',
     // Prefer enum over string literal unions
     'local-rules/prefer-enum-over-string-union': [
       'error',
@@ -279,6 +286,8 @@ module.exports = {
         'local-rules/no-new-in-test-body': 'error',
         'local-rules/use-data-builders': 'error',
         'local-rules/no-generic-result-variable': 'warn',
+        // Require type parameter on it.each / test.each / describe.each
+        'local-rules/require-typed-each': 'warn',
       },
     },
     // No data builders in production code

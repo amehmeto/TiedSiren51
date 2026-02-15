@@ -7,6 +7,8 @@ import {
   stateBuilder,
   stateBuilderProvider,
 } from '@/core/_tests_/state-builder'
+import { AuthError } from '@/core/auth/auth-error'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
 import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
@@ -46,7 +48,10 @@ export function authentificationFixture(
         _authUser: AuthUser,
         _password: string,
       ) {
-        const error = new Error('Invalid credentials')
+        const error = new AuthError(
+          'Invalid credentials',
+          AuthErrorType.Credential,
+        )
         authGateway.willResultWith = Promise.reject(error)
       },
       authUserIs(authUser: AuthUser) {
@@ -54,9 +59,18 @@ export function authentificationFixture(
           stateBuilder.withAuthUser(authUser),
         )
       },
-      authGatewayWillRejectWith(errorMessage: string) {
-        const error = new Error(errorMessage)
+      authGatewayWillRejectWith(
+        errorMessage: string,
+        errorType: AuthErrorType = AuthErrorType.Unknown,
+      ) {
+        const error = new AuthError(errorMessage, errorType)
         authGateway.willResultWith = Promise.reject(error)
+      },
+      logOutWillRejectWith(
+        errorMessage: string,
+        errorType: AuthErrorType = AuthErrorType.Unknown,
+      ) {
+        authGateway.logOutError = new AuthError(errorMessage, errorType)
       },
       reauthenticationWillSucceed() {
         authGateway.willReauthenticateWith = Promise.resolve()
@@ -129,6 +143,10 @@ export function authentificationFixture(
         const state = store.getState()
         expect(state.auth.error).toBe(expectedError)
       },
+      authErrorTypeShouldBe(expected: AuthErrorType) {
+        const state = store.getState()
+        expect(state.auth.errorType).toBe(expected)
+      },
       authShouldBeLoading(isLoading: boolean) {
         const state = store.getState()
         expect(state.auth.isLoading).toBe(isLoading)
@@ -142,6 +160,9 @@ export function authentificationFixture(
       },
       passwordResetShouldNotBeSent() {
         expect(authGateway.lastResetPasswordEmail).toBeNull()
+      },
+      passwordShouldBeCleared() {
+        expect(store.getState().auth.password).toBe('')
       },
       lastReauthenticatedAtShouldBe(expectedDate: ISODateString | null) {
         const { lastReauthenticatedAt } = store.getState().auth

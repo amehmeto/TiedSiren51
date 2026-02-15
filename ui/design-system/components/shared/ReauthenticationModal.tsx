@@ -22,9 +22,7 @@ export function ReauthenticationModal({
   onSuccess,
 }: ReauthenticationModalProps) {
   const dispatch = useDispatch<AppDispatch>()
-  const { reauthError } = useSelector((state: RootState) =>
-    selectReauthStatus(state),
-  )
+  const { reauthError } = useSelector(selectReauthStatus)
   const authProvider = useSelector(
     (state: RootState) => state.auth.authUser?.authProvider,
   )
