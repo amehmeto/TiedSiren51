@@ -17,11 +17,10 @@ Run a retrospective on PR #$ARGUMENTS to identify what caused excessive review r
    gh pr view $ARGUMENTS --json title,body,commits,createdAt,updatedAt,reviews,comments
    ```
 
-3. **Fetch the commit history for this PR:**
+3. **Extract the commit history from PR metadata:**
+   The `commits` field from step 2 already contains the full commit list. Parse it with:
    ```bash
-   BASE=$(gh pr view $ARGUMENTS --json baseRefName --jq '.baseRefName')
-   HEAD=$(gh pr view $ARGUMENTS --json headRefName --jq '.headRefName')
-   git log "$BASE..$HEAD" --pretty=format:"%h %s (%ai)" --reverse
+   gh pr view $ARGUMENTS --json commits --jq '.commits[] | "\(.oid[0:7]) \(.messageHeadline) (\(.committedDate))"'
    ```
 
 4. **Analyze the full conversation** and produce a structured retrospective:
