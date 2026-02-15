@@ -9,6 +9,7 @@ export enum DeleteAccountViewState {
 
 type FormViewModel = {
   type: DeleteAccountViewState.Form
+  isReauthenticated: boolean
   isDeletingAccount: boolean
   deleteAccountError: string | null
   confirmText: string
@@ -26,8 +27,13 @@ export type DeleteAccountViewModel = FormViewModel | DeletedViewModel
 export function selectDeleteAccountViewModel(
   state: RootState,
 ): DeleteAccountViewModel {
-  const { authUser, isDeletingAccount, deleteAccountError, deleteConfirmText } =
-    state.auth
+  const {
+    authUser,
+    isDeletingAccount,
+    deleteAccountError,
+    deleteConfirmText,
+    lastReauthenticatedAt,
+  } = state.auth
 
   if (!authUser) {
     return {
@@ -39,6 +45,7 @@ export function selectDeleteAccountViewModel(
 
   return {
     type: DeleteAccountViewState.Form,
+    isReauthenticated: lastReauthenticatedAt !== null,
     isDeletingAccount,
     deleteAccountError,
     confirmText: deleteConfirmText,

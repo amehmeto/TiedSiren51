@@ -12,6 +12,7 @@ describe('selectDeleteAccountViewModel', () => {
       .build()
     const expectedViewModel = {
       type: DeleteAccountViewState.Form,
+      isReauthenticated: false,
       isDeletingAccount: false,
       deleteAccountError: null,
       confirmText: '',
@@ -31,6 +32,21 @@ describe('selectDeleteAccountViewModel', () => {
     const viewModel = selectDeleteAccountViewModel(state)
 
     expect(viewModel.type).toBe(DeleteAccountViewState.Deleted)
+  })
+
+  it('should mark as reauthed when lastReauthenticatedAt is set', () => {
+    const state = stateBuilder()
+      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withLastReauthenticatedAt('2026-02-15T20:00:00.000Z')
+      .build()
+    const expectedViewModel = {
+      type: DeleteAccountViewState.Form,
+      isReauthenticated: true,
+    }
+
+    const viewModel = selectDeleteAccountViewModel(state)
+
+    expect(viewModel).toMatchObject(expectedViewModel)
   })
 
   it('should return loading state when deleting', () => {

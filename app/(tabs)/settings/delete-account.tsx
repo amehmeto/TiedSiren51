@@ -17,12 +17,16 @@ export default function DeleteAccountScreen() {
   const viewModel = useSelector(selectDeleteAccountViewModel)
   const dispatch = useDispatch<AppDispatch>()
   const [isReauthVisible, setIsReauthVisible] = useState(true)
-  const [isReauthenticated, setIsReauthenticated] = useState(false)
 
   if (viewModel.type === DeleteAccountViewState.Deleted) return null
 
-  const { confirmText, isDeleteDisabled, buttonText, deleteAccountError } =
-    viewModel
+  const {
+    isReauthenticated,
+    confirmText,
+    isDeleteDisabled,
+    buttonText,
+    deleteAccountError,
+  } = viewModel
 
   return (
     <View style={styles.container}>
@@ -40,12 +44,9 @@ export default function DeleteAccountScreen() {
       )}
 
       <ReauthenticationModal
-        isVisible={isReauthVisible}
+        isVisible={isReauthVisible && !isReauthenticated}
         onRequestClose={() => setIsReauthVisible(false)}
-        onSuccess={() => {
-          setIsReauthVisible(false)
-          setIsReauthenticated(true)
-        }}
+        onSuccess={() => setIsReauthVisible(false)}
       />
     </View>
   )
