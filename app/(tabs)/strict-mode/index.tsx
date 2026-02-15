@@ -59,12 +59,13 @@ export default function StrictModeScreen() {
   }
 
   const handleConfirmStrictMode = () => {
-    const startTimerAction = startTimer({
-      days: timerDuration.days,
-      hours: timerDuration.hours,
-      minutes: timerDuration.minutes,
-    })
-    dispatch(startTimerAction)
+    dispatch(
+      startTimer({
+        days: timerDuration.days,
+        hours: timerDuration.hours,
+        minutes: timerDuration.minutes,
+      }),
+    )
     setIsShowingConfirmation(false)
   }
 
@@ -111,14 +112,15 @@ export default function StrictModeScreen() {
       <TimerPickerModal
         visible={isShowingExtendPicker}
         onClose={() => setIsShowingExtendPicker(false)}
-        onSave={() => {
-          const extendTimerAction = extendTimer({
-            days: extendDuration.days,
-            hours: extendDuration.hours,
-            minutes: extendDuration.minutes,
-          })
-          dispatch(extendTimerAction)
-        }}
+        onSave={() =>
+          dispatch(
+            extendTimer({
+              days: extendDuration.days,
+              hours: extendDuration.hours,
+              minutes: extendDuration.minutes,
+            }),
+          )
+        }
         duration={extendDuration}
         onDurationChange={setExtendDuration}
         title={'Extend timer by'}
