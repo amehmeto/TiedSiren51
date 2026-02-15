@@ -26,7 +26,11 @@ resolve_main_repo() {
 }
 
 MAIN_REPO="$(resolve_main_repo)"
-WORKTREES_DIR="$MAIN_REPO/../worktrees"
+if [ -z "$MAIN_REPO" ]; then
+  echo "ERROR: Could not resolve main repository root" >&2
+  exit 1
+fi
+WORKTREES_DIR="$(cd "$MAIN_REPO/.." && pwd)/worktrees"
 
 # Load shared branch naming configuration
 # shellcheck disable=SC1091 # Path is dynamic but verified at runtime
