@@ -210,3 +210,40 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: bash scripts/cleanup-pr-releases.sh "$GITHUB_CONTEXT"
+
+  # Auto-generate review retrospective on PR merge
+  # Analyzes the review conversation, classifies feedback, and commits a retro file to main.
+  # Posts a summary to Slack #retro channel.
+  review-retro:
+    if: >-
+      github.event_name == 'pull_request'
+      && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Generate retrospective
+        id: retro
+        env:
+          GH_TOKEN: ${{ github.token }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+        run: bash scripts/run-retro-generation.sh "${{ github.event.pull_request.number }}"
+
+      - name: Commit retrospective to main
+        if: steps.retro.outputs.is_minimal != 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/commit-retro.sh "${{ steps.retro.outputs.retro_path }}" "${{ github.event.pull_request.number }}"
+
+      - name: Post to Slack
+        if: steps.retro.outputs.is_minimal != 'true'
+        env:
+          SLACK_RETRO_WEBHOOK_URL: ${{ secrets.SLACK_RETRO_WEBHOOK_URL }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: bash scripts/send-retro-slack-notification.sh '${{ steps.retro.outputs.retro_json }}'
