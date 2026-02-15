@@ -2,18 +2,45 @@
 set -e
 
 # Script to start work on a GitHub issue with automatic worktree, branch, and PR creation
+# Works from any worktree context — resolves the main repo automatically.
+#
 # Usage:
 #   ./scripts/start-issue.sh <issue-number>  Create worktree for issue (derives branch name)
 #   ./scripts/start-issue.sh --list          List all worktrees with PR status
 #   ./scripts/start-issue.sh --prune         Only cleanup merged PR worktrees
 #   ./scripts/start-issue.sh --remove <name> Remove specific worktree
 
-REPO_ROOT="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
-WORKTREES_DIR="$REPO_ROOT/.worktrees"
+# Resolve main repo root from any worktree context.
+# Uses git's common-dir to follow .git pointers back to the real repo.
+resolve_main_repo() {
+  local git_common_dir
+  git_common_dir=$(git rev-parse --git-common-dir 2>/dev/null) || {
+    echo "ERROR: Not inside a git repository" >&2
+    return 1
+  }
+  # git-common-dir returns the shared .git directory (e.g. /path/to/Repo/.git)
+  # We need the parent (the actual repo root)
+  local resolved
+  resolved=$(cd "$git_common_dir" && cd .. && pwd)
+  echo "$resolved"
+}
+
+MAIN_REPO="$(resolve_main_repo)"
+if [ -z "$MAIN_REPO" ]; then
+  echo "ERROR: Could not resolve main repository root" >&2
+  exit 1
+fi
+WORKTREES_DIR="$(cd "$MAIN_REPO/.." && pwd)/worktrees"
 
 # Load shared branch naming configuration
 # shellcheck disable=SC1091 # Path is dynamic but verified at runtime
 source "$(dirname "${BASH_SOURCE[0]}")/lib/branch-config.sh"
+
+# Wrapper for git commands that need the main repo context.
+# Disables hooks (husky breaks in worktree context) and operates on MAIN_REPO.
+mgit() {
+  git -C "$MAIN_REPO" -c core.hooksPath=/dev/null "$@"
+}
 
 # Exit codes
 readonly EXIT_SUCCESS=0
@@ -134,7 +161,58 @@ parse_worktree_list() {
       wt_path=""
       branch=""
     fi
-  done < <(git worktree list --porcelain; echo)
+  done < <(mgit worktree list --porcelain; echo)
+}
+
+# Validate .git pointers in existing worktrees
+# Warns about broken worktrees that need manual repair
+check_worktree_health() {
+  local unhealthy=0
+
+  while IFS=$'\t' read -r wt_path branch; do
+    # Skip main worktree
+    if [ "$wt_path" = "$MAIN_REPO" ]; then
+      continue
+    fi
+
+    if [ ! -e "$wt_path" ]; then
+      print_warning "Worktree path does not exist: $wt_path (branch: ${branch:-detached})"
+      ((unhealthy++)) || true
+      continue
+    fi
+
+    if [ ! -f "$wt_path/.git" ]; then
+      print_warning "Missing .git pointer in worktree: $wt_path (branch: ${branch:-detached})"
+      print_info "  Run 'git worktree repair' to attempt automatic repair"
+      ((unhealthy++)) || true
+      continue
+    fi
+
+    # Verify .git file content points to a valid directory
+    local gitdir_line
+    gitdir_line=$(head -1 "$wt_path/.git" 2>/dev/null) || true
+    if [[ "$gitdir_line" =~ ^gitdir:\ (.+)$ ]]; then
+      local gitdir="${BASH_REMATCH[1]}"
+      # Resolve relative paths
+      if [[ "$gitdir" != /* ]]; then
+        gitdir="$wt_path/$gitdir"
+      fi
+      if [ ! -d "$gitdir" ]; then
+        print_warning "Broken .git pointer in worktree: $wt_path"
+        print_info "  Points to non-existent directory: $gitdir"
+        print_info "  Run 'git worktree repair' to attempt automatic repair"
+        ((unhealthy++)) || true
+      fi
+    else
+      print_warning "Invalid .git file in worktree: $wt_path"
+      ((unhealthy++)) || true
+    fi
+  done < <(parse_worktree_list)
+
+  if [ "$unhealthy" -gt 0 ]; then
+    print_warning "$unhealthy worktree(s) have issues. Consider running: git worktree repair"
+    echo ""
+  fi
 }
 
 # Print summary block for Claude Code parsing
@@ -169,7 +247,7 @@ cleanup_merged_worktrees() {
 
   while IFS=$'\t' read -r wt_path branch; do
     # Skip main worktree and detached HEAD
-    if [ "$wt_path" = "$REPO_ROOT" ] || [ -z "$branch" ]; then
+    if [ "$wt_path" = "$MAIN_REPO" ] || [ -z "$branch" ]; then
       continue
     fi
 
@@ -187,14 +265,14 @@ cleanup_merged_worktrees() {
 
       if [ "$pr_state" = "MERGED" ] || [ "$pr_state" = "CLOSED" ]; then
         print_warning "Found $pr_state PR #$pr_number for worktree at $wt_path, removing..."
-        git worktree remove "$wt_path" --force 2>/dev/null || true
-        git branch -D "$branch" 2>/dev/null || true
+        mgit worktree remove "$wt_path" --force 2>/dev/null || true
+        mgit branch -D "$branch" 2>/dev/null || true
         ((cleaned++)) || true
       fi
     fi
   done < <(parse_worktree_list)
 
-  git worktree prune 2>/dev/null || true
+  mgit worktree prune 2>/dev/null || true
 
   if [ "$cleaned" -gt 0 ]; then
     print_success "Cleaned up $cleaned worktree(s) with merged/closed PRs"
@@ -291,13 +369,13 @@ remove_worktree() {
   fi
 
   print_info "Removing worktree at $wt_path (branch: $branch)..."
-  if ! git worktree remove "$wt_path" --force; then
+  if ! mgit worktree remove "$wt_path" --force; then
     print_error "Failed to remove worktree"
     exit "$EXIT_GIT_FAILED"
   fi
 
   if [ -n "$branch" ]; then
-    git branch -D "$branch" 2>/dev/null || true
+    mgit branch -D "$branch" 2>/dev/null || true
     print_success "Removed worktree and deleted local branch '$branch'"
   else
     print_success "Removed worktree"
@@ -314,14 +392,10 @@ sanitize_for_dirname() {
 create_from_issue() {
   local issue_number="$1"
 
-  print_info "Ensuring local main is up to date..."
-  if ! git diff-index --quiet HEAD 2>/dev/null; then
-    print_error "Working tree has uncommitted changes. Commit or stash them before starting a new issue."
-    exit "$EXIT_GIT_FAILED"
-  fi
-  git checkout main
-  if ! git pull origin main; then
-    print_error "Failed to pull latest main"
+  # Fetch latest from origin (no checkout needed — we branch from origin/main)
+  print_info "Fetching latest from origin..."
+  if ! mgit fetch origin main; then
+    print_error "Failed to fetch latest main from origin"
     exit "$EXIT_GIT_FAILED"
   fi
 
@@ -378,13 +452,13 @@ create_from_issue() {
 
   # Check if branch exists locally or remotely
   local branch_exists=false
-  if git show-ref --verify --quiet "refs/heads/$branch" 2>/dev/null; then
+  if mgit show-ref --verify --quiet "refs/heads/$branch" 2>/dev/null; then
     branch_exists=true
     print_info "Branch '$branch' exists locally"
-  elif git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+  elif mgit ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
     branch_exists=true
     print_info "Branch '$branch' exists on remote, fetching..."
-    git fetch origin "$branch"
+    mgit fetch origin "$branch"
   fi
 
   # Check if PR exists for this branch
@@ -419,11 +493,7 @@ create_from_issue() {
 
     if [ "$branch_exists" = true ]; then
       print_info "Creating worktree with existing branch '$branch'..."
-      # NOTE: We disable git hooks during worktree creation because husky's path
-      # resolution fails when git runs hooks from a worktree context. The .husky
-      # directory is resolved relative to the new worktree path before files exist.
-      # This is safe because worktree creation doesn't modify tracked files.
-      if ! git -c core.hooksPath=/dev/null worktree add "$wt_path" "$branch"; then
+      if ! mgit worktree add "$wt_path" "$branch"; then
         print_error "Failed to create worktree"
         exit "$EXIT_GIT_FAILED"
       fi
@@ -440,15 +510,15 @@ create_from_issue() {
   else
     # No PR yet - create branch, push, create PR, then create worktree with PR number
     if [ "$branch_exists" = false ]; then
-      print_info "Creating new branch '$branch' from main..."
-      if ! git branch "$branch" origin/main; then
+      print_info "Creating new branch '$branch' from origin/main..."
+      if ! mgit branch "$branch" origin/main; then
         print_error "Failed to create branch"
         exit "$EXIT_GIT_FAILED"
       fi
     fi
 
     print_info "Pushing branch to origin..."
-    if ! SKIP_E2E_CHECK=true git push -u origin "$branch"; then
+    if ! SKIP_E2E_CHECK=true mgit push -u origin "$branch"; then
       print_error "Failed to push branch to origin"
       exit "$EXIT_GIT_FAILED"
     fi
@@ -512,11 +582,7 @@ PREOF
     fi
 
     print_info "Creating worktree with branch '$branch'..."
-    # NOTE: We disable git hooks during worktree creation because husky's path
-    # resolution fails when git runs hooks from a worktree context. The .husky
-    # directory is resolved relative to the new worktree path before files exist.
-    # This is safe because worktree creation doesn't modify tracked files.
-    if ! git -c core.hooksPath=/dev/null worktree add "$wt_path" "$branch"; then
+    if ! mgit worktree add "$wt_path" "$branch"; then
       print_error "Failed to create worktree"
       exit "$EXIT_GIT_FAILED"
     fi
@@ -537,8 +603,10 @@ PREOF
 
 # Main script
 main() {
-  cd "$REPO_ROOT"
   check_dependencies
+
+  print_info "Main repo: $MAIN_REPO"
+  print_info "Worktrees dir: $WORKTREES_DIR"
 
   # Parse arguments
   if [ "${1:-}" = "--list" ] || [ "${1:-}" = "-l" ]; then
@@ -596,6 +664,9 @@ main() {
   # Cleanup first
   cleanup_merged_worktrees
   echo ""
+
+  # Health check existing worktrees
+  check_worktree_health
 
   create_from_issue "$1"
 }
