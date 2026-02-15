@@ -85,7 +85,7 @@ $(cat "$example")
 
 "
     ((++EXAMPLE_COUNT))
-  done < <(find "$RETRO_DIR" -maxdepth 1 -name '*.md' -printf '%T@\t%p\0' | sort -rzn | cut -z -f2-)
+  done < <(for f in "$RETRO_DIR"/*.md; do [ -f "$f" ] && printf '%s\t%s\0' "$(stat -c '%Y' "$f" 2>/dev/null || stat -f '%m' "$f")" "$f"; done | sort -rzn | cut -z -f2-)
 fi
 
 PROMPT=$(cat <<'PROMPT_END'
