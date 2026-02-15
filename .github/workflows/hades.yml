@@ -219,6 +219,9 @@ jobs:
       github.event_name == 'pull_request'
       && github.event.pull_request.merged == true
     runs-on: ubuntu-latest
+    concurrency:
+      group: review-retro-main
+      cancel-in-progress: false
     permissions:
       contents: write
     steps:
@@ -242,8 +245,10 @@ jobs:
 
       - name: Post to Slack
         if: steps.retro.outputs.is_minimal != 'true'
+        continue-on-error: true
         env:
           SLACK_RETRO_WEBHOOK_URL: ${{ secrets.SLACK_RETRO_WEBHOOK_URL }}
           GITHUB_SERVER_URL: ${{ github.server_url }}
           GITHUB_REPOSITORY: ${{ github.repository }}
-        run: bash scripts/send-retro-slack-notification.sh '${{ steps.retro.outputs.retro_json }}'
+          RETRO_JSON: ${{ steps.retro.outputs.retro_json }}
+        run: bash scripts/send-retro-slack-notification.sh "$RETRO_JSON"

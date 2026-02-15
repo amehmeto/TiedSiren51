@@ -13,7 +13,7 @@ set -euo pipefail
 # 5. Outputs a JSON summary to stdout for downstream consumers (Slack, etc.)
 #
 # Requires: gh, jq, curl
-# Env: ANTHROPIC_API_KEY (required)
+# Env: ANTHROPIC_API_KEY (required), CLAUDE_MODEL (optional, default: claude-sonnet-4-5-20250929)
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=/dev/null
@@ -45,6 +45,7 @@ SHORT_DESC=$(echo "$PR_TITLE" \
   | tr -cs '[:alnum:]' '-' \
   | sed 's/^-//;s/-$//' \
   | cut -d'-' -f1-5)
+SHORT_DESC="${SHORT_DESC:-untitled}"
 
 RETRO_FILENAME="PR-${PR_NUMBER}-${SHORT_DESC}-review-retro.md"
 RETRO_PATH="docs/retrospective/${RETRO_FILENAME}"
@@ -53,7 +54,10 @@ print_info "Will write retrospective to: $RETRO_PATH" >&2
 
 # --- Fetch PR comments ---
 print_info "Fetching PR comments..." >&2
-PR_COMMENTS=$("$SCRIPT_DIR/fetch-pr-comments.sh" "$PR_NUMBER" 2>/dev/null)
+if ! PR_COMMENTS=$("$SCRIPT_DIR/fetch-pr-comments.sh" "$PR_NUMBER"); then
+  print_error "Failed to fetch PR comments" >&2
+  exit 1
+fi
 
 # --- Fetch commit history ---
 print_info "Fetching commit history..." >&2
@@ -66,16 +70,23 @@ if [[ -f "$SCRIPT_DIR/../.claude/commands/review-retro.md" ]]; then
   RETRO_TEMPLATE=$(cat "$SCRIPT_DIR/../.claude/commands/review-retro.md")
 fi
 
-# Read existing retrospectives as examples
+# Read existing retrospectives as examples (cap to 3 most recent to avoid token bloat)
 EXAMPLE_RETRO=""
-for example in "$SCRIPT_DIR/../docs/retrospective/"*.md; do
-  if [[ -f "$example" ]]; then
+EXAMPLE_COUNT=0
+MAX_EXAMPLES=3
+RETRO_DIR="$SCRIPT_DIR/../docs/retrospective"
+if [[ -d "$RETRO_DIR" ]]; then
+  while IFS= read -r -d '' example; do
+    if [[ "$EXAMPLE_COUNT" -ge "$MAX_EXAMPLES" ]]; then
+      break
+    fi
     EXAMPLE_RETRO+="--- Example: $(basename "$example") ---
 $(cat "$example")
 
 "
-  fi
-done
+    ((++EXAMPLE_COUNT))
+  done < <(find "$RETRO_DIR" -maxdepth 1 -name '*.md' -print0 | sort -rz)
+fi
 
 PROMPT=$(cat <<'PROMPT_END'
 You are a code review analyst. Generate a structured review retrospective for a merged PR.
@@ -150,7 +161,7 @@ USER_JSON=$(echo "$USER_MESSAGE" | jq -Rs '.')
 
 API_BODY=$(cat <<EOF
 {
-  "model": "claude-sonnet-4-5-20250929",
+  "model": "${CLAUDE_MODEL:-claude-sonnet-4-5-20250929}",
   "max_tokens": 8192,
   "system": $SYSTEM_JSON,
   "messages": [
@@ -190,14 +201,14 @@ fi
 
 # --- Write the retrospective file ---
 mkdir -p "$(dirname "$RETRO_PATH")"
-echo "$RETRO_CONTENT" > "$RETRO_PATH"
+printf '%s\n' "$RETRO_CONTENT" > "$RETRO_PATH"
 print_success "Retrospective written to $RETRO_PATH" >&2
 
 # --- Extract summary stats for Slack ---
 # Count review rounds (lines starting with | **R in the Timeline table)
 ROUNDS=$(grep -c '| \*\*R' "$RETRO_PATH" 2>/dev/null || echo "0")
 # Count total threads mentioned
-THREADS=$(grep -oP '\d+ threads' "$RETRO_PATH" | head -1 | grep -oP '\d+' || echo "0")
+THREADS=$(grep -oE '[0-9]+ threads' "$RETRO_PATH" | head -1 | grep -oE '[0-9]+' || echo "0")
 # Extract top category from Root Cause Classification table (first data row after header)
 TOP_CATEGORY=$(grep -A1 '|-------' "$RETRO_PATH" | tail -1 | sed 's/|//g' | awk '{print $1, $2}' | sed 's/^ *//;s/ *$//' | head -1 || echo "Unknown")
 # Check for "minimal review" skip
