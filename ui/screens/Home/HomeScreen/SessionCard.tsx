@@ -130,7 +130,11 @@ export function SessionCard({ session, type }: SessionCardProps) {
           setIsRenameModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(renameBlockSession({ id: session.id, name: inputText }))
+          const renameAction = renameBlockSession({
+            id: session.id,
+            name: inputText,
+          })
+          dispatch(renameAction)
           setIsRenameModalVisible(false)
         }}
       />
@@ -145,7 +149,11 @@ export function SessionCard({ session, type }: SessionCardProps) {
           setIsDuplicateModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(duplicateBlockSession({ id: session.id, name: inputText }))
+          const duplicateAction = duplicateBlockSession({
+            id: session.id,
+            name: inputText,
+          })
+          dispatch(duplicateAction)
           setIsDuplicateModalVisible(false)
         }}
       />

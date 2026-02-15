@@ -5,10 +5,8 @@ import { selectIsUserAuthenticated } from './selectIsUserAuthenticated'
 
 describe('selectIsUserAuthenticated', () => {
   test('should return false when user is not authenticated', () => {
-    const store = createTestStore(
-      {},
-      stateBuilder().withoutAuthUser({}).build(),
-    )
+    const unauthenticatedState = stateBuilder().withoutAuthUser({}).build()
+    const store = createTestStore({}, unauthenticatedState)
 
     const isAuthenticated = selectIsUserAuthenticated(store.getState())
 
@@ -16,16 +14,14 @@ describe('selectIsUserAuthenticated', () => {
   })
 
   test('should return true when user is authenticated', () => {
-    const store = createTestStore(
-      {},
-      stateBuilder()
-        .withAuthUser({
-          id: 'user-123',
-          email: 'test@example.com',
-          username: 'testuser',
-        })
-        .build(),
-    )
+    const authenticatedState = stateBuilder()
+      .withAuthUser({
+        id: 'user-123',
+        email: 'test@example.com',
+        username: 'testuser',
+      })
+      .build()
+    const store = createTestStore({}, authenticatedState)
 
     const isAuthenticated = selectIsUserAuthenticated(store.getState())
 
@@ -33,15 +29,13 @@ describe('selectIsUserAuthenticated', () => {
   })
 
   test('should return true when user is authenticated without optional fields', () => {
-    const store = createTestStore(
-      {},
-      stateBuilder()
-        .withAuthUser({
-          id: 'user-456',
-          email: 'another@example.com',
-        })
-        .build(),
-    )
+    const authenticatedState = stateBuilder()
+      .withAuthUser({
+        id: 'user-456',
+        email: 'another@example.com',
+      })
+      .build()
+    const store = createTestStore({}, authenticatedState)
 
     const isAuthenticated = selectIsUserAuthenticated(store.getState())
 

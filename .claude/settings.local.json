@@ -6,6 +6,7 @@
     "allow": [
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
+      "Bash(./node_modules/.bin/eslint:*)",
       "Bash(./node_modules/.bin/vitest run:*)",
       "Bash(./scripts/*.sh:*)",
       "Bash(./scripts/fetch-pr-comments.sh:*)",
@@ -87,6 +88,9 @@
       "Bash(gh workflow list:*)",
       "Bash(gh workflow view:*)",
       "Bash(git --version:*)",
+      "Bash(git -c core.hooksPath=/dev/null diff)",
+      "Bash(git -c core.hooksPath=/dev/null log --oneline -5)",
+      "Bash(git -c core.hooksPath=/dev/null status)",
       "Bash(git -c core.hooksPath=/dev/null worktree add .worktrees/*)",
       "Bash(git add:*)",
       "Bash(git blame:*)",
@@ -103,6 +107,7 @@
       "Bash(git checkout:*)",
       "Bash(git cherry-pick:*)",
       "Bash(git commit:*)",
+      "Bash(git config:*)",
       "Bash(git diff:*)",
       "Bash(git fetch:*)",
       "Bash(git log:*)",
@@ -148,6 +153,7 @@
       "Bash(npx expo run:android:*)",
       "Bash(npx expo-module:*)",
       "Bash(npx expo-modules-autolinking:*)",
+      "Bash(npx husky:*)",
       "Bash(npx lint-staged:*)",
       "Bash(npx mocha eslint-rules/react-props-destructuring.spec.cjs)",
       "Bash(npx prettier:*)",
@@ -211,11 +217,7 @@
       "mcp__sentry__get_issue_details",
       "mcp__sentry__search_events",
       "mcp__sentry__search_issue_events",
-      "mcp__sentry__search_issues",
-      "Bash(git config:*)",
-      "Bash(git -c core.hooksPath=/dev/null status)",
-      "Bash(git -c core.hooksPath=/dev/null diff)",
-      "Bash(git -c core.hooksPath=/dev/null log --oneline -5)"
+      "mcp__sentry__search_issues"
     ],
     "deny": [
       "Bash(HUSKY=0:*)",

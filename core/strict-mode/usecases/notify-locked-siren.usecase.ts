@@ -8,6 +8,7 @@ export const notifyLockedSiren = createAppAsyncThunk<void, void>(
   (_, { dispatch, getState, extra: { dateProvider } }) => {
     const timeLeft = selectStrictModeTimeLeft(getState(), dateProvider)
     const timeLeftFormatted = formatDuration(timeLeft)
-    dispatch(showToast(`Locked (${timeLeftFormatted} left)`))
+    const toastAction = showToast(`Locked (${timeLeftFormatted} left)`)
+    dispatch(toastAction)
   },
 )

@@ -39,9 +39,8 @@ describe('PR Linter', () => {
 
       expect(success).toBe(false)
       expect(result.valid).toBe(false)
-      expect(
-        result.title.errors.some((e) => e.includes('Jira-style ticket prefix')),
-      ).toBe(true)
+      const hasJiraStylePrefixError = result.title.errors.some((e) => e.includes('Jira-style ticket prefix'))
+      expect(hasJiraStylePrefixError).toBe(true)
     })
 
     it('should pass when title has Jira-style ticket prefix', () => {
@@ -62,17 +61,15 @@ Adds login
       expect(success).toBe(true)
       expect(result.valid).toBe(true)
       expect(result.title.errors).toHaveLength(0)
-      expect(result.linkedTickets).toContainEqual(
-        expect.objectContaining({ repo: 'TiedSiren51', number: 123 }),
-      )
+      const expectedMainRepoTicket123 = expect.objectContaining({ repo: 'TiedSiren51', number: 123 })
+      expect(result.linkedTickets).toContainEqual(expectedMainRepoTicket123)
     })
 
     it('should extract ticket from Jira-style prefix', () => {
       const { result } = lintPR('TS-456: feat: add auth', '## Summary\nTest')
 
-      expect(result.linkedTickets).toContainEqual(
-        expect.objectContaining({ repo: 'TiedSiren51', number: 456 }),
-      )
+      const expectedMainRepoTicket456 = expect.objectContaining({ repo: 'TiedSiren51', number: 456 })
+      expect(result.linkedTickets).toContainEqual(expectedMainRepoTicket456)
     })
 
     it('should support all valid prefixes', () => {
@@ -89,33 +86,31 @@ Adds login
           `${prefix}-42: feat: test`,
           '## Summary\nTest',
         )
-        expect(result.linkedTickets).toContainEqual(
-          expect.objectContaining({ repo, number: 42 }),
-        )
+        const expectedRepoTicket42 = expect.objectContaining({ repo, number: 42 })
+        expect(result.linkedTickets).toContainEqual(expectedRepoTicket42)
       }
     })
 
     it('should warn when title does not use conventional commit format after prefix', () => {
       const { result } = lintPR('TS-123: Add login', '## Summary\nTest')
 
-      expect(
-        result.title.warnings.some((w) => w.includes('conventional commit')),
-      ).toBe(true)
+      const hasConventionalCommitWarning = result.title.warnings.some((w) => w.includes('conventional commit'))
+      expect(hasConventionalCommitWarning).toBe(true)
     })
 
     it('should not warn for conventional commit format after prefix', () => {
       const { result } = lintPR('TS-123: feat: add login', '## Summary\nTest')
 
-      expect(
-        result.title.warnings.some((w) => w.includes('conventional commit')),
-      ).toBe(false)
+      const hasConventionalCommitWarning = result.title.warnings.some((w) => w.includes('conventional commit'))
+      expect(hasConventionalCommitWarning).toBe(false)
     })
 
     it('should warn when title is too long', () => {
       const longTitle = 'TS-123: feat: ' + 'a'.repeat(100)
       const { result } = lintPR(longTitle, '## Summary\nTest')
 
-      expect(result.title.warnings.some((w) => w.includes('chars'))).toBe(true)
+      const hasCharsWarning = result.title.warnings.some((w) => w.includes('chars'))
+      expect(hasCharsWarning).toBe(true)
     })
 
     it('should fail when title is empty', () => {
@@ -132,9 +127,8 @@ Adds login
         '## Summary\nTest',
       )
 
-      expect(
-        result.title.info.some((i) => i.includes('Work In Progress')),
-      ).toBe(true)
+      const hasWipInfo = result.title.info.some((i) => i.includes('Work In Progress'))
+      expect(hasWipInfo).toBe(true)
     })
 
     it('should detect [WIP] in title', () => {
@@ -143,9 +137,8 @@ Adds login
         '## Summary\nTest',
       )
 
-      expect(
-        result.title.info.some((i) => i.includes('Work In Progress')),
-      ).toBe(true)
+      const hasWipInfo = result.title.info.some((i) => i.includes('Work In Progress'))
+      expect(hasWipInfo).toBe(true)
     })
   })
 
@@ -164,7 +157,8 @@ Adds login
       )
 
       expect(success).toBe(false)
-      expect(result.body.errors.some((e) => e.includes('Summary'))).toBe(true)
+      const hasSummaryError = result.body.errors.some((e) => e.includes('Summary'))
+      expect(hasSummaryError).toBe(true)
     })
 
     it('should pass when Summary section is present', () => {
@@ -173,32 +167,30 @@ Adds login
         '## Summary\n\nThis is the summary',
       )
 
-      expect(
-        result.body.errors.filter((e) => e.includes('Summary')),
-      ).toHaveLength(0)
+      const summaryErrors = result.body.errors.filter((e) => e.includes('Summary'))
+      expect(summaryErrors).toHaveLength(0)
     })
 
     it('should warn when Test Plan section is missing', () => {
       const { result } = lintPR('TS-123: feat: test', '## Summary\n\nTest')
 
-      expect(result.body.warnings.some((w) => w.includes('Test Plan'))).toBe(
-        true,
-      )
+      const hasTestPlanWarning = result.body.warnings.some((w) => w.includes('Test Plan'))
+      expect(hasTestPlanWarning).toBe(true)
     })
 
     it('should not warn when Test Plan section is present', () => {
       const body = '## Summary\n\nTest\n\n## Test Plan\n\n- Test manually'
       const { result } = lintPR('TS-123: feat: test', body)
 
-      expect(result.body.warnings.some((w) => w.includes('Test Plan'))).toBe(
-        false,
-      )
+      const hasTestPlanWarning = result.body.warnings.some((w) => w.includes('Test Plan'))
+      expect(hasTestPlanWarning).toBe(false)
     })
 
     it('should warn when missing Closes/Fixes keyword', () => {
       const { result } = lintPR('TS-123: feat: test', '## Summary\n\nTest')
 
-      expect(result.body.warnings.some((w) => w.includes('Closes'))).toBe(true)
+      const hasClosesWarning = result.body.warnings.some((w) => w.includes('Closes'))
+      expect(hasClosesWarning).toBe(true)
     })
 
     it('should not warn when Closes #X is present', () => {
@@ -207,7 +199,8 @@ Adds login
         '## Summary\n\nTest\n\nCloses #123',
       )
 
-      expect(result.body.warnings.some((w) => w.includes('Closes'))).toBe(false)
+      const hasClosesWarning = result.body.warnings.some((w) => w.includes('Closes'))
+      expect(hasClosesWarning).toBe(false)
     })
 
     it('should extract ticket references from body', () => {
@@ -230,12 +223,11 @@ Adds login
         '## Summary\nTest',
       )
 
-      expect(result.linkedTickets).toContainEqual(
-        expect.objectContaining({
-          repo: 'tied-siren-blocking-overlay',
-          number: 5,
-        }),
-      )
+      const expectedBlockingOverlayTicket5 = expect.objectContaining({
+        repo: 'tied-siren-blocking-overlay',
+        number: 5,
+      })
+      expect(result.linkedTickets).toContainEqual(expectedBlockingOverlayTicket5)
     })
 
     it('should extract full GitHub URL references', () => {
@@ -243,12 +235,11 @@ Adds login
         '## Summary\n\nSee https://github.com/amehmeto/expo-accessibility-service/issues/10'
       const { result } = lintPR('TS-123: feat: test', body)
 
-      expect(result.linkedTickets).toContainEqual(
-        expect.objectContaining({
-          repo: 'expo-accessibility-service',
-          number: 10,
-        }),
-      )
+      const expectedAccessibilityServiceTicket10 = expect.objectContaining({
+        repo: 'expo-accessibility-service',
+        number: 10,
+      })
+      expect(result.linkedTickets).toContainEqual(expectedAccessibilityServiceTicket10)
     })
 
     it('should extract PR URL references (pull/ URLs also close issues)', () => {
@@ -256,12 +247,11 @@ Adds login
         '## Summary\n\nRelated to https://github.com/amehmeto/tied-siren-blocking-overlay/pull/42'
       const { result } = lintPR('TS-123: feat: test', body)
 
-      expect(result.linkedTickets).toContainEqual(
-        expect.objectContaining({
-          repo: 'tied-siren-blocking-overlay',
-          number: 42,
-        }),
-      )
+      const expectedBlockingOverlayTicket42 = expect.objectContaining({
+        repo: 'tied-siren-blocking-overlay',
+        number: 42,
+      })
+      expect(result.linkedTickets).toContainEqual(expectedBlockingOverlayTicket42)
     })
 
     it('should warn for unknown repo names in body', () => {
@@ -270,9 +260,8 @@ Adds login
         '## Summary\nRelated to unknown-repo#42',
       )
 
-      expect(
-        result.crossRepoWarnings.some((w) => w.includes('Unknown repository')),
-      ).toBe(true)
+      const hasUnknownRepoWarning = result.crossRepoWarnings.some((w) => w.includes('Unknown repository'))
+      expect(hasUnknownRepoWarning).toBe(true)
     })
 
     it('should not warn for known repo names', () => {

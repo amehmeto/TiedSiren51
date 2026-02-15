@@ -52,9 +52,10 @@ export function DevicesModal({
     ? currentSelections.map((d) => d.id)
     : []
 
-  const availableDevices = [
-    ...new Map([currentDevice, ...devices].map((d) => [d.id, d])).values(),
-  ]
+  const deviceEntries = [currentDevice, ...devices].map(
+    (d) => [d.id, d] as const,
+  )
+  const availableDevices = [...new Map(deviceEntries).values()]
 
   if (isVisible && !wasVisible) {
     setWasVisible(true)
@@ -72,7 +73,8 @@ export function DevicesModal({
 
   function toggleDevice(deviceId: string, isNowSelected: boolean) {
     if (!isNowSelected && lockedDeviceIds.includes(deviceId)) {
-      dispatch(showToast('Cannot remove device during strict mode'))
+      const lockedMessage = 'Cannot remove device during strict mode'
+      dispatch(showToast(lockedMessage))
       return
     }
     const newSelections = isNowSelected

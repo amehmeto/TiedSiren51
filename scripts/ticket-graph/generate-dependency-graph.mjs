@@ -236,7 +236,8 @@ function formatEpicFindings(findings) {
   if (findings.length === 0) return null
 
   const lines = []
-  lines.push('\n' + ANSI.bold + ANSI.cyan + '━━━ EPIC COMPLETION CHECK ━━━' + ANSI.reset)
+  const epicCompletionHeader = '\n' + ANSI.bold + ANSI.cyan + '━━━ EPIC COMPLETION CHECK ━━━' + ANSI.reset
+  lines.push(epicCompletionHeader)
 
   for (const finding of findings) {
     if (finding.type === 'epic_ready_to_close') {
@@ -246,7 +247,9 @@ function formatEpicFindings(findings) {
     } else if (finding.type === 'epic_nearly_complete') {
       lines.push('')
       lines.push(`  ${ANSI.yellow}⚠${ANSI.reset} ${ANSI.bold}#${finding.epic.number}${ANSI.reset} "${finding.epic.title}"`)
-      lines.push(`    ${finding.closedCount}/${finding.totalCount} subtasks closed (${Math.round(finding.closedCount / finding.totalCount * 100)}%)`)
+      const closedRatio = finding.closedCount / finding.totalCount * 100
+      const closedPercentage = Math.round(closedRatio)
+      lines.push(`    ${finding.closedCount}/${finding.totalCount} subtasks closed (${closedPercentage}%)`)
       lines.push(`    ${ANSI.yellow}Remaining open:${ANSI.reset}`)
       for (const open of finding.openSubtasks) {
         const refStr = open.ref.repo === finding.epic.repo
@@ -528,9 +531,11 @@ function buildAsciiTreeContext(tickets) {
     (t) => (t.metadata?.depends_on?.length || 0) > 0 || (t.metadata?.blocks?.length || 0) > 0,
   )
 
-  const ticketByKey = new Map(withDeps.map((t) => [formatTicketId(t.repo, t.number), t]))
+  const ticketByKeyEntries = withDeps.map((t) => [formatTicketId(t.repo, t.number), t])
+  const ticketByKey = new Map(ticketByKeyEntries)
   const ticketKeys = new Set(ticketByKey.keys())
-  const allTicketsByKey = new Map(tickets.map((t) => [formatTicketId(t.repo, t.number), t]))
+  const allTicketEntries = tickets.map((t) => [formatTicketId(t.repo, t.number), t])
+  const allTicketsByKey = new Map(allTicketEntries)
 
   const children = new Map()
   for (const t of withDeps) {
@@ -541,7 +546,8 @@ function buildAsciiTreeContext(tickets) {
   const hasParent = new Set()
   for (const t of withDeps) {
     for (const blockRef of t.metadata?.blocks || []) {
-      hasParent.add(formatTicketId(blockRef.repo, blockRef.number))
+      const blockRefKey = formatTicketId(blockRef.repo, blockRef.number)
+      hasParent.add(blockRefKey)
     }
   }
   const roots = withDeps
@@ -1022,7 +1028,8 @@ function updateYamlMetadata(body, addBlocks, addDependsOn) {
     }
   }
 
-  return body.replace(yamlMatch[0], yamlMatch[1] + yamlContent + yamlMatch[3])
+  const updatedYamlBlock = yamlMatch[1] + yamlContent + yamlMatch[3]
+  return body.replace(yamlMatch[0], updatedYamlBlock)
 }
 
 // ============================================================================

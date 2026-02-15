@@ -120,7 +120,8 @@ blocks: []
 \`\`\`
 `
       const messages = await lint(markdown)
-      expect(messages.some((m) => m.includes('Invalid repo'))).toBe(true)
+      const hasInvalidRepoMessage = messages.some((m) => m.includes('Invalid repo'))
+      expect(hasInvalidRepoMessage).toBe(true)
     })
 
     it('should fail for non-Fibonacci story points', async () => {
@@ -136,7 +137,8 @@ blocks: []
 \`\`\`
 `
       const messages = await lint(markdown)
-      expect(messages.some((m) => m.includes('Fibonacci'))).toBe(true)
+      const hasFibonacciMessage = messages.some((m) => m.includes('Fibonacci'))
+      expect(hasFibonacciMessage).toBe(true)
     })
 
     it('should warn for unknown labels', async () => {
@@ -152,7 +154,8 @@ blocks: []
 \`\`\`
 `
       const messages = await lint(markdown)
-      expect(messages.some((m) => m.includes('Unknown labels'))).toBe(true)
+      const hasUnknownLabelsMessage = messages.some((m) => m.includes('Unknown labels'))
+      expect(hasUnknownLabelsMessage).toBe(true)
     })
 
     it('should fail when depends_on is missing', async () => {
@@ -246,19 +249,22 @@ blocks: []
     it('should fail when Summary section is missing', async () => {
       const markdown = `${validMetadata}\n## 🎯 Context\nTest`
       const messages = await lint(markdown)
-      expect(messages.some((m) => m.includes('📝 Summary'))).toBe(true)
+      const hasSummaryMessage = messages.some((m) => m.includes('📝 Summary'))
+      expect(hasSummaryMessage).toBe(true)
     })
 
     it('should fail when Context section is missing', async () => {
       const markdown = `${validMetadata}\n## 📝 Summary\nTest`
       const messages = await lint(markdown)
-      expect(messages.some((m) => m.includes('🎯 Context'))).toBe(true)
+      const hasContextMessage = messages.some((m) => m.includes('🎯 Context'))
+      expect(hasContextMessage).toBe(true)
     })
 
     it('should fail when Acceptance Criteria is missing', async () => {
       const markdown = `${validMetadata}\n## 📝 Summary\nTest\n## 🎯 Context\nTest`
       const messages = await lint(markdown)
-      expect(messages.some((m) => m.includes('Acceptance Criteria'))).toBe(true)
+      const hasAcceptanceCriteriaMessage = messages.some((m) => m.includes('Acceptance Criteria'))
+      expect(hasAcceptanceCriteriaMessage).toBe(true)
     })
   })
 
@@ -289,7 +295,8 @@ Test
     it('should warn when gherkin is missing', async () => {
       const markdown = `${validMetadataAndSections}\nNo gherkin here`
       const messages = await lint(markdown)
-      expect(messages.some((m) => m.includes('Given/When/Then'))).toBe(true)
+      const hasGherkinMessage = messages.some((m) => m.includes('Given/When/Then'))
+      expect(hasGherkinMessage).toBe(true)
     })
 
     it('should pass when gherkin code block is present', async () => {
@@ -301,7 +308,8 @@ Then something
 \`\`\`
 `
       const messages = await lint(markdown)
-      expect(messages.some((m) => m.includes('Given/When/Then'))).toBe(false)
+      const hasGherkinMessage = messages.some((m) => m.includes('Given/When/Then'))
+      expect(hasGherkinMessage).toBe(false)
     })
 
     it('should not require gherkin for epics', async () => {
@@ -327,7 +335,8 @@ Test goal
 - [ ] Done
 `
       const messages = await lint(markdown)
-      expect(messages.some((m) => m.includes('Given/When/Then'))).toBe(false)
+      const hasGherkinMessage = messages.some((m) => m.includes('Given/When/Then'))
+      expect(hasGherkinMessage).toBe(false)
     })
   })
 
@@ -347,9 +356,8 @@ blocks: []
 ## Feature - 3 sp
 `
       const messages = await lint(markdown)
-      expect(
-        messages.some((m) => m.includes('Story points should be in metadata')),
-      ).toBe(true)
+      const hasStoryPointsMessage = messages.some((m) => m.includes('Story points should be in metadata'))
+      expect(hasStoryPointsMessage).toBe(true)
     })
   })
 
@@ -401,9 +409,8 @@ Some context here.
         markdown,
         '.github/ISSUE_TEMPLATE/test.md',
       )
-      expect(
-        messages.some((m) => m.includes('Missing YAML metadata block')),
-      ).toBe(true)
+      const hasMissingMetadataMessage = messages.some((m) => m.includes('Missing YAML metadata block'))
+      expect(hasMissingMetadataMessage).toBe(true)
     })
   })
 
@@ -440,16 +447,14 @@ This is the summary.
       )
 
       // Should have added missing sections
-      expect(
-        messages.some((m) =>
-          m.includes('🔧 Added missing section: 🎯 Context'),
-        ),
-      ).toBe(true)
-      expect(
-        messages.some((m) =>
-          m.includes('🔧 Added missing section: ✅ Acceptance Criteria'),
-        ),
-      ).toBe(true)
+      const hasAddedContextSection = messages.some((m) =>
+        m.includes('🔧 Added missing section: 🎯 Context'),
+      )
+      expect(hasAddedContextSection).toBe(true)
+      const hasAddedAcceptanceCriteriaSection = messages.some((m) =>
+        m.includes('🔧 Added missing section: ✅ Acceptance Criteria'),
+      )
+      expect(hasAddedAcceptanceCriteriaSection).toBe(true)
 
       // Output should contain the new sections
       expect(output).toContain('## 🎯 Context')
@@ -561,11 +566,10 @@ Bug description.
       )
 
       // Should add bug-specific sections
-      expect(
-        messages.some((m) =>
-          m.includes('🔧 Added missing section: 🔄 Reproduction'),
-        ),
-      ).toBe(true)
+      const hasAddedReproductionSection = messages.some((m) =>
+        m.includes('🔧 Added missing section: 🔄 Reproduction'),
+      )
+      expect(hasAddedReproductionSection).toBe(true)
       expect(output).toContain('## 🔄 Reproduction')
       expect(output).toContain('Steps to Reproduce')
     })
@@ -591,11 +595,10 @@ Epic goal here.
       )
 
       // Should add epic-specific sections
-      expect(
-        messages.some((m) =>
-          m.includes('🔧 Added missing section: 📋 Stories / Tasks'),
-        ),
-      ).toBe(true)
+      const hasAddedStoriesSection = messages.some((m) =>
+        m.includes('🔧 Added missing section: 📋 Stories / Tasks'),
+      )
+      expect(hasAddedStoriesSection).toBe(true)
       expect(output).toContain('## 📋 Stories / Tasks')
     })
   })

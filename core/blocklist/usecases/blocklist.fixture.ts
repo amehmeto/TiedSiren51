@@ -65,7 +65,8 @@ export function blocklistFixture(
           },
           testStateBuilderProvider.getState(),
         )
-        await store.dispatch(duplicateBlocklist(toBeDuplicatedPayload))
+        const duplicateAction = duplicateBlocklist(toBeDuplicatedPayload)
+        await store.dispatch(duplicateAction)
       },
       deletingBlocklist: async (blocklistId: string) => {
         store = createTestStore(

@@ -16,10 +16,10 @@ describe('selectReauthStatus', () => {
   })
 
   test('should return loading state when re-authenticating', () => {
-    const store = createTestStore(
-      {},
-      stateBuilder().withReauthenticating(true).build(),
-    )
+    const stateWithReauthenticating = stateBuilder()
+      .withReauthenticating(true)
+      .build()
+    const store = createTestStore({}, stateWithReauthenticating)
 
     const { isReauthenticating } = selectReauthStatus(store.getState())
 
@@ -27,10 +27,10 @@ describe('selectReauthStatus', () => {
   })
 
   test('should return error when re-authentication fails', () => {
-    const store = createTestStore(
-      {},
-      stateBuilder().withReauthError('Incorrect password.').build(),
-    )
+    const stateWithReauthError = stateBuilder()
+      .withReauthError('Incorrect password.')
+      .build()
+    const store = createTestStore({}, stateWithReauthError)
 
     const { reauthError } = selectReauthStatus(store.getState())
 

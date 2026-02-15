@@ -67,7 +67,8 @@ export function blockSessionFixture(
           },
           testStateBuilderProvider.getState(),
         )
-        await store.dispatch(duplicateBlockSession(toBeDuplicatedPayload))
+        const duplicateAction = duplicateBlockSession(toBeDuplicatedPayload)
+        await store.dispatch(duplicateAction)
       },
       renamingBlockSession: async (toBeRenamedPayload: {
         name: string
@@ -79,7 +80,8 @@ export function blockSessionFixture(
           },
           testStateBuilderProvider.getState(),
         )
-        await store.dispatch(renameBlockSession(toBeRenamedPayload))
+        const renameAction = renameBlockSession(toBeRenamedPayload)
+        await store.dispatch(renameAction)
       },
       deletingBlockSession: async (blockSessionId: string) => {
         store = createTestStore(
@@ -103,7 +105,8 @@ export function blockSessionFixture(
           },
           testStateBuilderProvider.getState(),
         )
-        await store.dispatch(updateBlockSession(updateBlockSessionPayload))
+        const updateAction = updateBlockSession(updateBlockSessionPayload)
+        await store.dispatch(updateAction)
       },
     },
     then: {
@@ -138,16 +141,14 @@ export function blockSessionFixture(
           trigger: NotificationTrigger
         }[],
       ) {
-        expect(notificationService.lastScheduledNotification).toEqual(
-          expectedNotification,
-        )
+        const lastScheduled = notificationService.lastScheduledNotification
+        expect(lastScheduled).toEqual(expectedNotification)
       },
       scheduledNotificationsShouldBeCancelled(
         expectedNotificationIds: string[],
       ) {
-        expect(notificationService.lastCancelledNotificationIds).toEqual(
-          expectedNotificationIds,
-        )
+        const lastCancelled = notificationService.lastCancelledNotificationIds
+        expect(lastCancelled).toEqual(expectedNotificationIds)
       },
       backgroundTasksShouldBeScheduled(expectedTasks: string[]) {
         expect(backgroundTaskService.lastScheduledTasks).toEqual(expectedTasks)

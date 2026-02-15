@@ -54,9 +54,8 @@ describe('AndroidSirenTier', () => {
 
       await androidSirenTier.updateBlockingSchedule(schedules)
 
-      expect(mockSetBlockingSchedule).toHaveBeenCalledWith(
-        toNativeBlockingWindows(schedules, dateProvider),
-      )
+      const expectedWindows = toNativeBlockingWindows(schedules, dateProvider)
+      expect(mockSetBlockingSchedule).toHaveBeenCalledWith(expectedWindows)
     })
 
     it('calls setBlockedApps with package names from schedule', async () => {
@@ -170,9 +169,9 @@ describe('AndroidSirenTier', () => {
       const error = new Error('Native module not available')
       mockSetCallbackClass.mockRejectedValueOnce(error)
 
-      const result = await androidSirenTier.initializeNativeBlocking()
+      const initResult = await androidSirenTier.initializeNativeBlocking()
 
-      expect(result).toBeUndefined()
+      expect(initResult).toBeUndefined()
     })
 
     it('logs error message when initialization fails', async () => {
@@ -207,10 +206,10 @@ describe('toNativeBlockingWindows', () => {
       }),
     ]
 
-    const result = toNativeBlockingWindows(schedules, dateProvider)
-    const [firstWindow] = result
+    const blockingWindows = toNativeBlockingWindows(schedules, dateProvider)
+    const [firstWindow] = blockingWindows
 
-    expect(result).toHaveLength(1)
+    expect(blockingWindows).toHaveLength(1)
     expect(firstWindow.id).toBe('schedule-1')
     expect(firstWindow.startTime).toMatch(/^\d{2}:\d{2}$/)
     expect(firstWindow.endTime).toMatch(/^\d{2}:\d{2}$/)
@@ -236,9 +235,9 @@ describe('toNativeBlockingWindows', () => {
   })
 
   it('handles empty schedule list', () => {
-    const result = toNativeBlockingWindows([], dateProvider)
+    const blockingWindows = toNativeBlockingWindows([], dateProvider)
 
-    expect(result).toStrictEqual([])
+    expect(blockingWindows).toStrictEqual([])
   })
 
   it('handles schedule with no Android apps', () => {

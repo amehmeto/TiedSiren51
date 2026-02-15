@@ -23,39 +23,37 @@ describe('Blocklists View Model', () => {
   })
 
   test('Example: there is some blocklists', () => {
-    const store = createTestStore(
-      {},
-      stateBuilder()
-        .withBlocklists([
-          buildBlocklist({
-            id: 'blocklist-id-1',
-            name: 'Distractions',
-            sirens: {
-              android: [youtubeAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: [],
-              keywords: [],
-            },
-          }),
-          buildBlocklist({
-            id: 'blocklist-id-2',
-            name: 'Videos',
-            sirens: {
-              android: [youtubeAndroidSiren, amazonPrimeAndroidSiren],
-              ios: [],
-              linux: [],
-              macos: [],
-              windows: [],
-              websites: ['dailymotion.fr'],
-              keywords: ['cat videos'],
-            },
-          }),
-        ])
-        .build(),
-    )
+    const stateWithBlocklists = stateBuilder()
+      .withBlocklists([
+        buildBlocklist({
+          id: 'blocklist-id-1',
+          name: 'Distractions',
+          sirens: {
+            android: [youtubeAndroidSiren],
+            ios: [],
+            linux: [],
+            macos: [],
+            windows: [],
+            websites: [],
+            keywords: [],
+          },
+        }),
+        buildBlocklist({
+          id: 'blocklist-id-2',
+          name: 'Videos',
+          sirens: {
+            android: [youtubeAndroidSiren, amazonPrimeAndroidSiren],
+            ios: [],
+            linux: [],
+            macos: [],
+            windows: [],
+            websites: ['dailymotion.fr'],
+            keywords: ['cat videos'],
+          },
+        }),
+      ])
+      .build()
+    const store = createTestStore({}, stateWithBlocklists)
 
     const expectedViewModel = {
       type: BlocklistViewModel.WithBlockLists,
