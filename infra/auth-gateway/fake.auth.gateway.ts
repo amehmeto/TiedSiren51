@@ -9,6 +9,8 @@ export class FakeAuthGateway implements AuthGateway {
 
   willReauthenticateWith: Promise<void> = Promise.resolve()
 
+  logOutError: Error | null = null
+
   lastResetPasswordEmail: string | null = null
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
@@ -49,9 +51,8 @@ export class FakeAuthGateway implements AuthGateway {
   }
 
   async logOut(): Promise<void> {
+    if (this.logOutError) throw this.logOutError
     if (this.onUserLoggedOutListener) this.onUserLoggedOutListener()
-
-    return Promise.resolve()
   }
 
   simulateUserLoggedIn(authUser: AuthUser) {

@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { AppDispatch } from '@/core/_redux_/createStore'
 import { clearReauthError } from '@/core/auth/reducer'
 import { selectReauthStatus } from '@/core/auth/selectors/selectReauthStatus'
 import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
@@ -22,9 +22,7 @@ export function ReauthenticationModal({
   onSuccess,
 }: ReauthenticationModalProps) {
   const dispatch = useDispatch<AppDispatch>()
-  const { isReauthenticating, reauthError } = useSelector((state: RootState) =>
-    selectReauthStatus(state),
-  )
+  const { isReauthenticating, reauthError } = useSelector(selectReauthStatus)
   const [password, setPassword] = useState('')
 
   const handleConfirm = async () => {

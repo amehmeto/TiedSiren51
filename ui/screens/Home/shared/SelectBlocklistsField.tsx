@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useSelector } from 'react-redux'
-import { RootState } from '@/core/_redux_/createStore'
 import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
 import { T } from '@/ui/design-system/theme'
 import { BlocklistsModal } from '@/ui/screens/Home/shared/BlocklistsModal'
@@ -16,9 +15,7 @@ export function SelectBlocklistsField({
   setFieldValue,
 }: SelectBlocklistsFieldProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const blocklists = useSelector((state: RootState) =>
-    selectAllBlocklists(state),
-  )
+  const blocklists = useSelector(selectAllBlocklists)
   const displayText =
     blocklistIds.length === 0
       ? 'Select blocklists...'
