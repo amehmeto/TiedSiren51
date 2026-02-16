@@ -55,7 +55,6 @@ export default function ChangePasswordScreen() {
       <ReauthenticationModal
         isVisible={isReauthVisible && !isReauthenticated}
         onRequestClose={() => setIsReauthVisible(false)}
-        onSuccess={() => setIsReauthVisible(false)}
       />
     </View>
   )

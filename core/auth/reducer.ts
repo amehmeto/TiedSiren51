@@ -14,6 +14,7 @@ import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.useca
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
 import { AuthErrorType, isAuthErrorType } from './auth-error-type'
 import { changePassword } from './usecases/change-password.usecase'
+import { reauthenticateWithGoogle } from './usecases/reauthenticate-with-google.usecase'
 import { reauthenticate } from './usecases/reauthenticate.usecase'
 import { resetPassword } from './usecases/reset-password.usecase'
 import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
@@ -173,6 +174,19 @@ export const reducer = createReducer<AuthState>(
         state.reauthError = null
       })
       .addCase(reauthenticate.rejected, (state, action) => {
+        state.isReauthenticating = false
+        state.reauthError = action.error.message ?? null
+      })
+      .addCase(reauthenticateWithGoogle.pending, (state) => {
+        state.isReauthenticating = true
+        state.reauthError = null
+      })
+      .addCase(reauthenticateWithGoogle.fulfilled, (state, action) => {
+        state.isReauthenticating = false
+        state.lastReauthenticatedAt = action.payload
+        state.reauthError = null
+      })
+      .addCase(reauthenticateWithGoogle.rejected, (state, action) => {
         state.isReauthenticating = false
         state.reauthError = action.error.message ?? null
       })

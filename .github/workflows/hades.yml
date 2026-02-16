@@ -231,13 +231,17 @@ jobs:
         with:
           ref: main
 
+      - name: Expand retro prompt
+        id: expand-prompt
+        run: sed 's/\$ARGUMENTS/${{ github.event.pull_request.number }}/g' .claude/commands/retro.md > /tmp/retro-prompt.md
+
       - name: Generate retrospective
         id: retro
         uses: anthropics/claude-code-action@v1
         with:
           anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
           github_token: ${{ github.token }}
-          prompt: '/retro ${{ github.event.pull_request.number }}'
+          prompt_file: /tmp/retro-prompt.md
           claude_args: '--allowedTools Bash,Read,Write,Glob,Grep,Edit --max-turns 30'
 
       - name: Detect retro file
