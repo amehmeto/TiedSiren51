@@ -112,8 +112,8 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   private getAuthProvider(user: User): AuthProvider {
-    const extracted = user.providerData[0]?.providerId ?? 'password'
-    return this.mapProviderId(extracted)
+    const firebaseProviderId = user.providerData[0]?.providerId ?? 'password'
+    return this.mapProviderId(firebaseProviderId)
   }
 
   private setupAuthStateListener(): void {

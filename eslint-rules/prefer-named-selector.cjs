@@ -8,6 +8,7 @@
  * Detects:
  *   useSelector((state) => state.toast)
  *   useSelector((s) => s.blockSession)
+ *   useSelector((state) => state.auth.authUser?.email)
  *   useSelector((state) => selectFoo(state))
  *   useSelector((state: RootState) => selectFoo(state))
  *
@@ -67,17 +68,50 @@ module.exports = {
      * @param {string} paramName
      * @param {import('estree').Node} arg
      */
-    function checkInlineSliceAccess(body, paramName, arg) {
-      if (body.type !== 'MemberExpression') return
-      if (
-        body.object.type !== 'Identifier' ||
-        body.object.name !== paramName ||
-        body.computed ||
-        body.property.type !== 'Identifier'
-      )
-        return
+    /**
+     * Walk a MemberExpression/ChainExpression chain to find the root
+     * identifier and the first property (slice name).
+     * Returns null if the chain contains computed access or method calls.
+     * @param {import('estree').Node} node
+     * @returns {{ rootName: string, sliceName: string } | null}
+     */
+    function getPropertyChainRoot(node) {
+      /** @type {import('estree').Node} */
+      let current = node
 
-      const sliceName = body.property.name
+      // Unwrap ChainExpression (optional chaining wrapper)
+      if (current.type === 'ChainExpression') current = current.expression
+
+      if (current.type !== 'MemberExpression') return null
+      if (current.computed) return null
+      if (current.property.type !== 'Identifier') return null
+
+      // Walk down the chain of MemberExpressions
+      let obj = current.object
+      // Unwrap ChainExpression in nested positions
+      if (obj.type === 'ChainExpression') obj = obj.expression
+
+      if (obj.type === 'Identifier') {
+        // Direct: state.slice
+        return { rootName: obj.name, sliceName: current.property.name }
+      }
+
+      if (obj.type === 'MemberExpression') {
+        // Nested: state.slice.something...
+        // Recursively find root, but keep the slice name from the first level
+        const inner = getPropertyChainRoot(obj)
+        if (inner) return inner
+      }
+
+      return null
+    }
+
+    function checkInlineSliceAccess(body, paramName, arg) {
+      const chain = getPropertyChainRoot(body)
+      if (!chain) return
+      if (chain.rootName !== paramName) return
+
+      const { sliceName } = chain
       const capitalizedSliceName =
         sliceName.charAt(0).toUpperCase() + sliceName.slice(1)
 
