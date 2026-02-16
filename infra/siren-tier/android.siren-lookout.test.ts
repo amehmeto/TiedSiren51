@@ -179,13 +179,12 @@ describe('RealAndroidSirenLookout', () => {
       const [[capturedCallback]] = mockAddAccessibilityEventListener.mock.calls
       capturedCallback(event)
 
-      expect(listener).toHaveBeenCalledWith(
-        expect.objectContaining({
-          type: 'app',
-          identifier: packageName,
-          timestamp: expect.any(Number),
-        }),
-      )
+      const expectedDetection = expect.objectContaining({
+        type: 'app',
+        identifier: packageName,
+        timestamp: expect.any(Number),
+      })
+      expect(listener).toHaveBeenCalledWith(expectedDetection)
     })
 
     it('logs warning when overwriting existing listener', () => {

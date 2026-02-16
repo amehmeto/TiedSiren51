@@ -47,7 +47,8 @@ export function BlocklistsModal({
 
   function toggleBlocklist(blocklistId: string, isNowSelected: boolean) {
     if (!isNowSelected && lockedBlocklistIds.includes(blocklistId)) {
-      dispatch(showToast('Cannot remove blocklist during strict mode'))
+      const lockedMessage = 'Cannot remove blocklist during strict mode'
+      dispatch(showToast(lockedMessage))
       return
     }
     const newSelections = isNowSelected

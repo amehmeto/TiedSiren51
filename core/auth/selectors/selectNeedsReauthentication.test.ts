@@ -27,7 +27,11 @@ describe('selectNeedsReauthentication', () => {
     expect(shouldReauthenticate).toBe(true)
   })
 
-  test.each([
+  test.each<{
+    scenario: string
+    lastReauthenticatedAt: string
+    shouldNeedReauth: boolean
+  }>([
     {
       scenario: 'within 5 minutes',
       lastReauthenticatedAt: '2024-01-15T10:01:00.000Z',

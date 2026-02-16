@@ -26,7 +26,7 @@ describe('selectStrictModeViewModel', () => {
     dateProvider.now = NOW
   })
 
-  test.each([
+  test.each<[string, PreloadedState, Record<string, unknown>]>([
     [
       'no timer is set',
       stateBuilder().withStrictModeEndedAt(null).build(),
@@ -39,11 +39,12 @@ describe('selectStrictModeViewModel', () => {
     ],
     [
       'timer with hours, minutes, and seconds',
-      stateBuilder()
-        .withStrictModeEndedAt(
-          endedAtFromNow(1 * HOUR + 30 * MINUTE + 45 * SECOND),
-        )
-        .build(),
+      (() => {
+        const hoursMinutesSeconds = 1 * HOUR + 30 * MINUTE + 45 * SECOND
+        return stateBuilder()
+          .withStrictModeEndedAt(endedAtFromNow(hoursMinutesSeconds))
+          .build()
+      })(),
       {
         type: StrictModeViewState.Active,
         countdown: '1h 30m 45s',
@@ -55,11 +56,13 @@ describe('selectStrictModeViewModel', () => {
     ],
     [
       'timer with days, hours, minutes, and seconds',
-      stateBuilder()
-        .withStrictModeEndedAt(
-          endedAtFromNow(2 * DAY + 5 * HOUR + 30 * MINUTE + 15 * SECOND),
-        )
-        .build(),
+      (() => {
+        const daysHoursMinutesSeconds =
+          2 * DAY + 5 * HOUR + 30 * MINUTE + 15 * SECOND
+        return stateBuilder()
+          .withStrictModeEndedAt(endedAtFromNow(daysHoursMinutesSeconds))
+          .build()
+      })(),
       {
         type: StrictModeViewState.Active,
         countdown: '2d 5h 30m 15s',
@@ -71,9 +74,12 @@ describe('selectStrictModeViewModel', () => {
     ],
     [
       'timer with only minutes and seconds',
-      stateBuilder()
-        .withStrictModeEndedAt(endedAtFromNow(45 * MINUTE + 30 * SECOND))
-        .build(),
+      (() => {
+        const minutesSeconds = 45 * MINUTE + 30 * SECOND
+        return stateBuilder()
+          .withStrictModeEndedAt(endedAtFromNow(minutesSeconds))
+          .build()
+      })(),
       {
         type: StrictModeViewState.Active,
         countdown: '45m 30s',

@@ -138,16 +138,14 @@ export function blockSessionFixture(
           trigger: NotificationTrigger
         }[],
       ) {
-        expect(notificationService.lastScheduledNotification).toEqual(
-          expectedNotification,
-        )
+        const lastScheduled = notificationService.lastScheduledNotification
+        expect(lastScheduled).toEqual(expectedNotification)
       },
       scheduledNotificationsShouldBeCancelled(
         expectedNotificationIds: string[],
       ) {
-        expect(notificationService.lastCancelledNotificationIds).toEqual(
-          expectedNotificationIds,
-        )
+        const lastCancelled = notificationService.lastCancelledNotificationIds
+        expect(lastCancelled).toEqual(expectedNotificationIds)
       },
       backgroundTasksShouldBeScheduled(expectedTasks: string[]) {
         expect(backgroundTaskService.lastScheduledTasks).toEqual(expectedTasks)

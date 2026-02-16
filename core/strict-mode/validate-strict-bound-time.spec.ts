@@ -155,7 +155,8 @@ describe('validateStrictBoundTime', () => {
         initialTime: asHHmm(initialTime),
       }
 
-      expect(validateStrictBoundTime(asHHmm(newTime), bound).isValid).toBe(true)
+      const validationResult = validateStrictBoundTime(asHHmm(newTime), bound)
+      expect(validationResult.isValid).toBe(true)
     })
 
     it.each<[string, string, StrictBoundDirection]>([
@@ -167,9 +168,8 @@ describe('validateStrictBoundTime', () => {
         initialTime: asHHmm(initialTime),
       }
 
-      expect(validateStrictBoundTime(asHHmm(newTime), bound).isValid).toBe(
-        false,
-      )
+      const validationResult = validateStrictBoundTime(asHHmm(newTime), bound)
+      expect(validationResult.isValid).toBe(false)
     })
   })
 })
