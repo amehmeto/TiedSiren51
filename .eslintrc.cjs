@@ -288,7 +288,7 @@ module.exports = {
         'local-rules/use-data-builders': 'error',
         'local-rules/no-generic-result-variable': 'warn',
         // Require type parameter on it.each / test.each / describe.each
-        'local-rules/require-typed-each': 'warn',
+        'local-rules/require-typed-each': 'error',
       },
     },
     // No data builders in production code
