@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
+import { validateChangePasswordInput } from '@/ui/auth-schemas/validation.helper'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
 
@@ -26,16 +27,18 @@ export function ChangePasswordForm({
 
   const handleSubmit = () => {
     setLocalError(null)
-    if (newPassword.length < 6) {
-      setLocalError('Password must be at least 6 characters.')
+
+    const { errorMessage, data } = validateChangePasswordInput({
+      newPassword,
+      confirmPassword,
+    })
+
+    if (errorMessage) {
+      setLocalError(errorMessage)
       return
     }
 
-    if (newPassword !== confirmPassword) {
-      setLocalError('Passwords do not match.')
-      return
-    }
-    onChangePassword(newPassword)
+    if (data) onChangePassword(data.newPassword)
     setNewPassword('')
     setConfirmPassword('')
   }
