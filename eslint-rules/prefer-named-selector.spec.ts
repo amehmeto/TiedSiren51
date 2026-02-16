@@ -28,17 +28,17 @@ describe('prefer-named-selector', () => {
         {
           code: `useSelector((state) => selectIsStrictModeActive(state, dateProvider))`,
         },
-        // Nested property access - OK (more specific than slice)
+        // Method call on nested property - OK (derived value)
         {
-          code: `useSelector((state) => state.auth.user)`,
+          code: `useSelector((state) => state.auth.users.find(u => u.active))`,
         },
         // Computed/derived value - OK
         {
           code: `useSelector((state) => state.items.filter(i => i.active))`,
         },
-        // Method call on slice - OK
+        // Property access with computation - OK
         {
-          code: `useSelector((state) => state.items.length)`,
+          code: `useSelector((state) => state.items.filter(i => i.active).length)`,
         },
         // Multiple statements in block - OK (complex logic)
         {
@@ -75,6 +75,14 @@ describe('prefer-named-selector', () => {
         // Empty block - OK
         {
           code: `useSelector((state) => {})`,
+        },
+        // Selector with extra args - OK (not a passthrough)
+        {
+          code: `useSelector((state) => selectFiltered(state, filter))`,
+        },
+        // Selector with no args - OK (different call pattern)
+        {
+          code: `useSelector((state) => selectAll())`,
         },
       ],
 
@@ -126,6 +134,69 @@ describe('prefer-named-selector', () => {
             {
               messageId: 'preferNamedSelector',
               data: { sliceName: 'blocklist', SliceName: 'Blocklist' },
+            },
+          ],
+        },
+        // Nested property access on slice - should use named selector
+        {
+          code: `useSelector((state) => state.auth.user)`,
+          errors: [
+            {
+              messageId: 'preferNamedSelector',
+              data: { sliceName: 'auth', SliceName: 'Auth' },
+            },
+          ],
+        },
+        // Nested property access for length
+        {
+          code: `useSelector((state) => state.items.length)`,
+          errors: [
+            {
+              messageId: 'preferNamedSelector',
+              data: { sliceName: 'items', SliceName: 'Items' },
+            },
+          ],
+        },
+        // Deep nested property access with optional chaining
+        {
+          code: `useSelector((state) => state.auth.authUser?.authProvider)`,
+          errors: [
+            {
+              messageId: 'preferNamedSelector',
+              data: { sliceName: 'auth', SliceName: 'Auth' },
+            },
+          ],
+        },
+        // Redundant wrapper around named selector
+        {
+          code: `useSelector((state) => selectLoginViewModel(state))`,
+          output: `useSelector(selectLoginViewModel)`,
+          errors: [
+            {
+              messageId: 'redundantSelectorWrapper',
+              data: { selectorName: 'selectLoginViewModel' },
+            },
+          ],
+        },
+        // Redundant wrapper with different param name
+        {
+          code: `useSelector((s) => selectFoo(s))`,
+          output: `useSelector(selectFoo)`,
+          errors: [
+            {
+              messageId: 'redundantSelectorWrapper',
+              data: { selectorName: 'selectFoo' },
+            },
+          ],
+        },
+        // Redundant wrapper in block body
+        {
+          code: `useSelector((state) => { return selectBar(state) })`,
+          output: `useSelector(selectBar)`,
+          errors: [
+            {
+              messageId: 'redundantSelectorWrapper',
+              data: { selectorName: 'selectBar' },
             },
           ],
         },

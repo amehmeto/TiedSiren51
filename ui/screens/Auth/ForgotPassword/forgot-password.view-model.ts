@@ -1,20 +1,21 @@
 import { RootState } from '@/core/_redux_/createStore'
+import { AuthBaseViewModel } from '@/ui/screens/Auth/auth-view-model-base'
 
 export enum ForgotPasswordViewState {
-  Form = 'FORM',
+  Idle = 'IDLE',
+  Loading = 'LOADING',
+  Error = 'ERROR',
   Success = 'SUCCESS',
-}
-
-type FormViewModel = {
-  type: ForgotPasswordViewState.Form
-  isLoading: boolean
-  error: string | null
-  buttonText: string
-  isInputDisabled: boolean
 }
 
 type SuccessViewModel = {
   type: ForgotPasswordViewState.Success
+}
+
+type FormViewModel = AuthBaseViewModel<
+  Exclude<ForgotPasswordViewState, ForgotPasswordViewState.Success>
+> & {
+  error: string | null
 }
 
 export type ForgotPasswordViewModel = FormViewModel | SuccessViewModel
@@ -23,18 +24,36 @@ export function selectForgotPasswordViewModel(
   state: RootState,
 ): ForgotPasswordViewModel {
   const { isLoading, error, isPasswordResetSent } = state.auth
+  const { Success, Loading, Error, Idle } = ForgotPasswordViewState
 
   if (isPasswordResetSent) {
     return {
-      type: ForgotPasswordViewState.Success,
+      type: Success,
+    }
+  }
+
+  if (isLoading) {
+    return {
+      type: Loading,
+      buttonText: 'SENDING...',
+      isInputDisabled: true,
+      error: null,
+    }
+  }
+
+  if (error) {
+    return {
+      type: Error,
+      buttonText: 'SEND RESET LINK',
+      isInputDisabled: false,
+      error,
     }
   }
 
   return {
-    type: ForgotPasswordViewState.Form,
-    isLoading,
-    error,
-    buttonText: isLoading ? 'SENDING...' : 'SEND RESET LINK',
-    isInputDisabled: isLoading,
+    type: Idle,
+    buttonText: 'SEND RESET LINK',
+    isInputDisabled: false,
+    error: null,
   }
 }

@@ -150,7 +150,8 @@ function sanitizeTicketTitle(title, lineLength = 30, maxLines = 3) {
       if (lines.length >= maxLines - 1) {
         const remaining = words.slice(i).join(' ')
         if (remaining.length > lineLength) {
-          lines.push(remaining.substring(0, lineLength - 3) + '...')
+          const truncatedRemaining = remaining.substring(0, lineLength - 3) + '...'
+          lines.push(truncatedRemaining)
         } else {
           lines.push(remaining)
         }

@@ -5,11 +5,12 @@ import { createTestStore } from '@/core/_tests_/createTestStore'
 import { Fixture } from '@/core/_tests_/fixture.type'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
 import { AuthUser } from '@/core/auth/auth-user'
-import { selectAuthUserIdOrNull } from '@/core/auth/selectors/selectAuthUserIdOrNull'
+import { selectNullableAuthUserId } from '@/core/auth/selectors/selectNullableAuthUserId'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
 import { extendTimer, ExtendTimerPayload } from './extend-timer.usecase'
 import { loadTimer } from './load-timer.usecase'
+import { notifyLockedSiren } from './notify-locked-siren.usecase'
 import { startTimer, StartTimerPayload } from './start-timer.usecase'
 
 const DEFAULT_USER_ID = 'test-user-id'
@@ -78,8 +79,19 @@ export function timerFixture(
         )
         return store.dispatch(extendTimer(payload))
       },
+      notifyingLockedSiren: async () => {
+        store = createTestStore(
+          { timerRepository, dateProvider },
+          testStateBuilderProvider.getState(),
+        )
+        return store.dispatch(notifyLockedSiren())
+      },
     },
     then: {
+      toastShouldShow(expectedMessage: string) {
+        const message = store.getState().toast.message
+        expect(message).toBe(expectedMessage)
+      },
       timerShouldBeLoadedAs(expectedEndedAt: string | null) {
         expect(store.getState().strictMode.endedAt).toStrictEqual(
           expectedEndedAt,
@@ -92,7 +104,7 @@ export function timerFixture(
       },
       async timerShouldBePersisted(expectedEndedAt: string) {
         const userId =
-          selectAuthUserIdOrNull(store.getState()) ?? DEFAULT_USER_ID
+          selectNullableAuthUserId(store.getState()) ?? DEFAULT_USER_ID
         const endedAt = await timerRepository.loadTimer(userId)
         expect(endedAt).toStrictEqual(expectedEndedAt)
       },
@@ -100,9 +112,8 @@ export function timerFixture(
         action: unknown,
         expectedErrorMessage: string,
       ) {
-        const isRejectedAction = (
-          a: unknown,
-        ): a is { type: string; error: { message: string } } => {
+        type RejectedAction = { type: string; error: { message: string } }
+        const isRejectedAction = (a: unknown): a is RejectedAction => {
           return (
             typeof a === 'object' &&
             a !== null &&
@@ -117,9 +128,9 @@ export function timerFixture(
           )
         }
 
-        expect(isRejectedAction(action)).toBe(true)
-        if (isRejectedAction(action))
-          expect(action.error.message).toBe(expectedErrorMessage)
+        const isRejected = isRejectedAction(action)
+        expect(isRejected).toBe(true)
+        if (isRejected) expect(action.error.message).toBe(expectedErrorMessage)
       },
     },
     dateProvider,

@@ -12,6 +12,9 @@ import { duplicateBlocklist } from './duplicate-blocklist.usecase'
 import { renameBlocklist } from './rename-blocklist.usecase'
 import { updateBlocklist } from './update-blocklist.usecase'
 
+type RenameBlocklistPayload = { name: string; id: string }
+type DuplicateBlocklistPayload = { name: string; id: string }
+
 export function blocklistFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ): Fixture {
@@ -43,10 +46,9 @@ export function blocklistFixture(
         store = createTestStore()
         await store.dispatch(createBlocklist(payload))
       },
-      renamingBlocklist: async (renameBlocklistPayload: {
-        name: string
-        id: string
-      }) => {
+      renamingBlocklist: async (
+        renameBlocklistPayload: RenameBlocklistPayload,
+      ) => {
         store = createTestStore(
           {
             blocklistRepository,
@@ -55,10 +57,9 @@ export function blocklistFixture(
         )
         await store.dispatch(renameBlocklist(renameBlocklistPayload))
       },
-      duplicatingBlocklist: async (toBeDuplicatedPayload: {
-        name: string
-        id: string
-      }) => {
+      duplicatingBlocklist: async (
+        toBeDuplicatedPayload: DuplicateBlocklistPayload,
+      ) => {
         store = createTestStore(
           {
             blocklistRepository,
@@ -96,9 +97,9 @@ export function blocklistFixture(
         const retrievedBlocklists = blocklistAdapter
           .getSelectors()
           .selectAll(state.blocklist)
-        expect(retrievedBlocklists).toEqual(
-          expect.arrayContaining(expectedBlocklists),
-        )
+        const containingExpectedBlocklists =
+          expect.arrayContaining(expectedBlocklists)
+        expect(retrievedBlocklists).toEqual(containingExpectedBlocklists)
       },
       blocklistShouldNotBeInStore(deletedSessionId: string) {
         const retrievedBlocklist = selectBlocklistById(

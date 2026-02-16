@@ -7,6 +7,7 @@ import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { deleteBlockSession } from '@/core/block-session/usecases/delete-block-session.usecase'
 import { duplicateBlockSession } from '@/core/block-session/usecases/duplicate-block-session.usecase'
 import { renameBlockSession } from '@/core/block-session/usecases/rename-block-session.usecase'
+import { formatDuration } from '@/core/strict-mode/format-duration'
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
 import { dependencies } from '@/ui/dependencies'
@@ -16,18 +17,21 @@ import { T } from '@/ui/design-system/theme'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 import { RoundBlueDot } from '@/ui/screens/Home/HomeScreen/RoundBlueDot'
 import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
-import { formatDuration } from '@/ui/screens/StrictMode/format-duration.helper'
 
-type SessionCardProps = Readonly<{
-  session: {
-    id: string
-    name: string
-    minutesLeft: string
-    blocklists: number
-    devices: number
-  }
+type SessionCardSession = {
+  id: string
+  name: string
+  minutesLeft: string
+  blocklists: number
+  devices: number
+}
+
+type SessionCardOwnProps = {
+  session: SessionCardSession
   type: SessionType
-}>
+}
+
+type SessionCardProps = Readonly<SessionCardOwnProps>
 
 export function SessionCard({ session, type }: SessionCardProps) {
   const dispatch = useDispatch<AppDispatch>()
@@ -130,7 +134,8 @@ export function SessionCard({ session, type }: SessionCardProps) {
           setIsRenameModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(renameBlockSession({ id: session.id, name: inputText }))
+          const payload = { id: session.id, name: inputText }
+          dispatch(renameBlockSession(payload))
           setIsRenameModalVisible(false)
         }}
       />
@@ -145,7 +150,8 @@ export function SessionCard({ session, type }: SessionCardProps) {
           setIsDuplicateModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(duplicateBlockSession({ id: session.id, name: inputText }))
+          const payload = { id: session.id, name: inputText }
+          dispatch(duplicateBlockSession(payload))
           setIsDuplicateModalVisible(false)
         }}
       />

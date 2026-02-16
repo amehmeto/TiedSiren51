@@ -1,8 +1,10 @@
-export const formatDuration = (duration: {
+type DurationParts = {
   days: number
   hours: number
   minutes: number
-}): string => {
+}
+
+export const formatDuration = (duration: DurationParts): string => {
   const parts: string[] = []
 
   if (duration.days > 0)

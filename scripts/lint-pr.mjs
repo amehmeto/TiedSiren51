@@ -36,11 +36,10 @@ const TICKET_PREFIX_PATTERN = new RegExp(
 
 // Build cross-repo pattern dynamically from config
 // Matches: repo#123, org/repo#123, https://github.com/org/repo/issues/123, https://github.com/org/repo/pull/123
-const CROSS_REPO_ISSUE_PATTERN = new RegExp(
+const crossRepoIssueSource =
   `(?:${GITHUB_ORG}\\/)?([a-zA-Z0-9_-]+)#(\\d+)|` +
-    `https:\\/\\/github\\.com\\/${GITHUB_ORG}\\/([a-zA-Z0-9_-]+)\\/(?:issues|pull)\\/(\\d+)`,
-  'g',
-)
+  `https:\\/\\/github\\.com\\/${GITHUB_ORG}\\/([a-zA-Z0-9_-]+)\\/(?:issues|pull)\\/(\\d+)`
+const CROSS_REPO_ISSUE_PATTERN = new RegExp(crossRepoIssueSource, 'g')
 
 const VALID_REPO_NAMES = Object.keys(VALID_REPOS)
 

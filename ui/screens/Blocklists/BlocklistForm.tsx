@@ -12,27 +12,28 @@ import { useDispatch, useSelector } from 'react-redux'
 import { z } from 'zod'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { Blocklist } from '@/core/blocklist/blocklist'
-import { selectBlocklistById } from '@/core/blocklist/selectors/selectBlocklistById'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
 import { updateBlocklist } from '@/core/blocklist/usecases/update-blocklist.usecase'
-import { AndroidSiren, Sirens, SirenType } from '@/core/siren/sirens'
+import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
+import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
+import { showToast } from '@/core/toast/toast.slice'
+import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 import { ErrorMessages } from '@/ui/error-messages.type'
 import { AppsSelectionScene } from '@/ui/screens/Blocklists/AppsSelectionScene'
+import {
+  FormMode,
+  selectBlocklistFormViewModel,
+} from '@/ui/screens/Blocklists/blocklist-form.view-model'
 import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/ChooseBlockTabBar'
 import { blocklistFormSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
 import { TextInputSelectionScene } from '@/ui/screens/Blocklists/TextInputSelectionScene'
-
-export enum FormMode {
-  Create = 'create',
-  Edit = 'edit',
-}
 
 export type BlocklistScreenProps = {
   mode: FormMode
@@ -45,6 +46,11 @@ enum BlocklistTabKey {
   Keywords = 'keywords',
 }
 
+type BlocklistTabRoute = {
+  key: BlocklistTabKey
+  title: string
+}
+
 export function BlocklistForm({
   mode,
   blocklistId,
@@ -52,33 +58,43 @@ export function BlocklistForm({
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
 
-  const selectableSirens: Sirens = useSelector(
-    (state: RootState) => state.siren.availableSirens,
+  const viewModel = useSelector((state: RootState) =>
+    selectBlocklistFormViewModel(
+      state,
+      dependencies.dateProvider,
+      mode,
+      blocklistId,
+    ),
   )
 
-  const blocklistFromState = useSelector((state: RootState) =>
-    blocklistId ? selectBlocklistById(state, blocklistId) : undefined,
-  )
+  const {
+    existingBlocklist,
+    lockedSirens,
+    lockedToastMessage,
+    blocklistNamePlaceholder,
+  } = viewModel
+
+  const emptyBlocklist: Omit<Blocklist, 'id'> = {
+    name: '',
+    sirens: {
+      android: [],
+      ios: [],
+      windows: [],
+      macos: [],
+      linux: [],
+      websites: [],
+      keywords: [],
+    },
+  }
 
   const [blocklist, setBlocklist] = useState<Omit<Blocklist, 'id'> | Blocklist>(
-    {
-      name: '',
-      sirens: {
-        android: [],
-        ios: [],
-        windows: [],
-        macos: [],
-        linux: [],
-        websites: [],
-        keywords: [],
-      },
-    },
+    () => existingBlocklist ?? emptyBlocklist,
   )
 
   const [errors, setErrors] = useState<ErrorMessages>({})
   const [index, setIndex] = useState(0)
 
-  const routes: { key: BlocklistTabKey; title: string }[] = [
+  const routes: BlocklistTabRoute[] = [
     { key: BlocklistTabKey.Apps, title: 'Apps' },
     { key: BlocklistTabKey.Websites, title: 'Websites' },
     { key: BlocklistTabKey.Keywords, title: 'Keywords' },
@@ -86,13 +102,30 @@ export function BlocklistForm({
 
   useEffect(() => {
     dispatch(fetchAvailableSirens())
-    if (mode === FormMode.Edit && blocklistFromState)
-      // eslint-disable-next-line react-hooks/set-state-in-effect
-      setBlocklist(blocklistFromState)
-  }, [mode, blocklistFromState, dispatch])
+  }, [dispatch])
+
+  const isSirenSelected = useCallback(
+    (sirenType: SirenType, sirenId: string) =>
+      sirenType === SirenType.ANDROID
+        ? blocklist.sirens.android
+            .map((app) => app.packageName)
+            .includes(sirenId)
+        : blocklist.sirens[sirenType].includes(sirenId),
+    [blocklist],
+  )
+
+  const guardLockedSiren = useCallback(
+    (sirenType: SirenType, sirenId: string): boolean => {
+      if (!isSirenLocked(lockedSirens, sirenType, sirenId)) return false
+      if (lockedToastMessage) dispatch(showToast(lockedToastMessage))
+      return true
+    },
+    [lockedSirens, lockedToastMessage, dispatch],
+  )
 
   const toggleTextSiren = useCallback(
-    (sirenType: keyof Sirens, sirenId: string) => {
+    (sirenType: SirenType, sirenId: string) => {
+      if (guardLockedSiren(sirenType, sirenId)) return
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
         if (
@@ -110,11 +143,12 @@ export function BlocklistForm({
         return { ...prevBlocklist, sirens: updatedSirens }
       })
     },
-    [setBlocklist],
+    [guardLockedSiren, setBlocklist],
   )
 
   const toggleAppSiren = useCallback(
     (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
+      if (guardLockedSiren(sirenType, app.packageName)) return
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
 
@@ -127,60 +161,50 @@ export function BlocklistForm({
         return { ...prevBlocklist, sirens: updatedSirens }
       })
     },
-    [setBlocklist],
-  )
-
-  const isSirenSelected = useCallback(
-    (sirenType: SirenType, sirenId: string) => {
-      if (sirenType === SirenType.ANDROID) {
-        return blocklist.sirens.android
-          .map((app) => app.packageName)
-          .includes(sirenId)
-      }
-      return blocklist.sirens[sirenType].includes(sirenId)
-    },
-    [blocklist],
+    [guardLockedSiren, setBlocklist],
   )
 
   const renderScene = useCallback(
     ({
       route,
     }: SceneRendererProps & {
-      route: {
-        key: BlocklistTabKey
-        title: string
-      }
+      route: BlocklistTabRoute
     }) => {
       const scenes: Record<BlocklistTabKey, () => React.JSX.Element> = {
         apps: () => (
           <AppsSelectionScene
-            androidApps={selectableSirens.android}
             toggleAppSiren={toggleAppSiren}
             isSirenSelected={isSirenSelected}
+            mode={mode}
+            blocklistId={blocklistId}
           />
         ),
         websites: () => (
           <TextInputSelectionScene
-            onSubmitEditing={(event) =>
-              dispatch(addWebsiteToSirens(event.nativeEvent.text))
-            }
+            onSubmitEditing={(event) => {
+              const website = event.nativeEvent.text
+              dispatch(addWebsiteToSirens(website))
+            }}
             sirenType={SirenType.WEBSITES}
             placeholder={'Add websites...'}
-            data={selectableSirens.websites}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
+            mode={mode}
+            blocklistId={blocklistId}
           />
         ),
         keywords: () => (
           <TextInputSelectionScene
-            onSubmitEditing={(event) =>
-              dispatch(addKeywordToSirens(event.nativeEvent.text))
-            }
+            onSubmitEditing={(event) => {
+              const keyword = event.nativeEvent.text
+              dispatch(addKeywordToSirens(keyword))
+            }}
             sirenType={SirenType.KEYWORDS}
             placeholder={'Add keywords...'}
-            data={selectableSirens.keywords}
             toggleSiren={toggleTextSiren}
             isSirenSelected={isSirenSelected}
+            mode={mode}
+            blocklistId={blocklistId}
           />
         ),
       }
@@ -189,7 +213,8 @@ export function BlocklistForm({
     },
     [
       dispatch,
-      selectableSirens,
+      mode,
+      blocklistId,
       toggleAppSiren,
       toggleTextSiren,
       isSirenSelected,
@@ -242,9 +267,8 @@ export function BlocklistForm({
       <Text style={styles.title}>Name</Text>
       <TiedSCard>
         <TiedSTextInput
-          placeholder={blocklistFromState?.name ?? 'Blocklist name'}
+          placeholder={blocklistNamePlaceholder}
           onChangeText={(text) => setBlocklist({ ...blocklist, name: text })}
-          testID="addBlocklistName"
         />
       </TiedSCard>
       {errors.name && <Text style={styles.errorText}>{errors.name}</Text>}

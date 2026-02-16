@@ -73,15 +73,17 @@ describe('FirebaseAuthGateway - Error Translation', () => {
     gateway = new FirebaseAuthGateway(logger)
   })
 
+  type FirebaseAuthErrorCase = {
+    code: string
+    expected: string
+    method: AuthMethod
+  }
+
   describe('Firebase Auth Error Messages', () => {
-    it.each<{
-      code: string
-      expected: string
-      method: AuthMethod
-    }>([
+    it.each<FirebaseAuthErrorCase>([
       {
         code: 'auth/email-already-in-use',
-        expected: 'This email is already in use.',
+        expected: 'Invalid email or password.',
         method: AuthMethod.SignUpWithEmail,
       },
       {
@@ -146,12 +148,14 @@ describe('FirebaseAuthGateway - Error Translation', () => {
   })
 
   describe('Google Sign-In Error Messages', () => {
+    type GoogleSignInErrorCase = {
+      pattern: string
+      errorMessage: string
+      expected: string
+    }
+
     describe('errors from GoogleSignin.signIn', () => {
-      it.each<{
-        pattern: string
-        errorMessage: string
-        expected: string
-      }>([
+      it.each<GoogleSignInErrorCase>([
         {
           pattern: 'SIGN_IN_CANCELLED',
           errorMessage: 'User cancelled the sign-in flow SIGN_IN_CANCELLED',

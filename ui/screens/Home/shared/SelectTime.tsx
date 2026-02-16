@@ -19,7 +19,7 @@ export enum TimeField {
   EndedAt = 'endedAt',
 }
 
-type SelectTimeProps = Readonly<{
+type SelectTimeFields = {
   timeField?: TimeField
   setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
   values: BlockSessionFormValues
@@ -29,7 +29,9 @@ type SelectTimeProps = Readonly<{
   initialTime?: HHmmString | null
   /** The initial value of the other time field, for midnight-spanning session detection */
   initialOtherTime?: HHmmString | null
-}>
+}
+
+type SelectTimeProps = Readonly<SelectTimeFields>
 
 export function SelectTime({
   timeField = TimeField.StartedAt,
@@ -98,7 +100,8 @@ export function SelectTime({
           isVisible={isTimePickerVisible}
           chosenTimeAsDate={chosenTimeAsDate}
           onConfirm={(date) => {
-            handleTimeChange(dateProvider.toHHmm(date))
+            const timeHHmm = dateProvider.toHHmm(date)
+            handleTimeChange(timeHHmm)
             setIsTimePickerVisible(false)
           }}
           onCancel={() => setIsTimePickerVisible(false)}

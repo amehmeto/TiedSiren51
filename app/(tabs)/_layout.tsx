@@ -2,6 +2,10 @@ import { Entypo, Ionicons } from '@expo/vector-icons'
 import { Tabs } from 'expo-router'
 import React from 'react'
 import { Pressable, PressableProps, StyleSheet } from 'react-native'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/core/_redux_/createStore'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { AnimatedTabBarIcon, Tab } from '@/ui/navigation/AnimatedTabBarIcon'
 import { TabScreens } from '@/ui/navigation/TabScreens'
@@ -31,30 +35,44 @@ const tabs: Tab[] = [
     IconType: Entypo,
   },
   {
-    name: 'settings/index',
+    name: 'settings',
     title: TabScreens.SETTINGS,
     icon: 'settings-outline',
     IconType: Ionicons,
   },
 ]
 
+type HandleTabBarIconParams = {
+  route: { name: string }
+  color: string
+  size: number
+  focused: boolean
+  strictModeIcon: React.ComponentProps<typeof Ionicons>['name']
+}
+
 function handleTabBarIcon({
   route,
   color,
   size,
   focused: isFocused,
-}: {
-  route: { name: string }
-  color: string
-  size: number
-  focused: boolean
-}) {
+  strictModeIcon,
+}: HandleTabBarIconParams) {
   const tab = tabs.find((t) => t.name === route.name)
   if (!tab) return null
 
+  const resolvedTab: Tab =
+    tab.name === 'strict-mode/index'
+      ? {
+          name: tab.name,
+          title: tab.title,
+          icon: strictModeIcon,
+          IconType: Ionicons,
+        }
+      : tab
+
   return (
     <AnimatedTabBarIcon
-      tab={tab}
+      tab={resolvedTab}
       color={color}
       size={size}
       isFocused={isFocused}
@@ -63,6 +81,13 @@ function handleTabBarIcon({
 }
 
 export default function TabLayout() {
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
+
+  const strictModeIcon: React.ComponentProps<typeof Ionicons>['name'] =
+    isStrictModeActive ? 'lock-closed-outline' : 'lock-open-outline'
+
   const handleTabBarButton = (
     props: PressableProps,
     { route, navigation }: TabBarButtonProps,
@@ -83,7 +108,8 @@ export default function TabLayout() {
         tabBarActiveTintColor: T.color.lightBlue,
         tabBarInactiveTintColor: T.color.inactive,
         headerShown: false,
-        tabBarIcon: (props) => handleTabBarIcon({ ...props, route }),
+        tabBarIcon: (props) =>
+          handleTabBarIcon({ ...props, route, strictModeIcon }),
         tabBarButton: (props) =>
           handleTabBarButton(props, { route, navigation }),
       })}

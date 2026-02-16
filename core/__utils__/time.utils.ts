@@ -1,11 +1,13 @@
 import { DAY, HOUR, MINUTE, SECOND } from '@/core/__constants__/time'
 
-export const calculateMilliseconds = (params: {
+type TimeUnitsParams = {
   days?: number
   hours?: number
   minutes?: number
   seconds?: number
-}): number => {
+}
+
+export const calculateMilliseconds = (params: TimeUnitsParams): number => {
   const { days = 0, hours = 0, minutes = 0, seconds = 0 } = params
 
   return days * DAY + hours * HOUR + minutes * MINUTE + seconds * SECOND

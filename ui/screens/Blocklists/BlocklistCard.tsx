@@ -8,6 +8,7 @@ import { selectActiveSessionsUsingBlocklist } from '@/core/block-session/selecto
 import { deleteBlocklist } from '@/core/blocklist/usecases/delete-blocklist.usecase'
 import { duplicateBlocklist } from '@/core/blocklist/usecases/duplicate-blocklist.usecase'
 import { renameBlocklist } from '@/core/blocklist/usecases/rename-blocklist.usecase'
+import { formatDuration } from '@/core/strict-mode/format-duration'
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
 import { dependencies } from '@/ui/dependencies'
@@ -16,14 +17,15 @@ import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 import { BlocklistDeletionConfirmationModal } from '@/ui/screens/Blocklists/BlocklistDeletionConfirmationModal'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
-import { formatDuration } from '@/ui/screens/StrictMode/format-duration.helper'
+
+type BlocklistCardSummary = {
+  id: string
+  name: string
+  totalBlocks: string
+}
 
 type BlocklistCardProps = Readonly<{
-  blocklist: {
-    id: string
-    name: string
-    totalBlocks: string
-  }
+  blocklist: BlocklistCardSummary
 }>
 
 export function BlocklistCard({ blocklist }: BlocklistCardProps) {
@@ -125,7 +127,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
           setRenameModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(renameBlocklist({ id: blocklist.id, name: inputText }))
+          const payload = { id: blocklist.id, name: inputText }
+          dispatch(renameBlocklist(payload))
           setRenameModalVisible(false)
         }}
       />
@@ -140,7 +143,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
           setIsDuplicateModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(duplicateBlocklist({ id: blocklist.id, name: inputText }))
+          const payload = { id: blocklist.id, name: inputText }
+          dispatch(duplicateBlocklist(payload))
           setIsDuplicateModalVisible(false)
         }}
       />

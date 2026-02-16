@@ -26,9 +26,10 @@ export function sirensFixture(
         )
       },
       installedApps: (installedApps: InstalledApp[]) => {
-        installedAppRepository.installedApps = new Map(
-          installedApps.map((app) => [app.packageName, app]),
+        const appsByPackageName = installedApps.map(
+          (app) => [app.packageName, app] as const,
         )
+        installedAppRepository.installedApps = new Map(appsByPackageName)
       },
       existingRemoteSirens(existingRemoteSirens: Partial<Sirens>) {
         sirensRepository.selectableSirens = {

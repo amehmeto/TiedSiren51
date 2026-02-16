@@ -34,6 +34,7 @@
     "lint:schema": "npx prisma validate",
     "test": "vitest",
     "test:prepush": "vitest --run",
+    "test:affected": "vitest --run --changed",
     "test:cov": "vitest --run --coverage",
     "test:cov:track": "vitest --run --coverage --coverage.reporter=json && node scripts/track-coverage.js",
     "test:cov:history": "node scripts/view-coverage-history.js",

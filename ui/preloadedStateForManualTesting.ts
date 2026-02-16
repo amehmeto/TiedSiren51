@@ -36,12 +36,10 @@ export async function preloadedStateForManualTesting() {
   )
 
   if (blockSessionRepository instanceof FakeDataBlockSessionRepository) {
-    blockSessionRepository.entities = new Map(
-      preloadedBlockSessions.map((blockSession) => [
-        blockSession.id,
-        blockSession,
-      ]),
+    const blockSessionEntries = preloadedBlockSessions.map(
+      (blockSession) => [blockSession.id, blockSession] as const,
     )
+    blockSessionRepository.entities = new Map(blockSessionEntries)
   }
 
   return preloadedState
@@ -51,4 +49,5 @@ export async function preloadedStateForManualTesting() {
   (preloadedState) => createStore(dependencies, preloadedState.getState()),
 )*/
 
-export const storePromise = Promise.resolve(createStore(dependencies))
+export const store = createStore(dependencies)
+export const storePromise = Promise.resolve(store)

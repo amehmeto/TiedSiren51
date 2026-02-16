@@ -494,13 +494,15 @@ function createContentNodes(template) {
     for (const line of lines) {
       if (line.startsWith('### ')) {
         if (currentParagraph.length > 0) {
-          nodes.push(createParagraph(currentParagraph.join('\n')))
+          const joinedParagraph = createParagraph(currentParagraph.join('\n'))
+          nodes.push(joinedParagraph)
           currentParagraph = []
         }
         nodes.push(createHeading(line.slice(4), 3))
       } else if (line.startsWith('<!--')) {
         if (currentParagraph.length > 0) {
-          nodes.push(createParagraph(currentParagraph.join('\n')))
+          const joinedParagraph = createParagraph(currentParagraph.join('\n'))
+          nodes.push(joinedParagraph)
           currentParagraph = []
         }
         nodes.push({ type: 'html', value: line })
@@ -510,7 +512,8 @@ function createContentNodes(template) {
     }
 
     if (currentParagraph.length > 0) {
-      nodes.push(createParagraph(currentParagraph.join('\n')))
+      const joinedParagraph = createParagraph(currentParagraph.join('\n'))
+      nodes.push(joinedParagraph)
     }
 
     return nodes

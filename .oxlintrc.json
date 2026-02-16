@@ -70,8 +70,8 @@
     "local-rules/no-adapter-in-ui": "error",
     "local-rules/no-entire-state-selector": "error",
     "local-rules/no-complex-inline-arguments": "error",
-    "local-rules/no-usecallback-selector-wrapper": "warn",
-    "local-rules/prefer-named-selector": "warn",
+    "local-rules/no-usecallback-selector-wrapper": "error",
+    "local-rules/prefer-named-selector": "error",
     "local-rules/selector-state-first-param": "error",
     "local-rules/no-selector-prop-drilling": [
       "error",
@@ -89,6 +89,40 @@
     "local-rules/prefer-enum-over-string-union": [
       "error",
       { "ignoredPatterns": ["-outline$", "^logo-", "^add-", "^remove-"] }
+    ],
+    "local-rules/no-inline-import-type": "error",
+    "local-rules/require-logger-in-catch": "error",
+    "local-rules/no-thunk-result-in-component": "error",
+    "local-rules/no-and-or-in-names": "error",
+    "local-rules/prefer-jump-table": "error",
+    "local-rules/no-enum-value-as-string-literal": "error",
+    "local-rules/prefer-ternary-jsx": "error",
+    "local-rules/prefer-extracted-long-params": [
+      "error",
+      {
+        "exemptFunctions": ["createTestStore"],
+        "transparentWrappers": ["dispatch"]
+      }
+    ],
+    "local-rules/no-inline-object-type": "error",
+    "local-rules/no-lame-naming": "warn",
+    "local-rules/no-consecutive-duplicate-returns": "warn",
+    "local-rules/no-redundant-nullish-ternary": "warn",
+    "local-rules/prefer-object-destructuring": [
+      "warn",
+      {
+        "threshold": 3,
+        "ignoredObjects": [
+          "T",
+          "styles",
+          "fixture",
+          "viewModel",
+          "BlocklistViewModel",
+          "HomeViewModel",
+          "BlocklistTabKey",
+          "TabScreens"
+        ]
+      }
     ],
     "local-rules/no-i-prefix-in-imports": "error"
   },
@@ -108,7 +142,9 @@
         "jest/prefer-strict-equal": "error",
         "local-rules/expect-separate-act-assert": "error",
         "local-rules/no-new-in-test-body": "error",
-        "local-rules/use-data-builders": "error"
+        "local-rules/use-data-builders": "error",
+        "local-rules/no-generic-result-variable": "warn",
+        "local-rules/require-typed-each": "error"
       }
     }
   ],

@@ -2,38 +2,24 @@
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import React, { ReactNode } from 'react'
-import {
-  FlatList,
-  Platform,
-  Pressable,
-  StyleSheet,
-  Text,
-  View,
-} from 'react-native'
+import { FlatList, Platform, Pressable, StyleSheet } from 'react-native'
 import { useSelector } from 'react-redux'
-import { RootState } from '@/core/_redux_/createStore'
 import { BlocklistViewModel } from '@/core/blocklist/selectors/blocklist-view-model.type'
 import { selectBlocklistViewModel } from '@/core/blocklist/selectors/blocklist.view-model'
 import { T } from '@/ui/design-system/theme'
 import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { BlocklistCard } from '@/ui/screens/Blocklists/BlocklistCard'
+import { NoBlocklistMessage } from '@/ui/screens/Blocklists/NoBlocklistMessage'
 
 export default function BlocklistScreen() {
-  const viewModel = useSelector<
-    RootState,
-    ReturnType<typeof selectBlocklistViewModel>
-  >((rootState) => selectBlocklistViewModel(rootState))
+  const viewModel = useSelector(selectBlocklistViewModel)
 
   const router = useRouter()
 
   const blocklistsNode: ReactNode = (() => {
     switch (viewModel.type) {
       case BlocklistViewModel.NoBlocklist:
-        return (
-          <View>
-            <Text style={styles.text}>{viewModel.message}</Text>
-          </View>
-        )
+        return <NoBlocklistMessage message={viewModel.message} />
       case BlocklistViewModel.WithBlockLists:
         return (
           <FlatList
@@ -97,5 +83,4 @@ const styles = StyleSheet.create({
       },
     }),
   },
-  text: { color: T.color.white },
 })

@@ -5,12 +5,14 @@ import {
   NotificationTrigger,
 } from '@/core/_ports_/notification.service'
 
+type ScheduledNotification = {
+  title: string
+  body: string
+  trigger: NotificationTrigger
+}
+
 export class FakeNotificationService implements NotificationService {
-  lastScheduledNotification: {
-    title: string
-    body: string
-    trigger: NotificationTrigger
-  }[] = []
+  lastScheduledNotification: ScheduledNotification[] = []
 
   lastCancelledNotificationIds: string[] = []
 

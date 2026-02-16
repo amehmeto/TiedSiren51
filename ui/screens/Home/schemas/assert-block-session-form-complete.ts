@@ -1,12 +1,14 @@
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 
-export function assertBlockSessionFormComplete(
-  values: BlockSessionFormValues,
-): asserts values is BlockSessionFormValues & {
+type CompleteBlockSessionFormValues = BlockSessionFormValues & {
   name: string
   startedAt: string
   endedAt: string
-} {
+}
+
+export function assertBlockSessionFormComplete(
+  values: BlockSessionFormValues,
+): asserts values is CompleteBlockSessionFormValues {
   const {
     name,
     blocklistIds,

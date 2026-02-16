@@ -264,6 +264,61 @@ module.exports = {
     }
 
     /**
+     * Check if inlining would create a long argument in a function/constructor call
+     * This conflicts with prefer-extracted-long-params which requires extracting
+     * long arguments into named variables.
+     *
+     * Also handles transparent wrappers (e.g. dispatch): if usage is inside
+     * dispatch(actionCreator(usage)), check whether inlining would make the
+     * inner call (actionCreator(...)) exceed the threshold.
+     */
+    function wouldCreateLongCallArgument(usageNode, initNode) {
+      const parent = usageNode.parent
+      if (!parent) return false
+
+      const isCallArgument =
+        (parent.type === 'CallExpression' || parent.type === 'NewExpression') &&
+        parent.arguments.includes(usageNode)
+
+      if (!isCallArgument) return false
+
+      const initText = sourceCode.getText(initNode)
+
+      // Direct long argument check
+      if (initText.length > 40) return true
+
+      // Transparent wrapper check: if parent call is inside dispatch(),
+      // check if inlining would make the parent call text exceed threshold
+      const grandparent = parent.parent
+      if (
+        grandparent &&
+        grandparent.type === 'CallExpression' &&
+        grandparent.arguments.includes(parent)
+      ) {
+        const calleeName = getOuterCalleeName(grandparent)
+        if (calleeName === 'dispatch') {
+          const parentCallText = sourceCode.getText(parent)
+          const usageText = sourceCode.getText(usageNode)
+          const expandedLength =
+            parentCallText.length - usageText.length + initText.length
+          if (expandedLength > 40) return true
+        }
+      }
+
+      return false
+    }
+
+    function getOuterCalleeName(node) {
+      if (node.callee.type === 'Identifier') return node.callee.name
+      if (
+        node.callee.type === 'MemberExpression' &&
+        node.callee.property.type === 'Identifier'
+      )
+        return node.callee.property.name
+      return null
+    }
+
+    /**
      * Check if the usage is deeply nested in JSX (more than 1 level from return)
      * with sibling elements before it at any level. In such cases, the variable
      * serves as documentation for what the expression represents.
@@ -358,6 +413,9 @@ module.exports = {
 
         // Don't inline into expect() calls - conflicts with expect-separate-act-assert
         if (isInsideExpectCall(usage.identifier)) return
+
+        // Don't inline when it would create a long call argument (conflicts with prefer-extracted-long-params)
+        if (wouldCreateLongCallArgument(usage.identifier, decl.init)) return
 
         // Don't inline when deeply nested in JSX with siblings - variable documents the value
         if (isDeeplyNestedInJsxWithSiblings(usage.identifier)) return

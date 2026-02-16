@@ -27,12 +27,12 @@ function isEntypoTab(tab: Tab): tab is EntypoTab {
   return tab.IconType === Entypo
 }
 
-type AnimatedTabBarIconProps = Readonly<{
-  tab: Tab
-  color: string
-  size: number
-  isFocused: boolean
-}>
+type AnimatedTabBarIconProps = {
+  readonly tab: Tab
+  readonly color: string
+  readonly size: number
+  readonly isFocused: boolean
+}
 
 export function AnimatedTabBarIcon({
   tab,

@@ -98,4 +98,15 @@ export class PrismaSirensRepository
       throw error
     }
   }
+
+  async deleteAllSirens(): Promise<void> {
+    try {
+      await this.baseClient.siren.deleteMany()
+    } catch (error) {
+      this.logger.error(
+        `[PrismaSirensRepository] Failed to delete all sirens: ${error}`,
+      )
+      throw error
+    }
+  }
 }

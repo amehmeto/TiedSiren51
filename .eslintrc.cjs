@@ -20,6 +20,7 @@ oxlintConfigs.forEach((item) => {
 })
 
 module.exports = {
+  root: true,
   ignorePatterns: ['node_modules', '!.claude', 'eslint-rules/', 'oxlint-plugin-local-rules.js'],
   extends: [
     'expo',
@@ -432,12 +433,17 @@ module.exports = {
     // Uncomment each block as violations are fixed
     // See: docs/adr/conventions/no-nested-call-expressions.md
     //
-    // {
-    //   files: ['**/*.fixture.ts'],
-    //   rules: {
-    //     'local-rules/no-nested-call-expressions': 'error',
-    //   },
-    // },
+    {
+      files: ['**/*.fixture.ts'],
+      rules: {
+        'local-rules/no-nested-call-expressions': [
+          'error',
+          {
+            allowNoArguments: true,
+          },
+        ],
+      },
+    },
     // {
     //   files: ['core/**/listeners/*.ts'],
     //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
@@ -459,13 +465,19 @@ module.exports = {
     //     'local-rules/no-nested-call-expressions': 'error',
     //   },
     // },
-    // {
-    //   files: ['ui/**/*.ts', 'ui/**/*.tsx'],
-    //   excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
-    //   rules: {
-    //     'local-rules/no-nested-call-expressions': 'error',
-    //   },
-    // },
+    {
+      files: ['ui/**/*.ts', 'ui/**/*.tsx'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
+        'local-rules/no-nested-call-expressions': [
+          'error',
+          {
+            allowNoArguments: true,
+          },
+        ],
+        'local-rules/no-unused-test-id': 'error',
+      },
+    },
     // {
     //   files: ['app/**/*.ts', 'app/**/*.tsx'],
     //   rules: {

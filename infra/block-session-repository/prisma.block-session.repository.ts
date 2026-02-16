@@ -7,6 +7,18 @@ import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { BlockSession } from '@/core/block-session/block-session'
 import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
 
+type DbBlocklist = {
+  id: string
+  name: string
+  sirens: string
+}
+
+type DbDevice = {
+  id: string
+  type: string
+  name: string
+}
+
 type DbBlockSession = {
   id: string
   name: string
@@ -15,16 +27,8 @@ type DbBlockSession = {
   startNotificationId: string
   endNotificationId: string
   blockingConditions: string
-  blocklists: {
-    id: string
-    name: string
-    sirens: string
-  }[]
-  devices: {
-    id: string
-    type: string
-    name: string
-  }[]
+  blocklists: DbBlocklist[]
+  devices: DbDevice[]
 }
 
 export class PrismaBlockSessionRepository
@@ -190,6 +194,27 @@ export class PrismaBlockSessionRepository
     } catch (error) {
       this.logger.error(
         `[PrismaBlockSessionRepository] Failed to delete block session ${id}: ${error}`,
+      )
+      throw error
+    }
+  }
+
+  async deleteAll(): Promise<void> {
+    try {
+      const sessions = await this.baseClient.blockSession.findMany({
+        select: { id: true },
+      })
+      const disconnectRelations = sessions.map((s) =>
+        this.baseClient.blockSession.update({
+          where: { id: s.id },
+          data: { blocklists: { set: [] }, devices: { set: [] } },
+        }),
+      )
+      await Promise.all(disconnectRelations)
+      await this.baseClient.blockSession.deleteMany()
+    } catch (error) {
+      this.logger.error(
+        `[PrismaBlockSessionRepository] Failed to delete all block sessions: ${error}`,
       )
       throw error
     }

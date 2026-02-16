@@ -4,6 +4,7 @@ import {
   createReducer,
 } from '@reduxjs/toolkit'
 import { ISODateString } from '@/core/_ports_/date-provider'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
 import { RootState } from '../_redux_/createStore'
 import { rootReducer } from '../_redux_/rootReducer'
@@ -21,12 +22,28 @@ const withBlocklists = createAction<Blocklist[]>('withBlocklists')
 const withAvailableSirens = createAction<Sirens>('withAvailableSirens')
 const withAuthUser = createAction<AuthUser>('withAuthUser')
 const withoutAuthUser = createAction<{}>('withoutAuthUser')
-const withAuthError = createAction<string>('withAuthError')
+type AuthErrorPayload = {
+  message: string
+  errorType?: AuthErrorType
+}
+const withAuthError = createAction<AuthErrorPayload>('withAuthError')
 const withAuthLoading = createAction<boolean>('withAuthLoading')
 const withStrictModeEndedAt = createAction<ISODateString | null>(
   'withStrictModeEndedAt',
 )
 const withPasswordResetSent = createAction<boolean>('withPasswordResetSent')
+const withEmail = createAction<string>('withEmail')
+const withPassword = createAction<string>('withPassword')
+const withLastReauthenticatedAt = createAction<ISODateString | null>(
+  'withLastReauthenticatedAt',
+)
+const withReauthenticating = createAction<boolean>('withReauthenticating')
+const withReauthError = createAction<string | null>('withReauthError')
+const withDeletingAccount = createAction<boolean>('withDeletingAccount')
+const withDeleteAccountError = createAction<string | null>(
+  'withDeleteAccountError',
+)
+const withDeleteConfirmText = createAction<string>('withDeleteConfirmText')
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -46,7 +63,8 @@ const reducer = createReducer(initialState, (builder) => {
       state.siren.availableSirens = action.payload
     })
     .addCase(withAuthError, (state, action) => {
-      state.auth.error = action.payload
+      state.auth.error = action.payload.message
+      state.auth.errorType = action.payload.errorType ?? null
     })
     .addCase(withAuthLoading, (state, action) => {
       state.auth.isLoading = action.payload
@@ -57,13 +75,39 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withPasswordResetSent, (state, action) => {
       state.auth.isPasswordResetSent = action.payload
     })
+    .addCase(withEmail, (state, action) => {
+      state.auth.email = action.payload
+    })
+    .addCase(withPassword, (state, action) => {
+      state.auth.password = action.payload
+    })
+    .addCase(withLastReauthenticatedAt, (state, action) => {
+      state.auth.lastReauthenticatedAt = action.payload
+    })
+    .addCase(withReauthenticating, (state, action) => {
+      state.auth.isReauthenticating = action.payload
+    })
+    .addCase(withReauthError, (state, action) => {
+      state.auth.reauthError = action.payload
+    })
+    .addCase(withDeletingAccount, (state, action) => {
+      state.auth.isDeletingAccount = action.payload
+    })
+    .addCase(withDeleteAccountError, (state, action) => {
+      state.auth.deleteAccountError = action.payload
+    })
+    .addCase(withDeleteConfirmText, (state, action) => {
+      state.auth.deleteConfirmText = action.payload
+    })
 })
 
 export const stateBuilder = (baseState = initialState) => {
   const reduce =
     <P>(actionCreator: ActionCreatorWithPayload<P>) =>
-    (payload: P) =>
-      stateBuilder(reducer(baseState, actionCreator(payload)))
+    (payload: P) => {
+      const nextState = reducer(baseState, actionCreator(payload))
+      return stateBuilder(nextState)
+    }
 
   return {
     build(): RootState {
@@ -78,6 +122,14 @@ export const stateBuilder = (baseState = initialState) => {
     withAuthLoading: reduce(withAuthLoading),
     withStrictModeEndedAt: reduce(withStrictModeEndedAt),
     withPasswordResetSent: reduce(withPasswordResetSent),
+    withEmail: reduce(withEmail),
+    withPassword: reduce(withPassword),
+    withLastReauthenticatedAt: reduce(withLastReauthenticatedAt),
+    withReauthenticating: reduce(withReauthenticating),
+    withReauthError: reduce(withReauthError),
+    withDeletingAccount: reduce(withDeletingAccount),
+    withDeleteAccountError: reduce(withDeleteAccountError),
+    withDeleteConfirmText: reduce(withDeleteConfirmText),
   }
 }
 

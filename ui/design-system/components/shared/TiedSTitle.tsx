@@ -9,11 +9,13 @@ import {
 } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
-type TiedSTitleProps = Readonly<{
+type TiedSTitleOwnProps = {
   text: string
   style?: StyleProp<ViewStyle>
   textStyle?: StyleProp<TextStyle>
-}>
+}
+
+type TiedSTitleProps = Readonly<TiedSTitleOwnProps>
 
 export function TiedSTitle({ text, style, textStyle }: TiedSTitleProps) {
   return (

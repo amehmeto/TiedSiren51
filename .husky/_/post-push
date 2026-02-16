@@ -1,2 +1,5 @@
 #!/usr/bin/env sh
-. "$(dirname "$0")/h"
+# Husky v9 stub — delegates to the real hook in .husky/
+# core.hooksPath points here (.husky/_), so git runs this stub.
+# We forward to the actual implementation in the parent directory.
+exec sh "$(dirname "$0")/../post-push" "$@"

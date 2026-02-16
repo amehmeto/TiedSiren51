@@ -1,8 +1,9 @@
 import React, { useState } from 'react'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { SECOND } from '@/core/__constants__/time'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { formatDuration } from '@/core/strict-mode/format-duration'
 import { selectIsStrictModeLoading } from '@/core/strict-mode/selectors/selectIsStrictModeLoading'
 import { extendTimer } from '@/core/strict-mode/usecases/extend-timer.usecase'
 import { loadTimer } from '@/core/strict-mode/usecases/load-timer.usecase'
@@ -19,13 +20,12 @@ import {
 import { T } from '@/ui/design-system/theme'
 import { useAppForeground } from '@/ui/hooks/useAppForeground'
 import { useTick } from '@/ui/hooks/useTick'
-import { formatDuration } from '@ui/screens/StrictMode/format-duration.helper'
 import {
   selectStrictModeViewModel,
   StrictModeViewState,
 } from '@ui/screens/StrictMode/strict-mode.view-model'
 import { StrictModeConfirmationModal } from '@ui/screens/StrictMode/StrictModeConfirmationModal'
-import { UnLockMethodCard } from '@ui/screens/StrictMode/UnLockMethodCard'
+import { UnlockSection } from '@ui/screens/StrictMode/UnlockSection'
 
 const DEFAULT_DURATION: TimerDuration = { days: 0, hours: 0, minutes: 20 }
 
@@ -59,13 +59,7 @@ export default function StrictModeScreen() {
   }
 
   const handleConfirmStrictMode = () => {
-    dispatch(
-      startTimer({
-        days: timerDuration.days,
-        hours: timerDuration.hours,
-        minutes: timerDuration.minutes,
-      }),
-    )
+    dispatch(startTimer(timerDuration))
     setIsShowingConfirmation(false)
   }
 
@@ -96,10 +90,7 @@ export default function StrictModeScreen() {
         </View>
 
         {viewModel.type === StrictModeViewState.Active && (
-          <View style={styles.unlockSection}>
-            <Text style={styles.sectionTitle}>{'UNLOCK METHOD'}</Text>
-            <UnLockMethodCard inlineRemaining={viewModel.inlineRemaining} />
-          </View>
+          <UnlockSection inlineRemaining={viewModel.inlineRemaining} />
         )}
       </ScrollView>
 
@@ -115,15 +106,7 @@ export default function StrictModeScreen() {
       <TimerPickerModal
         visible={isShowingExtendPicker}
         onClose={() => setIsShowingExtendPicker(false)}
-        onSave={() =>
-          dispatch(
-            extendTimer({
-              days: extendDuration.days,
-              hours: extendDuration.hours,
-              minutes: extendDuration.minutes,
-            }),
-          )
-        }
+        onSave={() => dispatch(extendTimer(extendDuration))}
         duration={extendDuration}
         onDurationChange={setExtendDuration}
         title={'Extend timer by'}
@@ -154,17 +137,5 @@ const styles = StyleSheet.create({
   actionButtons: {
     paddingHorizontal: T.spacing.large,
     gap: T.spacing.medium,
-  },
-  unlockSection: {
-    paddingHorizontal: T.spacing.large,
-    marginTop: T.spacing.xx_large,
-  },
-  sectionTitle: {
-    color: T.color.grey,
-    fontSize: T.font.size.small,
-    fontWeight: T.font.weight.bold,
-    fontFamily: T.font.family.primary,
-    marginBottom: T.spacing.medium,
-    letterSpacing: T.font.letterSpacing.normal,
   },
 })

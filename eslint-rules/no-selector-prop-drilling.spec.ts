@@ -103,6 +103,51 @@ describe('no-selector-prop-drilling', () => {
             }
           `,
         },
+        // Member expression call - not a simple useSelector call
+        {
+          code: `
+            function Parent() {
+              const value = store.useSelector((s) => selectFoo(s))
+              return <Child value={value} />
+            }
+          `,
+        },
+        // Destructuring with rest element only (RestElement, not Property)
+        {
+          code: `
+            function Parent() {
+              const { ...rest } = useSelector((s) => selectData(s))
+              return <Child rest={rest} />
+            }
+          `,
+        },
+        // Ignored component (FlatList) - should not report
+        {
+          code: `
+            function Parent() {
+              const data = useSelector((s) => selectItems(s))
+              return <FlatList data={data} />
+            }
+          `,
+          options: [{ ignoredComponents: ['FlatList'] }],
+        },
+        // Expression in JSX children (not attribute)
+        {
+          code: `
+            function Parent() {
+              const text = useSelector((s) => selectText(s))
+              return <Child>{text}</Child>
+            }
+          `,
+        },
+        // Non-identifier expression in JSX attribute (object literal)
+        {
+          code: `
+            function Parent() {
+              return <Child style={{ color: 'red' }} />
+            }
+          `,
+        },
       ],
       invalid: [
         // Basic: simple variable from useSelector passed as prop

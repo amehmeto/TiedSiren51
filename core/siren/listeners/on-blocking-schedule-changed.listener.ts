@@ -7,6 +7,15 @@ import { AppStore } from '@/core/_redux_/createStore'
 import { selectBlockingSchedule } from '@/core/block-session/selectors/selectBlockingSchedule'
 import { selectHasActiveSession } from '@/core/block-session/selectors/selectHasActiveSession'
 
+type BlockingScheduleListenerDependencies = {
+  store: AppStore
+  sirenLookout: SirenLookout
+  sirenTier: SirenTier
+  foregroundService: ForegroundService
+  dateProvider: DateProvider
+  logger: Logger
+}
+
 export const onBlockingScheduleChangedListener = ({
   store,
   sirenLookout,
@@ -14,14 +23,7 @@ export const onBlockingScheduleChangedListener = ({
   foregroundService,
   dateProvider,
   logger,
-}: {
-  store: AppStore
-  sirenLookout: SirenLookout
-  sirenTier: SirenTier
-  foregroundService: ForegroundService
-  dateProvider: DateProvider
-  logger: Logger
-}): (() => void) => {
+}: BlockingScheduleListenerDependencies): (() => void) => {
   const getScheduleHashKey = (schedule: BlockingSchedule[]): string => {
     return schedule
       .map((s) => {

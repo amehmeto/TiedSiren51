@@ -93,11 +93,13 @@ describe('parseDependencyRef', () => {
     })
 
     it('returns null for non-numeric issue number', () => {
-      expect(parseDependencyRef('#abc', 'TiedSiren51')).toBeNull()
+      const nonNumericResult = parseDependencyRef('#abc', 'TiedSiren51')
+      expect(nonNumericResult).toBeNull()
     })
 
     it('returns null for malformed input', () => {
-      expect(parseDependencyRef('not-valid', 'TiedSiren51')).toBeNull()
+      const malformedResult = parseDependencyRef('not-valid', 'TiedSiren51')
+      expect(malformedResult).toBeNull()
     })
   })
 })

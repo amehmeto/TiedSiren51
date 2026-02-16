@@ -25,6 +25,26 @@ describe('no-adapter-in-ui', () => {
           code: `import { selectBlocklists } from '@core/blocklist/selectors/selectBlocklists'`,
           filename: '/project/ui/screens/Home/HomeScreen.tsx',
         },
+        // Default import (non-ImportSpecifier) - should not trigger adapter check
+        {
+          code: `import blocklistAdapter from '@core/blocklist'`,
+          filename: '/project/ui/screens/Home/HomeScreen.tsx',
+        },
+        // Namespace import (ImportNamespaceSpecifier) - should not trigger adapter check
+        {
+          code: `import * as adapters from '@core/blocklist'`,
+          filename: '/project/ui/screens/Home/HomeScreen.tsx',
+        },
+        // MemberExpression with non-Identifier object (CallExpression) - should not trigger
+        {
+          code: `const result = getAdapter().someMethod()`,
+          filename: '/project/ui/screens/Home/HomeScreen.tsx',
+        },
+        // MemberExpression with object that doesn't end in Adapter
+        {
+          code: `const result = blocklist.getSelectors()`,
+          filename: '/project/ui/screens/Home/HomeScreen.tsx',
+        },
         // Non-adapter import - OK
         {
           code: `import { BlockSession } from '@core/block-session/block-session'`,
@@ -101,6 +121,17 @@ describe('no-adapter-in-ui', () => {
               messageId: 'noAdapterInUi',
               data: { adapterName: 'blocklistAdapter' },
             },
+            {
+              messageId: 'noAdapterInUi',
+              data: { adapterName: 'sirenAdapter' },
+            },
+          ],
+        },
+        // Adapter method call via MemberExpression in app layer - NOT OK
+        {
+          code: `const selectors = sirenAdapter.getSelectors()`,
+          filename: '/project/app/(tabs)/home.tsx',
+          errors: [
             {
               messageId: 'noAdapterInUi',
               data: { adapterName: 'sirenAdapter' },
