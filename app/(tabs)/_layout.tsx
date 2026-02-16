@@ -35,12 +35,20 @@ const tabs: Tab[] = [
     IconType: Entypo,
   },
   {
-    name: 'settings/index',
+    name: 'settings',
     title: TabScreens.SETTINGS,
     icon: 'settings-outline',
     IconType: Ionicons,
   },
 ]
+
+type HandleTabBarIconParams = {
+  route: { name: string }
+  color: string
+  size: number
+  focused: boolean
+  strictModeIcon: React.ComponentProps<typeof Ionicons>['name']
+}
 
 function handleTabBarIcon({
   route,
@@ -48,13 +56,7 @@ function handleTabBarIcon({
   size,
   focused: isFocused,
   strictModeIcon,
-}: {
-  route: { name: string }
-  color: string
-  size: number
-  focused: boolean
-  strictModeIcon: React.ComponentProps<typeof Ionicons>['name']
-}) {
+}: HandleTabBarIconParams) {
   const tab = tabs.find((t) => t.name === route.name)
   if (!tab) return null
 

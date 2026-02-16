@@ -138,6 +138,7 @@ module.exports = {
           'BlocklistViewModel',
           'HomeViewModel',
           'BlocklistTabKey',
+          'TabScreens',
         ],
       },
     ],

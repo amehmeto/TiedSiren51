@@ -94,4 +94,9 @@ export class FakeDataBlocklistRepository implements BlocklistRepository {
     this.blocklists.delete(blocklistId)
     return Promise.resolve()
   }
+
+  deleteAll(): Promise<void> {
+    this.blocklists.clear()
+    return Promise.resolve()
+  }
 }

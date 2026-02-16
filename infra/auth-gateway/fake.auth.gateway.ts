@@ -9,6 +9,8 @@ export class FakeAuthGateway implements AuthGateway {
 
   willReauthenticateWith: Promise<void> = Promise.resolve()
 
+  willDeleteAccountWith: Promise<void> = Promise.resolve()
+
   logOutError: Error | null = null
 
   lastResetPasswordEmail: string | null = null
@@ -48,6 +50,11 @@ export class FakeAuthGateway implements AuthGateway {
 
   onUserLoggedOut(listener: () => void): void {
     this.onUserLoggedOutListener = listener
+  }
+
+  async deleteAccount(): Promise<void> {
+    await this.willDeleteAccountWith
+    this.onUserLoggedOutListener?.()
   }
 
   async logOut(): Promise<void> {

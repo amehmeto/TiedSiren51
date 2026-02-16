@@ -38,6 +38,11 @@ const withLastReauthenticatedAt = createAction<ISODateString | null>(
 )
 const withReauthenticating = createAction<boolean>('withReauthenticating')
 const withReauthError = createAction<string | null>('withReauthError')
+const withDeletingAccount = createAction<boolean>('withDeletingAccount')
+const withDeleteAccountError = createAction<string | null>(
+  'withDeleteAccountError',
+)
+const withDeleteConfirmText = createAction<string>('withDeleteConfirmText')
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -84,6 +89,15 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withReauthError, (state, action) => {
       state.auth.reauthError = action.payload
     })
+    .addCase(withDeletingAccount, (state, action) => {
+      state.auth.isDeletingAccount = action.payload
+    })
+    .addCase(withDeleteAccountError, (state, action) => {
+      state.auth.deleteAccountError = action.payload
+    })
+    .addCase(withDeleteConfirmText, (state, action) => {
+      state.auth.deleteConfirmText = action.payload
+    })
 })
 
 export const stateBuilder = (baseState = initialState) => {
@@ -112,6 +126,9 @@ export const stateBuilder = (baseState = initialState) => {
     withLastReauthenticatedAt: reduce(withLastReauthenticatedAt),
     withReauthenticating: reduce(withReauthenticating),
     withReauthError: reduce(withReauthError),
+    withDeletingAccount: reduce(withDeletingAccount),
+    withDeleteAccountError: reduce(withDeleteAccountError),
+    withDeleteConfirmText: reduce(withDeleteConfirmText),
   }
 }
 
