@@ -18,6 +18,8 @@
       "Bash(./scripts/worktree.sh:*)",
       "Bash(.claude/hooks/*.sh:*)",
       "Bash(.claude/hooks/validate-edit.sh scripts/ci-watch.sh)",
+      "Bash(/Users/arthurmehmetoglu/Development/tied-siren-project/worktrees/281-feat-TS281-change-password/scripts/reply-pr-comment.sh 303 2811380415 \"Done — removed \\\\`validateChangePasswordInput\\\\` wrapper. \\\\`ChangePasswordForm\\\\` now calls \\\\`changePasswordSchema.safeParse\\(\\)\\\\` directly.\")",
+      "Bash(/Users/arthurmehmetoglu/Development/tied-siren-project/worktrees/281-feat-TS281-change-password/scripts/reply-pr-comment.sh 303 2811385298 \"Done — added \\\\`''result''\\\\` to the \\\\`no-lame-naming\\\\` forbidden list and renamed all \\\\`const result\\\\` to \\\\`const validation\\\\` in \\\\`auth.schema.test.ts\\\\`.\")",
       "Bash(/opt/homebrew/bin/shellcheck --version)",
       "Bash(/usr/local/bin/shellcheck:*)",
       "Bash(GIT_DIR=*:*)",

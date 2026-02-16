@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react'
+import { useFocusEffect } from 'expo-router'
+import { useCallback, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
@@ -21,10 +22,11 @@ export default function ChangePasswordScreen() {
   const dispatch = useDispatch<AppDispatch>()
   const [isReauthVisible, setIsReauthVisible] = useState(true)
 
-  useEffect(() => {
+  const clearPreviousState = useCallback(() => {
     dispatch(clearChangePasswordError())
     dispatch(clearChangePasswordSuccess())
-  }, [])
+  }, [dispatch])
+  useFocusEffect(clearPreviousState)
 
   const {
     isReauthenticated,
@@ -43,7 +45,7 @@ export default function ChangePasswordScreen() {
           hasChangePasswordSucceeded={hasChangePasswordSucceeded}
           buttonText={buttonText}
           onChangePassword={(newPassword) =>
-            dispatch(changePassword({ newPassword }))
+            dispatch(changePassword({ newPassword })).unwrap()
           }
         />
       ) : (

@@ -9,7 +9,7 @@ type ChangePasswordFormFields = {
   changePasswordError: string | null
   hasChangePasswordSucceeded: boolean
   buttonText: string
-  onChangePassword: (newPassword: string) => void
+  onChangePassword: (newPassword: string) => Promise<void>
 }
 
 type ChangePasswordFormProps = Readonly<ChangePasswordFormFields>
@@ -25,22 +25,43 @@ export function ChangePasswordForm({
   const [confirmPassword, setConfirmPassword] = useState('')
   const [localError, setLocalError] = useState<string | null>(null)
 
-  const handleSubmit = () => {
-    setLocalError(null)
-
+  const validatePasswords = () => {
     const validation = changePasswordSchema.safeParse({
       newPassword,
       confirmPassword,
     })
 
     if (!validation.success) {
-      setLocalError(validation.error.errors[0].message)
+      return {
+        isValid: false as const,
+        error: validation.error.errors[0].message,
+      }
+    }
+
+    return { isValid: true as const, newPassword: validation.data.newPassword }
+  }
+
+  const handleSubmit = () => {
+    setLocalError(null)
+    const {
+      isValid,
+      error,
+      newPassword: validatedPassword,
+    } = validatePasswords()
+
+    if (!isValid) {
+      setLocalError(error)
       return
     }
 
-    onChangePassword(validation.data.newPassword)
-    setNewPassword('')
-    setConfirmPassword('')
+    onChangePassword(validatedPassword)
+      .then(() => {
+        setNewPassword('')
+        setConfirmPassword('')
+      })
+      .catch(() => {
+        // Error is handled by Redux state (changePasswordError)
+      })
   }
 
   const displayError = localError ?? changePasswordError
