@@ -12,6 +12,7 @@ describe('Feature: Log out', () => {
     fixture.given.authUserIs({
       id: 'fake-joe-id',
       email: 'joe@gmail.com',
+      isEmailVerified: true,
       username: 'Joe',
     })
 

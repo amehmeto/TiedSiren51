@@ -10,7 +10,9 @@ import {
 import { AuthUser } from '@/core/auth/auth-user'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
+import { refreshEmailVerificationStatus } from '@/core/auth/usecases/refresh-email-verification-status.usecase'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
+import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
@@ -63,6 +65,14 @@ export function authentificationFixture(
         const error = new Error(errorMessage)
         authGateway.willReauthenticateWith = Promise.reject(error)
       },
+      sendVerificationEmailWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willSendVerificationEmailWith = Promise.reject(error)
+      },
+      refreshEmailVerificationWillReturn(isVerified: boolean) {
+        authGateway.willRefreshEmailVerificationWith =
+          Promise.resolve(isVerified)
+      },
       nowIs(isoDate: ISODateString) {
         dateProvider.now = new Date(isoDate)
       },
@@ -93,6 +103,12 @@ export function authentificationFixture(
       reauthenticate(password: string) {
         return store.dispatch(reauthenticate({ password }))
       },
+      sendVerificationEmail() {
+        return store.dispatch(sendVerificationEmail())
+      },
+      refreshEmailVerificationStatus() {
+        return store.dispatch(refreshEmailVerificationStatus())
+      },
     },
     then: {
       userShouldBeAuthenticated(authUser: AuthUser) {
@@ -120,6 +136,21 @@ export function authentificationFixture(
       },
       passwordResetShouldNotBeSent() {
         expect(authGateway.lastResetPasswordEmail).toBeNull()
+      },
+      verificationEmailShouldBeSent() {
+        expect(authGateway.verificationEmailSentCount).toBeGreaterThan(0)
+      },
+      emailShouldBeVerified() {
+        const { authUser } = store.getState().auth
+        expect(authUser?.isEmailVerified).toBe(true)
+      },
+      emailShouldNotBeVerified() {
+        const { authUser } = store.getState().auth
+        expect(authUser?.isEmailVerified ?? false).toBe(false)
+      },
+      toastShouldShow(expectedMessage: string) {
+        const { message } = store.getState().toast
+        expect(message).toBe(expectedMessage)
       },
       lastReauthenticatedAtShouldBe(expectedDate: ISODateString | null) {
         const { lastReauthenticatedAt } = store.getState().auth

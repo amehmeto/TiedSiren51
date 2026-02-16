@@ -17,6 +17,7 @@ import {
   initializeAuth,
   onAuthStateChanged,
   reauthenticateWithCredential,
+  sendEmailVerification,
   sendPasswordResetEmail,
   signInWithCredential,
   signInWithEmailAndPassword,
@@ -157,6 +158,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         this.onUserLoggedInListener({
           id: user.uid,
           email: user.email ?? '',
+          isEmailVerified: user.emailVerified,
         })
         return
       }
@@ -210,6 +212,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       return {
         id: result.user.uid,
         email: result.user.email ?? '',
+        isEmailVerified: result.user.emailVerified,
       }
     } catch (error) {
       this.logger.error(
@@ -226,9 +229,17 @@ export class FirebaseAuthGateway implements AuthGateway {
         email,
         password,
       )
+
+      sendEmailVerification(result.user).catch((verificationError) => {
+        this.logger.error(
+          `[FirebaseAuthGateway] Failed to send verification email: ${verificationError}`,
+        )
+      })
+
       return {
         id: result.user.uid,
         email: result.user.email ?? '',
+        isEmailVerified: result.user.emailVerified,
       }
     } catch (error) {
       this.logger.error(
@@ -255,6 +266,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       return {
         id: credential.user.uid,
         email: credential.user.email ?? '',
+        isEmailVerified: credential.user.emailVerified,
         username: credential.user.displayName ?? undefined,
         profilePicture: credential.user.photoURL ?? undefined,
       }
@@ -283,6 +295,33 @@ export class FirebaseAuthGateway implements AuthGateway {
     } catch (error) {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to resetPassword: ${error}`,
+      )
+      throw new Error(this.translateFirebaseError(error))
+    }
+  }
+
+  async sendVerificationEmail(): Promise<void> {
+    try {
+      const user = this.auth.currentUser
+      if (!user) throw new Error('No authenticated user found.')
+      await sendEmailVerification(user)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to sendVerificationEmail: ${error}`,
+      )
+      throw new Error(this.translateFirebaseError(error))
+    }
+  }
+
+  async refreshEmailVerificationStatus(): Promise<boolean> {
+    try {
+      const user = this.auth.currentUser
+      if (!user) throw new Error('No authenticated user found.')
+      await user.reload()
+      return user.emailVerified
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to refreshEmailVerificationStatus: ${error}`,
       )
       throw new Error(this.translateFirebaseError(error))
     }

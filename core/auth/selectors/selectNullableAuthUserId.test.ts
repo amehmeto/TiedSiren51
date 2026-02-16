@@ -8,6 +8,7 @@ describe('selectNullableAuthUserId', () => {
       .withAuthUser({
         id: 'user-123',
         email: 'test@example.com',
+        isEmailVerified: true,
       })
       .build()
 

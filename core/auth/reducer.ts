@@ -6,7 +6,9 @@ import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
 import { reauthenticate } from './usecases/reauthenticate.usecase'
+import { refreshEmailVerificationStatus } from './usecases/refresh-email-verification-status.usecase'
 import { resetPassword } from './usecases/reset-password.usecase'
+import { sendVerificationEmail } from './usecases/send-verification-email.usecase'
 import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
 
 export type AuthState = {
@@ -14,6 +16,8 @@ export type AuthState = {
   isLoading: boolean
   error: string | null
   isPasswordResetSent: boolean
+  isVerificationEmailSent: boolean
+  isRefreshingEmailVerification: boolean
   lastReauthenticatedAt: ISODateString | null
   isReauthenticating: boolean
   reauthError: string | null
@@ -37,6 +41,8 @@ export const reducer = createReducer<AuthState>(
     isLoading: false,
     error: null,
     isPasswordResetSent: false,
+    isVerificationEmailSent: false,
+    isRefreshingEmailVerification: false,
     lastReauthenticatedAt: null,
     isReauthenticating: false,
     reauthError: null,
@@ -81,6 +87,8 @@ export const reducer = createReducer<AuthState>(
         state.authUser = null
         state.error = null
         state.isLoading = false
+        state.isVerificationEmailSent = false
+        state.isRefreshingEmailVerification = false
         state.lastReauthenticatedAt = null
         state.isReauthenticating = false
         state.reauthError = null
@@ -90,6 +98,7 @@ export const reducer = createReducer<AuthState>(
         state.isLoading = false
         state.error = null
         state.isPasswordResetSent = false
+        state.isVerificationEmailSent = false
       })
       .addCase(resetPassword.pending, (state) => {
         state.isLoading = true
@@ -134,6 +143,33 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(signInWithApple.rejected, (state, action) => {
         state.isLoading = false
+        state.error = action.error.message ?? null
+      })
+
+      .addCase(sendVerificationEmail.pending, (state) => {
+        state.isLoading = true
+        state.error = null
+        state.isVerificationEmailSent = false
+      })
+      .addCase(sendVerificationEmail.fulfilled, (state) => {
+        state.isLoading = false
+        state.isVerificationEmailSent = true
+      })
+      .addCase(sendVerificationEmail.rejected, (state, action) => {
+        state.isLoading = false
+        state.error = action.error.message ?? null
+      })
+
+      .addCase(refreshEmailVerificationStatus.pending, (state) => {
+        state.isRefreshingEmailVerification = true
+      })
+      .addCase(refreshEmailVerificationStatus.fulfilled, (state, action) => {
+        state.isRefreshingEmailVerification = false
+        if (action.payload && state.authUser)
+          state.authUser.isEmailVerified = true
+      })
+      .addCase(refreshEmailVerificationStatus.rejected, (state, action) => {
+        state.isRefreshingEmailVerification = false
         state.error = action.error.message ?? null
       })
 

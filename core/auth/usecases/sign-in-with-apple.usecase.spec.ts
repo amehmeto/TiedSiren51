@@ -12,6 +12,7 @@ describe('Feature: Authenticate with Apple', () => {
     fixture.given.authenticationWithAppleWillSucceedForUser({
       id: 'auth-user-id',
       email: 'steeve@gmail.com',
+      isEmailVerified: true,
       username: 'Steeve',
     })
 
@@ -20,6 +21,7 @@ describe('Feature: Authenticate with Apple', () => {
     fixture.then.userShouldBeAuthenticated({
       id: 'auth-user-id',
       email: 'steeve@gmail.com',
+      isEmailVerified: true,
       username: 'Steeve',
     })
   })

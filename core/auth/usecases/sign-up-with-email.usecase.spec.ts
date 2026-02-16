@@ -13,6 +13,7 @@ describe('Feature: Authenticate with Email', () => {
       {
         id: 'auth-user-id',
         email: 'amehmeto@gmail.com',
+        isEmailVerified: false,
         username: 'Arthur',
       },
       'validPass123',
@@ -23,6 +24,7 @@ describe('Feature: Authenticate with Email', () => {
     fixture.then.userShouldBeAuthenticated({
       id: 'auth-user-id',
       email: 'amehmeto@gmail.com',
+      isEmailVerified: false,
       username: 'Arthur',
     })
     fixture.then.authShouldNotBeLoading()
