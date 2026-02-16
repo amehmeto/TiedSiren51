@@ -21,6 +21,7 @@
 module.exports = {
   meta: {
     type: 'suggestion',
+    fixable: 'code',
     docs: {
       description:
         'Require extracting long function arguments into named variables when they would cause line breaks',
@@ -107,6 +108,92 @@ module.exports = {
       return null
     }
 
+    function findEnclosingStatement(node) {
+      const statementTypes = new Set([
+        'ExpressionStatement',
+        'ReturnStatement',
+        'VariableDeclaration',
+        'IfStatement',
+        'ThrowStatement',
+      ])
+      let current = node.parent
+      while (current) {
+        if (
+          statementTypes.has(current.type) &&
+          current.parent &&
+          (current.parent.type === 'BlockStatement' || current.parent.type === 'Program')
+        ) {
+          return current
+        }
+        current = current.parent
+      }
+      return null
+    }
+
+    function getIndentation(node) {
+      const lines = sourceCode.getLines()
+      const line = lines[node.loc.start.line - 1]
+      const match = line.match(/^(\s*)/)
+      return match ? match[1] : ''
+    }
+
+    function lowerFirst(str) {
+      if (!str) return str
+      return str[0].toLowerCase() + str.slice(1)
+    }
+
+    function toCamelCase(str) {
+      return lowerFirst(
+        str
+          .split('_')
+          .filter(Boolean)
+          .map((part) => part[0].toUpperCase() + part.slice(1).toLowerCase())
+          .join(''),
+      )
+    }
+
+    function deriveVariableName(node) {
+      if (node.type === 'MemberExpression') {
+        if (
+          node.computed &&
+          node.object.type === 'MemberExpression' &&
+          node.object.property.type === 'Identifier'
+        ) {
+          const name = node.object.property.name
+          if (name !== name.toLowerCase() && name === name.toUpperCase()) {
+            return toCamelCase(name)
+          }
+          return lowerFirst(name)
+        }
+        if (!node.computed && node.property.type === 'Identifier') {
+          const name = node.property.name
+          if (name !== name.toLowerCase() && name === name.toUpperCase()) {
+            return toCamelCase(name)
+          }
+          return lowerFirst(name)
+        }
+      }
+      if (node.type === 'CallExpression') {
+        const callee = node.callee
+        let name = null
+        if (callee.type === 'Identifier') name = callee.name
+        if (callee.type === 'MemberExpression' && callee.property.type === 'Identifier')
+          name = callee.property.name
+        if (name) {
+          const stripped = name.replace(/^(get|create|build|fetch|make|compute|find|resolve)/, '')
+          if (stripped && stripped !== name) return lowerFirst(stripped)
+          return lowerFirst(name)
+        }
+      }
+      if (node.type === 'ObjectExpression') return 'options'
+      return 'extracted'
+    }
+
+    function deriveVariableNameForInnerArg(node) {
+      if (node.type === 'ObjectExpression') return 'payload'
+      return deriveVariableName(node)
+    }
+
     function checkCallExpression(node) {
       if (node.arguments.length === 0) return
       if (wrappedCalls.has(node)) return
@@ -135,6 +222,16 @@ module.exports = {
           context.report({
             node: arg,
             messageId: 'extractParam',
+            fix(fixer) {
+              const enclosingStatement = findEnclosingStatement(arg)
+              if (!enclosingStatement) return null
+              const name = deriveVariableName(arg)
+              const indent = getIndentation(enclosingStatement)
+              return [
+                fixer.insertTextBefore(enclosingStatement, `const ${name} = ${argText}\n${indent}`),
+                fixer.replaceText(arg, name),
+              ]
+            },
           })
         }
       }
@@ -143,9 +240,20 @@ module.exports = {
     function checkInnerArgs(args) {
       for (const arg of args) {
         if (simpleNodeTypes.has(arg.type)) continue
+        const argText = sourceCode.getText(arg)
         context.report({
           node: arg,
           messageId: 'extractParam',
+          fix(fixer) {
+            const enclosingStatement = findEnclosingStatement(arg)
+            if (!enclosingStatement) return null
+            const name = deriveVariableNameForInnerArg(arg)
+            const indent = getIndentation(enclosingStatement)
+            return [
+              fixer.insertTextBefore(enclosingStatement, `const ${name} = ${argText}\n${indent}`),
+              fixer.replaceText(arg, name),
+            ]
+          },
         })
       }
     }
