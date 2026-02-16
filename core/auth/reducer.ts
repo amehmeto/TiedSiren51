@@ -13,6 +13,7 @@ import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
 import { AuthErrorType, isAuthErrorType } from './auth-error-type'
+import { reauthenticateWithGoogle } from './usecases/reauthenticate-with-google.usecase'
 import { reauthenticate } from './usecases/reauthenticate.usecase'
 import { resetPassword } from './usecases/reset-password.usecase'
 import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
@@ -158,6 +159,19 @@ export const reducer = createReducer<AuthState>(
         state.reauthError = null
       })
       .addCase(reauthenticate.rejected, (state, action) => {
+        state.isReauthenticating = false
+        state.reauthError = action.error.message ?? null
+      })
+      .addCase(reauthenticateWithGoogle.pending, (state) => {
+        state.isReauthenticating = true
+        state.reauthError = null
+      })
+      .addCase(reauthenticateWithGoogle.fulfilled, (state, action) => {
+        state.isReauthenticating = false
+        state.lastReauthenticatedAt = action.payload
+        state.reauthError = null
+      })
+      .addCase(reauthenticateWithGoogle.rejected, (state, action) => {
         state.isReauthenticating = false
         state.reauthError = action.error.message ?? null
       })

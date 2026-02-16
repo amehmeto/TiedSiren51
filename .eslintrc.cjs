@@ -94,6 +94,8 @@ module.exports = {
     'local-rules/time-constant-multiplication': 'error',
     'local-rules/try-catch-isolation': 'error',
     'local-rules/inline-single-statement-handlers': 'error',
+    // Components should not check thunk results — use state-driven UI
+    'local-rules/no-thunk-result-in-component': 'error',
     // Error handling convention rules
     'local-rules/no-try-catch-in-core': 'error',
     'local-rules/listener-error-handling': 'error',

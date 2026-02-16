@@ -26,18 +26,19 @@ const noElseIf = require('../eslint-rules/no-else-if.cjs')
 const noEntireStateSelector = require('../eslint-rules/no-entire-state-selector.cjs')
 const noEnumValueAsStringLiteral = require('../eslint-rules/no-enum-value-as-string-literal.cjs')
 const noGenericResultVariable = require('../eslint-rules/no-generic-result-variable.cjs')
-const noLameNaming = require('../eslint-rules/no-lame-naming.cjs')
 const noIPrefixInImports = require('../eslint-rules/no-i-prefix-in-imports.cjs')
 const noIconSizeMagicNumbers = require('../eslint-rules/no-icon-size-magic-numbers.cjs')
 const noIndexInCore = require('../eslint-rules/no-index-in-core.cjs')
 const noInlineImportType = require('../eslint-rules/no-inline-import-type.cjs')
 const noInlineObjectType = require('../eslint-rules/no-inline-object-type.cjs')
+const noLameNaming = require('../eslint-rules/no-lame-naming.cjs')
 const noModuleLevelConstants = require('../eslint-rules/no-module-level-constants.cjs')
 const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressions.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
 const noRedundantNullishTernary = require('../eslint-rules/no-redundant-nullish-ternary.cjs')
 const noSelectorPropDrilling = require('../eslint-rules/no-selector-prop-drilling.cjs')
 const noStylesheetMagicNumbers = require('../eslint-rules/no-stylesheet-magic-numbers.cjs')
+const noThunkResultInComponent = require('../eslint-rules/no-thunk-result-in-component.cjs')
 const noTryCatchInCore = require('../eslint-rules/no-try-catch-in-core.cjs')
 const noUnusedTestId = require('../eslint-rules/no-unused-test-id.cjs')
 const noUsecallbackSelectorWrapper = require('../eslint-rules/no-usecallback-selector-wrapper.cjs')
@@ -96,6 +97,7 @@ module.exports = {
     'listener-error-handling': listenerErrorHandling,
     'no-try-catch-in-core': noTryCatchInCore,
     'no-new-in-test-body': noNewInTestBody,
+    'no-thunk-result-in-component': noThunkResultInComponent,
     'require-colocated-test': requireColocatedTest,
     'require-logger-in-catch': requireLoggerInCatch,
     'use-data-builders': useDataBuilders,

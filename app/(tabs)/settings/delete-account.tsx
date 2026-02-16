@@ -53,7 +53,6 @@ export default function DeleteAccountScreen() {
       <ReauthenticationModal
         isVisible={isReauthVisible && !isReauthenticated}
         onRequestClose={() => setIsReauthVisible(false)}
-        onSuccess={() => setIsReauthVisible(false)}
       />
     </View>
   )

@@ -66,6 +66,10 @@ export class FakeStorageAuthGateway implements AuthGateway {
     return this.fakeAuthGateway.reauthenticate(password)
   }
 
+  async reauthenticateWithGoogle(): Promise<void> {
+    return this.fakeAuthGateway.reauthenticateWithGoogle()
+  }
+
   async resetPassword(email: string): Promise<void> {
     return this.fakeAuthGateway.resetPassword(email)
   }

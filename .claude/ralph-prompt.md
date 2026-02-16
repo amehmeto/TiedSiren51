@@ -1,22 +1,51 @@
 Implement the following GitHub issue in this worktree.
 
-PR: none (will be created after first commit via `gh pr create`)
+PR: none (create one after first commit using `gh pr create --draft --title "feat(auth): Google re-authentication for sensitive operations" --body "Implements #298"`)
 
 ## Context
 
-The `no-inline-object-type` ESLint rule was introduced in PR #265 as a `warn` to avoid breaking existing code. It flags inline object type literals with 2+ properties, encouraging extraction into named type aliases.
-
-## Task
-
-1. Change `'local-rules/no-inline-object-type': 'warn'` to `'error'` in `.eslintrc.cjs`
-2. Fix all files that violate this rule across the codebase by extracting inline object types into named type aliases
-3. Ensure all tests pass after the refactoring
+Users who signed up with Google have no password and cannot use the password-only `ReauthenticationModal`. This blocks the delete account flow (and any future sensitive operations) for Google users. The modal needs to detect the user's auth provider and show the appropriate re-auth method.
 
 ## Acceptance Criteria
 
-- Rule is set to `error` in `.eslintrc.cjs`
-- All inline object types with 2+ properties are extracted into named type aliases
-- CI passes with zero violations
+- [ ] `AuthUser` type includes an `authProvider` field (`'email' | 'google' | 'apple'`)
+- [ ] `authProvider` is populated from Firebase `user.providerData[0]?.providerId` in all auth flows
+- [ ] `AuthGateway` port exposes `reauthenticateWithGoogle(): Promise<void>`
+- [ ] Firebase gateway implements `reauthenticateWithGoogle()` using `reauthenticateWithCredential`
+- [ ] Fake gateway implements `reauthenticateWithGoogle()` with configurable stub
+- [ ] `reauthenticateWithGoogle` usecase exists with same pattern as `reauthenticate.usecase.ts`
+- [ ] Auth reducer handles `reauthenticateWithGoogle.pending/fulfilled/rejected`
+- [ ] `ReauthenticationModal` is provider-aware:
+  - `authProvider === 'google'` → shows Google sign-in button
+  - `authProvider === 'email'` or undefined → shows existing password input (backward-compatible)
+- [ ] `delete-account.tsx` passes `authProvider` to `ReauthenticationModal`
+- [ ] Unit tests cover Google re-auth success and failure paths
+- [ ] All existing tests still pass
+
+## Implementation Notes
+
+### Files to create
+- `core/auth/usecases/reauthenticate-with-google.usecase.ts`
+
+### Files to modify
+1. `core/auth/auth-user.ts` — add `authProvider` field (optional for backward compat)
+2. `core/_ports_/auth.gateway.ts` — add `reauthenticateWithGoogle()`
+3. `core/auth/reducer.ts` — add cases for new usecase
+4. `core/auth/authentification.fixture.ts` — add Google reauth given/when helpers
+5. `infra/auth-gateway/firebase.auth.gateway.ts` — implement `reauthenticateWithGoogle()`, populate `authProvider` in all sign-in/sign-up flows and `setupAuthStateListener`
+6. `infra/auth-gateway/fake.auth.gateway.ts` — implement `reauthenticateWithGoogle()`
+7. `ui/design-system/components/shared/ReauthenticationModal.tsx` — provider-aware UI
+8. `app/(tabs)/settings/delete-account.tsx` — pass `authProvider` prop
+
+### Key technical details
+- Firebase: map `providerId` → `authProvider` (`'google.com'` → `'google'`, `'password'` → `'email'`, `'apple.com'` → `'apple'`)
+- Google reauth uses `GoogleSignin.signIn()` → `GoogleAuthProvider.credential(idToken)` → `reauthenticateWithCredential(user, credential)` (same credential flow as `signInWithGoogle`, different final call)
+- Reuse existing state fields: `isReauthenticating`, `lastReauthenticatedAt`, `reauthError`
+
+## Dependencies
+
+- Depends on #163 (account deletion) being merged first ✅ (already merged)
+- Builds on the `ReauthenticationModal` and reauth infrastructure from #283
 
 Before making structural changes, read /docs/adr/README.md for architectural decisions that must be followed.
 
