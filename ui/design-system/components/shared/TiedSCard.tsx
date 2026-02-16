@@ -3,10 +3,12 @@ import React from 'react'
 import { StyleProp, StyleSheet, ViewStyle } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
-type TiedSCardProps = Readonly<{
+type TiedSCardOwnProps = {
   children: React.ReactNode
   style?: StyleProp<ViewStyle>
-}>
+}
+
+type TiedSCardProps = Readonly<TiedSCardOwnProps>
 
 export function TiedSCard({ children, style }: TiedSCardProps) {
   return (

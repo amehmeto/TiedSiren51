@@ -1,13 +1,17 @@
 import { calculateMilliseconds } from '@/core/__utils__/time.utils'
 import { DateProvider } from '@/core/_ports_/date-provider'
 
-export const formatEndFromOffsets = (params: {
+type FormatEndFromOffsetsParams = {
   now?: Date
   days: number
   hours: number
   minutes: number
   dateProvider: DateProvider
-}): string => {
+}
+
+export const formatEndFromOffsets = (
+  params: FormatEndFromOffsetsParams,
+): string => {
   const { now = new Date(), days, hours, minutes, dateProvider } = params
 
   const durationMs = calculateMilliseconds({ days, hours, minutes })

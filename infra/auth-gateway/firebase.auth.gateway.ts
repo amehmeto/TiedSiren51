@@ -10,6 +10,7 @@ import {
 import {
   Auth,
   createUserWithEmailAndPassword,
+  deleteUser,
   EmailAuthProvider,
   getAuth,
   getReactNativePersistence,
@@ -26,64 +27,18 @@ import {
 } from 'firebase/auth'
 import { AuthGateway } from '@/core/_ports_/auth.gateway'
 import { Logger } from '@/core/_ports_/logger'
-import { AuthUser } from '@/core/auth/auth-user'
+import { AuthError } from '@/core/auth/auth-error'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
+import { AuthProvider, AuthUser } from '@/core/auth/auth-user'
+import { FirebaseAuthErrorCode } from './firebase.auth-error-code'
+import { FIREBASE_ERROR_TYPES } from './firebase.auth-error-types'
+import { FIREBASE_ERRORS } from './firebase.auth-errors'
+import { GOOGLE_ERROR_TYPES } from './firebase.google-error-types'
+import { GoogleSignInError } from './firebase.google-sign-in-error'
+import { GOOGLE_SIGN_IN_ERRORS } from './firebase.google-sign-in-errors'
 import { firebaseConfig } from './firebaseConfig'
 
-enum FirebaseAuthErrorCode {
-  EmailAlreadyInUse = 'auth/email-already-in-use',
-  InvalidEmail = 'auth/invalid-email',
-  WeakPassword = 'auth/weak-password',
-  InvalidCredential = 'auth/invalid-credential',
-  PopupClosedByUser = 'auth/popup-closed-by-user',
-  CancelledByUser = 'auth/cancelled-popup-request',
-  UserNotFound = 'auth/user-not-found',
-  TooManyRequests = 'auth/too-many-requests',
-  WrongPassword = 'auth/wrong-password',
-  RequiresRecentLogin = 'auth/requires-recent-login',
-}
-
-enum GoogleSignInError {
-  SignInCancelled = 'SIGN_IN_CANCELLED',
-  InProgress = 'IN_PROGRESS',
-  PlayServicesNotAvailable = 'PLAY_SERVICES_NOT_AVAILABLE',
-  MissingIdToken = 'MISSING_ID_TOKEN',
-}
-
 export class FirebaseAuthGateway implements AuthGateway {
-  private static readonly FIREBASE_CONFIG = firebaseConfig
-
-  private static readonly FIREBASE_ERRORS: Record<
-    FirebaseAuthErrorCode,
-    string
-  > = {
-    [FirebaseAuthErrorCode.EmailAlreadyInUse]: 'This email is already in use.',
-    [FirebaseAuthErrorCode.InvalidEmail]: 'Invalid email address.',
-    [FirebaseAuthErrorCode.WeakPassword]:
-      'Password must be at least 6 characters.',
-    [FirebaseAuthErrorCode.InvalidCredential]: 'Invalid email or password.',
-    [FirebaseAuthErrorCode.PopupClosedByUser]: 'Sign-in cancelled.',
-    [FirebaseAuthErrorCode.CancelledByUser]: 'Sign-in cancelled.',
-    [FirebaseAuthErrorCode.UserNotFound]: 'No account found with this email.',
-    [FirebaseAuthErrorCode.TooManyRequests]:
-      'Too many requests. Please try again later.',
-    [FirebaseAuthErrorCode.WrongPassword]: 'Incorrect password.',
-    [FirebaseAuthErrorCode.RequiresRecentLogin]:
-      'Please re-authenticate to perform this action.',
-  }
-
-  private static readonly GOOGLE_SIGN_IN_ERRORS: Record<
-    GoogleSignInError,
-    string
-  > = {
-    [GoogleSignInError.SignInCancelled]: 'Google sign-in was cancelled.',
-    [GoogleSignInError.InProgress]: 'Sign-in already in progress.',
-    [GoogleSignInError.PlayServicesNotAvailable]:
-      'Google Play Services not available.',
-    [GoogleSignInError.MissingIdToken]: 'Failed to get Google ID token',
-  }
-
-  private readonly firebaseConfig: typeof firebaseConfig
-
   private readonly auth: Auth
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
@@ -97,10 +52,7 @@ export class FirebaseAuthGateway implements AuthGateway {
   private isFirebaseAuthError(
     error: unknown,
   ): error is FirebaseError & { code: FirebaseAuthErrorCode } {
-    return (
-      this.isFirebaseError(error) &&
-      error.code in FirebaseAuthGateway.FIREBASE_ERRORS
-    )
+    return this.isFirebaseError(error) && error.code in FIREBASE_ERRORS
   }
 
   private getGoogleSignInErrorPattern(error: Error): GoogleSignInError | null {
@@ -118,7 +70,6 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   public constructor(private readonly logger: Logger) {
-    this.firebaseConfig = FirebaseAuthGateway.FIREBASE_CONFIG
     const app = this.initializeApp()
     this.auth = this.initializeAuth(app)
     this.setupAuthStateListener()
@@ -126,7 +77,7 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   private initializeApp(): FirebaseApp {
-    return getApps().length ? getApp() : initializeApp(this.firebaseConfig)
+    return getApps().length ? getApp() : initializeApp(firebaseConfig)
   }
 
   private initializeAuth(app: FirebaseApp): Auth {
@@ -152,6 +103,20 @@ export class FirebaseAuthGateway implements AuthGateway {
     }
   }
 
+  private mapProviderId(providerId: string): AuthProvider {
+    const providerMap: Record<string, AuthProvider> = {
+      'google.com': AuthProvider.Google,
+      'apple.com': AuthProvider.Apple,
+      password: AuthProvider.Email,
+    }
+    return providerMap[providerId] ?? AuthProvider.Email
+  }
+
+  private getAuthProvider(user: User): AuthProvider {
+    const firebaseProviderId = user.providerData[0]?.providerId ?? 'password'
+    return this.mapProviderId(firebaseProviderId)
+  }
+
   private setupAuthStateListener(): void {
     onAuthStateChanged(this.auth, (user: User | null) => {
       if (user && this.onUserLoggedInListener) {
@@ -159,6 +124,7 @@ export class FirebaseAuthGateway implements AuthGateway {
           id: user.uid,
           email: user.email ?? '',
           isEmailVerified: user.emailVerified,
+          authProvider: this.getAuthProvider(user),
         })
         return
       }
@@ -169,22 +135,33 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   private configureGoogleSignIn(): void {
     GoogleSignin.configure({
-      webClientId: this.firebaseConfig.webClientId,
+      webClientId: firebaseConfig.webClientId,
     })
   }
 
-  private translateFirebaseError(error: unknown): string {
-    if (this.isFirebaseAuthError(error))
-      return FirebaseAuthGateway.FIREBASE_ERRORS[error.code]
+  private toAuthError(error: unknown): AuthError {
+    if (this.isFirebaseAuthError(error)) {
+      return new AuthError(
+        FIREBASE_ERRORS[error.code],
+        FIREBASE_ERROR_TYPES[error.code],
+      )
+    }
 
     if (this.isGoogleSignInError(error)) {
       const pattern = this.getGoogleSignInErrorPattern(error)
-      if (pattern) return FirebaseAuthGateway.GOOGLE_SIGN_IN_ERRORS[pattern]
+      if (pattern) {
+        return new AuthError(
+          GOOGLE_SIGN_IN_ERRORS[pattern],
+          GOOGLE_ERROR_TYPES[pattern],
+        )
+      }
     }
 
-    return error && error instanceof Error
-      ? error.message
-      : 'Unknown error occurred.'
+    const message =
+      error && error instanceof Error
+        ? error.message
+        : 'Unknown error occurred.'
+    return new AuthError(message, AuthErrorType.Unknown)
   }
 
   async reauthenticate(password: string): Promise<void> {
@@ -198,54 +175,76 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to reauthenticate: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
+    }
+  }
+
+  async reauthenticateWithGoogle(): Promise<void> {
+    try {
+      const user = this.auth.currentUser
+      if (!user) throw new Error('No authenticated user found.')
+
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
+      const userInfo = await GoogleSignin.signIn()
+      const idToken = userInfo.idToken
+      if (!idToken) throw new Error(GoogleSignInError.MissingIdToken)
+
+      const googleCredential = GoogleAuthProvider.credential(idToken)
+      await reauthenticateWithCredential(user, googleCredential)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to reauthenticateWithGoogle: ${error}`,
+      )
+      throw this.toAuthError(error)
     }
   }
 
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
     try {
-      const result = await signInWithEmailAndPassword(
+      const signInResponse = await signInWithEmailAndPassword(
         this.auth,
         email,
         password,
       )
       return {
-        id: result.user.uid,
-        email: result.user.email ?? '',
-        isEmailVerified: result.user.emailVerified,
+        id: signInResponse.user.uid,
+        email: signInResponse.user.email ?? '',
+        isEmailVerified: signInResponse.user.emailVerified,
+        authProvider: this.getAuthProvider(signInResponse.user),
       }
     } catch (error) {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to signInWithEmail: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
   async signUpWithEmail(email: string, password: string): Promise<AuthUser> {
     try {
-      const result = await createUserWithEmailAndPassword(
+      const signUpResponse = await createUserWithEmailAndPassword(
         this.auth,
         email,
         password,
       )
 
-      sendEmailVerification(result.user).catch((verificationError) => {
+      sendEmailVerification(signUpResponse.user).catch((verificationError) => {
         this.logger.error(
           `[FirebaseAuthGateway] Failed to send verification email: ${verificationError}`,
         )
       })
 
       return {
-        id: result.user.uid,
-        email: result.user.email ?? '',
-        isEmailVerified: result.user.emailVerified,
+        id: signUpResponse.user.uid,
+        email: signUpResponse.user.email ?? '',
+        isEmailVerified: signUpResponse.user.emailVerified,
+        authProvider: this.getAuthProvider(signUpResponse.user),
       }
     } catch (error) {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to signUpWithEmail: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -269,12 +268,13 @@ export class FirebaseAuthGateway implements AuthGateway {
         isEmailVerified: credential.user.emailVerified,
         username: credential.user.displayName ?? undefined,
         profilePicture: credential.user.photoURL ?? undefined,
+        authProvider: this.getAuthProvider(credential.user),
       }
     } catch (error) {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to signInWithGoogle: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -285,7 +285,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to signInWithApple: ${error}`,
       )
-      throw error
+      throw this.toAuthError(error)
     }
   }
 
@@ -296,7 +296,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to resetPassword: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -309,7 +309,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to sendVerificationEmail: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -323,7 +323,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to refreshEmailVerificationStatus: ${error}`,
       )
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 
@@ -335,13 +335,27 @@ export class FirebaseAuthGateway implements AuthGateway {
     this.onUserLoggedOutListener = listener
   }
 
+  async deleteAccount(): Promise<void> {
+    try {
+      const user = this.auth.currentUser
+      if (!user) throw new Error('No authenticated user found.')
+
+      await deleteUser(user)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to delete account: ${error}`,
+      )
+      throw this.toAuthError(error)
+    }
+  }
+
   async logOut(): Promise<void> {
     try {
       if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut()
       await signOut(this.auth)
     } catch (error) {
       this.logger.error(`[FirebaseAuthGateway] Failed to logOut: ${error}`)
-      throw new Error(this.translateFirebaseError(error))
+      throw this.toAuthError(error)
     }
   }
 }

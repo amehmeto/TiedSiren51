@@ -2,5 +2,6 @@ export const uniqueBy = <T, K>(
   array: T[],
   keyExtractor: (item: T) => K,
 ): T[] => {
-  return [...new Map(array.map((item) => [keyExtractor(item), item])).values()]
+  const keyedEntries = array.map((item) => [keyExtractor(item), item] as const)
+  return [...new Map(keyedEntries).values()]
 }

@@ -1,4 +1,5 @@
 import { beforeEach, describe, it } from 'vitest'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { authentificationFixture } from '@/core/auth/authentification.fixture'
 
 describe('Feature: Authenticate with Email', () => {
@@ -13,7 +14,6 @@ describe('Feature: Authenticate with Email', () => {
       {
         id: 'auth-user-id',
         email: 'amehmeto@gmail.com',
-        isEmailVerified: false,
         username: 'Arthur',
       },
       'validPass123',
@@ -24,25 +24,28 @@ describe('Feature: Authenticate with Email', () => {
     fixture.then.userShouldBeAuthenticated({
       id: 'auth-user-id',
       email: 'amehmeto@gmail.com',
-      isEmailVerified: false,
       username: 'Arthur',
     })
     fixture.then.authShouldNotBeLoading()
   })
 
   it('should show error when email is already in use', async () => {
-    fixture.given.authGatewayWillRejectWith('This email is already in use.')
+    fixture.given.authGatewayWillRejectWith(
+      'Invalid email or password.',
+      AuthErrorType.Validation,
+    )
 
     await fixture.when.signUpWithEmail('existing@example.com', 'validPass123')
 
-    fixture.then.authenticationErrorsShouldBe('This email is already in use.')
-
+    fixture.then.authenticationErrorsShouldBe('Invalid email or password.')
+    fixture.then.authErrorTypeShouldBe(AuthErrorType.Validation)
     fixture.then.authShouldNotBeLoading()
   })
 
   it('should show error when password is too weak', async () => {
     fixture.given.authGatewayWillRejectWith(
       'Password must be at least 6 characters.',
+      AuthErrorType.Validation,
     )
 
     await fixture.when.signUpWithEmail('user@example.com', 'weak')
@@ -50,5 +53,6 @@ describe('Feature: Authenticate with Email', () => {
     fixture.then.authenticationErrorsShouldBe(
       'Password must be at least 6 characters.',
     )
+    fixture.then.authErrorTypeShouldBe(AuthErrorType.Validation)
   })
 })

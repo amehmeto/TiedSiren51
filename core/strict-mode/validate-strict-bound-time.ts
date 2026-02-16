@@ -5,25 +5,30 @@ export enum StrictBoundDirection {
   Later = 'later',
 }
 
-export type StrictBound = Readonly<{
+type StrictBoundProperties = {
   direction: StrictBoundDirection
   initialTime: HHmmString
   /** The opposite boundary (end time when validating start, start time when validating end) for midnight-spanning detection */
   otherBound?: HHmmString
-}>
+}
 
-export type ValidationResult = Readonly<
-  { isValid: true } | { isValid: false; errorMessage: string }
->
+export type StrictBound = Readonly<StrictBoundProperties>
 
-export type StrictModeTimeValidationParams = Readonly<{
+type ValidationError = { isValid: false; errorMessage: string }
+
+export type ValidationResult = Readonly<{ isValid: true } | ValidationError>
+
+type StrictModeTimeValidationProperties = {
   newTime: HHmmString
   isStrictModeActive: boolean
   direction: StrictBoundDirection
   initialTime?: HHmmString | null
   /** The opposite boundary (end time when validating start, start time when validating end) for midnight-spanning detection */
   otherBound?: HHmmString | null
-}>
+}
+
+export type StrictModeTimeValidationParams =
+  Readonly<StrictModeTimeValidationProperties>
 
 function spansMidnight(start: HHmmString, end: HHmmString) {
   return start > end

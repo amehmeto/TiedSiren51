@@ -26,13 +26,13 @@ export enum Platform {
   Linux = 'Linux',
 }
 
-type BlocksPreviewCardProps = Readonly<{
-  IconTag: React.ComponentType<IconComponentProps>
-  iconName: string
-  platform: Platform
-  blocksNumber: number
-  onPress: () => void
-}>
+type BlocksPreviewCardProps = {
+  readonly IconTag: React.ComponentType<IconComponentProps>
+  readonly iconName: string
+  readonly platform: Platform
+  readonly blocksNumber: number
+  readonly onPress: () => void
+}
 
 export function BlocksPreviewCard({
   IconTag,

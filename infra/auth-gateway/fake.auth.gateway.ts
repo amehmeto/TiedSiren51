@@ -10,11 +10,17 @@ export class FakeAuthGateway implements AuthGateway {
 
   willReauthenticateWith: Promise<void> = Promise.resolve()
 
+  willReauthenticateWithGoogleWith: Promise<void> = Promise.resolve()
+
+  willDeleteAccountWith: Promise<void> = Promise.resolve()
+
   willSendVerificationEmailWith: Promise<void> = Promise.resolve()
 
   willRefreshEmailVerificationWith: Promise<boolean> = Promise.resolve(false)
 
   verificationEmailSentCount = 0
+
+  logOutError: Error | null = null
 
   lastResetPasswordEmail: string | null = null
 
@@ -24,6 +30,10 @@ export class FakeAuthGateway implements AuthGateway {
 
   reauthenticate(_password: string): Promise<void> {
     return this.willReauthenticateWith
+  }
+
+  reauthenticateWithGoogle(): Promise<void> {
+    return this.willReauthenticateWithGoogleWith
   }
 
   signInWithGoogle(): Promise<AuthUser> {
@@ -64,10 +74,14 @@ export class FakeAuthGateway implements AuthGateway {
     this.onUserLoggedOutListener = listener
   }
 
-  async logOut(): Promise<void> {
-    if (this.onUserLoggedOutListener) this.onUserLoggedOutListener()
+  async deleteAccount(): Promise<void> {
+    await this.willDeleteAccountWith
+    this.onUserLoggedOutListener?.()
+  }
 
-    return Promise.resolve()
+  async logOut(): Promise<void> {
+    if (this.logOutError) throw this.logOutError
+    if (this.onUserLoggedOutListener) this.onUserLoggedOutListener()
   }
 
   simulateUserLoggedIn(authUser: AuthUser) {

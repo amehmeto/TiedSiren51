@@ -210,3 +210,55 @@ jobs:
           GH_TOKEN: ${{ github.token }}
           GITHUB_CONTEXT: ${{ toJSON(github) }}
         run: bash scripts/cleanup-pr-releases.sh "$GITHUB_CONTEXT"
+
+  # Auto-generate review retrospective on PR merge
+  # Analyzes the review conversation, classifies feedback, and commits a retro file to main.
+  # Posts a summary to Slack #retro channel.
+  review-retro:
+    if: >-
+      github.event_name == 'pull_request'
+      && github.event.pull_request.merged == true
+    runs-on: ubuntu-latest
+    concurrency:
+      group: review-retro-main
+      cancel-in-progress: false
+    permissions:
+      contents: write
+      pull-requests: write
+    steps:
+      - name: Checkout main
+        uses: actions/checkout@v4
+        with:
+          ref: main
+
+      - name: Expand retro prompt
+        id: expand-prompt
+        run: sed 's/\$ARGUMENTS/${{ github.event.pull_request.number }}/g' .claude/commands/retro.md > /tmp/retro-prompt.md
+
+      - name: Generate retrospective
+        id: retro
+        uses: anthropics/claude-code-action@v1
+        with:
+          anthropic_api_key: ${{ secrets.ANTHROPIC_API_KEY }}
+          github_token: ${{ github.token }}
+          prompt_file: /tmp/retro-prompt.md
+          claude_args: '--allowedTools Bash,Read,Write,Glob,Grep,Edit --max-turns 30'
+
+      - name: Detect retro file
+        id: detect
+        run: bash scripts/detect-retro-file.sh "${{ github.event.pull_request.number }}"
+
+      - name: Commit retrospective to main
+        if: steps.detect.outputs.retro_path != ''
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: bash scripts/commit-retro.sh "${{ steps.detect.outputs.retro_path }}" "${{ github.event.pull_request.number }}"
+
+      - name: Post to Slack
+        if: steps.detect.outputs.retro_path != ''
+        continue-on-error: true
+        env:
+          SLACK_RETRO_WEBHOOK_URL: ${{ secrets.SLACK_RETRO_WEBHOOK_URL }}
+          GITHUB_SERVER_URL: ${{ github.server_url }}
+          GITHUB_REPOSITORY: ${{ github.repository }}
+        run: bash scripts/send-retro-slack-notification.sh "${{ steps.detect.outputs.retro_path }}" "${{ github.event.pull_request.number }}"

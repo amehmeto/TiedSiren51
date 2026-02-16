@@ -1,9 +1,18 @@
 import { describe, expect, test } from 'vitest'
 import { buildLockedSirens } from '@/core/_tests_/data-builders/locked-sirens.builder'
-import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
+import { Sirens } from '@/core/siren/sirens'
+import { isSirenLocked, LockedSirens } from '@/core/strict-mode/is-siren-locked'
+
+type IsSirenLockedTestCase = {
+  scenario: string
+  lockedSirens: LockedSirens
+  sirenType: keyof Sirens
+  sirenId: string
+  isExpectedLocked: boolean
+}
 
 describe('isSirenLocked', () => {
-  test.each([
+  test.each<IsSirenLockedTestCase>([
     {
       scenario: 'android siren is locked',
       lockedSirens: buildLockedSirens({ android: new Set(['com.app1']) }),
@@ -61,7 +70,10 @@ describe('isSirenLocked', () => {
     expect(isLocked).toBe(false)
   })
 
-  test.each([{ sirenType: 'ios' as const }, { sirenType: 'windows' as const }])(
+  test.each<{ sirenType: keyof Sirens }>([
+    { sirenType: 'ios' as const },
+    { sirenType: 'windows' as const },
+  ])(
     'should return false for unsupported siren type $sirenType',
     ({ sirenType }) => {
       const lockedSirens = buildLockedSirens()

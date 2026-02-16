@@ -12,6 +12,8 @@ import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
 import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 
+type TimeOfDay = { hours: number; minutes: number }
+
 export function blockingScheduleChangedFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ) {
@@ -45,7 +47,7 @@ export function blockingScheduleChangedFixture(
           builder.withBlocklists(blocklists),
         )
       },
-      nowIs({ hours, minutes }: { hours: number; minutes: number }) {
+      nowIs({ hours, minutes }: TimeOfDay) {
         const date = new Date()
         date.setHours(hours, minutes, 0, 0)
         dateProvider.now = date

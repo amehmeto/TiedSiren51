@@ -113,9 +113,8 @@ export function timerFixture(
         action: unknown,
         expectedErrorMessage: string,
       ) {
-        const isRejectedAction = (
-          a: unknown,
-        ): a is { type: string; error: { message: string } } => {
+        type RejectedAction = { type: string; error: { message: string } }
+        const isRejectedAction = (a: unknown): a is RejectedAction => {
           return (
             typeof a === 'object' &&
             a !== null &&

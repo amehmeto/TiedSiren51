@@ -32,56 +32,52 @@ export enum SessionBoardMessage {
   NO_SCHEDULED_SESSIONS = 'Scheduled sessions start automatically and help you stay on track with your goals.',
 }
 
+type NoActiveSessionsBoard = {
+  title: SessionBoardTitle.NO_ACTIVE_SESSIONS
+  message: SessionBoardMessage.NO_ACTIVE_SESSIONS
+}
+
+type NoScheduledSessionsBoard = {
+  title: SessionBoardTitle.NO_SCHEDULED_SESSIONS
+  message: SessionBoardMessage.NO_SCHEDULED_SESSIONS
+}
+
+type ActiveSessionsBoard = {
+  title: SessionBoardTitle.ACTIVE_SESSIONS
+  blockSessions: ViewModelBlockSession[]
+}
+
+type ScheduledSessionsBoard = {
+  title: SessionBoardTitle.SCHEDULED_SESSIONS
+  blockSessions: ViewModelBlockSession[]
+}
+
 export type WithoutActiveNorScheduledSessions = {
   type: HomeViewModel.WithoutActiveNorScheduledSessions
   greetings: Greetings
-  activeSessions: {
-    title: SessionBoardTitle.NO_ACTIVE_SESSIONS
-    message: SessionBoardMessage.NO_ACTIVE_SESSIONS
-  }
-  scheduledSessions: {
-    title: SessionBoardTitle.NO_SCHEDULED_SESSIONS
-    message: SessionBoardMessage.NO_SCHEDULED_SESSIONS
-  }
+  activeSessions: NoActiveSessionsBoard
+  scheduledSessions: NoScheduledSessionsBoard
 }
 
 export type WithActiveWithoutScheduledSessions = {
   type: HomeViewModel.WithActiveWithoutScheduledSessions
   greetings: Greetings
-  activeSessions: {
-    title: SessionBoardTitle.ACTIVE_SESSIONS
-    blockSessions: ViewModelBlockSession[]
-  }
-  scheduledSessions: {
-    title: SessionBoardTitle.NO_SCHEDULED_SESSIONS
-    message: SessionBoardMessage.NO_SCHEDULED_SESSIONS
-  }
+  activeSessions: ActiveSessionsBoard
+  scheduledSessions: NoScheduledSessionsBoard
 }
 
 export type WithoutActiveWithScheduledSessions = {
   type: HomeViewModel.WithoutActiveWithScheduledSessions
   greetings: Greetings
-  activeSessions: {
-    title: SessionBoardTitle.NO_ACTIVE_SESSIONS
-    message: SessionBoardMessage.NO_ACTIVE_SESSIONS
-  }
-  scheduledSessions: {
-    title: SessionBoardTitle.SCHEDULED_SESSIONS
-    blockSessions: ViewModelBlockSession[]
-  }
+  activeSessions: NoActiveSessionsBoard
+  scheduledSessions: ScheduledSessionsBoard
 }
 
 export type WithBothSessionTypes = {
   type: HomeViewModel.WithBothSessionTypes
   greetings: Greetings
-  activeSessions: {
-    title: SessionBoardTitle.ACTIVE_SESSIONS
-    blockSessions: ViewModelBlockSession[]
-  }
-  scheduledSessions: {
-    title: SessionBoardTitle.SCHEDULED_SESSIONS
-    blockSessions: ViewModelBlockSession[]
-  }
+  activeSessions: ActiveSessionsBoard
+  scheduledSessions: ScheduledSessionsBoard
 }
 
 export type HomeViewModelType =

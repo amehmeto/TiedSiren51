@@ -1,49 +1,72 @@
 import { describe, expect, it } from 'vitest'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import {
+  ForgotPasswordViewModel,
   ForgotPasswordViewState,
   selectForgotPasswordViewModel,
 } from './forgot-password.view-model'
 
 describe('selectForgotPasswordViewModel', () => {
-  it('should return Form state when password reset not sent', () => {
-    const state = stateBuilder().withPasswordResetSent(false).build()
+  describe('Idle state', () => {
+    it('should return idle view model when not loading and no error', () => {
+      const state = stateBuilder().build()
+      const expectedViewModel: ForgotPasswordViewModel = {
+        type: ForgotPasswordViewState.Idle,
+        buttonText: 'SEND RESET LINK',
+        isInputDisabled: false,
+        error: null,
+      }
 
-    const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state)
 
-    expect(viewModel.type).toBe(ForgotPasswordViewState.Form)
+      expect(viewModel).toStrictEqual(expectedViewModel)
+    })
   })
 
-  it('should return Success state when password reset sent', () => {
-    const state = stateBuilder().withPasswordResetSent(true).build()
+  describe('Loading state', () => {
+    it('should return loading view model when auth is loading', () => {
+      const state = stateBuilder().withAuthLoading(true).build()
+      const expectedViewModel: ForgotPasswordViewModel = {
+        type: ForgotPasswordViewState.Loading,
+        buttonText: 'SENDING...',
+        isInputDisabled: true,
+        error: null,
+      }
 
-    const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state)
 
-    expect(viewModel.type).toBe(ForgotPasswordViewState.Success)
+      expect(viewModel).toStrictEqual(expectedViewModel)
+    })
   })
 
-  it('should disable input when loading', () => {
-    const state = stateBuilder().withAuthLoading(true).build()
-    const expectedViewModel = {
-      type: ForgotPasswordViewState.Form,
-      isInputDisabled: true,
-      buttonText: 'SENDING...',
-    }
+  describe('Error state', () => {
+    it('should return error view model when error is present', () => {
+      const state = stateBuilder()
+        .withAuthError({ message: 'No account found' })
+        .build()
+      const expectedViewModel: ForgotPasswordViewModel = {
+        type: ForgotPasswordViewState.Error,
+        buttonText: 'SEND RESET LINK',
+        isInputDisabled: false,
+        error: 'No account found',
+      }
 
-    const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state)
 
-    expect(viewModel).toMatchObject(expectedViewModel)
+      expect(viewModel).toStrictEqual(expectedViewModel)
+    })
   })
 
-  it('should show error when present', () => {
-    const state = stateBuilder().withAuthError('No account found').build()
-    const expectedViewModel = {
-      type: ForgotPasswordViewState.Form,
-      error: 'No account found',
-    }
+  describe('Success state', () => {
+    it('should return success view model when password reset sent', () => {
+      const state = stateBuilder().withPasswordResetSent(true).build()
+      const expectedViewModel: ForgotPasswordViewModel = {
+        type: ForgotPasswordViewState.Success,
+      }
 
-    const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state)
 
-    expect(viewModel).toMatchObject(expectedViewModel)
+      expect(viewModel).toStrictEqual(expectedViewModel)
+    })
   })
 })

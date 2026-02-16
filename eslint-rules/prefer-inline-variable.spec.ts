@@ -264,6 +264,16 @@ console.log(result)`,
           code: `const result = (getFunc())()
 console.log(result)`,
         },
+        // Dispatch transparent wrapper: don't inline when it would make inner call long
+        {
+          code: `const website = event.nativeEvent.text
+dispatch(addWebsiteToSirens(website))`,
+        },
+        // Dispatch via member expression: don't inline
+        {
+          code: `const payload = { id: blocklist.id, name: inputText }
+store.dispatch(duplicateBlocklist(payload))`,
+        },
       ],
 
       invalid: [

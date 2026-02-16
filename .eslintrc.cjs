@@ -94,6 +94,8 @@ module.exports = {
     'local-rules/time-constant-multiplication': 'error',
     'local-rules/try-catch-isolation': 'error',
     'local-rules/inline-single-statement-handlers': 'error',
+    // Components should not check thunk results — use state-driven UI
+    'local-rules/no-thunk-result-in-component': 'error',
     // Error handling convention rules
     'local-rules/no-try-catch-in-core': 'error',
     'local-rules/listener-error-handling': 'error',
@@ -103,6 +105,7 @@ module.exports = {
     'local-rules/require-logger-in-catch': 'error',
     'local-rules/file-naming-convention': 'error',
     'local-rules/no-index-in-core': 'error',
+    'local-rules/no-inline-import-type': 'error',
     'local-rules/selector-matches-filename': 'error',
     'local-rules/usecase-matches-filename': 'error',
     'local-rules/no-cross-layer-imports': 'error',
@@ -137,6 +140,7 @@ module.exports = {
           'BlocklistViewModel',
           'HomeViewModel',
           'BlocklistTabKey',
+          'TabScreens',
         ],
       },
     ],
@@ -184,6 +188,18 @@ module.exports = {
     'local-rules/no-enum-value-as-string-literal': 'error',
     // Prefer ternary over complementary && conditions in JSX
     'local-rules/prefer-ternary-jsx': 'error',
+    // Extract long function arguments into named variables for readability
+    'local-rules/prefer-extracted-long-params': [
+      'error',
+      {
+        exemptFunctions: ['createTestStore'],
+        transparentWrappers: ['dispatch'],
+      },
+    ],
+    // Extract inline object types into named type aliases
+    'local-rules/no-inline-object-type': 'error',
+    // Disallow overly generic variable and function names
+    'local-rules/no-lame-naming': 'warn',
     // Prefer enum over string literal unions
     'local-rules/prefer-enum-over-string-union': [
       'error',
@@ -279,6 +295,8 @@ module.exports = {
         'local-rules/no-new-in-test-body': 'error',
         'local-rules/use-data-builders': 'error',
         'local-rules/no-generic-result-variable': 'warn',
+        // Require type parameter on it.each / test.each / describe.each
+        'local-rules/require-typed-each': 'error',
       },
     },
     // No data builders in production code

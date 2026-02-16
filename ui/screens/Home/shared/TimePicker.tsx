@@ -5,7 +5,7 @@ import { HHmmString } from '@/core/_ports_/date-provider'
 import { T } from '@/ui/design-system/theme'
 import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
 
-type TimePickerProps = Readonly<{
+type TimePickerFields = {
   isVisible: boolean
   chosenTimeAsDate: Date
   onConfirm: (date: Date) => void
@@ -14,7 +14,9 @@ type TimePickerProps = Readonly<{
   handleChange: () => void
   setTime: (time: HHmmString) => void
   setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
-}>
+}
+
+type TimePickerProps = Readonly<TimePickerFields>
 
 export function TimePicker({
   isVisible,

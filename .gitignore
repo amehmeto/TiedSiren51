@@ -47,6 +47,7 @@ yarn-error.*
 
 # Coverage - generated files, base coverage is cached via GitHub Actions
 coverage/*
+**/coverage/*
 coverage-history.json
 
 # Android
@@ -98,6 +99,7 @@ GoogleService-Info.plist
 .claude-init.sh
 .claude-issue-prompt.md
 .claude/ralph-loop.local.md
+.claude/ralph-prompt.md
 
 # Git worktrees (nested inside repo for Claude Code compatibility)
 .worktrees/

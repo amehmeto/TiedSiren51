@@ -9,11 +9,13 @@ type IconName =
   | 'copy-outline'
   | 'trash-outline'
 
-type TiedSMenuOptionProps = Readonly<{
+type TiedSMenuOptionOwnProps = {
   optionName: string
   iconName: IconName
   isDisabled?: boolean
-}>
+}
+
+type TiedSMenuOptionProps = Readonly<TiedSMenuOptionOwnProps>
 
 export function TiedSMenuOption({
   optionName,

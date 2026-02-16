@@ -2,12 +2,14 @@ import { ReactNode } from 'react'
 import { Pressable, StyleProp, StyleSheet, Text, ViewStyle } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
-type TiedSButtonProps = Readonly<{
+type TiedSButtonOwnProps = {
   onPress: () => void
   text: string | ReactNode
   style?: StyleProp<ViewStyle>
   isDisabled?: boolean
-}>
+}
+
+type TiedSButtonProps = Readonly<TiedSButtonOwnProps>
 
 export function TiedSButton({
   onPress,

@@ -7,12 +7,10 @@ const path = require('path')
 
 console.log('=== setup-google-services.js ===')
 console.log('Current directory:', process.cwd())
-console.log(
-  'Environment variables available:',
-  Object.keys(process.env).filter(
-    (k) => k.includes('GOOGLE') || k.includes('EAS'),
-  ),
+const googleOrEasEnvVars = Object.keys(process.env).filter(
+  (k) => k.includes('GOOGLE') || k.includes('EAS'),
 )
+console.log('Environment variables available:', googleOrEasEnvVars)
 
 const googleServicesJson = process.env.GOOGLE_SERVICES_JSON
 const expoRouterAppRoot = process.env.EXPO_ROUTER_APP_ROOT
@@ -38,7 +36,8 @@ if (googleServicesJson.startsWith('$')) {
 try {
   console.log('🔨 Decoding GOOGLE_SERVICES_JSON...')
   console.log('   Base64 length:', googleServicesJson.length)
-  console.log('   Base64 preview:', googleServicesJson.substring(0, 50) + '...')
+  const base64Preview = googleServicesJson.substring(0, 50) + '...'
+  console.log('   Base64 preview:', base64Preview)
 
   const decoded = Buffer.from(googleServicesJson, 'base64').toString('utf-8')
   const targetPath = path.join(process.cwd(), 'google-services.json')

@@ -26,12 +26,14 @@ describe('startTimer use case', () => {
     fixture.then.timerShouldBeStoredAs('2024-01-01T00:30:00.000Z')
   })
 
-  it.each<{
+  type StartTimerErrorCase = {
     scenario: string
     given: () => void
     payload: StartTimerPayload
     expectedError: string
-  }>([
+  }
+
+  it.each<StartTimerErrorCase>([
     {
       scenario: 'duration is zero',
       given: () => fixture.given.authenticatedUser(),

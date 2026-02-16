@@ -18,12 +18,14 @@ import { T } from '@/ui/design-system/theme'
 import { BlocklistDeletionConfirmationModal } from '@/ui/screens/Blocklists/BlocklistDeletionConfirmationModal'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 
+type BlocklistCardSummary = {
+  id: string
+  name: string
+  totalBlocks: string
+}
+
 type BlocklistCardProps = Readonly<{
-  blocklist: {
-    id: string
-    name: string
-    totalBlocks: string
-  }
+  blocklist: BlocklistCardSummary
 }>
 
 export function BlocklistCard({ blocklist }: BlocklistCardProps) {
@@ -125,7 +127,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
           setRenameModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(renameBlocklist({ id: blocklist.id, name: inputText }))
+          const payload = { id: blocklist.id, name: inputText }
+          dispatch(renameBlocklist(payload))
           setRenameModalVisible(false)
         }}
       />
@@ -140,7 +143,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
           setIsDuplicateModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(duplicateBlocklist({ id: blocklist.id, name: inputText }))
+          const payload = { id: blocklist.id, name: inputText }
+          dispatch(duplicateBlocklist(payload))
           setIsDuplicateModalVisible(false)
         }}
       />

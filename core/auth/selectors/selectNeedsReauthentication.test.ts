@@ -5,6 +5,12 @@ import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { selectNeedsReauthentication } from './selectNeedsReauthentication'
 
+type ReauthenticationCase = {
+  scenario: string
+  lastReauthenticatedAt: string
+  shouldNeedReauth: boolean
+}
+
 describe('selectNeedsReauthentication', () => {
   let dateProvider: StubDateProvider
 
@@ -27,7 +33,7 @@ describe('selectNeedsReauthentication', () => {
     expect(shouldReauthenticate).toBe(true)
   })
 
-  test.each([
+  test.each<ReauthenticationCase>([
     {
       scenario: 'within 5 minutes',
       lastReauthenticatedAt: '2024-01-15T10:01:00.000Z',

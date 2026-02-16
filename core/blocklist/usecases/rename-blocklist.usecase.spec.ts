@@ -21,17 +21,11 @@ describe('Feature: Creating a blocklist', () => {
       name: 'Focus',
     })
 
-    fixture.then.blocklistShouldBeStoredAs(
-      buildBlocklist({
-        ...givenBlocklist,
-        name: 'Focus',
-      }),
-    )
-    fixture.then.blocklistShouldBeSavedInRepositoryAs(
-      buildBlocklist({
-        ...givenBlocklist,
-        name: 'Focus',
-      }),
-    )
+    const expectedRenamedBlocklist = buildBlocklist({
+      ...givenBlocklist,
+      name: 'Focus',
+    })
+    fixture.then.blocklistShouldBeStoredAs(expectedRenamedBlocklist)
+    fixture.then.blocklistShouldBeSavedInRepositoryAs(expectedRenamedBlocklist)
   })
 })

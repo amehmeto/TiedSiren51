@@ -11,12 +11,14 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
 
-type BlocklistsModalProps = Readonly<{
+type BlocklistsModalFields = {
   isVisible: boolean
   currentSelections: string[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: string[]) => void
-}>
+}
+
+type BlocklistsModalProps = Readonly<BlocklistsModalFields>
 
 export function BlocklistsModal({
   isVisible,
@@ -26,9 +28,7 @@ export function BlocklistsModal({
 }: BlocklistsModalProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
-  const blocklists = useSelector((state: RootState) =>
-    selectAllBlocklists(state),
-  )
+  const blocklists = useSelector(selectAllBlocklists)
   const isStrictModeActive = useSelector((state: RootState) =>
     selectIsStrictModeActive(state, dependencies.dateProvider),
   )
@@ -49,7 +49,8 @@ export function BlocklistsModal({
 
   function toggleBlocklist(blocklistId: string, isNowSelected: boolean) {
     if (!isNowSelected && lockedBlocklistIds.includes(blocklistId)) {
-      dispatch(showToast('Cannot remove blocklist during strict mode'))
+      const lockedMessage = 'Cannot remove blocklist during strict mode'
+      dispatch(showToast(lockedMessage))
       return
     }
     const newSelections = isNowSelected

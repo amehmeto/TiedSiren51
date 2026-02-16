@@ -1,4 +1,5 @@
 import { beforeEach, describe, it } from 'vitest'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { authentificationFixture } from '@/core/auth/authentification.fixture'
 
 describe('Feature: Authenticate with Email', () => {
@@ -13,7 +14,6 @@ describe('Feature: Authenticate with Email', () => {
       {
         id: 'auth-user-id',
         email: 'amehmeto@gmail.com',
-        isEmailVerified: true,
         username: 'Arthur',
       },
       'validPass123',
@@ -24,18 +24,22 @@ describe('Feature: Authenticate with Email', () => {
     fixture.then.userShouldBeAuthenticated({
       id: 'auth-user-id',
       email: 'amehmeto@gmail.com',
-      isEmailVerified: true,
       username: 'Arthur',
     })
     fixture.then.authShouldNotBeLoading()
   })
 
   it('does not authenticate user when credentials are invalid', async () => {
-    fixture.given.authGatewayWillRejectWith('Invalid credentials')
+    fixture.given.authGatewayWillRejectWith(
+      'Invalid credentials',
+      AuthErrorType.Credential,
+    )
 
     await fixture.when.signInWithEmail('amehmeto@gmail.com', 'wrongPassword!')
 
     fixture.then.authenticationErrorsShouldBe('Invalid credentials')
+    fixture.then.authErrorTypeShouldBe(AuthErrorType.Credential)
+    fixture.then.passwordShouldBeCleared()
     fixture.then.authShouldNotBeLoading()
   })
 

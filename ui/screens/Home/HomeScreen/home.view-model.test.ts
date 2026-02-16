@@ -13,13 +13,15 @@ import {
 } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 
+type FixedTestDateParams = {
+  hours?: number
+  minutes?: number
+}
+
 function createFixedTestDate({
   hours = 0,
   minutes = 0,
-}: {
-  hours?: number
-  minutes?: number
-}): Date {
+}: FixedTestDateParams): Date {
   const date = new Date('2024-01-01T00:00:00')
   date.setHours(hours, minutes, 0, 0)
   return date
@@ -32,7 +34,7 @@ describe('Home View Model', () => {
     dateProvider = new StubDateProvider()
   })
 
-  test.each([
+  test.each<[string, PreloadedState, unknown, FixedTestDateParams]>([
     [
       'no session',
       {},
@@ -457,7 +459,7 @@ describe('Home View Model', () => {
       _,
       preloadedState: PreloadedState,
       expectedViewModel,
-      nowTime: { hours: number; minutes: number },
+      nowTime: FixedTestDateParams,
     ) => {
       const store = createTestStore({}, preloadedState)
       const now = createFixedTestDate(nowTime)
@@ -473,7 +475,7 @@ describe('Home View Model', () => {
     },
   )
 
-  it.each([
+  it.each<[Greetings, string, string]>([
     [Greetings.GoodMorning, 'from 06:00 to 11:59', '06:00'],
     [Greetings.GoodMorning, 'from 06 to 11:59', '08:50'],
     [Greetings.GoodMorning, 'from 06 to 11:59', '11:59'],

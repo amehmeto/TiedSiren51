@@ -1,4 +1,5 @@
 import { beforeEach, describe, it } from 'vitest'
+import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { authentificationFixture } from '@/core/auth/authentification.fixture'
 
 describe('Feature: Log out', () => {
@@ -12,12 +13,31 @@ describe('Feature: Log out', () => {
     fixture.given.authUserIs({
       id: 'fake-joe-id',
       email: 'joe@gmail.com',
-      isEmailVerified: true,
       username: 'Joe',
     })
 
     await fixture.when.logOut()
 
     fixture.then.userShouldNotBeAuthenticated()
+  })
+
+  it('should surface error when log out fails', async () => {
+    fixture.given.authUserIs({
+      id: 'fake-joe-id',
+      email: 'joe@gmail.com',
+      username: 'Joe',
+    })
+    fixture.given.logOutWillRejectWith(
+      'No internet connection. Please check your network and try again.',
+      AuthErrorType.Network,
+    )
+
+    await fixture.when.logOut()
+
+    fixture.then.authenticationErrorsShouldBe(
+      'No internet connection. Please check your network and try again.',
+    )
+    fixture.then.authErrorTypeShouldBe(AuthErrorType.Network)
+    fixture.then.authShouldNotBeLoading()
   })
 })
