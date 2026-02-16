@@ -28,7 +28,7 @@ import { AuthGateway } from '@/core/_ports_/auth.gateway'
 import { Logger } from '@/core/_ports_/logger'
 import { AuthError } from '@/core/auth/auth-error'
 import { AuthErrorType } from '@/core/auth/auth-error-type'
-import { AuthUser } from '@/core/auth/auth-user'
+import { AuthProvider, AuthUser } from '@/core/auth/auth-user'
 import { FirebaseAuthErrorCode } from './firebase.auth-error-code'
 import { FIREBASE_ERROR_TYPES } from './firebase.auth-error-types'
 import { FIREBASE_ERRORS } from './firebase.auth-errors'
@@ -102,12 +102,27 @@ export class FirebaseAuthGateway implements AuthGateway {
     }
   }
 
+  private mapProviderId(providerId: string): AuthProvider {
+    const providerMap: Record<string, AuthProvider> = {
+      'google.com': AuthProvider.Google,
+      'apple.com': AuthProvider.Apple,
+      password: AuthProvider.Email,
+    }
+    return providerMap[providerId] ?? AuthProvider.Email
+  }
+
+  private getAuthProvider(user: User): AuthProvider {
+    const extracted = user.providerData[0]?.providerId ?? 'password'
+    return this.mapProviderId(extracted)
+  }
+
   private setupAuthStateListener(): void {
     onAuthStateChanged(this.auth, (user: User | null) => {
       if (user && this.onUserLoggedInListener) {
         this.onUserLoggedInListener({
           id: user.uid,
           email: user.email ?? '',
+          authProvider: this.getAuthProvider(user),
         })
         return
       }
@@ -162,6 +177,26 @@ export class FirebaseAuthGateway implements AuthGateway {
     }
   }
 
+  async reauthenticateWithGoogle(): Promise<void> {
+    try {
+      const user = this.auth.currentUser
+      if (!user) throw new Error('No authenticated user found.')
+
+      await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
+      const userInfo = await GoogleSignin.signIn()
+      const idToken = userInfo.idToken
+      if (!idToken) throw new Error(GoogleSignInError.MissingIdToken)
+
+      const googleCredential = GoogleAuthProvider.credential(idToken)
+      await reauthenticateWithCredential(user, googleCredential)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to reauthenticateWithGoogle: ${error}`,
+      )
+      throw this.toAuthError(error)
+    }
+  }
+
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
     try {
       const result = await signInWithEmailAndPassword(
@@ -172,6 +207,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       return {
         id: result.user.uid,
         email: result.user.email ?? '',
+        authProvider: this.getAuthProvider(result.user),
       }
     } catch (error) {
       this.logger.error(
@@ -191,6 +227,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       return {
         id: result.user.uid,
         email: result.user.email ?? '',
+        authProvider: this.getAuthProvider(result.user),
       }
     } catch (error) {
       this.logger.error(
@@ -219,6 +256,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         email: credential.user.email ?? '',
         username: credential.user.displayName ?? undefined,
         profilePicture: credential.user.photoURL ?? undefined,
+        authProvider: this.getAuthProvider(credential.user),
       }
     } catch (error) {
       this.logger.error(

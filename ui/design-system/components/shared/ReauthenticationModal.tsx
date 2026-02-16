@@ -1,13 +1,13 @@
-import { useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
+import { AuthProvider } from '@/core/auth/auth-user'
 import { clearReauthError } from '@/core/auth/reducer'
 import { selectReauthStatus } from '@/core/auth/selectors/selectReauthStatus'
-import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
+import { GoogleReauthForm } from '@/ui/design-system/components/shared/GoogleReauthForm'
+import { PasswordReauthForm } from '@/ui/design-system/components/shared/PasswordReauthForm'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
-import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 
 type ReauthenticationModalProps = Readonly<{
@@ -22,48 +22,33 @@ export function ReauthenticationModal({
   onSuccess,
 }: ReauthenticationModalProps) {
   const dispatch = useDispatch<AppDispatch>()
-  const { isReauthenticating, reauthError } = useSelector(selectReauthStatus)
-  const [password, setPassword] = useState('')
-
-  const handleConfirm = async () => {
-    const result = await dispatch(reauthenticate({ password }))
-    if (reauthenticate.fulfilled.match(result)) {
-      setPassword('')
-      onSuccess()
-    }
-  }
+  const { reauthError } = useSelector(selectReauthStatus)
+  const authProvider = useSelector(
+    (state: RootState) => state.auth.authUser?.authProvider,
+  )
 
   const handleClose = () => {
-    setPassword('')
     dispatch(clearReauthError())
     onRequestClose()
   }
+
+  const isGoogleProvider = authProvider === AuthProvider.Google
 
   return (
     <TiedSModal isVisible={isVisible} onRequestClose={handleClose}>
       <View style={styles.container}>
         <Text style={styles.title}>Confirm your identity</Text>
-        <Text style={styles.description}>
-          Please enter your password to continue.
-        </Text>
-        <TiedSTextInput
-          label="Password"
-          hasPasswordToggle
-          value={password}
-          onChangeText={setPassword}
-          placeholder="Enter your password"
-        />
+        {isGoogleProvider ? (
+          <GoogleReauthForm onSuccess={onSuccess} />
+        ) : (
+          <PasswordReauthForm onSuccess={onSuccess} />
+        )}
         {reauthError && <Text style={styles.error}>{reauthError}</Text>}
         <View style={styles.buttonContainer}>
           <TiedSButton
             style={styles.cancelButton}
             onPress={handleClose}
             text="Cancel"
-          />
-          <TiedSButton
-            onPress={handleConfirm}
-            text="Confirm"
-            isDisabled={isReauthenticating || password.length === 0}
           />
         </View>
       </View>
@@ -82,12 +67,6 @@ const styles = StyleSheet.create({
     fontWeight: T.font.weight.bold,
     textAlign: 'center',
     marginBottom: T.spacing.small,
-  },
-  description: {
-    color: T.color.text,
-    fontSize: T.font.size.regular,
-    textAlign: 'center',
-    marginBottom: T.spacing.medium,
   },
   error: {
     color: T.color.red,
