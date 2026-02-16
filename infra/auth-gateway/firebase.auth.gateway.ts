@@ -199,15 +199,15 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   async signInWithEmail(email: string, password: string): Promise<AuthUser> {
     try {
-      const result = await signInWithEmailAndPassword(
+      const signInResponse = await signInWithEmailAndPassword(
         this.auth,
         email,
         password,
       )
       return {
-        id: result.user.uid,
-        email: result.user.email ?? '',
-        authProvider: this.getAuthProvider(result.user),
+        id: signInResponse.user.uid,
+        email: signInResponse.user.email ?? '',
+        authProvider: this.getAuthProvider(signInResponse.user),
       }
     } catch (error) {
       this.logger.error(
@@ -219,15 +219,15 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   async signUpWithEmail(email: string, password: string): Promise<AuthUser> {
     try {
-      const result = await createUserWithEmailAndPassword(
+      const signUpResponse = await createUserWithEmailAndPassword(
         this.auth,
         email,
         password,
       )
       return {
-        id: result.user.uid,
-        email: result.user.email ?? '',
-        authProvider: this.getAuthProvider(result.user),
+        id: signUpResponse.user.uid,
+        email: signUpResponse.user.email ?? '',
+        authProvider: this.getAuthProvider(signUpResponse.user),
       }
     } catch (error) {
       this.logger.error(

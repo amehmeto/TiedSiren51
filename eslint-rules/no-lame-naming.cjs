@@ -8,7 +8,7 @@
  * @author TiedSiren
  */
 
-const DEFAULT_FORBIDDEN_VARIABLES = ['data', 'extracted', 'item', 'items']
+const DEFAULT_FORBIDDEN_VARIABLES = ['data', 'extracted', 'item', 'items', 'result']
 const DEFAULT_FORBIDDEN_FUNCTION_PATTERNS = ['compute']
 
 module.exports = {
