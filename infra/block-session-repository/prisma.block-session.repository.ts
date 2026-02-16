@@ -200,14 +200,13 @@ export class PrismaBlockSessionRepository
       const sessions = await this.baseClient.blockSession.findMany({
         select: { id: true },
       })
-      await Promise.all(
-        sessions.map((s) =>
-          this.baseClient.blockSession.update({
-            where: { id: s.id },
-            data: { blocklists: { set: [] }, devices: { set: [] } },
-          }),
-        ),
+      const disconnectRelations = sessions.map((s) =>
+        this.baseClient.blockSession.update({
+          where: { id: s.id },
+          data: { blocklists: { set: [] }, devices: { set: [] } },
+        }),
       )
+      await Promise.all(disconnectRelations)
       await this.baseClient.blockSession.deleteMany()
     } catch (error) {
       this.logger.error(
