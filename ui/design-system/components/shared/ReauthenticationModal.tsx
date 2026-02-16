@@ -10,11 +10,13 @@ import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 
-type ReauthenticationModalProps = Readonly<{
+type ReauthenticationModalOwnProps = {
   isVisible: boolean
   onRequestClose: () => void
   onSuccess: () => void
-}>
+}
+
+type ReauthenticationModalProps = Readonly<ReauthenticationModalOwnProps>
 
 export function ReauthenticationModal({
   isVisible,

@@ -17,12 +17,14 @@ describe('extendTimer use case', () => {
     fixture.then.timerShouldBeStoredAs('2024-01-01T01:30:00.000Z')
   })
 
-  it.each<{
+  type ExtendTimerErrorCase = {
     scenario: string
     given: () => void
     payload: ExtendTimerPayload
     expectedError: string
-  }>([
+  }
+
+  it.each<ExtendTimerErrorCase>([
     {
       scenario: 'no active timer exists',
       given: () => fixture.given.noTimer(),

@@ -4,14 +4,16 @@ import { T } from '@/ui/design-system/theme'
 
 const DELETE_CONFIRMATION = 'DELETE'
 
-type DeleteAccountFormProps = Readonly<{
+type DeleteAccountFormFields = {
   confirmText: string
   isDeleteDisabled: boolean
   buttonText: string
   deleteAccountError: string | null
   onConfirmTextChange: (text: string) => void
   onDeleteAccount: () => void
-}>
+}
+
+type DeleteAccountFormProps = Readonly<DeleteAccountFormFields>
 
 export function DeleteAccountForm({
   confirmText,

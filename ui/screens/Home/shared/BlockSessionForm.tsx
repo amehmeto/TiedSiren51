@@ -33,8 +33,12 @@ const defaultFormValues: BlockSessionFormValues = {
   blockingConditions: [],
 }
 
+type BlockSessionFormCreateMode = { mode: 'create' }
+
+type BlockSessionFormEditMode = { mode: 'edit'; sessionId: string }
+
 type BlockSessionFormProps = Readonly<
-  { mode: 'create' } | { mode: 'edit'; sessionId: string }
+  BlockSessionFormCreateMode | BlockSessionFormEditMode
 >
 
 export function BlockSessionForm({ mode, ...rest }: BlockSessionFormProps) {

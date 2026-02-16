@@ -2,10 +2,12 @@ import { Ionicons } from '@expo/vector-icons'
 import { Pressable, StyleSheet } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
-type PasswordToggleProps = Readonly<{
+type PasswordToggleOwnProps = {
   isPasswordShown: boolean
   onToggle: () => void
-}>
+}
+
+type PasswordToggleProps = Readonly<PasswordToggleOwnProps>
 
 export function PasswordToggle({
   isPasswordShown,

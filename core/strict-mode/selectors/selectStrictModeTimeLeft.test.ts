@@ -5,6 +5,20 @@ import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { selectStrictModeTimeLeft } from './selectStrictModeTimeLeft'
 
+type TimeLeftExpectation = {
+  days: number
+  hours: number
+  minutes: number
+  seconds: number
+  totalMs: number
+}
+
+type StrictModeTimeLeftCase = {
+  description: string
+  remainingMs: number
+  expected: TimeLeftExpectation
+}
+
 describe('selectStrictModeTimeLeft', () => {
   let dateProvider: StubDateProvider
   let nowMs: number
@@ -52,17 +66,7 @@ describe('selectStrictModeTimeLeft', () => {
     expect(timeLeft).toStrictEqual(expectedTimeLeft)
   })
 
-  test.each<{
-    description: string
-    remainingMs: number
-    expected: {
-      days: number
-      hours: number
-      minutes: number
-      seconds: number
-      totalMs: number
-    }
-  }>([
+  test.each<StrictModeTimeLeftCase>([
     {
       description: '1 hour',
       remainingMs: 1 * HOUR,

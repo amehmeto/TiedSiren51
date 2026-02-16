@@ -7,7 +7,7 @@ import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextIn
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 
-type ChooseNameProps = Readonly<{
+type ChooseNameFields = {
   values: BlockSessionFormValues
   onChange: (text: string) => void
   onBlur: () => (e: React.FocusEvent) => void
@@ -16,7 +16,9 @@ type ChooseNameProps = Readonly<{
     value: string,
     shouldValidate?: boolean,
   ) => Promise<void | FormikErrors<BlockSessionFormValues>>
-}>
+}
+
+type ChooseNameProps = Readonly<ChooseNameFields>
 
 export function ChooseName({
   values,

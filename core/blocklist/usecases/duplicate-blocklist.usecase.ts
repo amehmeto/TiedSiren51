@@ -1,9 +1,11 @@
 import { createAppAsyncThunk } from '../../_redux_/create-app-thunk'
 
+type DuplicateBlocklistPayload = { id: string; name: string }
+
 export const duplicateBlocklist = createAppAsyncThunk(
   'blocklist/duplicateBlocklist',
   async (
-    payload: { id: string; name: string },
+    payload: DuplicateBlocklistPayload,
     { extra: { blocklistRepository } },
   ) => {
     const blocklistToBeCopied = await blocklistRepository.findById(payload.id)

@@ -15,12 +15,15 @@ import {
 import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
 
-type AppsSelectionSceneProps = Readonly<{
-  toggleAppSiren: (sirenType: SirenType.ANDROID, app: AndroidSiren) => void
-  isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
-  mode: FormMode
-  blocklistId?: string
-}>
+type AppsSelectionSceneProps = {
+  readonly toggleAppSiren: (
+    sirenType: SirenType.ANDROID,
+    app: AndroidSiren,
+  ) => void
+  readonly isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
+  readonly mode: FormMode
+  readonly blocklistId?: string
+}
 
 export function AppsSelectionScene({
   toggleAppSiren,

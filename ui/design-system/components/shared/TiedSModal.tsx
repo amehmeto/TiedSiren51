@@ -3,12 +3,14 @@ import { Dimensions, Modal, StyleSheet, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { TiedSCard } from './TiedSCard'
 
-type TiedSModalProps = Readonly<{
+type TiedSModalOwnProps = {
   isVisible: boolean
   children: React.ReactNode
   onRequestClose: () => void
   style?: Record<string, unknown>
-}>
+}
+
+type TiedSModalProps = Readonly<TiedSModalOwnProps>
 
 export function TiedSModal({
   isVisible,

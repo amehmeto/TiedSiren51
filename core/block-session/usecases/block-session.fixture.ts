@@ -22,6 +22,14 @@ import { duplicateBlockSession } from './duplicate-block-session.usecase'
 import { renameBlockSession } from './rename-block-session.usecase'
 import { updateBlockSession } from './update-block-session.usecase'
 
+type DuplicatePayload = { name: string; id: string }
+type RenamePayload = { name: string; id: string }
+type ExpectedNotification = {
+  title: string
+  body: string
+  trigger: NotificationTrigger
+}
+
 export function blockSessionFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ): Fixture {
@@ -55,10 +63,9 @@ export function blockSessionFixture(
         })
         await store.dispatch(createBlockSession(payload))
       },
-      duplicatingBlockSession: async (toBeDuplicatedPayload: {
-        name: string
-        id: string
-      }) => {
+      duplicatingBlockSession: async (
+        toBeDuplicatedPayload: DuplicatePayload,
+      ) => {
         store = createTestStore(
           {
             blockSessionRepository,
@@ -69,10 +76,7 @@ export function blockSessionFixture(
         )
         await store.dispatch(duplicateBlockSession(toBeDuplicatedPayload))
       },
-      renamingBlockSession: async (toBeRenamedPayload: {
-        name: string
-        id: string
-      }) => {
+      renamingBlockSession: async (toBeRenamedPayload: RenamePayload) => {
         store = createTestStore(
           {
             blockSessionRepository,
@@ -132,11 +136,7 @@ export function blockSessionFixture(
         expect(retrievedBlockSession).toBeUndefined()
       },
       notificationsShouldBeScheduled(
-        expectedNotification: {
-          title: string
-          body: string
-          trigger: NotificationTrigger
-        }[],
+        expectedNotification: ExpectedNotification[],
       ) {
         const lastScheduled = notificationService.lastScheduledNotification
         expect(lastScheduled).toEqual(expectedNotification)

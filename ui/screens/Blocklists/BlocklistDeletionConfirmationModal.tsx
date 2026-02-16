@@ -4,14 +4,14 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
 
-type BlocklistDeletionConfirmationModalProps = Readonly<{
-  isVisible: boolean
-  blocklistName: string
-  activeSessions: BlockSession[]
-  onRequestClose: () => void
-  onCancel: () => void
-  onConfirm: () => void
-}>
+type BlocklistDeletionConfirmationModalProps = {
+  readonly isVisible: boolean
+  readonly blocklistName: string
+  readonly activeSessions: BlockSession[]
+  readonly onRequestClose: () => void
+  readonly onCancel: () => void
+  readonly onConfirm: () => void
+}
 
 export function BlocklistDeletionConfirmationModal({
   isVisible,

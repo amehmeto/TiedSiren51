@@ -7,6 +7,18 @@ import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { BlockSession } from '@/core/block-session/block-session'
 import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
 
+type DbBlocklist = {
+  id: string
+  name: string
+  sirens: string
+}
+
+type DbDevice = {
+  id: string
+  type: string
+  name: string
+}
+
 type DbBlockSession = {
   id: string
   name: string
@@ -15,16 +27,8 @@ type DbBlockSession = {
   startNotificationId: string
   endNotificationId: string
   blockingConditions: string
-  blocklists: {
-    id: string
-    name: string
-    sirens: string
-  }[]
-  devices: {
-    id: string
-    type: string
-    name: string
-  }[]
+  blocklists: DbBlocklist[]
+  devices: DbDevice[]
 }
 
 export class PrismaBlockSessionRepository
