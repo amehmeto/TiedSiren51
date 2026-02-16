@@ -1,11 +1,19 @@
-import { describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { stateBuilder } from '@/core/_tests_/state-builder'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import {
   DeleteAccountViewState,
   selectDeleteAccountViewModel,
 } from './delete-account.view-model'
 
 describe('selectDeleteAccountViewModel', () => {
+  let dateProvider: StubDateProvider
+
+  beforeEach(() => {
+    dateProvider = new StubDateProvider()
+    dateProvider.now = new Date('2026-02-15T20:03:00.000Z')
+  })
+
   it('should return Form state when user is authenticated', () => {
     const state = stateBuilder()
       .withAuthUser({ id: 'user-id', email: 'user@test.com' })
@@ -21,7 +29,7 @@ describe('selectDeleteAccountViewModel', () => {
       isDeleteDisabled: true,
     }
 
-    const viewModel = selectDeleteAccountViewModel(state)
+    const viewModel = selectDeleteAccountViewModel(state, dateProvider)
 
     expect(viewModel).toStrictEqual(expectedViewModel)
   })
@@ -29,12 +37,12 @@ describe('selectDeleteAccountViewModel', () => {
   it('should return Deleted state when user is null', () => {
     const state = stateBuilder().build()
 
-    const viewModel = selectDeleteAccountViewModel(state)
+    const viewModel = selectDeleteAccountViewModel(state, dateProvider)
 
     expect(viewModel.type).toBe(DeleteAccountViewState.Deleted)
   })
 
-  it('should mark as reauthed when lastReauthenticatedAt is set', () => {
+  it('should mark as reauthed when lastReauthenticatedAt is within 5 minutes', () => {
     const state = stateBuilder()
       .withAuthUser({ id: 'user-id', email: 'user@test.com' })
       .withLastReauthenticatedAt('2026-02-15T20:00:00.000Z')
@@ -44,7 +52,22 @@ describe('selectDeleteAccountViewModel', () => {
       isReauthenticated: true,
     }
 
-    const viewModel = selectDeleteAccountViewModel(state)
+    const viewModel = selectDeleteAccountViewModel(state, dateProvider)
+
+    expect(viewModel).toMatchObject(expectedViewModel)
+  })
+
+  it('should mark as not reauthed when lastReauthenticatedAt is older than 5 minutes', () => {
+    const state = stateBuilder()
+      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withLastReauthenticatedAt('2026-02-15T19:57:00.000Z')
+      .build()
+    const expectedViewModel = {
+      type: DeleteAccountViewState.Form,
+      isReauthenticated: false,
+    }
+
+    const viewModel = selectDeleteAccountViewModel(state, dateProvider)
 
     expect(viewModel).toMatchObject(expectedViewModel)
   })
@@ -61,7 +84,7 @@ describe('selectDeleteAccountViewModel', () => {
       isDeleteDisabled: true,
     }
 
-    const viewModel = selectDeleteAccountViewModel(state)
+    const viewModel = selectDeleteAccountViewModel(state, dateProvider)
 
     expect(viewModel).toMatchObject(expectedViewModel)
   })
@@ -76,7 +99,7 @@ describe('selectDeleteAccountViewModel', () => {
       deleteAccountError: 'Please re-authenticate to perform this action.',
     }
 
-    const viewModel = selectDeleteAccountViewModel(state)
+    const viewModel = selectDeleteAccountViewModel(state, dateProvider)
 
     expect(viewModel).toMatchObject(expectedViewModel)
   })
@@ -93,7 +116,7 @@ describe('selectDeleteAccountViewModel', () => {
       isDeleteDisabled: false,
     }
 
-    const viewModel = selectDeleteAccountViewModel(state)
+    const viewModel = selectDeleteAccountViewModel(state, dateProvider)
 
     expect(viewModel).toMatchObject(expectedViewModel)
   })
@@ -110,7 +133,7 @@ describe('selectDeleteAccountViewModel', () => {
       isDeleteDisabled: true,
     }
 
-    const viewModel = selectDeleteAccountViewModel(state)
+    const viewModel = selectDeleteAccountViewModel(state, dateProvider)
 
     expect(viewModel).toMatchObject(expectedViewModel)
   })
@@ -128,7 +151,7 @@ describe('selectDeleteAccountViewModel', () => {
       buttonText: 'Deleting...',
     }
 
-    const viewModel = selectDeleteAccountViewModel(state)
+    const viewModel = selectDeleteAccountViewModel(state, dateProvider)
 
     expect(viewModel).toMatchObject(expectedViewModel)
   })

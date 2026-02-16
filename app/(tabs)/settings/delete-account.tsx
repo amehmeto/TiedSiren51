@@ -1,9 +1,10 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { setDeleteConfirmText } from '@/core/auth/reducer'
 import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
+import { dependencies } from '@/ui/dependencies'
 import { ReauthenticationModal } from '@/ui/design-system/components/shared/ReauthenticationModal'
 import { T } from '@/ui/design-system/theme'
 import {
@@ -14,9 +15,15 @@ import { DeleteAccountForm } from '@/ui/screens/Settings/DeleteAccountForm'
 import { ReauthPrompt } from '@/ui/screens/Settings/ReauthPrompt'
 
 export default function DeleteAccountScreen() {
-  const viewModel = useSelector(selectDeleteAccountViewModel)
+  const viewModel = useSelector((state: RootState) =>
+    selectDeleteAccountViewModel(state, dependencies.dateProvider),
+  )
   const dispatch = useDispatch<AppDispatch>()
   const [isReauthVisible, setIsReauthVisible] = useState(true)
+
+  useEffect(() => {
+    dispatch(setDeleteConfirmText(''))
+  }, [])
 
   if (viewModel.type === DeleteAccountViewState.Deleted) return null
 

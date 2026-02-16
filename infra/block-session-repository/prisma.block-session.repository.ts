@@ -197,8 +197,18 @@ export class PrismaBlockSessionRepository
 
   async deleteAll(): Promise<void> {
     try {
-      const sessions = await this.baseClient.blockSession.findMany()
-      for (const session of sessions) await this.delete(session.id)
+      const sessions = await this.baseClient.blockSession.findMany({
+        select: { id: true },
+      })
+      await Promise.all(
+        sessions.map((s) =>
+          this.baseClient.blockSession.update({
+            where: { id: s.id },
+            data: { blocklists: { set: [] }, devices: { set: [] } },
+          }),
+        ),
+      )
+      await this.baseClient.blockSession.deleteMany()
     } catch (error) {
       this.logger.error(
         `[PrismaBlockSessionRepository] Failed to delete all block sessions: ${error}`,

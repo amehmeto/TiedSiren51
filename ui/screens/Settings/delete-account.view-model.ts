@@ -1,4 +1,6 @@
+import { DateProvider } from '@/core/_ports_/date-provider'
 import { RootState } from '@/core/_redux_/createStore'
+import { selectNeedsReauthentication } from '@/core/auth/selectors/selectNeedsReauthentication'
 
 const DELETE_CONFIRMATION = 'DELETE'
 
@@ -26,14 +28,10 @@ export type DeleteAccountViewModel = FormViewModel | DeletedViewModel
 
 export function selectDeleteAccountViewModel(
   state: RootState,
+  dateProvider: DateProvider,
 ): DeleteAccountViewModel {
-  const {
-    authUser,
-    isDeletingAccount,
-    deleteAccountError,
-    deleteConfirmText,
-    lastReauthenticatedAt,
-  } = state.auth
+  const { authUser, isDeletingAccount, deleteAccountError, deleteConfirmText } =
+    state.auth
 
   if (!authUser) {
     return {
@@ -45,7 +43,7 @@ export function selectDeleteAccountViewModel(
 
   return {
     type: DeleteAccountViewState.Form,
-    isReauthenticated: lastReauthenticatedAt !== null,
+    isReauthenticated: !selectNeedsReauthentication(state, dateProvider),
     isDeletingAccount,
     deleteAccountError,
     confirmText: deleteConfirmText,

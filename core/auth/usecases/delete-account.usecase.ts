@@ -13,9 +13,11 @@ export const deleteAccount = createAppAsyncThunk(
       },
     },
   ) => {
-    await blockSessionRepository.deleteAll()
-    await blocklistRepository.deleteAll()
-    await sirensRepository.deleteAllSirens()
+    await Promise.all([
+      blockSessionRepository.deleteAll(),
+      blocklistRepository.deleteAll(),
+      sirensRepository.deleteAllSirens(),
+    ])
     await authGateway.deleteAccount()
   },
 )
