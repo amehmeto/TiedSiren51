@@ -53,3 +53,22 @@ npm run graph:view                       # ASCII tree in terminal
 | blocking-overlay | amehmeto/tied-siren-blocking-overlay |
 | expo-accessibility-service | amehmeto/expo-accessibility-service |
 | expo-foreground-service | amehmeto/expo-foreground-service |
+
+### Graph Validation Warnings
+
+| Type | Severity | Action |
+|------|----------|--------|
+| `cycle` | Critical | Manual fix required — break the dependency cycle |
+| `dangling_ref` | Warning | Create the missing issue or remove the reference |
+| `bidirectional_mismatch` | Auto-fixed | Script updates issues automatically |
+
+### Issue Body Dependency Format
+
+When creating issues, add dependencies as YAML or inline:
+
+```yaml
+depends_on: [177, 178]
+blocks: [184]
+```
+
+Or inline: `Depends on #177, #178. Blocks #184.`

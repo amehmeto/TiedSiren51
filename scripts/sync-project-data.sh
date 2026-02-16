@@ -287,6 +287,7 @@ if json_mode:
         "blocked": blocked,
         "recently_done": recently_done[:10],
         "mismatches": mismatches,
+        "board_updates": board_updates,
         "stats": {
             "total_issues": len(main_issues),
             "open": sum(1 for i in main_issues if i["state"] == "OPEN"),
@@ -547,9 +548,12 @@ BOARD_LINE=$(grep "^BOARD_UPDATES:" "$STDERR_FILE" 2>/dev/null || true)
 if [ -n "$BOARD_LINE" ]; then
   BOARD_JSON="${BOARD_LINE#BOARD_UPDATES:}"
 
-  # Fetch project metadata (IDs) once via GraphQL
-  OWNER=$(gh repo view --json owner -q '.owner.login' 2>/dev/null || echo "")
-  if [ -n "$OWNER" ]; then
+  # Resolve repo identity once
+  REPO_NWO=$(gh repo view --json nameWithOwner -q '.nameWithOwner' 2>/dev/null || echo "")
+  OWNER="${REPO_NWO%%/*}"
+
+  if [ -n "$OWNER" ] && [ -n "$REPO_NWO" ]; then
+    # Fetch project metadata (IDs) once via GraphQL
     PROJECT_META=$(gh api graphql -f query="
     {
       user(login: \"$OWNER\") {
@@ -565,46 +569,54 @@ if [ -n "$BOARD_LINE" ]; then
       }
     }" 2>/dev/null || echo "")
 
+    # Parse all IDs in a single Python call
     if [ -n "$PROJECT_META" ]; then
-      PROJECT_ID=$(echo "$PROJECT_META" | python3 -c "import json,sys; print(json.load(sys.stdin)['data']['user']['projectV2']['id'])" 2>/dev/null || echo "")
-      FIELD_ID=$(echo "$PROJECT_META" | python3 -c "import json,sys; print(json.load(sys.stdin)['data']['user']['projectV2']['field']['id'])" 2>/dev/null || echo "")
-      TODO_OPT=$(echo "$PROJECT_META" | python3 -c "
-import json,sys
-opts = json.load(sys.stdin)['data']['user']['projectV2']['field']['options']
-print(next(o['id'] for o in opts if o['name'] == 'Todo'), end='')
-" 2>/dev/null || echo "")
-      IN_PROGRESS_OPT=$(echo "$PROJECT_META" | python3 -c "
-import json,sys
-opts = json.load(sys.stdin)['data']['user']['projectV2']['field']['options']
-print(next(o['id'] for o in opts if o['name'] == 'In Progress'), end='')
-" 2>/dev/null || echo "")
-      DONE_OPT=$(echo "$PROJECT_META" | python3 -c "
-import json,sys
-opts = json.load(sys.stdin)['data']['user']['projectV2']['field']['options']
-print(next(o['id'] for o in opts if o['name'] == 'Done'), end='')
-" 2>/dev/null || echo "")
+      eval "$(echo "$PROJECT_META" | python3 -c "
+import json, sys
+try:
+    d = json.load(sys.stdin)['data']['user']['projectV2']
+    f = d['field']
+    opts = {o['name']: o['id'] for o in f['options']}
+    print(f'PROJECT_ID={d[\"id\"]}')
+    print(f'FIELD_ID={f[\"id\"]}')
+    print(f'TODO_OPT={opts[\"Todo\"]}')
+    print(f'IN_PROGRESS_OPT={opts[\"In Progress\"]}')
+    print(f'DONE_OPT={opts[\"Done\"]}')
+except (KeyError, TypeError):
+    pass
+" 2>/dev/null)"
+    fi
 
-      if [ -n "$PROJECT_ID" ] && [ -n "$FIELD_ID" ]; then
-        echo "📋 Syncing project board..." >&2
-        echo "$BOARD_JSON" | python3 -c "
-import json, sys, subprocess
+    if [ -n "${PROJECT_ID:-}" ] && [ -n "${FIELD_ID:-}" ]; then
+      echo "📋 Syncing project board..." >&2
+      # Pass config via env vars to avoid shell injection in Python source
+      export SYNC_PROJECT_ID="$PROJECT_ID"
+      export SYNC_FIELD_ID="$FIELD_ID"
+      export SYNC_TODO_OPT="$TODO_OPT"
+      export SYNC_IN_PROGRESS_OPT="$IN_PROGRESS_OPT"
+      export SYNC_DONE_OPT="$DONE_OPT"
+      export SYNC_OWNER="$OWNER"
+      export SYNC_REPO_NWO="$REPO_NWO"
+      echo "$BOARD_JSON" | python3 -c "
+import json, os, sys, subprocess
 
 updates = json.load(sys.stdin)
-project_id = '$PROJECT_ID'
-field_id = '$FIELD_ID'
-todo_opt = '$TODO_OPT'
-in_progress_opt = '$IN_PROGRESS_OPT'
-done_opt = '$DONE_OPT'
+project_id = os.environ['SYNC_PROJECT_ID']
+field_id = os.environ['SYNC_FIELD_ID']
+todo_opt = os.environ['SYNC_TODO_OPT']
+in_progress_opt = os.environ['SYNC_IN_PROGRESS_OPT']
+done_opt = os.environ['SYNC_DONE_OPT']
+owner = os.environ['SYNC_OWNER']
+repo_nwo = os.environ['SYNC_REPO_NWO']
 
 for u in updates:
     num = u['number']
     action = u['action']
 
     if action == 'add_todo':
-        # Add issue to project, then set status to Todo
         result = subprocess.run(
-            ['gh', 'project', 'item-add', '1', '--owner', '$OWNER',
-             '--url', f'https://github.com/$OWNER/TiedSiren51/issues/{num}',
+            ['gh', 'project', 'item-add', '1', '--owner', owner,
+             '--url', f'https://github.com/{repo_nwo}/issues/{num}',
              '--format', 'json'],
             capture_output=True, text=True
         )
@@ -649,11 +661,8 @@ for u in updates:
         )
         print(f'  ✅ #{num} → Done', file=sys.stderr)
 "
-      else
-        echo "⚠️  Could not fetch project metadata — board sync skipped" >&2
-      fi
     else
-      echo "⚠️  GraphQL query failed — board sync skipped" >&2
+      echo "⚠️  Could not fetch project metadata — board sync skipped" >&2
     fi
   else
     echo "⚠️  Could not determine repo owner — board sync skipped" >&2
