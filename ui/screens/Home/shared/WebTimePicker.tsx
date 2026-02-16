@@ -2,12 +2,14 @@ import React from 'react'
 import { StyleSheet, View } from 'react-native'
 import { assertHHmmString, HHmmString } from '@/core/_ports_/date-provider'
 
-type WebTimePickerProps = Readonly<{
+type WebTimePickerFields = {
   chosenTime: HHmmString
   setTime: (chosenTime: HHmmString) => void
   handleChange: (field: string) => void
   setIsTimePickerVisible: (value: React.SetStateAction<boolean>) => void
-}>
+}
+
+type WebTimePickerProps = Readonly<WebTimePickerFields>
 
 export function WebTimePicker({
   chosenTime,

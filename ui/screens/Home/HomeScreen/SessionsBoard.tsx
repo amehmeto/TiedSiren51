@@ -4,13 +4,17 @@ import { ViewModelBlockSession } from '@/ui/screens/Home/HomeScreen/home-view-mo
 import { SessionCard } from '@/ui/screens/Home/HomeScreen/SessionCard'
 import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 
-type SessionsBoardProps = Readonly<{
-  sessions: {
-    title: string
-    blockSessions: ViewModelBlockSession[]
-  }
+type SessionsBoardSessions = {
+  title: string
+  blockSessions: ViewModelBlockSession[]
+}
+
+type SessionsBoardOwnProps = {
+  sessions: SessionsBoardSessions
   type: SessionType
-}>
+}
+
+type SessionsBoardProps = Readonly<SessionsBoardOwnProps>
 
 export function SessionsBoard({ sessions, type }: SessionsBoardProps) {
   return (

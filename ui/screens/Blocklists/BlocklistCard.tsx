@@ -18,12 +18,14 @@ import { T } from '@/ui/design-system/theme'
 import { BlocklistDeletionConfirmationModal } from '@/ui/screens/Blocklists/BlocklistDeletionConfirmationModal'
 import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 
+type BlocklistCardSummary = {
+  id: string
+  name: string
+  totalBlocks: string
+}
+
 type BlocklistCardProps = Readonly<{
-  blocklist: {
-    id: string
-    name: string
-    totalBlocks: string
-  }
+  blocklist: BlocklistCardSummary
 }>
 
 export function BlocklistCard({ blocklist }: BlocklistCardProps) {

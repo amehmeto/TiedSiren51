@@ -13,8 +13,10 @@ type InvalidCase<T> = [
   expectedError: string,
 ]
 
+type AuthCredentials = { email: string; password: string }
+
 describe('validateSignInInput', () => {
-  it.each<ValidCase<{ email: string; password: string }>>([
+  it.each<ValidCase<AuthCredentials>>([
     [
       'correct credentials',
       { email: 'user@example.com', password: 'password123' },
@@ -26,7 +28,7 @@ describe('validateSignInInput', () => {
     expect(validation.data).toStrictEqual(credentials)
   })
 
-  it.each<InvalidCase<{ email: string; password: string }>>([
+  it.each<InvalidCase<AuthCredentials>>([
     [
       'missing email',
       { email: '', password: 'password123' },
@@ -50,7 +52,7 @@ describe('validateSignInInput', () => {
 })
 
 describe('validateSignUpInput', () => {
-  it.each<ValidCase<{ email: string; password: string }>>([
+  it.each<ValidCase<AuthCredentials>>([
     [
       'correct credentials',
       { email: 'user@example.com', password: 'Password123' },
@@ -62,7 +64,7 @@ describe('validateSignUpInput', () => {
     expect(validation.data).toStrictEqual(credentials)
   })
 
-  it.each<InvalidCase<{ email: string; password: string }>>([
+  it.each<InvalidCase<AuthCredentials>>([
     [
       'weak password',
       { email: 'user@example.com', password: 'weak' },

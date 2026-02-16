@@ -16,15 +16,15 @@ import {
 import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
 
-type TextInputSelectionSceneProps = Readonly<{
-  onSubmitEditing: (event: { nativeEvent: { text: string } }) => void
-  placeholder: string
-  sirenType: SirenType.WEBSITES | SirenType.KEYWORDS
-  toggleSiren: (sirenType: SirenType, sirenId: string) => void
-  isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
-  mode: FormMode
-  blocklistId?: string
-}>
+type TextInputSelectionSceneProps = {
+  readonly onSubmitEditing: (event: { nativeEvent: { text: string } }) => void
+  readonly placeholder: string
+  readonly sirenType: SirenType.WEBSITES | SirenType.KEYWORDS
+  readonly toggleSiren: (sirenType: SirenType, sirenId: string) => void
+  readonly isSirenSelected: (sirenType: SirenType, sirenId: string) => boolean
+  readonly mode: FormMode
+  readonly blocklistId?: string
+}
 
 export function TextInputSelectionScene({
   onSubmitEditing,

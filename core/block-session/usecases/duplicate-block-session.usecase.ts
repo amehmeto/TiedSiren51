@@ -1,10 +1,12 @@
 import { differenceInSeconds } from 'date-fns'
 import { createAppAsyncThunk } from '../../_redux_/create-app-thunk'
 
+type DuplicateBlockSessionPayload = { id: string; name: string }
+
 export const duplicateBlockSession = createAppAsyncThunk(
   'blockSession/duplicateBlockSession',
   async (
-    payload: { id: string; name: string },
+    payload: DuplicateBlockSessionPayload,
     { extra: { blockSessionRepository, notificationService, dateProvider } },
   ) => {
     const sessionToBeCopied = await blockSessionRepository.findById(payload.id)

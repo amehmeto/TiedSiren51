@@ -4,15 +4,17 @@ import { AppStore } from '@/core/_redux_/createStore'
 import { userAuthenticated } from '@/core/auth/reducer'
 import { loadUser } from '@/core/auth/usecases/load-user.usecase'
 
+type OnUserLoggedInDependencies = {
+  store: AppStore
+  authGateway: AuthGateway
+  logger: Logger
+}
+
 export const onUserLoggedInListener = ({
   store,
   authGateway,
   logger,
-}: {
-  store: AppStore
-  authGateway: AuthGateway
-  logger: Logger
-}) => {
+}: OnUserLoggedInDependencies) => {
   authGateway.onUserLoggedIn((user) => {
     try {
       store.dispatch(userAuthenticated(user))

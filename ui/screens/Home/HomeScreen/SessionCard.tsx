@@ -18,16 +18,20 @@ import { TextInputModal } from '@/ui/screens/Blocklists/TextInputModal'
 import { RoundBlueDot } from '@/ui/screens/Home/HomeScreen/RoundBlueDot'
 import { SessionType } from '@/ui/screens/Home/HomeScreen/SessionType'
 
-type SessionCardProps = Readonly<{
-  session: {
-    id: string
-    name: string
-    minutesLeft: string
-    blocklists: number
-    devices: number
-  }
+type SessionCardSession = {
+  id: string
+  name: string
+  minutesLeft: string
+  blocklists: number
+  devices: number
+}
+
+type SessionCardOwnProps = {
+  session: SessionCardSession
   type: SessionType
-}>
+}
+
+type SessionCardProps = Readonly<SessionCardOwnProps>
 
 export function SessionCard({ session, type }: SessionCardProps) {
   const dispatch = useDispatch<AppDispatch>()

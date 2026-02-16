@@ -28,10 +28,12 @@ export type TiedSMenu = {
   disabledMessage?: string
 }
 
-type ThreeDotMenuProps = Readonly<{
+type ThreeDotMenuOwnProps = {
   menuOptions: TiedSMenu[]
   style?: StyleProp<ViewStyle>
-}>
+}
+
+type ThreeDotMenuProps = Readonly<ThreeDotMenuOwnProps>
 
 export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
   const { width: windowWidth } = useWindowDimensions()
