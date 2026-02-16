@@ -14,7 +14,6 @@ import { T } from '@/ui/design-system/theme'
 type ReauthenticationModalOwnProps = {
   isVisible: boolean
   onRequestClose: () => void
-  onSuccess: () => void
 }
 
 type ReauthenticationModalProps = Readonly<ReauthenticationModalOwnProps>
@@ -22,7 +21,6 @@ type ReauthenticationModalProps = Readonly<ReauthenticationModalOwnProps>
 export function ReauthenticationModal({
   isVisible,
   onRequestClose,
-  onSuccess,
 }: ReauthenticationModalProps) {
   const dispatch = useDispatch<AppDispatch>()
   const { reauthError } = useSelector(selectReauthStatus)
@@ -39,11 +37,7 @@ export function ReauthenticationModal({
     <TiedSModal isVisible={isVisible} onRequestClose={handleClose}>
       <View style={styles.container}>
         <Text style={styles.title}>Confirm your identity</Text>
-        {isGoogleProvider ? (
-          <GoogleReauthForm onSuccess={onSuccess} />
-        ) : (
-          <PasswordReauthForm onSuccess={onSuccess} />
-        )}
+        {isGoogleProvider ? <GoogleReauthForm /> : <PasswordReauthForm />}
         {reauthError && <Text style={styles.error}>{reauthError}</Text>}
         <View style={styles.buttonContainer}>
           <TiedSButton

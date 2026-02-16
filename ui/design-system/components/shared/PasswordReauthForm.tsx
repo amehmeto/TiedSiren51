@@ -9,22 +9,10 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 
-type PasswordReauthFormProps = Readonly<{
-  onSuccess: () => void
-}>
-
-export function PasswordReauthForm({ onSuccess }: PasswordReauthFormProps) {
+export function PasswordReauthForm() {
   const dispatch = useDispatch<AppDispatch>()
   const { isReauthenticating } = useSelector(selectReauthStatus)
   const [password, setPassword] = useState('')
-
-  const handlePasswordConfirm = async () => {
-    const reauthAction = await dispatch(reauthenticate({ password }))
-    if (reauthenticate.fulfilled.match(reauthAction)) {
-      setPassword('')
-      onSuccess()
-    }
-  }
 
   return (
     <>
@@ -40,7 +28,7 @@ export function PasswordReauthForm({ onSuccess }: PasswordReauthFormProps) {
       />
       <View style={styles.buttonContainer}>
         <TiedSButton
-          onPress={handlePasswordConfirm}
+          onPress={() => dispatch(reauthenticate({ password }))}
           text="Confirm"
           isDisabled={isReauthenticating || password.length === 0}
         />

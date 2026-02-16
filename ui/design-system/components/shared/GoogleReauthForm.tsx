@@ -5,17 +5,8 @@ import { reauthenticateWithGoogle } from '@/core/auth/usecases/reauthenticate-wi
 import { reauthFormStyles } from '@/ui/design-system/components/shared/reauthFormStyles'
 import { TiedSSocialButton } from '@/ui/design-system/components/shared/TiedSSocialButton'
 
-type GoogleReauthFormProps = Readonly<{
-  onSuccess: () => void
-}>
-
-export function GoogleReauthForm({ onSuccess }: GoogleReauthFormProps) {
+export function GoogleReauthForm() {
   const dispatch = useDispatch<AppDispatch>()
-
-  const handleGoogleConfirm = async () => {
-    const reauthAction = await dispatch(reauthenticateWithGoogle())
-    if (reauthenticateWithGoogle.fulfilled.match(reauthAction)) onSuccess()
-  }
 
   return (
     <>
@@ -25,7 +16,7 @@ export function GoogleReauthForm({ onSuccess }: GoogleReauthFormProps) {
       <TiedSSocialButton
         iconName="logo-google"
         text="Sign in with Google"
-        onPress={handleGoogleConfirm}
+        onPress={() => dispatch(reauthenticateWithGoogle())}
       />
     </>
   )
