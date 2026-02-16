@@ -13,6 +13,7 @@ import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
 import { AuthErrorType, isAuthErrorType } from './auth-error-type'
+import { changePassword } from './usecases/change-password.usecase'
 import { reauthenticate } from './usecases/reauthenticate.usecase'
 import { resetPassword } from './usecases/reset-password.usecase'
 import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
@@ -31,6 +32,9 @@ export type AuthState = {
   isDeletingAccount: boolean
   deleteAccountError: string | null
   deleteConfirmText: string
+  isChangingPassword: boolean
+  changePasswordError: string | null
+  hasChangePasswordSucceeded: boolean
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -53,6 +57,14 @@ export const clearDeleteAccountError = createAction(
   'auth/clearDeleteAccountError',
 )
 
+export const clearChangePasswordError = createAction(
+  'auth/clearChangePasswordError',
+)
+
+export const clearChangePasswordSuccess = createAction(
+  'auth/clearChangePasswordSuccess',
+)
+
 export const setDeleteConfirmText = createAction<string>(
   'auth/setDeleteConfirmText',
 )
@@ -72,6 +84,9 @@ function createInitialAuthState(): AuthState {
     isDeletingAccount: false,
     deleteAccountError: null,
     deleteConfirmText: '',
+    isChangingPassword: false,
+    changePasswordError: null,
+    hasChangePasswordSucceeded: false,
   }
 }
 
@@ -160,6 +175,28 @@ export const reducer = createReducer<AuthState>(
       .addCase(reauthenticate.rejected, (state, action) => {
         state.isReauthenticating = false
         state.reauthError = action.error.message ?? null
+      })
+
+      .addCase(clearChangePasswordError, (state) => {
+        state.changePasswordError = null
+      })
+      .addCase(clearChangePasswordSuccess, (state) => {
+        state.hasChangePasswordSucceeded = false
+      })
+      .addCase(changePassword.pending, (state) => {
+        state.isChangingPassword = true
+        state.changePasswordError = null
+        state.hasChangePasswordSucceeded = false
+      })
+      .addCase(changePassword.fulfilled, (state) => {
+        state.isChangingPassword = false
+        state.changePasswordError = null
+        state.hasChangePasswordSucceeded = true
+      })
+      .addCase(changePassword.rejected, (state, action) => {
+        state.isChangingPassword = false
+        state.changePasswordError = action.error.message ?? null
+        state.hasChangePasswordSucceeded = false
       })
 
       .addCase(clearDeleteAccountError, (state) => {

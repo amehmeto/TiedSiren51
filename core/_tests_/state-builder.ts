@@ -44,6 +44,13 @@ const withDeleteAccountError = createAction<string | null>(
   'withDeleteAccountError',
 )
 const withDeleteConfirmText = createAction<string>('withDeleteConfirmText')
+const withChangingPassword = createAction<boolean>('withChangingPassword')
+const withChangePasswordError = createAction<string | null>(
+  'withChangePasswordError',
+)
+const withHasChangePasswordSucceeded = createAction<boolean>(
+  'withHasChangePasswordSucceeded',
+)
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -99,6 +106,15 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withDeleteConfirmText, (state, action) => {
       state.auth.deleteConfirmText = action.payload
     })
+    .addCase(withChangingPassword, (state, action) => {
+      state.auth.isChangingPassword = action.payload
+    })
+    .addCase(withChangePasswordError, (state, action) => {
+      state.auth.changePasswordError = action.payload
+    })
+    .addCase(withHasChangePasswordSucceeded, (state, action) => {
+      state.auth.hasChangePasswordSucceeded = action.payload
+    })
 })
 
 export const stateBuilder = (baseState = initialState) => {
@@ -130,6 +146,9 @@ export const stateBuilder = (baseState = initialState) => {
     withDeletingAccount: reduce(withDeletingAccount),
     withDeleteAccountError: reduce(withDeleteAccountError),
     withDeleteConfirmText: reduce(withDeleteConfirmText),
+    withChangingPassword: reduce(withChangingPassword),
+    withChangePasswordError: reduce(withChangePasswordError),
+    withHasChangePasswordSucceeded: reduce(withHasChangePasswordSucceeded),
   }
 }
 
