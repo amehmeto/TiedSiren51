@@ -18,6 +18,20 @@ describe('selectAuthProvider', () => {
     expect(authProvider).toBe(AuthProvider.Google)
   })
 
+  test('should return email provider for email-authenticated user', () => {
+    const state = stateBuilder()
+      .withAuthUser({
+        id: 'user-456',
+        email: 'email@example.com',
+        authProvider: AuthProvider.Email,
+      })
+      .build()
+
+    const authProvider = selectAuthProvider(state)
+
+    expect(authProvider).toBe(AuthProvider.Email)
+  })
+
   test('should return undefined when user is not authenticated', () => {
     const state = stateBuilder().withoutAuthUser({}).build()
 

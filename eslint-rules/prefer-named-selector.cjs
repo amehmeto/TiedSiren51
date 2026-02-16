@@ -64,11 +64,6 @@ module.exports = {
     }
 
     /**
-     * @param {import('estree').Node} body
-     * @param {string} paramName
-     * @param {import('estree').Node} arg
-     */
-    /**
      * Walk a MemberExpression/ChainExpression chain to find the root
      * identifier and the first property (slice name).
      * Returns null if the chain contains computed access or method calls.

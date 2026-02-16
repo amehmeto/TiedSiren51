@@ -4,6 +4,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { selectReauthStatus } from '@/core/auth/selectors/selectReauthStatus'
 import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
+import { reauthFormStyles } from '@/ui/design-system/components/shared/reauthFormStyles'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
@@ -18,8 +19,8 @@ export function PasswordReauthForm({ onSuccess }: PasswordReauthFormProps) {
   const [password, setPassword] = useState('')
 
   const handlePasswordConfirm = async () => {
-    const result = await dispatch(reauthenticate({ password }))
-    if (reauthenticate.fulfilled.match(result)) {
+    const reauthAction = await dispatch(reauthenticate({ password }))
+    if (reauthenticate.fulfilled.match(reauthAction)) {
       setPassword('')
       onSuccess()
     }
@@ -27,7 +28,7 @@ export function PasswordReauthForm({ onSuccess }: PasswordReauthFormProps) {
 
   return (
     <>
-      <Text style={styles.description}>
+      <Text style={reauthFormStyles.description}>
         Please enter your password to continue.
       </Text>
       <TiedSTextInput
@@ -49,12 +50,6 @@ export function PasswordReauthForm({ onSuccess }: PasswordReauthFormProps) {
 }
 
 const styles = StyleSheet.create({
-  description: {
-    color: T.color.text,
-    fontSize: T.font.size.regular,
-    textAlign: 'center',
-    marginBottom: T.spacing.medium,
-  },
   buttonContainer: {
     flexDirection: 'row',
     justifyContent: 'flex-end',
