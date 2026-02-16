@@ -42,6 +42,14 @@ describe('no-inline-object-type', () => {
           code: `function foo(param: { a: string; b: number }) {}`,
           options: [{ minProperties: 3 }],
         },
+        // Union type alias at module scope - OK
+        {
+          code: `type Result = { ok: true; value: string } | { ok: false; error: string }`,
+        },
+        // Non-union type alias inside function - OK
+        {
+          code: `function foo() { type Name = string }`,
+        },
       ],
 
       invalid: [
@@ -70,6 +78,16 @@ describe('no-inline-object-type', () => {
           code: `function foo(param: { name: string }) {}`,
           options: [{ minProperties: 1 }],
           errors: [{ messageId: 'extractObjectType' }],
+        },
+        // Union type alias inside function body - NOT OK
+        {
+          code: `function foo() { type Result = { ok: true } | { ok: false; error: string } }`,
+          errors: [{ messageId: 'extractUnionType' }],
+        },
+        // Union type alias inside arrow function - NOT OK
+        {
+          code: `const foo = () => { type Status = { loading: true } | { loading: false; data: string } }`,
+          errors: [{ messageId: 'extractUnionType' }],
         },
       ],
     })

@@ -6,15 +6,21 @@
  * parameter types, return types, and variable type annotations. These should be
  * extracted into named type aliases for readability.
  *
+ * Also flags union type aliases (using `|`) declared inside function bodies —
+ * these should be extracted to module scope.
+ *
  * BAD:
  *   it.each<{ email: string; password: string }>([...])
  *   function foo(param: { name: string; age: number }) {}
+ *   function foo() { type Result = { ok: true } | { ok: false; error: string } }
  *
  * GOOD:
  *   type Credentials = { email: string; password: string }
  *   it.each<Credentials>([...])
  *   type Person = { name: string; age: number }
  *   function foo(param: Person) {}
+ *   type Result = { ok: true } | { ok: false; error: string }
+ *   function foo() { const r: Result = ... }
  */
 
 module.exports = {
@@ -29,6 +35,8 @@ module.exports = {
     messages: {
       extractObjectType:
         'Extract this inline object type into a named type alias for readability.',
+      extractUnionType:
+        'Extract this union type alias to module scope for readability.',
     },
     schema: [
       {
@@ -62,6 +70,16 @@ module.exports = {
           messageId: 'extractObjectType',
         })
       },
+
+      TSTypeAliasDeclaration(node) {
+        if (node.typeAnnotation.type !== 'TSUnionType') return
+        if (!isInsideFunctionBody(node)) return
+
+        context.report({
+          node,
+          messageId: 'extractUnionType',
+        })
+      },
     }
 
     function isInsideTypeAliasDeclaration(node) {
@@ -82,6 +100,23 @@ module.exports = {
           current.type === 'TSTypeAnnotation'
         )
           return false
+
+        current = current.parent
+      }
+
+      return false
+    }
+
+    function isInsideFunctionBody(node) {
+      let current = node.parent
+
+      while (current) {
+        if (
+          current.type === 'FunctionDeclaration' ||
+          current.type === 'FunctionExpression' ||
+          current.type === 'ArrowFunctionExpression'
+        )
+          return true
 
         current = current.parent
       }

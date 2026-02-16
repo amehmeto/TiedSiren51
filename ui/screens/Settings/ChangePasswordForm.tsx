@@ -14,6 +14,10 @@ type ChangePasswordFormFields = {
 
 type ChangePasswordFormProps = Readonly<ChangePasswordFormFields>
 
+type PasswordValidation =
+  | { isValid: false; error: string }
+  | { isValid: true; newPassword: string }
+
 export function ChangePasswordForm({
   isChangingPassword,
   changePasswordError,
@@ -24,10 +28,6 @@ export function ChangePasswordForm({
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [localError, setLocalError] = useState<string | null>(null)
-
-  type PasswordValidation =
-    | { isValid: false; error: string }
-    | { isValid: true; newPassword: string }
 
   const validatePasswords = (): PasswordValidation => {
     const validation = changePasswordSchema.safeParse({
