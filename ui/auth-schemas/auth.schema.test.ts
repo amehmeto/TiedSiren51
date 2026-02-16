@@ -1,6 +1,6 @@
 import { expect, describe, it } from 'vitest'
 import { LoginCredentials, SignUpCredentials } from '@/core/auth/auth.type'
-import { signInSchema, signUpSchema } from './auth.schema'
+import { changePasswordSchema, signInSchema, signUpSchema } from './auth.schema'
 
 type InvalidCredentialsTestCase = [
   description: string,
@@ -77,6 +77,56 @@ describe('Auth Schemas', () => {
       ],
     ])('should reject %s', (_, input, expectedMessage) => {
       const result = signUpSchema.safeParse(input)
+      expect(result.success).toBe(false)
+      expect(result.error?.issues[0].message).toBe(expectedMessage)
+    })
+  })
+
+  describe('changePasswordSchema', () => {
+    it('should validate matching strong passwords', () => {
+      const validData = {
+        newPassword: 'NewPassword1',
+        confirmPassword: 'NewPassword1',
+      }
+
+      const result = changePasswordSchema.safeParse(validData)
+      expect(result.success).toBe(true)
+    })
+
+    type ChangePasswordTestCase = [
+      description: string,
+      input: { newPassword: string; confirmPassword: string },
+      expectedMessage: string,
+    ]
+
+    it.each<ChangePasswordTestCase>([
+      [
+        'too short password',
+        { newPassword: 'Ab1', confirmPassword: 'Ab1' },
+        'Password must be at least 6 characters',
+      ],
+      [
+        'password without uppercase',
+        { newPassword: 'password123', confirmPassword: 'password123' },
+        'Password must contain uppercase, lowercase and number',
+      ],
+      [
+        'password without lowercase',
+        { newPassword: 'PASSWORD123', confirmPassword: 'PASSWORD123' },
+        'Password must contain uppercase, lowercase and number',
+      ],
+      [
+        'password without number',
+        { newPassword: 'Password', confirmPassword: 'Password' },
+        'Password must contain uppercase, lowercase and number',
+      ],
+      [
+        'mismatched passwords',
+        { newPassword: 'Password123', confirmPassword: 'Different123' },
+        'Passwords do not match',
+      ],
+    ])('should reject %s', (_, input, expectedMessage) => {
+      const result = changePasswordSchema.safeParse(input)
       expect(result.success).toBe(false)
       expect(result.error?.issues[0].message).toBe(expectedMessage)
     })
