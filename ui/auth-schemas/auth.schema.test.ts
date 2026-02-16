@@ -16,8 +16,8 @@ describe('Auth Schemas', () => {
         password: 'password123',
       }
 
-      const result = signInSchema.safeParse(validData)
-      expect(result.success).toBe(true)
+      const validation = signInSchema.safeParse(validData)
+      expect(validation.success).toBe(true)
     })
 
     it.each<InvalidCredentialsTestCase>([
@@ -37,9 +37,9 @@ describe('Auth Schemas', () => {
         'Password is required',
       ],
     ])('should reject %s', (_, input, expectedMessage) => {
-      const result = signInSchema.safeParse(input)
-      expect(result.success).toBe(false)
-      expect(result.error?.issues[0].message).toBe(expectedMessage)
+      const validation = signInSchema.safeParse(input)
+      expect(validation.success).toBe(false)
+      expect(validation.error?.issues[0].message).toBe(expectedMessage)
     })
   })
 
@@ -50,8 +50,8 @@ describe('Auth Schemas', () => {
         password: 'Password123',
       }
 
-      const result = signUpSchema.safeParse(validData)
-      expect(result.success).toBe(true)
+      const validation = signUpSchema.safeParse(validData)
+      expect(validation.success).toBe(true)
     })
 
     it.each<InvalidCredentialsTestCase>([
@@ -76,9 +76,9 @@ describe('Auth Schemas', () => {
         'Password must contain uppercase, lowercase and number',
       ],
     ])('should reject %s', (_, input, expectedMessage) => {
-      const result = signUpSchema.safeParse(input)
-      expect(result.success).toBe(false)
-      expect(result.error?.issues[0].message).toBe(expectedMessage)
+      const validation = signUpSchema.safeParse(input)
+      expect(validation.success).toBe(false)
+      expect(validation.error?.issues[0].message).toBe(expectedMessage)
     })
   })
 
@@ -89,8 +89,8 @@ describe('Auth Schemas', () => {
         confirmPassword: 'NewPassword1',
       }
 
-      const result = changePasswordSchema.safeParse(validData)
-      expect(result.success).toBe(true)
+      const validation = changePasswordSchema.safeParse(validData)
+      expect(validation.success).toBe(true)
     })
 
     type ChangePasswordTestCase = [
@@ -126,9 +126,9 @@ describe('Auth Schemas', () => {
         'Passwords do not match',
       ],
     ])('should reject %s', (_, input, expectedMessage) => {
-      const result = changePasswordSchema.safeParse(input)
-      expect(result.success).toBe(false)
-      expect(result.error?.issues[0].message).toBe(expectedMessage)
+      const validation = changePasswordSchema.safeParse(input)
+      expect(validation.success).toBe(false)
+      expect(validation.error?.issues[0].message).toBe(expectedMessage)
     })
   })
 })

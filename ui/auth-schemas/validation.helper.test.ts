@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
   getForgotPasswordValidationError,
-  validateChangePasswordInput,
   validateForgotPasswordInput,
   validateSignInInput,
   validateSignUpInput,
@@ -102,42 +101,6 @@ describe('validateForgotPasswordInput', () => {
     ],
   ])('should return error for %s', (_, credentials, expectedError) => {
     const validation = validateForgotPasswordInput(credentials)
-
-    expect(validation.errorMessage).toBe(expectedError)
-  })
-})
-
-type ChangePasswordCredentials = {
-  newPassword: string
-  confirmPassword: string
-}
-
-describe('validateChangePasswordInput', () => {
-  it.each<ValidCase<ChangePasswordCredentials>>([
-    [
-      'matching strong passwords',
-      { newPassword: 'Password123', confirmPassword: 'Password123' },
-    ],
-  ])('should return valid result for %s', (_, credentials) => {
-    const validation = validateChangePasswordInput(credentials)
-
-    expect(validation.errorMessage).toBeNull()
-    expect(validation.data).toStrictEqual(credentials)
-  })
-
-  it.each<InvalidCase<ChangePasswordCredentials>>([
-    [
-      'weak password',
-      { newPassword: 'weak', confirmPassword: 'weak' },
-      'Password must contain uppercase, lowercase and number',
-    ],
-    [
-      'mismatched passwords',
-      { newPassword: 'Password123', confirmPassword: 'Different123' },
-      'Passwords do not match',
-    ],
-  ])('should return error for %s', (_, credentials, expectedError) => {
-    const validation = validateChangePasswordInput(credentials)
 
     expect(validation.errorMessage).toBe(expectedError)
   })

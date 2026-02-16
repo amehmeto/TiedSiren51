@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { StyleSheet, Text, TextInput, View } from 'react-native'
-import { validateChangePasswordInput } from '@/ui/auth-schemas/validation.helper'
+import { changePasswordSchema } from '@/ui/auth-schemas/auth.schema'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
 
@@ -28,17 +28,17 @@ export function ChangePasswordForm({
   const handleSubmit = () => {
     setLocalError(null)
 
-    const { errorMessage, data } = validateChangePasswordInput({
+    const validation = changePasswordSchema.safeParse({
       newPassword,
       confirmPassword,
     })
 
-    if (errorMessage) {
-      setLocalError(errorMessage)
+    if (!validation.success) {
+      setLocalError(validation.error.errors[0].message)
       return
     }
 
-    if (data) onChangePassword(data.newPassword)
+    onChangePassword(validation.data.newPassword)
     setNewPassword('')
     setConfirmPassword('')
   }

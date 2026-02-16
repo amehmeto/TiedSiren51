@@ -1,10 +1,8 @@
 import { z } from 'zod'
 import {
-  changePasswordSchema,
   forgotPasswordSchema,
   signInSchema,
   signUpSchema,
-  ChangePasswordInput,
   ForgotPasswordInput,
   SignInInput,
   SignUpInput,
@@ -30,12 +28,6 @@ export function validateForgotPasswordInput(
   input: ForgotPasswordInput,
 ): ValidationResult<ForgotPasswordInput> {
   return validateWithSchema(forgotPasswordSchema, input)
-}
-
-export function validateChangePasswordInput(
-  input: ChangePasswordInput,
-): ValidationResult<ChangePasswordInput> {
-  return validateWithSchema(changePasswordSchema, input)
 }
 
 export function getForgotPasswordValidationError(email: string): string | null {
