@@ -94,6 +94,13 @@ module.exports = {
       'SpreadElement',
       'UnaryExpression',
     ])
+    const statementTypes = new Set([
+      'ExpressionStatement',
+      'ReturnStatement',
+      'VariableDeclaration',
+      'IfStatement',
+      'ThrowStatement',
+    ])
 
     return {
       CallExpression: checkCallExpression,
@@ -109,13 +116,6 @@ module.exports = {
     }
 
     function findEnclosingStatement(node) {
-      const statementTypes = new Set([
-        'ExpressionStatement',
-        'ReturnStatement',
-        'VariableDeclaration',
-        'IfStatement',
-        'ThrowStatement',
-      ])
       let current = node.parent
       while (current) {
         if (

@@ -153,6 +153,11 @@ describe('prefer-extracted-long-params', () => {
           output: `const payload = { id: blocklist.id, name: inputText, extra: somethingElse }\nstore.dispatch(duplicateBlocklist(payload))`,
           errors: [{ messageId: 'extractParam' }],
         },
+        // No enclosing statement (export default) - no fix possible
+        {
+          code: `export default fn(this.someService.someProperty.someMethod())`,
+          errors: [{ messageId: 'extractParam' }],
+        },
       ],
     })
   })
