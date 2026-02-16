@@ -138,6 +138,7 @@ module.exports = {
           'BlocklistViewModel',
           'HomeViewModel',
           'BlocklistTabKey',
+          'TabScreens',
         ],
       },
     ],
@@ -186,7 +187,13 @@ module.exports = {
     // Prefer ternary over complementary && conditions in JSX
     'local-rules/prefer-ternary-jsx': 'error',
     // Extract long function arguments into named variables for readability
-    'local-rules/prefer-extracted-long-params': 'warn',
+    'local-rules/prefer-extracted-long-params': [
+      'error',
+      {
+        exemptFunctions: ['createTestStore'],
+        transparentWrappers: ['dispatch'],
+      },
+    ],
     // Extract inline object types into named type aliases
     'local-rules/no-inline-object-type': 'error',
     // Disallow overly generic variable and function names

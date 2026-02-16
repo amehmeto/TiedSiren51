@@ -107,17 +107,14 @@ describe('PrismaBlockSessionRepository', () => {
     expect(foundSessions).toHaveLength(createdSessions.length)
 
     for (const createdSession of createdSessions) {
-      expect(foundSessions).toContainEqual(
-        expect.objectContaining({
-          id: createdSession.id,
-          name: createdSession.name,
-          startedAt: createdSession.startedAt,
-          endedAt: createdSession.endedAt,
-          devices: expect.arrayContaining([
-            expect.objectContaining(testDevice),
-          ]),
-        }),
-      )
+      const expectedSessionFields = expect.objectContaining({
+        id: createdSession.id,
+        name: createdSession.name,
+        startedAt: createdSession.startedAt,
+        endedAt: createdSession.endedAt,
+        devices: expect.arrayContaining([expect.objectContaining(testDevice)]),
+      })
+      expect(foundSessions).toContainEqual(expectedSessionFields)
     }
   })
 

@@ -104,7 +104,8 @@ async function fetchRepoPullRequestStates(repo) {
  * @returns {Promise<Map<string, 'merged' | 'open' | 'closed'>>}
  */
 async function fetchPullRequestStates(repos) {
-  const results = await Promise.all(repos.map((repo) => fetchRepoPullRequestStates(repo)))
+  const prStateFetches = repos.map((repo) => fetchRepoPullRequestStates(repo))
+  const results = await Promise.all(prStateFetches)
 
   const prStateByIssue = new Map()
   for (const mappings of results) {
@@ -182,7 +183,8 @@ async function fetchRepoIssues(repo, prStateByIssue) {
  */
 export async function fetchAllIssues(repos) {
   const prStateByIssue = await fetchPullRequestStates(repos)
-  const results = await Promise.all(repos.map((repo) => fetchRepoIssues(repo, prStateByIssue)))
+  const issueFetches = repos.map((repo) => fetchRepoIssues(repo, prStateByIssue))
+  const results = await Promise.all(issueFetches)
   return results.flat()
 }
 

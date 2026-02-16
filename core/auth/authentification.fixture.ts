@@ -10,6 +10,7 @@ import {
 import { AuthError } from '@/core/auth/auth-error'
 import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
+import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
@@ -77,6 +78,13 @@ export function authentificationFixture(
         const error = new Error(errorMessage)
         authGateway.willReauthenticateWith = Promise.reject(error)
       },
+      accountDeletionWillSucceed() {
+        authGateway.willDeleteAccountWith = Promise.resolve()
+      },
+      accountDeletionWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willDeleteAccountWith = Promise.reject(error)
+      },
       nowIs(isoDate: ISODateString) {
         dateProvider.now = new Date(isoDate)
       },
@@ -106,6 +114,13 @@ export function authentificationFixture(
       },
       reauthenticate(password: string) {
         return store.dispatch(reauthenticate({ password }))
+      },
+      deleteAccount() {
+        store = createTestStore(
+          { authGateway, dateProvider },
+          testStateBuilderProvider.getState(),
+        )
+        return store.dispatch(deleteAccount())
       },
     },
     then: {
@@ -157,6 +172,18 @@ export function authentificationFixture(
       reauthErrorShouldBeNull() {
         const { reauthError } = store.getState().auth
         expect(reauthError).toBeNull()
+      },
+      authUserShouldBe(expectedUser: AuthUser) {
+        const { authUser } = store.getState().auth
+        expect(authUser).toEqual(expectedUser)
+      },
+      accountDeletionShouldNotBeLoading() {
+        const { isDeletingAccount } = store.getState().auth
+        expect(isDeletingAccount).toBe(false)
+      },
+      deleteAccountErrorShouldBe(errorMessage: string) {
+        const { deleteAccountError } = store.getState().auth
+        expect(deleteAccountError).toBe(errorMessage)
       },
     },
   }

@@ -40,13 +40,12 @@ describe('PrismaRemoteDeviceRepository', () => {
     expect(devices).toHaveLength(testDevices.length)
 
     for (const testDevice of testDevices) {
-      expect(devices).toContainEqual(
-        expect.objectContaining({
-          id: testDevice.id,
-          name: testDevice.name,
-          type: testDevice.type,
-        }),
-      )
+      const expectedDevice = expect.objectContaining({
+        id: testDevice.id,
+        name: testDevice.name,
+        type: testDevice.type,
+      })
+      expect(devices).toContainEqual(expectedDevice)
     }
   })
 })

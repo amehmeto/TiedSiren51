@@ -17,12 +17,11 @@ describe('Feature: Adding keyword to sirens', () => {
 
     await fixture.when.addingKeywordToSirens('boxe')
 
-    fixture.then.availableSirensShouldBeStoredAs(
-      buildSirens({
-        ...initialSirens,
-        keywords: [...initialSirens.keywords, 'boxe'],
-      }),
-    )
+    const sirensWithAddedKeyword = buildSirens({
+      ...initialSirens,
+      keywords: [...initialSirens.keywords, 'boxe'],
+    })
+    fixture.then.availableSirensShouldBeStoredAs(sirensWithAddedKeyword)
     await fixture.then.keywordShouldBeSaved('boxe')
   })
 })

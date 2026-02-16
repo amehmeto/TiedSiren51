@@ -36,12 +36,10 @@ export async function preloadedStateForManualTesting() {
   )
 
   if (blockSessionRepository instanceof FakeDataBlockSessionRepository) {
-    blockSessionRepository.entities = new Map(
-      preloadedBlockSessions.map((blockSession) => [
-        blockSession.id,
-        blockSession,
-      ]),
+    const blockSessionEntries = preloadedBlockSessions.map(
+      (blockSession) => [blockSession.id, blockSession] as const,
     )
+    blockSessionRepository.entities = new Map(blockSessionEntries)
   }
 
   return preloadedState

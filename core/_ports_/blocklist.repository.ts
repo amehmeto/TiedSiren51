@@ -8,4 +8,5 @@ export interface BlocklistRepository {
   update(payload: UpdatePayload<Blocklist>): Promise<void>
   findById(blocklistId: string): Promise<Blocklist>
   delete(blocklistId: string): Promise<void>
+  deleteAll(): Promise<void>
 }

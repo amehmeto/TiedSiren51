@@ -83,13 +83,13 @@ const getCoverageData = () => {
   let prCoverage, baseCoverage
 
   try {
-    prCoverage = JSON.parse(fs.readFileSync('pr-coverage.json', 'utf8'))
+    const prCoverageRaw = fs.readFileSync('pr-coverage.json', 'utf8')
+    prCoverage = JSON.parse(prCoverageRaw)
   } catch {
     // Try coverage-summary.json for CLI mode
     try {
-      prCoverage = JSON.parse(
-        fs.readFileSync('coverage/coverage-summary.json', 'utf8'),
-      )
+      const coverageSummaryRaw = fs.readFileSync('coverage/coverage-summary.json', 'utf8')
+      prCoverage = JSON.parse(coverageSummaryRaw)
     } catch {
       prCoverage = {
         total: {
@@ -103,7 +103,8 @@ const getCoverageData = () => {
   }
 
   try {
-    baseCoverage = JSON.parse(fs.readFileSync('base-coverage.json', 'utf8'))
+    const baseCoverageRaw = fs.readFileSync('base-coverage.json', 'utf8')
+    baseCoverage = JSON.parse(baseCoverageRaw)
   } catch {
     baseCoverage = {
       total: {
@@ -159,22 +160,21 @@ const formatCLI = (data) => {
   console.log('\n📊 Coverage Report\n')
   console.log('Metric          Base      Current  Change')
   console.log('─'.repeat(60))
-  console.log(
-    formatRow('Statements', prStats.statements.pct, baseStats.statements.pct),
-  )
-  console.log(
-    formatRow('Functions', prStats.functions.pct, baseStats.functions.pct),
-  )
-  console.log(
-    formatRow('Branches', prStats.branches.pct, baseStats.branches.pct),
-  )
-  console.log(formatRow('Lines', prStats.lines.pct, baseStats.lines.pct))
+  const statementsRow = formatRow('Statements', prStats.statements.pct, baseStats.statements.pct)
+  console.log(statementsRow)
+  const functionsRow = formatRow('Functions', prStats.functions.pct, baseStats.functions.pct)
+  console.log(functionsRow)
+  const branchesRow = formatRow('Branches', prStats.branches.pct, baseStats.branches.pct)
+  console.log(branchesRow)
+  const linesRow = formatRow('Lines', prStats.lines.pct, baseStats.lines.pct)
+  console.log(linesRow)
   console.log('')
-  console.log(formatRow('UI (Lines)', prUi.lines.pct, baseUi.lines.pct))
-  console.log(formatRow('Core (Lines)', prCore.lines.pct, baseCore.lines.pct))
-  console.log(
-    formatRow('Infra (Lines)', prInfra.lines.pct, baseInfra.lines.pct),
-  )
+  const uiLinesRow = formatRow('UI (Lines)', prUi.lines.pct, baseUi.lines.pct)
+  console.log(uiLinesRow)
+  const coreLinesRow = formatRow('Core (Lines)', prCore.lines.pct, baseCore.lines.pct)
+  console.log(coreLinesRow)
+  const infraLinesRow = formatRow('Infra (Lines)', prInfra.lines.pct, baseInfra.lines.pct)
+  console.log(infraLinesRow)
   console.log('')
 
   if (prStats.statements.pct >= baseStats.statements.pct) {
