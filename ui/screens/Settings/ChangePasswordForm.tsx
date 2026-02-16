@@ -36,6 +36,8 @@ export function ChangePasswordForm({
       return
     }
     onChangePassword(newPassword)
+    setNewPassword('')
+    setConfirmPassword('')
   }
 
   const displayError = localError ?? changePasswordError
