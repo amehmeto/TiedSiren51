@@ -39,7 +39,7 @@ describe('blockSessionSchema', () => {
       expectValidationSuccess(result)
     })
 
-    it.each([
+    it.each<{ field: string; value: null | string; expectedMessage: string }>([
       {
         field: 'name',
         value: null,
@@ -89,7 +89,7 @@ describe('blockSessionSchema', () => {
   })
 
   describe('Time fields validation', () => {
-    it.each([
+    it.each<{ field: string; value: null | string; expectedMessage: string }>([
       {
         field: 'startedAt',
         value: null,

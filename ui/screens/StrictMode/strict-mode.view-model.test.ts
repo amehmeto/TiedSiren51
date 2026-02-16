@@ -26,7 +26,7 @@ describe('selectStrictModeViewModel', () => {
     dateProvider.now = NOW
   })
 
-  test.each([
+  test.each<[string, PreloadedState, object]>([
     [
       'no timer is set',
       stateBuilder().withStrictModeEndedAt(null).build(),
