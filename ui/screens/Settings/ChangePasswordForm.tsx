@@ -25,7 +25,11 @@ export function ChangePasswordForm({
   const [confirmPassword, setConfirmPassword] = useState('')
   const [localError, setLocalError] = useState<string | null>(null)
 
-  const validatePasswords = () => {
+  type PasswordValidation =
+    | { isValid: false; error: string }
+    | { isValid: true; newPassword: string }
+
+  const validatePasswords = (): PasswordValidation => {
     const validation = changePasswordSchema.safeParse({
       newPassword,
       confirmPassword,
@@ -33,28 +37,24 @@ export function ChangePasswordForm({
 
     if (!validation.success) {
       return {
-        isValid: false as const,
+        isValid: false,
         error: validation.error.errors[0].message,
       }
     }
 
-    return { isValid: true as const, newPassword: validation.data.newPassword }
+    return { isValid: true, newPassword: validation.data.newPassword }
   }
 
   const handleSubmit = () => {
     setLocalError(null)
-    const {
-      isValid,
-      error,
-      newPassword: validatedPassword,
-    } = validatePasswords()
+    const passwordValidation = validatePasswords()
 
-    if (!isValid) {
-      setLocalError(error)
+    if (!passwordValidation.isValid) {
+      setLocalError(passwordValidation.error)
       return
     }
 
-    onChangePassword(validatedPassword)
+    onChangePassword(passwordValidation.newPassword)
       .then(() => {
         setNewPassword('')
         setConfirmPassword('')
