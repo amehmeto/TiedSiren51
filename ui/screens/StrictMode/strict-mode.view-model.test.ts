@@ -7,6 +7,7 @@ import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import {
   selectStrictModeViewModel,
+  StrictModeViewModel,
   StrictModeViewState,
 } from './strict-mode.view-model'
 
@@ -26,7 +27,7 @@ describe('selectStrictModeViewModel', () => {
     dateProvider.now = NOW
   })
 
-  test.each([
+  test.each<[string, PreloadedState, StrictModeViewModel]>([
     [
       'no timer is set',
       stateBuilder().withStrictModeEndedAt(null).build(),

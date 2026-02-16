@@ -1,6 +1,12 @@
 import { describe, it, expect } from 'vitest'
 import { blockSessionSchema } from './block-session.schema'
 
+type ValidationCase = {
+  field: string
+  value: unknown
+  expectedMessage: string
+}
+
 const validBlockSession = {
   id: '1',
   name: 'Test Session',
@@ -39,7 +45,7 @@ describe('blockSessionSchema', () => {
       expectValidationSuccess(result)
     })
 
-    it.each([
+    it.each<ValidationCase>([
       {
         field: 'name',
         value: null,
@@ -89,7 +95,7 @@ describe('blockSessionSchema', () => {
   })
 
   describe('Time fields validation', () => {
-    it.each([
+    it.each<ValidationCase>([
       {
         field: 'startedAt',
         value: null,

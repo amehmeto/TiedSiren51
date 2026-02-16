@@ -87,6 +87,9 @@
       "Bash(gh workflow list:*)",
       "Bash(gh workflow view:*)",
       "Bash(git --version:*)",
+      "Bash(git -c core.hooksPath=/dev/null diff)",
+      "Bash(git -c core.hooksPath=/dev/null log --oneline -5)",
+      "Bash(git -c core.hooksPath=/dev/null status)",
       "Bash(git -c core.hooksPath=/dev/null worktree add .worktrees/*)",
       "Bash(git add:*)",
       "Bash(git blame:*)",
@@ -103,6 +106,7 @@
       "Bash(git checkout:*)",
       "Bash(git cherry-pick:*)",
       "Bash(git commit:*)",
+      "Bash(git config:*)",
       "Bash(git diff:*)",
       "Bash(git fetch:*)",
       "Bash(git log:*)",
@@ -211,11 +215,7 @@
       "mcp__sentry__get_issue_details",
       "mcp__sentry__search_events",
       "mcp__sentry__search_issue_events",
-      "mcp__sentry__search_issues",
-      "Bash(git config:*)",
-      "Bash(git -c core.hooksPath=/dev/null status)",
-      "Bash(git -c core.hooksPath=/dev/null diff)",
-      "Bash(git -c core.hooksPath=/dev/null log --oneline -5)"
+      "mcp__sentry__search_issues"
     ],
     "deny": [
       "Bash(HUSKY=0:*)",
