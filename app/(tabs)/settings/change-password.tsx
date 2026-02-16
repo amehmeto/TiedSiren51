@@ -36,16 +36,19 @@ export default function ChangePasswordScreen() {
     buttonText,
   } = viewModel
 
+  const formResetKey = String(hasChangePasswordSucceeded)
+
   return (
     <View style={styles.container}>
       {isReauthenticated ? (
         <ChangePasswordForm
+          key={formResetKey}
           isChangingPassword={isChangingPassword}
           changePasswordError={changePasswordError}
           hasChangePasswordSucceeded={hasChangePasswordSucceeded}
           buttonText={buttonText}
           onChangePassword={(newPassword) =>
-            dispatch(changePassword({ newPassword })).unwrap()
+            dispatch(changePassword({ newPassword }))
           }
         />
       ) : (

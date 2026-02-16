@@ -13,6 +13,7 @@
  *   it.each<{ email: string; password: string }>([...])
  *   function foo(param: { name: string; age: number }) {}
  *   function foo() { type Result = { ok: true } | { ok: false; error: string } }
+ *   type Result = { ok: true; value: string } | { ok: false; error: string }
  *
  * GOOD:
  *   type Credentials = { email: string; password: string }
@@ -21,6 +22,9 @@
  *   function foo(param: Person) {}
  *   type Result = { ok: true } | { ok: false; error: string }
  *   function foo() { const r: Result = ... }
+ *   type Success = { ok: true; value: string }
+ *   type Failure = { ok: false; error: string }
+ *   type Result = Success | Failure
  */
 
 module.exports = {
@@ -83,15 +87,19 @@ module.exports = {
     }
 
     function isInsideTypeAliasDeclaration(node) {
+      let isInsideUnion = false
       let current = node.parent
 
       while (current) {
+        if (current.type === 'TSUnionType') isInsideUnion = true
+
         // Inside a type alias or interface definition
         if (
           current.type === 'TSTypeAliasDeclaration' ||
           current.type === 'TSInterfaceDeclaration'
         )
-          return true
+          // Object types in union members should still be extracted
+          return !isInsideUnion
 
         // Stop climbing if we hit a type parameter or function param
         // (these are the locations we want to flag)

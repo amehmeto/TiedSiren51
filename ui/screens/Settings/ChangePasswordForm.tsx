@@ -9,14 +9,16 @@ type ChangePasswordFormFields = {
   changePasswordError: string | null
   hasChangePasswordSucceeded: boolean
   buttonText: string
-  onChangePassword: (newPassword: string) => Promise<void>
+  onChangePassword: (newPassword: string) => void
 }
 
 type ChangePasswordFormProps = Readonly<ChangePasswordFormFields>
 
-type PasswordValidation =
-  | { isValid: false; error: string }
-  | { isValid: true; newPassword: string }
+type PasswordValidationFailure = { isValid: false; error: string }
+
+type PasswordValidationSuccess = { isValid: true; newPassword: string }
+
+type PasswordValidation = PasswordValidationFailure | PasswordValidationSuccess
 
 export function ChangePasswordForm({
   isChangingPassword,
@@ -55,13 +57,6 @@ export function ChangePasswordForm({
     }
 
     onChangePassword(passwordValidation.newPassword)
-      .then(() => {
-        setNewPassword('')
-        setConfirmPassword('')
-      })
-      .catch(() => {
-        // Error is handled by Redux state (changePasswordError)
-      })
   }
 
   const displayError = localError ?? changePasswordError
