@@ -188,7 +188,7 @@ module.exports = {
     // Extract long function arguments into named variables for readability
     'local-rules/prefer-extracted-long-params': 'warn',
     // Extract inline object types into named type aliases
-    'local-rules/no-inline-object-type': 'warn',
+    'local-rules/no-inline-object-type': 'error',
     // Disallow overly generic variable and function names
     'local-rules/no-lame-naming': 'warn',
     // Prefer enum over string literal unions

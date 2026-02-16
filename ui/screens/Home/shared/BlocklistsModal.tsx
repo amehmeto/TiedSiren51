@@ -11,12 +11,14 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
 
-type BlocklistsModalProps = Readonly<{
+type BlocklistsModalFields = {
   isVisible: boolean
   currentSelections: string[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: string[]) => void
-}>
+}
+
+type BlocklistsModalProps = Readonly<BlocklistsModalFields>
 
 export function BlocklistsModal({
   isVisible,

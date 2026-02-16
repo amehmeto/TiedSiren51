@@ -3,13 +3,16 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
 
-type StrictModeConfirmationModalProps = Readonly<{
+type StrictModeConfirmationModalFields = {
   isVisible: boolean
   formattedDuration: string
   onRequestClose: () => void
   onCancel: () => void
   onConfirm: () => void
-}>
+}
+
+type StrictModeConfirmationModalProps =
+  Readonly<StrictModeConfirmationModalFields>
 
 export function StrictModeConfirmationModal({
   isVisible,

@@ -9,12 +9,14 @@ type IconName =
   | 'hourglass-outline'
   | 'power-outline'
 
-type BlockingConditionItemProps = Readonly<{
+type BlockingConditionItemOwnProps = {
   iconName: IconName
   title: string
   subtitle: string
   onSelect: () => void
-}>
+}
+
+type BlockingConditionItemProps = Readonly<BlockingConditionItemOwnProps>
 
 export function BlockingConditionItem({
   iconName,

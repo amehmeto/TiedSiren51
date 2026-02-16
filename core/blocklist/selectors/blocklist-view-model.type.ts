@@ -3,6 +3,12 @@ export enum BlocklistViewModel {
   WithBlockLists = 'WITH_BLOCKLISTS',
 }
 
+type BlocklistSummary = {
+  id: string
+  name: string
+  totalBlocks: string
+}
+
 export type BlocklistViewModelType =
   | {
       type: BlocklistViewModel.NoBlocklist
@@ -10,9 +16,5 @@ export type BlocklistViewModelType =
     }
   | {
       type: BlocklistViewModel.WithBlockLists
-      blocklists: {
-        id: string
-        name: string
-        totalBlocks: string
-      }[]
+      blocklists: BlocklistSummary[]
     }

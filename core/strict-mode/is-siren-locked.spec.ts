@@ -3,14 +3,16 @@ import { buildLockedSirens } from '@/core/_tests_/data-builders/locked-sirens.bu
 import { Sirens } from '@/core/siren/sirens'
 import { isSirenLocked, LockedSirens } from '@/core/strict-mode/is-siren-locked'
 
+type IsSirenLockedTestCase = {
+  scenario: string
+  lockedSirens: LockedSirens
+  sirenType: keyof Sirens
+  sirenId: string
+  isExpectedLocked: boolean
+}
+
 describe('isSirenLocked', () => {
-  test.each<{
-    scenario: string
-    lockedSirens: LockedSirens
-    sirenType: keyof Sirens
-    sirenId: string
-    isExpectedLocked: boolean
-  }>([
+  test.each<IsSirenLockedTestCase>([
     {
       scenario: 'android siren is locked',
       lockedSirens: buildLockedSirens({ android: new Set(['com.app1']) }),

@@ -13,13 +13,13 @@ function isAndroidSiren(
   return sirenType === SirenType.ANDROID && typeof siren === 'object'
 }
 
-type SelectableSirenCardProps = Readonly<{
-  sirenType: SirenType
-  siren: AndroidSiren | string
-  onPress: () => void
-  isSelected: boolean
-  isLocked?: boolean
-}>
+type SelectableSirenCardProps = {
+  readonly sirenType: SirenType
+  readonly siren: AndroidSiren | string
+  readonly onPress: () => void
+  readonly isSelected: boolean
+  readonly isLocked?: boolean
+}
 
 export function SelectableSirenCard({
   sirenType,

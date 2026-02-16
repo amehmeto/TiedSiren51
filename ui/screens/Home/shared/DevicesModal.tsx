@@ -26,13 +26,15 @@ function generateDeviceName() {
   )
 }
 
-type DevicesModalProps = Readonly<{
+type DevicesModalFields = {
   isVisible: boolean
   currentSelections: Device[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: Device[]) => void
   devices: Device[]
-}>
+}
+
+type DevicesModalProps = Readonly<DevicesModalFields>
 
 export function DevicesModal({
   isVisible,

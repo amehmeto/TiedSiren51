@@ -4,11 +4,13 @@ import { Device } from '@/core/device/device'
 import { T } from '@/ui/design-system/theme'
 import { DevicesModal } from '@/ui/screens/Home/shared/DevicesModal'
 
-type SelectDevicesFieldProps = Readonly<{
+type SelectDevicesFieldFields = {
   selectedDevices: Device[]
   setFieldValue: (field: string, value: Device[]) => void
   availableDevices: Device[]
-}>
+}
+
+type SelectDevicesFieldProps = Readonly<SelectDevicesFieldFields>
 
 export function SelectDevicesField({
   selectedDevices,

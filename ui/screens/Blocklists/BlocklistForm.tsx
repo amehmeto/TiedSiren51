@@ -46,6 +46,11 @@ enum BlocklistTabKey {
   Keywords = 'keywords',
 }
 
+type BlocklistTabRoute = {
+  key: BlocklistTabKey
+  title: string
+}
+
 export function BlocklistForm({
   mode,
   blocklistId,
@@ -89,7 +94,7 @@ export function BlocklistForm({
   const [errors, setErrors] = useState<ErrorMessages>({})
   const [index, setIndex] = useState(0)
 
-  const routes: { key: BlocklistTabKey; title: string }[] = [
+  const routes: BlocklistTabRoute[] = [
     { key: BlocklistTabKey.Apps, title: 'Apps' },
     { key: BlocklistTabKey.Websites, title: 'Websites' },
     { key: BlocklistTabKey.Keywords, title: 'Keywords' },
@@ -163,10 +168,7 @@ export function BlocklistForm({
     ({
       route,
     }: SceneRendererProps & {
-      route: {
-        key: BlocklistTabKey
-        title: string
-      }
+      route: BlocklistTabRoute
     }) => {
       const scenes: Record<BlocklistTabKey, () => React.JSX.Element> = {
         apps: () => (

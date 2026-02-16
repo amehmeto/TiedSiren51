@@ -5,10 +5,12 @@ import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlockli
 import { T } from '@/ui/design-system/theme'
 import { BlocklistsModal } from '@/ui/screens/Home/shared/BlocklistsModal'
 
-type SelectBlocklistsFieldProps = Readonly<{
+type SelectBlocklistsFieldFields = {
   blocklistIds: string[]
   setFieldValue: (field: string, value: string[]) => void
-}>
+}
+
+type SelectBlocklistsFieldProps = Readonly<SelectBlocklistsFieldFields>
 
 export function SelectBlocklistsField({
   blocklistIds,

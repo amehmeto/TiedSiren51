@@ -22,10 +22,11 @@ const withBlocklists = createAction<Blocklist[]>('withBlocklists')
 const withAvailableSirens = createAction<Sirens>('withAvailableSirens')
 const withAuthUser = createAction<AuthUser>('withAuthUser')
 const withoutAuthUser = createAction<{}>('withoutAuthUser')
-const withAuthError = createAction<{
+type AuthErrorPayload = {
   message: string
   errorType?: AuthErrorType
-}>('withAuthError')
+}
+const withAuthError = createAction<AuthErrorPayload>('withAuthError')
 const withAuthLoading = createAction<boolean>('withAuthLoading')
 const withStrictModeEndedAt = createAction<ISODateString | null>(
   'withStrictModeEndedAt',

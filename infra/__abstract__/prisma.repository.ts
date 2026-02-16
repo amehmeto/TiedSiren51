@@ -4,6 +4,8 @@ import { Platform } from 'react-native'
 import '@prisma/react-native'
 import { Logger } from '@/core/_ports_/logger'
 
+type TimerColumnInfo = { name: string; type: string }
+
 export abstract class PrismaRepository {
   private _isInitialized = false
 
@@ -157,9 +159,7 @@ export abstract class PrismaRepository {
 
   private async migrateTimerTable(): Promise<void> {
     try {
-      const tableInfo = await this.baseClient.$queryRaw<
-        { name: string; type: string }[]
-      >`
+      const tableInfo = await this.baseClient.$queryRaw<TimerColumnInfo[]>`
         PRAGMA table_info("Timer");
       `
 

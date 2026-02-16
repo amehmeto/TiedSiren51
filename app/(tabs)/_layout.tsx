@@ -42,19 +42,21 @@ const tabs: Tab[] = [
   },
 ]
 
+type TabBarIconProps = {
+  route: { name: string }
+  color: string
+  size: number
+  focused: boolean
+  strictModeIcon: React.ComponentProps<typeof Ionicons>['name']
+}
+
 function handleTabBarIcon({
   route,
   color,
   size,
   focused: isFocused,
   strictModeIcon,
-}: {
-  route: { name: string }
-  color: string
-  size: number
-  focused: boolean
-  strictModeIcon: React.ComponentProps<typeof Ionicons>['name']
-}) {
+}: TabBarIconProps) {
   const tab = tabs.find((t) => t.name === route.name)
   if (!tab) return null
 

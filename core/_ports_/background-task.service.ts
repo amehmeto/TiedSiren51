@@ -1,18 +1,22 @@
 import { AppStore } from '../_redux_/createStore'
 
+type TaskIcon = {
+  name: string
+  type: string
+}
+
+type TaskParameters = {
+  delay: number
+}
+
 export type TaskOptions = {
   taskName: string
   taskTitle: string
   taskDesc: string
-  taskIcon: {
-    name: string
-    type: string
-  }
+  taskIcon: TaskIcon
   color: string
   linkingURI: string
-  parameters: {
-    delay: number
-  }
+  parameters: TaskParameters
 }
 
 export type Task = (options: TaskOptions) => Promise<void>

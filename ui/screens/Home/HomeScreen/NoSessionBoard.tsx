@@ -1,11 +1,13 @@
 import { StyleSheet, Text } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
+type NoSessionBoardSessions = {
+  title: string
+  message: string
+}
+
 type NoSessionBoardProps = Readonly<{
-  sessions: {
-    title: string
-    message: string
-  }
+  sessions: NoSessionBoardSessions
 }>
 
 export function NoSessionBoard({ sessions }: NoSessionBoardProps) {
