@@ -125,7 +125,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
           setRenameModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(renameBlocklist({ id: blocklist.id, name: inputText }))
+          const payload = { id: blocklist.id, name: inputText }
+          dispatch(renameBlocklist(payload))
           setRenameModalVisible(false)
         }}
       />
@@ -140,7 +141,8 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
           setIsDuplicateModalVisible(false)
         }}
         onSave={(inputText: string) => {
-          dispatch(duplicateBlocklist({ id: blocklist.id, name: inputText }))
+          const payload = { id: blocklist.id, name: inputText }
+          dispatch(duplicateBlocklist(payload))
           setIsDuplicateModalVisible(false)
         }}
       />

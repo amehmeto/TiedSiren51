@@ -61,13 +61,12 @@ describe('PrismaBlocklistRepository', () => {
     expect(foundBlocklists).toHaveLength(createdBlocklists.length)
 
     for (const createdBlocklist of createdBlocklists) {
-      expect(foundBlocklists).toContainEqual(
-        expect.objectContaining({
-          id: createdBlocklist.id,
-          name: createdBlocklist.name,
-          sirens: createdBlocklist.sirens,
-        }),
-      )
+      const expectedBlocklistFields = expect.objectContaining({
+        id: createdBlocklist.id,
+        name: createdBlocklist.name,
+        sirens: createdBlocklist.sirens,
+      })
+      expect(foundBlocklists).toContainEqual(expectedBlocklistFields)
     }
   })
 

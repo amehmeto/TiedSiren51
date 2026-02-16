@@ -574,10 +574,8 @@ export function buildGraphFromTickets(tickets, options = {}) {
 
     // Track declared blocks for bidirectional validation
     if (ticket.metadata?.blocks) {
-      declaredBlocks.set(
-        id,
-        ticket.metadata.blocks.map((ref) => formatId(ref.repo, ref.number)),
-      )
+      const blockIds = ticket.metadata.blocks.map((ref) => formatId(ref.repo, ref.number))
+      declaredBlocks.set(id, blockIds)
     }
   }
 

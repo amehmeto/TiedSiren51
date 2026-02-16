@@ -10,49 +10,57 @@ import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { Blocklist } from '@/core/blocklist/blocklist'
 
 export class FakeDataBlocklistRepository implements BlocklistRepository {
+  private static readonly initialBlocklists = [
+    buildBlocklist(),
+    {
+      id: 'blocklist-id-1',
+      name: 'Social medias',
+      sirens: {
+        android: [instagramAndroidSiren, facebookAndroidSiren],
+        ios: [],
+        linux: [],
+        macos: [],
+        windows: [],
+        websites: ['twitter.com'],
+        keywords: ['cat videos'],
+      },
+    },
+    {
+      id: 'blocklist-id-2',
+      name: 'Necessary evils',
+      sirens: {
+        android: [whatsappAndroidSiren],
+        ios: [],
+        linux: [],
+        macos: [],
+        windows: [],
+        keywords: ['work'],
+        websites: ['linkedin.com'],
+      },
+    },
+    {
+      id: 'blocklist-id-3',
+      name: 'Streaming services',
+      sirens: {
+        android: [youtubeAndroidSiren, amazonPrimeAndroidSiren],
+        ios: [],
+        linux: [],
+        macos: [],
+        windows: [],
+        websites: ['hulu.com'],
+        keywords: ['movies', 'series'],
+      },
+    },
+  ]
+
+  private static readonly entries: [string, Blocklist][] =
+    FakeDataBlocklistRepository.initialBlocklists.map((blocklist) => [
+      blocklist.id,
+      blocklist,
+    ])
+
   blocklists: Map<string, Blocklist> = new Map(
-    [
-      buildBlocklist(),
-      {
-        id: 'blocklist-id-1',
-        name: 'Social medias',
-        sirens: {
-          android: [instagramAndroidSiren, facebookAndroidSiren],
-          ios: [],
-          linux: [],
-          macos: [],
-          windows: [],
-          websites: ['twitter.com'],
-          keywords: ['cat videos'],
-        },
-      },
-      {
-        id: 'blocklist-id-2',
-        name: 'Necessary evils',
-        sirens: {
-          android: [whatsappAndroidSiren],
-          ios: [],
-          linux: [],
-          macos: [],
-          windows: [],
-          keywords: ['work'],
-          websites: ['linkedin.com'],
-        },
-      },
-      {
-        id: 'blocklist-id-3',
-        name: 'Streaming services',
-        sirens: {
-          android: [youtubeAndroidSiren, amazonPrimeAndroidSiren],
-          ios: [],
-          linux: [],
-          macos: [],
-          windows: [],
-          websites: ['hulu.com'],
-          keywords: ['movies', 'series'],
-        },
-      },
-    ].map((blocklist) => [blocklist.id, blocklist]),
+    FakeDataBlocklistRepository.entries,
   )
 
   findAll(): Promise<Blocklist[]> {

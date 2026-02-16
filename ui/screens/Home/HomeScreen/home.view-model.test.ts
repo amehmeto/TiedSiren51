@@ -33,7 +33,12 @@ describe('Home View Model', () => {
   })
 
   test.each<
-    [string, PreloadedState, object, { hours: number; minutes: number }]
+    [
+      string,
+      PreloadedState | Record<string, never>,
+      Record<string, unknown>,
+      { hours: number; minutes: number },
+    ]
   >([
     [
       'no session',

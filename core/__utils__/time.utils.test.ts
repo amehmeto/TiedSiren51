@@ -10,7 +10,12 @@ describe('calculateMilliseconds', () => {
   })
 
   test.each<{
-    input: { seconds?: number; minutes?: number; hours?: number; days?: number }
+    input: Partial<{
+      seconds: number
+      minutes: number
+      hours: number
+      days: number
+    }>
     expected: number
   }>([
     { input: { seconds: 1 }, expected: 1 * SECOND },
@@ -31,7 +36,8 @@ describe('calculateMilliseconds', () => {
       seconds: 45,
     })
 
-    expect(result).toBe(1 * DAY + 2 * HOUR + 30 * MINUTE + 45 * SECOND)
+    const expectedMilliseconds = 1 * DAY + 2 * HOUR + 30 * MINUTE + 45 * SECOND
+    expect(result).toBe(expectedMilliseconds)
   })
 
   test('should handle partial parameters', () => {

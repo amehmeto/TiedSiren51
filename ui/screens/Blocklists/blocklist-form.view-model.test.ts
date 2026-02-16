@@ -159,9 +159,8 @@ describe('selectBlocklistFormViewModel', () => {
       endedAt: '23:00',
     })
 
-    const endedAt = dateProvider.msToISOString(
-      dateProvider.getNowMs() + 2 * HOUR + 30 * MINUTE,
-    )
+    const expirationMs = dateProvider.getNowMs() + 2 * HOUR + 30 * MINUTE
+    const endedAt = dateProvider.msToISOString(expirationMs)
 
     const store = createTestStore(
       { dateProvider },

@@ -103,8 +103,10 @@ const reducer = createReducer(initialState, (builder) => {
 export const stateBuilder = (baseState = initialState) => {
   const reduce =
     <P>(actionCreator: ActionCreatorWithPayload<P>) =>
-    (payload: P) =>
-      stateBuilder(reducer(baseState, actionCreator(payload)))
+    (payload: P) => {
+      const nextState = reducer(baseState, actionCreator(payload))
+      return stateBuilder(nextState)
+    }
 
   return {
     build(): RootState {

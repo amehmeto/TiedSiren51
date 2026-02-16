@@ -17,12 +17,11 @@ describe('Feature: Adding websites to sirens', () => {
 
     await fixture.when.addingWebsiteToSirens('jeuxvideos.fr')
 
-    fixture.then.availableSirensShouldBeStoredAs(
-      buildSirens({
-        ...initialSirens,
-        websites: [...initialSirens.websites, 'jeuxvideos.fr'],
-      }),
-    )
+    const sirensWithAddedWebsite = buildSirens({
+      ...initialSirens,
+      websites: [...initialSirens.websites, 'jeuxvideos.fr'],
+    })
+    fixture.then.availableSirensShouldBeStoredAs(sirensWithAddedWebsite)
     await fixture.then.websiteShouldBeSaved('jeuxvideos.fr')
   })
 })
