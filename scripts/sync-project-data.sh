@@ -234,19 +234,23 @@ recently_done.sort(key=lambda x: x["closed"], reverse=True)
 
 board_items = board_raw.get("items", [])
 board_status_by_issue = {}
+board_item_id_by_issue = {}
 for item in board_items:
     content = item.get("content", {})
     num = content.get("number")
     repo = content.get("repository", "")
     status = item.get("status", "")
+    item_id = item.get("id", "")
     if num and "TiedSiren51" in repo:
         board_status_by_issue[num] = status
+        board_item_id_by_issue[num] = item_id
 
 # ---------------------------------------------------------------------------
 # Detect board mismatches
 # ---------------------------------------------------------------------------
 
 mismatches = []
+board_updates = []
 
 # Issues that are CLOSED but board says Todo/In Progress
 for issue in main_issues:
@@ -257,17 +261,20 @@ for issue in main_issues:
 
     if issue["state"] == "CLOSED" and board_status in ("Todo", "In Progress"):
         mismatches.append(f"#{num} — board says **{board_status}** but issue is **Closed**. Move to Done.")
+        board_updates.append({"action": "move_done", "number": num, "item_id": board_item_id_by_issue.get(num, "")})
 
 # Issues in-progress but board says Todo
 for item in in_progress:
     board_status = board_status_by_issue.get(item["number"])
     if board_status == "Todo":
         mismatches.append(f"#{item['number']} — board says **Todo** but has open PR #{item['pr']}. Move to In Progress.")
+        board_updates.append({"action": "move_in_progress", "number": item["number"], "item_id": board_item_id_by_issue.get(item["number"], "")})
 
 # Open issues not on the board
-for item in ready:
+for item in ready + blocked:
     if item["number"] not in board_status_by_issue:
         mismatches.append(f"#{item['number']} — not on project board. Add as Todo.")
+        board_updates.append({"action": "add_todo", "number": item["number"]})
 
 # ---------------------------------------------------------------------------
 # JSON mode: output raw data
@@ -520,7 +527,9 @@ if orphans:
             lines.append(f"| #{m['number']} | {m['title']} | {m.get('label', '?')} |")
         lines.append("")
 
-# Output matches as JSON on stderr for the shell wrapper to pick up
+# Output structured data on stderr for the shell wrapper to pick up
+if board_updates:
+    print("BOARD_UPDATES:" + json.dumps(board_updates), file=sys.stderr)
 if auto_matched:
     print("ORPHAN_MATCHES:" + json.dumps(auto_matched), file=sys.stderr)
 if needs_user:
@@ -529,6 +538,127 @@ if needs_user:
 print("\n".join(lines))
 
 PYEOF
+
+# ============================================================================
+# Phase 4: Sync project board (add missing issues, fix status mismatches)
+# ============================================================================
+
+BOARD_LINE=$(grep "^BOARD_UPDATES:" "$STDERR_FILE" 2>/dev/null || true)
+if [ -n "$BOARD_LINE" ]; then
+  BOARD_JSON="${BOARD_LINE#BOARD_UPDATES:}"
+
+  # Fetch project metadata (IDs) once via GraphQL
+  OWNER=$(gh repo view --json owner -q '.owner.login' 2>/dev/null || echo "")
+  if [ -n "$OWNER" ]; then
+    PROJECT_META=$(gh api graphql -f query="
+    {
+      user(login: \"$OWNER\") {
+        projectV2(number: 1) {
+          id
+          field(name: \"Status\") {
+            ... on ProjectV2SingleSelectField {
+              id
+              options { id name }
+            }
+          }
+        }
+      }
+    }" 2>/dev/null || echo "")
+
+    if [ -n "$PROJECT_META" ]; then
+      PROJECT_ID=$(echo "$PROJECT_META" | python3 -c "import json,sys; print(json.load(sys.stdin)['data']['user']['projectV2']['id'])" 2>/dev/null || echo "")
+      FIELD_ID=$(echo "$PROJECT_META" | python3 -c "import json,sys; print(json.load(sys.stdin)['data']['user']['projectV2']['field']['id'])" 2>/dev/null || echo "")
+      TODO_OPT=$(echo "$PROJECT_META" | python3 -c "
+import json,sys
+opts = json.load(sys.stdin)['data']['user']['projectV2']['field']['options']
+print(next(o['id'] for o in opts if o['name'] == 'Todo'), end='')
+" 2>/dev/null || echo "")
+      IN_PROGRESS_OPT=$(echo "$PROJECT_META" | python3 -c "
+import json,sys
+opts = json.load(sys.stdin)['data']['user']['projectV2']['field']['options']
+print(next(o['id'] for o in opts if o['name'] == 'In Progress'), end='')
+" 2>/dev/null || echo "")
+      DONE_OPT=$(echo "$PROJECT_META" | python3 -c "
+import json,sys
+opts = json.load(sys.stdin)['data']['user']['projectV2']['field']['options']
+print(next(o['id'] for o in opts if o['name'] == 'Done'), end='')
+" 2>/dev/null || echo "")
+
+      if [ -n "$PROJECT_ID" ] && [ -n "$FIELD_ID" ]; then
+        echo "📋 Syncing project board..." >&2
+        echo "$BOARD_JSON" | python3 -c "
+import json, sys, subprocess
+
+updates = json.load(sys.stdin)
+project_id = '$PROJECT_ID'
+field_id = '$FIELD_ID'
+todo_opt = '$TODO_OPT'
+in_progress_opt = '$IN_PROGRESS_OPT'
+done_opt = '$DONE_OPT'
+
+for u in updates:
+    num = u['number']
+    action = u['action']
+
+    if action == 'add_todo':
+        # Add issue to project, then set status to Todo
+        result = subprocess.run(
+            ['gh', 'project', 'item-add', '1', '--owner', '$OWNER',
+             '--url', f'https://github.com/$OWNER/TiedSiren51/issues/{num}',
+             '--format', 'json'],
+            capture_output=True, text=True
+        )
+        if result.returncode != 0:
+            print(f'  ❌ #{num}: failed to add to project', file=sys.stderr)
+            continue
+        item_id = json.loads(result.stdout).get('id', '')
+        if not item_id:
+            print(f'  ❌ #{num}: no item ID returned', file=sys.stderr)
+            continue
+        subprocess.run(
+            ['gh', 'project', 'item-edit', '--project-id', project_id,
+             '--id', item_id, '--field-id', field_id,
+             '--single-select-option-id', todo_opt],
+            capture_output=True, text=True
+        )
+        print(f'  ✅ #{num} → added as Todo', file=sys.stderr)
+
+    elif action == 'move_in_progress':
+        item_id = u.get('item_id', '')
+        if not item_id:
+            print(f'  ❌ #{num}: no item ID for status update', file=sys.stderr)
+            continue
+        subprocess.run(
+            ['gh', 'project', 'item-edit', '--project-id', project_id,
+             '--id', item_id, '--field-id', field_id,
+             '--single-select-option-id', in_progress_opt],
+            capture_output=True, text=True
+        )
+        print(f'  ✅ #{num} → In Progress', file=sys.stderr)
+
+    elif action == 'move_done':
+        item_id = u.get('item_id', '')
+        if not item_id:
+            print(f'  ❌ #{num}: no item ID for status update', file=sys.stderr)
+            continue
+        subprocess.run(
+            ['gh', 'project', 'item-edit', '--project-id', project_id,
+             '--id', item_id, '--field-id', field_id,
+             '--single-select-option-id', done_opt],
+            capture_output=True, text=True
+        )
+        print(f'  ✅ #{num} → Done', file=sys.stderr)
+"
+      else
+        echo "⚠️  Could not fetch project metadata — board sync skipped" >&2
+      fi
+    else
+      echo "⚠️  GraphQL query failed — board sync skipped" >&2
+    fi
+  else
+    echo "⚠️  Could not determine repo owner — board sync skipped" >&2
+  fi
+fi
 
 # ============================================================================
 # Phase 5.5: Auto-update orphan tickets with hierarchy sections
