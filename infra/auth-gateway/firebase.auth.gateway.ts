@@ -228,11 +228,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         password,
       )
 
-      sendEmailVerification(signUpResponse.user).catch((verificationError) => {
-        this.logger.error(
-          `[FirebaseAuthGateway] Failed to send verification email: ${verificationError}`,
-        )
-      })
+      this.trySendVerificationEmail(signUpResponse.user)
 
       return {
         id: signUpResponse.user.uid,
@@ -298,6 +294,14 @@ export class FirebaseAuthGateway implements AuthGateway {
       )
       throw this.toAuthError(error)
     }
+  }
+
+  private trySendVerificationEmail(user: User): void {
+    sendEmailVerification(user).catch((error) => {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to send verification email: ${error}`,
+      )
+    })
   }
 
   async sendVerificationEmail(): Promise<void> {

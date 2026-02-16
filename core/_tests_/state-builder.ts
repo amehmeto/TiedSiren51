@@ -36,6 +36,9 @@ const withPasswordResetSent = createAction<boolean>('withPasswordResetSent')
 const withLastReauthenticatedAt = createAction<ISODateString | null>(
   'withLastReauthenticatedAt',
 )
+const withSendingVerificationEmail = createAction<boolean>(
+  'withSendingVerificationEmail',
+)
 const withVerificationEmailSent = createAction<boolean>(
   'withVerificationEmailSent',
 )
@@ -84,6 +87,9 @@ const reducer = createReducer(initialState, (builder) => {
     })
     .addCase(withLastReauthenticatedAt, (state, action) => {
       state.auth.lastReauthenticatedAt = action.payload
+    })
+    .addCase(withSendingVerificationEmail, (state, action) => {
+      state.auth.isSendingVerificationEmail = action.payload
     })
     .addCase(withVerificationEmailSent, (state, action) => {
       state.auth.isVerificationEmailSent = action.payload
@@ -135,6 +141,7 @@ export const stateBuilder = (baseState = initialState) => {
     withAuthLoading: reduce(withAuthLoading),
     withStrictModeEndedAt: reduce(withStrictModeEndedAt),
     withPasswordResetSent: reduce(withPasswordResetSent),
+    withSendingVerificationEmail: reduce(withSendingVerificationEmail),
     withVerificationEmailSent: reduce(withVerificationEmailSent),
     withRefreshingEmailVerification: reduce(withRefreshingEmailVerification),
     withEmail: reduce(withEmail),

@@ -26,6 +26,7 @@ export type AuthState = {
   error: string | null
   errorType: AuthErrorType | null
   isPasswordResetSent: boolean
+  isSendingVerificationEmail: boolean
   isVerificationEmailSent: boolean
   isRefreshingEmailVerification: boolean
   email: string
@@ -69,6 +70,7 @@ function createInitialAuthState(): AuthState {
     error: null,
     errorType: null,
     isPasswordResetSent: false,
+    isSendingVerificationEmail: false,
     isVerificationEmailSent: false,
     isRefreshingEmailVerification: false,
     email: '',
@@ -85,6 +87,9 @@ function createInitialAuthState(): AuthState {
 export const reducer = createReducer<AuthState>(
   createInitialAuthState(),
   (builder) => {
+    // All auth thunks share the same pending/fulfilled/rejected state transitions
+    // (loading, error, errorType). The addMatcher calls below handle this shared
+    // logic, while thunk-specific behavior (e.g. setting authUser) stays in addCase.
     const authThunks = [
       signInWithEmail,
       signUpWithEmail,
@@ -134,6 +139,7 @@ export const reducer = createReducer<AuthState>(
         state.authUser = null
         state.email = ''
         state.password = ''
+        state.isSendingVerificationEmail = false
         state.isVerificationEmailSent = false
         state.isRefreshingEmailVerification = false
         state.lastReauthenticatedAt = null
@@ -145,6 +151,7 @@ export const reducer = createReducer<AuthState>(
         state.error = null
         state.errorType = null
         state.isPasswordResetSent = false
+        state.isSendingVerificationEmail = false
         state.isVerificationEmailSent = false
         state.email = ''
         state.password = ''
@@ -157,13 +164,19 @@ export const reducer = createReducer<AuthState>(
       })
 
       .addCase(sendVerificationEmail.pending, (state) => {
+        state.isSendingVerificationEmail = true
         state.isVerificationEmailSent = false
       })
       .addCase(sendVerificationEmail.fulfilled, (state) => {
+        state.isSendingVerificationEmail = false
         state.isVerificationEmailSent = true
       })
       .addCase(sendVerificationEmail.rejected, (state, action) => {
+        state.isSendingVerificationEmail = false
         state.error = action.error.message ?? null
+        state.errorType = isAuthErrorType(action.error.code)
+          ? action.error.code
+          : null
       })
 
       .addCase(refreshEmailVerificationStatus.pending, (state) => {
@@ -177,6 +190,9 @@ export const reducer = createReducer<AuthState>(
       .addCase(refreshEmailVerificationStatus.rejected, (state, action) => {
         state.isRefreshingEmailVerification = false
         state.error = action.error.message ?? null
+        state.errorType = isAuthErrorType(action.error.code)
+          ? action.error.code
+          : null
       })
 
       .addCase(reauthenticate.pending, (state) => {

@@ -9,6 +9,7 @@ describe('selectEmailVerificationStatus', () => {
 
     const expectedStatus = {
       isEmailVerified: false,
+      isSendingVerificationEmail: false,
       isVerificationEmailSent: false,
       isRefreshingEmailVerification: false,
     }

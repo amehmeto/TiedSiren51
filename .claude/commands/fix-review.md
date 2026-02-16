@@ -43,14 +43,9 @@ Fix all pending review comments on PR #$ARGUMENTS.
    - **Always prefix replies with `🤖 Claude's answer:` ** so they're distinguishable from the repo owner's own comments
    - For each comment you fixed: reply with a concise summary of what you changed (e.g., "🤖 Claude's answer: Fixed — extracted to variable")
    - For questions from the reviewer: reply with a direct answer to their question
-   - Use the `repo` field from step 1 output as REPO_NWO. Reply in-thread via:
+   - Reply in-thread using the wrapper script:
      ```bash
-     gh api repos/REPO_NWO/pulls/$PR_NUMBER/comments \
-       -F body="🤖 Claude's answer: Your reply" \
-       -F commit_id="$(git rev-parse HEAD)" \
-       -F path="file.ts" \
-       -F line=1 \
-       -F in_reply_to=COMMENT_ID
+     ./scripts/reply-pr-comment.sh $ARGUMENTS COMMENT_ID "🤖 Claude's answer: Your reply"
      ```
 
 7. **After all fixes are applied:**

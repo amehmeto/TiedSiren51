@@ -2,24 +2,24 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { ActivityIndicator, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
-import { selectEmailVerificationStatus } from '@/core/auth/selectors/selectEmailVerificationStatus'
 import { refreshEmailVerificationStatus } from '@/core/auth/usecases/refresh-email-verification-status.usecase'
 import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
+import {
+  EmailVerificationBannerViewModel,
+  EmailVerificationBannerViewState,
+  selectEmailVerificationBannerViewModel,
+} from './email-verification-banner.view-model'
 
 export function EmailVerificationBanner() {
   const dispatch = useDispatch<AppDispatch>()
-  const {
-    isEmailVerified,
-    isVerificationEmailSent,
-    isRefreshingEmailVerification,
-  } = useSelector<RootState, ReturnType<typeof selectEmailVerificationStatus>>(
-    selectEmailVerificationStatus,
+  const viewModel = useSelector<RootState, EmailVerificationBannerViewModel>(
+    selectEmailVerificationBannerViewModel,
   )
 
-  if (isEmailVerified) return null
+  if (viewModel.type === EmailVerificationBannerViewState.Hidden) return null
 
   return (
     <TiedSCard style={styles.container}>
@@ -34,7 +34,7 @@ export function EmailVerificationBanner() {
           Please check your inbox and verify your email address to secure your
           account.
         </Text>
-        {isVerificationEmailSent && (
+        {viewModel.isVerificationEmailSent && (
           <Text style={styles.sentConfirmation}>
             Verification email sent! Check your inbox.
           </Text>
@@ -42,17 +42,21 @@ export function EmailVerificationBanner() {
       </View>
 
       <View style={styles.buttonContainer}>
-        <TiedSButton
-          onPress={() => dispatch(sendVerificationEmail())}
-          text="Resend verification email"
-        />
+        {viewModel.isSendingVerificationEmail ? (
+          <ActivityIndicator color={T.color.lightBlue} />
+        ) : (
+          <TiedSButton
+            onPress={() => dispatch(sendVerificationEmail())}
+            text={viewModel.resendButtonText}
+          />
+        )}
         <View style={styles.refreshButton}>
-          {isRefreshingEmailVerification ? (
+          {viewModel.isRefreshingEmailVerification ? (
             <ActivityIndicator color={T.color.lightBlue} />
           ) : (
             <TiedSButton
               onPress={() => dispatch(refreshEmailVerificationStatus())}
-              text="I've verified my email"
+              text={viewModel.refreshButtonText}
             />
           )}
         </View>
