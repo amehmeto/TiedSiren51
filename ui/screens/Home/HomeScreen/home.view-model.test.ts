@@ -32,7 +32,14 @@ describe('Home View Model', () => {
     dateProvider = new StubDateProvider()
   })
 
-  test.each([
+  test.each<
+    [
+      string,
+      PreloadedState | Record<string, never>,
+      Record<string, unknown>,
+      { hours: number; minutes: number },
+    ]
+  >([
     [
       'no session',
       {},
@@ -473,7 +480,7 @@ describe('Home View Model', () => {
     },
   )
 
-  it.each([
+  it.each<[Greetings, string, string]>([
     [Greetings.GoodMorning, 'from 06:00 to 11:59', '06:00'],
     [Greetings.GoodMorning, 'from 06 to 11:59', '08:50'],
     [Greetings.GoodMorning, 'from 06 to 11:59', '11:59'],

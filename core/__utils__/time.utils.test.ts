@@ -9,7 +9,15 @@ describe('calculateMilliseconds', () => {
     expect(result).toBe(0)
   })
 
-  test.each([
+  test.each<{
+    input: Partial<{
+      seconds: number
+      minutes: number
+      hours: number
+      days: number
+    }>
+    expected: number
+  }>([
     { input: { seconds: 1 }, expected: 1 * SECOND },
     { input: { minutes: 1 }, expected: 1 * MINUTE },
     { input: { hours: 1 }, expected: 1 * HOUR },
@@ -56,7 +64,10 @@ describe('millisecondsToTimeUnits', () => {
     expect(result).toStrictEqual(expectedTimeUnits)
   })
 
-  test.each([
+  test.each<{
+    input: number
+    expected: { days: number; hours: number; minutes: number; seconds: number }
+  }>([
     {
       input: 1 * SECOND,
       expected: { days: 0, hours: 0, minutes: 0, seconds: 1 },

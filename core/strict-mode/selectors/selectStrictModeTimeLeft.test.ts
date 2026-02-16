@@ -52,7 +52,17 @@ describe('selectStrictModeTimeLeft', () => {
     expect(timeLeft).toStrictEqual(expectedTimeLeft)
   })
 
-  test.each([
+  test.each<{
+    description: string
+    remainingMs: number
+    expected: {
+      days: number
+      hours: number
+      minutes: number
+      seconds: number
+      totalMs: number
+    }
+  }>([
     {
       description: '1 hour',
       remainingMs: 1 * HOUR,
