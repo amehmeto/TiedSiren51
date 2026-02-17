@@ -11,6 +11,7 @@
       "Bash(./scripts/*.sh:*)",
       "Bash(./scripts/fetch-pr-comments.sh:*)",
       "Bash(./scripts/fetch-project-board.sh:*)",
+      "Bash(./scripts/prepare-worktree.sh:*)",
       "Bash(./scripts/reply-pr-comment.sh:*)",
       "Bash(./scripts/start-issue.sh:*)",
       "Bash(./scripts/sync-project-data.sh:*)",

@@ -4,7 +4,7 @@ description: Start working on a GitHub issue - launches ralph loop in the curren
 
 This command assumes you are already in the correct worktree (created via `/prepare-worktree`).
 
-1. **Extract the issue number** from `$ARGUMENTS`. If no argument is provided, extract it from the current branch name (format: `<type>/TS<number>-<slug>`).
+1. **Extract the issue number** from `$ARGUMENTS`. If no argument is provided, extract it from the current branch name (format: `<type>/TS<number>-<slug>`). **If neither provides an issue number, stop and report an error:** "Could not determine issue number. Provide it as an argument (`/start-issue 42`) or run from a worktree branch."
 
 2. **Detect the PR** for the current branch:
    ```bash
