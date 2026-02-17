@@ -8,10 +8,13 @@ export interface AuthGateway {
   signUpWithEmail(email: string, password: string): Promise<AuthUser>
   signInWithEmail(email: string, password: string): Promise<AuthUser>
   reauthenticate(password: string): Promise<void>
+  changePassword(newPassword: string): Promise<void>
   reauthenticateWithGoogle(): Promise<void>
   resetPassword(email: string): Promise<void>
   /** @param oobCode - Out-of-band code from Firebase password reset email link */
   confirmPasswordReset(oobCode: string, newPassword: string): Promise<void>
-  logOut(): Promise<void>
+  sendVerificationEmail(): Promise<void>
+  refreshEmailVerificationStatus(): Promise<boolean>
   deleteAccount(): Promise<void>
+  logOut(): Promise<void>
 }

@@ -9,6 +9,7 @@ describe('selectAuthProvider', () => {
       .withAuthUser({
         id: 'user-123',
         email: 'test@example.com',
+        isEmailVerified: true,
         authProvider: AuthProvider.Google,
       })
       .build()
@@ -23,6 +24,7 @@ describe('selectAuthProvider', () => {
       .withAuthUser({
         id: 'user-456',
         email: 'email@example.com',
+        isEmailVerified: true,
         authProvider: AuthProvider.Email,
       })
       .build()

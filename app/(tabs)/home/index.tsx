@@ -12,6 +12,7 @@ import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { useAccessibilityPermission } from '@/ui/hooks/useAccessibilityPermission'
 import { useTick } from '@/ui/hooks/useTick'
 import { AccessibilityPermissionCard } from '@/ui/screens/Home/HomeScreen/AccessibilityPermissionCard'
+import { EmailVerificationBanner } from '@/ui/screens/Home/HomeScreen/EmailVerificationBanner'
 import { HomeViewModel } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 import { NoSessionBoard } from '@/ui/screens/Home/HomeScreen/NoSessionBoard'
@@ -84,6 +85,8 @@ export default function HomeScreen() {
       <Image style={styles.image} source={logoSource} />
       <Text style={styles.greetings}>{viewModel.greetings}</Text>
       <Text style={styles.text}>{"Let's make it productive"}</Text>
+
+      <EmailVerificationBanner />
 
       {!hasAccessibilityPermission && isAndroidSirenLookout(sirenLookout) && (
         <AccessibilityPermissionCard sirenLookout={sirenLookout} />

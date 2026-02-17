@@ -21,6 +21,7 @@ describe('onUserLoggedIn listener', () => {
     const userPayload = {
       id: 'wesh alors',
       email: 'jul@gmail.com',
+      isEmailVerified: true,
       username: 'Jul',
     }
     const expectedAction = userAuthenticated(userPayload)
@@ -51,6 +52,7 @@ describe('onUserLoggedIn listener', () => {
     authGateway.simulateUserLoggedIn({
       id: 'user-id',
       email: 'test@test.com',
+      isEmailVerified: true,
       username: 'Test',
     })
 

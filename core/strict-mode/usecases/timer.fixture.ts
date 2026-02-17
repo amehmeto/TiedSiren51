@@ -31,6 +31,7 @@ export function timerFixture(
   const defaultAuthUser: AuthUser = {
     id: DEFAULT_USER_ID,
     email: 'test@example.com',
+    isEmailVerified: true,
   }
 
   return {

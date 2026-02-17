@@ -52,11 +52,6 @@ export class FakeStorageAuthGateway implements AuthGateway {
     this.fakeAuthGateway.onUserLoggedOut(listener)
   }
 
-  async deleteAccount(): Promise<void> {
-    await AsyncStorage.removeItem('fake-auth-user')
-    return this.fakeAuthGateway.deleteAccount()
-  }
-
   async logOut(): Promise<void> {
     await AsyncStorage.removeItem('fake-auth-user')
     return this.fakeAuthGateway.logOut()
@@ -64,6 +59,10 @@ export class FakeStorageAuthGateway implements AuthGateway {
 
   async reauthenticate(password: string): Promise<void> {
     return this.fakeAuthGateway.reauthenticate(password)
+  }
+
+  async changePassword(newPassword: string): Promise<void> {
+    return this.fakeAuthGateway.changePassword(newPassword)
   }
 
   async reauthenticateWithGoogle(): Promise<void> {
@@ -79,6 +78,19 @@ export class FakeStorageAuthGateway implements AuthGateway {
     newPassword: string,
   ): Promise<void> {
     return this.fakeAuthGateway.confirmPasswordReset(oobCode, newPassword)
+  }
+
+  async sendVerificationEmail(): Promise<void> {
+    return this.fakeAuthGateway.sendVerificationEmail()
+  }
+
+  async refreshEmailVerificationStatus(): Promise<boolean> {
+    return this.fakeAuthGateway.refreshEmailVerificationStatus()
+  }
+
+  async deleteAccount(): Promise<void> {
+    await AsyncStorage.removeItem('fake-auth-user')
+    return this.fakeAuthGateway.deleteAccount()
   }
 
   private async verifyUserIsAuthenticated(): Promise<void> {

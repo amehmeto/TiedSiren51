@@ -3,17 +3,17 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2026-02-13
+> Last updated: 2026-02-16
 
 ## Graph Statistics
 
 | Metric | Value |
 |--------|-------|
-| Total Nodes | 93 |
+| Total Nodes | 103 |
 | Total Edges | 43 |
-| Root Nodes (no dependencies) | 64 |
-| Leaf Nodes (nothing depends on them) | 71 |
-| Orphan Nodes (isolated) | 52 |
+| Root Nodes (no dependencies) | 74 |
+| Leaf Nodes (nothing depends on them) | 81 |
+| Orphan Nodes (isolated) | 62 |
 | Critical Path Length | 5 |
 
 ### Critical Path
@@ -56,7 +56,7 @@ The longest dependency chain in the graph:
 | #80 | [Bug] Logout redirects to /login modal instead of /home, requires double close | - | medium | - |
 
 
-### Features - Other (32)
+### Features - Other (40)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #1 | Add ability to filter between system apps and user-installed apps on Android | - | - | - |
@@ -91,6 +91,14 @@ The longest dependency chain in the graph:
 | #272 | Display selected apps at top of blocklist screen | - | - | - |
 | #276 | Migrate from ESLint to OxLint | - | - | - |
 | #278 | Refactor: Extract BlocklistForm view model selector | - | - | - |
+| #287 | refactor: promote require-typed-each ESLint rule from warn to error | - | - | - |
+| #288 | refactor: promote no-inline-object-type ESLint rule from warn to error | - | - | - |
+| #289 | refactor: promote prefer-extracted-long-params ESLint rule from warn to error | - | - | - |
+| #291 | feat(ci): auto-generate review retrospective on PR merge and post to Slack | - | - | - |
+| #292 | fix: make start-issue.sh work from any worktree context | - | - | - |
+| #299 | feat: add pre-merge-commit Husky hook for squash-merge safety gate | - | - | - |
+| #300 | fix(scripts): automate board sync in sync-project-data.sh | - | - | - |
+| #304 | fix(ci): retro workflow fails because claude-code-action doesn't expand custom slash commands | - | - | - |
 
 
 ### Features - Blocking Architecture (30)
@@ -128,7 +136,7 @@ The longest dependency chain in the graph:
 | #267 | feat(strict-mode): prevent siren deselection from blocklists during strict mode | - | - | - |
 
 
-### Features - Authentication (16)
+### Features - Authentication (18)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #85 | Setup Firebase Authentication Infrastructure | - | - | - |
@@ -147,6 +155,8 @@ The longest dependency chain in the graph:
 | #169 | feat(auth): deep link to email app after signup | 🟢 2 | - | - |
 | #281 | feat(auth): change password | - | - | - |
 | #282 | feat(auth): account deletion | - | - | - |
+| #290 | refactor(auth): strip password from Redux serialization/logging | - | - | - |
+| #298 | feat(auth): Google re-authentication for sensitive operations | - | - | - |
 
 
 ---
@@ -264,8 +274,18 @@ flowchart LR
         T_TSBO_14["✅ TSBO#14 weekly recurrence in scheduler [5sp]"]:::blocking3_done
         T_TSBO_13["✅ TSBO#13 daily recurrence in scheduler [3sp]"]:::blocking2_done
     end
+    subgraph Epic_60["TS#60 Polish design"]
+        direction TB
+        T_TS_299["📝 TS#299 : add pre-merge-commit Husky<br/>hook for squash-merge safety<br/>gate"]:::other0_todo
+        T_TS_272["✅ TS#272 selected apps at top of<br/>blocklist screen"]:::other0_done
+    end
+    subgraph Epic_59["TS#59 Blocking keywords on A..."]
+        direction TB
+        T_TS_264["📝 TS#264 : Add caching for installed<br/>apps list"]:::blocking0_todo
+    end
     subgraph Epic_57["TS#57 Strict Mode"]
         direction TB
+        T_TS_278["✅ TS#278 : Extract BlocklistForm view<br/>model selector"]:::blocking0_done
         T_TS_255["✅ TS#255 strict-mode: disable edit and<br/>delete actions on sessions and<br/>blocklists during strict mode"]:::blocking0_done
         T_TS_213["✅ TS#213 confirmation modal before<br/>setting strict mode timer [2sp]"]:::blocking0_done
         T_TS_200["✅ TS#200 strict-mode: block blocklist<br/>deletion during active strict<br/>mode sessions"]:::blocking0_done
@@ -282,30 +302,35 @@ flowchart LR
     end
     subgraph Epic_54["TS#54 User Authentification"]
         direction TB
+        T_TS_298["📝 TS#298 auth: Google re-authentication<br/>for sensitive operations"]:::auth0_todo
+        T_TS_290["📝 TS#290 auth: strip password from<br/>Redux serialization/logging"]:::auth0_todo
+        T_TS_282["📝 TS#282 auth: account deletion"]:::auth0_todo
+        T_TS_281["🔄 TS#281 auth: change password"]:::auth0_in_progress
         T_TS_169["📝 TS#169 auth: deep link to email app<br/>after signup [2sp]"]:::auth0_todo
         T_TS_168["📝 TS#168 auth: security notification<br/>emails [5sp]"]:::auth0_todo
         T_TS_167["📝 TS#167 auth: brute force protection<br/>on login [2sp]"]:::auth0_todo
         T_TS_166["📝 TS#166 auth: invalidate sessions<br/>after password reset [3sp]"]:::auth1_todo
         T_TS_165["📝 TS#165 auth: resend password reset<br/>email [1sp]"]:::auth0_todo
-        T_TS_164["🔄 TS#164 auth: re-authentication for<br/>sensitive operations [2sp]"]:::auth0_in_progress
-        T_TS_163["📝 TS#163 auth: account deletion GDPR<br/>compliance [5sp]"]:::auth1_todo
-        T_TS_162["📝 TS#162 auth: change password when<br/>logged in [2sp]"]:::auth1_todo
+        T_TS_164["✅ TS#164 auth: re-authentication for<br/>sensitive operations [2sp]"]:::auth0_done
+        T_TS_163["✅ TS#163 auth: account deletion GDPR<br/>compliance [5sp]"]:::auth1_done
+        T_TS_162["✅ TS#162 auth: change password when<br/>logged in [2sp]"]:::auth1_done
         T_TS_161["📝 TS#161 auth: implement email<br/>verification flow [3sp]"]:::auth0_todo
         T_TS_160["📝 TS#160 auth: custom in-app password<br/>reset confirmation flow [5sp]"]:::auth0_todo
-        T_TS_89["📝 TS#89 Authentication Error Handling [3sp]"]:::auth0_todo
+        T_TS_89["✅ TS#89 Authentication Error Handling [3sp]"]:::auth0_done
         T_TS_88["📝 TS#88 Apple Sign-In with Firebase [3sp]"]:::auth0_todo
     end
     subgraph Ungrouped
         direction TB
-        T_TS_282["📝 TS#282 auth: account deletion"]:::auth0_todo
-        T_TS_281["📝 TS#281 auth: change password"]:::auth0_todo
-        T_TS_278["📝 TS#278 : Extract BlocklistForm view<br/>model selector"]:::other0_todo
+        T_TS_304["✅ TS#304 ci: retro workflow fails<br/>because claude-code-action<br/>doesn't expand custom slash..."]:::other0_done
+        T_TS_292["✅ TS#292 : make start-issue.sh work<br/>from any worktree context"]:::other0_done
+        T_TS_291["✅ TS#291 ci: auto-generate review<br/>retrospective on PR merge and<br/>post to Slack"]:::other0_done
+        T_TS_289["📝 TS#289 : promote<br/>prefer-extracted-long-params<br/>ESLint rule from warn to error"]:::other0_todo
+        T_TS_288["📝 TS#288 : promote<br/>no-inline-object-type ESLint<br/>rule from warn to error"]:::other0_todo
+        T_TS_287["✅ TS#287 : promote require-typed-each<br/>ESLint rule from warn to error"]:::other0_done
         T_TS_276["📝 TS#276 from ESLint to OxLint"]:::other0_todo
-        T_TS_272["✅ TS#272 selected apps at top of<br/>blocklist screen"]:::other0_done
         T_TS_270["✅ TS#270 : add review-fix command,<br/>enhance start-issue with issue<br/>content, and add branch hyg..."]:::other0_done
         T_TS_268["✅ TS#268 strict-mode: show closed lock<br/>icon in tab bar when strict<br/>mode is active"]:::blocking0_done
         T_TS_267["✅ TS#267 strict-mode: prevent siren<br/>deselection from blocklists<br/>during strict mode"]:::blocking0_done
-        T_TS_264["📝 TS#264 : Add caching for installed<br/>apps list"]:::other0_todo
         T_TS_260["✅ TS#260 ui: redesign time picker with<br/>consistent design system<br/>primitives"]:::other0_done
         T_TS_258["✅ TS#258 : enforce stricter-only<br/>editing of block sessions<br/>during strict mode"]:::blocking0_done
         T_TS_257["✅ TS#257 100% code coverage for custom<br/>ESLint rules"]:::other0_done
@@ -344,6 +369,7 @@ flowchart LR
         T_TSBO_5["✅ TSBO#5 BlockingScheduler with<br/>schedule storage"]:::blocking0_done
         T_ELIA_10["✅ ELIA#10 : Add uniqueBy option to<br/>deduplicate apps by package or<br/>activity"]:::other0_done
         T_ELIA_1["📝 ELIA#1 ability to filter between<br/>system apps and user-installed<br/>apps on Android"]:::other0_todo
+        T_TS_300["✅ TS#300 scripts: automate board sync<br/>in sync-project-data.sh"]:::other0_done
     end
 
     T_TS_55 --> T_TS_219
@@ -454,4 +480,4 @@ Quick reference showing what blocks what:
 
 ---
 
-*Auto-generated on 2026-02-13 from GitHub issue metadata*
+*Auto-generated on 2026-02-16 from GitHub issue metadata*

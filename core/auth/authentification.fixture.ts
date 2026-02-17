@@ -10,12 +10,15 @@ import {
 import { AuthError } from '@/core/auth/auth-error'
 import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
+import { changePassword } from '@/core/auth/usecases/change-password.usecase'
 import { confirmPasswordReset } from '@/core/auth/usecases/confirm-password-reset.usecase'
 import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { reauthenticateWithGoogle } from '@/core/auth/usecases/reauthenticate-with-google.usecase'
 import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
+import { refreshEmailVerificationStatus } from '@/core/auth/usecases/refresh-email-verification-status.usecase'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
+import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
@@ -98,6 +101,21 @@ export function authentificationFixture(
         const error = new Error(errorMessage)
         authGateway.willDeleteAccountWith = Promise.reject(error)
       },
+      changePasswordWillSucceed() {
+        authGateway.willChangePasswordWith = Promise.resolve()
+      },
+      changePasswordWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willChangePasswordWith = Promise.reject(error)
+      },
+      sendVerificationEmailWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willSendVerificationEmailWith = Promise.reject(error)
+      },
+      refreshEmailVerificationWillReturn(isVerified: boolean) {
+        authGateway.willRefreshEmailVerificationWith =
+          Promise.resolve(isVerified)
+      },
       nowIs(isoDate: ISODateString) {
         dateProvider.now = new Date(isoDate)
       },
@@ -142,6 +160,15 @@ export function authentificationFixture(
         )
         return store.dispatch(deleteAccount())
       },
+      changePassword(newPassword: string) {
+        return store.dispatch(changePassword({ newPassword }))
+      },
+      sendVerificationEmail() {
+        return store.dispatch(sendVerificationEmail())
+      },
+      refreshEmailVerificationStatus() {
+        return store.dispatch(refreshEmailVerificationStatus())
+      },
     },
     then: {
       userShouldBeAuthenticated(authUser: AuthUser) {
@@ -176,6 +203,21 @@ export function authentificationFixture(
       },
       passwordShouldBeCleared() {
         expect(store.getState().auth.password).toBe('')
+      },
+      verificationEmailShouldBeSent() {
+        expect(authGateway.verificationEmailSentCount).toBeGreaterThan(0)
+      },
+      emailShouldBeVerified() {
+        const { authUser } = store.getState().auth
+        expect(authUser?.isEmailVerified).toBe(true)
+      },
+      emailShouldNotBeVerified() {
+        const { authUser } = store.getState().auth
+        expect(authUser?.isEmailVerified ?? false).toBe(false)
+      },
+      toastShouldShow(expectedMessage: string) {
+        const { message } = store.getState().toast
+        expect(message).toBe(expectedMessage)
       },
       lastReauthenticatedAtShouldBe(expectedDate: ISODateString | null) {
         const { lastReauthenticatedAt } = store.getState().auth
@@ -216,6 +258,26 @@ export function authentificationFixture(
       deleteAccountErrorShouldBe(errorMessage: string) {
         const { deleteAccountError } = store.getState().auth
         expect(deleteAccountError).toBe(errorMessage)
+      },
+      changePasswordShouldNotBeLoading() {
+        const { isChangingPassword } = store.getState().auth
+        expect(isChangingPassword).toBe(false)
+      },
+      changePasswordErrorShouldBe(errorMessage: string) {
+        const { changePasswordError } = store.getState().auth
+        expect(changePasswordError).toBe(errorMessage)
+      },
+      changePasswordErrorShouldBeNull() {
+        const { changePasswordError } = store.getState().auth
+        expect(changePasswordError).toBeNull()
+      },
+      changePasswordShouldHaveSucceeded() {
+        const { hasChangePasswordSucceeded } = store.getState().auth
+        expect(hasChangePasswordSucceeded).toBe(true)
+      },
+      changePasswordShouldNotHaveSucceeded() {
+        const { hasChangePasswordSucceeded } = store.getState().auth
+        expect(hasChangePasswordSucceeded).toBe(false)
       },
     },
   }
