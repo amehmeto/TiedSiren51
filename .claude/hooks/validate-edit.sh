@@ -25,8 +25,7 @@ extension="${filename##*.}"
 # Determine which linters to run based on file type (mirrors lint-staged config)
 case "$extension" in
   ts|tsx|js|jsx)
-    # Prettier first (always auto-fix formatting), then ESLint
-    npx prettier --write "$file_path" >/dev/null 2>&1
+    # ESLint with auto-fix, then prettier
     output=$(npx eslint "$file_path" --fix 2>&1)
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
@@ -35,6 +34,7 @@ case "$extension" in
         '{"decision": "block", "reason": $reason, "errors": $errors}'
       exit 2
     fi
+    npx prettier --write "$file_path" >/dev/null 2>&1
     ;;
   json)
     # Prettier for JSON

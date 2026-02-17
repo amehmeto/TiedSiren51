@@ -15,7 +15,9 @@ import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { reauthenticateWithGoogle } from '@/core/auth/usecases/reauthenticate-with-google.usecase'
 import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
+import { refreshEmailVerificationStatus } from '@/core/auth/usecases/refresh-email-verification-status.usecase'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
+import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithEmail } from '@/core/auth/usecases/sign-in-with-email.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
@@ -101,6 +103,14 @@ export function authentificationFixture(
         const error = new Error(errorMessage)
         authGateway.willChangePasswordWith = Promise.reject(error)
       },
+      sendVerificationEmailWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willSendVerificationEmailWith = Promise.reject(error)
+      },
+      refreshEmailVerificationWillReturn(isVerified: boolean) {
+        authGateway.willRefreshEmailVerificationWith =
+          Promise.resolve(isVerified)
+      },
       nowIs(isoDate: ISODateString) {
         dateProvider.now = new Date(isoDate)
       },
@@ -144,6 +154,12 @@ export function authentificationFixture(
       changePassword(newPassword: string) {
         return store.dispatch(changePassword({ newPassword }))
       },
+      sendVerificationEmail() {
+        return store.dispatch(sendVerificationEmail())
+      },
+      refreshEmailVerificationStatus() {
+        return store.dispatch(refreshEmailVerificationStatus())
+      },
     },
     then: {
       userShouldBeAuthenticated(authUser: AuthUser) {
@@ -178,6 +194,21 @@ export function authentificationFixture(
       },
       passwordShouldBeCleared() {
         expect(store.getState().auth.password).toBe('')
+      },
+      verificationEmailShouldBeSent() {
+        expect(authGateway.verificationEmailSentCount).toBeGreaterThan(0)
+      },
+      emailShouldBeVerified() {
+        const { authUser } = store.getState().auth
+        expect(authUser?.isEmailVerified).toBe(true)
+      },
+      emailShouldNotBeVerified() {
+        const { authUser } = store.getState().auth
+        expect(authUser?.isEmailVerified ?? false).toBe(false)
+      },
+      toastShouldShow(expectedMessage: string) {
+        const { message } = store.getState().toast
+        expect(message).toBe(expectedMessage)
       },
       lastReauthenticatedAtShouldBe(expectedDate: ISODateString | null) {
         const { lastReauthenticatedAt } = store.getState().auth

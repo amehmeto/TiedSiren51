@@ -116,4 +116,8 @@ export class FakeDataBlockSessionRepository
   create(sessionPayload: Omit<BlockSession, 'id'>): Promise<BlockSession> {
     return super.create(sessionPayload)
   }
+
+  deleteAll(): Promise<void> {
+    return super.deleteAll()
+  }
 }

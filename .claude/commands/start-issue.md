@@ -22,31 +22,25 @@ After the script completes successfully:
    - The full issue content between `ISSUE_CONTENT_START` and `ISSUE_CONTENT_END`
    - The `PR_URL` value
 
-3. Write the full ralph-loop prompt to `.claude/ralph-loop-prompt.local.md` using the Write tool, replacing placeholders with actual extracted values:
+3. Launch a ralph loop to implement the issue, injecting the extracted values:
 
-   ```markdown
-   Implement the following GitHub issue in this worktree.
+```
+/ralph-loop "Implement the following GitHub issue in this worktree.
 
-   PR: {PR_URL from SUMMARY}
+PR: {PR_URL from SUMMARY}
 
-   {ISSUE_CONTENT between ISSUE_CONTENT_START and ISSUE_CONTENT_END}
+{ISSUE_CONTENT between ISSUE_CONTENT_START and ISSUE_CONTENT_END}
 
-   Before making structural changes, read /docs/adr/README.md for architectural decisions that must be followed.
+Before making structural changes, read /docs/adr/README.md for architectural decisions that must be followed.
 
-   Completion checklist:
-   - ALL acceptance criteria from the issue are met
-   - All unit tests pass (npm test)
-   - Lint passes (npm run lint)
-   - Changes committed and pushed with /commit-push
-   - CI passes on the PR
-   - No merge conflicts with main
-   - PR description updated to reflect ALL changes made
+Completion checklist:
+- ALL acceptance criteria from the issue are met
+- All unit tests pass (npm test)
+- Lint passes (npm run lint)
+- Changes committed and pushed with /commit-push
+- CI passes on the PR
+- No merge conflicts with main
+- PR description updated to reflect ALL changes made
 
-   When ALL criteria are met, output: <promise>COMPLETE</promise>
-   ```
-
-4. Launch the ralph loop with a single-line invocation referencing the prompt file:
-
-   ```
-   /ralph-loop Read and implement the task described in .claude/ralph-loop-prompt.local.md --completion-promise "COMPLETE" --max-iterations 5
-   ```
+When ALL criteria are met, output: <promise>COMPLETE</promise>" --completion-promise "COMPLETE" --max-iterations 5
+```
