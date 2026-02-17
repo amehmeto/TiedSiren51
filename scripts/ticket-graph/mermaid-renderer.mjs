@@ -14,7 +14,10 @@ import { writeFileSync, unlinkSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 
-import { BLOCKING_REPOS, CATEGORY_KEYWORDS } from '../remark-lint-ticket/config.mjs'
+import {
+  BLOCKING_REPOS,
+  CATEGORY_KEYWORDS,
+} from '../remark-lint-ticket/config.mjs'
 
 // ============================================================================
 // Constants
@@ -38,6 +41,7 @@ const CATEGORY_COLOR_SHADES = {
   auth: ['#16a34a', '#22c55e', '#4ade80', '#86efac', '#bbf7d0'],
   blocking: ['#ea580c', '#f97316', '#fb923c', '#fdba74', '#fed7aa'],
   bug: ['#dc2626', '#ef4444', '#f87171', '#fca5a5', '#fecaca'],
+  tooling: ['#0891b2', '#06b6d4', '#22d3ee', '#67e8f9', '#a5f3fc'],
   other: ['#4b5563', '#6b7280', '#9ca3af', '#d1d5db', '#e5e7eb'],
 }
 
@@ -79,9 +83,8 @@ function hslToRgb(h, s, l) {
   h /= 360
   let r, g, b
 
-  if (s === 0) {
-    r = g = b = l
-  } else {
+  if (s === 0) r = g = b = l
+  else {
     const hue2rgb = (p, q, t) => {
       if (t < 0) t += 1
       if (t > 1) t -= 1
@@ -129,7 +132,10 @@ function sanitizeTicketTitle(title, lineLength = 30, maxLines = 3) {
     .replace(/"/g, "'")
 
   const maxLength = lineLength * maxLines
-  const truncated = cleaned.length > maxLength ? cleaned.substring(0, maxLength - 3) + '...' : cleaned
+  const truncated =
+    cleaned.length > maxLength
+      ? cleaned.substring(0, maxLength - 3) + '...'
+      : cleaned
 
   const words = truncated.split(/\s+/).filter(Boolean)
   if (words.length === 0) return ''
@@ -139,29 +145,28 @@ function sanitizeTicketTitle(title, lineLength = 30, maxLines = 3) {
 
   for (let i = 0; i < words.length; i++) {
     let word = words[i]
-    if (word.length > lineLength) {
+    if (word.length > lineLength)
       word = word.substring(0, lineLength - 3) + '...'
-    }
-    if (currentLine.length + word.length + 1 <= lineLength) {
+
+    if (currentLine.length + word.length + 1 <= lineLength)
       currentLine += (currentLine ? ' ' : '') + word
-    } else {
+    else {
       if (currentLine) lines.push(currentLine)
       currentLine = word
       if (lines.length >= maxLines - 1) {
         const remaining = words.slice(i).join(' ')
         if (remaining.length > lineLength) {
-          const truncatedRemaining = remaining.substring(0, lineLength - 3) + '...'
+          const truncatedRemaining =
+            remaining.substring(0, lineLength - 3) + '...'
           lines.push(truncatedRemaining)
-        } else {
-          lines.push(remaining)
-        }
+        } else lines.push(remaining)
+
         break
       }
     }
   }
-  if (currentLine && lines.length < maxLines) {
-    lines.push(currentLine)
-  }
+
+  if (currentLine && lines.length < maxLines) lines.push(currentLine)
 
   return lines.join('<br/>')
 }
@@ -185,7 +190,9 @@ function buildEpicCategoryMap(graph) {
     if (node.type !== 'epic') continue
 
     const title = node.title.toLowerCase()
-    const labels = (node.labels || []).map((l) => (typeof l === 'string' ? l : l)?.toLowerCase() || '')
+    const labels = (node.labels || []).map(
+      (l) => (typeof l === 'string' ? l : l)?.toLowerCase() || '',
+    )
 
     let found = false
     for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
@@ -206,9 +213,7 @@ function buildEpicCategoryMap(graph) {
       }
     }
 
-    if (!found) {
-      epicCategories.set(node.number, 'other')
-    }
+    if (!found) epicCategories.set(node.number, 'other')
   }
 
   return epicCategories
@@ -228,12 +233,17 @@ function categorizeNode(node, epicCategoryMap) {
   if (BLOCKING_REPOS.includes(node.repo)) return 'blocking'
 
   const parentEpic = node.parentEpic
-  if (parentEpic && epicCategoryMap.has(parentEpic)) {
+  if (parentEpic && epicCategoryMap.has(parentEpic))
     return epicCategoryMap.get(parentEpic)
-  }
 
-  if (labels.includes('auth') || title.includes('auth') || title.includes('sign-in') || title.includes('password')) return 'auth'
-  if (labels.includes('blocking') || title.includes('blocking') || title.includes('siren') || title.includes('tier') || title.includes('lookout') || title.includes('strict')) return 'blocking'
+  for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+    if (
+      keywords.some(
+        (kw) => title.includes(kw) || labels.some((l) => l.includes(kw)),
+      )
+    )
+      return category
+  }
 
   return 'other'
 }
@@ -273,7 +283,9 @@ function generateMermaidStyles(maxDepth) {
           extraStyle = ',stroke-width:3px'
         }
 
-        styles.push(`    classDef ${category}${d}_${status} fill:${fill},stroke:${stroke},color:${text}${extraStyle}`)
+        styles.push(
+          `    classDef ${category}${d}_${status} fill:${fill},stroke:${stroke},color:${text}${extraStyle}`,
+        )
       }
     }
   }
@@ -311,7 +323,11 @@ function createNodeId(node, repoDisplayAbbrev) {
  * @returns {string}
  */
 export function renderMermaidDiagram(graph, options) {
-  const { repoDisplayAbbrev = {}, groupByEpic = true, showCrossGroupEdges = false } = options
+  const {
+    repoDisplayAbbrev = {},
+    groupByEpic = true,
+    showCrossGroupEdges = false,
+  } = options
 
   const nodes = []
   const depths = graph.computeDepths()
@@ -328,18 +344,19 @@ export function renderMermaidDiagram(graph, options) {
   const orphanTickets = []
 
   for (const node of graph.nodes.values()) {
-    if (node.type === 'initiative') {
-      initiatives.push(node)
-    } else if (node.type === 'epic') {
+    if (node.type === 'initiative') initiatives.push(node)
+    else if (node.type === 'epic') {
       epics.push(node)
       epicByNumber.set(node.number, node)
-    } else if (groupByEpic && node.parentEpic && epicByNumber.has(node.parentEpic)) {
+    } else if (
+      groupByEpic &&
+      node.parentEpic &&
+      epicByNumber.has(node.parentEpic)
+    ) {
       // Will be grouped later
     } else if (groupByEpic && node.parentEpic) {
       // Parent epic might be added later
-    } else {
-      orphanTickets.push(node)
-    }
+    } else orphanTickets.push(node)
   }
 
   // Second pass for epic children (now that epicByNumber is populated)
@@ -347,13 +364,11 @@ export function renderMermaidDiagram(graph, options) {
     if (node.type === 'initiative' || node.type === 'epic') continue
 
     if (groupByEpic && node.parentEpic && epicByNumber.has(node.parentEpic)) {
-      if (!ticketsByEpic.has(node.parentEpic)) {
+      if (!ticketsByEpic.has(node.parentEpic))
         ticketsByEpic.set(node.parentEpic, [])
-      }
+
       ticketsByEpic.get(node.parentEpic).push(node)
-    } else if (!orphanTickets.includes(node)) {
-      orphanTickets.push(node)
-    }
+    } else if (!orphanTickets.includes(node)) orphanTickets.push(node)
   }
 
   // Helper to build node line
@@ -365,58 +380,82 @@ export function renderMermaidDiagram(graph, options) {
     const repoAbbrev = repoDisplayAbbrev[node.repo] || node.repo
     const status = node.status || 'todo'
     const statusEmoji = STATUS_EMOJI[status] || ''
-    const displayNum = `${statusEmoji} ${repoAbbrev}#${node.number}`
-    return `        ${createNodeId(node, repoDisplayAbbrev)}["${displayNum} ${label}${storyPoints}"]:::${category}${depth}_${status}`
+
+    return `        ${createNodeId(node, repoDisplayAbbrev)}["${`${statusEmoji} ${repoAbbrev}#${node.number}`} ${label}${storyPoints}"]:::${category}${depth}_${status}`
   }
 
   // Build subgraphs
   if (initiatives.length > 0) {
     nodes.push('    subgraph Initiatives')
     nodes.push('        direction TB')
-    for (const node of initiatives) {
-      nodes.push(buildNodeLine(node))
-    }
+    for (const node of initiatives) nodes.push(buildNodeLine(node))
+
     nodes.push('    end')
   }
 
   if (epics.length > 0) {
     nodes.push('    subgraph Epics')
     nodes.push('        direction TB')
-    for (const node of epics) {
-      nodes.push(buildNodeLine(node))
-    }
+    for (const node of epics) nodes.push(buildNodeLine(node))
+
     nodes.push('    end')
   }
 
   for (const epic of epics) {
     const children = ticketsByEpic.get(epic.number) || []
     if (children.length > 0) {
-      const epicLabel = sanitizeTicketTitle(epic.title, 25, 1).replace(/<br\/>/g, ' ')
+      const epicLabel = sanitizeTicketTitle(epic.title, 25, 1).replace(
+        /<br\/>/g,
+        ' ',
+      )
       const repoAbbrev = repoDisplayAbbrev[epic.repo] || epic.repo
-      nodes.push(`    subgraph Epic_${epic.number}["${repoAbbrev}#${epic.number} ${epicLabel}"]`)
+      nodes.push(
+        `    subgraph Epic_${epic.number}["${repoAbbrev}#${epic.number} ${epicLabel}"]`,
+      )
       nodes.push('        direction TB')
-      for (const child of children) {
-        nodes.push(buildNodeLine(child))
-      }
+      for (const child of children) nodes.push(buildNodeLine(child))
+
       nodes.push('    end')
     }
   }
 
   if (orphanTickets.length > 0) {
-    nodes.push('    subgraph Ungrouped')
-    nodes.push('        direction TB')
-    for (const node of orphanTickets) {
-      nodes.push(buildNodeLine(node))
+    // Group orphan tickets by category
+    const CATEGORY_LABELS = {
+      auth: 'Auth (ungrouped)',
+      blocking: 'Blocking (ungrouped)',
+      tooling: 'Tooling & CI',
+      bug: 'Bugs (ungrouped)',
+      other: 'Other (ungrouped)',
     }
-    nodes.push('    end')
+    const orphansByCategory = new Map()
+    for (const node of orphanTickets) {
+      const category = categorizeNode(node, epicCategoryMap)
+      if (!orphansByCategory.has(category)) orphansByCategory.set(category, [])
+
+      orphansByCategory.get(category).push(node)
+    }
+
+    for (const [category, categoryNodes] of orphansByCategory) {
+      const label =
+        CATEGORY_LABELS[category] ||
+        `${category.charAt(0).toUpperCase() + category.slice(1)} (ungrouped)`
+      nodes.push(`    subgraph Ungrouped_${category}["${label}"]`)
+      nodes.push('        direction TB')
+      for (const node of categoryNodes) nodes.push(buildNodeLine(node))
+
+      nodes.push('    end')
+    }
   }
 
   // Helper to get node's group
   const getNodeGroup = (node) => {
     if (node.type === 'initiative') return 'initiative'
     if (node.type === 'epic') return 'epic'
-    if (node.parentEpic && epicByNumber.has(node.parentEpic)) return `epic_${node.parentEpic}`
-    return 'ungrouped'
+    if (node.parentEpic && epicByNumber.has(node.parentEpic))
+      return `epic_${node.parentEpic}`
+    const category = categorizeNode(node, epicCategoryMap)
+    return `ungrouped_${category}`
   }
 
   // Generate edges
@@ -434,7 +473,9 @@ export function renderMermaidDiagram(graph, options) {
     // In Mermaid: A --> B means A points to B
     // We want: dependency --> dependent
     if (showCrossGroupEdges || fromGroup === toGroup) {
-      edges.push(`    ${createNodeId(toNode, repoDisplayAbbrev)} --> ${createNodeId(fromNode, repoDisplayAbbrev)}`)
+      edges.push(
+        `    ${createNodeId(toNode, repoDisplayAbbrev)} --> ${createNodeId(fromNode, repoDisplayAbbrev)}`,
+      )
     }
   }
 
@@ -463,11 +504,14 @@ export function validateMermaid(code) {
 
   try {
     writeFileSync(tmpFile, code)
-    execSync(`npx --yes @mermaid-js/mermaid-cli@10 -i "${tmpFile}" -o "${outFile}"`, {
-      encoding: 'utf-8',
-      stdio: 'pipe',
-      timeout: 60000,
-    })
+    execSync(
+      `npx --yes @mermaid-js/mermaid-cli@10 -i "${tmpFile}" -o "${outFile}"`,
+      {
+        encoding: 'utf-8',
+        stdio: 'pipe',
+        timeout: 60000,
+      },
+    )
     return { valid: true }
   } catch (error) {
     const errorMsg = error.stdout || error.stderr || error.message
@@ -477,14 +521,13 @@ export function validateMermaid(code) {
       errorMsg.includes('Error:') ||
       errorMsg.includes('EBADENGINE')
 
-    if (!isRealError) {
-      return { valid: true }
-    }
+    if (!isRealError) return { valid: true }
 
     if (errorMsg.includes('ENOENT') || errorMsg.includes('not found')) {
       return {
         valid: false,
-        error: 'mermaid-cli not available. Install with: npm install -g @mermaid-js/mermaid-cli',
+        error:
+          'mermaid-cli not available. Install with: npm install -g @mermaid-js/mermaid-cli',
       }
     }
     return { valid: false, error: errorMsg }

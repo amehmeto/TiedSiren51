@@ -429,11 +429,9 @@ for epic in epics:
         "keywords": expanded,
     }
 
-# Detect orphans
+# Detect orphans (across all repos, including closed issues)
 orphans = []
-for issue in main_issues:
-    if issue["state"] != "OPEN":
-        continue
+for issue in all_issues:
     labels = [l.get("name", "") for l in issue.get("labels", [])]
     if "epic" in labels or "initiative" in labels:
         continue
@@ -479,10 +477,36 @@ for orphan in orphans:
         if matches:
             scores[epic_num] = matches
 
+    BLOCKING_REPOS = [
+        "tied-siren-blocking-overlay",
+        "expo-accessibility-service",
+        "expo-foreground-service",
+    ]
+
     if not scores:
+        # Cross-repo blocking fallback: if orphan is from a blocking repo,
+        # auto-assign to the best blocking epic
+        if orphan["repo"] in BLOCKING_REPOS:
+            blocking_epics = [
+                (num, info) for num, info in epic_keywords.items()
+                if any(kw in info["keywords"] for kw in ["native", "blocking", "overlay", "accessibility"])
+            ]
+            if blocking_epics:
+                best_num, best_info = max(blocking_epics, key=lambda x: len(x[1]["keywords"]))
+                auto_matched.append({
+                    "number": orphan["number"],
+                    "title": orphan["title"],
+                    "repo": orphan["repo"],
+                    "epic": best_num,
+                    "epic_title": best_info["title"],
+                    "keywords": ["cross-repo-blocking"],
+                })
+                continue
+
         needs_user.append({
             "number": orphan["number"],
             "title": orphan["title"],
+            "repo": orphan["repo"],
             "label": infer_label(orphan),
             "reason": "no epic match",
         })
@@ -493,6 +517,7 @@ for orphan in orphans:
             auto_matched.append({
                 "number": orphan["number"],
                 "title": orphan["title"],
+                "repo": orphan["repo"],
                 "epic": best_epic,
                 "epic_title": epic_keywords[best_epic]["title"],
                 "keywords": best_matches,
@@ -501,6 +526,7 @@ for orphan in orphans:
             needs_user.append({
                 "number": orphan["number"],
                 "title": orphan["title"],
+                "repo": orphan["repo"],
                 "label": infer_label(orphan),
                 "reason": f"low confidence: #{best_epic} ({', '.join(best_matches)})",
             })
@@ -681,19 +707,32 @@ if [ -n "$ORPHAN_LINE" ]; then
   echo "$ORPHAN_JSON" | python3 -c "
 import json, sys, subprocess, tempfile, os
 
+REPO_TO_FULL = {
+    'TiedSiren51': 'amehmeto/TiedSiren51',
+    'tied-siren-blocking-overlay': 'amehmeto/tied-siren-blocking-overlay',
+    'expo-accessibility-service': 'amehmeto/expo-accessibility-service',
+    'expo-foreground-service': 'amehmeto/expo-foreground-service',
+    'expo-list-installed-apps': 'amehmeto/expo-list-installed-apps',
+}
+
 matches = json.load(sys.stdin)
 for m in matches:
     num = m['number']
     epic_num = m['epic']
     epic_title = m['epic_title']
+    repo = m.get('repo', 'TiedSiren51')
     epic_url = f'https://github.com/amehmeto/TiedSiren51/issues/{epic_num}'
 
+    # Build --repo args for cross-repo issues
+    full_repo = REPO_TO_FULL.get(repo, '')
+    repo_args = ['--repo', full_repo] if repo != 'TiedSiren51' and full_repo else []
+
     result = subprocess.run(
-        ['gh', 'issue', 'view', str(num), '--json', 'body', '-q', '.body'],
+        ['gh', 'issue', 'view', str(num), '--json', 'body', '-q', '.body'] + repo_args,
         capture_output=True, text=True
     )
     if result.returncode != 0:
-        print(f'  ❌ #{num}: failed to fetch body', file=sys.stderr)
+        print(f'  ❌ {repo}#{num}: failed to fetch body', file=sys.stderr)
         continue
 
     body = result.stdout.strip()
@@ -710,13 +749,13 @@ for m in matches:
         with os.fdopen(fd, 'w') as f:
             f.write(new_body)
         result = subprocess.run(
-            ['gh', 'issue', 'edit', str(num), '--body-file', tmppath],
+            ['gh', 'issue', 'edit', str(num), '--body-file', tmppath] + repo_args,
             capture_output=True, text=True
         )
         if result.returncode == 0:
-            print(f'  ✅ #{num} → Epic #{epic_num}', file=sys.stderr)
+            print(f'  ✅ {repo}#{num} → Epic #{epic_num}', file=sys.stderr)
         else:
-            print(f'  ❌ #{num}: {result.stderr[:100]}', file=sys.stderr)
+            print(f'  ❌ {repo}#{num}: {result.stderr[:100]}', file=sys.stderr)
     finally:
         os.unlink(tmppath)
 "
@@ -731,24 +770,37 @@ if [ -n "$LABEL_LINE" ]; then
   echo "$LABEL_JSON" | python3 -c "
 import json, sys, subprocess
 
+REPO_TO_FULL = {
+    'TiedSiren51': 'amehmeto/TiedSiren51',
+    'tied-siren-blocking-overlay': 'amehmeto/tied-siren-blocking-overlay',
+    'expo-accessibility-service': 'amehmeto/expo-accessibility-service',
+    'expo-foreground-service': 'amehmeto/expo-foreground-service',
+    'expo-list-installed-apps': 'amehmeto/expo-list-installed-apps',
+}
+
 orphans = json.load(sys.stdin)
 for o in orphans:
     num = o['number']
     label = o.get('label', 'enhancement')
+    repo = o.get('repo', 'TiedSiren51')
+
+    # Build --repo args for cross-repo issues
+    full_repo = REPO_TO_FULL.get(repo, '')
+    repo_args = ['--repo', full_repo] if repo != 'TiedSiren51' and full_repo else []
 
     # Ensure label exists (create if needed)
     subprocess.run(
-        ['gh', 'label', 'create', label, '--force', '--description', ''],
+        ['gh', 'label', 'create', label, '--force', '--description', ''] + repo_args,
         capture_output=True, text=True
     )
 
     result = subprocess.run(
-        ['gh', 'issue', 'edit', str(num), '--add-label', label],
+        ['gh', 'issue', 'edit', str(num), '--add-label', label] + repo_args,
         capture_output=True, text=True
     )
     if result.returncode == 0:
-        print(f'  ✅ #{num} → label \"{label}\"', file=sys.stderr)
+        print(f'  ✅ {repo}#{num} → label \"{label}\"', file=sys.stderr)
     else:
-        print(f'  ❌ #{num}: {result.stderr[:100]}', file=sys.stderr)
+        print(f'  ❌ {repo}#{num}: {result.stderr[:100]}', file=sys.stderr)
 "
 fi

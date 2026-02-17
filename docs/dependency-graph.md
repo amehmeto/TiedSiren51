@@ -3,7 +3,7 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2026-02-16
+> Last updated: 2026-02-17
 
 ## Graph Statistics
 
@@ -302,10 +302,10 @@ flowchart LR
     end
     subgraph Epic_54["TS#54 User Authentification"]
         direction TB
-        T_TS_298["📝 TS#298 auth: Google re-authentication<br/>for sensitive operations"]:::auth0_todo
+        T_TS_298["✅ TS#298 auth: Google re-authentication<br/>for sensitive operations"]:::auth0_done
         T_TS_290["📝 TS#290 auth: strip password from<br/>Redux serialization/logging"]:::auth0_todo
-        T_TS_282["📝 TS#282 auth: account deletion"]:::auth0_todo
-        T_TS_281["🔄 TS#281 auth: change password"]:::auth0_in_progress
+        T_TS_282["✅ TS#282 auth: account deletion"]:::auth0_done
+        T_TS_281["✅ TS#281 auth: change password"]:::auth0_done
         T_TS_169["📝 TS#169 auth: deep link to email app<br/>after signup [2sp]"]:::auth0_todo
         T_TS_168["📝 TS#168 auth: security notification<br/>emails [5sp]"]:::auth0_todo
         T_TS_167["📝 TS#167 auth: brute force protection<br/>on login [2sp]"]:::auth0_todo
@@ -315,7 +315,7 @@ flowchart LR
         T_TS_163["✅ TS#163 auth: account deletion GDPR<br/>compliance [5sp]"]:::auth1_done
         T_TS_162["✅ TS#162 auth: change password when<br/>logged in [2sp]"]:::auth1_done
         T_TS_161["📝 TS#161 auth: implement email<br/>verification flow [3sp]"]:::auth0_todo
-        T_TS_160["📝 TS#160 auth: custom in-app password<br/>reset confirmation flow [5sp]"]:::auth0_todo
+        T_TS_160["🔄 TS#160 auth: custom in-app password<br/>reset confirmation flow [5sp]"]:::auth0_in_progress
         T_TS_89["✅ TS#89 Authentication Error Handling [3sp]"]:::auth0_done
         T_TS_88["📝 TS#88 Apple Sign-In with Firebase [3sp]"]:::auth0_todo
     end
@@ -324,8 +324,8 @@ flowchart LR
         T_TS_304["✅ TS#304 ci: retro workflow fails<br/>because claude-code-action<br/>doesn't expand custom slash..."]:::other0_done
         T_TS_292["✅ TS#292 : make start-issue.sh work<br/>from any worktree context"]:::other0_done
         T_TS_291["✅ TS#291 ci: auto-generate review<br/>retrospective on PR merge and<br/>post to Slack"]:::other0_done
-        T_TS_289["📝 TS#289 : promote<br/>prefer-extracted-long-params<br/>ESLint rule from warn to error"]:::other0_todo
-        T_TS_288["📝 TS#288 : promote<br/>no-inline-object-type ESLint<br/>rule from warn to error"]:::other0_todo
+        T_TS_289["✅ TS#289 : promote<br/>prefer-extracted-long-params<br/>ESLint rule from warn to error"]:::other0_done
+        T_TS_288["✅ TS#288 : promote<br/>no-inline-object-type ESLint<br/>rule from warn to error"]:::other0_done
         T_TS_287["✅ TS#287 : promote require-typed-each<br/>ESLint rule from warn to error"]:::other0_done
         T_TS_276["📝 TS#276 from ESLint to OxLint"]:::other0_todo
         T_TS_270["✅ TS#270 : add review-fix command,<br/>enhance start-issue with issue<br/>content, and add branch hyg..."]:::other0_done
@@ -480,4 +480,4 @@ Quick reference showing what blocks what:
 
 ---
 
-*Auto-generated on 2026-02-16 from GitHub issue metadata*
+*Auto-generated on 2026-02-17 from GitHub issue metadata*

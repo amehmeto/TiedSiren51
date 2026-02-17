@@ -56,7 +56,9 @@ export const REPO_DISPLAY_ABBREV = REPO_PREFIXES
 export const TICKET_PREFIXES = REPO_PREFIXES
 
 // Reverse mapping: prefix -> repo name (derived from REPO_PREFIXES)
-const prefixToRepoEntries = Object.entries(REPO_PREFIXES).map(([repo, prefix]) => [prefix, repo])
+const prefixToRepoEntries = Object.entries(REPO_PREFIXES).map(
+  ([repo, prefix]) => [prefix, repo],
+)
 export const PREFIX_TO_REPO = Object.fromEntries(prefixToRepoEntries)
 
 // Special prefix for tickets that require creating a new repo
@@ -74,6 +76,7 @@ export const VALID_LABELS = [
   'needs-refinement',
   'documentation',
   'in-progress',
+  'tooling',
 ]
 
 export const FIBONACCI_POINTS = [0, 1, 2, 3, 5, 8, 13, 21]
@@ -90,7 +93,30 @@ export const BLOCKING_REPOS = [
 // Category keywords for matching tickets to categories in graphs
 export const CATEGORY_KEYWORDS = {
   auth: ['auth', 'sign-in', 'password', 'login', 'firebase', 'session'],
-  blocking: ['blocking', 'siren', 'tier', 'lookout', 'strict', 'overlay', 'schedule', 'native'],
+  blocking: [
+    'blocking',
+    'siren',
+    'tier',
+    'lookout',
+    'strict',
+    'overlay',
+    'schedule',
+    'native',
+  ],
+  tooling: [
+    'lint',
+    'eslint',
+    'oxlint',
+    'ci',
+    'hook',
+    'script',
+    'husky',
+    'prettier',
+    'refactor',
+    'tooling',
+    'pipeline',
+    'workflow',
+  ],
 }
 
 // Required sections for different ticket types
@@ -99,7 +125,10 @@ export const FEATURE_SECTIONS = [
   { pattern: /📝\s*Summary/i, name: '📝 Summary' },
   { pattern: /🎯\s*Context/i, name: '🎯 Context' },
   { pattern: /✅\s*Acceptance Criteria/i, name: '✅ Acceptance Criteria' },
-  { pattern: /🎭\s*Scenarios|Given.*When.*Then/i, name: '🎭 Scenarios (Given/When/Then)' },
+  {
+    pattern: /🎭\s*Scenarios|Given.*When.*Then/i,
+    name: '🎭 Scenarios (Given/When/Then)',
+  },
   { pattern: /🔗\s*Hierarchy/i, name: '🔗 Hierarchy' },
 ]
 
@@ -126,21 +155,25 @@ export const INITIATIVE_SECTIONS = [
 
 // Section templates for --fix mode
 export const SECTION_TEMPLATES = {
-  '📝 Summary': '<!-- One paragraph explaining what this feature does and why it matters -->',
+  '📝 Summary':
+    '<!-- One paragraph explaining what this feature does and why it matters -->',
   '🎯 Context':
     '<!-- Background information: Why does this feature exist? What problem does it solve? -->',
-  '✅ Acceptance Criteria': '- [ ] Requirement 1\n- [ ] Requirement 2\n- [ ] Requirement 3',
+  '✅ Acceptance Criteria':
+    '- [ ] Requirement 1\n- [ ] Requirement 2\n- [ ] Requirement 3',
   '🎭 Scenarios (Given/When/Then)':
     '```gherkin\nGiven [initial context]\nWhen [action taken]\nThen [expected outcome]\n```',
   '🐛 Bug Summary': '<!-- One sentence describing the bug -->',
   '🔄 Reproduction':
     '### 📋 Steps to Reproduce\n1. Step 1\n2. Step 2\n3. Step 3\n\n### ❌ Actual Behavior\n<!-- What happens now -->\n\n### ✅ Expected Behavior\n<!-- What should happen -->',
-  '🎯 Goal': "<!-- One paragraph describing the epic's objective and business value -->",
+  '🎯 Goal':
+    "<!-- One paragraph describing the epic's objective and business value -->",
   '📋 Stories / Tasks':
     '| # | Story | Points | Status | Notes |\n|---|-------|--------|--------|-------|\n| #XX | Story title | 3 | 🔲 Todo | |',
   '✅ Success Criteria':
     '- [ ] Criterion 1\n- [ ] Criterion 2\n- [ ] All stories completed',
-  '🎯 Vision': "<!-- One paragraph describing the initiative's strategic objective and why it matters -->",
+  '🎯 Vision':
+    "<!-- One paragraph describing the initiative's strategic objective and why it matters -->",
   '📋 Epics':
     '| # | Epic | Status | Notes |\n|---|------|--------|-------|\n| #XX | Epic title | 🔲 Todo | |',
   '🔗 Hierarchy':
@@ -151,10 +184,8 @@ export const SECTION_TEMPLATES = {
 export const HIERARCHY_TEMPLATES = {
   feature:
     '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
-  bug:
-    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
-  epic:
-    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
+  bug: '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
+  epic: '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
   initiative:
     '| Level | Description |\n|-------|-------------|\n| 🚀 **Initiative** | ← You are here |\n| 🏔️ Epics | Listed in table above |\n| 📋 Issues | Inside each Epic |',
 }
@@ -173,51 +204,52 @@ export function validateRepoAbbreviations() {
 
   for (const repoName of Object.keys(VALID_REPOS)) {
     // Check REPO_ABBREVIATIONS has the full name mapping
-    if (REPO_ABBREVIATIONS[repoName] !== repoName) {
+    if (REPO_ABBREVIATIONS[repoName] !== repoName)
       errors.push(`REPO_ABBREVIATIONS missing self-mapping for: ${repoName}`)
-    }
 
     // Check REPO_DISPLAY_ABBREV has a display abbreviation
-    if (!REPO_DISPLAY_ABBREV[repoName]) {
+    if (!REPO_DISPLAY_ABBREV[repoName])
       errors.push(`REPO_DISPLAY_ABBREV missing abbreviation for: ${repoName}`)
-    }
 
     // Check TICKET_PREFIXES has a prefix for this repo
-    if (!TICKET_PREFIXES[repoName]) {
+    if (!TICKET_PREFIXES[repoName])
       errors.push(`TICKET_PREFIXES missing prefix for: ${repoName}`)
-    }
   }
 
   // Check that all abbreviations point to valid repos
   for (const [abbrev, fullName] of Object.entries(REPO_ABBREVIATIONS)) {
     if (!VALID_REPOS[fullName]) {
-      errors.push(`REPO_ABBREVIATIONS[${abbrev}] points to unknown repo: ${fullName}`)
+      errors.push(
+        `REPO_ABBREVIATIONS[${abbrev}] points to unknown repo: ${fullName}`,
+      )
     }
   }
 
   // Check that all display abbreviations are for valid repos
   for (const repoName of Object.keys(REPO_DISPLAY_ABBREV)) {
-    if (!VALID_REPOS[repoName]) {
+    if (!VALID_REPOS[repoName])
       errors.push(`REPO_DISPLAY_ABBREV has entry for unknown repo: ${repoName}`)
-    }
   }
 
   // Check that PREFIX_TO_REPO is consistent with TICKET_PREFIXES
   for (const [repoName, prefix] of Object.entries(TICKET_PREFIXES)) {
-    if (PREFIX_TO_REPO[prefix] !== repoName) {
+    if (PREFIX_TO_REPO[prefix] !== repoName)
       errors.push(`PREFIX_TO_REPO[${prefix}] should map to ${repoName}`)
-    }
   }
 
   // Check that all prefixes in PREFIX_TO_REPO point to valid repos
   for (const [prefix, repoName] of Object.entries(PREFIX_TO_REPO)) {
     if (!VALID_REPOS[repoName]) {
-      errors.push(`PREFIX_TO_REPO[${prefix}] points to unknown repo: ${repoName}`)
+      errors.push(
+        `PREFIX_TO_REPO[${prefix}] points to unknown repo: ${repoName}`,
+      )
     }
   }
 
   if (errors.length > 0) {
-    throw new Error(`Repository abbreviation configuration errors:\n  - ${errors.join('\n  - ')}`)
+    throw new Error(
+      `Repository abbreviation configuration errors:\n  - ${errors.join('\n  - ')}`,
+    )
   }
 }
 

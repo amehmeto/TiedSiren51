@@ -20,12 +20,17 @@
 
 import { execSync } from 'node:child_process'
 import { exec } from 'node:child_process'
-import { promisify } from 'node:util'
 import { writeFileSync, unlinkSync } from 'node:fs'
+import { promisify } from 'node:util'
 
-const execAsync = promisify(exec)
-
-import { VALID_REPOS, REPO_ABBREVIATIONS, REPO_DISPLAY_ABBREV, MAIN_REPO, BLOCKING_REPOS, CATEGORY_KEYWORDS } from '../remark-lint-ticket/config.mjs'
+import {
+  VALID_REPOS,
+  REPO_ABBREVIATIONS,
+  REPO_DISPLAY_ABBREV,
+  MAIN_REPO,
+  BLOCKING_REPOS,
+  CATEGORY_KEYWORDS,
+} from '../remark-lint-ticket/config.mjs'
 import {
   buildGraphFromTickets,
   fetchAllIssues,
@@ -34,9 +39,16 @@ import {
 } from './index.mjs'
 import { renderMermaidDiagram, validateMermaid } from './mermaid-renderer.mjs'
 
+const execAsync = promisify(exec)
+
 // Re-export parsing functions with config bound (for backward compatibility)
 export function parseDependencyRef(ref, currentRepo) {
-  return parseDependencyRefBase(ref, currentRepo, REPO_ABBREVIATIONS, VALID_REPOS)
+  return parseDependencyRefBase(
+    ref,
+    currentRepo,
+    REPO_ABBREVIATIONS,
+    VALID_REPOS,
+  )
 }
 
 export function depRefKey(ref) {
@@ -69,9 +81,8 @@ function formatTicketId(repo, number) {
  * Format a dependency ref for display
  */
 function formatDepRef(ref, currentRepo) {
-  if (ref.repo === currentRepo) {
-    return `#${ref.number}`
-  }
+  if (ref.repo === currentRepo) return `#${ref.number}`
+
   const abbrev = REPO_DISPLAY_ABBREV[ref.repo] || ref.repo
   return `${abbrev}#${ref.number}`
 }
@@ -122,9 +133,7 @@ function parseEpicSubtasks(body, currentRepo) {
   let combinedText = ''
   for (const pattern of sectionPatterns) {
     const match = body.match(pattern)
-    if (match) {
-      combinedText += match[0] + '\n'
-    }
+    if (match) combinedText += match[0] + '\n'
   }
 
   if (!combinedText) return []
@@ -170,7 +179,7 @@ function detectCompletableEpics(tickets, issuesByKey) {
 
   // Filter to open epics only
   const openEpics = tickets.filter(
-    (t) => t.type === 'epic' && t.status !== 'done'
+    (t) => t.type === 'epic' && t.status !== 'done',
   )
 
   for (const epic of openEpics) {
@@ -183,17 +192,20 @@ function detectCompletableEpics(tickets, issuesByKey) {
     let hasUnknown = false
 
     for (const ref of subtaskRefs) {
-      const key = `${ref.repo}#${ref.number}`
-      const subtask = issuesByKey.get(key)
+      const subtask = issuesByKey.get(`${ref.repo}#${ref.number}`)
 
       if (!subtask) {
         subtaskStatuses.push({ ref, status: 'unknown', title: '(not found)' })
         hasUnknown = true
         allClosed = false
-      } else if (subtask.status === 'done') {
+      } else if (subtask.status === 'done')
         subtaskStatuses.push({ ref, status: 'done', title: subtask.title })
-      } else {
-        subtaskStatuses.push({ ref, status: subtask.status, title: subtask.title })
+      else {
+        subtaskStatuses.push({
+          ref,
+          status: subtask.status,
+          title: subtask.title,
+        })
         allClosed = false
       }
     }
@@ -236,25 +248,35 @@ function formatEpicFindings(findings) {
   if (findings.length === 0) return null
 
   const lines = []
-  const epicCompletionHeader = '\n' + ANSI.bold + ANSI.cyan + '━━━ EPIC COMPLETION CHECK ━━━' + ANSI.reset
+  const epicCompletionHeader =
+    '\n' + ANSI.bold + ANSI.cyan + '━━━ EPIC COMPLETION CHECK ━━━' + ANSI.reset
   lines.push(epicCompletionHeader)
 
   for (const finding of findings) {
     if (finding.type === 'epic_ready_to_close') {
       lines.push('')
-      lines.push(`  ${ANSI.green}✓${ANSI.reset} ${ANSI.bold}#${finding.epic.number}${ANSI.reset} "${finding.epic.title}"`)
-      lines.push(`    ${ANSI.green}All ${finding.subtasks.length} subtasks are CLOSED - epic can be closed${ANSI.reset}`)
+      lines.push(
+        `  ${ANSI.green}✓${ANSI.reset} ${ANSI.bold}#${finding.epic.number}${ANSI.reset} "${finding.epic.title}"`,
+      )
+      lines.push(
+        `    ${ANSI.green}All ${finding.subtasks.length} subtasks are CLOSED - epic can be closed${ANSI.reset}`,
+      )
     } else if (finding.type === 'epic_nearly_complete') {
       lines.push('')
-      lines.push(`  ${ANSI.yellow}⚠${ANSI.reset} ${ANSI.bold}#${finding.epic.number}${ANSI.reset} "${finding.epic.title}"`)
-      const closedRatio = finding.closedCount / finding.totalCount * 100
+      lines.push(
+        `  ${ANSI.yellow}⚠${ANSI.reset} ${ANSI.bold}#${finding.epic.number}${ANSI.reset} "${finding.epic.title}"`,
+      )
+      const closedRatio = (finding.closedCount / finding.totalCount) * 100
       const closedPercentage = Math.round(closedRatio)
-      lines.push(`    ${finding.closedCount}/${finding.totalCount} subtasks closed (${closedPercentage}%)`)
+      lines.push(
+        `    ${finding.closedCount}/${finding.totalCount} subtasks closed (${closedPercentage}%)`,
+      )
       lines.push(`    ${ANSI.yellow}Remaining open:${ANSI.reset}`)
       for (const open of finding.openSubtasks) {
-        const refStr = open.ref.repo === finding.epic.repo
-          ? `#${open.ref.number}`
-          : `${REPO_DISPLAY_ABBREV[open.ref.repo] || open.ref.repo}#${open.ref.number}`
+        const refStr =
+          open.ref.repo === finding.epic.repo
+            ? `#${open.ref.number}`
+            : `${REPO_DISPLAY_ABBREV[open.ref.repo] || open.ref.repo}#${open.ref.number}`
         lines.push(`      - ${refStr}: ${open.title}`)
       }
     }
@@ -287,16 +309,20 @@ function generateInventoryTable(tickets, type) {
   let table = `${headers[type]}\n${separator[type]}\n`
 
   for (const t of tickets) {
-    const deps = t.metadata?.depends_on?.map((ref) => formatDepRef(ref, t.repo)).join(', ') || '-'
-    const blocks = t.metadata?.blocks?.map((ref) => formatDepRef(ref, t.repo)).join(', ') || '-'
+    const deps =
+      t.metadata?.depends_on
+        ?.map((ref) => formatDepRef(ref, t.repo))
+        .join(', ') || '-'
+    const blocks =
+      t.metadata?.blocks?.map((ref) => formatDepRef(ref, t.repo)).join(', ') ||
+      '-'
     const severity = t.metadata?.severity || 'medium'
     const sp = formatStoryPointsMarkdown(t.metadata?.story_points)
 
-    if (type === 'bug') {
-      table += `| #${t.number} | ${t.title} | ${sp} | ${severity} | ${deps} |\n`
-    } else {
-      table += `| #${t.number} | ${t.title} | ${sp} | ${deps} | ${blocks} |\n`
-    }
+    table +=
+      type === 'bug'
+        ? `| #${t.number} | ${t.title} | ${sp} | ${severity} | ${deps} |\n`
+        : `| #${t.number} | ${t.title} | ${sp} | ${deps} | ${blocks} |\n`
   }
 
   return table
@@ -314,15 +340,18 @@ function groupTicketsByType(tickets) {
     feature: [],
   }
 
-  for (const ticket of tickets) {
-    groups[ticket.type].push(ticket)
-  }
+  for (const ticket of tickets) groups[ticket.type].push(ticket)
 
-  for (const type of Object.keys(groups)) {
+  for (const type of Object.keys(groups))
     groups[type].sort((a, b) => a.number - b.number)
-  }
 
   return groups
+}
+
+const CATEGORY_DISPLAY_NAMES = {
+  auth: 'Authentication',
+  blocking: 'Blocking Architecture',
+  tooling: 'Tooling & CI',
 }
 
 function groupFeaturesByCategory(features) {
@@ -333,10 +362,17 @@ function groupFeaturesByCategory(features) {
     const title = feature.title.toLowerCase()
     const labels = feature.metadata?.labels || []
 
-    if (title.includes('auth') || labels.includes('auth')) {
-      category = 'Authentication'
-    } else if (labels.includes('blocking') || title.includes('blocking') || title.includes('siren')) {
-      category = 'Blocking Architecture'
+    for (const [cat, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
+      if (
+        keywords.some(
+          (kw) => title.includes(kw) || labels.some((l) => l.includes(kw)),
+        )
+      ) {
+        category =
+          CATEGORY_DISPLAY_NAMES[cat] ||
+          cat.charAt(0).toUpperCase() + cat.slice(1)
+        break
+      }
     }
 
     if (!categories[category]) categories[category] = []
@@ -355,9 +391,7 @@ function generateDependencyMatrix(tickets) {
 
   for (const t of tickets) {
     const blocks = t.metadata?.blocks || []
-    if (blocks.length > 0) {
-      blockers.push({ ticket: t, blocks })
-    }
+    if (blocks.length > 0) blockers.push({ ticket: t, blocks })
   }
 
   if (blockers.length === 0) return ''
@@ -368,10 +402,16 @@ function generateDependencyMatrix(tickets) {
     return a.ticket.number - b.ticket.number
   })
 
-  let table = '| Blocker | Blocks These Issues |\n|---------|---------------------|\n'
+  let table =
+    '| Blocker | Blocks These Issues |\n|---------|---------------------|\n'
   for (const { ticket, blocks } of blockers) {
-    const blockerLabel = formatDepRef({ repo: ticket.repo, number: ticket.number }, MAIN_REPO)
-    const blockedLabels = blocks.map((ref) => formatDepRef(ref, ticket.repo)).join(', ')
+    const blockerLabel = formatDepRef(
+      { repo: ticket.repo, number: ticket.number },
+      MAIN_REPO,
+    )
+    const blockedLabels = blocks
+      .map((ref) => formatDepRef(ref, ticket.repo))
+      .join(', ')
     table += `| ${blockerLabel} | ${blockedLabels} |\n`
   }
 
@@ -431,6 +471,7 @@ const CATEGORY_COLORS = {
   auth: ANSI.brightGreen,
   blocking: ANSI.brightRed,
   bug: ANSI.red,
+  tooling: ANSI.brightCyan,
   other: ANSI.white,
 }
 
@@ -443,17 +484,19 @@ function categorizeTicket(ticket, epicCategories) {
 
   // Check parent epic category
   const parentEpic = ticket.metadata?.parentEpic
-  if (parentEpic && epicCategories.has(parentEpic)) {
+  if (parentEpic && epicCategories.has(parentEpic))
     return epicCategories.get(parentEpic)
-  }
 
   const title = ticket.title.toLowerCase()
   const labels = ticket.metadata?.labels || []
 
   for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-    if (keywords.some(kw => title.includes(kw) || labels.some(l => l.includes(kw)))) {
+    if (
+      keywords.some(
+        (kw) => title.includes(kw) || labels.some((l) => l.includes(kw)),
+      )
+    )
       return category
-    }
   }
 
   return 'other'
@@ -469,15 +512,18 @@ function buildEpicCategories(tickets) {
     const labels = ticket.metadata?.labels || []
 
     for (const [category, keywords] of Object.entries(CATEGORY_KEYWORDS)) {
-      if (keywords.some(kw => title.includes(kw) || labels.some(l => l.includes(kw)))) {
+      if (
+        keywords.some(
+          (kw) => title.includes(kw) || labels.some((l) => l.includes(kw)),
+        )
+      ) {
         epicCategories.set(ticket.number, category)
         break
       }
     }
 
-    if (!epicCategories.has(ticket.number)) {
+    if (!epicCategories.has(ticket.number))
       epicCategories.set(ticket.number, 'other')
-    }
   }
 
   return epicCategories
@@ -485,18 +531,17 @@ function buildEpicCategories(tickets) {
 
 function truncateTitle(title, maxLen = 40) {
   // Remove common prefixes
-  let cleaned = title
-    .replace(/^\[?\w+\]?\s*/i, '')           // [Epic], [Bug], etc.
-    .replace(/^feat\([^)]*\):\s*/i, '')      // feat(scope):
-    .replace(/^fix\([^)]*\):\s*/i, '')       // fix(scope):
-    .replace(/^refactor\([^)]*\):\s*/i, '')  // refactor(scope):
-    .replace(/^chore\([^)]*\):\s*/i, '')     // chore(scope):
-    .replace(/^test\([^)]*\):\s*/i, '')      // test(scope):
-    .replace(/^\([^)]*\):\s*/i, '')          // (scope): without type prefix
+  const cleaned = title
+    .replace(/^\[?\w+\]?\s*/i, '') // [Epic], [Bug], etc.
+    .replace(/^feat\([^)]*\):\s*/i, '') // feat(scope):
+    .replace(/^fix\([^)]*\):\s*/i, '') // fix(scope):
+    .replace(/^refactor\([^)]*\):\s*/i, '') // refactor(scope):
+    .replace(/^chore\([^)]*\):\s*/i, '') // chore(scope):
+    .replace(/^test\([^)]*\):\s*/i, '') // test(scope):
+    .replace(/^\([^)]*\):\s*/i, '') // (scope): without type prefix
 
-  if (cleaned.length > maxLen) {
-    return cleaned.substring(0, maxLen - 3) + '...'
-  }
+  if (cleaned.length > maxLen) return cleaned.substring(0, maxLen - 3) + '...'
+
   return cleaned
 }
 
@@ -509,17 +554,18 @@ function formatAsciiTicket(ticket, epicCategories) {
   const repoAbbrev = REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
   const id = `${repoAbbrev}#${ticket.number}`
   const title = truncateTitle(ticket.title)
-  const sp = ticket.metadata?.story_points ? ` [${ticket.metadata.story_points}sp]` : ''
+  const sp = ticket.metadata?.story_points
+    ? ` [${ticket.metadata.story_points}sp]`
+    : ''
 
   const emoji = statusStyle.emoji
   const idColored = `${categoryColor}${id}${ANSI.reset}`
 
   let titleColored = title
-  if (status === 'done') {
+  if (status === 'done')
     titleColored = `${ANSI.gray}${ANSI.dim}${title}${ANSI.reset}`
-  } else if (status === 'in_progress') {
+  else if (status === 'in_progress')
     titleColored = `${ANSI.bold}${ANSI.brightYellow}${title}${ANSI.reset}`
-  }
 
   const spColored = sp ? `${ANSI.cyan}${sp}${ANSI.reset}` : ''
 
@@ -528,13 +574,21 @@ function formatAsciiTicket(ticket, epicCategories) {
 
 function buildAsciiTreeContext(tickets) {
   const withDeps = tickets.filter(
-    (t) => (t.metadata?.depends_on?.length || 0) > 0 || (t.metadata?.blocks?.length || 0) > 0,
+    (t) =>
+      (t.metadata?.depends_on?.length || 0) > 0 ||
+      (t.metadata?.blocks?.length || 0) > 0,
   )
 
-  const ticketByKeyEntries = withDeps.map((t) => [formatTicketId(t.repo, t.number), t])
+  const ticketByKeyEntries = withDeps.map((t) => [
+    formatTicketId(t.repo, t.number),
+    t,
+  ])
   const ticketByKey = new Map(ticketByKeyEntries)
   const ticketKeys = new Set(ticketByKey.keys())
-  const allTicketEntries = tickets.map((t) => [formatTicketId(t.repo, t.number), t])
+  const allTicketEntries = tickets.map((t) => [
+    formatTicketId(t.repo, t.number),
+    t,
+  ])
   const allTicketsByKey = new Map(allTicketEntries)
 
   const children = new Map()
@@ -557,21 +611,35 @@ function buildAsciiTreeContext(tickets) {
   return { ticketByKey, ticketKeys, children, roots, allTicketsByKey }
 }
 
-function renderAsciiTree(key, prefix, context, epicCategories, printed, lines, connector = '') {
+function renderAsciiTree(
+  key,
+  prefix,
+  context,
+  epicCategories,
+  printed,
+  lines,
+  connector = '',
+) {
   const { ticketByKey, ticketKeys, children, allTicketsByKey } = context
   const ticket = ticketByKey.get(key) || allTicketsByKey.get(key)
 
   // Handle already printed (backreference)
   if (printed.has(key)) {
-    const repoAbbrev = ticket ? (REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo) : ''
+    const repoAbbrev = ticket
+      ? REPO_DISPLAY_ABBREV[ticket.repo] || ticket.repo
+      : ''
     const num = ticket ? ticket.number : key.split('#')[1]
-    lines.push(`${prefix}${connector}${ANSI.gray}↑ ${repoAbbrev}#${num} (see above)${ANSI.reset}`)
+    lines.push(
+      `${prefix}${connector}${ANSI.gray}↑ ${repoAbbrev}#${num} (see above)${ANSI.reset}`,
+    )
     return
   }
   printed.add(key)
 
   // Format and print this node
-  const formatted = ticket ? formatAsciiTicket(ticket, epicCategories) : `${ANSI.gray}${key}${ANSI.reset}`
+  const formatted = ticket
+    ? formatAsciiTicket(ticket, epicCategories)
+    : `${ANSI.gray}${key}${ANSI.reset}`
   lines.push(`${prefix}${connector}${formatted}`)
 
   // Get children
@@ -584,8 +652,17 @@ function renderAsciiTree(key, prefix, context, epicCategories, printed, lines, c
   kids.forEach((kid, i) => {
     const isLast = i === kids.length - 1
     const childConnector = isLast ? '└─ ' : '├─ '
-    const childPrefix = prefix + (connector ? (connector.startsWith('└') ? '   ' : '│  ') : '')
-    renderAsciiTree(kid, childPrefix, context, epicCategories, printed, lines, childConnector)
+    const childPrefix =
+      prefix + (connector ? (connector.startsWith('└') ? '   ' : '│  ') : '')
+    renderAsciiTree(
+      kid,
+      childPrefix,
+      context,
+      epicCategories,
+      printed,
+      lines,
+      childConnector,
+    )
   })
 }
 
@@ -593,30 +670,41 @@ function generateAsciiGraph(tickets) {
   const epicCategories = buildEpicCategories(tickets)
   const context = buildAsciiTreeContext(tickets)
 
-  if (context.roots.length === 0) {
+  if (context.roots.length === 0)
     return `${ANSI.yellow}No dependencies found.${ANSI.reset}`
-  }
 
   const lines = []
 
   // Header
-  lines.push(`${ANSI.bold}${ANSI.cyan}═══════════════════════════════════════════════════════════════${ANSI.reset}`)
-  lines.push(`${ANSI.bold}${ANSI.cyan}                    TICKET DEPENDENCY GRAPH${ANSI.reset}`)
-  lines.push(`${ANSI.bold}${ANSI.cyan}═══════════════════════════════════════════════════════════════${ANSI.reset}`)
+  lines.push(
+    `${ANSI.bold}${ANSI.cyan}═══════════════════════════════════════════════════════════════${ANSI.reset}`,
+  )
+  lines.push(
+    `${ANSI.bold}${ANSI.cyan}                    TICKET DEPENDENCY GRAPH${ANSI.reset}`,
+  )
+  lines.push(
+    `${ANSI.bold}${ANSI.cyan}═══════════════════════════════════════════════════════════════${ANSI.reset}`,
+  )
   lines.push('')
 
   // Legend
   lines.push(`${ANSI.bold}Legend:${ANSI.reset}`)
-  lines.push(`  ${STATUS_STYLES.done.emoji} Done    ${STATUS_STYLES.in_progress.emoji} In Progress    ${STATUS_STYLES.todo.emoji} To Do`)
-  lines.push(`  ${CATEGORY_COLORS.initiative}■${ANSI.reset} Initiative  ${CATEGORY_COLORS.epic}■${ANSI.reset} Epic  ${CATEGORY_COLORS.auth}■${ANSI.reset} Auth  ${CATEGORY_COLORS.blocking}■${ANSI.reset} Blocking  ${CATEGORY_COLORS.bug}■${ANSI.reset} Bug`)
+  lines.push(
+    `  ${STATUS_STYLES.done.emoji} Done    ${STATUS_STYLES.in_progress.emoji} In Progress    ${STATUS_STYLES.todo.emoji} To Do`,
+  )
+  lines.push(
+    `  ${CATEGORY_COLORS.initiative}■${ANSI.reset} Initiative  ${CATEGORY_COLORS.epic}■${ANSI.reset} Epic  ${CATEGORY_COLORS.auth}■${ANSI.reset} Auth  ${CATEGORY_COLORS.blocking}■${ANSI.reset} Blocking  ${CATEGORY_COLORS.tooling}■${ANSI.reset} Tooling  ${CATEGORY_COLORS.bug}■${ANSI.reset} Bug`,
+  )
   lines.push('')
-  lines.push(`${ANSI.bold}${ANSI.cyan}───────────────────────────────────────────────────────────────${ANSI.reset}`)
+  lines.push(
+    `${ANSI.bold}${ANSI.cyan}───────────────────────────────────────────────────────────────${ANSI.reset}`,
+  )
   lines.push('')
 
   // Separate tickets by type
-  const initiatives = tickets.filter(t => t.type === 'initiative')
-  const epics = tickets.filter(t => t.type === 'epic')
-  const features = tickets.filter(t => t.type === 'feature')
+  const initiatives = tickets.filter((t) => t.type === 'initiative')
+  const epics = tickets.filter((t) => t.type === 'epic')
+  const features = tickets.filter((t) => t.type === 'feature')
 
   // Group features by parent epic
   const featuresByEpic = new Map()
@@ -624,9 +712,8 @@ function generateAsciiGraph(tickets) {
   for (const ticket of features) {
     const parentEpic = ticket.metadata?.parentEpic
     if (parentEpic) {
-      if (!featuresByEpic.has(parentEpic)) {
-        featuresByEpic.set(parentEpic, [])
-      }
+      if (!featuresByEpic.has(parentEpic)) featuresByEpic.set(parentEpic, [])
+
       featuresByEpic.get(parentEpic).push(ticket)
     }
   }
@@ -634,9 +721,13 @@ function generateAsciiGraph(tickets) {
   const printed = new Set()
 
   // Section: Initiatives (if they have dependencies)
-  const initiativesWithDeps = initiatives.filter(t => context.ticketKeys.has(formatTicketId(t.repo, t.number)))
+  const initiativesWithDeps = initiatives.filter((t) =>
+    context.ticketKeys.has(formatTicketId(t.repo, t.number)),
+  )
   if (initiativesWithDeps.length > 0) {
-    lines.push(`${ANSI.bold}${CATEGORY_COLORS.initiative}━━━ INITIATIVES ━━━${ANSI.reset}`)
+    lines.push(
+      `${ANSI.bold}${CATEGORY_COLORS.initiative}━━━ INITIATIVES ━━━${ANSI.reset}`,
+    )
     lines.push('')
     for (const init of initiativesWithDeps) {
       const key = formatTicketId(init.repo, init.number)
@@ -648,10 +739,12 @@ function generateAsciiGraph(tickets) {
   }
 
   // Section: Epics with their children
-  const epicsWithContent = epics.filter(epic => {
+  const epicsWithContent = epics.filter((epic) => {
     const epicKey = formatTicketId(epic.repo, epic.number)
     const children = featuresByEpic.get(epic.number) || []
-    const childrenWithDeps = children.filter(t => context.ticketKeys.has(formatTicketId(t.repo, t.number)))
+    const childrenWithDeps = children.filter((t) =>
+      context.ticketKeys.has(formatTicketId(t.repo, t.number)),
+    )
     return context.ticketKeys.has(epicKey) || childrenWithDeps.length > 0
   })
 
@@ -662,27 +755,47 @@ function generateAsciiGraph(tickets) {
     for (const epic of epicsWithContent) {
       const epicKey = formatTicketId(epic.repo, epic.number)
       const epicChildren = featuresByEpic.get(epic.number) || []
-      const childrenWithDeps = epicChildren.filter(t => context.ticketKeys.has(formatTicketId(t.repo, t.number)))
+      const childrenWithDeps = epicChildren.filter((t) =>
+        context.ticketKeys.has(formatTicketId(t.repo, t.number)),
+      )
 
       // Epic header
       const epicTitle = truncateTitle(epic.title, 45)
-      const epicStatus = STATUS_STYLES[epic.status || 'todo']
-      lines.push(`${ANSI.bold}${CATEGORY_COLORS.epic}┌─ #${epic.number}: ${epicTitle} ${epicStatus.emoji}${ANSI.reset}`)
+
+      lines.push(
+        `${ANSI.bold}${CATEGORY_COLORS.epic}┌─ #${epic.number}: ${epicTitle} ${STATUS_STYLES[epic.status || 'todo'].emoji}${ANSI.reset}`,
+      )
 
       // If epic itself has dependencies, show it in the tree
       if (context.ticketKeys.has(epicKey) && !printed.has(epicKey)) {
-        renderAsciiTree(epicKey, `${CATEGORY_COLORS.epic}│${ANSI.reset} `, context, epicCategories, printed, lines, '')
+        renderAsciiTree(
+          epicKey,
+          `${CATEGORY_COLORS.epic}│${ANSI.reset} `,
+          context,
+          epicCategories,
+          printed,
+          lines,
+          '',
+        )
       }
 
       // Render children that are roots (not blocked by anything in the tree)
-      const childRoots = childrenWithDeps.filter(child => {
+      const childRoots = childrenWithDeps.filter((child) => {
         const childKey = formatTicketId(child.repo, child.number)
         return context.roots.includes(childKey) && !printed.has(childKey)
       })
 
       for (const child of childRoots) {
         const childKey = formatTicketId(child.repo, child.number)
-        renderAsciiTree(childKey, `${CATEGORY_COLORS.epic}│${ANSI.reset} `, context, epicCategories, printed, lines, '')
+        renderAsciiTree(
+          childKey,
+          `${CATEGORY_COLORS.epic}│${ANSI.reset} `,
+          context,
+          epicCategories,
+          printed,
+          lines,
+          '',
+        )
       }
 
       lines.push(`${CATEGORY_COLORS.epic}└${'─'.repeat(50)}${ANSI.reset}`)
@@ -691,30 +804,57 @@ function generateAsciiGraph(tickets) {
   }
 
   // Section: Ungrouped features (features without parent epic but with dependencies)
-  const orphanRoots = context.roots.filter(r => {
+  const orphanRoots = context.roots.filter((r) => {
     if (printed.has(r)) return false
     const ticket = context.allTicketsByKey.get(r)
     return ticket && ticket.type === 'feature' && !ticket.metadata?.parentEpic
   })
 
   if (orphanRoots.length > 0) {
-    lines.push(`${ANSI.bold}${ANSI.white}━━━ UNGROUPED FEATURES ━━━${ANSI.reset}`)
-    lines.push('')
+    // Group orphan roots by category
+    const orphansByCategory = new Map()
     for (const root of orphanRoots) {
-      renderAsciiTree(root, '', context, epicCategories, printed, lines, '')
+      const ticket = context.allTicketsByKey.get(root)
+      const category = categorizeTicket(ticket, epicCategories)
+      if (!orphansByCategory.has(category)) orphansByCategory.set(category, [])
+
+      orphansByCategory.get(category).push(root)
+    }
+
+    const categoryLabels = {
+      auth: 'AUTH (ungrouped)',
+      blocking: 'BLOCKING (ungrouped)',
+      tooling: 'TOOLING & CI',
+      bug: 'BUGS (ungrouped)',
+      other: 'OTHER (ungrouped)',
+    }
+
+    for (const [category, roots] of orphansByCategory) {
+      const label =
+        categoryLabels[category] || `${category.toUpperCase()} (ungrouped)`
+      const color = CATEGORY_COLORS[category] || ANSI.white
+      lines.push(`${ANSI.bold}${color}━━━ ${label} ━━━${ANSI.reset}`)
       lines.push('')
+      for (const root of roots) {
+        renderAsciiTree(root, '', context, epicCategories, printed, lines, '')
+        lines.push('')
+      }
     }
   }
 
   // Stats footer
-  lines.push(`${ANSI.bold}${ANSI.cyan}───────────────────────────────────────────────────────────────${ANSI.reset}`)
+  lines.push(
+    `${ANSI.bold}${ANSI.cyan}───────────────────────────────────────────────────────────────${ANSI.reset}`,
+  )
   const stats = {
     total: tickets.length,
-    done: tickets.filter(t => t.status === 'done').length,
-    inProgress: tickets.filter(t => t.status === 'in_progress').length,
-    todo: tickets.filter(t => t.status === 'todo').length,
+    done: tickets.filter((t) => t.status === 'done').length,
+    inProgress: tickets.filter((t) => t.status === 'in_progress').length,
+    todo: tickets.filter((t) => t.status === 'todo').length,
   }
-  lines.push(`${ANSI.bold}Stats:${ANSI.reset} ${stats.total} tickets | ✅ ${stats.done} done | 🔄 ${stats.inProgress} in progress | 📝 ${stats.todo} todo`)
+  lines.push(
+    `${ANSI.bold}Stats:${ANSI.reset} ${stats.total} tickets | ✅ ${stats.done} done | 🔄 ${stats.inProgress} in progress | 📝 ${stats.todo} todo`,
+  )
 
   return lines.join('\n')
 }
@@ -726,7 +866,7 @@ function generateAsciiGraph(tickets) {
 function generateMarkdown(tickets, graph, validationErrors) {
   const groups = groupTicketsByType(tickets)
   const featureCategories = groupFeaturesByCategory(groups.feature)
-  const today = new Date().toISOString().split('T')[0]
+  const [today] = new Date().toISOString().split('T')
 
   let md = `# Ticket Dependency Graph
 
@@ -894,30 +1034,33 @@ ${Object.entries(VALID_REPOS)
  * @returns {Promise<{fixed: number, failed: string[]}>}
  */
 async function fixBidirectionalMismatches(errors, tickets, validRepos) {
-  const bidirectionalErrors = errors.filter((e) => e.type === 'bidirectional_mismatch')
-  if (bidirectionalErrors.length === 0) {
-    return { fixed: 0, failed: [] }
-  }
+  const bidirectionalErrors = errors.filter(
+    (e) => e.type === 'bidirectional_mismatch',
+  )
+  if (bidirectionalErrors.length === 0) return { fixed: 0, failed: [] }
 
   // Group fixes by target issue
   const fixesByIssue = new Map()
 
   for (const error of bidirectionalErrors) {
-    const targetId = error.nodes[0] // The issue that needs updating
+    const [targetId] = error.nodes // The issue that needs updating
     const [targetRepo, targetNumberStr] = targetId.split('#')
     const targetNumber = parseInt(targetNumberStr, 10)
 
     if (!fixesByIssue.has(targetId)) {
-      fixesByIssue.set(targetId, { repo: targetRepo, number: targetNumber, addBlocks: [], addDependsOn: [] })
+      fixesByIssue.set(targetId, {
+        repo: targetRepo,
+        number: targetNumber,
+        addBlocks: [],
+        addDependsOn: [],
+      })
     }
 
     const fixes = fixesByIssue.get(targetId)
-    if (error.fix?.addBlocks) {
-      fixes.addBlocks.push(...error.fix.addBlocks)
-    }
-    if (error.fix?.addDependsOn) {
+    if (error.fix?.addBlocks) fixes.addBlocks.push(...error.fix.addBlocks)
+
+    if (error.fix?.addDependsOn)
       fixes.addDependsOn.push(...error.fix.addDependsOn)
-    }
   }
 
   let fixed = 0
@@ -925,7 +1068,10 @@ async function fixBidirectionalMismatches(errors, tickets, validRepos) {
 
   for (const [issueId, fixes] of fixesByIssue) {
     try {
-      const fullRepoName = validRepos[fixes.repo]?.replace('https://github.com/', '')
+      const fullRepoName = validRepos[fixes.repo]?.replace(
+        'https://github.com/',
+        '',
+      )
       if (!fullRepoName) {
         failed.push(`${issueId}: unknown repo ${fixes.repo}`)
         continue
@@ -938,7 +1084,11 @@ async function fixBidirectionalMismatches(errors, tickets, validRepos) {
       const currentBody = stdout.trim()
 
       // Update the YAML block
-      const updatedBody = updateYamlMetadata(currentBody, fixes.addBlocks, fixes.addDependsOn)
+      const updatedBody = updateYamlMetadata(
+        currentBody,
+        fixes.addBlocks,
+        fixes.addDependsOn,
+      )
 
       if (updatedBody === currentBody) {
         console.log(`  - ${issueId}: no changes needed`)
@@ -949,7 +1099,9 @@ async function fixBidirectionalMismatches(errors, tickets, validRepos) {
       const tempFile = `/tmp/issue-body-${fixes.number}.md`
       writeFileSync(tempFile, updatedBody)
       try {
-        await execAsync(`gh issue edit ${fixes.number} --repo ${fullRepoName} --body-file "${tempFile}"`)
+        await execAsync(
+          `gh issue edit ${fixes.number} --repo ${fullRepoName} --body-file "${tempFile}"`,
+        )
       } finally {
         try {
           unlinkSync(tempFile)
@@ -958,7 +1110,9 @@ async function fixBidirectionalMismatches(errors, tickets, validRepos) {
         }
       }
 
-      console.log(`  - ${issueId}: updated (added blocks: [${fixes.addBlocks.join(', ')}], depends_on: [${fixes.addDependsOn.join(', ')}])`)
+      console.log(
+        `  - ${issueId}: updated (added blocks: [${fixes.addBlocks.join(', ')}], depends_on: [${fixes.addDependsOn.join(', ')}])`,
+      )
       fixed++
     } catch (err) {
       failed.push(`${issueId}: ${err.message}`)
@@ -979,12 +1133,11 @@ function updateYamlMetadata(body, addBlocks, addDependsOn) {
   if (!yamlMatch) {
     // No YAML block exists, create one
     const newYaml = []
-    if (addBlocks.length > 0) {
-      newYaml.push(`blocks: [${addBlocks.join(', ')}]`)
-    }
-    if (addDependsOn.length > 0) {
+    if (addBlocks.length > 0) newYaml.push(`blocks: [${addBlocks.join(', ')}]`)
+
+    if (addDependsOn.length > 0)
       newYaml.push(`depends_on: [${addDependsOn.join(', ')}]`)
-    }
+
     if (newYaml.length === 0) return body
 
     return `\`\`\`yaml\n${newYaml.join('\n')}\n\`\`\`\n\n${body}`
@@ -1002,11 +1155,17 @@ function updateYamlMetadata(body, addBlocks, addDependsOn) {
         .map((s) => s.trim())
         .filter(Boolean)
         .map(Number)
-      const merged = [...new Set([...existing, ...addBlocks])].sort((a, b) => a - b)
-      yamlContent = yamlContent.replace(/^blocks:\s*\[[^\]]*\]/m, `blocks: [${merged.join(', ')}]`)
+      const merged = [...new Set([...existing, ...addBlocks])].sort(
+        (a, b) => a - b,
+      )
+      yamlContent = yamlContent.replace(
+        /^blocks:\s*\[[^\]]*\]/m,
+        `blocks: [${merged.join(', ')}]`,
+      )
     } else {
       // Add new blocks line
-      yamlContent = yamlContent.trimEnd() + `\nblocks: [${addBlocks.join(', ')}]\n`
+      yamlContent =
+        yamlContent.trimEnd() + `\nblocks: [${addBlocks.join(', ')}]\n`
     }
   }
 
@@ -1020,11 +1179,17 @@ function updateYamlMetadata(body, addBlocks, addDependsOn) {
         .map((s) => s.trim())
         .filter(Boolean)
         .map(Number)
-      const merged = [...new Set([...existing, ...addDependsOn])].sort((a, b) => a - b)
-      yamlContent = yamlContent.replace(/^depends_on:\s*\[[^\]]*\]/m, `depends_on: [${merged.join(', ')}]`)
+      const merged = [...new Set([...existing, ...addDependsOn])].sort(
+        (a, b) => a - b,
+      )
+      yamlContent = yamlContent.replace(
+        /^depends_on:\s*\[[^\]]*\]/m,
+        `depends_on: [${merged.join(', ')}]`,
+      )
     } else {
       // Add new depends_on line
-      yamlContent = yamlContent.trimEnd() + `\ndepends_on: [${addDependsOn.join(', ')}]\n`
+      yamlContent =
+        yamlContent.trimEnd() + `\ndepends_on: [${addDependsOn.join(', ')}]\n`
     }
   }
 
@@ -1042,13 +1207,18 @@ async function main() {
   const jsonMode = process.argv.includes('--json')
 
   // Step 1: Fetch issues from GitHub
-  if (!asciiMode && !jsonMode) {
+  if (!asciiMode && !jsonMode)
     console.log(`Fetching issues from ${REPOS.length} repos in parallel...`)
-  }
+
   const issues = await fetchAllIssues(REPOS)
 
   // Step 2: Transform to tickets
-  const tickets = transformIssuesToTickets(issues, MAIN_REPO, REPO_ABBREVIATIONS, VALID_REPOS)
+  const tickets = transformIssuesToTickets(
+    issues,
+    MAIN_REPO,
+    REPO_ABBREVIATIONS,
+    VALID_REPOS,
+  )
 
   if (!asciiMode && !jsonMode) {
     const repoCounts = {}
@@ -1058,51 +1228,69 @@ async function main() {
       statusCounts[ticket.status] = (statusCounts[ticket.status] || 0) + 1
     }
     console.log(`Found ${tickets.length} issues:`)
-    for (const [repo, count] of Object.entries(repoCounts)) {
+    for (const [repo, count] of Object.entries(repoCounts))
       console.log(`  - ${repo}: ${count}`)
-    }
-    console.log(`Status breakdown: ✅ ${statusCounts.done} done, 🔄 ${statusCounts.in_progress} in progress, 📝 ${statusCounts.todo} todo`)
+
+    console.log(
+      `Status breakdown: ✅ ${statusCounts.done} done, 🔄 ${statusCounts.in_progress} in progress, 📝 ${statusCounts.todo} todo`,
+    )
   }
 
   // Step 3: Build the graph
-  if (!asciiMode && !jsonMode) {
-    console.log('Building dependency graph...')
-  }
+  if (!asciiMode && !jsonMode) console.log('Building dependency graph...')
+
   let { graph, validationErrors } = buildGraphFromTickets(tickets, {
     formatId: formatTicketId,
   })
 
   // Step 4: Auto-fix bidirectional mismatches (always enabled)
-  const bidirectionalErrors = validationErrors.filter((e) => e.type === 'bidirectional_mismatch')
+  const bidirectionalErrors = validationErrors.filter(
+    (e) => e.type === 'bidirectional_mismatch',
+  )
   if (bidirectionalErrors.length > 0 && !jsonMode && !asciiMode) {
-    console.log(`\nFixing ${bidirectionalErrors.length} bidirectional mismatch(es)...`)
-    const { fixed, failed } = await fixBidirectionalMismatches(bidirectionalErrors, tickets, VALID_REPOS)
+    console.log(
+      `\nFixing ${bidirectionalErrors.length} bidirectional mismatch(es)...`,
+    )
+    const { fixed, failed } = await fixBidirectionalMismatches(
+      bidirectionalErrors,
+      tickets,
+      VALID_REPOS,
+    )
 
     if (fixed > 0) {
       console.log(`Fixed ${fixed} issue(s). Re-fetching to verify...`)
       // Re-fetch and rebuild to verify fixes
       const freshIssues = await fetchAllIssues(REPOS)
-      const freshTickets = transformIssuesToTickets(freshIssues, MAIN_REPO, REPO_ABBREVIATIONS, VALID_REPOS)
-      const freshResult = buildGraphFromTickets(freshTickets, { formatId: formatTicketId })
+      const freshTickets = transformIssuesToTickets(
+        freshIssues,
+        MAIN_REPO,
+        REPO_ABBREVIATIONS,
+        VALID_REPOS,
+      )
+      const freshResult = buildGraphFromTickets(freshTickets, {
+        formatId: formatTicketId,
+      })
       graph = freshResult.graph
       validationErrors = freshResult.validationErrors
     }
 
     if (failed.length > 0) {
       console.error('Failed to fix:')
-      for (const f of failed) {
-        console.error(`  - ${f}`)
-      }
+      for (const f of failed) console.error(`  - ${f}`)
     }
   }
 
   // Step 5: Check for remaining bidirectional errors (blocking)
-  const remainingBidirectionalErrors = validationErrors.filter((e) => e.type === 'bidirectional_mismatch')
+  const remainingBidirectionalErrors = validationErrors.filter(
+    (e) => e.type === 'bidirectional_mismatch',
+  )
   if (remainingBidirectionalErrors.length > 0 && !jsonMode) {
-    console.error(`\n❌ ${remainingBidirectionalErrors.length} bidirectional mismatch(es) could not be fixed:`)
-    for (const error of remainingBidirectionalErrors) {
+    console.error(
+      `\n❌ ${remainingBidirectionalErrors.length} bidirectional mismatch(es) could not be fixed:`,
+    )
+    for (const error of remainingBidirectionalErrors)
       console.error(`  - ${error.message}`)
-    }
+
     console.error('\nManually update the issues listed above.')
     process.exit(1)
   }
@@ -1118,9 +1306,7 @@ async function main() {
 
     const epicFindings = detectCompletableEpics(tickets, issuesByKey)
     const epicOutput = formatEpicFindings(epicFindings)
-    if (epicOutput) {
-      console.log(epicOutput)
-    }
+    if (epicOutput) console.log(epicOutput)
   }
 
   // Step 6: Output
@@ -1130,7 +1316,9 @@ async function main() {
     console.log(json)
   } else if (liveMode) {
     // Open in mermaid.live (standalone)
-    const mermaidCode = renderMermaidDiagram(graph, { repoDisplayAbbrev: REPO_DISPLAY_ABBREV })
+    const mermaidCode = renderMermaidDiagram(graph, {
+      repoDisplayAbbrev: REPO_DISPLAY_ABBREV,
+    })
       .replace(/```mermaid\n/, '')
       .replace(/\n```$/, '')
 
@@ -1145,7 +1333,12 @@ async function main() {
     }
     console.log('Syntax valid')
 
-    const state = JSON.stringify({ code: mermaidCode, mermaid: { theme: 'default' }, autoSync: true, updateDiagram: true })
+    const state = JSON.stringify({
+      code: mermaidCode,
+      mermaid: { theme: 'default' },
+      autoSync: true,
+      updateDiagram: true,
+    })
     const encoded = Buffer.from(state).toString('base64url')
     const url = `https://mermaid.live/edit#base64:${encoded}`
     console.log('Opening mermaid.live...')
@@ -1162,12 +1355,13 @@ async function main() {
   }
 
   // Report other validation issues (non-bidirectional, since those are already handled)
-  const otherErrors = validationErrors.filter((e) => e.type !== 'bidirectional_mismatch')
+  const otherErrors = validationErrors.filter(
+    (e) => e.type !== 'bidirectional_mismatch',
+  )
   if (otherErrors.length > 0 && !jsonMode) {
     console.log('\nValidation warnings:')
-    for (const error of otherErrors) {
+    for (const error of otherErrors)
       console.log(`  - [${error.type}] ${error.message}`)
-    }
   }
 
   // Report graph statistics
@@ -1178,7 +1372,9 @@ async function main() {
     console.log(`  - Edges: ${graph.edges.length}`)
     console.log(`  - Critical path length: ${criticalPath.length}`)
     if (criticalPath.path.length > 0) {
-      console.log(`  - Critical path: ${criticalPath.path.slice(0, 5).join(' → ')}${criticalPath.path.length > 5 ? '...' : ''}`)
+      console.log(
+        `  - Critical path: ${criticalPath.path.slice(0, 5).join(' → ')}${criticalPath.path.length > 5 ? '...' : ''}`,
+      )
     }
   }
 }
