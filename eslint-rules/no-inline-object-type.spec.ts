@@ -42,6 +42,18 @@ describe('no-inline-object-type', () => {
           code: `function foo(param: { a: string; b: number }) {}`,
           options: [{ minProperties: 3 }],
         },
+        // Union of named types at module scope - OK
+        {
+          code: `type Success = { ok: true; value: string }; type Failure = { ok: false; error: string }; type Result = Success | Failure`,
+        },
+        // Union with single-property object types - OK (under threshold)
+        {
+          code: `type Result = { ok: true } | { ok: false }`,
+        },
+        // Non-union type alias inside function - OK
+        {
+          code: `function foo() { type Name = string }`,
+        },
       ],
 
       invalid: [
@@ -70,6 +82,30 @@ describe('no-inline-object-type', () => {
           code: `function foo(param: { name: string }) {}`,
           options: [{ minProperties: 1 }],
           errors: [{ messageId: 'extractObjectType' }],
+        },
+        // Object types in union members at module scope - NOT OK
+        {
+          code: `type Result = { ok: true; value: string } | { ok: false; error: string }`,
+          errors: [
+            { messageId: 'extractObjectType' },
+            { messageId: 'extractObjectType' },
+          ],
+        },
+        // Union type alias inside function body - NOT OK (union + object member)
+        {
+          code: `function foo() { type Result = { ok: true } | { ok: false; error: string } }`,
+          errors: [
+            { messageId: 'extractUnionType' },
+            { messageId: 'extractObjectType' },
+          ],
+        },
+        // Union type alias inside arrow function - NOT OK (union + object member)
+        {
+          code: `const foo = () => { type Status = { loading: true } | { loading: false; data: string } }`,
+          errors: [
+            { messageId: 'extractUnionType' },
+            { messageId: 'extractObjectType' },
+          ],
         },
       ],
     })

@@ -41,6 +41,7 @@ const noStylesheetMagicNumbers = require('../eslint-rules/no-stylesheet-magic-nu
 const noThunkResultInComponent = require('../eslint-rules/no-thunk-result-in-component.cjs')
 const noTryCatchInCore = require('../eslint-rules/no-try-catch-in-core.cjs')
 const noUnusedTestId = require('../eslint-rules/no-unused-test-id.cjs')
+const noUnwrap = require('../eslint-rules/no-unwrap.cjs')
 const noUsecallbackSelectorWrapper = require('../eslint-rules/no-usecallback-selector-wrapper.cjs')
 const oneComponentPerFile = require('../eslint-rules/one-component-per-file.cjs')
 const oneListenerPerFile = require('../eslint-rules/one-listener-per-file.cjs')
@@ -145,5 +146,6 @@ module.exports = {
     'require-typed-each': requireTypedEach,
     'no-inline-object-type': noInlineObjectType,
     'no-lame-naming': noLameNaming,
+    'no-unwrap': noUnwrap,
   },
 }

@@ -9,12 +9,14 @@ type BlocklistSummary = {
   totalBlocks: string
 }
 
-export type BlocklistViewModelType =
-  | {
-      type: BlocklistViewModel.NoBlocklist
-      message: string
-    }
-  | {
-      type: BlocklistViewModel.WithBlockLists
-      blocklists: BlocklistSummary[]
-    }
+type NoBlocklistView = {
+  type: BlocklistViewModel.NoBlocklist
+  message: string
+}
+
+type WithBlocklistsView = {
+  type: BlocklistViewModel.WithBlockLists
+  blocklists: BlocklistSummary[]
+}
+
+export type BlocklistViewModelType = NoBlocklistView | WithBlocklistsView

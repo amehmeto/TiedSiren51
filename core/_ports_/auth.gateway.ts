@@ -8,8 +8,11 @@ export interface AuthGateway {
   signUpWithEmail(email: string, password: string): Promise<AuthUser>
   signInWithEmail(email: string, password: string): Promise<AuthUser>
   reauthenticate(password: string): Promise<void>
+  changePassword(newPassword: string): Promise<void>
   reauthenticateWithGoogle(): Promise<void>
   resetPassword(email: string): Promise<void>
-  logOut(): Promise<void>
+  sendVerificationEmail(): Promise<void>
+  refreshEmailVerificationStatus(): Promise<boolean>
   deleteAccount(): Promise<void>
+  logOut(): Promise<void>
 }

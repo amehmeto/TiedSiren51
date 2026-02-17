@@ -22,6 +22,7 @@ describe('selectIsUserAuthenticated', () => {
         .withAuthUser({
           id: 'user-123',
           email: 'test@example.com',
+          isEmailVerified: true,
           username: 'testuser',
         })
         .build(),
@@ -39,6 +40,7 @@ describe('selectIsUserAuthenticated', () => {
         .withAuthUser({
           id: 'user-456',
           email: 'another@example.com',
+          isEmailVerified: true,
         })
         .build(),
     )

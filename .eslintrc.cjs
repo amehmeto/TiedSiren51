@@ -198,6 +198,8 @@ module.exports = {
     ],
     // Extract inline object types into named type aliases
     'local-rules/no-inline-object-type': 'error',
+    // Disallow .unwrap() — rely on Redux state for thunk success/error
+    'local-rules/no-unwrap': 'error',
     // Disallow overly generic variable and function names
     'local-rules/no-lame-naming': 'warn',
     // Prefer enum over string literal unions

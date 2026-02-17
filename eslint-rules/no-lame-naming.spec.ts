@@ -31,6 +31,8 @@ describe('no-lame-naming', () => {
         // "item" as part of a longer name is fine
         { code: 'const listItem = getFirst()' },
         { code: 'const menuItems = getMenu()' },
+        // "result" as part of a longer name is fine
+        { code: 'const validationResult = schema.safeParse(input)' },
         // Descriptive function names
         { code: 'function sortSirens() {}' },
         { code: 'const fetchApps = () => {}' },
@@ -81,6 +83,16 @@ describe('no-lame-naming', () => {
             {
               messageId: 'noLameVariableName',
               data: { name: 'items' },
+            },
+          ],
+        },
+        // Forbidden variable: result
+        {
+          code: 'const result = schema.safeParse(input)',
+          errors: [
+            {
+              messageId: 'noLameVariableName',
+              data: { name: 'result' },
             },
           ],
         },
