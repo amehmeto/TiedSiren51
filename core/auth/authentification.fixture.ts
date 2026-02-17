@@ -10,6 +10,7 @@ import {
 import { AuthError } from '@/core/auth/auth-error'
 import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
+import { changePassword } from '@/core/auth/usecases/change-password.usecase'
 import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { reauthenticateWithGoogle } from '@/core/auth/usecases/reauthenticate-with-google.usecase'
@@ -95,6 +96,13 @@ export function authentificationFixture(
         const error = new Error(errorMessage)
         authGateway.willDeleteAccountWith = Promise.reject(error)
       },
+      changePasswordWillSucceed() {
+        authGateway.willChangePasswordWith = Promise.resolve()
+      },
+      changePasswordWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willChangePasswordWith = Promise.reject(error)
+      },
       sendVerificationEmailWillFailWith(errorMessage: string) {
         const error = new Error(errorMessage)
         authGateway.willSendVerificationEmailWith = Promise.reject(error)
@@ -142,6 +150,9 @@ export function authentificationFixture(
           testStateBuilderProvider.getState(),
         )
         return store.dispatch(deleteAccount())
+      },
+      changePassword(newPassword: string) {
+        return store.dispatch(changePassword({ newPassword }))
       },
       sendVerificationEmail() {
         return store.dispatch(sendVerificationEmail())
@@ -226,6 +237,26 @@ export function authentificationFixture(
       deleteAccountErrorShouldBe(errorMessage: string) {
         const { deleteAccountError } = store.getState().auth
         expect(deleteAccountError).toBe(errorMessage)
+      },
+      changePasswordShouldNotBeLoading() {
+        const { isChangingPassword } = store.getState().auth
+        expect(isChangingPassword).toBe(false)
+      },
+      changePasswordErrorShouldBe(errorMessage: string) {
+        const { changePasswordError } = store.getState().auth
+        expect(changePasswordError).toBe(errorMessage)
+      },
+      changePasswordErrorShouldBeNull() {
+        const { changePasswordError } = store.getState().auth
+        expect(changePasswordError).toBeNull()
+      },
+      changePasswordShouldHaveSucceeded() {
+        const { hasChangePasswordSucceeded } = store.getState().auth
+        expect(hasChangePasswordSucceeded).toBe(true)
+      },
+      changePasswordShouldNotHaveSucceeded() {
+        const { hasChangePasswordSucceeded } = store.getState().auth
+        expect(hasChangePasswordSucceeded).toBe(false)
       },
     },
   }

@@ -23,6 +23,7 @@ import {
   signInWithCredential,
   signInWithEmailAndPassword,
   signOut,
+  updatePassword,
   User,
 } from 'firebase/auth'
 import { AuthGateway } from '@/core/_ports_/auth.gateway'
@@ -280,6 +281,20 @@ export class FirebaseAuthGateway implements AuthGateway {
     } catch (error) {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to signInWithApple: ${error}`,
+      )
+      throw this.toAuthError(error)
+    }
+  }
+
+  async changePassword(newPassword: string): Promise<void> {
+    try {
+      const user = this.auth.currentUser
+      if (!user) throw new Error('No authenticated user found.')
+
+      await updatePassword(user, newPassword)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to change password: ${error}`,
       )
       throw this.toAuthError(error)
     }

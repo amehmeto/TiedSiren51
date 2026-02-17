@@ -1,6 +1,6 @@
 import { expect, describe, it } from 'vitest'
 import { LoginCredentials, SignUpCredentials } from '@/core/auth/auth.type'
-import { signInSchema, signUpSchema } from './auth.schema'
+import { changePasswordSchema, signInSchema, signUpSchema } from './auth.schema'
 
 type InvalidCredentialsTestCase = [
   description: string,
@@ -16,8 +16,8 @@ describe('Auth Schemas', () => {
         password: 'password123',
       }
 
-      const result = signInSchema.safeParse(validData)
-      expect(result.success).toBe(true)
+      const validation = signInSchema.safeParse(validData)
+      expect(validation.success).toBe(true)
     })
 
     it.each<InvalidCredentialsTestCase>([
@@ -37,9 +37,9 @@ describe('Auth Schemas', () => {
         'Password is required',
       ],
     ])('should reject %s', (_, input, expectedMessage) => {
-      const result = signInSchema.safeParse(input)
-      expect(result.success).toBe(false)
-      expect(result.error?.issues[0].message).toBe(expectedMessage)
+      const validation = signInSchema.safeParse(input)
+      expect(validation.success).toBe(false)
+      expect(validation.error?.issues[0].message).toBe(expectedMessage)
     })
   })
 
@@ -50,8 +50,8 @@ describe('Auth Schemas', () => {
         password: 'Password123',
       }
 
-      const result = signUpSchema.safeParse(validData)
-      expect(result.success).toBe(true)
+      const validation = signUpSchema.safeParse(validData)
+      expect(validation.success).toBe(true)
     })
 
     it.each<InvalidCredentialsTestCase>([
@@ -76,9 +76,59 @@ describe('Auth Schemas', () => {
         'Password must contain uppercase, lowercase and number',
       ],
     ])('should reject %s', (_, input, expectedMessage) => {
-      const result = signUpSchema.safeParse(input)
-      expect(result.success).toBe(false)
-      expect(result.error?.issues[0].message).toBe(expectedMessage)
+      const validation = signUpSchema.safeParse(input)
+      expect(validation.success).toBe(false)
+      expect(validation.error?.issues[0].message).toBe(expectedMessage)
+    })
+  })
+
+  describe('changePasswordSchema', () => {
+    it('should validate matching strong passwords', () => {
+      const validData = {
+        newPassword: 'NewPassword1',
+        confirmPassword: 'NewPassword1',
+      }
+
+      const validation = changePasswordSchema.safeParse(validData)
+      expect(validation.success).toBe(true)
+    })
+
+    type ChangePasswordTestCase = [
+      description: string,
+      input: { newPassword: string; confirmPassword: string },
+      expectedMessage: string,
+    ]
+
+    it.each<ChangePasswordTestCase>([
+      [
+        'too short password',
+        { newPassword: 'Ab1', confirmPassword: 'Ab1' },
+        'Password must be at least 6 characters',
+      ],
+      [
+        'password without uppercase',
+        { newPassword: 'password123', confirmPassword: 'password123' },
+        'Password must contain uppercase, lowercase and number',
+      ],
+      [
+        'password without lowercase',
+        { newPassword: 'PASSWORD123', confirmPassword: 'PASSWORD123' },
+        'Password must contain uppercase, lowercase and number',
+      ],
+      [
+        'password without number',
+        { newPassword: 'Password', confirmPassword: 'Password' },
+        'Password must contain uppercase, lowercase and number',
+      ],
+      [
+        'mismatched passwords',
+        { newPassword: 'Password123', confirmPassword: 'Different123' },
+        'Passwords do not match',
+      ],
+    ])('should reject %s', (_, input, expectedMessage) => {
+      const validation = changePasswordSchema.safeParse(input)
+      expect(validation.success).toBe(false)
+      expect(validation.error?.issues[0].message).toBe(expectedMessage)
     })
   })
 })

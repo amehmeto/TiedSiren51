@@ -12,6 +12,12 @@ export default function SettingsScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.text}>Settings</Text>
+      <Pressable
+        onPress={() => router.push('/(tabs)/settings/change-password')}
+        style={styles.changePasswordButton}
+      >
+        <Text style={styles.changePasswordText}>Change Password</Text>
+      </Pressable>
       <Pressable onPress={() => dispatch(logOut())} style={styles.logoutButton}>
         <Text style={styles.logoutText}>Logout</Text>
       </Pressable>
@@ -40,6 +46,14 @@ const styles = StyleSheet.create({
   },
   logoutText: {
     color: T.color.red,
+    fontSize: T.font.size.base,
+  },
+  changePasswordButton: {
+    padding: T.spacing.smallMedium,
+    marginTop: T.spacing.medium,
+  },
+  changePasswordText: {
+    color: T.color.text,
     fontSize: T.font.size.base,
   },
   deleteAccountButton: {

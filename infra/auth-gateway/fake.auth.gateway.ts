@@ -14,6 +14,8 @@ export class FakeAuthGateway implements AuthGateway {
 
   willDeleteAccountWith: Promise<void> = Promise.resolve()
 
+  willChangePasswordWith: Promise<void> = Promise.resolve()
+
   willSendVerificationEmailWith: Promise<void> = Promise.resolve()
 
   willRefreshEmailVerificationWith: Promise<boolean> = Promise.resolve(false)
@@ -30,6 +32,10 @@ export class FakeAuthGateway implements AuthGateway {
 
   reauthenticate(_password: string): Promise<void> {
     return this.willReauthenticateWith
+  }
+
+  changePassword(_newPassword: string): Promise<void> {
+    return this.willChangePasswordWith
   }
 
   reauthenticateWithGoogle(): Promise<void> {
