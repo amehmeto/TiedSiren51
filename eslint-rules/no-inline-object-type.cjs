@@ -20,7 +20,7 @@
  *   it.each<Credentials>([...])
  *   type Person = { name: string; age: number }
  *   function foo(param: Person) {}
- *   type Result = { ok: true } | { ok: false; error: string }
+ *   type Result = { ok: true } | { error: string }
  *   function foo() { const r: Result = ... }
  *   type Success = { ok: true; value: string }
  *   type Failure = { ok: false; error: string }

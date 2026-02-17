@@ -20,6 +20,7 @@ type PasswordValidationSuccess = { isValid: true; newPassword: string }
 
 type PasswordValidation = PasswordValidationFailure | PasswordValidationSuccess
 
+// Field clearing on success is handled by the parent remounting via key prop
 export function ChangePasswordForm({
   isChangingPassword,
   changePasswordError,

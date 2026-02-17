@@ -36,7 +36,15 @@ export default function ChangePasswordScreen() {
     buttonText,
   } = viewModel
 
-  const formResetKey = String(hasChangePasswordSucceeded)
+  const [didSucceed, setDidSucceed] = useState(false)
+  const [formResetKey, setFormResetKey] = useState(0)
+
+  if (hasChangePasswordSucceeded && !didSucceed) {
+    setDidSucceed(true)
+    setFormResetKey((c) => c + 1)
+  }
+
+  if (!hasChangePasswordSucceeded && didSucceed) setDidSucceed(false)
 
   return (
     <View style={styles.container}>
