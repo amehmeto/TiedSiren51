@@ -10,6 +10,7 @@ export interface AuthGateway {
   reauthenticate(password: string): Promise<void>
   reauthenticateWithGoogle(): Promise<void>
   resetPassword(email: string): Promise<void>
+  confirmPasswordReset(oobCode: string, newPassword: string): Promise<void>
   logOut(): Promise<void>
   deleteAccount(): Promise<void>
 }

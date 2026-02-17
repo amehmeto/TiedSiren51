@@ -17,7 +17,7 @@ export default {
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
-    scheme: 'myapp',
+    scheme: 'tiedsiren',
     userInterfaceStyle: 'automatic',
     splash: {
       image: './assets/images/splash.png',
@@ -29,6 +29,7 @@ export default {
       bundleIdentifier: 'com.tiedsiren.tiedsiren',
       googleServicesFile: './GoogleService-Info.plist',
       usesAppleSignIn: true,
+      associatedDomains: ['applinks:tiedsiren.app'],
     },
     android: {
       adaptiveIcon: {
@@ -42,6 +43,20 @@ export default {
         'QUERY_ALL_PACKAGES',
         'android.permission.READ_EXTERNAL_STORAGE',
         'android.permission.WRITE_EXTERNAL_STORAGE',
+      ],
+      intentFilters: [
+        {
+          action: 'VIEW',
+          autoVerify: true,
+          data: [
+            {
+              scheme: 'https',
+              host: 'tiedsiren.app',
+              pathPrefix: '/reset-password',
+            },
+          ],
+          category: ['BROWSABLE', 'DEFAULT'],
+        },
       ],
     },
     web: {

@@ -9,6 +9,7 @@ import {
 } from 'firebase/app'
 import {
   Auth,
+  confirmPasswordReset as firebaseConfirmPasswordReset,
   createUserWithEmailAndPassword,
   EmailAuthProvider,
   getAuth,
@@ -283,6 +284,20 @@ export class FirebaseAuthGateway implements AuthGateway {
     } catch (error) {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to resetPassword: ${error}`,
+      )
+      throw this.toAuthError(error)
+    }
+  }
+
+  async confirmPasswordReset(
+    oobCode: string,
+    newPassword: string,
+  ): Promise<void> {
+    try {
+      await firebaseConfirmPasswordReset(this.auth, oobCode, newPassword)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to confirmPasswordReset: ${error}`,
       )
       throw this.toAuthError(error)
     }

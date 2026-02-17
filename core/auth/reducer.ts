@@ -13,6 +13,7 @@ import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
 import { AuthErrorType, isAuthErrorType } from './auth-error-type'
+import { confirmPasswordReset } from './usecases/confirm-password-reset.usecase'
 import { reauthenticateWithGoogle } from './usecases/reauthenticate-with-google.usecase'
 import { reauthenticate } from './usecases/reauthenticate.usecase'
 import { resetPassword } from './usecases/reset-password.usecase'
@@ -29,6 +30,9 @@ export type AuthState = {
   lastReauthenticatedAt: ISODateString | null
   isReauthenticating: boolean
   reauthError: string | null
+  isConfirmingPasswordReset: boolean
+  confirmPasswordResetError: string | null
+  isPasswordResetConfirmed: boolean
   isDeletingAccount: boolean
   deleteAccountError: string | null
   deleteConfirmText: string
@@ -50,6 +54,14 @@ export const setPassword = createAction<string>('auth/setPassword')
 
 export const clearReauthError = createAction('auth/clearReauthError')
 
+export const clearConfirmPasswordResetError = createAction(
+  'auth/clearConfirmPasswordResetError',
+)
+
+export const clearConfirmPasswordResetState = createAction(
+  'auth/clearConfirmPasswordResetState',
+)
+
 export const clearDeleteAccountError = createAction(
   'auth/clearDeleteAccountError',
 )
@@ -70,6 +82,9 @@ function createInitialAuthState(): AuthState {
     lastReauthenticatedAt: null,
     isReauthenticating: false,
     reauthError: null,
+    isConfirmingPasswordReset: false,
+    confirmPasswordResetError: null,
+    isPasswordResetConfirmed: false,
     isDeletingAccount: false,
     deleteAccountError: null,
     deleteConfirmText: '',
@@ -176,6 +191,28 @@ export const reducer = createReducer<AuthState>(
         state.reauthError = action.error.message ?? null
       })
 
+      .addCase(clearConfirmPasswordResetError, (state) => {
+        state.confirmPasswordResetError = null
+      })
+      .addCase(clearConfirmPasswordResetState, (state) => {
+        state.isConfirmingPasswordReset = false
+        state.confirmPasswordResetError = null
+        state.isPasswordResetConfirmed = false
+      })
+      .addCase(confirmPasswordReset.pending, (state) => {
+        state.isConfirmingPasswordReset = true
+        state.confirmPasswordResetError = null
+        state.isPasswordResetConfirmed = false
+      })
+      .addCase(confirmPasswordReset.fulfilled, (state) => {
+        state.isConfirmingPasswordReset = false
+        state.isPasswordResetConfirmed = true
+        state.confirmPasswordResetError = null
+      })
+      .addCase(confirmPasswordReset.rejected, (state, action) => {
+        state.isConfirmingPasswordReset = false
+        state.confirmPasswordResetError = action.error.message ?? null
+      })
       .addCase(clearDeleteAccountError, (state) => {
         state.deleteAccountError = null
       })
