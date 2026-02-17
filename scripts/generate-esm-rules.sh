@@ -52,8 +52,9 @@ for cjs_file in "$RULES_DIR"/*.cjs; do
 done
 
 # Convert kebab-case to camelCase for JS variable names
+# Uses awk for portability (macOS sed lacks \U for uppercase)
 kebab_to_camel() {
-  echo "$1" | sed -E 's/-([a-z])/\U\1/g'
+  echo "$1" | awk -F- '{for(i=1;i<=NF;i++){if(i==1){printf "%s",$i}else{printf "%s%s",toupper(substr($i,1,1)),substr($i,2)}}print ""}'
 }
 
 {
@@ -89,9 +90,13 @@ if grep -l "require(" "$RULES_DIR"/*.js 2>/dev/null; then
   exit 1
 fi
 
-# --- Step 4: Format generated files ---
+# --- Step 4: Format generated files (best-effort, may fail during postinstall) ---
 
 echo "Formatting generated files..."
-npx prettier --write "$RULES_DIR"/*.js "$PLUGIN_FILE" --log-level warn
+if npx prettier --write "$RULES_DIR"/*.js "$PLUGIN_FILE" --log-level warn 2>/dev/null; then
+  :
+else
+  echo "  Prettier not available, skipping formatting (files still usable)."
+fi
 
 echo "Done! Generated ${#rules[@]} ESM rules + plugin entry point."

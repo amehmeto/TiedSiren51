@@ -6,7 +6,7 @@
     "no-console": "error",
     "eqeqeq": "error",
     "no-nested-ternary": "error",
-    "no-else-return": "warn",
+    "no-else-return": "error",
     "prefer-const": "error",
     "complexity": ["warn", { "max": 10 }],
     "no-unused-vars": [

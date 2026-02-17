@@ -199,8 +199,9 @@ module.exports = {
     function checkCallExpression(node) {
       try {
         checkCallExpressionImpl(node)
-      } catch (_) {
-        // Gracefully skip files with incompatible AST shapes (e.g. oxlint JS plugin)
+      } catch (err) {
+        if (!(err instanceof TypeError)) throw err
+        // Gracefully skip nodes with incompatible AST shapes (oxlint JS plugin)
       }
     }
 
