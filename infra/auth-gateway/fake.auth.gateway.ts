@@ -5,6 +5,7 @@ export class FakeAuthGateway implements AuthGateway {
   willResultWith: Promise<AuthUser> = Promise.resolve({
     id: 'fake-user-id',
     email: 'fake-user@gmail.com',
+    isEmailVerified: false,
   })
 
   willReauthenticateWith: Promise<void> = Promise.resolve()
@@ -12,6 +13,12 @@ export class FakeAuthGateway implements AuthGateway {
   willReauthenticateWithGoogleWith: Promise<void> = Promise.resolve()
 
   willDeleteAccountWith: Promise<void> = Promise.resolve()
+
+  willSendVerificationEmailWith: Promise<void> = Promise.resolve()
+
+  willRefreshEmailVerificationWith: Promise<boolean> = Promise.resolve(false)
+
+  verificationEmailSentCount = 0
 
   logOutError: Error | null = null
 
@@ -48,6 +55,15 @@ export class FakeAuthGateway implements AuthGateway {
   async resetPassword(email: string): Promise<void> {
     await this.willResultWith
     this.lastResetPasswordEmail = email
+  }
+
+  async sendVerificationEmail(): Promise<void> {
+    await this.willSendVerificationEmailWith
+    this.verificationEmailSentCount++
+  }
+
+  refreshEmailVerificationStatus(): Promise<boolean> {
+    return this.willRefreshEmailVerificationWith
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {

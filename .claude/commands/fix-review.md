@@ -6,20 +6,21 @@ Fix all pending review comments on PR #$ARGUMENTS.
 
 ## Steps
 
-1. **Fetch actionable PR comments using the dedicated script:**
+1. **Fetch all PR comments using the dedicated script:**
    ```bash
-   ./scripts/fetch-pr-comments.sh $ARGUMENTS --needs-action
+   ./scripts/fetch-pr-comments.sh $ARGUMENTS --owner-only
    ```
-   This returns structured JSON pre-filtered to only actionable threads:
+   This returns structured JSON with:
    - `repo` / `owner` — repo metadata (use for API calls in later steps)
-   - `issue_comments` — top-level PR comments from the owner
-   - `reviews` — review bodies and states from the owner
-   - `review_comment_threads` — only threads that need action (unresolved, no bot reply as last comment, from owner)
+   - `issue_comments` — top-level PR comments
+   - `reviews` — review bodies and states (APPROVED, CHANGES_REQUESTED, etc.)
+   - `review_comment_threads` — file/line-level comments grouped into threads
 
    **Interpreting the output:**
-   - All returned threads need action — no further filtering required
+   - Each thread in `review_comment_threads` groups a root comment with its replies via `in_reply_to_id`
+   - Threads with `"is_resolved": true` have been marked as resolved on GitHub — skip them
    - Comments with `"outdated": true` refer to code that has since changed — verify if the feedback still applies
-   - `has_bot_reply` indicates a previous bot response exists in the thread (but was followed by a new owner comment)
+   - Focus on **unresolved** threads where the latest comment is from the owner and hasn't been addressed yet
 
 2. **Ensure you are on the correct branch** for this PR:
    ```bash
