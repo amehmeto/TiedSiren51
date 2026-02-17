@@ -1,12 +1,12 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Send a Slack notification to #qa channel when an APK build is ready.
+# Send a Slack notification to #qa-testing channel when an APK build is ready.
 # Includes PR metadata, download link, and test plan extracted from the linked issue.
 #
 # Usage: ./scripts/send-slack-notification.sh <github_context_json> <steps_context_json>
 #
-# Env: SLACK_QA_WEBHOOK_URL (required) - Slack incoming webhook for #qa channel
+# Env: SLACK_QA_WEBHOOK_URL (required) - Slack incoming webhook for #qa-testing channel
 #      GH_TOKEN (required) - GitHub token for issue body retrieval
 
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
@@ -44,7 +44,9 @@ DOWNLOAD_URL=$(echo "$STEPS_CONTEXT" | jq -r '.create_release.outputs.download_u
 TAG_NAME=$(echo "$STEPS_CONTEXT" | jq -r '.create_release.outputs.tag_name')
 RELEASE_URL="${SERVER_URL}/${REPOSITORY}/releases/tag/${TAG_NAME}"
 
-# Extract issue number from branch name (e.g., feat/TS300-description -> 300)
+# Extract issue number from branch name (e.g., feat/TS300-description -> 300).
+# Only matches the TS prefix (TiedSiren51 repo). Branches for other repos
+# (TSBO, EAS, EFS, ELIA) or non-standard names will skip test plan extraction.
 ISSUE_NUMBER=""
 if [[ "$BRANCH" =~ TS([0-9]+) ]]; then
   ISSUE_NUMBER="${BASH_REMATCH[1]}"
@@ -55,7 +57,7 @@ TEST_PLAN=""
 ISSUE_URL=""
 if [[ -n "$ISSUE_NUMBER" ]]; then
   ISSUE_URL="${SERVER_URL}/${REPOSITORY}/issues/${ISSUE_NUMBER}"
-  TEST_PLAN=$("$SCRIPT_DIR/extract-test-plan.sh" "$ISSUE_NUMBER" 2>/dev/null) || TEST_PLAN=""
+  TEST_PLAN=$("$SCRIPT_DIR/extract-test-plan.sh" "$ISSUE_NUMBER" "$REPOSITORY" 2>/dev/null) || TEST_PLAN=""
 fi
 
 # Build test plan blocks (conditionally included)
@@ -172,7 +174,7 @@ HTTP_CODE=$(curl -s -o /dev/null -w "%{http_code}" \
   "$SLACK_QA_WEBHOOK_URL")
 
 if [[ "$HTTP_CODE" == "200" ]]; then
-  print_success "QA notification sent to Slack #qa channel" >&2
+  print_success "QA notification sent to Slack #qa-testing" >&2
 else
   print_error "Slack webhook returned HTTP $HTTP_CODE" >&2
   exit 1
