@@ -4,6 +4,7 @@
   },
   "permissions": {
     "allow": [
+      "Bash(*/scripts/setup-ralph-loop.sh:*)",
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
       "Bash(./node_modules/.bin/eslint:*)",
@@ -318,6 +319,7 @@
       "Bash(printenv:*)",
       "Bash(rm -rf .husky:*)",
       "Bash(rm .husky:*)",
+      "Bash(ruby -e:*)",
       "Bash(scp:*)",
       "Bash(ssh:*)",
       "Bash(sudo:*)",
