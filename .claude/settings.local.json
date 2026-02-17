@@ -4,7 +4,7 @@
   },
   "permissions": {
     "allow": [
-      "Bash(\"/Users/arthurmehmetoglu/.claude/plugins/cache/claude-code-plugins/ralph-wiggum/1.0.0/scripts/setup-ralph-loop.sh\" \"Merge main into feat/TS276-migrate-from-eslint-to-oxlint, resolve all conflicts, push the fix commit that was never pushed \\(35bc23c - pin oxlint binding version\\), and iterate until CI passes. The branch has a merge conflict in .eslintrc.cjs from ESLint rule promotions that landed on main since the branch diverged. After merging and resolving conflicts, push and monitor CI. If CI fails, fix the issue and push again. Repeat until CI is green.\")",
+      "Bash(*/scripts/setup-ralph-loop.sh:*)",
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
       "Bash(./node_modules/.bin/eslint:*)",
@@ -169,7 +169,6 @@
       "Bash(pwd:*)",
       "Bash(rm .claude/ralph-loop.local.md)",
       "Bash(rm:*)",
-      "Bash(ruby -e:*)",
       "Bash(sed:*)",
       "Bash(shellcheck:*)",
       "Bash(sort:*)",
@@ -320,6 +319,7 @@
       "Bash(printenv:*)",
       "Bash(rm -rf .husky:*)",
       "Bash(rm .husky:*)",
+      "Bash(ruby -e:*)",
       "Bash(scp:*)",
       "Bash(ssh:*)",
       "Bash(sudo:*)",
