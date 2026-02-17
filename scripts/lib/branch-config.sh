@@ -3,7 +3,7 @@
 
 # ┌─────────────────────────────────────────────────────────────────────────────┐
 # │ SHARED BRANCH NAMING CONFIGURATION                                          │
-# │ Used by: start-issue.sh, branch-name-check.sh                               │
+# │ Used by: prepare-worktree.sh, branch-name-check.sh                           │
 # └─────────────────────────────────────────────────────────────────────────────┘
 
 # TICKET_PREFIX: Project identifier prepended to issue numbers in branch names

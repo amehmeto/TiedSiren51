@@ -1,35 +1,29 @@
 ---
-description: Manage git worktrees - create, list, prune merged PRs, or remove.
+description: Start working on a GitHub issue - launches ralph loop in the current worktree.
 ---
 
-Run the start-issue script with the provided arguments:
+This command assumes you are already in the correct worktree (created via `/prepare-worktree`).
 
-```bash
-./scripts/start-issue.sh $ARGUMENTS
-```
+1. **Extract the issue number** from `$ARGUMENTS`. If no argument is provided, extract it from the current branch name (format: `<type>/TS<number>-<slug>`). **If neither provides an issue number, stop and report an error:** "Could not determine issue number. Provide it as an argument (`/start-issue 42`) or run from a worktree branch."
 
-**If the script exits with a non-zero code, stop and report the error to the user. Do NOT proceed to the steps below.**
-
-After the script completes successfully:
-
-1. **Change to the worktree directory** using the WORKTREE_PATH from the script's SUMMARY output:
+2. **Detect the PR** for the current branch:
    ```bash
-   cd <WORKTREE_PATH>
+   gh pr list --head "$(git branch --show-current)" --json number,url --jq '.[0] // empty'
    ```
-   This is critical - all work must happen in the worktree, not the main repo.
 
-2. Extract the following from the SUMMARY output:
-   - The full issue content between `ISSUE_CONTENT_START` and `ISSUE_CONTENT_END`
-   - The `PR_URL` value
+3. **Fetch the issue content**:
+   ```bash
+   gh issue view <issue_number> --comments
+   ```
 
-3. Launch a ralph loop to implement the issue, injecting the extracted values:
+4. **Write the ralph-loop prompt to a file** using the Write tool to create `.claude/ralph-prompt.md` with the following content (injecting extracted values):
 
-```
-/ralph-loop "Implement the following GitHub issue in this worktree.
+```markdown
+Implement the following GitHub issue in this worktree.
 
-PR: {PR_URL from SUMMARY}
+PR: {PR_URL, or "none" if not found}
 
-{ISSUE_CONTENT between ISSUE_CONTENT_START and ISSUE_CONTENT_END}
+{ISSUE_CONTENT from step 3}
 
 Before making structural changes, read /docs/adr/README.md for architectural decisions that must be followed.
 
@@ -42,5 +36,11 @@ Completion checklist:
 - No merge conflicts with main
 - PR description updated to reflect ALL changes made
 
-When ALL criteria are met, output: <promise>COMPLETE</promise>" --completion-promise "COMPLETE" --max-iterations 5
+When ALL criteria are met, output: <promise>COMPLETE</promise>
+```
+
+5. Launch the ralph loop with a **single-line** prompt referencing the file. This is critical — the `/ralph-loop` args must be a single line with no newlines, because the Bash tool rejects multi-line commands:
+
+```
+/ralph-loop Read .claude/ralph-prompt.md and implement the task described within --completion-promise COMPLETE --max-iterations 5
 ```
