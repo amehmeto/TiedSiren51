@@ -1,26 +1,29 @@
 ---
-description: Start working on a GitHub issue - creates worktree and launches ralph loop.
+description: Start working on a GitHub issue - launches ralph loop in the current worktree.
 ---
 
-First, prepare the worktree by running `/prepare-worktree $ARGUMENTS`.
+This command assumes you are already in the correct worktree (created via `/prepare-worktree`).
 
-**If `/prepare-worktree` fails, stop and report the error. Do NOT proceed to the steps below.**
+1. **Extract the issue number** from `$ARGUMENTS`. If no argument is provided, extract it from the current branch name (format: `<type>/TS<number>-<slug>`).
 
-After `/prepare-worktree` completes successfully:
+2. **Detect the PR** for the current branch:
+   ```bash
+   gh pr list --head "$(git branch --show-current)" --json number,url --jq '.[0] // empty'
+   ```
 
-1. Extract the following from the SUMMARY output:
-   - The full issue content between `ISSUE_CONTENT_START` and `ISSUE_CONTENT_END`
-   - The `PR_URL` value
-   - If `ISSUE_CONTENT` is empty, fetch it with `gh issue view <number> --repo <owner/repo>`
+3. **Fetch the issue content**:
+   ```bash
+   gh issue view <issue_number> --comments
+   ```
 
-2. **Write the ralph-loop prompt to a file** using the Write tool to create `.claude/ralph-prompt.md` with the following content (injecting extracted values):
+4. **Write the ralph-loop prompt to a file** using the Write tool to create `.claude/ralph-prompt.md` with the following content (injecting extracted values):
 
 ```markdown
 Implement the following GitHub issue in this worktree.
 
-PR: {PR_URL from SUMMARY, or "none" if not yet created}
+PR: {PR_URL, or "none" if not found}
 
-{ISSUE_CONTENT between ISSUE_CONTENT_START and ISSUE_CONTENT_END}
+{ISSUE_CONTENT from step 3}
 
 Before making structural changes, read /docs/adr/README.md for architectural decisions that must be followed.
 
@@ -36,7 +39,7 @@ Completion checklist:
 When ALL criteria are met, output: <promise>COMPLETE</promise>
 ```
 
-3. Launch the ralph loop with a **single-line** prompt referencing the file. This is critical — the `/ralph-loop` args must be a single line with no newlines, because the Bash tool rejects multi-line commands:
+5. Launch the ralph loop with a **single-line** prompt referencing the file. This is critical — the `/ralph-loop` args must be a single line with no newlines, because the Bash tool rejects multi-line commands:
 
 ```
 /ralph-loop Read .claude/ralph-prompt.md and implement the task described within --completion-promise COMPLETE --max-iterations 5
