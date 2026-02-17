@@ -2,7 +2,7 @@
 description: Manage git worktrees - create, list, prune merged PRs, or remove.
 ---
 
-Run the start-issue script with the provided arguments:
+Run the prepare-worktree script with the provided arguments:
 
 ```bash
 ./scripts/prepare-worktree.sh $ARGUMENTS

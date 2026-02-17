@@ -46,7 +46,7 @@ fi
 
 echo "Issue fetched: $ISSUE_TITLE"
 
-# Create worktree using scripts/start-issue.sh (handles branch creation, PR, npm ci)
+# Create worktree using scripts/prepare-worktree.sh (handles branch creation, PR, npm ci)
 WORKTREE_SCRIPT="$REPO_ROOT/scripts/prepare-worktree.sh"
 if [ ! -x "$WORKTREE_SCRIPT" ]; then
     echo "Error: prepare-worktree.sh not found or not executable at $WORKTREE_SCRIPT"
