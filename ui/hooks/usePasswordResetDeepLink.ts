@@ -1,6 +1,6 @@
 import * as Linking from 'expo-linking'
 import { useRouter } from 'expo-router'
-import { useEffect } from 'react'
+import { useEffect, useRef } from 'react'
 
 function extractOobCode(url: string): string | null {
   try {
@@ -17,8 +17,11 @@ function extractOobCode(url: string): string | null {
 
 export function usePasswordResetDeepLink() {
   const router = useRouter()
+  const isUnmountedRef = useRef(false)
 
   useEffect(() => {
+    isUnmountedRef.current = false
+
     const handleUrl = (event: { url: string }) => {
       const oobCode = extractOobCode(event.url)
       if (oobCode) {
@@ -32,9 +35,12 @@ export function usePasswordResetDeepLink() {
     const subscription = Linking.addEventListener('url', handleUrl)
 
     Linking.getInitialURL().then((url) => {
-      if (url) handleUrl({ url })
+      if (!isUnmountedRef.current && url) handleUrl({ url })
     })
 
-    return () => subscription.remove()
+    return () => {
+      isUnmountedRef.current = true
+      subscription.remove()
+    }
   }, [router])
 }
