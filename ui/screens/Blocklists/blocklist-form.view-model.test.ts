@@ -237,6 +237,91 @@ describe('selectBlocklistFormViewModel', () => {
     expect(firstKeyword.siren).toBe('gaming')
   })
 
+  test('No divider when no sirens are selected', () => {
+    const availableSirens = buildSirens({
+      android: [facebookAndroidSiren, instagramAndroidSiren],
+    })
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withAvailableSirens(availableSirens).build(),
+    )
+
+    const viewModel = selectBlocklistFormViewModel(
+      store.getState(),
+      dateProvider,
+      FormMode.Create,
+      undefined,
+    )
+
+    const dividers = viewModel.sortedAndroidApps.filter(
+      (entry) => entry.type === 'divider',
+    )
+    expect(dividers).toHaveLength(0)
+  })
+
+  test('Single label-less divider between selected and available sirens', () => {
+    const availableSirens = buildSirens({
+      android: [facebookAndroidSiren, instagramAndroidSiren],
+    })
+    const blocklist = buildBlocklist({
+      id: 'blocklist-1',
+      sirens: { android: [instagramAndroidSiren] },
+    })
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder()
+        .withAvailableSirens(availableSirens)
+        .withBlocklists([blocklist])
+        .build(),
+    )
+
+    const viewModel = selectBlocklistFormViewModel(
+      store.getState(),
+      dateProvider,
+      FormMode.Edit,
+      'blocklist-1',
+    )
+
+    const expectedDivider = { type: 'divider', id: 'divider' }
+
+    const dividers = viewModel.sortedAndroidApps.filter(
+      (entry) => entry.type === 'divider',
+    )
+    expect(dividers).toHaveLength(1)
+    expect(dividers[0]).toStrictEqual(expectedDivider)
+  })
+
+  test('No divider when all sirens are selected', () => {
+    const availableSirens = buildSirens({
+      android: [facebookAndroidSiren, instagramAndroidSiren],
+    })
+    const blocklist = buildBlocklist({
+      id: 'blocklist-1',
+      sirens: {
+        android: [facebookAndroidSiren, instagramAndroidSiren],
+      },
+    })
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder()
+        .withAvailableSirens(availableSirens)
+        .withBlocklists([blocklist])
+        .build(),
+    )
+
+    const viewModel = selectBlocklistFormViewModel(
+      store.getState(),
+      dateProvider,
+      FormMode.Edit,
+      'blocklist-1',
+    )
+
+    const dividers = viewModel.sortedAndroidApps.filter(
+      (entry) => entry.type === 'divider',
+    )
+    expect(dividers).toHaveLength(0)
+  })
+
   test('Editing mode with empty blocklist name falls back to default placeholder', () => {
     const blocklist = buildBlocklist({ id: 'blocklist-1', name: '' })
     const store = createTestStore(
