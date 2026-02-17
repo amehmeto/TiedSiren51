@@ -69,6 +69,7 @@ module.exports = {
 
       if (typeLiteral?.type !== 'TSTypeLiteral') return []
 
+      if (!Array.isArray(typeLiteral.members)) return []
       return typeLiteral.members
         .filter((m) => m.type === 'TSPropertySignature' && m.key?.name)
         .map((m) => m.key.name)

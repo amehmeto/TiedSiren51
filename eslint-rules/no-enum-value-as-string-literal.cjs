@@ -33,6 +33,7 @@ module.exports = {
       TSEnumDeclaration(node) {
         const enumName = node.id.name
 
+        if (!Array.isArray(node.members)) return
         for (const member of node.members) {
           if (!member.initializer) continue
           if (

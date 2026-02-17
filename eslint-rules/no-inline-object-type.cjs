@@ -52,7 +52,7 @@ module.exports = {
 
     return {
       TSTypeLiteral(node) {
-        if (node.members.length < minProperties) return
+        if (!Array.isArray(node.members) || node.members.length < minProperties) return
 
         // Skip if already inside a type alias declaration (the definition itself)
         if (isInsideTypeAliasDeclaration(node)) return

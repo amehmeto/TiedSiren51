@@ -1,8 +1,27 @@
 // https://docs.expo.dev/guides/using-eslint/
-// ESM configuration file
+//
+// This is the ESLint-only config. Most rules (including 50+ custom rules) run
+// in OxLint for speed — see .oxlintrc.json. ESLint handles rules that OxLint
+// cannot: sonarjs, react-native, jsonc, naming-convention, curly multi-or-nest,
+// import/order, and rules needing excludedFiles override scoping.
+//
+// buildFromOxlintConfigFile reads .oxlintrc.json to compute exactly which rules
+// OxLint handles, then disables them in ESLint — no double-reporting, no gaps.
+// The plugin version should match oxlint version.
+//
+// OxLint uses jest/* rules which also understand vitest syntax.
+// unicorn/no-nested-ternary is off in OxLint (auto-fix conflicts with Prettier).
+
+const { buildFromOxlintConfigFile } = require('eslint-plugin-oxlint')
+const oxlintConfigs = buildFromOxlintConfigFile('.oxlintrc.json')
+const oxlintDisableRules = {}
+oxlintConfigs.forEach((item) => {
+  if (item.rules) Object.assign(oxlintDisableRules, item.rules)
+})
+
 module.exports = {
   root: true,
-  ignorePatterns: ['node_modules', '!.claude', 'eslint-rules/*.spec.ts'],
+  ignorePatterns: ['node_modules', '!.claude', 'eslint-rules/', 'oxlint-plugin-local-rules.js'],
   extends: [
     'expo',
     'prettier',
@@ -21,6 +40,10 @@ module.exports = {
     'jsonc',
   ],
   rules: {
+    // Disable all rules that OxLint handles (computed from .oxlintrc.json)
+    ...oxlintDisableRules,
+    // Rules kept in ESLint due to OxLint override scoping bugs
+    'local-rules/no-nested-call-expressions': 'off',
     'import/order': [
       'error',
       {
@@ -38,11 +61,7 @@ module.exports = {
     'object-shorthand': ['error', 'always'],
     'lines-between-class-members': ['error', 'always'],
     'max-statements-per-line': ['error', { max: 1 }],
-    'no-console': 'error',
-    'no-else-return': 'error',
-    'no-nested-ternary': 'error',
     'no-switch-statements/no-switch': 'error',
-    'prefer-const': 'error',
     'sonarjs/no-collapsible-if': 'error',
     'sonarjs/no-collection-size-mischeck': 'error',
     'sonarjs/no-duplicated-branches': 'error',
@@ -58,9 +77,7 @@ module.exports = {
     'sonarjs/prefer-single-boolean-return': 'error',
     'unicorn/prefer-ternary': 'error',
     'prettier/prettier': 'error',
-    complexity: ['warn', { max: 10 }],
     curly: ['error', 'multi-or-nest'],
-    eqeqeq: ['error', 'always'],
     'padding-line-between-statements': [
       'error',
       { blankLine: 'always', prev: 'block-like', next: 'block-like' },
@@ -68,143 +85,12 @@ module.exports = {
     // React rules
     'react/prop-types': 'off',
     'react/react-in-jsx-scope': 'off',
-    // React Hooks rules
-    'react-hooks/rules-of-hooks': 'error',
-    'react-hooks/exhaustive-deps': 'off',
     // React Native rules
     'react-native/no-color-literals': 'error',
     'react-native/no-inline-styles': 'error',
     'react-native/no-raw-text': 'error',
     'react-native/no-single-element-style-arrays': 'error',
     'react-native/no-unused-styles': 'error',
-    // Custom local rules
-    'local-rules/no-icon-size-magic-numbers': 'error',
-    'local-rules/no-stylesheet-magic-numbers': 'error',
-    'local-rules/no-complex-jsx-in-conditionals': [
-      'error',
-      {
-        maxProps: 2,
-        allowSimpleElements: true,
-      },
-    ],
-    'local-rules/one-selector-per-file': 'error',
-    'local-rules/one-usecase-per-file': 'error',
-    'local-rules/core-test-file-naming': 'error',
-    'local-rules/require-colocated-test': 'error',
-    'local-rules/time-constant-multiplication': 'error',
-    'local-rules/try-catch-isolation': 'error',
-    'local-rules/inline-single-statement-handlers': 'error',
-    // Components should not check thunk results — use state-driven UI
-    'local-rules/no-thunk-result-in-component': 'error',
-    // Error handling convention rules
-    'local-rules/no-try-catch-in-core': 'error',
-    'local-rules/listener-error-handling': 'error',
-    'local-rules/infra-must-rethrow': 'error',
-    'local-rules/infra-public-method-try-catch': 'error',
-    'local-rules/infra-logger-prefix': 'error',
-    'local-rules/require-logger-in-catch': 'error',
-    'local-rules/file-naming-convention': 'error',
-    'local-rules/no-index-in-core': 'error',
-    'local-rules/no-inline-import-type': 'error',
-    'local-rules/selector-matches-filename': 'error',
-    'local-rules/usecase-matches-filename': 'error',
-    'local-rules/no-cross-layer-imports': 'error',
-    'local-rules/listener-matches-filename': 'error',
-    'local-rules/view-model-matches-filename': 'error',
-    'local-rules/builder-matches-filename': 'error',
-    'local-rules/fixture-matches-filename': 'error',
-    'local-rules/one-listener-per-file': 'error',
-    'local-rules/slice-matches-folder': 'error',
-    'local-rules/repository-implementation-naming': 'error',
-    'local-rules/gateway-implementation-naming': 'error',
-    'local-rules/schema-matches-filename': 'error',
-    'local-rules/one-view-model-per-file': 'error',
-    'local-rules/reducer-in-domain-folder': 'error',
-    'local-rules/no-module-level-constants': 'error',
-    'local-rules/require-named-regex': 'error',
-    // Disabled globally - too many valid patterns. Enable per-file as needed.
-    // See: docs/adr/conventions/no-nested-call-expressions.md
-    'local-rules/no-consecutive-duplicate-returns': 'warn',
-    'local-rules/no-nested-call-expressions': 'off',
-    'local-rules/no-redundant-nullish-ternary': 'warn',
-    'local-rules/prefer-array-destructuring': 'error',
-    'local-rules/prefer-object-destructuring': [
-      'warn',
-      {
-        threshold: 3,
-        ignoredObjects: [
-          'T',
-          'styles',
-          'fixture',
-          'viewModel',
-          'BlocklistViewModel',
-          'HomeViewModel',
-          'BlocklistTabKey',
-          'TabScreens',
-        ],
-      },
-    ],
-    // Warn-only: many valid patterns use named variables for self-documentation
-    'local-rules/prefer-inline-variable': 'warn',
-    'local-rules/react-props-destructuring': 'error',
-    // Extract call expressions from JSX props into variables for readability
-    'local-rules/no-call-expression-in-jsx-props': 'error',
-    // Enforce one React component per file
-    'local-rules/one-component-per-file': 'error',
-    // Disallow else-if statements - use separate ifs or nested if-else
-    'local-rules/no-else-if': 'error',
-    // Prevent direct adapter usage in UI layer - use selectors instead
-    'local-rules/no-adapter-in-ui': 'error',
-    // Prevent selecting entire Redux state - select specific slices instead
-    'local-rules/no-entire-state-selector': 'error',
-    // Extract complex expressions with long strings to variables
-    'local-rules/no-complex-inline-arguments': 'error',
-    // Warn when useCallback is unnecessarily wrapping a selector for useSelector
-    'local-rules/no-usecallback-selector-wrapper': 'error',
-    // Prefer named selectors over inline state slice access
-    'local-rules/prefer-named-selector': 'error',
-    // Enforce state as first parameter in selectors
-    'local-rules/selector-state-first-param': 'error',
-    // Prevent passing useSelector results as props - child should call useSelector itself
-    'local-rules/no-selector-prop-drilling': [
-      'error',
-      {
-        ignoredComponents: [
-          'FlatList',
-          'SectionList',
-          'VirtualizedList',
-          'TiedSButton',
-          'CircularTimerDisplay',
-        ],
-      },
-    ],
-    // Prefer ternary over if-return followed by return
-    'local-rules/prefer-ternary-return': ['error', { skipJsx: true }],
-    // Names with "And"/"Or" at word boundaries suggest multiple responsibilities
-    'local-rules/no-and-or-in-names': 'error',
-    // Prefer object map over 3+ sequential ifs testing the same variable
-    'local-rules/prefer-jump-table': 'error',
-    // Flag string literals in comparisons when a matching enum value exists
-    'local-rules/no-enum-value-as-string-literal': 'error',
-    // Prefer ternary over complementary && conditions in JSX
-    'local-rules/prefer-ternary-jsx': 'error',
-    // Extract long function arguments into named variables for readability
-    'local-rules/prefer-extracted-long-params': [
-      'error',
-      {
-        exemptFunctions: ['createTestStore'],
-        transparentWrappers: ['dispatch'],
-      },
-    ],
-    // Extract inline object types into named type aliases
-    'local-rules/no-inline-object-type': 'error',
-    // Disallow overly generic variable and function names
-    'local-rules/no-lame-naming': 'warn',
-    // Prefer enum over string literal unions
-    'local-rules/prefer-enum-over-string-union': [
-      'error',
-      { ignoredPatterns: ['-outline$', '^logo-', '^add-', '^remove-'] },
-    ],
   },
   overrides: [
     {
@@ -213,11 +99,6 @@ module.exports = {
         project: './tsconfig.json',
       },
       rules: {
-        '@typescript-eslint/no-unused-vars': [
-          'error',
-          { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
-        ],
-        '@typescript-eslint/no-explicit-any': 'error',
         '@typescript-eslint/no-unnecessary-condition': 'error',
         '@typescript-eslint/prefer-optional-chain': 'error',
         '@typescript-eslint/prefer-nullish-coalescing': 'error',
@@ -260,8 +141,6 @@ module.exports = {
             leadingUnderscore: 'allow',
           },
         ],
-        // Extend no I-prefix rule to import aliases
-        'local-rules/no-i-prefix-in-imports': 'error',
       },
     },
     {
@@ -269,64 +148,14 @@ module.exports = {
       env: {
         node: true,
       },
-      rules: {
-        'no-unused-vars': [
-          'error',
-          { argsIgnorePattern: '^_', varsIgnorePattern: '^_' },
-        ],
-      },
     },
-    {
-      files: ['**/*.spec.ts', '**/*.test.ts'],
-      plugins: ['vitest'],
-      rules: {
-        'vitest/no-commented-out-tests': 'error',
-        'vitest/no-conditional-expect': 'error',
-        'vitest/no-conditional-in-test': 'error',
-        'vitest/no-disabled-tests': 'error',
-        'vitest/no-focused-tests': 'error',
-        'vitest/no-identical-title': 'error',
-        'vitest/prefer-each': 'error',
-        'vitest/prefer-hooks-in-order': 'error',
-        'vitest/prefer-hooks-on-top': 'error',
-        'vitest/prefer-strict-equal': 'error',
-        'local-rules/expect-separate-act-assert': 'error',
-        // Test structure rules
-        'local-rules/no-new-in-test-body': 'error',
-        'local-rules/use-data-builders': 'error',
-        'local-rules/no-generic-result-variable': 'warn',
-        // Require type parameter on it.each / test.each / describe.each
-        'local-rules/require-typed-each': 'error',
-      },
-    },
-    // No data builders in production code
-    {
-      files: ['**/*.ts', '**/*.tsx'],
-      excludedFiles: [
-        '**/*.test.ts',
-        '**/*.test.tsx',
-        '**/*.spec.ts',
-        '**/*.spec.tsx',
-        '**/*.fixture.ts',
-        '**/*.fixture.tsx',
-        '**/*.builder.ts',
-        '**/*.builder.tsx',
-        '**/core/_tests_/**',
-        '**/fake-data.*.ts', // Fake repositories for development/testing
-        '**/preloadedStateForManualTesting.ts', // Manual testing utilities
-      ],
-      rules: {
-        'local-rules/no-data-builders-in-production': 'error',
-      },
-    },
-    // No non-deterministic values in core (use injected dependencies)
+    // No non-deterministic globals/imports in core (OxLint overrides don't scope correctly)
     {
       files: ['core/**/*.ts'],
       excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
       rules: {
         'no-restricted-globals': [
           'error',
-          // Time
           {
             name: 'Date',
             message:
@@ -337,7 +166,6 @@ module.exports = {
             message:
               'Non-deterministic: Use DateProvider dependency instead of performance in core.',
           },
-          // Async timing
           {
             name: 'setTimeout',
             message:
@@ -348,13 +176,11 @@ module.exports = {
             message:
               'Non-deterministic: Use TimerProvider dependency instead of setInterval in core.',
           },
-          // Randomness
           {
             name: 'crypto',
             message:
               'Non-deterministic: Use UuidProvider dependency instead of crypto in core.',
           },
-          // Network I/O
           {
             name: 'fetch',
             message:
@@ -365,7 +191,6 @@ module.exports = {
             message:
               'Non-deterministic: Use a Repository/Gateway dependency instead of XMLHttpRequest in core.',
           },
-          // External state
           {
             name: 'localStorage',
             message:
@@ -376,7 +201,6 @@ module.exports = {
             message:
               'Non-deterministic: Use a Repository dependency instead of sessionStorage in core.',
           },
-          // Environment/device info
           {
             name: 'navigator',
             message:
@@ -388,6 +212,53 @@ module.exports = {
               'Non-deterministic: Use a RouterProvider dependency instead of location in core.',
           },
         ],
+        'no-restricted-imports': [
+          'error',
+          {
+            paths: [
+              {
+                name: 'uuid',
+                message:
+                  'Non-deterministic: Use UuidProvider dependency instead of uuid in core.',
+              },
+              {
+                name: 'react-native-uuid',
+                message:
+                  'Non-deterministic: Use UuidProvider dependency instead of react-native-uuid in core.',
+              },
+              {
+                name: 'crypto',
+                message:
+                  'Non-deterministic: Use UuidProvider dependency instead of crypto in core.',
+              },
+              {
+                name: '@faker-js/faker',
+                message:
+                  'Non-deterministic: Use data builders with injected dependencies instead of faker in core.',
+              },
+            ],
+          },
+        ],
+      },
+    },
+    {
+      files: ['core/**/*.builder.ts'],
+      rules: {
+        'no-restricted-imports': 'off',
+      },
+    },
+    {
+      files: ['core/_ports_/**/*.ts', 'core/**/*.fixture.ts'],
+      rules: {
+        'no-restricted-globals': 'off',
+      },
+    },
+    // no-restricted-properties not supported by OxLint - keep in ESLint
+    // No non-deterministic property access in core
+    {
+      files: ['core/**/*.ts'],
+      excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
+      rules: {
         'no-restricted-properties': [
           'error',
           {
@@ -419,33 +290,6 @@ module.exports = {
             property: 'sessionStorage',
             message:
               'Non-deterministic: Use a Repository dependency instead of window.sessionStorage in core.',
-          },
-        ],
-        'no-restricted-imports': [
-          'error',
-          {
-            paths: [
-              {
-                name: 'uuid',
-                message:
-                  'Non-deterministic: Use UuidProvider dependency instead of uuid in core.',
-              },
-              {
-                name: 'react-native-uuid',
-                message:
-                  'Non-deterministic: Use UuidProvider dependency instead of react-native-uuid in core.',
-              },
-              {
-                name: 'crypto',
-                message:
-                  'Non-deterministic: Use UuidProvider dependency instead of crypto in core.',
-              },
-              {
-                name: '@faker-js/faker',
-                message:
-                  'Non-deterministic: Use data builders with injected dependencies instead of faker in core.',
-              },
-            ],
           },
         ],
       },
@@ -495,20 +339,6 @@ module.exports = {
         ],
       },
     },
-    // Allow faker in data builders (they generate test data)
-    {
-      files: ['core/**/*.builder.ts'],
-      rules: {
-        'no-restricted-imports': 'off',
-      },
-    },
-    // Allow Date in port type definitions and test fixtures
-    {
-      files: ['core/_ports_/**/*.ts', 'core/**/*.fixture.ts'],
-      rules: {
-        'no-restricted-globals': 'off',
-      },
-    },
     // Enforce boolean naming convention on type properties in core (our domain types)
     {
       files: ['core/**/*.ts'],
@@ -554,40 +384,27 @@ module.exports = {
         ],
       },
     },
-    // JSON files linting
+    // No data builders in production code (OxLint override excludedFiles don't work)
     {
-      files: ['*.json', '**/*.json'],
+      files: ['**/*.ts', '**/*.tsx'],
       excludedFiles: [
-        'tsconfig.json',
-        'tsconfig.*.json',
-        '.claude/settings.local.json',
+        '**/*.test.ts',
+        '**/*.test.tsx',
+        '**/*.spec.ts',
+        '**/*.spec.tsx',
+        '**/*.fixture.ts',
+        '**/*.fixture.tsx',
+        '**/*.builder.ts',
+        '**/*.builder.tsx',
+        '**/core/_tests_/**',
+        '**/fake-data.*.ts',
+        '**/preloadedStateForManualTesting.ts',
       ],
-      parser: 'jsonc-eslint-parser',
       rules: {
-        'jsonc/indent': ['error', 2],
-        'jsonc/key-spacing': 'error',
-        'jsonc/no-dupe-keys': 'error',
-        'jsonc/sort-keys': 'off',
+        'local-rules/no-data-builders-in-production': 'error',
       },
     },
-    // Claude settings - enforce sorted arrays for permissions
-    {
-      files: ['.claude/settings.local.json', '.claude/settings.json'],
-      parser: 'jsonc-eslint-parser',
-      rules: {
-        'jsonc/indent': ['error', 2],
-        'jsonc/key-spacing': 'error',
-        'jsonc/no-dupe-keys': 'error',
-        'jsonc/sort-array-values': [
-          'error',
-          {
-            pathPattern: '^permissions\\.(allow|deny|ask)$',
-            order: { type: 'asc' },
-          },
-        ],
-      },
-    },
-    // Selectors - enforce no nested calls for readability
+    // Selectors - enforce no nested calls for readability (OxLint override scoping bug)
     {
       files: ['core/**/selectors/*.ts'],
       excludedFiles: ['**/*.test.ts', '**/*.spec.ts'],
@@ -596,7 +413,12 @@ module.exports = {
           'error',
           {
             allowedPatterns: [
-              // Entity adapter
+              '^map$',
+              '^filter$',
+              '^flatMap$',
+              '^find$',
+              '^some$',
+              '^every$',
               '^selectAll$',
               '^selectById$',
               '^selectIds$',
@@ -662,6 +484,39 @@ module.exports = {
     //     'local-rules/no-nested-call-expressions': 'error',
     //   },
     // },
+    // JSON files linting
+    {
+      files: ['*.json', '**/*.json'],
+      excludedFiles: [
+        'tsconfig.json',
+        'tsconfig.*.json',
+        '.claude/settings.local.json',
+      ],
+      parser: 'jsonc-eslint-parser',
+      rules: {
+        'jsonc/indent': ['error', 2],
+        'jsonc/key-spacing': 'error',
+        'jsonc/no-dupe-keys': 'error',
+        'jsonc/sort-keys': 'off',
+      },
+    },
+    // Claude settings - enforce sorted arrays for permissions
+    {
+      files: ['.claude/settings.local.json', '.claude/settings.json'],
+      parser: 'jsonc-eslint-parser',
+      rules: {
+        'jsonc/indent': ['error', 2],
+        'jsonc/key-spacing': 'error',
+        'jsonc/no-dupe-keys': 'error',
+        'jsonc/sort-array-values': [
+          'error',
+          {
+            pathPattern: '^permissions\\.(allow|deny|ask)$',
+            order: { type: 'asc' },
+          },
+        ],
+      },
+    },
     // JSONC files (tsconfig allows comments)
     {
       files: ['tsconfig.json', 'tsconfig.*.json'],
