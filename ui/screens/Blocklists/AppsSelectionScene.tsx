@@ -53,8 +53,7 @@ export function AppsSelectionScene({
           : sectionEntry.siren.packageName
       }
       renderItem={({ item: sectionEntry }) => {
-        if (sectionEntry.type === 'divider')
-          return <SectionDivider label={sectionEntry.label} />
+        if (sectionEntry.type === 'divider') return <SectionDivider />
 
         const isSelected = isSirenSelected(
           SirenType.ANDROID,

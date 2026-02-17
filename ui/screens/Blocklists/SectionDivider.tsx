@@ -3,15 +3,15 @@ import { StyleSheet, Text, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
 type SectionDividerProps = Readonly<{
-  label: string
+  label?: string
 }>
 
 export function SectionDivider({ label }: SectionDividerProps) {
   return (
     <View style={styles.container}>
       <View style={styles.line} />
-      <Text style={styles.label}>{label}</Text>
-      <View style={styles.line} />
+      {label ? <Text style={styles.label}>{label}</Text> : null}
+      {label ? <View style={styles.line} /> : null}
     </View>
   )
 }

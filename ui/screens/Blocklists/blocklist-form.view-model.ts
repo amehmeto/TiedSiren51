@@ -22,7 +22,7 @@ export enum BlocklistFormViewState {
   EditingWithLockedSirens = 'EDITING_WITH_LOCKED_SIRENS',
 }
 
-type SectionedSirenDivider = { type: 'divider'; id: string; label: string }
+type SectionedSirenDivider = { type: 'divider'; id: string }
 export type SectionedSirenEntry<T> = { type: 'siren'; siren: T }
 
 export type SectionedSiren<T> = SectionedSirenEntry<T> | SectionedSirenDivider
@@ -85,24 +85,12 @@ function sortSirensSelectedFirst<T>(
   const sectioned: SectionedSiren<T>[] = []
 
   if (selectedSirens.length > 0) {
-    sectioned.push({
-      type: 'divider',
-      id: 'divider-selected',
-      label: 'Selected',
-    })
     selectedSirens.forEach((siren) => sectioned.push({ type: 'siren', siren }))
+    if (unselectedSirens.length > 0)
+      sectioned.push({ type: 'divider', id: 'divider' })
   }
 
-  if (unselectedSirens.length > 0) {
-    sectioned.push({
-      type: 'divider',
-      id: 'divider-available',
-      label: 'Available',
-    })
-    unselectedSirens.forEach((siren) =>
-      sectioned.push({ type: 'siren', siren }),
-    )
-  }
+  unselectedSirens.forEach((siren) => sectioned.push({ type: 'siren', siren }))
 
   return sectioned
 }

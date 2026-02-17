@@ -73,8 +73,7 @@ export function TextInputSelectionScene({
           sectionEntry.type === 'divider' ? sectionEntry.id : sectionEntry.siren
         }
         renderItem={({ item: sectionEntry }) => {
-          if (sectionEntry.type === 'divider')
-            return <SectionDivider label={sectionEntry.label} />
+          if (sectionEntry.type === 'divider') return <SectionDivider />
 
           const isSelected = isSirenSelected(sirenType, sectionEntry.siren)
           const isLocked = isSirenLocked(
