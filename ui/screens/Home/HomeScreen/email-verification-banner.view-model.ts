@@ -31,7 +31,7 @@ export function selectEmailVerificationBannerViewModel(
   if (
     !authUser ||
     authUser.isEmailVerified ||
-    authUser.authProvider === AuthProvider.Google
+    authUser.authProvider !== AuthProvider.Email
   )
     return { type: EmailVerificationBannerViewState.Hidden }
 

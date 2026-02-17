@@ -153,6 +153,7 @@ export const reducer = createReducer<AuthState>(
         state.isPasswordResetSent = false
         state.isSendingVerificationEmail = false
         state.isVerificationEmailSent = false
+        state.isRefreshingEmailVerification = false
         state.email = ''
         state.password = ''
       })

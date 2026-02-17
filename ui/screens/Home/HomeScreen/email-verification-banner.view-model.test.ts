@@ -54,6 +54,24 @@ describe('selectEmailVerificationBannerViewModel', () => {
     expect(viewModel).toStrictEqual(expectedViewModel)
   })
 
+  test('should return Hidden for Apple-authenticated users', () => {
+    const state = stateBuilder()
+      .withAuthUser({
+        id: 'user-123',
+        email: 'test@example.com',
+        isEmailVerified: false,
+        authProvider: AuthProvider.Apple,
+      })
+      .build()
+    const expectedViewModel = {
+      type: EmailVerificationBannerViewState.Hidden,
+    }
+
+    const viewModel = selectEmailVerificationBannerViewModel(state)
+
+    expect(viewModel).toStrictEqual(expectedViewModel)
+  })
+
   test('should return Visible for unverified email user', () => {
     const state = stateBuilder()
       .withAuthUser({
