@@ -1,51 +1,111 @@
 Implement the following GitHub issue in this worktree.
 
-PR: none (create one after first commit using `gh pr create --draft --title "feat(auth): Google re-authentication for sensitive operations" --body "Implements #298"`)
+PR: none (create one after first commit with `gh pr create --draft --title "feat(auth): custom in-app password reset confirmation flow" --body "Implements #160"`)
 
-## Context
+## 📝 Summary
 
-Users who signed up with Google have no password and cannot use the password-only `ReauthenticationModal`. This blocks the delete account flow (and any future sensitive operations) for Google users. The modal needs to detect the user's auth provider and show the appropriate re-auth method.
+Implement a custom in-app flow where users can reset their password directly within the app, instead of being redirected to Firebase's hosted password reset page.
 
-## Acceptance Criteria
+---
 
-- [ ] `AuthUser` type includes an `authProvider` field (`'email' | 'google' | 'apple'`)
-- [ ] `authProvider` is populated from Firebase `user.providerData[0]?.providerId` in all auth flows
-- [ ] `AuthGateway` port exposes `reauthenticateWithGoogle(): Promise<void>`
-- [ ] Firebase gateway implements `reauthenticateWithGoogle()` using `reauthenticateWithCredential`
-- [ ] Fake gateway implements `reauthenticateWithGoogle()` with configurable stub
-- [ ] `reauthenticateWithGoogle` usecase exists with same pattern as `reauthenticate.usecase.ts`
-- [ ] Auth reducer handles `reauthenticateWithGoogle.pending/fulfilled/rejected`
-- [ ] `ReauthenticationModal` is provider-aware:
-  - `authProvider === 'google'` → shows Google sign-in button
-  - `authProvider === 'email'` or undefined → shows existing password input (backward-compatible)
-- [ ] `delete-account.tsx` passes `authProvider` to `ReauthenticationModal`
-- [ ] Unit tests cover Google re-auth success and failure paths
-- [ ] All existing tests still pass
+## 🎯 Context
 
-## Implementation Notes
+Currently, clicking the password reset email link redirects users to Firebase's hosted password reset page. This is a jarring experience. A custom in-app flow provides a seamless, branded experience.
 
-### Files to create
-- `core/auth/usecases/reauthenticate-with-google.usecase.ts`
+**Current flow:**
+1. User requests password reset → ✅ (PR #149)
+2. User receives email with reset link → ✅
+3. User clicks link → **Opens Firebase hosted page** ❌
+4. User enters new password on Firebase page
+5. User manually returns to app
 
-### Files to modify
-1. `core/auth/auth-user.ts` — add `authProvider` field (optional for backward compat)
-2. `core/_ports_/auth.gateway.ts` — add `reauthenticateWithGoogle()`
-3. `core/auth/reducer.ts` — add cases for new usecase
-4. `core/auth/authentification.fixture.ts` — add Google reauth given/when helpers
-5. `infra/auth-gateway/firebase.auth.gateway.ts` — implement `reauthenticateWithGoogle()`, populate `authProvider` in all sign-in/sign-up flows and `setupAuthStateListener`
-6. `infra/auth-gateway/fake.auth.gateway.ts` — implement `reauthenticateWithGoogle()`
-7. `ui/design-system/components/shared/ReauthenticationModal.tsx` — provider-aware UI
-8. `app/(tabs)/settings/delete-account.tsx` — pass `authProvider` prop
+**Desired flow:**
+1. User requests password reset → ✅
+2. User receives email with reset link → ✅
+3. User clicks link → **App opens with reset confirmation screen** ✅
+4. User enters new password in-app
+5. User is redirected to login screen
 
-### Key technical details
-- Firebase: map `providerId` → `authProvider` (`'google.com'` → `'google'`, `'password'` → `'email'`, `'apple.com'` → `'apple'`)
-- Google reauth uses `GoogleSignin.signIn()` → `GoogleAuthProvider.credential(idToken)` → `reauthenticateWithCredential(user, credential)` (same credential flow as `signInWithGoogle`, different final call)
-- Reuse existing state fields: `isReauthenticating`, `lastReauthenticatedAt`, `reauthError`
+---
 
-## Dependencies
+## ✅ Acceptance Criteria
 
-- Depends on #163 (account deletion) being merged first ✅ (already merged)
-- Builds on the `ReauthenticationModal` and reauth infrastructure from #283
+### Deep Linking Setup
+- [ ] Configure Expo deep linking with custom scheme (`tiedsiren://`)
+- [ ] Set up Universal Links (iOS) for `https://tiedsiren.app/reset-password`
+- [ ] Set up App Links (Android) for the same domain
+- [ ] Handle deep link params extraction (`oobCode`, `mode`)
+
+### Firebase Configuration
+- [ ] Update Firebase Console → Authentication → Templates → Password Reset
+- [ ] Set action URL to app's deep link endpoint
+
+### New Screen: `app/(auth)/reset-password-confirm.tsx`
+- [ ] Parse `oobCode` from deep link URL params
+- [ ] New password input field
+- [ ] Confirm password input field
+- [ ] Submit button with loading state
+- [ ] Error display for invalid/expired codes
+- [ ] Success state with redirect to login
+
+### Core Layer
+- [ ] Add `confirmPasswordReset(oobCode: string, newPassword: string)` to `AuthGateway` port
+- [ ] Create `confirm-password-reset.usecase.ts`
+- [ ] Add reducer state for confirmation flow
+- [ ] Unit tests for usecase
+
+### Infra Layer
+- [ ] Implement `confirmPasswordReset` in `FirebaseAuthGateway`
+- [ ] Handle error codes: `auth/expired-action-code`, `auth/invalid-action-code`, `auth/weak-password`
+- [ ] Implement in `FakeAuthGateway` for testing
+
+---
+
+## 🎭 Scenarios (Given/When/Then)
+
+### ✅ Scenario 1: Successful password reset
+```gherkin
+Given a user has requested a password reset
+And they received the reset email
+When they click the reset link
+Then the app opens to the password confirmation screen
+And they can enter a new password
+And they are redirected to login on success
+```
+
+### ❌ Scenario 2: Expired link
+```gherkin
+Given a user has a password reset link older than 24 hours
+When they click the link
+Then they see an error message about the expired link
+And can request a new reset email
+```
+
+### ❌ Scenario 3: Mismatched passwords
+```gherkin
+Given a user is on the password reset confirmation screen
+When they enter mismatched passwords
+Then they see a validation error
+And cannot submit the form
+```
+
+---
+
+## 🚫 Out of Scope
+
+- Email link customization (branding)
+- "Verify email" deep link handling
+- Password strength meter
+
+---
+
+## 🔗 Related
+
+- 📌 Parent Epic: #54
+- 📚 Firebase confirmPasswordReset docs
+- 📚 Expo Deep Linking docs
+
+---
 
 Before making structural changes, read /docs/adr/README.md for architectural decisions that must be followed.
 
