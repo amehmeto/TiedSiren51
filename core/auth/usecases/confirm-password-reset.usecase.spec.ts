@@ -9,19 +9,22 @@ describe('Feature: Confirm Password Reset', () => {
   })
 
   it('should confirm password reset successfully', async () => {
-    await fixture.when.confirmPasswordReset('valid-oob-code', 'newPassword123')
+    await fixture.when.confirmPasswordReset(
+      'valid-reset-code',
+      'newPassword123',
+    )
 
     fixture.then.passwordResetShouldBeConfirmed()
     fixture.then.confirmPasswordResetShouldNotBeLoading()
   })
 
-  it('should fail when oob code is expired', async () => {
+  it('should fail when reset code is expired', async () => {
     fixture.given.confirmPasswordResetWillFailWith(
       'This password reset link has expired. Please request a new one.',
     )
 
     await fixture.when.confirmPasswordReset(
-      'expired-oob-code',
+      'expired-reset-code',
       'newPassword123',
     )
 
@@ -31,13 +34,13 @@ describe('Feature: Confirm Password Reset', () => {
     fixture.then.confirmPasswordResetShouldNotBeLoading()
   })
 
-  it('should fail when oob code is invalid', async () => {
+  it('should fail when reset code is invalid', async () => {
     fixture.given.confirmPasswordResetWillFailWith(
       'This password reset link is invalid. Please request a new one.',
     )
 
     await fixture.when.confirmPasswordReset(
-      'invalid-oob-code',
+      'invalid-reset-code',
       'newPassword123',
     )
 
