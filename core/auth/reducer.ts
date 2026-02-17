@@ -36,6 +36,7 @@ export type AuthState = {
   isChangingPassword: boolean
   changePasswordError: string | null
   hasChangePasswordSucceeded: boolean
+  changePasswordSuccessCount: number
 }
 
 export const userAuthenticated = createAction<AuthUser>(
@@ -88,6 +89,7 @@ function createInitialAuthState(): AuthState {
     isChangingPassword: false,
     changePasswordError: null,
     hasChangePasswordSucceeded: false,
+    changePasswordSuccessCount: 0,
   }
 }
 
@@ -206,6 +208,7 @@ export const reducer = createReducer<AuthState>(
         state.isChangingPassword = false
         state.changePasswordError = null
         state.hasChangePasswordSucceeded = true
+        state.changePasswordSuccessCount += 1
       })
       .addCase(changePassword.rejected, (state, action) => {
         state.isChangingPassword = false

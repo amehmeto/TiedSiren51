@@ -20,6 +20,7 @@ describe('selectChangePasswordViewModel', () => {
       isChangingPassword: false,
       changePasswordError: null,
       hasChangePasswordSucceeded: false,
+      changePasswordSuccessCount: 0,
       buttonText: 'Change Password',
     }
 

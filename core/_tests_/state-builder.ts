@@ -51,6 +51,9 @@ const withChangePasswordError = createAction<string | null>(
 const withHasChangePasswordSucceeded = createAction<boolean>(
   'withHasChangePasswordSucceeded',
 )
+const withChangePasswordSuccessCount = createAction<number>(
+  'withChangePasswordSuccessCount',
+)
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -115,6 +118,9 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withHasChangePasswordSucceeded, (state, action) => {
       state.auth.hasChangePasswordSucceeded = action.payload
     })
+    .addCase(withChangePasswordSuccessCount, (state, action) => {
+      state.auth.changePasswordSuccessCount = action.payload
+    })
 })
 
 export const stateBuilder = (baseState = initialState) => {
@@ -149,6 +155,7 @@ export const stateBuilder = (baseState = initialState) => {
     withChangingPassword: reduce(withChangingPassword),
     withChangePasswordError: reduce(withChangePasswordError),
     withHasChangePasswordSucceeded: reduce(withHasChangePasswordSucceeded),
+    withChangePasswordSuccessCount: reduce(withChangePasswordSuccessCount),
   }
 }
 

@@ -10,6 +10,7 @@ export function selectChangePasswordViewModel(
     isChangingPassword,
     changePasswordError,
     hasChangePasswordSucceeded,
+    changePasswordSuccessCount,
   } = state.auth
 
   return {
@@ -17,6 +18,7 @@ export function selectChangePasswordViewModel(
     isChangingPassword,
     changePasswordError,
     hasChangePasswordSucceeded,
+    changePasswordSuccessCount,
     buttonText: isChangingPassword ? 'Changing...' : 'Change Password',
   }
 }
