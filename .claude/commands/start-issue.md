@@ -1,33 +1,24 @@
 ---
-description: Manage git worktrees - create, list, prune merged PRs, or remove.
+description: Start working on a GitHub issue - creates worktree and launches ralph loop.
 ---
 
-Run the start-issue script with the provided arguments:
+First, prepare the worktree by running `/prepare-worktree $ARGUMENTS`.
 
-```bash
-./scripts/start-issue.sh $ARGUMENTS
-```
+**If `/prepare-worktree` fails, stop and report the error. Do NOT proceed to the steps below.**
 
-**If the script exits with a non-zero code, stop and report the error to the user. Do NOT proceed to the steps below.**
+After `/prepare-worktree` completes successfully:
 
-After the script completes successfully:
-
-1. **Change to the worktree directory** using the WORKTREE_PATH from the script's SUMMARY output:
-   ```bash
-   cd <WORKTREE_PATH>
-   ```
-   This is critical - all work must happen in the worktree, not the main repo.
-
-2. Extract the following from the SUMMARY output:
+1. Extract the following from the SUMMARY output:
    - The full issue content between `ISSUE_CONTENT_START` and `ISSUE_CONTENT_END`
    - The `PR_URL` value
+   - If `ISSUE_CONTENT` is empty, fetch it with `gh issue view <number> --repo <owner/repo>`
 
-3. Launch a ralph loop to implement the issue, injecting the extracted values:
+2. **Write the ralph-loop prompt to a file** using the Write tool to create `.claude/ralph-prompt.md` with the following content (injecting extracted values):
 
-```
-/ralph-loop "Implement the following GitHub issue in this worktree.
+```markdown
+Implement the following GitHub issue in this worktree.
 
-PR: {PR_URL from SUMMARY}
+PR: {PR_URL from SUMMARY, or "none" if not yet created}
 
 {ISSUE_CONTENT between ISSUE_CONTENT_START and ISSUE_CONTENT_END}
 
@@ -42,5 +33,11 @@ Completion checklist:
 - No merge conflicts with main
 - PR description updated to reflect ALL changes made
 
-When ALL criteria are met, output: <promise>COMPLETE</promise>" --completion-promise "COMPLETE" --max-iterations 5
+When ALL criteria are met, output: <promise>COMPLETE</promise>
+```
+
+3. Launch the ralph loop with a **single-line** prompt referencing the file. This is critical — the `/ralph-loop` args must be a single line with no newlines, because the Bash tool rejects multi-line commands:
+
+```
+/ralph-loop Read .claude/ralph-prompt.md and implement the task described within --completion-promise COMPLETE --max-iterations 5
 ```

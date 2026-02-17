@@ -239,12 +239,50 @@ print_summary() {
   echo -e "${CYAN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
 }
 
+# Extract issue number from branch name
+# Branch format: <type>/TS<issue_number>-<slug> (e.g. feat/TS160-custom-flow)
+# Returns the issue number or empty string if not found
+extract_issue_number() {
+  local branch="$1"
+  if [[ "$branch" =~ /${TICKET_PREFIX}([0-9]+) ]]; then
+    echo "${BASH_REMATCH[1]}"
+  fi
+}
+
+# Close the GitHub issue associated with a branch (only for merged PRs)
+close_issue_if_merged() {
+  local branch="$1"
+  local pr_state="$2"
+
+  if [ "$pr_state" != "MERGED" ]; then
+    return
+  fi
+
+  local issue_number
+  issue_number=$(extract_issue_number "$branch")
+  if [ -z "$issue_number" ]; then
+    return
+  fi
+
+  # Check if issue is already closed
+  local issue_state
+  issue_state=$(gh issue view "$issue_number" --json state --jq '.state' 2>/dev/null) || return
+  if [ "$issue_state" = "CLOSED" ]; then
+    return
+  fi
+
+  print_info "Closing issue #$issue_number (PR merged)..."
+  gh issue close "$issue_number" --reason completed 2>/dev/null || \
+    print_warning "Failed to close issue #$issue_number"
+}
+
 # Cleanup worktrees with merged/closed PRs
 cleanup_merged_worktrees() {
   print_info "Checking for worktrees with merged/closed PRs..."
 
   local cleaned=0
 
+  # Pass 1: Remove git-tracked worktrees whose PRs are merged/closed
   while IFS=$'\t' read -r wt_path branch; do
     # Skip main worktree and detached HEAD
     if [ "$wt_path" = "$MAIN_REPO" ] || [ -z "$branch" ]; then
@@ -265,7 +303,12 @@ cleanup_merged_worktrees() {
 
       if [ "$pr_state" = "MERGED" ] || [ "$pr_state" = "CLOSED" ]; then
         print_warning "Found $pr_state PR #$pr_number for worktree at $wt_path, removing..."
+        close_issue_if_merged "$branch" "$pr_state"
         mgit worktree remove "$wt_path" --force 2>/dev/null || true
+        # Fallback: if git worktree remove didn't delete the directory, remove it directly
+        if [ -d "$wt_path" ]; then
+          rm -rf "$wt_path"
+        fi
         mgit branch -D "$branch" 2>/dev/null || true
         ((cleaned++)) || true
       fi
@@ -273,6 +316,37 @@ cleanup_merged_worktrees() {
   done < <(parse_worktree_list)
 
   mgit worktree prune 2>/dev/null || true
+
+  # Pass 2: Remove orphaned directories in WORKTREES_DIR not tracked by git worktree
+  # These appear when a previous 'git worktree remove' failed silently and
+  # 'git worktree prune' only removed the tracking, leaving the directory on disk.
+  if [ -d "$WORKTREES_DIR" ]; then
+    # Build a set of tracked worktree paths
+    local tracked_paths=""
+    while IFS=$'\t' read -r wt_path _; do
+      tracked_paths="$tracked_paths|$wt_path"
+    done < <(parse_worktree_list)
+
+    for dir in "$WORKTREES_DIR"/*/; do
+      [ -d "$dir" ] || continue
+      # Remove trailing slash for comparison
+      dir="${dir%/}"
+      # Skip hidden directories (e.g. .claude)
+      local dirname
+      dirname=$(basename "$dir")
+      if [[ "$dirname" == .* ]]; then
+        continue
+      fi
+      # Skip if still tracked by git worktree
+      if [[ "$tracked_paths" == *"|$dir"* ]]; then
+        continue
+      fi
+      # This directory is orphaned — remove it
+      print_warning "Removing orphaned worktree directory: $dir"
+      rm -rf "$dir"
+      ((cleaned++)) || true
+    done
+  fi
 
   if [ "$cleaned" -gt 0 ]; then
     print_success "Cleaned up $cleaned worktree(s) with merged/closed PRs"
@@ -595,7 +669,14 @@ PREOF
   fi
 
   print_success "Worktree created at: $wt_path"
-  print_info "To navigate: cd $wt_path"
+
+  # Copy cd command to clipboard for quick navigation
+  if command -v pbcopy &>/dev/null; then
+    echo -n "cd $wt_path" | pbcopy
+    print_info "Copied to clipboard: cd $wt_path"
+  else
+    print_info "To navigate: cd $wt_path"
+  fi
 
   print_summary "$wt_path" "$branch" "$pr_number" "$pr_url" "$issue_number"
   exit "$EXIT_SUCCESS"
