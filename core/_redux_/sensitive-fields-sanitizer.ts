@@ -13,9 +13,11 @@ export function sanitizeState(state: RootState): RootState {
       }
 }
 
-function hasAuthPassword(
-  value: unknown,
-): value is { auth: { password: string } } {
+type StateWithAuthPassword = {
+  auth: { password: string }
+}
+
+function hasAuthPassword(value: unknown): value is StateWithAuthPassword {
   return (
     typeof value === 'object' &&
     value !== null &&
@@ -27,7 +29,7 @@ function hasAuthPassword(
   )
 }
 
-export function sanitizeDevToolsState<S>(state: S, _index: number): S {
+export function sanitizeDevToolsState<S>(state: S): S {
   if (!hasAuthPassword(state) || !state.auth.password) return state
 
   return Object.assign({}, state, {
@@ -35,10 +37,7 @@ export function sanitizeDevToolsState<S>(state: S, _index: number): S {
   })
 }
 
-export function sanitizeDevToolsAction<A extends Action>(
-  action: A,
-  _id: number,
-): A {
+export function sanitizeDevToolsAction<A extends Action>(action: A): A {
   return action.type !== 'auth/setPassword'
     ? action
     : Object.assign({}, action, { payload: '[REDACTED]' })

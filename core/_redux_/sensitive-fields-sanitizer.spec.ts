@@ -34,7 +34,7 @@ describe('Sensitive fields sanitizer', () => {
       const store = createTestStore()
       store.dispatch(setPassword('my-secret'))
 
-      const sanitized = sanitizeDevToolsState(store.getState(), 0)
+      const sanitized = sanitizeDevToolsState(store.getState())
 
       const { password } = sanitized.auth
       expect(password).toBe('[REDACTED]')
@@ -44,7 +44,7 @@ describe('Sensitive fields sanitizer', () => {
       const store = createTestStore()
       const state = store.getState()
 
-      const sanitized = sanitizeDevToolsState(state, 0)
+      const sanitized = sanitizeDevToolsState(state)
 
       expect(sanitized).toBe(state)
     })
@@ -52,7 +52,7 @@ describe('Sensitive fields sanitizer', () => {
     it('returns non-RootState values unchanged', () => {
       const state = { unrelated: true }
 
-      const sanitized = sanitizeDevToolsState(state, 0)
+      const sanitized = sanitizeDevToolsState(state)
 
       expect(sanitized).toBe(state)
     })
@@ -62,7 +62,7 @@ describe('Sensitive fields sanitizer', () => {
     it('redacts setPassword action payload', () => {
       const action = setPassword('my-secret')
 
-      const sanitized = sanitizeDevToolsAction(action, 0)
+      const sanitized = sanitizeDevToolsAction(action)
 
       expect(sanitized.type).toBe('auth/setPassword')
       expect(sanitized.payload).toBe('[REDACTED]')
@@ -71,7 +71,7 @@ describe('Sensitive fields sanitizer', () => {
     it('returns other actions unchanged', () => {
       const action = { type: 'auth/setEmail', payload: 'test@email.com' }
 
-      const sanitized = sanitizeDevToolsAction(action, 0)
+      const sanitized = sanitizeDevToolsAction(action)
 
       expect(sanitized).toBe(action)
     })

@@ -29,7 +29,7 @@ export const createStore = (
 ) => {
   const actions: Action[] = []
   const logActionMiddleware: Middleware = () => (next) => (action: unknown) => {
-    if (isAction(action)) actions.push(sanitizeDevToolsAction(action, 0))
+    if (isAction(action)) actions.push(sanitizeDevToolsAction(action))
     return next(action)
   }
 
