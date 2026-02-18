@@ -17,7 +17,7 @@ export function ResetPasswordConfirmSuccessView({
       <View style={styles.container}>
         <Text style={styles.title}>{'PASSWORD RESET'}</Text>
         <Text style={styles.messageText}>
-          {'Your password has been reset successfully.'}
+          {'Your password has been successfully reset.'}
         </Text>
         <TiedSButton
           onPress={onBackToLogin}
