@@ -17,7 +17,29 @@ Key constraints:
 
 ## Decision
 
-All app data is stored and queried locally via SQLite (Prisma ORM). The local database is the single source of truth. Cloud services are used only for authentication (Firebase Auth), not for data storage or retrieval of core domain entities.
+All domain data (blocklists, block sessions, sirens, etc.) is persisted and queried locally via SQLite (Prisma ORM). Installed apps are detected at runtime by the `expo-list-installed-apps` native module — not stored in the database. The local database is the single source of truth for user-created data. Cloud services are used only for authentication (Firebase Auth), not for domain data storage.
+
+### Architecture
+
+```
+┌─────────────────────────────────────┐
+│         UI Layer (React Native)      │
+└──────────────┬──────────────────────┘
+               │
+┌──────────────▼──────────────────────┐
+│     Core Layer (Redux + Business)   │
+└──────────────┬──────────────────────┘
+               │
+┌──────────────▼──────────────────────┐
+│   Infra Layer (Repositories)        │
+└──────────────┬──────────────────────┘
+               │
+┌──────────────▼──────────────────────┐
+│   SQLite (Prisma ORM)               │  ◄── Local storage
+└─────────────────────────────────────┘
+
+(No cloud dependency for core features)
+```
 
 ### What is local
 
@@ -51,11 +73,14 @@ There is no migration version tracking — each migration is idempotent and dete
 
 **Negative**: No cross-device data sync — data is lost if the device is lost. Schema migrations are manual and untested against upgrade paths. No database encryption — data is readable on rooted/jailbroken devices.
 
+## Future: Cross-Device Sync via PowerSync
+
+The planned evolution is to add [PowerSync](https://www.powersync.com/) as a sync layer so that local-first data replicates across all of a user's devices. PowerSync keeps SQLite as the local source of truth and syncs bidirectionally with a backend database, preserving the offline-first guarantees. The hexagonal architecture (repository ports in `core/_ports_/`) means the sync layer can be introduced behind existing interfaces without changing core or UI code.
+
 ## Alternatives Considered
 
 1. **Cloud-first (Firestore / Supabase)** — Rejected. Network latency makes real-time blocking unreliable. Requires internet for core functionality.
-2. **Hybrid local + cloud sync** — Deferred. Adds sync conflict complexity not justified for single-device use. Can be added later via PowerSync behind existing repository ports.
-3. **PouchDB** — Previously attempted, abandoned. See [Abandon PouchDB](abandon-pouchdb.md). Dead PouchDB repository implementations still exist in `infra/` but are not wired into the dependency graph.
+2. **PouchDB** — Previously attempted, abandoned. See [Abandon PouchDB](abandon-pouchdb.md). Dead PouchDB repository implementations still exist in `infra/` but are not wired into the dependency graph.
 
 ## Related ADRs
 
