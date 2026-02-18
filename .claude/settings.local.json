@@ -193,6 +193,7 @@
       "Skill(ralph-wiggum:ralph-loop)",
       "Skill(sync-project)",
       "Skill(worktree)",
+      "WebFetch(domain:com-tiedsiren.firebaseapp.com)",
       "WebFetch(domain:com-tiedsiren.web.app)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:expo.dev)",
