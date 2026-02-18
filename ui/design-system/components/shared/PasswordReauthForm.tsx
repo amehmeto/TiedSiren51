@@ -9,7 +9,13 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 
-export function PasswordReauthForm() {
+type PasswordReauthFormOwnProps = {
+  onCancel: () => void
+}
+
+type PasswordReauthFormProps = Readonly<PasswordReauthFormOwnProps>
+
+export function PasswordReauthForm({ onCancel }: PasswordReauthFormProps) {
   const dispatch = useDispatch<AppDispatch>()
   const { isReauthenticating } = useSelector(selectReauthStatus)
   const [password, setPassword] = useState('')
@@ -28,6 +34,11 @@ export function PasswordReauthForm() {
       />
       <View style={styles.buttonContainer}>
         <TiedSButton
+          style={styles.cancelButton}
+          onPress={onCancel}
+          text="Cancel"
+        />
+        <TiedSButton
           onPress={() => dispatch(reauthenticate({ password }))}
           text="Confirm"
           isDisabled={isReauthenticating || password.length === 0}
@@ -43,5 +54,8 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-end',
     width: T.layout.width.full,
     marginTop: T.spacing.medium,
+  },
+  cancelButton: {
+    marginRight: T.spacing.small,
   },
 })
