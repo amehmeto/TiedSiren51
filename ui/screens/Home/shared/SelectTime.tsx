@@ -71,9 +71,9 @@ export function SelectTime({
   const pendingTimeRef = useRef<HHmmString | null>(null)
 
   const handleTimeChange = useCallback(
-    (time: HHmmString) => {
+    (selectedTime: HHmmString) => {
       const validation = validateStrictModeTime({
-        newTime: time,
+        newTime: selectedTime,
         isStrictModeActive,
         initialTime,
         direction,
@@ -85,7 +85,7 @@ export function SelectTime({
         return
       }
 
-      setFieldValue(timeField, time)
+      setFieldValue(timeField, selectedTime)
     },
     [
       isStrictModeActive,
@@ -113,14 +113,14 @@ export function SelectTime({
 
   const handleHide = useCallback(() => {
     if (pendingTimeRef.current) {
-      const time = pendingTimeRef.current
+      const confirmedTime = pendingTimeRef.current
       pendingTimeRef.current = null
       // Defer the field update to a separate render cycle so the picker's
       // isVisible=false is committed before the date prop changes. Without
       // this, React may batch both updates and the memo in
       // DateTimePickerModal.android sees a new date while isVisible is still
       // true, causing the picker to reappear.
-      requestAnimationFrame(() => handleTimeChange(time))
+      requestAnimationFrame(() => handleTimeChange(confirmedTime))
     }
   }, [handleTimeChange])
 
