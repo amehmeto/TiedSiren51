@@ -10,6 +10,7 @@ type TimePickerFields = {
   chosenTimeAsDate: Date
   onConfirm: (date: Date) => void
   onCancel: () => void
+  onHide?: () => void
   chosenTime: HHmmString
   handleChange: () => void
   setTime: (time: HHmmString) => void
@@ -23,6 +24,7 @@ export function TimePicker({
   chosenTimeAsDate,
   onConfirm,
   onCancel,
+  onHide,
   chosenTime,
   handleChange,
   setTime,
@@ -54,6 +56,7 @@ export function TimePicker({
       modalStyleIOS={styles.modalStyle}
       onConfirm={onConfirm}
       onCancel={onCancel}
+      onHide={onHide}
     />
   )
 }
