@@ -106,6 +106,7 @@
       "Bash(git cherry-pick:*)",
       "Bash(git commit:*)",
       "Bash(git diff:*)",
+      "Bash(git fetch origin main && git merge origin/main --no-edit)",
       "Bash(git fetch:*)",
       "Bash(git log:*)",
       "Bash(git ls-tree:*)",
