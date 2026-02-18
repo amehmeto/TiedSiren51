@@ -1,17 +1,5 @@
 import { Action } from '@reduxjs/toolkit'
-import { RootState } from './createStore'
-
-export function sanitizeState(state: RootState): RootState {
-  return !state.auth.password
-    ? state
-    : {
-        ...state,
-        auth: {
-          ...state.auth,
-          password: '[REDACTED]',
-        },
-      }
-}
+import { setPassword } from '@/core/auth/reducer'
 
 type StateWithAuthPassword = {
   auth: { password: string }
@@ -38,7 +26,7 @@ export function sanitizeDevToolsState<S>(state: S): S {
 }
 
 export function sanitizeDevToolsAction<A extends Action>(action: A): A {
-  return action.type !== 'auth/setPassword'
+  return action.type !== setPassword.type
     ? action
     : Object.assign({}, action, { payload: '[REDACTED]' })
 }

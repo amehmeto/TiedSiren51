@@ -4,33 +4,11 @@ import { setPassword } from '@/core/auth/reducer'
 import {
   sanitizeDevToolsAction,
   sanitizeDevToolsState,
-  sanitizeState,
 } from './sensitive-fields-sanitizer'
 
 describe('Sensitive fields sanitizer', () => {
-  describe('sanitizeState', () => {
-    it('redacts auth.password when present', () => {
-      const store = createTestStore()
-      store.dispatch(setPassword('my-secret'))
-
-      const sanitized = sanitizeState(store.getState())
-
-      const { password } = sanitized.auth
-      expect(password).toBe('[REDACTED]')
-    })
-
-    it('returns state unchanged when password is empty', () => {
-      const store = createTestStore()
-      const state = store.getState()
-
-      const sanitized = sanitizeState(state)
-
-      expect(sanitized).toBe(state)
-    })
-  })
-
   describe('sanitizeDevToolsState', () => {
-    it('redacts auth.password from a generic state object', () => {
+    it('redacts auth.password when present', () => {
       const store = createTestStore()
       store.dispatch(setPassword('my-secret'))
 
