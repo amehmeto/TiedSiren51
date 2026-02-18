@@ -122,6 +122,7 @@ export const T = {
     roundButton: 60,
     chipMinWidth: 50,
     textInputHeight: 40,
+    settingsRowMinHeight: 44,
     modalButton: 120,
     tiedSirenLogo: 100,
   },
@@ -137,6 +138,7 @@ export const T = {
   },
   opacity: {
     invisible: 0,
+    divider: 0.2,
     pressed: 0.5,
     disabled: 0.6,
     semiTransparent: 0.9,
