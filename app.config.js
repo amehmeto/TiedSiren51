@@ -53,7 +53,7 @@ export default {
             {
               scheme: 'https',
               host: APP_DOMAIN,
-              pathPrefix: '/reset-password',
+              pathPrefix: '/__/auth/action',
             },
           ],
           category: ['BROWSABLE', 'DEFAULT'],
