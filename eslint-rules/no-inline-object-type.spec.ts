@@ -107,6 +107,11 @@ describe('no-inline-object-type', () => {
             { messageId: 'extractObjectType' },
           ],
         },
+        // Nested object type in type predicate — total deep properties >= 2 - NOT OK
+        {
+          code: `function hasAuth(v: unknown): v is { auth: { password: string } } { return true }`,
+          errors: [{ messageId: 'extractObjectType' }],
+        },
       ],
     })
   })
