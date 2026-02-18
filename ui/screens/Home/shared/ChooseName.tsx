@@ -27,7 +27,7 @@ export function ChooseName({
   setFieldValue,
 }: ChooseNameProps) {
   const [isNameModalVisible, setIsNameModalVisible] = useState<boolean>(false)
-  const displayName = values.name ?? 'Choose a name...'
+  const displayName = values.name ? values.name : 'Choose a name...'
 
   return (
     <>
