@@ -27,6 +27,7 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 
 ### UI/UX
 - [Android Time Picker Styling](android-time-picker-styling.md) - 📋 **LOW PRIORITY** - Border radius not supported on Android
+- [Android Time Picker Double Selection](android-time-picker-double-selection.md) - 📋 **LOW PRIORITY** - Upstream `react-native-modal-datetime-picker` race condition workaround (#321)
 
 ### Maintenance
 - [Scripts Audit](scripts-audit.md) - 📋 **LOW PRIORITY** - Inventory of all scripts with usage status
