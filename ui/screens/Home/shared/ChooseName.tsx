@@ -1,5 +1,5 @@
-import React, { useEffect, useRef, useState } from 'react'
-import { Pressable, StyleSheet, Text, TextInput, View } from 'react-native'
+import React, { useState } from 'react'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
@@ -7,7 +7,6 @@ import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 
 const NAME_PLACEHOLDER = 'Choose a name...'
-const FOCUS_DELAY_MS = 300
 
 type ChooseNameFields = {
   values: BlockSessionFormValues
@@ -19,15 +18,7 @@ type ChooseNameProps = Readonly<ChooseNameFields>
 
 export function ChooseName({ values, onChange, onBlur }: ChooseNameProps) {
   const [isNameModalVisible, setIsNameModalVisible] = useState<boolean>(false)
-  const inputRef = useRef<TextInput>(null)
   const displayName = values.name ? values.name : NAME_PLACEHOLDER
-
-  useEffect(() => {
-    if (!isNameModalVisible) return
-
-    const timeout = setTimeout(() => inputRef.current?.focus(), FOCUS_DELAY_MS)
-    return () => clearTimeout(timeout)
-  }, [isNameModalVisible])
 
   return (
     <>
@@ -44,9 +35,9 @@ export function ChooseName({ values, onChange, onBlur }: ChooseNameProps) {
         style={styles.modal}
       >
         <TiedSTextInput
-          ref={inputRef}
           onChangeText={onChange}
           onBlur={onBlur}
+          autoFocus={true}
           selectTextOnFocus={true}
           placeholder={NAME_PLACEHOLDER}
           value={values.name ?? ''}
