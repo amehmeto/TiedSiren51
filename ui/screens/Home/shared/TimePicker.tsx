@@ -1,8 +1,3 @@
-// Android dark mode: the datetimepicker config plugin only exposes widget-level
-// styling (colors, backgrounds), but dialog-level text colors (inner clock
-// numbers, header) are controlled by a separate dialog theme. The co-located
-// config plugin (withTimePickerDarkTheme.cjs) creates that dialog theme with
-// white textColorPrimary so all text is readable on our dark background.
 import React from 'react'
 import { Platform, StyleSheet } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
@@ -59,8 +54,6 @@ export function TimePicker({
       textColor={T.color.white}
       pickerContainerStyleIOS={styles.pickerContainer}
       modalStyleIOS={styles.modalStyle}
-      positiveButton={{ textColor: T.color.white }}
-      negativeButton={{ textColor: T.color.white }}
       onConfirm={onConfirm}
       onCancel={onCancel}
       onHide={onHide}
