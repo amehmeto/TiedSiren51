@@ -8,8 +8,9 @@ This command assumes you are already in the correct worktree (created via `/prep
 
 2. **Detect the PR** for the current branch:
    ```bash
-   gh pr list --head "$(git branch --show-current)" --json number,url --jq '.[0] // empty'
+   .claude/scripts/detect-pr.sh
    ```
+   Note: This script handles shell interpolation internally to avoid permission issues with `$(...)` in Bash tool calls.
 
 3. **Fetch the issue content**:
    ```bash
