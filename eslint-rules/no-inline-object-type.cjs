@@ -64,7 +64,7 @@ module.exports = {
 
     return {
       TSTypeLiteral(node) {
-        if (node.members.length < minProperties) return
+        if (countPropertiesDeep(node) < minProperties) return
 
         // Skip if already inside a type alias declaration (the definition itself)
         if (isInsideTypeAliasDeclaration(node)) return
@@ -84,6 +84,17 @@ module.exports = {
           messageId: 'extractUnionType',
         })
       },
+    }
+
+    function countPropertiesDeep(node) {
+      let count = 0
+      for (const member of node.members) {
+        count += 1
+        const annotation = member.typeAnnotation?.typeAnnotation
+        if (annotation && annotation.type === 'TSTypeLiteral')
+          count += countPropertiesDeep(annotation)
+      }
+      return count
     }
 
     function isInsideTypeAliasDeclaration(node) {

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useCallback, useRef } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { assertHHmmString, HHmmString } from '@/core/_ports_/date-provider'
@@ -68,22 +68,61 @@ export function SelectTime({
   assertHHmmString(chosenTime)
   const chosenTimeAsDate = dateProvider.recoverDate(chosenTime)
 
-  const handleTimeChange = (time: HHmmString) => {
-    const validation = validateStrictModeTime({
-      newTime: time,
+  const pendingTimeRef = useRef<HHmmString | null>(null)
+
+  const handleTimeChange = useCallback(
+    (selectedTime: HHmmString) => {
+      const validation = validateStrictModeTime({
+        newTime: selectedTime,
+        isStrictModeActive,
+        initialTime,
+        direction,
+        otherBound: initialOtherTime,
+      })
+
+      if (!validation.isValid) {
+        dispatch(showToast(validation.errorMessage))
+        return
+      }
+
+      setFieldValue(timeField, selectedTime)
+    },
+    [
       isStrictModeActive,
       initialTime,
       direction,
-      otherBound: initialOtherTime,
-    })
+      initialOtherTime,
+      dispatch,
+      setFieldValue,
+      timeField,
+    ],
+  )
 
-    if (!validation.isValid) {
-      dispatch(showToast(validation.errorMessage))
-      return
+  const handleConfirm = useCallback(
+    (date: Date) => {
+      pendingTimeRef.current = dateProvider.toHHmm(date)
+      setIsTimePickerVisible(false)
+    },
+    [dateProvider, setIsTimePickerVisible],
+  )
+
+  const handleCancel = useCallback(() => {
+    pendingTimeRef.current = null
+    setIsTimePickerVisible(false)
+  }, [setIsTimePickerVisible])
+
+  const handleHide = useCallback(() => {
+    if (pendingTimeRef.current) {
+      const confirmedTime = pendingTimeRef.current
+      pendingTimeRef.current = null
+      // Defer the field update to a separate render cycle so the picker's
+      // isVisible=false is committed before the date prop changes. Without
+      // this, React may batch both updates and the memo in
+      // DateTimePickerModal.android sees a new date while isVisible is still
+      // true, causing the picker to reappear.
+      requestAnimationFrame(() => handleTimeChange(confirmedTime))
     }
-
-    setFieldValue(timeField, time)
-  }
+  }, [handleTimeChange])
 
   return (
     <>
@@ -99,12 +138,9 @@ export function SelectTime({
         <TimePicker
           isVisible={isTimePickerVisible}
           chosenTimeAsDate={chosenTimeAsDate}
-          onConfirm={(date) => {
-            const timeHHmm = dateProvider.toHHmm(date)
-            handleTimeChange(timeHHmm)
-            setIsTimePickerVisible(false)
-          }}
-          onCancel={() => setIsTimePickerVisible(false)}
+          onConfirm={handleConfirm}
+          onCancel={handleCancel}
+          onHide={handleHide}
           chosenTime={chosenTime}
           handleChange={() => handleChange(timeField)}
           setTime={handleTimeChange}

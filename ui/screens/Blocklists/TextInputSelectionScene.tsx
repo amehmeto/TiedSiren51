@@ -16,8 +16,12 @@ import {
 import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
 
+type TextInputSubmitEvent = {
+  nativeEvent: { text: string }
+}
+
 type TextInputSelectionSceneProps = {
-  readonly onSubmitEditing: (event: { nativeEvent: { text: string } }) => void
+  readonly onSubmitEditing: (event: TextInputSubmitEvent) => void
   readonly placeholder: string
   readonly sirenType: SirenType.WEBSITES | SirenType.KEYWORDS
   readonly toggleSiren: (sirenType: SirenType, sirenId: string) => void
@@ -73,8 +77,7 @@ export function TextInputSelectionScene({
           sectionEntry.type === 'divider' ? sectionEntry.id : sectionEntry.siren
         }
         renderItem={({ item: sectionEntry }) => {
-          if (sectionEntry.type === 'divider')
-            return <SectionDivider label={sectionEntry.label} />
+          if (sectionEntry.type === 'divider') return <SectionDivider />
 
           const isSelected = isSirenSelected(sirenType, sectionEntry.siren)
           const isLocked = isSirenLocked(

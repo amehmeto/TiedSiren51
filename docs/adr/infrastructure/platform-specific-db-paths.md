@@ -8,261 +8,75 @@ Accepted
 
 ## Context
 
-TiedSiren51 runs on iOS and Android with SQLite database. Each platform has different file system conventions:
+TiedSiren51 uses Prisma with SQLite on both iOS and Android. Prisma requires an absolute file path for its SQLite datasource. Each platform has different file system conventions:
 
-**iOS**:
-- Apps sandboxed in application container
-- Document directory: `~/Documents/`
-- Files backed up to iCloud by default
-- Path: `FileSystem.documentDirectory + 'app.db'`
+- **iOS**: Apps store data in `~/Documents/` (backed up to iCloud by default)
+- **Android**: Apps store data in `/data/data/<package>/files/`, with databases conventionally in a `/databases/` subdirectory
 
-**Android**:
-- Apps sandboxed in `/data/data/<package>/`
-- Multiple storage locations (internal, external, cache)
-- Databases traditionally in `/databases/` subdirectory
-- Path: `FileSystem.documentDirectory + 'databases/app.db'`
-
-**Challenges**:
-- Prisma needs absolute file path for SQLite datasource
-- Path differs by platform
-- Must ensure database directory exists
-- File permissions vary by platform
-- React Native's `expo-file-system` provides cross-platform API
-
-**Risk**:
-- Hardcoding path breaks on one platform
-- Wrong directory might not have write permissions
-- Database file might not persist correctly
+The path must be determined at runtime since both platforms are served from a single codebase.
 
 ## Decision
 
-Use **platform-specific database paths** determined at runtime based on `Platform.OS`.
+Determine the database path at runtime using `Platform.OS` in the abstract `PrismaRepository` base class. Android appends `databases/` to follow platform conventions; iOS writes directly to the document directory.
 
-### Implementation
+### Key files
 
-**1. Abstract Repository Base** (`/infra/__abstract__/prisma.repository.ts`)
+- `/infra/__abstract__/prisma.repository.ts` — path resolution and initialization
+- `/infra/database-service/prisma.database.service.ts` — thin wrapper implementing the `DatabaseService` port
+- `/core/_ports_/database.service.ts` — port interface
+
+### Path resolution (`PrismaRepository.getDbPath()`)
 
 ```typescript
-import { Platform } from 'react-native'
-import * as FileSystem from 'expo-file-system'
-
-export abstract class PrismaRepository {
-  protected getDatabasePath(): string {
-    const docDir = FileSystem.documentDirectory
-
-    if (Platform.OS === 'android') {
-      // Android: /data/data/<package>/files/databases/app.db
-      return `${docDir}databases/app.db`
-    } else {
-      // iOS: ~/Documents/app.db
-      return `${docDir}app.db`
-    }
-  }
-
-  protected async ensureDatabaseDirectory(): Promise<void> {
-    const dbPath = this.getDatabasePath()
-    const dbDir = dbPath.substring(0, dbPath.lastIndexOf('/'))
-
-    const dirInfo = await FileSystem.getInfoAsync(dbDir)
-    if (!dirInfo.exists) {
-      await FileSystem.makeDirectoryAsync(dbDir, { intermediates: true })
-    }
-  }
+public getDbPath() {
+  return Platform.OS === 'android'
+    ? `${FileSystem.documentDirectory}databases/${this.dbName}`
+    : `${FileSystem.documentDirectory}${this.dbName}`
 }
 ```
 
-**2. Database Service** (`/infra/database-service/prisma.database.service.ts`)
+`FileSystem.documentDirectory` (from `expo-file-system`) returns a `file://` URI ending with `/`. The resulting path is passed to Prisma as `file:${dbPath}`.
+
+### File and directory creation (`PrismaRepository.ensureDatabaseFile()`)
+
+Before connecting, the base class checks if the database file exists. If not, it creates the parent directory (with `intermediates: true`) and writes an empty file:
 
 ```typescript
-export class PrismaDatabaseService implements IDatabaseService {
-  async initialize(): Promise<void> {
-    const dbPath = this.getDatabasePath()
-
-    // Ensure directory exists
-    await this.ensureDatabaseDirectory()
-
-    // Initialize Prisma with platform-specific path
-    await initializePrismaClient({
-      datasources: {
-        db: {
-          url: `file:${dbPath}`,
-        },
-      },
+private async ensureDatabaseFile(): Promise<void> {
+  const fileInfo = await FileSystem.getInfoAsync(this.dbPath)
+  if (!fileInfo.exists) {
+    const dirPath = this.dbPath.substring(0, this.dbPath.lastIndexOf('/'))
+    await FileSystem.makeDirectoryAsync(dirPath, { intermediates: true })
+    await FileSystem.writeAsStringAsync(this.dbPath, '', {
+      encoding: FileSystem.EncodingType.UTF8,
     })
-
-    // Run migrations
-    await this.runMigrations()
   }
 }
 ```
 
-**3. Resulting Paths**
+### Initialization flow
 
-```typescript
-// Android
-file:/data/data/com.tiedsiren51/files/databases/app.db
+`PrismaRepository.initialize()` runs sequentially:
+1. `ensureDatabaseFile()` — create directory and empty file if needed
+2. `connectToDatabase()` — `$connect()` + enable foreign keys
+3. `createAllTables()` — raw SQL `CREATE TABLE IF NOT EXISTS` statements
+4. `loadInitialData()` — warm the Prisma client cache
 
-// iOS
-file:/var/mobile/Containers/Data/Application/<UUID>/Documents/app.db
-```
+There are no Prisma migrations — tables are created and altered via raw SQL.
 
 ## Consequences
 
-### Positive
+**Positive**: Single path-resolution point in the base class; follows each platform's conventions; directory auto-created on first run.
 
-- **Cross-platform**: Works correctly on both iOS and Android
-- **Conventional**: Follows platform conventions
-- **Reliable**: Database persists across app restarts
-- **Permissions**: Uses directories with guaranteed write access
-- **Explicit**: Path construction is clear and traceable
-- **Testable**: Can mock `Platform.OS` for testing
-- **Centralized**: Path logic in one place (base class)
-- **Directory creation**: Automatically creates directories if needed
-
-### Negative
-
-- **Platform coupling**: Code must check platform
-- **Abstraction complexity**: Extra layer for path resolution
-- **Testing**: Must test on both platforms
-- **Debugging**: Different paths make debugging harder
-- **Documentation**: Must document path differences
-
-### Neutral
-
-- **Runtime determination**: Path determined at runtime, not build time
-- **expo-file-system dependency**: Relies on Expo's file system API
+**Negative**: Platform check couples the code to `react-native`'s `Platform` API; different paths complicate on-device debugging.
 
 ## Alternatives Considered
 
-### 1. Hardcoded Single Path
-**Rejected because**:
-```typescript
-const DB_PATH = `${FileSystem.documentDirectory}app.db`
-```
-- Doesn't follow Android conventions
-- Might fail on Android (no `/databases/` dir)
-- Not platform-aware
+1. **Single hardcoded path** — Would work on both platforms but ignores Android conventions for database location.
+2. **Build-time configuration** — Unnecessary complexity; Expo already provides runtime platform detection.
+3. **Environment variables** — Extra configuration burden with no benefit over `Platform.OS`.
 
-### 2. Build-Time Configuration
-**Rejected because**:
-- Requires separate builds per platform
-- More complex build setup
-- Expo handles this better at runtime
+## Related ADRs
 
-### 3. Environment Variables
-**Rejected because**:
-```typescript
-const DB_PATH = process.env.DB_PATH
-```
-- Must set for each platform
-- More configuration to maintain
-- Runtime determination simpler
-
-### 4. Same Path Both Platforms
-**Rejected because**:
-- Ignores platform conventions
-- Android developers expect `/databases/`
-- Could confuse debugging
-
-### 5. External Storage (Android)
-**Rejected because**:
-- Requires additional permissions
-- Less secure
-- Not necessary for our use case
-- Internal storage sufficient
-
-## Implementation Notes
-
-### Key Files
-- `/infra/__abstract__/prisma.repository.ts` - Path resolution
-- `/infra/database-service/prisma.database.service.ts` - Database initialization
-
-### Path Resolution Logic
-
-```typescript
-protected getDatabasePath(): string {
-  const baseDir = FileSystem.documentDirectory
-
-  switch (Platform.OS) {
-    case 'android':
-      return `${baseDir}databases/app.db`
-    case 'ios':
-      return `${baseDir}app.db`
-    case 'web':
-      // Not currently supported, but could use IndexedDB
-      throw new Error('Web platform not supported for SQLite')
-    default:
-      throw new Error(`Unsupported platform: ${Platform.OS}`)
-  }
-}
-```
-
-### Directory Creation
-
-```typescript
-protected async ensureDatabaseDirectory(): Promise<void> {
-  const dbPath = this.getDatabasePath()
-  const dbDir = dbPath.substring(0, dbPath.lastIndexOf('/'))
-
-  try {
-    const dirInfo = await FileSystem.getInfoAsync(dbDir)
-
-    if (!dirInfo.exists) {
-      await FileSystem.makeDirectoryAsync(dbDir, {
-        intermediates: true, // Create parent directories if needed
-      })
-    }
-  } catch (error) {
-    throw new Error(`Failed to create database directory: ${error}`)
-  }
-}
-```
-
-### Testing Different Platforms
-
-```typescript
-describe('PrismaRepository', () => {
-  it('uses correct path on Android', () => {
-    jest.spyOn(Platform, 'OS', 'get').mockReturnValue('android')
-
-    const repo = new TestRepository()
-    const path = repo.getDatabasePath()
-
-    expect(path).toContain('databases/app.db')
-  })
-
-  it('uses correct path on iOS', () => {
-    jest.spyOn(Platform, 'OS', 'get').mockReturnValue('ios')
-
-    const repo = new TestRepository()
-    const path = repo.getDatabasePath()
-
-    expect(path).toContain('app.db')
-    expect(path).not.toContain('databases/')
-  })
-})
-```
-
-### Debugging Database Files
-
-**Android (via adb)**:
-```bash
-adb shell run-as com.tiedsiren51
-cd files/databases
-ls -la
-```
-
-**iOS (via Xcode)**:
-- Device: Use Xcode -> Window -> Devices and Simulators
-- Simulator: `~/Library/Developer/CoreSimulator/Devices/<UUID>/data/Containers/Data/Application/<UUID>/Documents/`
-
-### Related ADRs
 - [Prisma ORM with SQLite](prisma-orm-sqlite.md)
 - [Local-First Architecture](local-first-architecture.md)
-
-## References
-
-- [Expo File System Docs](https://docs.expo.dev/versions/latest/sdk/filesystem/)
-- [iOS File System Programming Guide](https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/)
-- [Android Data Storage](https://developer.android.com/training/data-storage)
-- `/infra/__abstract__/prisma.repository.ts` - Implementation

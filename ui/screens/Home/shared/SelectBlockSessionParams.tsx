@@ -45,7 +45,6 @@ export function SelectBlockSessionParams({
         <ChooseName
           values={form.values}
           onChange={handleNameChange}
-          setFieldValue={form.setFieldValue}
           onBlur={() => form.handleBlur('name')}
         />
         {hasFieldError('name') && <FormError error={form.errors.name} />}

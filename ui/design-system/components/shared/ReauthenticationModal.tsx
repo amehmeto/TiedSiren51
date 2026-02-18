@@ -7,7 +7,6 @@ import { selectAuthProvider } from '@/core/auth/selectors/selectAuthProvider'
 import { selectReauthStatus } from '@/core/auth/selectors/selectReauthStatus'
 import { GoogleReauthForm } from '@/ui/design-system/components/shared/GoogleReauthForm'
 import { PasswordReauthForm } from '@/ui/design-system/components/shared/PasswordReauthForm'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
 
@@ -37,15 +36,12 @@ export function ReauthenticationModal({
     <TiedSModal isVisible={isVisible} onRequestClose={handleClose}>
       <View style={styles.container}>
         <Text style={styles.title}>Confirm your identity</Text>
-        {isGoogleProvider ? <GoogleReauthForm /> : <PasswordReauthForm />}
+        {isGoogleProvider ? (
+          <GoogleReauthForm onCancel={handleClose} />
+        ) : (
+          <PasswordReauthForm onCancel={handleClose} />
+        )}
         {reauthError && <Text style={styles.error}>{reauthError}</Text>}
-        <View style={styles.buttonContainer}>
-          <TiedSButton
-            style={styles.cancelButton}
-            onPress={handleClose}
-            text="Cancel"
-          />
-        </View>
       </View>
     </TiedSModal>
   )
@@ -68,14 +64,5 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.small,
     textAlign: 'center',
     marginTop: T.spacing.small,
-  },
-  buttonContainer: {
-    flexDirection: 'row',
-    justifyContent: 'flex-end',
-    width: T.layout.width.full,
-    marginTop: T.spacing.medium,
-  },
-  cancelButton: {
-    marginRight: T.spacing.small,
   },
 })
