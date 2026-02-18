@@ -9,6 +9,7 @@ const DARK_BLUE = '#0C207A'
 const DARK_BLUE_GRAY = '#1E293B'
 const LIGHT_BLUE = '#00D4FF'
 const WHITE = '#FFFFFF'
+const APP_DOMAIN = 'tiedsiren.app'
 
 export default {
   expo: {
@@ -29,7 +30,7 @@ export default {
       bundleIdentifier: 'com.tiedsiren.tiedsiren',
       googleServicesFile: './GoogleService-Info.plist',
       usesAppleSignIn: true,
-      associatedDomains: ['applinks:tiedsiren.app'],
+      associatedDomains: [`applinks:${APP_DOMAIN}`],
     },
     android: {
       adaptiveIcon: {
@@ -51,7 +52,7 @@ export default {
           data: [
             {
               scheme: 'https',
-              host: 'tiedsiren.app',
+              host: APP_DOMAIN,
               pathPrefix: '/reset-password',
             },
           ],

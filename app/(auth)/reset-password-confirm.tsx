@@ -15,6 +15,7 @@ import {
   clearConfirmPasswordResetState,
 } from '@/core/auth/reducer'
 import { confirmPasswordReset } from '@/core/auth/usecases/confirm-password-reset.usecase'
+import { changePasswordSchema } from '@/ui/auth-schemas/auth.schema'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
@@ -29,7 +30,7 @@ import { FormError } from '@/ui/screens/Home/shared/FormError'
 export default function ResetPasswordConfirmScreen() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
-  const { oobCode } = useLocalSearchParams<{ oobCode: string }>()
+  const { oobCode } = useLocalSearchParams<{ oobCode?: string }>()
   const [newPassword, setNewPassword] = useState('')
   const [confirmPassword, setConfirmPassword] = useState('')
   const [localError, setLocalError] = useState<string | null>(null)
@@ -40,7 +41,7 @@ export default function ResetPasswordConfirmScreen() {
     dispatch(clearConfirmPasswordResetState())
   }, [dispatch])
 
-  const handleClose = () => {
+  const handleBackToLogin = () => {
     dispatch(clearConfirmPasswordResetState())
     router.replace('/(auth)/login')
   }
@@ -54,23 +55,18 @@ export default function ResetPasswordConfirmScreen() {
       return
     }
 
-    if (newPassword.length < 6) {
-      setLocalError('Password must be at least 6 characters.')
+    const validation = changePasswordSchema.safeParse({
+      newPassword,
+      confirmPassword,
+    })
+
+    if (!validation.success) {
+      setLocalError(validation.error.errors[0].message)
       return
     }
 
-    if (newPassword !== confirmPassword) {
-      setLocalError('Passwords do not match.')
-      return
-    }
-
-    const payload = { oobCode, newPassword }
+    const payload = { oobCode, newPassword: validation.data.newPassword }
     await dispatch(confirmPasswordReset(payload))
-  }
-
-  const handleBackToLogin = () => {
-    dispatch(clearConfirmPasswordResetState())
-    router.replace('/(auth)/login')
   }
 
   const handleRequestNewLink = () => {
@@ -85,7 +81,7 @@ export default function ResetPasswordConfirmScreen() {
 
   return (
     <Pressable onPress={Keyboard.dismiss} style={styles.mainContainer}>
-      <TiedSCloseButton onClose={handleClose} />
+      <TiedSCloseButton onClose={handleBackToLogin} />
       <KeyboardAvoidingView
         style={styles.container}
         behavior={Platform.OS === 'ios' ? 'padding' : 'height'}

@@ -34,9 +34,11 @@ export function usePasswordResetDeepLink() {
 
     const subscription = Linking.addEventListener('url', handleUrl)
 
-    Linking.getInitialURL().then((url) => {
-      if (!isUnmountedRef.current && url) handleUrl({ url })
-    })
+    Linking.getInitialURL()
+      .then((url) => {
+        if (!isUnmountedRef.current && url) handleUrl({ url })
+      })
+      .catch(() => {})
 
     return () => {
       isUnmountedRef.current = true
