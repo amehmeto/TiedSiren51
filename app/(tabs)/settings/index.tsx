@@ -4,11 +4,11 @@ import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
-import { SecuritySection } from '@/ui/design-system/components/shared/SecuritySection'
 import { SettingsRow } from '@/ui/design-system/components/shared/SettingsRow'
 import { SettingsSection } from '@/ui/design-system/components/shared/SettingsSection'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
+import { SecuritySection } from '@/ui/screens/Settings/SecuritySection'
 import { selectSettingsViewModel } from '@/ui/screens/Settings/settings.view-model'
 
 export default function SettingsScreen() {
@@ -30,8 +30,13 @@ export default function SettingsScreen() {
           label={viewModel.email}
           icon="mail-outline"
           hasDivider={true}
+          accessibilityLabel={`Email: ${viewModel.email}`}
         />
-        <SettingsRow label={viewModel.authProviderLabel} icon="key-outline" />
+        <SettingsRow
+          label={viewModel.authProviderLabel}
+          icon="key-outline"
+          accessibilityLabel={`Sign-in method: ${viewModel.authProviderLabel}`}
+        />
       </SettingsSection>
 
       {viewModel.hasPasswordProvider ? (

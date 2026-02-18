@@ -122,7 +122,6 @@ export const T = {
     roundButton: 60,
     chipMinWidth: 50,
     textInputHeight: 40,
-    settingsRowMinHeight: 44,
     modalButton: 120,
     tiedSirenLogo: 100,
   },
@@ -175,6 +174,9 @@ export const T = {
       minBottom: 40,
       additional: 20,
     },
+  },
+  height: {
+    settingsRow: 44,
   },
   // Legacy icon size constants (kept for backward compatibility)
   sirenIconSize: 20,

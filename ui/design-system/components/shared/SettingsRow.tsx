@@ -11,6 +11,7 @@ type SettingsRowOwnProps = {
   onPress?: () => void
   labelColor?: string
   hasDivider?: boolean
+  accessibilityLabel?: string
 }
 
 type SettingsRowProps = Readonly<SettingsRowOwnProps>
@@ -23,6 +24,7 @@ export function SettingsRow({
   onPress,
   labelColor = T.color.text,
   hasDivider = false,
+  accessibilityLabel,
 }: SettingsRowProps) {
   const content = (
     <>
@@ -59,13 +61,14 @@ export function SettingsRow({
           opacity: isPressed ? T.opacity.pressed : T.opacity.full,
         })}
         accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
       >
         {content}
       </Pressable>
     )
   }
 
-  return <View>{content}</View>
+  return <View accessibilityLabel={accessibilityLabel}>{content}</View>
 }
 
 const styles = StyleSheet.create({
@@ -74,7 +77,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingVertical: T.spacing.smallMedium,
     paddingHorizontal: T.spacing.medium,
-    minHeight: T.width.settingsRowMinHeight,
+    minHeight: T.height.settingsRow,
   },
   icon: {
     marginRight: T.spacing.smallMedium,

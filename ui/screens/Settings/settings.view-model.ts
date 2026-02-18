@@ -22,6 +22,6 @@ export function selectSettingsViewModel(state: RootState): SettingsViewModel {
   return {
     email: authUser?.email ?? '',
     authProviderLabel: AUTH_PROVIDER_LABELS[provider],
-    hasPasswordProvider: provider === AuthProvider.Email,
+    hasPasswordProvider: provider === Email,
   }
 }
