@@ -149,9 +149,10 @@ jobs:
 
   build:
     needs: [test, hecate]
-    # Only build if: not a draft PR AND (this push contains app changes OR PR was just marked ready with app changes)
+    # Only build if: tests passed, not a draft PR, AND (this push contains app changes OR PR was just marked ready with app changes)
     if: >-
-      github.event.pull_request.draft == false
+      needs.test.result == 'success'
+      && github.event.pull_request.draft == false
       && (needs.hecate.outputs.app-changed-this-push == 'true'
           || (github.event.action == 'ready_for_review'
               && needs.hecate.outputs.app-changed == 'true'))
