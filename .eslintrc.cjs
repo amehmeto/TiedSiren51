@@ -186,6 +186,8 @@ module.exports = {
     'local-rules/prefer-jump-table': 'error',
     // Flag string literals in comparisons when a matching enum value exists
     'local-rules/no-enum-value-as-string-literal': 'error',
+    // Prefer short-circuit (&&) over ternary with null for conditional JSX
+    'local-rules/prefer-short-circuit-jsx': 'error',
     // Prefer ternary over complementary && conditions in JSX
     'local-rules/prefer-ternary-jsx': 'error',
     // Extract long function arguments into named variables for readability

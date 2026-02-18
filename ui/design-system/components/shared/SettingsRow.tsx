@@ -29,46 +29,44 @@ export function SettingsRow({
   const content = (
     <>
       <View style={styles.row}>
-        {icon ? (
+        {icon && (
           <Ionicons
             name={icon}
             size={T.icon.size.medium}
             color={labelColor}
             style={styles.icon}
           />
-        ) : null}
+        )}
         <Text style={[styles.label, { color: labelColor }]}>{label}</Text>
         <View style={styles.rightAccessory}>
-          {value ? <Text style={styles.value}>{value}</Text> : null}
-          {hasChevron ? (
+          {value && <Text style={styles.value}>{value}</Text>}
+          {hasChevron && (
             <Ionicons
               name="chevron-forward"
               size={T.icon.size.small}
               color={T.color.grey}
             />
-          ) : null}
+          )}
         </View>
       </View>
-      {hasDivider ? <View style={styles.divider} /> : null}
+      {hasDivider && <View style={styles.divider} />}
     </>
   )
 
-  if (onPress) {
-    return (
-      <Pressable
-        onPress={onPress}
-        style={({ pressed: isPressed }) => ({
-          opacity: isPressed ? T.opacity.pressed : T.opacity.full,
-        })}
-        accessibilityRole="button"
-        accessibilityLabel={accessibilityLabel}
-      >
-        {content}
-      </Pressable>
-    )
-  }
-
-  return <View accessibilityLabel={accessibilityLabel}>{content}</View>
+  return onPress ? (
+    <Pressable
+      onPress={onPress}
+      style={({ pressed: isPressed }) => ({
+        opacity: isPressed ? T.opacity.pressed : T.opacity.full,
+      })}
+      accessibilityRole="button"
+      accessibilityLabel={accessibilityLabel}
+    >
+      {content}
+    </Pressable>
+  ) : (
+    <View accessibilityLabel={accessibilityLabel}>{content}</View>
+  )
 }
 
 const styles = StyleSheet.create({

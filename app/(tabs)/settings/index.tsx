@@ -39,13 +39,13 @@ export default function SettingsScreen() {
         />
       </SettingsSection>
 
-      {viewModel.hasPasswordProvider ? (
+      {viewModel.hasPasswordProvider && (
         <SecuritySection
           onChangePassword={() =>
             router.push('/(tabs)/settings/change-password')
           }
         />
-      ) : null}
+      )}
 
       <View style={styles.logoutContainer}>
         <TiedSButton

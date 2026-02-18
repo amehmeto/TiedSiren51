@@ -12,7 +12,7 @@ type SettingsSectionProps = Readonly<SettingsSectionOwnProps>
 export function SettingsSection({ children, title }: SettingsSectionProps) {
   return (
     <View style={styles.wrapper}>
-      {title ? <Text style={styles.title}>{title}</Text> : null}
+      {title && <Text style={styles.title}>{title}</Text>}
       <View style={styles.card}>{children}</View>
     </View>
   )

@@ -263,9 +263,71 @@ module.exports = {
       })
     }
 
+    function hasEarlyJSXReturn(statements) {
+      return statements.some((stmt) => {
+        if (stmt.type !== 'IfStatement') return false
+
+        const block =
+          stmt.consequent.type === 'BlockStatement'
+            ? stmt.consequent.body
+            : [stmt.consequent]
+
+        return block.some(
+          (s) =>
+            s.type === 'ReturnStatement' &&
+            s.argument &&
+            (s.argument.type === 'JSXElement' ||
+              s.argument.type === 'JSXFragment'),
+        )
+      })
+    }
+
+    function checkImplicitElseReturn(node) {
+      // Check if this return is at the function body level (not inside if/switch)
+      if (!node.argument) return
+
+      const returnValue = node.argument
+      if (
+        returnValue.type !== 'JSXElement' &&
+        returnValue.type !== 'JSXFragment'
+      )
+        return
+
+      // Must be a direct child of a block statement
+      const block = node.parent
+      if (!block || block.type !== 'BlockStatement') return
+
+      // Block must belong to a function
+      const fn = block.parent
+      if (
+        !fn ||
+        (fn.type !== 'FunctionDeclaration' &&
+          fn.type !== 'FunctionExpression' &&
+          fn.type !== 'ArrowFunctionExpression')
+      )
+        return
+
+      // Check if any preceding sibling is an if-statement with an early JSX return
+      const statements = block.body
+      const returnIndex = statements.indexOf(node)
+      if (returnIndex < 1) return
+
+      const precedingStatements = statements.slice(0, returnIndex)
+      if (!hasEarlyJSXReturn(precedingStatements)) return
+
+      const suggestedName = generateSuggestedName(returnValue, fn)
+
+      context.report({
+        node: returnValue,
+        messageId: 'extractComponent',
+        data: { suggestedName },
+      })
+    }
+
     return {
       ReturnStatement(node) {
         checkConditionalReturn(node)
+        checkImplicitElseReturn(node)
       },
       ConditionalExpression(node) {
         checkTernaryExpression(node)
