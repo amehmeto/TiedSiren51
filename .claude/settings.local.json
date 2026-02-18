@@ -147,6 +147,7 @@
       "Bash(npx expo config:*)",
       "Bash(npx expo prebuild --platform android --clean)",
       "Bash(npx expo run:android:*)",
+      "Bash(npx expo-doctor:*)",
       "Bash(npx expo-module:*)",
       "Bash(npx expo-modules-autolinking:*)",
       "Bash(npx lint-staged:*)",

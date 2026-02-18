@@ -80,7 +80,7 @@ export default {
           },
         },
       ],
-      './plugins/withTimePickerDarkTheme',
+      './plugins/withTimePickerDarkTheme.cjs',
       'expo-apple-authentication',
       'expo-router',
     ],
