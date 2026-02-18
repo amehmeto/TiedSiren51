@@ -13,10 +13,7 @@ export function SelectBlockingCondition({
   form,
 }: SelectBlockingConditionProps) {
   const selectBlockingCondition = (selectedCondition: string) => {
-    form.setFieldValue('blockingConditions', [
-      ...form.values.blockingConditions,
-      selectedCondition,
-    ])
+    form.setFieldValue('blockingConditions', [selectedCondition])
     form.setFieldTouched('blockingCondition', true)
     setIsBlockingConditionModalVisible(false)
   }
