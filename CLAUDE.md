@@ -101,6 +101,13 @@ Three Husky hooks run automatically during the commit-push cycle:
 
 **Efficiency:** All tests and lint rules run in CI regardless. Use linter and unit tests **surgically** on modified files only to validate changes quickly — avoid running the full suite locally. After pushing, always wait for the CI result before considering the task complete.
 
+## Code Review
+
+When reviewing a PR (`/review`), always include a verdict using one of these emojis:
+- ✅ **Approve** — good to merge as-is
+- ⚠️ **Approve with suggestions** — mergeable but has non-blocking improvements
+- ❌ **Request changes** — must fix before merging
+
 ## Anti-patterns
 
 **NEVER import from `infra/` in `core/`.** Core defines ports; Infra implements them. Dependency inversion is mandatory.
