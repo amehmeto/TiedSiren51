@@ -25,10 +25,9 @@ export default function ResetPasswordConfirmScreen() {
     router.replace('/(auth)/forgot-password')
   }
 
-  if (viewModel.type === ResetPasswordConfirmViewState.Success)
-    return <ResetPasswordConfirmSuccessView onBackToLogin={handleBackToLogin} />
-
-  return (
+  return viewModel.type === ResetPasswordConfirmViewState.Success ? (
+    <ResetPasswordConfirmSuccessView onBackToLogin={handleBackToLogin} />
+  ) : (
     <ResetPasswordConfirmForm
       onBackToLogin={handleBackToLogin}
       onRequestNewLink={handleRequestNewLink}
