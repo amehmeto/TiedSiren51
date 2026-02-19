@@ -19,6 +19,7 @@
       "Bash(.claude/hooks/*.sh:*)",
       "Bash(.claude/hooks/validate-edit.sh scripts/ci-watch.sh)",
       "Bash(.claude/scripts/*.sh:*)",
+      "Bash(.claude/scripts/detect-pr.sh:*)",
       "Bash(/opt/homebrew/bin/shellcheck --version)",
       "Bash(/usr/local/bin/shellcheck:*)",
       "Bash(OWNER=$(gh repo view --json owner -q '.owner.login') && gh project item-list:*)",

@@ -1,19 +1,25 @@
 import * as React from 'react'
 import { Pressable, StyleSheet, Text } from 'react-native'
-import { SceneRendererProps, TabBar } from 'react-native-tab-view'
+import { Route, TabBar, TabBarProps } from 'react-native-tab-view'
 import { T } from '@/ui/design-system/theme'
 
-export function ChooseBlockTabBar({ ...props }: SceneRendererProps) {
+export function ChooseBlockTabBar({
+  navigationState: _navigationState,
+  ...rest
+}: TabBarProps<Route>) {
+  const filteredRoutes = _navigationState.routes.filter(
+    (route) => route.key !== 'apps',
+  )
+
+  if (filteredRoutes.length === 0) return null
+
   return (
     <TabBar
+      {...rest}
       navigationState={{
         index: 0,
-        routes: [
-          { key: 'websites', title: 'Websites' },
-          { key: 'keywords', title: 'Keywords' },
-        ],
+        routes: filteredRoutes,
       }}
-      {...props}
       indicatorStyle={styles.indicator}
       renderLabel={({ route, focused: isFocused, color }) => (
         <Pressable
