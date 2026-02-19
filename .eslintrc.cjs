@@ -201,7 +201,7 @@ module.exports = {
     // Disallow .unwrap() — rely on Redux state for thunk success/error
     'local-rules/no-unwrap': 'error',
     // Disallow overly generic variable and function names
-    'local-rules/no-lame-naming': 'warn',
+    'local-rules/no-lame-naming': 'error',
     // Prefer enum over string literal unions
     'local-rules/prefer-enum-over-string-union': [
       'error',

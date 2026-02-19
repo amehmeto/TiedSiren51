@@ -19,9 +19,9 @@ describe('selectBlockingSchedule', () => {
   test('should return empty array when no sessions exist', () => {
     const state = stateBuilder().build()
 
-    const result = selectBlockingSchedule(dateProvider, state)
+    const schedule = selectBlockingSchedule(dateProvider, state)
 
-    expect(result).toHaveLength(0)
+    expect(schedule).toHaveLength(0)
   })
 
   test('should return all sessions as blocking schedule', () => {
@@ -47,10 +47,10 @@ describe('selectBlockingSchedule', () => {
       .withBlocklists([blocklist])
       .build()
 
-    const result = selectBlockingSchedule(dateProvider, state)
-    const scheduleIds = result.map((s) => s.id)
+    const schedule = selectBlockingSchedule(dateProvider, state)
+    const scheduleIds = schedule.map((s) => s.id)
 
-    expect(result).toHaveLength(2)
+    expect(schedule).toHaveLength(2)
     expect(scheduleIds).toContain('active-session')
     expect(scheduleIds).toContain('future-session')
   })
