@@ -209,6 +209,8 @@ module.exports = {
       'error',
       { ignoredPatterns: ['-outline$', '^logo-', '^add-', '^remove-'] },
     ],
+    // Extract large JSX elements with few dynamic props into reusable components
+    'local-rules/prefer-extracted-component': 'warn',
   },
   overrides: [
     {

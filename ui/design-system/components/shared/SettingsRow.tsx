@@ -1,6 +1,7 @@
 import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
+import { OpacityPressable } from '@/ui/design-system/components/shared/OpacityPressable'
 import { T } from '@/ui/design-system/theme'
 
 type SettingsRowOwnProps = {
@@ -54,16 +55,9 @@ export function SettingsRow({
   )
 
   return onPress ? (
-    <Pressable
-      onPress={onPress}
-      style={({ pressed: isPressed }) => ({
-        opacity: isPressed ? T.opacity.pressed : T.opacity.full,
-      })}
-      accessibilityRole="button"
-      accessibilityLabel={accessibilityLabel}
-    >
+    <OpacityPressable onPress={onPress} accessibilityLabel={accessibilityLabel}>
       {content}
-    </Pressable>
+    </OpacityPressable>
   ) : (
     <View accessibilityLabel={accessibilityLabel}>{content}</View>
   )
