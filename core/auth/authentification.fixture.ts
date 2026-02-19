@@ -10,6 +10,7 @@ import {
 import { AuthError } from '@/core/auth/auth-error'
 import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
+import { applyEmailVerificationCode } from '@/core/auth/usecases/apply-email-verification-code.usecase'
 import { changePassword } from '@/core/auth/usecases/change-password.usecase'
 import { confirmPasswordReset } from '@/core/auth/usecases/confirm-password-reset.usecase'
 import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
@@ -112,6 +113,10 @@ export function authentificationFixture(
         const error = new Error(errorMessage)
         authGateway.willSendVerificationEmailWith = Promise.reject(error)
       },
+      applyEmailVerificationCodeWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willApplyEmailVerificationCodeWith = Promise.reject(error)
+      },
       refreshEmailVerificationWillReturn(isVerified: boolean) {
         authGateway.willRefreshEmailVerificationWith =
           Promise.resolve(isVerified)
@@ -165,6 +170,9 @@ export function authentificationFixture(
       },
       sendVerificationEmail() {
         return store.dispatch(sendVerificationEmail())
+      },
+      applyEmailVerificationCode(oobCode: string) {
+        return store.dispatch(applyEmailVerificationCode(oobCode))
       },
       refreshEmailVerificationStatus() {
         return store.dispatch(refreshEmailVerificationStatus())

@@ -13,6 +13,7 @@ import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
 import { AuthErrorType, isAuthErrorType } from './auth-error-type'
+import { applyEmailVerificationCode } from './usecases/apply-email-verification-code.usecase'
 import { changePassword } from './usecases/change-password.usecase'
 import { confirmPasswordReset } from './usecases/confirm-password-reset.usecase'
 import { reauthenticateWithGoogle } from './usecases/reauthenticate-with-google.usecase'
@@ -226,6 +227,10 @@ export const reducer = createReducer<AuthState>(
         state.errorType = isAuthErrorType(action.error.code)
           ? action.error.code
           : null
+      })
+
+      .addCase(applyEmailVerificationCode.fulfilled, (state) => {
+        if (state.authUser) state.authUser.isEmailVerified = true
       })
 
       .addCase(reauthenticate.pending, (state) => {

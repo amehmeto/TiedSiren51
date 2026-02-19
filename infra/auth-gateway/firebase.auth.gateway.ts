@@ -8,6 +8,7 @@ import {
   initializeApp,
 } from 'firebase/app'
 import {
+  applyActionCode,
   Auth,
   confirmPasswordReset as firebaseConfirmPasswordReset,
   createUserWithEmailAndPassword,
@@ -345,6 +346,36 @@ export class FirebaseAuthGateway implements AuthGateway {
       )
       throw this.toAuthError(error)
     }
+  }
+
+  async applyEmailVerificationCode(oobCode: string): Promise<void> {
+    try {
+      await applyActionCode(this.auth, oobCode)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to applyEmailVerificationCode: ${error}`,
+      )
+      throw this.toEmailVerificationError(error)
+    }
+  }
+
+  private toEmailVerificationError(error: unknown): AuthError {
+    if (this.isFirebaseAuthError(error)) {
+      const verificationMessages: Partial<
+        Record<FirebaseAuthErrorCode, string>
+      > = {
+        [FirebaseAuthErrorCode.ExpiredActionCode]:
+          'Verification link has expired. Please request a new one.',
+        [FirebaseAuthErrorCode.InvalidActionCode]: 'Invalid verification link.',
+        [FirebaseAuthErrorCode.NetworkRequestFailed]:
+          'Could not verify email. Please check your connection.',
+      }
+      const message =
+        verificationMessages[error.code] ?? FIREBASE_ERRORS[error.code]
+      return new AuthError(message, FIREBASE_ERROR_TYPES[error.code])
+    }
+
+    return this.toAuthError(error)
   }
 
   async refreshEmailVerificationStatus(): Promise<boolean> {

@@ -87,7 +87,7 @@ describe('selectEmailVerificationBannerViewModel', () => {
       isVerificationEmailSent: false,
       isRefreshingEmailVerification: false,
       resendButtonText: 'Resend verification email',
-      refreshButtonText: "I've verified my email",
+      refreshButtonText: 'Check verification status',
     }
 
     const viewModel = selectEmailVerificationBannerViewModel(state)
@@ -111,7 +111,7 @@ describe('selectEmailVerificationBannerViewModel', () => {
       isVerificationEmailSent: false,
       isRefreshingEmailVerification: false,
       resendButtonText: 'Sending...',
-      refreshButtonText: "I've verified my email",
+      refreshButtonText: 'Check verification status',
     }
 
     const viewModel = selectEmailVerificationBannerViewModel(state)
@@ -135,7 +135,7 @@ describe('selectEmailVerificationBannerViewModel', () => {
       isVerificationEmailSent: true,
       isRefreshingEmailVerification: false,
       resendButtonText: 'Resend verification email',
-      refreshButtonText: "I've verified my email",
+      refreshButtonText: 'Check verification status',
     }
 
     const viewModel = selectEmailVerificationBannerViewModel(state)
@@ -159,7 +159,7 @@ describe('selectEmailVerificationBannerViewModel', () => {
       isVerificationEmailSent: false,
       isRefreshingEmailVerification: true,
       resendButtonText: 'Resend verification email',
-      refreshButtonText: "I've verified my email",
+      refreshButtonText: 'Check verification status',
     }
 
     const viewModel = selectEmailVerificationBannerViewModel(state)

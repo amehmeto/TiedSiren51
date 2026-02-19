@@ -20,6 +20,8 @@ export class FakeAuthGateway implements AuthGateway {
 
   willSendVerificationEmailWith: Promise<void> = Promise.resolve()
 
+  willApplyEmailVerificationCodeWith: Promise<void> = Promise.resolve()
+
   willRefreshEmailVerificationWith: Promise<boolean> = Promise.resolve(false)
 
   verificationEmailSentCount = 0
@@ -78,6 +80,10 @@ export class FakeAuthGateway implements AuthGateway {
   async sendVerificationEmail(): Promise<void> {
     await this.willSendVerificationEmailWith
     this.verificationEmailSentCount++
+  }
+
+  async applyEmailVerificationCode(_oobCode: string): Promise<void> {
+    await this.willApplyEmailVerificationCodeWith
   }
 
   refreshEmailVerificationStatus(): Promise<boolean> {

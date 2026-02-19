@@ -84,6 +84,10 @@ export class FakeStorageAuthGateway implements AuthGateway {
     return this.fakeAuthGateway.sendVerificationEmail()
   }
 
+  async applyEmailVerificationCode(oobCode: string): Promise<void> {
+    return this.fakeAuthGateway.applyEmailVerificationCode(oobCode)
+  }
+
   async refreshEmailVerificationStatus(): Promise<boolean> {
     return this.fakeAuthGateway.refreshEmailVerificationStatus()
   }

@@ -49,6 +49,6 @@ export function selectEmailVerificationBannerViewModel(
     resendButtonText: isSendingVerificationEmail
       ? 'Sending...'
       : 'Resend verification email',
-    refreshButtonText: "I've verified my email",
+    refreshButtonText: 'Check verification status',
   }
 }

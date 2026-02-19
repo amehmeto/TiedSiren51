@@ -31,8 +31,8 @@ export function EmailVerificationBanner() {
         />
         <Text style={styles.title}>Verify your email</Text>
         <Text style={styles.description}>
-          Please check your inbox and verify your email address to secure your
-          account.
+          Please check your inbox and tap the verification link. Your email will
+          be verified automatically.
         </Text>
         {viewModel.isVerificationEmailSent && (
           <Text style={styles.sentConfirmation}>
