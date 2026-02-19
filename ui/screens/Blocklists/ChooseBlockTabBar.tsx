@@ -1,14 +1,20 @@
 import * as React from 'react'
 import { Pressable, StyleSheet, Text } from 'react-native'
 import { Route, TabBar, TabBarProps } from 'react-native-tab-view'
+import { FeatureFlags } from '@/feature-flags'
 import { T } from '@/ui/design-system/theme'
+
+const featureFlagByRouteKey: Record<string, boolean> = {
+  websites: FeatureFlags.WEBSITE_BLOCKING,
+  keywords: FeatureFlags.KEYWORD_BLOCKING,
+}
 
 export function ChooseBlockTabBar({
   navigationState: _navigationState,
   ...rest
 }: TabBarProps<Route>) {
   const filteredRoutes = _navigationState.routes.filter(
-    (route) => route.key !== 'apps',
+    (route) => featureFlagByRouteKey[route.key] === true,
   )
 
   if (filteredRoutes.length === 0) return null
