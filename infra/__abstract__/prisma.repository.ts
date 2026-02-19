@@ -212,9 +212,9 @@ export abstract class PrismaRepository {
   }
 
   private async addUserIdColumnIfMissing(tableName: string): Promise<void> {
-    const tableInfo = await this.baseClient.$queryRaw<ColumnInfo[]>`
-      PRAGMA table_info(${tableName});
-    `
+    const tableInfo = await this.baseClient.$queryRawUnsafe<ColumnInfo[]>(
+      `PRAGMA table_info("${tableName}");`,
+    )
 
     const hasUserIdColumn = tableInfo.some((col) => col.name === 'userId')
 
