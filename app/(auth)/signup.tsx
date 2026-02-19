@@ -104,7 +104,7 @@ export default function SignUpScreen() {
           placeholder="Create Password"
           accessibilityLabel="Password"
           placeholderTextColor={T.color.grey}
-          hasPasswordToggle={true}
+          hasPasswordToggle
           value={viewModel.password}
           onChangeText={(text) => {
             dispatch(setPassword(text))

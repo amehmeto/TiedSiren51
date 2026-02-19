@@ -22,7 +22,7 @@ export function TiedSModal({
     <Modal
       style={styles.modalView}
       animationType="slide"
-      transparent={true}
+      transparent
       visible={isVisible}
       onRequestClose={onRequestClose}
     >

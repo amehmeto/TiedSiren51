@@ -137,6 +137,7 @@ export const T = {
   },
   opacity: {
     invisible: 0,
+    divider: 0.2,
     pressed: 0.5,
     disabled: 0.6,
     semiTransparent: 0.9,
@@ -173,6 +174,9 @@ export const T = {
       minBottom: 40,
       additional: 20,
     },
+  },
+  height: {
+    settingsRow: 44,
   },
   // Legacy icon size constants (kept for backward compatibility)
   sirenIconSize: 20,

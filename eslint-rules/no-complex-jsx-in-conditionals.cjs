@@ -263,9 +263,110 @@ module.exports = {
       })
     }
 
+    function collectJSXReturnsFromIf(ifStmt, nodes) {
+      const branches = [ifStmt.consequent]
+      if (ifStmt.alternate) branches.push(ifStmt.alternate)
+
+      for (const branch of branches) {
+        if (branch.type === 'IfStatement') {
+          collectJSXReturnsFromIf(branch, nodes)
+          continue
+        }
+
+        const block =
+          branch.type === 'BlockStatement' ? branch.body : [branch]
+
+        for (const s of block) {
+          if (
+            s.type === 'ReturnStatement' &&
+            s.argument &&
+            (s.argument.type === 'JSXElement' ||
+              s.argument.type === 'JSXFragment')
+          )
+            nodes.push(s.argument)
+        }
+      }
+    }
+
+    function getEarlyJSXReturnNodes(statements) {
+      const nodes = []
+      for (const stmt of statements) {
+        if (stmt.type !== 'IfStatement') continue
+        collectJSXReturnsFromIf(stmt, nodes)
+      }
+      return nodes
+    }
+
+    function isComponentFunction(fn) {
+      if (fn.id && /^[A-Z]/.test(fn.id.name)) return true
+
+      if (
+        fn.parent?.type === 'VariableDeclarator' &&
+        fn.parent.id?.type === 'Identifier' &&
+        /^[A-Z]/.test(fn.parent.id.name)
+      )
+        return true
+
+      if (fn.parent?.type === 'ExportDefaultDeclaration') return true
+
+      return false
+    }
+
+    function checkImplicitElseReturn(node) {
+      if (!node.argument) return
+
+      const returnValue = node.argument
+      if (
+        returnValue.type !== 'JSXElement' &&
+        returnValue.type !== 'JSXFragment'
+      )
+        return
+
+      const block = node.parent
+      if (!block || block.type !== 'BlockStatement') return
+
+      const fn = block.parent
+      if (
+        !fn ||
+        (fn.type !== 'FunctionDeclaration' &&
+          fn.type !== 'FunctionExpression' &&
+          fn.type !== 'ArrowFunctionExpression')
+      )
+        return
+
+      // Only flag in component functions (PascalCase), not renderItem callbacks
+      if (!isComponentFunction(fn)) return
+
+      const statements = block.body
+      const returnIndex = statements.indexOf(node)
+      if (returnIndex < 1) return
+
+      const precedingStatements = statements.slice(0, returnIndex)
+      const earlyReturnNodes = getEarlyJSXReturnNodes(precedingStatements)
+      if (earlyReturnNodes.length === 0) return
+
+      // Only flag when neither branch is complex, so converting to a ternary
+      // is a clean fix. Complex branches (loading guards, state machines)
+      // would just shift the violation to checkTernaryExpression.
+      const isDefaultComplex = isComplexJSXOrFragment(returnValue)
+      const hasComplexEarly = earlyReturnNodes.some((n) =>
+        isComplexJSXOrFragment(n),
+      )
+      if (isDefaultComplex || hasComplexEarly) return
+
+      const suggestedName = generateSuggestedName(returnValue, fn)
+
+      context.report({
+        node: returnValue,
+        messageId: 'extractComponent',
+        data: { suggestedName },
+      })
+    }
+
     return {
       ReturnStatement(node) {
         checkConditionalReturn(node)
+        checkImplicitElseReturn(node)
       },
       ConditionalExpression(node) {
         checkTernaryExpression(node)
