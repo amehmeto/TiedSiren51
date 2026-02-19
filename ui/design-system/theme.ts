@@ -180,6 +180,9 @@ export const T = {
     settingsRow: 44,
     pickerItem: 48,
   },
+  picker: {
+    visibleItemCount: 5,
+  },
   // Legacy icon size constants (kept for backward compatibility)
   sirenIconSize: 20,
   largeIconSize: 32,

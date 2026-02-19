@@ -8,7 +8,13 @@
  * @author TiedSiren
  */
 
-const DEFAULT_FORBIDDEN_VARIABLES = ['data', 'extracted', 'item', 'items', 'result']
+const DEFAULT_FORBIDDEN_VARIABLES = [
+  'data',
+  'extracted',
+  'item',
+  'items',
+  'result',
+]
 const DEFAULT_FORBIDDEN_FUNCTION_PATTERNS = ['compute']
 
 module.exports = {
@@ -46,9 +52,9 @@ module.exports = {
 
   create(context) {
     const options = context.options[0] || {}
-    const forbiddenVariables = new Set(
-      options.forbiddenVariables ?? DEFAULT_FORBIDDEN_VARIABLES,
-    )
+    const forbiddenVariableNames =
+      options.forbiddenVariables ?? DEFAULT_FORBIDDEN_VARIABLES
+    const forbiddenVariables = new Set(forbiddenVariableNames)
     const forbiddenFunctionPatterns =
       options.forbiddenFunctionPatterns ?? DEFAULT_FORBIDDEN_FUNCTION_PATTERNS
 
@@ -56,42 +62,46 @@ module.exports = {
       return name.split(/(?=[A-Z])/).map((segment) => segment.toLowerCase())
     }
 
+    // Only checks names with ≤2 camelCase segments to avoid false positives
+    // on descriptive compound names (e.g., BlockingConditionItem, buildValidBlocklistFormData).
+    // Trade-off: 3+ segment names like handleFetchData won't be caught.
     function endsWithForbiddenWord(name) {
       const segments = splitCamelCase(name)
-      if (segments.length > 2) return false
-      const lastSegment = segments[segments.length - 1]
-      return forbiddenVariables.has(lastSegment)
+
+      return segments.length > 2
+        ? false
+        : forbiddenVariables.has(segments[segments.length - 1])
     }
 
     function isForbiddenFunctionName(name) {
-      if (
-        forbiddenFunctionPatterns.some((pattern) =>
-          name.toLowerCase().startsWith(pattern.toLowerCase()),
-        )
+      return forbiddenFunctionPatterns.some((pattern) =>
+        name.toLowerCase().startsWith(pattern.toLowerCase()),
       )
-        return true
-      return endsWithForbiddenWord(name)
+        ? true
+        : endsWithForbiddenWord(name)
     }
 
     return {
       VariableDeclarator(node) {
         if (node.id.type !== 'Identifier') return
-        if (forbiddenVariables.has(node.id.name))
+        if (forbiddenVariables.has(node.id.name)) {
           context.report({
             node: node.id,
             messageId: 'noLameVariableName',
             data: { name: node.id.name },
           })
+        }
       },
 
       // Check function declaration parameters
       'FunctionDeclaration > Identifier.params'(node) {
-        if (forbiddenVariables.has(node.name))
+        if (forbiddenVariables.has(node.name)) {
           context.report({
             node,
             messageId: 'noLameVariableName',
             data: { name: node.name },
           })
+        }
       },
 
       // Check arrow function parameters
@@ -109,33 +119,36 @@ module.exports = {
 
       FunctionDeclaration(node) {
         if (!node.id) return
-        if (isForbiddenFunctionName(node.id.name))
+        if (isForbiddenFunctionName(node.id.name)) {
           context.report({
             node: node.id,
             messageId: 'noLameFunctionName',
             data: { name: node.id.name },
           })
+        }
       },
 
       // Variable declarations with arrow functions: const computeX = () => {}
       'VariableDeclarator[init.type="ArrowFunctionExpression"]'(node) {
         if (node.id.type !== 'Identifier') return
-        if (isForbiddenFunctionName(node.id.name))
+        if (isForbiddenFunctionName(node.id.name)) {
           context.report({
             node: node.id,
             messageId: 'noLameFunctionName',
             data: { name: node.id.name },
           })
+        }
       },
 
       // Object property keys for method definitions: { computeStuff() {} }
       'Property[value.type="FunctionExpression"] > Identifier.key'(node) {
-        if (isForbiddenFunctionName(node.name))
+        if (isForbiddenFunctionName(node.name)) {
           context.report({
             node,
             messageId: 'noLameFunctionName',
             data: { name: node.name },
           })
+        }
       },
     }
   },
