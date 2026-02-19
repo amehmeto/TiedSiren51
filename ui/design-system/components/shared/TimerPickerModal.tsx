@@ -1,12 +1,12 @@
 import React, { useMemo } from 'react'
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { Text, StyleSheet, ScrollView } from 'react-native'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { formatEndFromOffsets } from '@/ui/utils/timeFormat'
+import { DurationWheelPicker } from './DurationWheelPicker'
 import { TiedSButton } from './TiedSButton'
 import { TiedSCloseButton } from './TiedSCloseButton'
 import { TiedSModal } from './TiedSModal'
-import { TimeStepper } from './TimeStepper'
 
 export type TimerDuration = {
   days: number
@@ -54,31 +54,10 @@ export const TimerPickerModal = ({
 
         <Text style={styles.title}>{title}</Text>
 
-        <View style={styles.pickerContainer}>
-          <TimeStepper
-            selectedValue={duration.days}
-            onValueChange={(days) => onDurationChange({ ...duration, days })}
-            max={30}
-            labelSingular="day"
-            labelPlural="days"
-          />
-          <TimeStepper
-            selectedValue={duration.hours}
-            onValueChange={(hours) => onDurationChange({ ...duration, hours })}
-            max={23}
-            labelSingular="hour"
-            labelPlural="hours"
-          />
-          <TimeStepper
-            selectedValue={duration.minutes}
-            onValueChange={(minutes) =>
-              onDurationChange({ ...duration, minutes })
-            }
-            max={59}
-            labelSingular="min"
-            labelPlural="min"
-          />
-        </View>
+        <DurationWheelPicker
+          duration={duration}
+          onDurationChange={onDurationChange}
+        />
 
         <Text style={styles.endTimeText}>{endDateTime}</Text>
 
@@ -105,17 +84,6 @@ const styles = StyleSheet.create({
     fontFamily: T.font.family.primary,
     textAlign: 'center',
     marginBottom: T.spacing.large,
-  },
-  pickerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-evenly',
-    alignItems: 'stretch',
-    marginVertical: T.spacing.medium,
-    backgroundColor: T.color.darkBlueGray,
-    borderRadius: T.border.radius.roundedMedium,
-    paddingHorizontal: T.spacing.small,
-    paddingVertical: T.spacing.medium,
-    gap: T.spacing.small,
   },
   endTimeText: {
     color: T.color.grey,
