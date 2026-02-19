@@ -77,6 +77,7 @@ Three Husky hooks run automatically during the commit-push cycle:
 
 **Pre-commit** (`git commit`):
 - Blocks commits to `main`/`demo` branches
+- Blocks commits on branches whose PR was already merged
 - Runs `tsc --noEmit` (full project type check)
 - Runs lint-staged: ESLint fix + Prettier fix on staged `.ts/.tsx/.js/.json` files, remark on `.md`, shell linter on `.sh`, Prisma validation on `schema.prisma`
 
