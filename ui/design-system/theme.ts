@@ -20,6 +20,7 @@ export const T = {
     modalContentColor: 'rgba(240, 244, 255, 1)',
     modalTitleColor: 'rgba(125, 138, 153, 1)',
     darkBlueGray: 'rgba(30, 41, 59, 1)',
+    lightBlueOverlay: 'rgba(0, 212, 255, 0.1)',
   },
   font: {
     size: {
