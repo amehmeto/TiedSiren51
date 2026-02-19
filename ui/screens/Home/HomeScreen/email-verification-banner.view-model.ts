@@ -12,11 +12,6 @@ type HiddenViewModel = {
 
 type VisibleViewModel = {
   type: EmailVerificationBannerViewState.Visible
-  isSendingVerificationEmail: boolean
-  isVerificationEmailSent: boolean
-  isRefreshingEmailVerification: boolean
-  resendButtonText: string
-  refreshButtonText: string
 }
 
 export type EmailVerificationBannerViewModel =
@@ -28,27 +23,9 @@ export function selectEmailVerificationBannerViewModel(
 ): EmailVerificationBannerViewModel {
   const { authUser } = state.auth
 
-  if (
-    !authUser ||
+  return !authUser ||
     authUser.isEmailVerified ||
     authUser.authProvider !== AuthProvider.Email
-  )
-    return { type: EmailVerificationBannerViewState.Hidden }
-
-  const {
-    isSendingVerificationEmail,
-    isVerificationEmailSent,
-    isRefreshingEmailVerification,
-  } = state.auth
-
-  return {
-    type: EmailVerificationBannerViewState.Visible,
-    isSendingVerificationEmail,
-    isVerificationEmailSent,
-    isRefreshingEmailVerification,
-    resendButtonText: isSendingVerificationEmail
-      ? 'Sending...'
-      : 'Resend verification email',
-    refreshButtonText: 'Check verification status',
-  }
+    ? { type: EmailVerificationBannerViewState.Hidden }
+    : { type: EmailVerificationBannerViewState.Visible }
 }

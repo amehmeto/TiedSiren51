@@ -1,4 +1,5 @@
 import * as Linking from 'expo-linking'
+import { useRouter } from 'expo-router'
 import { useEffect, useRef } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
@@ -14,6 +15,7 @@ function extractVerifyEmailOobCode(url: string): string | null {
 }
 
 export function useEmailVerificationDeepLink() {
+  const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const isAuthenticated = useSelector(selectIsUserAuthenticated)
   const isAuthenticatedRef = useRef(isAuthenticated)
@@ -40,6 +42,8 @@ export function useEmailVerificationDeepLink() {
           'Could not verify email. Please try again.'
         dispatch(showToast(message))
       }
+
+      router.replace('/home')
     }
 
     const subscription = Linking.addEventListener('url', handleUrl)
@@ -54,5 +58,5 @@ export function useEmailVerificationDeepLink() {
       isUnmountedRef.current = true
       subscription.remove()
     }
-  }, [dispatch])
+  }, [dispatch, router])
 }
