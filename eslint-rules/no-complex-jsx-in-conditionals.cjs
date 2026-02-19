@@ -263,27 +263,45 @@ module.exports = {
       })
     }
 
-    function hasEarlyJSXReturn(statements) {
-      return statements.some((stmt) => {
-        if (stmt.type !== 'IfStatement') return false
+    function getEarlyJSXReturnNodes(statements) {
+      const nodes = []
+      for (const stmt of statements) {
+        if (stmt.type !== 'IfStatement') continue
 
         const block =
           stmt.consequent.type === 'BlockStatement'
             ? stmt.consequent.body
             : [stmt.consequent]
 
-        return block.some(
-          (s) =>
+        for (const s of block) {
+          if (
             s.type === 'ReturnStatement' &&
             s.argument &&
             (s.argument.type === 'JSXElement' ||
-              s.argument.type === 'JSXFragment'),
-        )
-      })
+              s.argument.type === 'JSXFragment')
+          )
+            nodes.push(s.argument)
+        }
+      }
+      return nodes
+    }
+
+    function isComponentFunction(fn) {
+      if (fn.id && /^[A-Z]/.test(fn.id.name)) return true
+
+      if (
+        fn.parent?.type === 'VariableDeclarator' &&
+        fn.parent.id?.type === 'Identifier' &&
+        /^[A-Z]/.test(fn.parent.id.name)
+      )
+        return true
+
+      if (fn.parent?.type === 'ExportDefaultDeclaration') return true
+
+      return false
     }
 
     function checkImplicitElseReturn(node) {
-      // Check if this return is at the function body level (not inside if/switch)
       if (!node.argument) return
 
       const returnValue = node.argument
@@ -293,11 +311,9 @@ module.exports = {
       )
         return
 
-      // Must be a direct child of a block statement
       const block = node.parent
       if (!block || block.type !== 'BlockStatement') return
 
-      // Block must belong to a function
       const fn = block.parent
       if (
         !fn ||
@@ -307,13 +323,25 @@ module.exports = {
       )
         return
 
-      // Check if any preceding sibling is an if-statement with an early JSX return
+      // Only flag in component functions (PascalCase), not renderItem callbacks
+      if (!isComponentFunction(fn)) return
+
       const statements = block.body
       const returnIndex = statements.indexOf(node)
       if (returnIndex < 1) return
 
       const precedingStatements = statements.slice(0, returnIndex)
-      if (!hasEarlyJSXReturn(precedingStatements)) return
+      const earlyReturnNodes = getEarlyJSXReturnNodes(precedingStatements)
+      if (earlyReturnNodes.length === 0) return
+
+      // Only flag when neither branch is complex, so converting to a ternary
+      // is a clean fix. Complex branches (loading guards, state machines)
+      // would just shift the violation to checkTernaryExpression.
+      const isDefaultComplex = isComplexJSXOrFragment(returnValue)
+      const hasComplexEarly = earlyReturnNodes.some((n) =>
+        isComplexJSXOrFragment(n),
+      )
+      if (isDefaultComplex || hasComplexEarly) return
 
       const suggestedName = generateSuggestedName(returnValue, fn)
 
