@@ -25,7 +25,6 @@ export function timerFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ): TimerFixture {
   let store: AppStore
-  let isUnauthenticated = false
   const timerRepository = new FakeDataTimerRepository()
   const dateProvider = new StubDateProvider()
   dateProvider.now = new Date(DEFAULT_TEST_DATE)
@@ -35,12 +34,13 @@ export function timerFixture(
     isEmailVerified: true,
   }
 
-  const buildStore = () =>
-    createTestStore(
-      { timerRepository, dateProvider },
-      testStateBuilderProvider.getState(),
-      { isAuthDefaultSkipped: isUnauthenticated },
-    )
+  const buildStore = () => {
+    const preloadedState = testStateBuilderProvider.getState()
+    const isAuthDefaultSkipped = preloadedState.auth.authUser === null
+    return createTestStore({ timerRepository, dateProvider }, preloadedState, {
+      isAuthDefaultSkipped,
+    })
+  }
 
   return {
     given: {
@@ -61,7 +61,6 @@ export function timerFixture(
         )
       },
       unauthenticatedUser() {
-        isUnauthenticated = true
         testStateBuilderProvider.setState((builder) =>
           builder.withoutAuthUser({}),
         )

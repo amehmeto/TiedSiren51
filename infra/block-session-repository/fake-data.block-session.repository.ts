@@ -9,10 +9,10 @@ import {
   BlockingConditions,
   BlockSession,
 } from '@/core/block-session/block-session'
-import { InMemoryRepository } from '@/infra/__abstract__/in-memory.repository'
+import { UserScopedInMemoryRepository } from '@/infra/__abstract__/user-scoped-in-memory.repository'
 
 export class FakeDataBlockSessionRepository
-  extends InMemoryRepository<BlockSession>
+  extends UserScopedInMemoryRepository<BlockSession>
   implements BlockSessionRepository
 {
   private static readonly startedAt: HHmmString = '10:48'

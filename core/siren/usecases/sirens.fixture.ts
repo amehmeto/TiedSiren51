@@ -2,7 +2,7 @@ import { expect } from 'vitest'
 import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
 import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
 import { AppStore } from '../../_redux_/createStore'
-import { createTestStore } from '../../_tests_/createTestStore'
+import { createTestStore, defaultTestUser } from '../../_tests_/createTestStore'
 import { Fixture } from '../../_tests_/fixture.type'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
 import { InstalledApp } from '../../installed-app/installed-app'
@@ -76,13 +76,15 @@ export function sirensFixture(
     },
     then: {
       keywordShouldBeSaved: async (expectedKeyword: string) => {
-        const retrievedKeywords =
-          await sirensRepository.getSelectableSirens('test-user-id')
+        const retrievedKeywords = await sirensRepository.getSelectableSirens(
+          defaultTestUser.id,
+        )
         expect(retrievedKeywords.keywords).toContain(expectedKeyword)
       },
       websiteShouldBeSaved: async (expectedWebsite: string) => {
-        const retrievedKeywords =
-          await sirensRepository.getSelectableSirens('test-user-id')
+        const retrievedKeywords = await sirensRepository.getSelectableSirens(
+          defaultTestUser.id,
+        )
         expect(retrievedKeywords.websites).toContain(expectedWebsite)
       },
       availableSirensShouldBeStoredAs: (expectedSirens: Sirens) => {

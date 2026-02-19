@@ -211,6 +211,8 @@ export abstract class PrismaRepository {
     }
   }
 
+  // Uses $queryRawUnsafe because SQLite PRAGMAs don't support bound parameters.
+  // Safe: tableName is always a hardcoded internal string ('Siren', 'Blocklist', 'BlockSession').
   private async addUserIdColumnIfMissing(tableName: string): Promise<void> {
     const tableInfo = await this.baseClient.$queryRawUnsafe<ColumnInfo[]>(
       `PRAGMA table_info("${tableName}");`,
@@ -231,6 +233,9 @@ export abstract class PrismaRepository {
 
   private claimedUserTables = new Set<string>()
 
+  // Idempotent: UPDATE WHERE userId = '' is a no-op if rows were already claimed.
+  // Safe under concurrent calls — each repo instance has its own claimedUserTables
+  // Set, and the SQL itself is harmless to run multiple times.
   protected async claimOrphanedRows(
     userId: string,
     tableName: string,
