@@ -124,9 +124,9 @@ module.exports = {
     'local-rules/require-named-regex': 'error',
     // Disabled globally - too many valid patterns. Enable per-file as needed.
     // See: docs/adr/conventions/no-nested-call-expressions.md
-    'local-rules/no-consecutive-duplicate-returns': 'warn',
+    'local-rules/no-consecutive-duplicate-returns': 'error',
     'local-rules/no-nested-call-expressions': 'off',
-    'local-rules/no-redundant-nullish-ternary': 'warn',
+    'local-rules/no-redundant-nullish-ternary': 'error',
     'local-rules/prefer-array-destructuring': 'error',
     'local-rules/prefer-object-destructuring': [
       'warn',
@@ -203,7 +203,7 @@ module.exports = {
     // Disallow .unwrap() — rely on Redux state for thunk success/error
     'local-rules/no-unwrap': 'error',
     // Disallow overly generic variable and function names
-    'local-rules/no-lame-naming': 'warn',
+    'local-rules/no-lame-naming': 'error',
     // Prefer enum over string literal unions
     'local-rules/prefer-enum-over-string-union': [
       'error',
@@ -300,7 +300,7 @@ module.exports = {
         // Test structure rules
         'local-rules/no-new-in-test-body': 'error',
         'local-rules/use-data-builders': 'error',
-        'local-rules/no-generic-result-variable': 'warn',
+        'local-rules/no-generic-result-variable': 'error',
         // Require type parameter on it.each / test.each / describe.each
         'local-rules/require-typed-each': 'error',
       },
