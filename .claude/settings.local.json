@@ -171,6 +171,7 @@
       "Bash(rm .claude/ralph-loop.local.md)",
       "Bash(rm:*)",
       "Bash(sed:*)",
+      "Bash(sh:*)",
       "Bash(shellcheck:*)",
       "Bash(sort:*)",
       "Bash(tail:*)",
