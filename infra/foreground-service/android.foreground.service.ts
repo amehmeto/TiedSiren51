@@ -76,8 +76,8 @@ export class AndroidForegroundService implements ForegroundService {
   }
 
   private async requestNotificationPermission(): Promise<void> {
-    const result = await ExpoForegroundService.requestPermissions()
-    if (!result.granted) {
+    const permissionStatus = await ExpoForegroundService.requestPermissions()
+    if (!permissionStatus.granted) {
       this.logger.warn(
         '[AndroidForegroundService] Notification permission denied, service may not show notification',
       )

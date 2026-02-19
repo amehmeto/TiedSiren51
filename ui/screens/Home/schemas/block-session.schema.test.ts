@@ -18,19 +18,19 @@ const validBlockSession = {
 }
 
 const expectValidationSuccess = (
-  result: ReturnType<typeof blockSessionSchema.safeParse>,
+  validation: ReturnType<typeof blockSessionSchema.safeParse>,
 ) => {
-  expect(result.success).toBe(true)
+  expect(validation.success).toBe(true)
 }
 
 const expectValidationFailure = (
-  result: ReturnType<typeof blockSessionSchema.safeParse>,
+  validation: ReturnType<typeof blockSessionSchema.safeParse>,
   expectedPath: string,
   expectedMessage: string,
 ) => {
-  expect(result.success).toBe(false)
-  if (!result.success) {
-    const error = result.error.issues.find(
+  expect(validation.success).toBe(false)
+  if (!validation.success) {
+    const error = validation.error.issues.find(
       (issue) => issue.path[0] === expectedPath,
     )
     expect(error).toBeDefined()
@@ -41,8 +41,8 @@ const expectValidationFailure = (
 describe('blockSessionSchema', () => {
   describe('Basic field validation', () => {
     it('should pass with valid data', () => {
-      const result = blockSessionSchema.safeParse(validBlockSession)
-      expectValidationSuccess(result)
+      const validation = blockSessionSchema.safeParse(validBlockSession)
+      expectValidationSuccess(validation)
     })
 
     it.each<ValidationCase>([
@@ -59,35 +59,35 @@ describe('blockSessionSchema', () => {
     ])(
       'should fail when $field is invalid',
       ({ field, value, expectedMessage }) => {
-        const result = blockSessionSchema.safeParse({
+        const validation = blockSessionSchema.safeParse({
           ...validBlockSession,
           [field]: value,
         })
-        expectValidationFailure(result, field, expectedMessage)
+        expectValidationFailure(validation, field, expectedMessage)
       },
     )
   })
 
   describe('Blocklists and devices validation', () => {
     it('should fail when blocklistIds is empty', () => {
-      const result = blockSessionSchema.safeParse({
+      const validation = blockSessionSchema.safeParse({
         ...validBlockSession,
         blocklistIds: [],
       })
       expectValidationFailure(
-        result,
+        validation,
         'blocklistIds',
         'At least one blocklist must be selected',
       )
     })
 
     it('should fail when devices is empty', () => {
-      const result = blockSessionSchema.safeParse({
+      const validation = blockSessionSchema.safeParse({
         ...validBlockSession,
         devices: [],
       })
       expectValidationFailure(
-        result,
+        validation,
         'devices',
         'At least one device must be selected',
       )
@@ -119,23 +119,23 @@ describe('blockSessionSchema', () => {
     ])(
       'should fail when $field is invalid',
       ({ field, value, expectedMessage }) => {
-        const result = blockSessionSchema.safeParse({
+        const validation = blockSessionSchema.safeParse({
           ...validBlockSession,
           [field]: value,
         })
-        expectValidationFailure(result, field, expectedMessage)
+        expectValidationFailure(validation, field, expectedMessage)
       },
     )
   })
 
   describe('Blocking conditions validation', () => {
     it('should fail when blockingConditions is empty', () => {
-      const result = blockSessionSchema.safeParse({
+      const validation = blockSessionSchema.safeParse({
         ...validBlockSession,
         blockingConditions: [],
       })
       expectValidationFailure(
-        result,
+        validation,
         'blockingConditions',
         'A blocking condition must be selected',
       )

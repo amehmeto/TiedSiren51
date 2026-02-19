@@ -46,7 +46,7 @@ export function BlockSessionForm({ mode, ...rest }: BlockSessionFormProps) {
   const router = useRouter()
   const sessionId = 'sessionId' in rest ? rest.sessionId : undefined
   const blockSession = useSelector((state: RootState) =>
-    sessionId ? selectBlockSessionById(state, sessionId) : undefined,
+    selectBlockSessionById(state, sessionId),
   )
   const initialValues = blockSession ?? defaultFormValues
 

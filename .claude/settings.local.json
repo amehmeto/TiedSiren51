@@ -81,6 +81,7 @@
       "Bash(gh project list:*)",
       "Bash(gh release list:*)",
       "Bash(gh release view:*)",
+      "Bash(gh repo fork:*)",
       "Bash(gh repo list:*)",
       "Bash(gh repo view:*)",
       "Bash(gh run list:*)",

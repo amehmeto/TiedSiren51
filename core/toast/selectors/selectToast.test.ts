@@ -9,8 +9,8 @@ describe('selectToast', () => {
     store.dispatch(showToast('Test message'))
     const expectedToast = { message: 'Test message' }
 
-    const result = selectToast(store.getState())
+    const toast = selectToast(store.getState())
 
-    expect(result).toStrictEqual(expectedToast)
+    expect(toast).toStrictEqual(expectedToast)
   })
 })
