@@ -77,6 +77,7 @@ Three Husky hooks run automatically during the commit-push cycle:
 
 **Pre-commit** (`git commit`):
 - Blocks commits to `main`/`demo` branches
+- Blocks commits on branches whose PR was already merged
 - Runs `tsc --noEmit` (full project type check)
 - Runs lint-staged: ESLint fix + Prettier fix on staged `.ts/.tsx/.js/.json` files, remark on `.md`, shell linter on `.sh`, Prisma validation on `schema.prisma`
 
@@ -100,6 +101,13 @@ Three Husky hooks run automatically during the commit-push cycle:
 2. **After CI passes, update the PR description** to accurately reflect all changes made.
 
 **Efficiency:** All tests and lint rules run in CI regardless. Use linter and unit tests **surgically** on modified files only to validate changes quickly — avoid running the full suite locally. After pushing, always wait for the CI result before considering the task complete.
+
+## Code Review
+
+When reviewing a PR (`/review`), always include a verdict using one of these emojis:
+- ✅ **Approve** — good to merge as-is
+- ⚠️ **Approve with suggestions** — mergeable but has non-blocking improvements
+- ❌ **Request changes** — must fix before merging
 
 ## Anti-patterns
 
