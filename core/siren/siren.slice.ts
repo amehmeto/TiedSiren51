@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { loadUser } from '../auth/usecases/load-user.usecase'
+import { logOut } from '../auth/usecases/log-out.usecase'
 import { Sirens } from './sirens'
 import { addKeywordToSirens } from './usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from './usecases/add-website-to-sirens.usecase'
@@ -38,6 +39,9 @@ export const sirenSlice = createSlice({
       })
       .addCase(addWebsiteToSirens.fulfilled, (state, action) => {
         state.availableSirens.websites.push(action.payload)
+      })
+      .addCase(logOut.fulfilled, (state) => {
+        state.availableSirens = initialSirens
       })
   },
 })

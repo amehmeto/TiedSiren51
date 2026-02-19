@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { loadUser } from '../auth/usecases/load-user.usecase'
+import { logOut } from '../auth/usecases/log-out.usecase'
 import { blocklistAdapter } from './blocklist'
 import { createBlocklist } from './usecases/create-blocklist.usecase'
 import { deleteBlocklist } from './usecases/delete-blocklist.usecase'
@@ -40,6 +41,9 @@ export const blocklistSlice = createSlice({
       })
       .addCase(deleteBlocklist.fulfilled, (state, action) => {
         blocklistAdapter.removeOne(state, action.payload)
+      })
+      .addCase(logOut.fulfilled, (state) => {
+        blocklistAdapter.removeAll(state)
       })
   },
 })

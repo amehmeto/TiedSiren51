@@ -1,5 +1,6 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { loadUser } from '../auth/usecases/load-user.usecase'
+import { logOut } from '../auth/usecases/log-out.usecase'
 import { blockSessionAdapter } from './block-session'
 import { createBlockSession } from './usecases/create-block-session.usecase'
 import { deleteBlockSession } from './usecases/delete-block-session.usecase'
@@ -40,6 +41,9 @@ export const blockSessionSlice = createSlice({
       })
       .addCase(deleteBlockSession.fulfilled, (state, action) => {
         blockSessionAdapter.removeOne(state, action.payload)
+      })
+      .addCase(logOut.fulfilled, (state) => {
+        blockSessionAdapter.removeAll(state)
       })
   },
 })
