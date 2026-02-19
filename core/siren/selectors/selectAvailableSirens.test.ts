@@ -11,18 +11,18 @@ describe('selectAvailableSirens', () => {
     })
     const state = stateBuilder().withAvailableSirens(sirens).build()
 
-    const result = selectAvailableSirens(state)
+    const availableSirens = selectAvailableSirens(state)
 
-    expect(result.websites).toContain('facebook.com')
-    expect(result.websites).toContain('twitter.com')
-    expect(result.keywords).toContain('social')
+    expect(availableSirens.websites).toContain('facebook.com')
+    expect(availableSirens.websites).toContain('twitter.com')
+    expect(availableSirens.keywords).toContain('social')
   })
 
   test('should return empty sirens when none are set', () => {
     const state = stateBuilder().build()
 
-    const result = selectAvailableSirens(state)
+    const availableSirens = selectAvailableSirens(state)
 
-    expect(result).toBeDefined()
+    expect(availableSirens).toBeDefined()
   })
 })
