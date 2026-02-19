@@ -202,6 +202,11 @@ module.exports = {
     'local-rules/no-unwrap': 'error',
     // Disallow overly generic variable and function names
     'local-rules/no-lame-naming': 'error',
+    // Disallow passing 3+ props from the same object — pass the object directly
+    'local-rules/no-redundant-prop-spreading': [
+      'error',
+      { ignoredObjects: ['styles', 'form'] },
+    ],
     // Prefer enum over string literal unions
     'local-rules/prefer-enum-over-string-union': [
       'error',

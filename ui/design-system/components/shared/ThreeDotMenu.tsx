@@ -102,13 +102,8 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
         }}
       >
         <TiedSCard style={styles.menuOptions}>
-          {menuOptions.map((option) => (
-            <TiedSMenuOption
-              key={option.name}
-              optionName={option.name}
-              iconName={option.iconName}
-              isDisabled={option.isDisabled}
-            />
+          {menuOptions.map((menuOption) => (
+            <TiedSMenuOption key={menuOption.name} option={menuOption} />
           ))}
         </TiedSCard>
       </MenuOptions>

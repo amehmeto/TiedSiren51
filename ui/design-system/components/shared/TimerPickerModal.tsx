@@ -55,14 +55,8 @@ export const TimerPickerModal = ({
         <Text style={styles.title}>{title}</Text>
 
         <DurationWheelPicker
-          days={duration.days}
-          hours={duration.hours}
-          minutes={duration.minutes}
-          onDaysChange={(days) => onDurationChange({ ...duration, days })}
-          onHoursChange={(hours) => onDurationChange({ ...duration, hours })}
-          onMinutesChange={(minutes) =>
-            onDurationChange({ ...duration, minutes })
-          }
+          duration={duration}
+          onDurationChange={onDurationChange}
         />
 
         <Text style={styles.endTimeText}>{endDateTime}</Text>

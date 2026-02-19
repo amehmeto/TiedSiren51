@@ -52,10 +52,25 @@ module.exports = {
     const forbiddenFunctionPatterns =
       options.forbiddenFunctionPatterns ?? DEFAULT_FORBIDDEN_FUNCTION_PATTERNS
 
+    function splitCamelCase(name) {
+      return name.split(/(?=[A-Z])/).map((segment) => segment.toLowerCase())
+    }
+
+    function endsWithForbiddenWord(name) {
+      const segments = splitCamelCase(name)
+      if (segments.length > 2) return false
+      const lastSegment = segments[segments.length - 1]
+      return forbiddenVariables.has(lastSegment)
+    }
+
     function isForbiddenFunctionName(name) {
-      return forbiddenFunctionPatterns.some((pattern) =>
-        name.toLowerCase().startsWith(pattern.toLowerCase()),
+      if (
+        forbiddenFunctionPatterns.some((pattern) =>
+          name.toLowerCase().startsWith(pattern.toLowerCase()),
+        )
       )
+        return true
+      return endsWithForbiddenWord(name)
     }
 
     return {
