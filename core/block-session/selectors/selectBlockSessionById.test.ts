@@ -15,6 +15,14 @@ describe('selectBlockSessionById', () => {
     expect(selectedSession?.name).toBe('Test Session')
   })
 
+  test('should return undefined when sessionId is undefined', () => {
+    const state = stateBuilder().build()
+
+    const selectedSession = selectBlockSessionById(state, undefined)
+
+    expect(selectedSession).toBeUndefined()
+  })
+
   test('should return undefined when session does not exist', () => {
     const state = stateBuilder().build()
 
