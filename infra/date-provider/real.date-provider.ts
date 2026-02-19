@@ -9,9 +9,9 @@ import {
 
 export class RealDateProvider implements DateProvider {
   getISOStringNow(): ISODateString {
-    const result = new Date().toISOString()
-    assertISODateString(result)
-    return result
+    const isoString = new Date().toISOString()
+    assertISODateString(isoString)
+    return isoString
   }
 
   getNow(): Date {
@@ -56,9 +56,9 @@ export class RealDateProvider implements DateProvider {
   toHHmm(date: Date): HHmmString {
     const hours = String(date.getHours()).padStart(2, '0')
     const minutes = String(date.getMinutes()).padStart(2, '0')
-    const result = `${hours}:${minutes}`
-    assertHHmmString(result)
-    return result
+    const hhmmString = `${hours}:${minutes}`
+    assertHHmmString(hhmmString)
+    return hhmmString
   }
 
   to12HourTime(date: Date): string {
@@ -75,14 +75,14 @@ export class RealDateProvider implements DateProvider {
   }
 
   toISOString(date: Date): ISODateString {
-    const result = date.toISOString()
-    assertISODateString(result)
-    return result
+    const isoString = date.toISOString()
+    assertISODateString(isoString)
+    return isoString
   }
 
   msToISOString(ms: number): ISODateString {
-    const result = new Date(ms).toISOString()
-    assertISODateString(result)
-    return result
+    const isoString = new Date(ms).toISOString()
+    assertISODateString(isoString)
+    return isoString
   }
 }

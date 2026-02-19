@@ -15,8 +15,8 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
 
   async findAll(_userId: string): Promise<BlockSession[]> {
     try {
-      const result = await this.db.allDocs({ include_docs: true })
-      return result.rows
+      const allDocsResponse = await this.db.allDocs({ include_docs: true })
+      return allDocsResponse.rows
         .filter((row) => row.doc)
         .map((row) => {
           const { _id, _rev, ...sessionWithoutInternalIds } = row.doc!
@@ -101,8 +101,8 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
 
   async deleteAll(_userId: string): Promise<void> {
     try {
-      const result = await this.db.allDocs()
-      for (const row of result.rows) {
+      const allDocsResponse = await this.db.allDocs()
+      for (const row of allDocsResponse.rows) {
         const doc = await this.db.get(row.id)
         await this.db.remove(doc._id, doc._rev)
       }

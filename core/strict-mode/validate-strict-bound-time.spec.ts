@@ -25,19 +25,19 @@ describe('validateStrictBoundTime', () => {
       ['10:00', 'same time'],
       ['09:59', 'one minute earlier'],
     ])('%s is valid (%s)', (time) => {
-      const result = validateStrictBoundTime(asHHmm(time), earlierBound)
+      const validation = validateStrictBoundTime(asHHmm(time), earlierBound)
 
-      expect(result.isValid).toBe(true)
+      expect(validation.isValid).toBe(true)
     })
 
     it.each<[string, string]>([
       ['11:00', 'later time'],
       ['10:01', 'one minute later'],
     ])('%s is invalid (%s)', (time) => {
-      const result = validateStrictBoundTime(asHHmm(time), earlierBound)
+      const validation = validateStrictBoundTime(asHHmm(time), earlierBound)
 
-      expect(result.isValid).toBe(false)
-      expect(result).toHaveProperty(
+      expect(validation.isValid).toBe(false)
+      expect(validation).toHaveProperty(
         'errorMessage',
         'Cannot set a later start time during strict mode',
       )
@@ -55,19 +55,19 @@ describe('validateStrictBoundTime', () => {
       ['18:00', 'same time'],
       ['18:01', 'one minute later'],
     ])('%s is valid (%s)', (time) => {
-      const result = validateStrictBoundTime(asHHmm(time), laterBound)
+      const validation = validateStrictBoundTime(asHHmm(time), laterBound)
 
-      expect(result.isValid).toBe(true)
+      expect(validation.isValid).toBe(true)
     })
 
     it.each<[string, string]>([
       ['17:00', 'earlier time'],
       ['17:59', 'one minute earlier'],
     ])('%s is invalid (%s)', (time) => {
-      const result = validateStrictBoundTime(asHHmm(time), laterBound)
+      const validation = validateStrictBoundTime(asHHmm(time), laterBound)
 
-      expect(result.isValid).toBe(false)
-      expect(result).toHaveProperty(
+      expect(validation.isValid).toBe(false)
+      expect(validation).toHaveProperty(
         'errorMessage',
         'Cannot set an earlier end time during strict mode',
       )
@@ -87,12 +87,12 @@ describe('validateStrictBoundTime', () => {
         ['21:00', 'earlier in evening zone'],
         ['05:00', 'after end time (valid evening zone)'],
       ])('%s is valid (%s)', (time) => {
-        const result = validateStrictBoundTime(
+        const validation = validateStrictBoundTime(
           asHHmm(time),
           midnightSpanningStartBound,
         )
 
-        expect(result.isValid).toBe(true)
+        expect(validation.isValid).toBe(true)
       })
 
       it.each<[string, string]>([
@@ -101,12 +101,12 @@ describe('validateStrictBoundTime', () => {
         ['03:00', 'morning zone (before end time)'],
         ['04:00', 'equals end time (boundary)'],
       ])('%s is invalid (%s)', (time) => {
-        const result = validateStrictBoundTime(
+        const validation = validateStrictBoundTime(
           asHHmm(time),
           midnightSpanningStartBound,
         )
 
-        expect(result.isValid).toBe(false)
+        expect(validation.isValid).toBe(false)
       })
     })
 
@@ -122,12 +122,12 @@ describe('validateStrictBoundTime', () => {
         ['06:00', 'later in morning zone'],
         ['22:00', 'before start time (valid morning zone)'],
       ])('%s is valid (%s)', (time) => {
-        const result = validateStrictBoundTime(
+        const validation = validateStrictBoundTime(
           asHHmm(time),
           midnightSpanningEndBound,
         )
 
-        expect(result.isValid).toBe(true)
+        expect(validation.isValid).toBe(true)
       })
 
       it.each<[string, string]>([
@@ -135,12 +135,12 @@ describe('validateStrictBoundTime', () => {
         ['23:00', 'evening zone (at start time)'],
         ['23:30', 'evening zone (after start time)'],
       ])('%s is invalid (%s)', (time) => {
-        const result = validateStrictBoundTime(
+        const validation = validateStrictBoundTime(
           asHHmm(time),
           midnightSpanningEndBound,
         )
 
-        expect(result.isValid).toBe(false)
+        expect(validation.isValid).toBe(false)
       })
     })
   })
@@ -178,25 +178,25 @@ describe('validateStrictModeTime', () => {
   const expectedValidResult = { isValid: true }
 
   it('allows any time change when strict mode is inactive', () => {
-    const result = validateStrictModeTime({
+    const validation = validateStrictModeTime({
       newTime: asHHmm('23:00'),
       isStrictModeActive: false,
       initialTime: asHHmm('10:00'),
       direction: StrictBoundDirection.Earlier,
     })
 
-    expect(result).toStrictEqual(expectedValidResult)
+    expect(validation).toStrictEqual(expectedValidResult)
   })
 
   it('allows any time change when initialTime is null', () => {
-    const result = validateStrictModeTime({
+    const validation = validateStrictModeTime({
       newTime: asHHmm('23:00'),
       isStrictModeActive: true,
       initialTime: null,
       direction: StrictBoundDirection.Earlier,
     })
 
-    expect(result).toStrictEqual(expectedValidResult)
+    expect(validation).toStrictEqual(expectedValidResult)
   })
 
   describe('when strict mode is active with initialTime', () => {
@@ -206,14 +206,14 @@ describe('validateStrictModeTime', () => {
     ])(
       '%s against %s (%s) is valid (%s)',
       (newTime, initialTime, direction) => {
-        const result = validateStrictModeTime({
+        const validation = validateStrictModeTime({
           newTime: asHHmm(newTime),
           isStrictModeActive: true,
           initialTime: asHHmm(initialTime),
           direction,
         })
 
-        expect(result.isValid).toBe(true)
+        expect(validation.isValid).toBe(true)
       },
     )
 
@@ -223,19 +223,19 @@ describe('validateStrictModeTime', () => {
     ])(
       '%s against %s (%s) is invalid (%s)',
       (newTime, initialTime, direction) => {
-        const result = validateStrictModeTime({
+        const validation = validateStrictModeTime({
           newTime: asHHmm(newTime),
           isStrictModeActive: true,
           initialTime: asHHmm(initialTime),
           direction,
         })
 
-        expect(result.isValid).toBe(false)
+        expect(validation.isValid).toBe(false)
       },
     )
 
     it('passes otherBound for midnight-spanning detection', () => {
-      const result = validateStrictModeTime({
+      const validation = validateStrictModeTime({
         newTime: asHHmm('00:30'),
         isStrictModeActive: true,
         initialTime: asHHmm('23:00'),
@@ -243,7 +243,7 @@ describe('validateStrictModeTime', () => {
         otherBound: asHHmm('04:00'),
       })
 
-      expect(result.isValid).toBe(false)
+      expect(validation.isValid).toBe(false)
     })
   })
 })

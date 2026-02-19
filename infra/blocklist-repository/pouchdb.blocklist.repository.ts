@@ -90,8 +90,8 @@ export class PouchdbBlocklistRepository implements BlocklistRepository {
 
   async deleteAll(_userId: string): Promise<void> {
     try {
-      const result = await this.db.allDocs()
-      for (const row of result.rows) {
+      const allDocsResponse = await this.db.allDocs()
+      for (const row of allDocsResponse.rows) {
         const doc = await this.db.get(row.id)
         await this.db.remove(doc._id, doc._rev)
       }

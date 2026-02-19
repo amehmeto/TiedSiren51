@@ -14,6 +14,8 @@ export class FakeAuthGateway implements AuthGateway {
 
   willDeleteAccountWith: Promise<void> = Promise.resolve()
 
+  willConfirmPasswordResetWith: Promise<void> = Promise.resolve()
+
   willChangePasswordWith: Promise<void> = Promise.resolve()
 
   willSendVerificationEmailWith: Promise<void> = Promise.resolve()
@@ -25,6 +27,8 @@ export class FakeAuthGateway implements AuthGateway {
   logOutError: Error | null = null
 
   lastResetPasswordEmail: string | null = null
+
+  lastConfirmPasswordResetOobCode: string | null = null
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
@@ -61,6 +65,14 @@ export class FakeAuthGateway implements AuthGateway {
   async resetPassword(email: string): Promise<void> {
     await this.willResultWith
     this.lastResetPasswordEmail = email
+  }
+
+  async confirmPasswordReset(
+    oobCode: string,
+    _newPassword: string,
+  ): Promise<void> {
+    await this.willConfirmPasswordResetWith
+    this.lastConfirmPasswordResetOobCode = oobCode
   }
 
   async sendVerificationEmail(): Promise<void> {
