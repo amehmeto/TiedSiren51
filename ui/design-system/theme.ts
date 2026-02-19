@@ -178,6 +178,7 @@ export const T = {
   },
   height: {
     settingsRow: 44,
+    pickerItem: 48,
   },
   // Legacy icon size constants (kept for backward compatibility)
   sirenIconSize: 20,

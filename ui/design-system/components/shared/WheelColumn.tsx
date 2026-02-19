@@ -16,7 +16,6 @@ type WheelColumnProps = {
   onValueChanged: (value: number) => void
 }
 
-const PICKER_ITEM_HEIGHT = 48
 const VISIBLE_ITEM_COUNT = 5
 
 export const WheelColumn = ({
@@ -32,7 +31,7 @@ export const WheelColumn = ({
       value={selectedValue}
       onValueChanging={() => WheelPickerFeedback.triggerSoundAndImpact()}
       onValueChanged={({ item: { value } }) => onValueChanged(value)}
-      itemHeight={PICKER_ITEM_HEIGHT}
+      itemHeight={T.height.pickerItem}
       visibleItemCount={VISIBLE_ITEM_COUNT}
       itemTextStyle={styles.wheelText}
       overlayItemStyle={styles.overlayItem}
