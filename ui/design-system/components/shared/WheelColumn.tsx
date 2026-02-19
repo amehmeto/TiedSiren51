@@ -30,7 +30,7 @@ export const WheelColumn = ({
     <WheelPicker
       data={pickerValues}
       value={selectedValue}
-      onValueChanging={WheelPickerFeedback.triggerSoundAndImpact}
+      onValueChanging={() => WheelPickerFeedback.triggerSoundAndImpact()}
       onValueChanged={({ item: { value } }) => onValueChanged(value)}
       itemHeight={PICKER_ITEM_HEIGHT}
       visibleItemCount={VISIBLE_ITEM_COUNT}
