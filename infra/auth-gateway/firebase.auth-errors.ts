@@ -16,4 +16,8 @@ export const FIREBASE_ERRORS: Record<FirebaseAuthErrorCode, string> = {
   [FirebaseAuthErrorCode.WrongPassword]: 'Incorrect password.',
   [FirebaseAuthErrorCode.RequiresRecentLogin]:
     'Please re-authenticate to perform this action.',
+  [FirebaseAuthErrorCode.ExpiredActionCode]:
+    'This password reset link has expired. Please request a new one.',
+  [FirebaseAuthErrorCode.InvalidActionCode]:
+    'This password reset link is invalid. Please request a new one.',
 }

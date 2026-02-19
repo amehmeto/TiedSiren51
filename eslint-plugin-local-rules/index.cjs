@@ -51,11 +51,13 @@ const oneUsecasePerFile = require('../eslint-rules/one-usecase-per-file.cjs')
 const oneViewModelPerFile = require('../eslint-rules/one-view-model-per-file.cjs')
 const preferArrayDestructuring = require('../eslint-rules/prefer-array-destructuring.cjs')
 const preferEnumOverStringUnion = require('../eslint-rules/prefer-enum-over-string-union.cjs')
+const preferExtractedComponent = require('../eslint-rules/prefer-extracted-component.cjs')
 const preferExtractedLongParams = require('../eslint-rules/prefer-extracted-long-params.cjs')
 const preferInlineVariable = require('../eslint-rules/prefer-inline-variable.cjs')
 const preferJumpTable = require('../eslint-rules/prefer-jump-table.cjs')
 const preferNamedSelector = require('../eslint-rules/prefer-named-selector.cjs')
 const preferObjectDestructuring = require('../eslint-rules/prefer-object-destructuring.cjs')
+const preferShortCircuitJsx = require('../eslint-rules/prefer-short-circuit-jsx.cjs')
 const preferTernaryJsx = require('../eslint-rules/prefer-ternary-jsx.cjs')
 const preferTernaryReturn = require('../eslint-rules/prefer-ternary-return.cjs')
 const reactPropsDestructuring = require('../eslint-rules/react-props-destructuring.cjs')
@@ -138,6 +140,7 @@ module.exports = {
     'prefer-named-selector': preferNamedSelector,
     'selector-state-first-param': selectorStateFirstParam,
     'no-selector-prop-drilling': noSelectorPropDrilling,
+    'prefer-short-circuit-jsx': preferShortCircuitJsx,
     'prefer-ternary-jsx': preferTernaryJsx,
     'prefer-ternary-return': preferTernaryReturn,
     'no-enum-value-as-string-literal': noEnumValueAsStringLiteral,
@@ -149,5 +152,6 @@ module.exports = {
     'no-inline-object-type': noInlineObjectType,
     'no-lame-naming': noLameNaming,
     'no-unwrap': noUnwrap,
+    'prefer-extracted-component': preferExtractedComponent,
   },
 }

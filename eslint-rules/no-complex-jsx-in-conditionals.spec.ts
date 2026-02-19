@@ -21,17 +21,6 @@ describe('no-complex-jsx-in-conditionals', () => {
   it('should pass all rule tests', () => {
     ruleTester.run('no-complex-jsx-in-conditionals', rule, {
       valid: [
-        // Simple JSX in conditional - OK
-        {
-          code: `
-        function Component() {
-          if (loading) {
-            return <div>Loading</div>
-          }
-          return <div>Done</div>
-        }
-      `,
-        },
         // Simple ternary - OK
         {
           code: `
@@ -71,14 +60,29 @@ describe('no-complex-jsx-in-conditionals', () => {
         }
       `,
         },
-        // Element with no children and few props - OK
+        // Loading guard with complex default return - OK (skipped by design)
         {
           code: `
         function Component() {
           if (loading) {
-            return <Spinner size="small" />
+            return <Spinner />
           }
-          return <div>Done</div>
+          return (
+            <div>
+              <span>Content</span>
+            </div>
+          )
+        }
+      `,
+        },
+        // Non-component function (renderItem callback) - OK
+        {
+          code: `
+        function Component() {
+          return items.map(item => {
+            if (item.type === 'divider') return <Divider />
+            return <Card name={item.name} />
+          })
         }
       `,
         },
@@ -479,6 +483,42 @@ describe('no-complex-jsx-in-conditionals', () => {
             )
           }
           return <div>Done</div>
+        }
+      `,
+          errors: [{ messageId: 'extractComponent' }],
+        },
+        // Implicit else: simple JSX in both branches (wrapper variant)
+        {
+          code: `
+        function Component() {
+          if (loading) {
+            return <div>Loading</div>
+          }
+          return <div>Done</div>
+        }
+      `,
+          errors: [{ messageId: 'extractComponent' }],
+        },
+        // Implicit else: simple leaf components in both branches
+        {
+          code: `
+        function Component() {
+          if (loading) {
+            return <Spinner size="small" />
+          }
+          return <Content />
+        }
+      `,
+          errors: [{ messageId: 'extractComponent' }],
+        },
+        // Implicit else: arrow function component assigned to PascalCase variable
+        {
+          code: `
+        const Component = () => {
+          if (loading) {
+            return <Spinner />
+          }
+          return <Content />
         }
       `,
           errors: [{ messageId: 'extractComponent' }],
