@@ -46,6 +46,7 @@ export class PrismaBlocklistRepository
 
   async findAll(userId: string): Promise<Blocklist[]> {
     try {
+      await this.claimOrphanedRows(userId, 'Blocklist')
       const blocklists = await this.baseClient.blocklist.findMany({
         where: { userId },
       })

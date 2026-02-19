@@ -15,17 +15,11 @@ export const loadUser = createAppAsyncThunk<UserData>(
   async (
     _,
     {
-      extra: {
-        blocklistRepository,
-        blockSessionRepository,
-        sirensRepository,
-        databaseService,
-      },
+      extra: { blocklistRepository, blockSessionRepository, sirensRepository },
       getState,
     },
   ) => {
     const userId = selectAuthUserId(getState())
-    await databaseService.claimOrphanedData(userId)
     const [blocklists, blockSessions, sirens] = await Promise.all([
       blocklistRepository.findAll(userId),
       blockSessionRepository.findAll(userId),

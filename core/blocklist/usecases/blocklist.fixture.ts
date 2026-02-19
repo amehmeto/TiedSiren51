@@ -1,5 +1,6 @@
 import { expect } from 'vitest'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
+import { UpdatePayload } from '../../_ports_/update.payload'
 import { AppStore } from '../../_redux_/createStore'
 import { createTestStore } from '../../_tests_/createTestStore'
 import { Fixture } from '../../_tests_/fixture.type'
@@ -31,9 +32,7 @@ export function blocklistFixture(
       },
     },
     when: {
-      updatingBlocklist: async (
-        payload: Partial<Blocklist> & Required<Pick<Blocklist, 'id'>>,
-      ) => {
+      updatingBlocklist: async (payload: UpdatePayload<Blocklist>) => {
         store = createTestStore(
           {
             blocklistRepository,

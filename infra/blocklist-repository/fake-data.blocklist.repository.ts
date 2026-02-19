@@ -1,4 +1,5 @@
 import { BlocklistRepository } from '@/core/_ports_/blocklist.repository'
+import { UpdatePayload } from '@/core/_ports_/update.payload'
 import {
   amazonPrimeAndroidSiren,
   facebookAndroidSiren,
@@ -75,10 +76,7 @@ export class FakeDataBlocklistRepository implements BlocklistRepository {
     return Promise.resolve(createdBlocklist)
   }
 
-  update(
-    _userId: string,
-    payload: Partial<Blocklist> & Required<Pick<Blocklist, 'id'>>,
-  ): Promise<void> {
+  update(_userId: string, payload: UpdatePayload<Blocklist>): Promise<void> {
     const blocklist = this.blocklists.get(payload.id)
     if (!blocklist) throw new Error('Blocklist not found')
     this.blocklists.set(payload.id, { ...blocklist, ...payload })

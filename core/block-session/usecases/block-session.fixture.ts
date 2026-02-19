@@ -5,6 +5,7 @@ import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
 import { NotificationTrigger } from '../../_ports_/notification.service'
+import { UpdatePayload } from '../../_ports_/update.payload'
 import { AppStore } from '../../_redux_/createStore'
 import { createTestStore } from '../../_tests_/createTestStore'
 import { dateFixture } from '../../_tests_/date.fixture'
@@ -96,8 +97,7 @@ export function blockSessionFixture(
         await store.dispatch(deleteBlockSession(blockSessionId))
       },
       updatingBlockSession: async (
-        updateBlockSessionPayload: Partial<BlockSession> &
-          Required<Pick<BlockSession, 'id'>>,
+        updateBlockSessionPayload: UpdatePayload<BlockSession>,
       ) => {
         store = createTestStore(
           {

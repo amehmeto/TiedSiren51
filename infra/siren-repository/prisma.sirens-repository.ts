@@ -18,6 +18,7 @@ export class PrismaSirensRepository
 
   async getSelectableSirens(userId: string): Promise<Sirens> {
     try {
+      await this.claimOrphanedRows(userId, 'Siren')
       const sirens = await this.baseClient.siren.findMany({
         where: { userId },
       })

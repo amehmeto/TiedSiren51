@@ -9,11 +9,15 @@
  * Also flags union type aliases (using `|`) declared inside function bodies —
  * these should be extracted to module scope.
  *
+ * Also flags nested generic types (e.g. `Partial<ReturnType<typeof x>>`) in
+ * type annotations — these should be extracted into named type aliases.
+ *
  * BAD:
  *   it.each<{ email: string; password: string }>([...])
  *   function foo(param: { name: string; age: number }) {}
  *   function foo() { type Result = { ok: true } | { ok: false; error: string } }
  *   type Result = { ok: true; value: string } | { ok: false; error: string }
+ *   function foo(state: Partial<ReturnType<typeof reducer>>) {}
  *
  * GOOD:
  *   type Credentials = { email: string; password: string }
@@ -25,6 +29,8 @@
  *   type Success = { ok: true; value: string }
  *   type Failure = { ok: false; error: string }
  *   type Result = Success | Failure
+ *   type AppState = Partial<ReturnType<typeof reducer>>
+ *   function foo(state: AppState) {}
  */
 
 module.exports = {
@@ -41,6 +47,8 @@ module.exports = {
         'Extract this inline object type into a named type alias for readability.',
       extractUnionType:
         'Extract this union type alias to module scope for readability.',
+      extractNestedGeneric:
+        'Extract this nested generic type into a named type alias for readability.',
     },
     schema: [
       {
@@ -84,6 +92,16 @@ module.exports = {
           messageId: 'extractUnionType',
         })
       },
+
+      TSTypeReference(node) {
+        if (!hasNestedGeneric(node)) return
+        if (isInsideTypeAliasDeclaration(node)) return
+
+        context.report({
+          node,
+          messageId: 'extractNestedGeneric',
+        })
+      },
     }
 
     function countPropertiesDeep(node) {
@@ -124,6 +142,19 @@ module.exports = {
       }
 
       return false
+    }
+
+    function hasNestedGeneric(node) {
+      if (
+        node.type !== 'TSTypeReference' ||
+        !node.typeArguments?.params?.length
+      )
+        return false
+
+      return node.typeArguments.params.some(
+        (param) =>
+          param.type === 'TSTypeReference' && param.typeArguments?.params?.length,
+      )
     }
 
     function isInsideFunctionBody(node) {

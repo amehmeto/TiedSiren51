@@ -5,14 +5,14 @@ import { UpdatePayload } from '@/core/_ports_/update.payload'
 export class InMemoryRepository<T extends { id: string }> {
   entities: Map<string, T> = new Map()
 
-  async findById(id: string): Promise<T> {
+  async findById(_userId: string, id: string): Promise<T> {
     const entities = this.entities.get(id)
     if (!entities)
       throw new Error(`Entity not found in InMemoryRepository for ${id}`)
     return entities
   }
 
-  async findAll(): Promise<T[]> {
+  async findAll(_userId: string): Promise<T[]> {
     return Array.from(this.entities.values())
   }
 
@@ -20,7 +20,7 @@ export class InMemoryRepository<T extends { id: string }> {
     this.entities.set(String(uuid.v4()), entity)
   }
 
-  async create(payload: CreatePayload<T>): Promise<T> {
+  async create(_userId: string, payload: CreatePayload<T>): Promise<T> {
     // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
     const toBeCreatedEntity: T = { id: uuid.v4().toString(), ...payload } as T
     this.entities.set(toBeCreatedEntity.id, toBeCreatedEntity)
@@ -33,17 +33,17 @@ export class InMemoryRepository<T extends { id: string }> {
     return Promise.resolve(createdEntity)
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(_userId: string, id: string): Promise<void> {
     this.entities.delete(id)
     return Promise.resolve()
   }
 
-  async deleteAll(): Promise<void> {
+  async deleteAll(_userId: string): Promise<void> {
     this.entities.clear()
     return Promise.resolve()
   }
 
-  update(updatePayload: UpdatePayload<T>) {
+  update(_userId: string, updatePayload: UpdatePayload<T>) {
     const entity = this.entities.get(updatePayload.id)
     if (!entity)
       throw new Error('Entity not found and not updated inside InMemory')

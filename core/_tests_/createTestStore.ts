@@ -1,4 +1,3 @@
-import { AuthUser } from '@/core/auth/auth-user'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
@@ -17,14 +16,21 @@ import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 import { createStore } from '../_redux_/createStore'
 import { Dependencies } from '../_redux_/dependencies'
 import { rootReducer } from '../_redux_/rootReducer'
+import { buildAuthUser } from './data-builders/auth-user.builder'
+
+type PreloadedState = Partial<ReturnType<typeof rootReducer>>
+
+type TestStoreOptions = {
+  isAuthDefaultSkipped?: boolean
+}
 
 const defaultTestLogger = new InMemoryLogger()
 
-export const defaultTestUser: AuthUser = {
+export const defaultTestUser = buildAuthUser({
   id: 'test-user-id',
   email: 'test@example.com',
   isEmailVerified: true,
-}
+})
 
 export const createTestStore = (
   {
@@ -44,15 +50,15 @@ export const createTestStore = (
     notificationService = new FakeNotificationService(logger),
     sirenTier = new InMemorySirenTier(logger),
   }: Partial<Dependencies> = {},
-  preloadedState?: Partial<ReturnType<typeof rootReducer>>,
-  { isAuthDefaultSkipped = false }: { isAuthDefaultSkipped?: boolean } = {},
+  preloadedState?: PreloadedState,
+  { isAuthDefaultSkipped = false }: TestStoreOptions = {},
 ) => {
   const resolvedAuth =
     preloadedState?.auth ?? rootReducer(undefined, { type: 'unknown' }).auth
   const authUser = isAuthDefaultSkipped
     ? resolvedAuth.authUser
     : (resolvedAuth.authUser ?? defaultTestUser)
-  const stateWithAuth: Partial<ReturnType<typeof rootReducer>> = {
+  const stateWithAuth: PreloadedState = {
     ...preloadedState,
     auth: {
       ...resolvedAuth,

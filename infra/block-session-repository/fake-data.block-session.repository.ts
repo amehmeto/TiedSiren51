@@ -1,14 +1,20 @@
 import uuid from 'react-native-uuid'
 
 import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
+import { CreatePayload } from '@/core/_ports_/create.payload'
 import { HHmmString } from '@/core/_ports_/date-provider'
+import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import {
   BlockingConditions,
   BlockSession,
 } from '@/core/block-session/block-session'
+import { InMemoryRepository } from '@/infra/__abstract__/in-memory.repository'
 
-export class FakeDataBlockSessionRepository implements BlockSessionRepository {
+export class FakeDataBlockSessionRepository
+  extends InMemoryRepository<BlockSession>
+  implements BlockSessionRepository
+{
   private static readonly startedAt: HHmmString = '10:48'
 
   private static readonly endedAt: HHmmString = '13:58'
@@ -91,44 +97,30 @@ export class FakeDataBlockSessionRepository implements BlockSessionRepository {
     FakeDataBlockSessionRepository.entries,
   )
 
-  delete(_userId: string, sessionId: string): Promise<void> {
-    this.entities.delete(sessionId)
-    return Promise.resolve()
+  delete(userId: string, sessionId: string): Promise<void> {
+    return super.delete(userId, sessionId)
   }
 
-  findById(_userId: string, sessionId: string): Promise<BlockSession> {
-    const entity = this.entities.get(sessionId)
-    if (!entity) throw new Error(`Entity not found for ${sessionId}`)
-    return Promise.resolve(entity)
+  findById(userId: string, sessionId: string): Promise<BlockSession> {
+    return super.findById(userId, sessionId)
   }
 
-  update(
-    _userId: string,
-    session: Partial<BlockSession> & Required<Pick<BlockSession, 'id'>>,
-  ): Promise<void> {
-    const entity = this.entities.get(session.id)
-    if (!entity) throw new Error('Entity not found')
-    this.entities.set(session.id, { ...entity, ...session })
-    return Promise.resolve()
+  update(userId: string, session: UpdatePayload<BlockSession>): Promise<void> {
+    return super.update(userId, session)
   }
 
-  findAll(_userId: string): Promise<BlockSession[]> {
-    return Promise.resolve(Array.from(this.entities.values()))
+  findAll(userId: string): Promise<BlockSession[]> {
+    return super.findAll(userId)
   }
 
   create(
-    _userId: string,
-    sessionPayload: Omit<BlockSession, 'id'>,
+    userId: string,
+    sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
-    const id = uuid.v4().toString()
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const entity = { id, ...sessionPayload } as BlockSession
-    this.entities.set(id, entity)
-    return Promise.resolve(entity)
+    return super.create(userId, sessionPayload)
   }
 
-  deleteAll(_userId: string): Promise<void> {
-    this.entities.clear()
-    return Promise.resolve()
+  deleteAll(userId: string): Promise<void> {
+    return super.deleteAll(userId)
   }
 }

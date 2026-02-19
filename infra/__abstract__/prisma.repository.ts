@@ -229,6 +229,29 @@ export abstract class PrismaRepository {
     }
   }
 
+  private claimedUserTables = new Set<string>()
+
+  protected async claimOrphanedRows(
+    userId: string,
+    tableName: string,
+  ): Promise<void> {
+    try {
+      const key = `${tableName}:${userId}`
+      if (this.claimedUserTables.has(key)) return
+
+      await this.baseClient.$executeRawUnsafe(
+        `UPDATE "${tableName}" SET "userId" = ? WHERE "userId" = ''`,
+        userId,
+      )
+      this.claimedUserTables.add(key)
+    } catch (error) {
+      this.logger.error(
+        `[PrismaRepository] Failed to claimOrphanedRows: ${error}`,
+      )
+      throw error
+    }
+  }
+
   private async createJunctionTables(): Promise<void> {
     await this.baseClient.$executeRaw`
       CREATE TABLE IF NOT EXISTS "_BlockSessionToBlocklist" (

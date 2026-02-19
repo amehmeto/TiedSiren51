@@ -107,6 +107,7 @@ export class PrismaBlockSessionRepository
 
   async findAll(userId: string): Promise<BlockSession[]> {
     try {
+      await this.claimOrphanedRows(userId, 'BlockSession')
       const sessions = await this.baseClient.blockSession.findMany({
         where: { userId },
         include: {
