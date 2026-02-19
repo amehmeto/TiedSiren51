@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, vi } from 'vitest'
+import { afterEach, beforeEach, describe, it, vi } from 'vitest'
 import { FeatureFlags } from '@/feature-flags'
 import { blocklistFormFixture } from './blocklist-form.fixture'
 
@@ -84,6 +84,11 @@ describe('blocklistSchema with all feature flags enabled', () => {
     FeatureFlags.WEBSITE_BLOCKING = true
     FeatureFlags.KEYWORD_BLOCKING = true
     fixture = blocklistFormFixture()
+  })
+
+  afterEach(() => {
+    FeatureFlags.WEBSITE_BLOCKING = false
+    FeatureFlags.KEYWORD_BLOCKING = false
   })
 
   it('should fail if all sirens are empty', () => {
