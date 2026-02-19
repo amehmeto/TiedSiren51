@@ -12,7 +12,7 @@ type IconName =
   | 'hourglass-outline'
   | 'power-outline'
 
-type BlockingCondition = {
+export type BlockingCondition = {
   iconName: IconName
   title: string
   subtitle: string
@@ -72,9 +72,7 @@ export default function BlockingConditionModal({
           {CONDITIONS.map((condition) => (
             <BlockingConditionItem
               key={condition.title}
-              iconName={condition.iconName}
-              title={condition.title}
-              subtitle={condition.subtitle}
+              condition={condition}
               onSelect={() => onSelectCondition(condition.title)}
             />
           ))}
