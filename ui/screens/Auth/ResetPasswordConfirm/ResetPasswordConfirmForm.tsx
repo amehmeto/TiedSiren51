@@ -16,6 +16,10 @@ import { changePasswordSchema } from '@/ui/auth-schemas/auth.schema'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
+import {
+  TiedSTextLink,
+  TiedSTextLinkVariant,
+} from '@/ui/design-system/components/shared/TiedSTextLink'
 import { T } from '@/ui/design-system/theme'
 import {
   ResetPasswordConfirmViewState,
@@ -110,13 +114,18 @@ export function ResetPasswordConfirmForm({
         />
         {displayError && <FormError error={displayError} />}
         {viewModel.error && (
-          <Text style={styles.linkText} onPress={onRequestNewLink}>
-            {'Request a new reset link'}
-          </Text>
+          <TiedSTextLink
+            text="Request a new reset link"
+            onPress={onRequestNewLink}
+            variant={TiedSTextLinkVariant.Highlight}
+            style={styles.linkSpacing}
+          />
         )}
-        <Text style={styles.backText} onPress={onBackToLogin}>
-          {'Back to Login'}
-        </Text>
+        <TiedSTextLink
+          text="Back to Login"
+          onPress={onBackToLogin}
+          style={styles.backSpacing}
+        />
       </KeyboardAvoidingView>
     </Pressable>
   )
@@ -149,14 +158,10 @@ const styles = StyleSheet.create({
     paddingHorizontal: T.spacing.xx_large,
     marginBottom: T.spacing.x_large,
   },
-  backText: {
-    color: T.color.text,
-    fontSize: T.font.size.regular,
+  backSpacing: {
     marginBottom: T.spacing.large,
   },
-  linkText: {
-    color: T.color.lightBlue,
-    fontSize: T.font.size.regular,
+  linkSpacing: {
     marginBottom: T.spacing.medium,
   },
 })
