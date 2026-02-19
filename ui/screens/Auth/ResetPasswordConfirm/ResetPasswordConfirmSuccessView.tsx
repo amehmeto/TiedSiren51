@@ -1,7 +1,7 @@
 import React from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
+import { TiedSTextLink } from '@/ui/design-system/components/shared/TiedSTextLink'
 import { T } from '@/ui/design-system/theme'
 
 type ResetPasswordConfirmSuccessViewProps = {
@@ -19,10 +19,10 @@ export function ResetPasswordConfirmSuccessView({
         <Text style={styles.messageText}>
           {'Your password has been successfully reset.'}
         </Text>
-        <TiedSButton
+        <TiedSTextLink
+          text="Back to Login"
           onPress={onBackToLogin}
-          text={'BACK TO LOGIN'}
-          style={styles.button}
+          style={styles.linkSpacing}
         />
       </View>
     </View>
@@ -51,9 +51,7 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: T.spacing.large,
   },
-  button: {
-    paddingVertical: T.spacing.small,
-    paddingHorizontal: T.spacing.xx_large,
+  linkSpacing: {
     marginBottom: T.spacing.x_large,
   },
 })

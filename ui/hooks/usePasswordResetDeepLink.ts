@@ -23,14 +23,18 @@ export function usePasswordResetDeepLink() {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
   const isAuthenticated = useSelector(selectIsUserAuthenticated)
+  const isAuthenticatedRef = useRef(isAuthenticated)
   const isUnmountedRef = useRef(false)
 
   useEffect(() => {
-    if (isAuthenticated) return
+    isAuthenticatedRef.current = isAuthenticated
+  }, [isAuthenticated])
 
+  useEffect(() => {
     isUnmountedRef.current = false
 
     const handleUrl = (event: { url: string }) => {
+      if (isAuthenticatedRef.current) return
       const oobCode = extractOobCode(event.url)
       if (oobCode) {
         dispatch(clearConfirmPasswordResetState())
@@ -53,5 +57,5 @@ export function usePasswordResetDeepLink() {
       isUnmountedRef.current = true
       subscription.remove()
     }
-  }, [router, dispatch, isAuthenticated])
+  }, [router, dispatch])
 }
