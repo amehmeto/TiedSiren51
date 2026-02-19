@@ -10,4 +10,6 @@ export enum FirebaseAuthErrorCode {
   NetworkRequestFailed = 'auth/network-request-failed',
   WrongPassword = 'auth/wrong-password',
   RequiresRecentLogin = 'auth/requires-recent-login',
+  ExpiredActionCode = 'auth/expired-action-code',
+  InvalidActionCode = 'auth/invalid-action-code',
 }

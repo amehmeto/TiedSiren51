@@ -11,6 +11,7 @@ import { AuthError } from '@/core/auth/auth-error'
 import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
 import { changePassword } from '@/core/auth/usecases/change-password.usecase'
+import { confirmPasswordReset } from '@/core/auth/usecases/confirm-password-reset.usecase'
 import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { reauthenticateWithGoogle } from '@/core/auth/usecases/reauthenticate-with-google.usecase'
@@ -89,6 +90,10 @@ export function authentificationFixture(
         const error = new Error(errorMessage)
         authGateway.willReauthenticateWithGoogleWith = Promise.reject(error)
       },
+      confirmPasswordResetWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willConfirmPasswordResetWith = Promise.reject(error)
+      },
       accountDeletionWillSucceed() {
         authGateway.willDeleteAccountWith = Promise.resolve()
       },
@@ -143,6 +148,10 @@ export function authentificationFixture(
       },
       reauthenticateWithGoogle() {
         return store.dispatch(reauthenticateWithGoogle())
+      },
+      confirmPasswordReset(oobCode: string, newPassword: string) {
+        const payload = { oobCode, newPassword }
+        return store.dispatch(confirmPasswordReset(payload))
       },
       deleteAccount() {
         store = createTestStore(
@@ -229,6 +238,18 @@ export function authentificationFixture(
       authUserShouldBe(expectedUser: AuthUser) {
         const { authUser } = store.getState().auth
         expect(authUser).toEqual(expectedUser)
+      },
+      passwordResetShouldBeConfirmed() {
+        const { isPasswordResetConfirmed } = store.getState().auth
+        expect(isPasswordResetConfirmed).toBe(true)
+      },
+      confirmPasswordResetShouldNotBeLoading() {
+        const { isConfirmingPasswordReset } = store.getState().auth
+        expect(isConfirmingPasswordReset).toBe(false)
+      },
+      confirmPasswordResetErrorShouldBe(errorMessage: string) {
+        const { confirmPasswordResetError } = store.getState().auth
+        expect(confirmPasswordResetError).toBe(errorMessage)
       },
       accountDeletionShouldNotBeLoading() {
         const { isDeletingAccount } = store.getState().auth

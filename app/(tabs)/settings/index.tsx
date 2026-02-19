@@ -1,68 +1,99 @@
+import Constants from 'expo-constants'
 import { useRouter } from 'expo-router'
-import { Pressable, StyleSheet, Text, View } from 'react-native'
-import { useDispatch } from 'react-redux'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
+import { SettingsRow } from '@/ui/design-system/components/shared/SettingsRow'
+import { SettingsSection } from '@/ui/design-system/components/shared/SettingsSection'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
+import { SecuritySection } from '@/ui/screens/Settings/SecuritySection'
+import { selectSettingsViewModel } from '@/ui/screens/Settings/settings.view-model'
 
 export default function SettingsScreen() {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const viewModel = useSelector(selectSettingsViewModel)
+
+  const appVersion = Constants.expoConfig?.version ?? '0.0.0'
 
   return (
-    <View style={styles.container}>
-      <Text style={styles.text}>Settings</Text>
-      <Pressable
-        onPress={() => router.push('/(tabs)/settings/change-password')}
-        style={styles.changePasswordButton}
-      >
-        <Text style={styles.changePasswordText}>Change Password</Text>
-      </Pressable>
-      <Pressable onPress={() => dispatch(logOut())} style={styles.logoutButton}>
-        <Text style={styles.logoutText}>Logout</Text>
-      </Pressable>
-      <Pressable
-        onPress={() => router.push('/(tabs)/settings/delete-account')}
-        style={styles.deleteAccountButton}
-      >
-        <Text style={styles.deleteAccountText}>Delete Account</Text>
-      </Pressable>
-    </View>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.contentContainer}
+    >
+      <Text style={styles.title}>Settings</Text>
+
+      <SettingsSection title="Account">
+        <SettingsRow
+          label={viewModel.email}
+          icon="mail-outline"
+          hasDivider
+          accessibilityLabel={`Email: ${viewModel.email}`}
+        />
+        <SettingsRow
+          label={viewModel.authProviderLabel}
+          icon="key-outline"
+          accessibilityLabel={`Sign-in method: ${viewModel.authProviderLabel}`}
+        />
+      </SettingsSection>
+
+      {viewModel.hasPasswordProvider && (
+        <SecuritySection
+          onChangePassword={() =>
+            router.push('/(tabs)/settings/change-password')
+          }
+        />
+      )}
+
+      <View style={styles.logoutContainer}>
+        <TiedSButton
+          text="Log Out"
+          onPress={() => dispatch(logOut())}
+          style={styles.logoutButton}
+        />
+      </View>
+
+      <SettingsSection title="Danger Zone">
+        <SettingsRow
+          label="Delete Account"
+          labelColor={T.color.red}
+          hasChevron
+          onPress={() => router.push('/(tabs)/settings/delete-account')}
+        />
+      </SettingsSection>
+
+      <Text style={styles.version}>v{appVersion}</Text>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  scrollView: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
   },
-  text: {
-    color: T.color.white,
+  contentContainer: {
+    padding: T.spacing.medium,
+    paddingBottom: T.spacing.xxx_large,
+  },
+  title: {
+    color: T.color.text,
+    fontSize: T.font.size.xLarge,
+    fontWeight: T.font.weight.bold,
     marginBottom: T.spacing.large,
   },
+  logoutContainer: {
+    marginBottom: T.spacing.medium,
+  },
   logoutButton: {
-    padding: T.spacing.smallMedium,
+    backgroundColor: T.color.darkBlueGray,
+    marginTop: T.spacing.none,
   },
-  logoutText: {
-    color: T.color.red,
-    fontSize: T.font.size.base,
-  },
-  changePasswordButton: {
-    padding: T.spacing.smallMedium,
-    marginTop: T.spacing.medium,
-  },
-  changePasswordText: {
-    color: T.color.text,
-    fontSize: T.font.size.base,
-  },
-  deleteAccountButton: {
-    padding: T.spacing.smallMedium,
+  version: {
+    color: T.color.grey,
+    fontSize: T.font.size.small,
+    textAlign: 'center',
     marginTop: T.spacing.large,
-  },
-  deleteAccountText: {
-    color: T.color.red,
-    fontSize: T.font.size.base,
-    fontWeight: T.font.weight.bold,
   },
 })

@@ -37,8 +37,8 @@ export function ChooseName({ values, onChange, onBlur }: ChooseNameProps) {
         <TiedSTextInput
           onChangeText={onChange}
           onBlur={onBlur}
-          autoFocus={true}
-          selectTextOnFocus={true}
+          autoFocus
+          selectTextOnFocus
           placeholder={NAME_PLACEHOLDER}
           value={values.name ?? ''}
         />
