@@ -73,6 +73,13 @@ export class FakeStorageAuthGateway implements AuthGateway {
     return this.fakeAuthGateway.resetPassword(email)
   }
 
+  async confirmPasswordReset(
+    oobCode: string,
+    newPassword: string,
+  ): Promise<void> {
+    return this.fakeAuthGateway.confirmPasswordReset(oobCode, newPassword)
+  }
+
   async sendVerificationEmail(): Promise<void> {
     return this.fakeAuthGateway.sendVerificationEmail()
   }

@@ -9,6 +9,7 @@ const DARK_BLUE = '#0C207A'
 const DARK_BLUE_GRAY = '#1E293B'
 const LIGHT_BLUE = '#00D4FF'
 const WHITE = '#FFFFFF'
+const APP_DOMAIN = 'com-tiedsiren.firebaseapp.com'
 
 export default {
   expo: {
@@ -17,7 +18,7 @@ export default {
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
-    scheme: 'myapp',
+    scheme: 'tiedsiren',
     userInterfaceStyle: 'automatic',
     splash: {
       image: './assets/images/splash.png',
@@ -29,6 +30,7 @@ export default {
       bundleIdentifier: 'com.tiedsiren.tiedsiren',
       googleServicesFile: './GoogleService-Info.plist',
       usesAppleSignIn: true,
+      associatedDomains: [`applinks:${APP_DOMAIN}`],
     },
     android: {
       adaptiveIcon: {
@@ -42,6 +44,20 @@ export default {
         'QUERY_ALL_PACKAGES',
         'android.permission.READ_EXTERNAL_STORAGE',
         'android.permission.WRITE_EXTERNAL_STORAGE',
+      ],
+      intentFilters: [
+        {
+          action: 'VIEW',
+          autoVerify: true,
+          data: [
+            {
+              scheme: 'https',
+              host: APP_DOMAIN,
+              pathPrefix: '/__/auth/action',
+            },
+          ],
+          category: ['BROWSABLE', 'DEFAULT'],
+        },
       ],
     },
     web: {

@@ -11,6 +11,8 @@ export interface AuthGateway {
   changePassword(newPassword: string): Promise<void>
   reauthenticateWithGoogle(): Promise<void>
   resetPassword(email: string): Promise<void>
+  /** @param oobCode - Out-of-band code from Firebase password reset email link */
+  confirmPasswordReset(oobCode: string, newPassword: string): Promise<void>
   sendVerificationEmail(): Promise<void>
   refreshEmailVerificationStatus(): Promise<boolean>
   deleteAccount(): Promise<void>
