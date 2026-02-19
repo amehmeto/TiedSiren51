@@ -1,29 +1,21 @@
 import { Ionicons } from '@expo/vector-icons'
 import { View, Text, Pressable, StyleSheet } from 'react-native'
+import { BlockingCondition } from '@/ui/design-system/components/shared/BlockingConditionModal'
 import { T } from '@/ui/design-system/theme'
 
-type IconName =
-  | 'time-outline'
-  | 'location-outline'
-  | 'wifi-outline'
-  | 'hourglass-outline'
-  | 'power-outline'
-
 type BlockingConditionItemOwnProps = {
-  iconName: IconName
-  title: string
-  subtitle: string
+  condition: BlockingCondition
   onSelect: () => void
 }
 
 type BlockingConditionItemProps = Readonly<BlockingConditionItemOwnProps>
 
 export function BlockingConditionItem({
-  iconName,
-  title,
-  subtitle,
+  condition,
   onSelect,
 }: BlockingConditionItemProps) {
+  const { iconName, title, subtitle } = condition
+
   return (
     <Pressable
       style={({ pressed: isPressed }) => [

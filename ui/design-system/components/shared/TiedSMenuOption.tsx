@@ -1,36 +1,26 @@
 import { Ionicons } from '@expo/vector-icons'
 import { StyleSheet, Text } from 'react-native'
 import { MenuOption } from 'react-native-popup-menu'
+import { TiedSMenu } from '@/ui/design-system/components/shared/ThreeDotMenu'
 import { T } from '@/ui/design-system/theme'
 
-type IconName =
-  | 'text-outline'
-  | 'create-outline'
-  | 'copy-outline'
-  | 'trash-outline'
-
 type TiedSMenuOptionOwnProps = {
-  optionName: string
-  iconName: IconName
-  isDisabled?: boolean
+  option: TiedSMenu
 }
 
 type TiedSMenuOptionProps = Readonly<TiedSMenuOptionOwnProps>
 
-export function TiedSMenuOption({
-  optionName,
-  iconName,
-  isDisabled = false,
-}: TiedSMenuOptionProps) {
+export function TiedSMenuOption({ option }: TiedSMenuOptionProps) {
+  const { name, iconName, isDisabled = false } = option
   const enabledColor = isDisabled ? T.color.grey : T.color.white
 
   return (
     <MenuOption
-      value={optionName}
+      value={name}
       style={[styles.menuOption, isDisabled && styles.menuOptionDisabled]}
     >
       <Text style={[styles.menuOptionText, { color: enabledColor }]}>
-        {optionName}
+        {name}
       </Text>
       <Ionicons name={iconName} size={T.icon.size.large} color={enabledColor} />
     </MenuOption>

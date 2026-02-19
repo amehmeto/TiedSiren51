@@ -36,6 +36,7 @@ const noModuleLevelConstants = require('../eslint-rules/no-module-level-constant
 const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressions.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
 const noRedundantNullishTernary = require('../eslint-rules/no-redundant-nullish-ternary.cjs')
+const noRedundantPropSpreading = require('../eslint-rules/no-redundant-prop-spreading.cjs')
 const noSelectorPropDrilling = require('../eslint-rules/no-selector-prop-drilling.cjs')
 const noStylesheetMagicNumbers = require('../eslint-rules/no-stylesheet-magic-numbers.cjs')
 const noThunkResultInComponent = require('../eslint-rules/no-thunk-result-in-component.cjs')
@@ -123,6 +124,7 @@ module.exports = {
     'no-nested-call-expressions': noNestedCallExpressions,
     'no-unused-test-id': noUnusedTestId,
     'no-redundant-nullish-ternary': noRedundantNullishTernary,
+    'no-redundant-prop-spreading': noRedundantPropSpreading,
     'prefer-array-destructuring': preferArrayDestructuring,
     'prefer-object-destructuring': preferObjectDestructuring,
     'prefer-inline-variable': preferInlineVariable,
