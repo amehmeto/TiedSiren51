@@ -72,13 +72,11 @@ module.exports = {
       if (node.type === 'JSXExpressionContainer') {
         const expr = node.expression
 
-        // Literal inside expression container is still static: {42}, {"text"}
-        // Template literal with no expressions is static: {`text`}
-        if (expr.type === 'Literal') return false
-        if (expr.type === 'TemplateLiteral' && expr.expressions.length === 0)
-          return false
-
-        return true
+        // Literal or static template literal inside expression container is still static
+        return (
+          expr.type !== 'Literal' &&
+          !(expr.type === 'TemplateLiteral' && expr.expressions.length === 0)
+        )
       }
 
       // Bare string literal (JSX attribute without braces) = static
@@ -140,16 +138,14 @@ module.exports = {
 
     return {
       JSXElement(node) {
-        // Only check inside React component functions
-        if (!isInsideComponentFunction(node)) return
-
-        // Skip if this JSX element is the direct return value (it IS the component)
-        // But do NOT skip if it's inside a conditional/logical — those branches
-        // are exactly the pattern we want to flag for extraction
-        if (node.parent.type === 'ReturnStatement') return
-
-        // Must have children (acts as a wrapper)
-        if (!hasChildren(node)) return
+        // Skip non-component contexts, direct return values (the component itself),
+        // and leaf elements without children (not wrappers)
+        if (
+          !isInsideComponentFunction(node) ||
+          node.parent.type === 'ReturnStatement' ||
+          !hasChildren(node)
+        )
+          return
 
         const lineCount = getLineSpan(node)
         if (lineCount < maxLines) return
