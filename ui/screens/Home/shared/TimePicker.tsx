@@ -45,9 +45,9 @@ export function TimePicker({
     <DateTimePickerModal
       date={chosenTimeAsDate}
       isVisible={isVisible}
-      is24Hour={true}
+      is24Hour
       mode="time"
-      isDarkModeEnabled={true}
+      isDarkModeEnabled
       themeVariant="dark"
       accentColor={T.color.lightBlue}
       buttonTextColorIOS={T.color.lightBlue}

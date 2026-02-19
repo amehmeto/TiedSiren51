@@ -70,6 +70,8 @@ module.exports = {
     // React Hooks rules
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'off',
+    // Prefer shorthand boolean JSX props: <Comp disabled /> over <Comp disabled={true} />
+    'react/jsx-boolean-value': 'error',
     // React Native rules
     'react-native/no-color-literals': 'error',
     'react-native/no-inline-styles': 'error',
@@ -185,6 +187,8 @@ module.exports = {
     'local-rules/prefer-jump-table': 'error',
     // Flag string literals in comparisons when a matching enum value exists
     'local-rules/no-enum-value-as-string-literal': 'error',
+    // Prefer short-circuit (&&) over ternary with null for conditional JSX
+    'local-rules/prefer-short-circuit-jsx': 'error',
     // Prefer ternary over complementary && conditions in JSX
     'local-rules/prefer-ternary-jsx': 'error',
     // Extract long function arguments into named variables for readability
@@ -206,6 +210,8 @@ module.exports = {
       'error',
       { ignoredPatterns: ['-outline$', '^logo-', '^add-', '^remove-'] },
     ],
+    // Extract large JSX elements with few dynamic props into reusable components
+    'local-rules/prefer-extracted-component': 'warn',
   },
   overrides: [
     {
