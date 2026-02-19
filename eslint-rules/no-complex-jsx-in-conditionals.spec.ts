@@ -511,6 +511,18 @@ describe('no-complex-jsx-in-conditionals', () => {
       `,
           errors: [{ messageId: 'extractComponent' }],
         },
+        // Implicit else: arrow function component assigned to PascalCase variable
+        {
+          code: `
+        const Component = () => {
+          if (loading) {
+            return <Spinner />
+          }
+          return <Content />
+        }
+      `,
+          errors: [{ messageId: 'extractComponent' }],
+        },
       ],
     })
   })
