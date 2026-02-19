@@ -20,6 +20,7 @@ import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
 import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
 import { showToast } from '@/core/toast/toast.slice'
+import { FeatureFlags } from '@/feature-flags'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -96,8 +97,12 @@ export function BlocklistForm({
 
   const routes: BlocklistTabRoute[] = [
     { key: BlocklistTabKey.Apps, title: 'Apps' },
-    { key: BlocklistTabKey.Websites, title: 'Websites' },
-    { key: BlocklistTabKey.Keywords, title: 'Keywords' },
+    ...(FeatureFlags.WEBSITE_BLOCKING
+      ? [{ key: BlocklistTabKey.Websites, title: 'Websites' }]
+      : []),
+    ...(FeatureFlags.KEYWORD_BLOCKING
+      ? [{ key: BlocklistTabKey.Keywords, title: 'Keywords' }]
+      : []),
   ]
 
   useEffect(() => {

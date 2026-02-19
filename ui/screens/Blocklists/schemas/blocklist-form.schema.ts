@@ -1,4 +1,13 @@
 import { z } from 'zod'
+import { FeatureFlags } from '@/feature-flags'
+
+function getEnabledSirenTypeLabels(): string[] {
+  return [
+    'Apps',
+    ...(FeatureFlags.WEBSITE_BLOCKING ? ['Websites'] : []),
+    ...(FeatureFlags.KEYWORD_BLOCKING ? ['Keywords'] : []),
+  ]
+}
 
 export const blocklistFormSchema = z.object({
   name: z.string().refine((val) => val.trim() !== '', {
@@ -19,17 +28,18 @@ export const blocklistFormSchema = z.object({
       websites: z.array(z.string()).optional(),
       keywords: z.array(z.string()).optional(),
     })
-    .refine(
-      (sirens) => {
-        const hasSelectedApps = (sirens.android?.length ?? 0) > 0
-        const hasSelectedWebsites = (sirens.websites?.length ?? 0) > 0
-        const hasSelectedKeywords = (sirens.keywords?.length ?? 0) > 0
+    .superRefine(({ android, websites, keywords }, ctx) => {
+      const hasSelectedApps = (android?.length ?? 0) > 0
+      const hasSelectedWebsites =
+        FeatureFlags.WEBSITE_BLOCKING && (websites?.length ?? 0) > 0
+      const hasSelectedKeywords =
+        FeatureFlags.KEYWORD_BLOCKING && (keywords?.length ?? 0) > 0
 
-        return hasSelectedApps || hasSelectedWebsites || hasSelectedKeywords
-      },
-      {
-        message:
-          'You must select at least one of: Apps, Websites, or Keywords.',
-      },
-    ),
+      if (!hasSelectedApps && !hasSelectedWebsites && !hasSelectedKeywords) {
+        ctx.addIssue({
+          code: z.ZodIssueCode.custom,
+          message: `You must select at least one of: ${getEnabledSirenTypeLabels().join(', ')}.`,
+        })
+      }
+    }),
 })
