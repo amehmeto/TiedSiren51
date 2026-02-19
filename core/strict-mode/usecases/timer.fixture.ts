@@ -25,6 +25,7 @@ export function timerFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ): TimerFixture {
   let store: AppStore
+  let isUnauthenticated = false
   const timerRepository = new FakeDataTimerRepository()
   const dateProvider = new StubDateProvider()
   dateProvider.now = new Date(DEFAULT_TEST_DATE)
@@ -33,6 +34,13 @@ export function timerFixture(
     email: 'test@example.com',
     isEmailVerified: true,
   }
+
+  const buildStore = () =>
+    createTestStore(
+      { timerRepository, dateProvider },
+      testStateBuilderProvider.getState(),
+      { isAuthDefaultSkipped: isUnauthenticated },
+    )
 
   return {
     given: {
@@ -53,6 +61,7 @@ export function timerFixture(
         )
       },
       unauthenticatedUser() {
+        isUnauthenticated = true
         testStateBuilderProvider.setState((builder) =>
           builder.withoutAuthUser({}),
         )
@@ -60,31 +69,19 @@ export function timerFixture(
     },
     when: {
       loadingTimer: async () => {
-        store = createTestStore(
-          { timerRepository, dateProvider },
-          testStateBuilderProvider.getState(),
-        )
+        store = buildStore()
         return store.dispatch(loadTimer())
       },
       startingTimer: async (payload: StartTimerPayload) => {
-        store = createTestStore(
-          { timerRepository, dateProvider },
-          testStateBuilderProvider.getState(),
-        )
+        store = buildStore()
         return store.dispatch(startTimer(payload))
       },
       extendingTimerOf: async (payload: ExtendTimerPayload) => {
-        store = createTestStore(
-          { timerRepository, dateProvider },
-          testStateBuilderProvider.getState(),
-        )
+        store = buildStore()
         return store.dispatch(extendTimer(payload))
       },
       notifyingLockedSiren: async () => {
-        store = createTestStore(
-          { timerRepository, dateProvider },
-          testStateBuilderProvider.getState(),
-        )
+        store = buildStore()
         return store.dispatch(notifyLockedSiren())
       },
     },

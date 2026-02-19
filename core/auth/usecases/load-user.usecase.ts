@@ -2,6 +2,7 @@ import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
 import { BlockSession } from '@/core/block-session/block-session'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { Sirens } from '@/core/siren/sirens'
+import { selectAuthUserId } from '../selectors/selectAuthUserId'
 
 type UserData = {
   blocklists: Blocklist[]
@@ -15,12 +16,14 @@ export const loadUser = createAppAsyncThunk<UserData>(
     _,
     {
       extra: { blocklistRepository, blockSessionRepository, sirensRepository },
+      getState,
     },
   ) => {
+    const userId = selectAuthUserId(getState())
     const [blocklists, blockSessions, sirens] = await Promise.all([
-      blocklistRepository.findAll(),
-      blockSessionRepository.findAll(),
-      sirensRepository.getSelectableSirens(),
+      blocklistRepository.findAll(userId),
+      blockSessionRepository.findAll(userId),
+      sirensRepository.getSelectableSirens(userId),
     ])
 
     return {

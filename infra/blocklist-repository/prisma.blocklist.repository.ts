@@ -22,10 +22,14 @@ export class PrismaBlocklistRepository
     this.logger = logger
   }
 
-  async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
+  async create(
+    userId: string,
+    blocklistPayload: CreatePayload<Blocklist>,
+  ): Promise<Blocklist> {
     try {
       const created = await this.baseClient.blocklist.create({
         data: {
+          userId,
           name: blocklistPayload.name,
           sirens: JSON.stringify(blocklistPayload.sirens),
         },
@@ -40,9 +44,11 @@ export class PrismaBlocklistRepository
     }
   }
 
-  async findAll(): Promise<Blocklist[]> {
+  async findAll(userId: string): Promise<Blocklist[]> {
     try {
-      const blocklists = await this.baseClient.blocklist.findMany()
+      const blocklists = await this.baseClient.blocklist.findMany({
+        where: { userId },
+      })
       return blocklists.map(this.mapToBlocklist)
     } catch (error) {
       this.logger.error(
@@ -52,10 +58,13 @@ export class PrismaBlocklistRepository
     }
   }
 
-  async update(payload: UpdatePayload<Blocklist>): Promise<void> {
+  async update(
+    userId: string,
+    payload: UpdatePayload<Blocklist>,
+  ): Promise<void> {
     try {
       await this.baseClient.blocklist.update({
-        where: { id: payload.id },
+        where: { id: payload.id, userId },
         data: {
           name: payload.name,
           sirens: JSON.stringify(payload.sirens),
@@ -69,10 +78,10 @@ export class PrismaBlocklistRepository
     }
   }
 
-  async findById(id: string): Promise<Blocklist> {
+  async findById(userId: string, id: string): Promise<Blocklist> {
     try {
-      const blocklist = await this.baseClient.blocklist.findUnique({
-        where: { id },
+      const blocklist = await this.baseClient.blocklist.findFirst({
+        where: { id, userId },
       })
 
       if (!blocklist) throw new Error(`Blocklist ${id} not found`)
@@ -86,10 +95,10 @@ export class PrismaBlocklistRepository
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(userId: string, id: string): Promise<void> {
     try {
-      await this.baseClient.blocklist.delete({
-        where: { id },
+      await this.baseClient.blocklist.deleteMany({
+        where: { id, userId },
       })
     } catch (error) {
       this.logger.error(
@@ -99,9 +108,11 @@ export class PrismaBlocklistRepository
     }
   }
 
-  async deleteAll(): Promise<void> {
+  async deleteAll(userId: string): Promise<void> {
     try {
-      await this.baseClient.blocklist.deleteMany()
+      await this.baseClient.blocklist.deleteMany({
+        where: { userId },
+      })
     } catch (error) {
       this.logger.error(
         `[PrismaBlocklistRepository] Failed to delete all blocklists: ${error}`,

@@ -10,6 +10,7 @@ import { PouchdbBlockSessionRepository } from './pouchdb.block-session.repositor
 describe('PouchDBBlockSessionRepository', () => {
   let blockSessionRepository: PouchdbBlockSessionRepository
   let db: PouchDB.Database<BlockSession>
+  const userId = 'test-user-id'
 
   beforeEach(async () => {
     db = new PouchDB('pdb-block-sessions')
@@ -31,8 +32,10 @@ describe('PouchDBBlockSessionRepository', () => {
       ...sessionPayload,
     }
 
-    const createdBlockSession =
-      await blockSessionRepository.create(sessionPayload)
+    const createdBlockSession = await blockSessionRepository.create(
+      userId,
+      sessionPayload,
+    )
 
     expect(createdBlockSession).toStrictEqual(expectedBlockSession)
   })
@@ -40,10 +43,13 @@ describe('PouchDBBlockSessionRepository', () => {
   it('should find a block session by id', async () => {
     const sessionPayload = buildSessionPayload()
 
-    const createdBlockSession =
-      await blockSessionRepository.create(sessionPayload)
+    const createdBlockSession = await blockSessionRepository.create(
+      userId,
+      sessionPayload,
+    )
 
     const foundBlockSession = await blockSessionRepository.findById(
+      userId,
       createdBlockSession.id,
     )
     expect(foundBlockSession).toStrictEqual(createdBlockSession)
@@ -52,16 +58,19 @@ describe('PouchDBBlockSessionRepository', () => {
   it('should find all current block sessions', async () => {
     const createSessionPayload = buildSessionPayload()
 
-    const createdSession1 =
-      await blockSessionRepository.create(createSessionPayload)
+    const createdSession1 = await blockSessionRepository.create(
+      userId,
+      createSessionPayload,
+    )
 
     const createSessionPayload2 = buildSessionPayload()
 
     const createdSession2 = await blockSessionRepository.create(
+      userId,
       createSessionPayload2,
     )
 
-    const currentSessions = await blockSessionRepository.findAll()
+    const currentSessions = await blockSessionRepository.findAll(userId)
 
     expect(currentSessions).toHaveLength(2)
     expect(currentSessions).toContainEqual(createdSession1)
@@ -71,8 +80,10 @@ describe('PouchDBBlockSessionRepository', () => {
   it('should update a block session', async () => {
     const createSessionPayload = buildSessionPayload()
 
-    const createdBlockSession =
-      await blockSessionRepository.create(createSessionPayload)
+    const createdBlockSession = await blockSessionRepository.create(
+      userId,
+      createSessionPayload,
+    )
 
     const updateSessionPayload: UpdatePayload<BlockSession> = {
       id: createdBlockSession.id,
@@ -84,8 +95,9 @@ describe('PouchDBBlockSessionRepository', () => {
       name: 'Updated name',
     }
 
-    await blockSessionRepository.update(updateSessionPayload)
+    await blockSessionRepository.update(userId, updateSessionPayload)
     const updatedBlockSession = await blockSessionRepository.findById(
+      userId,
       updateSessionPayload.id,
     )
 
@@ -95,12 +107,17 @@ describe('PouchDBBlockSessionRepository', () => {
   it('should delete a block session', async () => {
     const createSessionPayload = buildSessionPayload()
 
-    const createdBlockSession =
-      await blockSessionRepository.create(createSessionPayload)
+    const createdBlockSession = await blockSessionRepository.create(
+      userId,
+      createSessionPayload,
+    )
 
-    await blockSessionRepository.delete(createdBlockSession.id)
+    await blockSessionRepository.delete(userId, createdBlockSession.id)
 
-    const promise = blockSessionRepository.findById(createdBlockSession.id)
+    const promise = blockSessionRepository.findById(
+      userId,
+      createdBlockSession.id,
+    )
 
     await expect(promise).rejects.toThrow()
   })

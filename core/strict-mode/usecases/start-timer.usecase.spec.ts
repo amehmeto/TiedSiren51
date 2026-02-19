@@ -54,7 +54,7 @@ describe('startTimer use case', () => {
     },
     {
       scenario: 'user is not authenticated',
-      given: () => {},
+      given: () => fixture.given.unauthenticatedUser(),
       payload: { hours: 1 },
       expectedError: 'User not authenticated',
     },

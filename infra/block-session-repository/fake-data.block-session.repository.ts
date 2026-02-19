@@ -7,12 +7,8 @@ import {
   BlockingConditions,
   BlockSession,
 } from '@/core/block-session/block-session'
-import { InMemoryRepository } from '../__abstract__/in-memory.repository'
 
-export class FakeDataBlockSessionRepository
-  extends InMemoryRepository<BlockSession>
-  implements BlockSessionRepository
-{
+export class FakeDataBlockSessionRepository implements BlockSessionRepository {
   private static readonly startedAt: HHmmString = '10:48'
 
   private static readonly endedAt: HHmmString = '13:58'
@@ -95,29 +91,44 @@ export class FakeDataBlockSessionRepository
     FakeDataBlockSessionRepository.entries,
   )
 
-  delete(sessionId: string): Promise<void> {
-    return super.delete(sessionId)
+  delete(_userId: string, sessionId: string): Promise<void> {
+    this.entities.delete(sessionId)
+    return Promise.resolve()
   }
 
-  findById(sessionId: string): Promise<BlockSession> {
-    return super.findById(sessionId)
+  findById(_userId: string, sessionId: string): Promise<BlockSession> {
+    const entity = this.entities.get(sessionId)
+    if (!entity) throw new Error(`Entity not found for ${sessionId}`)
+    return Promise.resolve(entity)
   }
 
   update(
+    _userId: string,
     session: Partial<BlockSession> & Required<Pick<BlockSession, 'id'>>,
   ): Promise<void> {
-    return super.update(session)
+    const entity = this.entities.get(session.id)
+    if (!entity) throw new Error('Entity not found')
+    this.entities.set(session.id, { ...entity, ...session })
+    return Promise.resolve()
   }
 
-  findAll(): Promise<BlockSession[]> {
+  findAll(_userId: string): Promise<BlockSession[]> {
     return Promise.resolve(Array.from(this.entities.values()))
   }
 
-  create(sessionPayload: Omit<BlockSession, 'id'>): Promise<BlockSession> {
-    return super.create(sessionPayload)
+  create(
+    _userId: string,
+    sessionPayload: Omit<BlockSession, 'id'>,
+  ): Promise<BlockSession> {
+    const id = uuid.v4().toString()
+    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
+    const entity = { id, ...sessionPayload } as BlockSession
+    this.entities.set(id, entity)
+    return Promise.resolve(entity)
   }
 
-  deleteAll(): Promise<void> {
-    return super.deleteAll()
+  deleteAll(_userId: string): Promise<void> {
+    this.entities.clear()
+    return Promise.resolve()
   }
 }

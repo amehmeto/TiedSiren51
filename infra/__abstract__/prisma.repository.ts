@@ -4,7 +4,7 @@ import { Platform } from 'react-native'
 import '@prisma/react-native'
 import { Logger } from '@/core/_ports_/logger'
 
-type TimerColumnInfo = { name: string; type: string }
+type ColumnInfo = { name: string; type: string }
 
 export abstract class PrismaRepository {
   private _isInitialized = false
@@ -100,6 +100,7 @@ export abstract class PrismaRepository {
       await this.createMainTables()
       await this.createJunctionTables()
       await this.migrateTimerTable()
+      await this.migrateUserIdColumns()
     } catch (error) {
       this.logger.error(`[PrismaRepository] Error creating tables: ${error}`)
       throw error
@@ -110,6 +111,7 @@ export abstract class PrismaRepository {
     await this.baseClient.$executeRaw`
       CREATE TABLE IF NOT EXISTS "Siren" (
         "id" TEXT PRIMARY KEY NOT NULL,
+        "userId" TEXT NOT NULL DEFAULT '',
         "type" TEXT NOT NULL,
         "value" TEXT NOT NULL,
         "name" TEXT,
@@ -120,6 +122,7 @@ export abstract class PrismaRepository {
     await this.baseClient.$executeRaw`
       CREATE TABLE IF NOT EXISTS "Blocklist" (
         "id" TEXT PRIMARY KEY NOT NULL,
+        "userId" TEXT NOT NULL DEFAULT '',
         "name" TEXT NOT NULL,
         "sirens" TEXT NOT NULL
       );
@@ -136,6 +139,7 @@ export abstract class PrismaRepository {
     await this.baseClient.$executeRaw`
       CREATE TABLE IF NOT EXISTS "BlockSession" (
         "id" TEXT PRIMARY KEY NOT NULL,
+        "userId" TEXT NOT NULL DEFAULT '',
         "name" TEXT NOT NULL,
         "startedAt" TEXT NOT NULL,
         "endedAt" TEXT NOT NULL,
@@ -159,7 +163,7 @@ export abstract class PrismaRepository {
 
   private async migrateTimerTable(): Promise<void> {
     try {
-      const tableInfo = await this.baseClient.$queryRaw<TimerColumnInfo[]>`
+      const tableInfo = await this.baseClient.$queryRaw<ColumnInfo[]>`
         PRAGMA table_info("Timer");
       `
 
@@ -191,6 +195,37 @@ export abstract class PrismaRepository {
         `[PrismaRepository] Error migrating Timer table: ${error}`,
       )
       throw error
+    }
+  }
+
+  private async migrateUserIdColumns(): Promise<void> {
+    try {
+      await this.addUserIdColumnIfMissing('Siren')
+      await this.addUserIdColumnIfMissing('Blocklist')
+      await this.addUserIdColumnIfMissing('BlockSession')
+    } catch (error) {
+      this.logger.error(
+        `[PrismaRepository] Error migrating userId columns: ${error}`,
+      )
+      throw error
+    }
+  }
+
+  private async addUserIdColumnIfMissing(tableName: string): Promise<void> {
+    const tableInfo = await this.baseClient.$queryRaw<ColumnInfo[]>`
+      PRAGMA table_info(${tableName});
+    `
+
+    const hasUserIdColumn = tableInfo.some((col) => col.name === 'userId')
+
+    if (!hasUserIdColumn) {
+      await this.baseClient.$executeRawUnsafe(
+        `ALTER TABLE "${tableName}" ADD COLUMN "userId" TEXT NOT NULL DEFAULT ''`,
+      )
+
+      this.logger.info(
+        `[PrismaRepository] Migrated ${tableName} table: added userId column`,
+      )
     }
   }
 

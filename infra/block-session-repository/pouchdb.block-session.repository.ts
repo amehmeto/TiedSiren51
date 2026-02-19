@@ -13,7 +13,7 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
     this.db = new PouchDB('pdb-block-sessions')
   }
 
-  async findAll(): Promise<BlockSession[]> {
+  async findAll(_userId: string): Promise<BlockSession[]> {
     try {
       const result = await this.db.allDocs({ include_docs: true })
       return result.rows
@@ -31,6 +31,7 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
   }
 
   async create(
+    _userId: string,
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
     try {
@@ -53,7 +54,7 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
     }
   }
 
-  async delete(blockSessionId: string): Promise<void> {
+  async delete(_userId: string, blockSessionId: string): Promise<void> {
     try {
       const doc = await this.db.get(blockSessionId)
       await this.db.remove(doc._id, doc._rev)
@@ -65,7 +66,7 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
     }
   }
 
-  async findById(sessionId: string): Promise<BlockSession> {
+  async findById(_userId: string, sessionId: string): Promise<BlockSession> {
     try {
       const retrievedSession = await this.db.get(sessionId)
       const { _id, _rev, ...sessionWithoutInternalIds } = retrievedSession
@@ -78,7 +79,10 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
     }
   }
 
-  async update(updateBlockSession: UpdatePayload<BlockSession>): Promise<void> {
+  async update(
+    _userId: string,
+    updateBlockSession: UpdatePayload<BlockSession>,
+  ): Promise<void> {
     try {
       const doc = await this.db.get(updateBlockSession.id)
       await this.db.put({
@@ -95,7 +99,7 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
     }
   }
 
-  async deleteAll(): Promise<void> {
+  async deleteAll(_userId: string): Promise<void> {
     try {
       const result = await this.db.allDocs()
       for (const row of result.rows) {

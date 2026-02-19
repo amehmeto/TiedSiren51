@@ -1,4 +1,5 @@
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
+import { selectAuthUserId } from '../selectors/selectAuthUserId'
 
 export const deleteAccount = createAppAsyncThunk(
   'auth/deleteAccount',
@@ -11,12 +12,14 @@ export const deleteAccount = createAppAsyncThunk(
         sirensRepository,
         authGateway,
       },
+      getState,
     },
   ) => {
+    const userId = selectAuthUserId(getState())
     await Promise.all([
-      blockSessionRepository.deleteAll(),
-      blocklistRepository.deleteAll(),
-      sirensRepository.deleteAllSirens(),
+      blockSessionRepository.deleteAll(userId),
+      blocklistRepository.deleteAll(userId),
+      sirensRepository.deleteAllSirens(userId),
     ])
     await authGateway.deleteAccount()
   },

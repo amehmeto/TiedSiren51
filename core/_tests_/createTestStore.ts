@@ -1,3 +1,4 @@
+import { AuthUser } from '@/core/auth/auth-user'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
@@ -19,6 +20,12 @@ import { rootReducer } from '../_redux_/rootReducer'
 
 const defaultTestLogger = new InMemoryLogger()
 
+export const defaultTestUser: AuthUser = {
+  id: 'test-user-id',
+  email: 'test@example.com',
+  isEmailVerified: true,
+}
+
 export const createTestStore = (
   {
     authGateway = new FakeAuthGateway(),
@@ -38,8 +45,22 @@ export const createTestStore = (
     sirenTier = new InMemorySirenTier(logger),
   }: Partial<Dependencies> = {},
   preloadedState?: Partial<ReturnType<typeof rootReducer>>,
-) =>
-  createStore(
+  { isAuthDefaultSkipped = false }: { isAuthDefaultSkipped?: boolean } = {},
+) => {
+  const resolvedAuth =
+    preloadedState?.auth ?? rootReducer(undefined, { type: 'unknown' }).auth
+  const authUser = isAuthDefaultSkipped
+    ? resolvedAuth.authUser
+    : (resolvedAuth.authUser ?? defaultTestUser)
+  const stateWithAuth: Partial<ReturnType<typeof rootReducer>> = {
+    ...preloadedState,
+    auth: {
+      ...resolvedAuth,
+      authUser,
+    },
+  }
+
+  return createStore(
     {
       authGateway,
       backgroundTaskService,
@@ -57,5 +78,6 @@ export const createTestStore = (
       sirensRepository,
       timerRepository,
     },
-    preloadedState,
+    stateWithAuth,
   )
+}
