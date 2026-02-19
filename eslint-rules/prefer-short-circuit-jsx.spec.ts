@@ -72,10 +72,16 @@ describe('prefer-short-circuit-jsx', () => {
           output: `function C() { let el; el = isVisible && (<Comp />) }`,
           errors: [{ messageId: 'preferShortCircuit' }],
         },
-        // With complex condition
+        // With compound LogicalExpression condition — wraps in parens
         {
           code: `function C() { return <div>{a && b ? <Comp /> : null}</div> }`,
-          output: `function C() { return <div>{a && b && (<Comp />)}</div> }`,
+          output: `function C() { return <div>{(a && b) && (<Comp />)}</div> }`,
+          errors: [{ messageId: 'preferShortCircuit' }],
+        },
+        // With compound BinaryExpression condition — wraps in parens
+        {
+          code: `function C() { return <div>{a === b ? <Comp /> : null}</div> }`,
+          output: `function C() { return <div>{(a === b) && (<Comp />)}</div> }`,
           errors: [{ messageId: 'preferShortCircuit' }],
         },
         // With JSX Fragment consequent

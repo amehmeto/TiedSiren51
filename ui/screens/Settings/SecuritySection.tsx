@@ -12,7 +12,7 @@ export function SecuritySection({ onChangePassword }: SecuritySectionProps) {
     <SettingsSection title="Security">
       <SettingsRow
         label="Change Password"
-        hasChevron={true}
+        hasChevron
         onPress={onChangePassword}
       />
     </SettingsSection>

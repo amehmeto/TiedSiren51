@@ -110,7 +110,7 @@ export default function LoginScreen() {
           accessibilityLabel="Password"
           placeholderTextColor={T.color.grey}
           value={viewModel.password}
-          hasPasswordToggle={true}
+          hasPasswordToggle
           onChangeText={(text) => {
             dispatch(setPassword(text))
             if (error) dispatch(clearError())

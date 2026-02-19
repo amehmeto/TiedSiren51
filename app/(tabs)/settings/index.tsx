@@ -29,7 +29,7 @@ export default function SettingsScreen() {
         <SettingsRow
           label={viewModel.email}
           icon="mail-outline"
-          hasDivider={true}
+          hasDivider
           accessibilityLabel={`Email: ${viewModel.email}`}
         />
         <SettingsRow
@@ -59,7 +59,7 @@ export default function SettingsScreen() {
         <SettingsRow
           label="Delete Account"
           labelColor={T.color.red}
-          hasChevron={true}
+          hasChevron
           onPress={() => router.push('/(tabs)/settings/delete-account')}
         />
       </SettingsSection>

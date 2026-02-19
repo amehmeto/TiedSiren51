@@ -71,6 +71,8 @@ module.exports = {
     // React Hooks rules
     'react-hooks/rules-of-hooks': 'error',
     'react-hooks/exhaustive-deps': 'off',
+    // Prefer shorthand boolean JSX props: <Comp disabled /> over <Comp disabled={true} />
+    'react/jsx-boolean-value': 'error',
     // React Native rules
     'react-native/no-color-literals': 'error',
     'react-native/no-inline-styles': 'error',

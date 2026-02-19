@@ -89,6 +89,26 @@ function MyComponent() {
   return <View>{icon}</View>
 }`,
         },
+        // styles.x treated as static — 4 identifiers + styles.x = 4 dynamic, over threshold
+        {
+          code: `
+function MyComponent() {
+  const content = (
+    <Pressable
+      onPress={onPress}
+      style={styles.container}
+      hitSlop={hitSlop}
+      testID={testID}
+      disabled={isDisabled}
+      accessibilityLabel="tap"
+      accessibilityHint="press"
+    >
+      <Text>Content</Text>
+    </Pressable>
+  )
+  return content
+}`,
+        },
         // Outside component function — not relevant
         {
           code: `
@@ -167,6 +187,25 @@ const MyComponent = () => {
     >
       <Text>Click</Text>
     </Pressable>
+  )
+  return wrapped
+}`,
+          errors: [{ messageId: 'extractComponent' }],
+        },
+        // styles.x treated as static — only 1 dynamic prop (onPress), flagged
+        {
+          code: `
+function MyComponent() {
+  const wrapped = (
+    <View
+      style={styles.container}
+      onPress={onPress}
+      accessibilityRole="none"
+      pointerEvents="box-none"
+      collapsable={false}
+    >
+      <Text>Hello</Text>
+    </View>
   )
   return wrapped
 }`,

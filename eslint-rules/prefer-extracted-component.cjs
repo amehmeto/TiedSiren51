@@ -65,19 +65,23 @@ module.exports = {
       return 'Component'
     }
 
+    function isStaticExpression(expr) {
+      return (
+        // Literal values: {42}, {"text"}, {true}, {false}, {null}
+        expr.type === 'Literal' ||
+        // Static template literal: {`text`}
+        (expr.type === 'TemplateLiteral' && expr.expressions.length === 0) ||
+        // Module-level object property access: {styles.foo}, {T.color.red}
+        (expr.type === 'MemberExpression' && !expr.computed)
+      )
+    }
+
     function isDynamicValue(node) {
       if (!node) return false
 
       // JSXExpressionContainer wrapping an expression = dynamic
-      if (node.type === 'JSXExpressionContainer') {
-        const expr = node.expression
-
-        // Literal or static template literal inside expression container is still static
-        return (
-          expr.type !== 'Literal' &&
-          !(expr.type === 'TemplateLiteral' && expr.expressions.length === 0)
-        )
-      }
+      if (node.type === 'JSXExpressionContainer')
+        return !isStaticExpression(node.expression)
 
       // Bare string literal (JSX attribute without braces) = static
       // e.g., accessibilityRole="button"

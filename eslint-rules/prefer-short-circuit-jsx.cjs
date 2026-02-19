@@ -36,8 +36,14 @@ module.exports = {
       return node.type === 'JSXElement' || node.type === 'JSXFragment'
     }
 
-    function getConditionText(node, sourceCode) {
-      return sourceCode.getText(node)
+    function needsParens(node) {
+      return (
+        node.type === 'LogicalExpression' ||
+        node.type === 'BinaryExpression' ||
+        node.type === 'ConditionalExpression' ||
+        node.type === 'AssignmentExpression' ||
+        node.type === 'SequenceExpression'
+      )
     }
 
     return {
@@ -56,12 +62,15 @@ module.exports = {
         // Pattern: condition ? <JSX /> : null
         if (isJSXNode(consequent) && isNullLiteral(alternate)) {
           const sourceCode = context.getSourceCode()
-          const conditionText = getConditionText(test, sourceCode)
+          const rawCondition = sourceCode.getText(test)
+          const conditionText = needsParens(test)
+            ? `(${rawCondition})`
+            : rawCondition
 
           context.report({
             node,
             messageId: 'preferShortCircuit',
-            data: { condition: conditionText },
+            data: { condition: rawCondition },
             fix(fixer) {
               const consequentText = sourceCode.getText(consequent)
               return fixer.replaceText(
