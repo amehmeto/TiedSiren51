@@ -150,11 +150,18 @@ export class PrismaBlockSessionRepository
     payload: UpdatePayload<BlockSession>,
   ): Promise<void> {
     try {
+      const session = await this.baseClient.blockSession.findFirst({
+        where: { id: payload.id, userId },
+      })
+
+      if (!session)
+        throw new Error(`BlockSession ${payload.id} not found for user`)
+
       const blocklistIds = payload.blocklistIds?.map((id) => ({ id }))
       const deviceIds = payload.devices?.map((d) => ({ id: d.id }))
 
-      await this.baseClient.blockSession.updateMany({
-        where: { id: payload.id, userId },
+      await this.baseClient.blockSession.update({
+        where: { id: payload.id },
         data: {
           name: payload.name,
           startedAt: payload.startedAt,
@@ -164,22 +171,10 @@ export class PrismaBlockSessionRepository
           blockingConditions: payload.blockingConditions
             ? JSON.stringify(payload.blockingConditions)
             : undefined,
+          blocklists: blocklistIds ? { set: blocklistIds } : undefined,
+          devices: deviceIds ? { set: deviceIds } : undefined,
         },
       })
-
-      if (blocklistIds) {
-        await this.baseClient.blockSession.update({
-          where: { id: payload.id },
-          data: { blocklists: { set: blocklistIds } },
-        })
-      }
-
-      if (deviceIds) {
-        await this.baseClient.blockSession.update({
-          where: { id: payload.id },
-          data: { devices: { set: deviceIds } },
-        })
-      }
     } catch (error) {
       this.logger.error(
         `[PrismaBlockSessionRepository] Failed to update block session ${payload.id}: ${error}`,

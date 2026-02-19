@@ -63,8 +63,15 @@ export class PrismaBlocklistRepository
     payload: UpdatePayload<Blocklist>,
   ): Promise<void> {
     try {
-      await this.baseClient.blocklist.update({
+      const blocklist = await this.baseClient.blocklist.findFirst({
         where: { id: payload.id, userId },
+      })
+
+      if (!blocklist)
+        throw new Error(`Blocklist ${payload.id} not found for user`)
+
+      await this.baseClient.blocklist.update({
+        where: { id: payload.id },
         data: {
           name: payload.name,
           sirens: JSON.stringify(payload.sirens),

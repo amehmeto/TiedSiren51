@@ -77,12 +77,12 @@ export function sirensFixture(
     then: {
       keywordShouldBeSaved: async (expectedKeyword: string) => {
         const retrievedKeywords =
-          await sirensRepository.getSelectableSirens('any-user')
+          await sirensRepository.getSelectableSirens('test-user-id')
         expect(retrievedKeywords.keywords).toContain(expectedKeyword)
       },
       websiteShouldBeSaved: async (expectedWebsite: string) => {
         const retrievedKeywords =
-          await sirensRepository.getSelectableSirens('any-user')
+          await sirensRepository.getSelectableSirens('test-user-id')
         expect(retrievedKeywords.websites).toContain(expectedWebsite)
       },
       availableSirensShouldBeStoredAs: (expectedSirens: Sirens) => {

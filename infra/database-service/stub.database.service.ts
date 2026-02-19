@@ -8,4 +8,8 @@ export class StubDatabaseService implements DatabaseService {
   initialize(): Promise<void> {
     return Promise.resolve(undefined)
   }
+
+  claimOrphanedData(_userId: string): Promise<void> {
+    return Promise.resolve(undefined)
+  }
 }

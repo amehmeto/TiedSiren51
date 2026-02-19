@@ -27,4 +27,29 @@ export class PrismaDatabaseService
       throw error
     }
   }
+
+  async claimOrphanedData(userId: string): Promise<void> {
+    try {
+      await this.baseClient.$executeRawUnsafe(
+        `UPDATE "Siren" SET "userId" = ? WHERE "userId" = ''`,
+        userId,
+      )
+      await this.baseClient.$executeRawUnsafe(
+        `UPDATE "Blocklist" SET "userId" = ? WHERE "userId" = ''`,
+        userId,
+      )
+      await this.baseClient.$executeRawUnsafe(
+        `UPDATE "BlockSession" SET "userId" = ? WHERE "userId" = ''`,
+        userId,
+      )
+      this.logger.info(
+        `[PrismaDatabaseService] Claimed orphaned data for user ${userId}`,
+      )
+    } catch (error) {
+      this.logger.error(
+        `[PrismaDatabaseService] Failed to claim orphaned data: ${error}`,
+      )
+      throw error
+    }
+  }
 }
