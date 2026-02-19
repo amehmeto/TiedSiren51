@@ -263,15 +263,18 @@ module.exports = {
       })
     }
 
-    function getEarlyJSXReturnNodes(statements) {
-      const nodes = []
-      for (const stmt of statements) {
-        if (stmt.type !== 'IfStatement') continue
+    function collectJSXReturnsFromIf(ifStmt, nodes) {
+      const branches = [ifStmt.consequent]
+      if (ifStmt.alternate) branches.push(ifStmt.alternate)
+
+      for (const branch of branches) {
+        if (branch.type === 'IfStatement') {
+          collectJSXReturnsFromIf(branch, nodes)
+          continue
+        }
 
         const block =
-          stmt.consequent.type === 'BlockStatement'
-            ? stmt.consequent.body
-            : [stmt.consequent]
+          branch.type === 'BlockStatement' ? branch.body : [branch]
 
         for (const s of block) {
           if (
@@ -282,6 +285,14 @@ module.exports = {
           )
             nodes.push(s.argument)
         }
+      }
+    }
+
+    function getEarlyJSXReturnNodes(statements) {
+      const nodes = []
+      for (const stmt of statements) {
+        if (stmt.type !== 'IfStatement') continue
+        collectJSXReturnsFromIf(stmt, nodes)
       }
       return nodes
     }
