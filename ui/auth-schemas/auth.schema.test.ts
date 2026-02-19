@@ -36,8 +36,8 @@ describe('Auth Schemas', () => {
         { email: 'user@example.com', password: '' },
         'Password is required',
       ],
-    ])('should reject %s', (_, input, expectedMessage) => {
-      const validation = signInSchema.safeParse(input)
+    ])('should reject %s', (_, invalidCredentials, expectedMessage) => {
+      const validation = signInSchema.safeParse(invalidCredentials)
       expect(validation.success).toBe(false)
       expect(validation.error?.issues[0].message).toBe(expectedMessage)
     })
@@ -75,8 +75,8 @@ describe('Auth Schemas', () => {
         { email: 'user@example.com', password: 'Password' },
         'Password must contain uppercase, lowercase and number',
       ],
-    ])('should reject %s', (_, input, expectedMessage) => {
-      const validation = signUpSchema.safeParse(input)
+    ])('should reject %s', (_, invalidCredentials, expectedMessage) => {
+      const validation = signUpSchema.safeParse(invalidCredentials)
       expect(validation.success).toBe(false)
       expect(validation.error?.issues[0].message).toBe(expectedMessage)
     })
@@ -125,8 +125,8 @@ describe('Auth Schemas', () => {
         { newPassword: 'Password123', confirmPassword: 'Different123' },
         'Passwords do not match',
       ],
-    ])('should reject %s', (_, input, expectedMessage) => {
-      const validation = changePasswordSchema.safeParse(input)
+    ])('should reject %s', (_, invalidPasswords, expectedMessage) => {
+      const validation = changePasswordSchema.safeParse(invalidPasswords)
       expect(validation.success).toBe(false)
       expect(validation.error?.issues[0].message).toBe(expectedMessage)
     })

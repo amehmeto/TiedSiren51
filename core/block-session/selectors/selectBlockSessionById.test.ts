@@ -11,8 +11,8 @@ describe('selectBlockSessionById', () => {
     const selectedSession = selectBlockSessionById(state, 'session-1')
 
     expect(selectedSession).toBeDefined()
-    expect(selectedSession.id).toBe('session-1')
-    expect(selectedSession.name).toBe('Test Session')
+    expect(selectedSession?.id).toBe('session-1')
+    expect(selectedSession?.name).toBe('Test Session')
   })
 
   test('should return undefined when session does not exist', () => {
