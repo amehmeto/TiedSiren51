@@ -1,11 +1,15 @@
-import { AuthGateway } from '@/core/_ports_/auth.gateway'
-import { AuthUser } from '@/core/auth/auth-user'
+import {
+  AuthGateway,
+  EmailVerificationResult,
+} from '@/core/_ports_/auth.gateway'
+import { AuthProvider, AuthUser } from '@/core/auth/auth-user'
 
 export class FakeAuthGateway implements AuthGateway {
   willResultWith: Promise<AuthUser> = Promise.resolve({
     id: 'fake-user-id',
     email: 'fake-user@gmail.com',
     isEmailVerified: false,
+    authProvider: AuthProvider.Email,
   })
 
   willReauthenticateWith: Promise<void> = Promise.resolve()
@@ -20,7 +24,8 @@ export class FakeAuthGateway implements AuthGateway {
 
   willSendVerificationEmailWith: Promise<void> = Promise.resolve()
 
-  willRefreshEmailVerificationWith: Promise<boolean> = Promise.resolve(false)
+  willApplyEmailVerificationCodeWith: Promise<EmailVerificationResult> =
+    Promise.resolve(EmailVerificationResult.Verified)
 
   verificationEmailSentCount = 0
 
@@ -80,8 +85,10 @@ export class FakeAuthGateway implements AuthGateway {
     this.verificationEmailSentCount++
   }
 
-  refreshEmailVerificationStatus(): Promise<boolean> {
-    return this.willRefreshEmailVerificationWith
+  async applyEmailVerificationCode(
+    _oobCode: string,
+  ): Promise<EmailVerificationResult> {
+    return this.willApplyEmailVerificationCodeWith
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {

@@ -10,5 +10,5 @@ export type AuthUser = {
   isEmailVerified: boolean
   username?: string
   profilePicture?: string
-  authProvider?: AuthProvider
+  authProvider: AuthProvider
 }

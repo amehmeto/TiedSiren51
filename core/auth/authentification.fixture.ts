@@ -1,4 +1,5 @@
 import { expect } from 'vitest'
+import { EmailVerificationResult } from '@/core/_ports_/auth.gateway'
 import { ISODateString } from '@/core/_ports_/date-provider'
 import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
@@ -10,13 +11,13 @@ import {
 import { AuthError } from '@/core/auth/auth-error'
 import { AuthErrorType } from '@/core/auth/auth-error-type'
 import { AuthUser } from '@/core/auth/auth-user'
+import { applyEmailVerificationCode } from '@/core/auth/usecases/apply-email-verification-code.usecase'
 import { changePassword } from '@/core/auth/usecases/change-password.usecase'
 import { confirmPasswordReset } from '@/core/auth/usecases/confirm-password-reset.usecase'
 import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { reauthenticateWithGoogle } from '@/core/auth/usecases/reauthenticate-with-google.usecase'
 import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
-import { refreshEmailVerificationStatus } from '@/core/auth/usecases/refresh-email-verification-status.usecase'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
 import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
@@ -112,9 +113,14 @@ export function authentificationFixture(
         const error = new Error(errorMessage)
         authGateway.willSendVerificationEmailWith = Promise.reject(error)
       },
-      refreshEmailVerificationWillReturn(isVerified: boolean) {
-        authGateway.willRefreshEmailVerificationWith =
-          Promise.resolve(isVerified)
+      applyEmailVerificationCodeWillFailWith(errorMessage: string) {
+        const error = new Error(errorMessage)
+        authGateway.willApplyEmailVerificationCodeWith = Promise.reject(error)
+      },
+      applyEmailVerificationCodeWillReturnAlreadyVerified() {
+        authGateway.willApplyEmailVerificationCodeWith = Promise.resolve(
+          EmailVerificationResult.AlreadyVerified,
+        )
       },
       nowIs(isoDate: ISODateString) {
         dateProvider.now = new Date(isoDate)
@@ -166,8 +172,8 @@ export function authentificationFixture(
       sendVerificationEmail() {
         return store.dispatch(sendVerificationEmail())
       },
-      refreshEmailVerificationStatus() {
-        return store.dispatch(refreshEmailVerificationStatus())
+      applyEmailVerificationCode(oobCode: string) {
+        return store.dispatch(applyEmailVerificationCode(oobCode))
       },
     },
     then: {
