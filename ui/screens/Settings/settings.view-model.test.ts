@@ -17,6 +17,28 @@ describe('selectSettingsViewModel', () => {
       email: 'user@test.com',
       authProviderLabel: 'Password',
       hasPasswordProvider: true,
+      showResendVerificationEmail: false,
+    }
+
+    const viewModel = selectSettingsViewModel(state)
+
+    expect(viewModel).toStrictEqual(expectedViewModel)
+  })
+
+  it('should show resend verification email for unverified email user', () => {
+    const state = stateBuilder()
+      .withAuthUser({
+        id: 'user-id',
+        email: 'user@test.com',
+        isEmailVerified: false,
+        authProvider: AuthProvider.Email,
+      })
+      .build()
+    const expectedViewModel = {
+      email: 'user@test.com',
+      authProviderLabel: 'Password',
+      hasPasswordProvider: true,
+      showResendVerificationEmail: true,
     }
 
     const viewModel = selectSettingsViewModel(state)
@@ -37,6 +59,7 @@ describe('selectSettingsViewModel', () => {
       email: 'user@gmail.com',
       authProviderLabel: 'Google',
       hasPasswordProvider: false,
+      showResendVerificationEmail: false,
     }
 
     const viewModel = selectSettingsViewModel(state)
@@ -57,6 +80,7 @@ describe('selectSettingsViewModel', () => {
       email: 'user@icloud.com',
       authProviderLabel: 'Apple',
       hasPasswordProvider: false,
+      showResendVerificationEmail: false,
     }
 
     const viewModel = selectSettingsViewModel(state)
@@ -76,6 +100,7 @@ describe('selectSettingsViewModel', () => {
       email: 'user@test.com',
       authProviderLabel: 'Password',
       hasPasswordProvider: true,
+      showResendVerificationEmail: false,
     }
 
     const viewModel = selectSettingsViewModel(state)
@@ -89,6 +114,7 @@ describe('selectSettingsViewModel', () => {
       email: '',
       authProviderLabel: 'Password',
       hasPasswordProvider: true,
+      showResendVerificationEmail: false,
     }
 
     const viewModel = selectSettingsViewModel(state)

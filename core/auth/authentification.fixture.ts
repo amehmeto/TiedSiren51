@@ -1,4 +1,5 @@
 import { expect } from 'vitest'
+import { EmailVerificationResult } from '@/core/_ports_/auth.gateway'
 import { ISODateString } from '@/core/_ports_/date-provider'
 import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
@@ -116,6 +117,11 @@ export function authentificationFixture(
       applyEmailVerificationCodeWillFailWith(errorMessage: string) {
         const error = new Error(errorMessage)
         authGateway.willApplyEmailVerificationCodeWith = Promise.reject(error)
+      },
+      applyEmailVerificationCodeWillReturnAlreadyVerified() {
+        authGateway.willApplyEmailVerificationCodeWith = Promise.resolve(
+          EmailVerificationResult.AlreadyVerified,
+        )
       },
       refreshEmailVerificationWillReturn(isVerified: boolean) {
         authGateway.willRefreshEmailVerificationWith =

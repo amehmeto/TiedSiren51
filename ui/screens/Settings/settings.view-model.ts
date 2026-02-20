@@ -5,6 +5,7 @@ type SettingsViewModel = {
   email: string
   authProviderLabel: string
   hasPasswordProvider: boolean
+  showResendVerificationEmail: boolean
 }
 
 const { Email, Google, Apple } = AuthProvider
@@ -23,5 +24,7 @@ export function selectSettingsViewModel(state: RootState): SettingsViewModel {
     email: authUser?.email ?? '',
     authProviderLabel: AUTH_PROVIDER_LABELS[provider],
     hasPasswordProvider: provider === Email,
+    showResendVerificationEmail:
+      provider === Email && authUser?.isEmailVerified === false,
   }
 }

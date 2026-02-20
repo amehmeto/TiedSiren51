@@ -1,4 +1,7 @@
-import { AuthGateway } from '@/core/_ports_/auth.gateway'
+import {
+  AuthGateway,
+  EmailVerificationResult,
+} from '@/core/_ports_/auth.gateway'
 import { AuthUser } from '@/core/auth/auth-user'
 
 export class FakeAuthGateway implements AuthGateway {
@@ -20,7 +23,8 @@ export class FakeAuthGateway implements AuthGateway {
 
   willSendVerificationEmailWith: Promise<void> = Promise.resolve()
 
-  willApplyEmailVerificationCodeWith: Promise<void> = Promise.resolve()
+  willApplyEmailVerificationCodeWith: Promise<EmailVerificationResult> =
+    Promise.resolve(EmailVerificationResult.Verified)
 
   willRefreshEmailVerificationWith: Promise<boolean> = Promise.resolve(false)
 
@@ -82,8 +86,10 @@ export class FakeAuthGateway implements AuthGateway {
     this.verificationEmailSentCount++
   }
 
-  async applyEmailVerificationCode(_oobCode: string): Promise<void> {
-    await this.willApplyEmailVerificationCodeWith
+  async applyEmailVerificationCode(
+    _oobCode: string,
+  ): Promise<EmailVerificationResult> {
+    return this.willApplyEmailVerificationCodeWith
   }
 
   refreshEmailVerificationStatus(): Promise<boolean> {

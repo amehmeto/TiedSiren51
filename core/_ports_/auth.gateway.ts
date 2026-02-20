@@ -1,5 +1,10 @@
 import { AuthUser } from '@/core/auth/auth-user'
 
+export enum EmailVerificationResult {
+  Verified = 'VERIFIED',
+  AlreadyVerified = 'ALREADY_VERIFIED',
+}
+
 export interface AuthGateway {
   onUserLoggedIn(listener: (user: AuthUser) => void): void
   onUserLoggedOut(listener: () => void): void
@@ -15,7 +20,7 @@ export interface AuthGateway {
   confirmPasswordReset(oobCode: string, newPassword: string): Promise<void>
   sendVerificationEmail(): Promise<void>
   /** @param oobCode - Out-of-band code from Firebase email verification deep link */
-  applyEmailVerificationCode(oobCode: string): Promise<void>
+  applyEmailVerificationCode(oobCode: string): Promise<EmailVerificationResult>
   refreshEmailVerificationStatus(): Promise<boolean>
   deleteAccount(): Promise<void>
   logOut(): Promise<void>

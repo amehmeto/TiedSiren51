@@ -28,7 +28,10 @@ import {
   updatePassword,
   User,
 } from 'firebase/auth'
-import { AuthGateway } from '@/core/_ports_/auth.gateway'
+import {
+  AuthGateway,
+  EmailVerificationResult,
+} from '@/core/_ports_/auth.gateway'
 import { Logger } from '@/core/_ports_/logger'
 import { AuthError } from '@/core/auth/auth-error'
 import { AuthErrorType } from '@/core/auth/auth-error-type'
@@ -348,14 +351,31 @@ export class FirebaseAuthGateway implements AuthGateway {
     }
   }
 
-  async applyEmailVerificationCode(oobCode: string): Promise<void> {
+  async applyEmailVerificationCode(
+    oobCode: string,
+  ): Promise<EmailVerificationResult> {
     try {
       await applyActionCode(this.auth, oobCode)
+      return EmailVerificationResult.Verified
     } catch (error) {
+      if (await this.isEmailAlreadyVerified())
+        return EmailVerificationResult.AlreadyVerified
+
       this.logger.error(
         `[FirebaseAuthGateway] Failed to applyEmailVerificationCode: ${error}`,
       )
       throw this.toEmailVerificationError(error)
+    }
+  }
+
+  private async isEmailAlreadyVerified(): Promise<boolean> {
+    try {
+      return await this.refreshEmailVerificationStatus()
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to isEmailAlreadyVerified: ${error}`,
+      )
+      return false
     }
   }
 

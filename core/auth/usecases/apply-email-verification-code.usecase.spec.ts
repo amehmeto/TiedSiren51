@@ -18,7 +18,6 @@ describe('Feature: Apply Email Verification Code', () => {
       'password',
     )
     await fixture.when.signInWithEmail('test@example.com', 'password')
-    fixture.given.refreshEmailVerificationWillReturn(false)
 
     await fixture.when.applyEmailVerificationCode('valid-oob-code')
 
@@ -35,7 +34,7 @@ describe('Feature: Apply Email Verification Code', () => {
       'password',
     )
     await fixture.when.signInWithEmail('test@example.com', 'password')
-    fixture.given.refreshEmailVerificationWillReturn(true)
+    fixture.given.applyEmailVerificationCodeWillReturnAlreadyVerified()
 
     await fixture.when.applyEmailVerificationCode('any-oob-code')
 
@@ -52,7 +51,6 @@ describe('Feature: Apply Email Verification Code', () => {
       'password',
     )
     await fixture.when.signInWithEmail('test@example.com', 'password')
-    fixture.given.refreshEmailVerificationWillReturn(false)
     fixture.given.applyEmailVerificationCodeWillFailWith(
       'Verification link has expired. Please request a new one.',
     )
@@ -72,7 +70,6 @@ describe('Feature: Apply Email Verification Code', () => {
       'password',
     )
     await fixture.when.signInWithEmail('test@example.com', 'password')
-    fixture.given.refreshEmailVerificationWillReturn(false)
     fixture.given.applyEmailVerificationCodeWillFailWith(
       'Invalid verification link.',
     )
@@ -92,7 +89,6 @@ describe('Feature: Apply Email Verification Code', () => {
       'password',
     )
     await fixture.when.signInWithEmail('test@example.com', 'password')
-    fixture.given.refreshEmailVerificationWillReturn(false)
     fixture.given.applyEmailVerificationCodeWillFailWith(
       'Could not verify email. Please check your connection.',
     )
@@ -112,7 +108,6 @@ describe('Feature: Apply Email Verification Code', () => {
       'password',
     )
     await fixture.when.signInWithEmail('test@example.com', 'password')
-    fixture.given.refreshEmailVerificationWillReturn(false)
 
     await fixture.when.applyEmailVerificationCode('valid-oob-code')
 
