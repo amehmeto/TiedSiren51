@@ -18,6 +18,8 @@ describe('selectSettingsViewModel', () => {
       authProviderLabel: 'Password',
       hasPasswordProvider: true,
       showResendVerificationEmail: false,
+      isSendingVerificationEmail: false,
+      resendVerificationEmailLabel: 'Resend Verification Email',
     }
 
     const viewModel = selectSettingsViewModel(state)
@@ -39,11 +41,33 @@ describe('selectSettingsViewModel', () => {
       authProviderLabel: 'Password',
       hasPasswordProvider: true,
       showResendVerificationEmail: true,
+      isSendingVerificationEmail: false,
+      resendVerificationEmailLabel: 'Resend Verification Email',
     }
 
     const viewModel = selectSettingsViewModel(state)
 
     expect(viewModel).toStrictEqual(expectedViewModel)
+  })
+
+  it('should show sending label while verification email is being sent', () => {
+    const state = stateBuilder()
+      .withAuthUser({
+        id: 'user-id',
+        email: 'user@test.com',
+        isEmailVerified: false,
+        authProvider: AuthProvider.Email,
+      })
+      .withSendingVerificationEmail(true)
+      .build()
+    const expectedViewModel = {
+      isSendingVerificationEmail: true,
+      resendVerificationEmailLabel: 'Sending...',
+    }
+
+    const viewModel = selectSettingsViewModel(state)
+
+    expect(viewModel).toMatchObject(expectedViewModel)
   })
 
   it('should return Google provider label for Google auth user', () => {
@@ -60,6 +84,8 @@ describe('selectSettingsViewModel', () => {
       authProviderLabel: 'Google',
       hasPasswordProvider: false,
       showResendVerificationEmail: false,
+      isSendingVerificationEmail: false,
+      resendVerificationEmailLabel: 'Resend Verification Email',
     }
 
     const viewModel = selectSettingsViewModel(state)
@@ -81,6 +107,8 @@ describe('selectSettingsViewModel', () => {
       authProviderLabel: 'Apple',
       hasPasswordProvider: false,
       showResendVerificationEmail: false,
+      isSendingVerificationEmail: false,
+      resendVerificationEmailLabel: 'Resend Verification Email',
     }
 
     const viewModel = selectSettingsViewModel(state)
@@ -95,6 +123,8 @@ describe('selectSettingsViewModel', () => {
       authProviderLabel: 'Password',
       hasPasswordProvider: true,
       showResendVerificationEmail: false,
+      isSendingVerificationEmail: false,
+      resendVerificationEmailLabel: 'Resend Verification Email',
     }
 
     const viewModel = selectSettingsViewModel(state)

@@ -43,9 +43,13 @@ export default function SettingsScreen() {
         />
         {viewModel.showResendVerificationEmail && (
           <SettingsRow
-            label="Resend Verification Email"
+            label={viewModel.resendVerificationEmailLabel}
             icon="send-outline"
-            onPress={() => dispatch(sendVerificationEmail())}
+            onPress={
+              viewModel.isSendingVerificationEmail
+                ? undefined
+                : () => dispatch(sendVerificationEmail())
+            }
             accessibilityLabel="Resend verification email"
           />
         )}

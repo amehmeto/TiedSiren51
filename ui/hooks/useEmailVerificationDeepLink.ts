@@ -39,6 +39,9 @@ export function useEmailVerificationDeepLink() {
       )
       if (!oobCode) return
 
+      // oobCode is intentionally discarded when unauthenticated — Firebase
+      // verification codes are single-use, so the user will need a new link
+      // after signing in. They can request one from Settings.
       if (!isAuthenticatedRef.current) {
         router.replace('/register')
         return
@@ -47,6 +50,8 @@ export function useEmailVerificationDeepLink() {
       const verificationAction = await dispatch(
         applyEmailVerificationCode(oobCode),
       )
+      // Error toast lives here because core prohibits try-catch
+      // (no-try-catch-in-core). Success toast is dispatched inside the usecase.
       if (applyEmailVerificationCode.rejected.match(verificationAction)) {
         const message =
           verificationAction.error.message ??
