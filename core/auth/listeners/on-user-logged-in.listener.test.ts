@@ -38,6 +38,34 @@ describe('onUserLoggedIn listener', () => {
     expect(hasLoadUserPending).toBe(true)
   })
 
+  it('should log error when loadUser is rejected', async () => {
+    const store = createTestStore({ authGateway, logger }, undefined, {
+      isAuthDefaultSkipped: true,
+    })
+    const expectedLog = {
+      level: 'error',
+      message: '[onUserLoggedIn] loadUser failed: User not authenticated',
+    }
+
+    const originalDispatch = store.dispatch.bind(store)
+    // eslint-disable-next-line no-restricted-properties -- store.dispatch can't be injected
+    const dispatchSpy = vi.spyOn(store, 'dispatch')
+    dispatchSpy.mockImplementationOnce(() => ({ type: 'noop' }))
+    dispatchSpy.mockImplementation((action) => originalDispatch(action))
+
+    authGateway.simulateUserLoggedIn({
+      id: 'user-id',
+      email: 'test@test.com',
+      isEmailVerified: true,
+      username: 'Test',
+    })
+
+    await vi.waitFor(() => {
+      const logs = logger.getLogs()
+      expect(logs).toContainEqual(expectedLog)
+    })
+  })
+
   it('should log error when dispatch throws', () => {
     const store = createTestStore({ authGateway, logger })
     const expectedLog = {
