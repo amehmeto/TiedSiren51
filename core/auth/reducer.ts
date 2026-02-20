@@ -29,9 +29,6 @@ export type AuthState = {
   error: string | null
   errorType: AuthErrorType | null
   isPasswordResetSent: boolean
-  isSendingVerificationEmail: boolean
-  isVerificationEmailSent: boolean
-  isRefreshingEmailVerification: boolean
   email: string
   password: string
   lastReauthenticatedAt: ISODateString | null
@@ -96,9 +93,6 @@ function createInitialAuthState(): AuthState {
     error: null,
     errorType: null,
     isPasswordResetSent: false,
-    isSendingVerificationEmail: false,
-    isVerificationEmailSent: false,
-    isRefreshingEmailVerification: false,
     email: '',
     password: '',
     lastReauthenticatedAt: null,
@@ -172,9 +166,6 @@ export const reducer = createReducer<AuthState>(
         state.authUser = null
         state.email = ''
         state.password = ''
-        state.isSendingVerificationEmail = false
-        state.isVerificationEmailSent = false
-        state.isRefreshingEmailVerification = false
         state.lastReauthenticatedAt = null
         state.isReauthenticating = false
         state.reauthError = null
@@ -184,9 +175,6 @@ export const reducer = createReducer<AuthState>(
         state.error = null
         state.errorType = null
         state.isPasswordResetSent = false
-        state.isSendingVerificationEmail = false
-        state.isVerificationEmailSent = false
-        state.isRefreshingEmailVerification = false
         state.email = ''
         state.password = ''
       })
@@ -197,32 +185,18 @@ export const reducer = createReducer<AuthState>(
         state.isPasswordResetSent = true
       })
 
-      .addCase(sendVerificationEmail.pending, (state) => {
-        state.isSendingVerificationEmail = true
-        state.isVerificationEmailSent = false
-      })
-      .addCase(sendVerificationEmail.fulfilled, (state) => {
-        state.isSendingVerificationEmail = false
-        state.isVerificationEmailSent = true
-      })
       .addCase(sendVerificationEmail.rejected, (state, action) => {
-        state.isSendingVerificationEmail = false
         state.error = action.error.message ?? null
         state.errorType = isAuthErrorType(action.error.code)
           ? action.error.code
           : null
       })
 
-      .addCase(refreshEmailVerificationStatus.pending, (state) => {
-        state.isRefreshingEmailVerification = true
-      })
       .addCase(refreshEmailVerificationStatus.fulfilled, (state, action) => {
-        state.isRefreshingEmailVerification = false
         if (action.payload && state.authUser)
           state.authUser.isEmailVerified = true
       })
       .addCase(refreshEmailVerificationStatus.rejected, (state, action) => {
-        state.isRefreshingEmailVerification = false
         state.error = action.error.message ?? null
         state.errorType = isAuthErrorType(action.error.code)
           ? action.error.code

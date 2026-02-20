@@ -12,7 +12,7 @@ describe('Feature: Send Verification Email', () => {
     await fixture.when.sendVerificationEmail()
 
     fixture.then.verificationEmailShouldBeSent()
-    fixture.then.authShouldNotBeLoading()
+    fixture.then.toastShouldShow('Verification email sent! Check your inbox.')
   })
 
   it('should fail when rate limited', async () => {
