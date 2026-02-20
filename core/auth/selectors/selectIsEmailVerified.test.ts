@@ -1,6 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
+import { AuthProvider } from '@/core/auth/auth-user'
 import { selectIsEmailVerified } from './selectIsEmailVerified'
 
 describe('selectIsEmailVerified', () => {
@@ -24,6 +25,7 @@ describe('selectIsEmailVerified', () => {
           id: 'user-123',
           email: 'test@example.com',
           isEmailVerified: false,
+          authProvider: AuthProvider.Email,
         })
         .build(),
     )
@@ -41,6 +43,7 @@ describe('selectIsEmailVerified', () => {
           id: 'user-123',
           email: 'test@example.com',
           isEmailVerified: true,
+          authProvider: AuthProvider.Email,
         })
         .build(),
     )

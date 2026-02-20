@@ -1,5 +1,6 @@
 import { describe, expect, test } from 'vitest'
 import { stateBuilder } from '@/core/_tests_/state-builder'
+import { AuthProvider } from '@/core/auth/auth-user'
 import { selectNullableAuthUserId } from './selectNullableAuthUserId'
 
 describe('selectNullableAuthUserId', () => {
@@ -9,6 +10,7 @@ describe('selectNullableAuthUserId', () => {
         id: 'user-123',
         email: 'test@example.com',
         isEmailVerified: true,
+        authProvider: AuthProvider.Email,
       })
       .build()
 

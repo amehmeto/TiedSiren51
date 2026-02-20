@@ -31,7 +31,7 @@ module.exports = {
     },
     messages: {
       extractComponent:
-        '<{{elementName}}> spans {{lineCount}} lines but only has {{dynamicCount}} dynamic prop(s). Consider extracting into a reusable component.',
+        '<{{elementName}}> opening tag spans {{lineCount}} lines but only has {{dynamicCount}} dynamic prop(s). Consider extracting into a reusable component.',
     },
     schema: [
       {
@@ -151,7 +151,7 @@ module.exports = {
         )
           return
 
-        const lineCount = getLineSpan(node)
+        const lineCount = getLineSpan(node.openingElement)
         if (lineCount < maxLines) return
 
         const dynamicCount = countDynamicProps(node.openingElement)
