@@ -4,7 +4,7 @@
     "details": [
       {
         "appID": "TODO_TEAM_ID.com.tiedsiren.tiedsiren",
-        "paths": ["/reset-password*"]
+        "paths": ["/__/auth/action*"]
       }
     ]
   }
