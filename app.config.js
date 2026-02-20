@@ -9,7 +9,7 @@ const DARK_BLUE = '#0C207A'
 const DARK_BLUE_GRAY = '#1E293B'
 const LIGHT_BLUE = '#00D4FF'
 const WHITE = '#FFFFFF'
-const APP_DOMAIN = 'tiedsiren.app'
+const APP_DOMAIN = 'tiedsiren.com'
 
 export default {
   expo: {
