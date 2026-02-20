@@ -36,15 +36,16 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: T.font.size.medium,
-    fontWeight: T.font.weight.bold,
+    fontWeight: T.font.weight.semibold,
+    fontFamily: T.font.family.semibold,
     color: T.color.text,
     textAlign: 'center',
     marginBottom: T.spacing.small,
   },
   description: {
     fontSize: T.font.size.small,
-    color: T.color.text,
+    fontFamily: T.font.family.primary,
+    color: T.color.textMuted,
     textAlign: 'center',
-    opacity: T.opacity.semiTransparent,
   },
 })

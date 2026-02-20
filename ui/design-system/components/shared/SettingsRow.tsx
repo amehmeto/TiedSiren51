@@ -76,6 +76,7 @@ const styles = StyleSheet.create({
   },
   label: {
     fontSize: T.font.size.base,
+    fontFamily: T.font.family.primary,
     flex: 1,
   },
   rightAccessory: {
@@ -83,14 +84,14 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   value: {
-    color: T.color.grey,
+    color: T.color.textMuted,
     fontSize: T.font.size.base,
+    fontFamily: T.font.family.primary,
     marginRight: T.spacing.small,
   },
   divider: {
     height: T.border.width.thin,
-    backgroundColor: T.color.grey,
-    opacity: T.opacity.divider,
+    backgroundColor: T.color.borderSubtle,
     marginLeft: T.spacing.medium,
   },
 })

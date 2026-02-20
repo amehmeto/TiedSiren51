@@ -21,11 +21,11 @@ const styles = StyleSheet.create({
     marginTop: T.spacing.xx_large,
   },
   sectionTitle: {
-    color: T.color.grey,
+    color: T.color.textMuted,
     fontSize: T.font.size.small,
-    fontWeight: T.font.weight.bold,
-    fontFamily: T.font.family.primary,
+    fontWeight: T.font.weight.semibold,
+    fontFamily: T.font.family.semibold,
     marginBottom: T.spacing.medium,
-    letterSpacing: T.font.letterSpacing.normal,
+    letterSpacing: T.font.letterSpacing.wide,
   },
 })

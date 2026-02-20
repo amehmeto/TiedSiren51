@@ -62,9 +62,11 @@ const styles = StyleSheet.create({
   },
   label: {
     color: T.color.text,
+    fontFamily: T.font.family.medium,
   },
   option: {
     color: T.color.lightBlue,
+    fontFamily: T.font.family.primary,
     textAlign: 'right',
   },
   modal: {

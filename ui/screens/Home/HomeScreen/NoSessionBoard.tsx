@@ -23,11 +23,14 @@ export function NoSessionBoard({ sessions }: NoSessionBoardProps) {
 
 const styles = StyleSheet.create({
   title: {
-    fontWeight: T.font.weight.bold,
+    fontWeight: T.font.weight.semibold,
+    fontFamily: T.font.family.semibold,
     color: T.color.text,
     fontSize: T.font.size.small,
     marginTop: T.spacing.small,
     marginBottom: T.spacing.small,
+    letterSpacing: T.font.letterSpacing.wide,
+    textTransform: 'uppercase',
   },
-  text: { color: T.color.text },
+  text: { color: T.color.textMuted, fontFamily: T.font.family.primary },
 })

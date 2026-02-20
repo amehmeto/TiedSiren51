@@ -39,6 +39,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: T.spacing.medium,
+    backgroundColor: T.color.modalBackgroundColor,
   },
   modalView: {
     margin: T.spacing.large,
@@ -46,7 +47,7 @@ const styles = StyleSheet.create({
     padding: T.spacing.xx_large,
     alignItems: 'center',
     shadowColor: T.shadow.color,
-    shadowOffset: T.shadow.offset,
+    shadowOffset: T.shadow.offsets.large,
     width: Dimensions.get('window').width * 0.9,
     shadowOpacity: T.shadow.opacity,
     shadowRadius: T.shadow.radius.large,

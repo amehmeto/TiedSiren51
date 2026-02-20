@@ -27,11 +27,7 @@ export function TiedSSocialButton({
       ]}
       onPress={onPress}
     >
-      <Ionicons
-        name={iconName}
-        size={T.icon.size.large}
-        color={T.color.white}
-      />
+      <Ionicons name={iconName} size={T.icon.size.large} color={T.color.text} />
       <Text style={styles.buttonText}>{text}</Text>
     </Pressable>
   )
@@ -43,16 +39,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: T.layout.width.nineTenths,
-    padding: T.spacing.medium,
+    paddingVertical: T.spacing.medium,
+    paddingHorizontal: T.spacing.large,
     marginBottom: T.spacing.medium,
     borderRadius: T.border.radius.roundedMedium,
-    backgroundColor: T.color.modalBackgroundColor,
+    backgroundColor: T.color.surfaceElevated,
+    borderWidth: T.border.width.thin,
+    borderColor: T.color.borderSubtle,
   },
   buttonText: {
     marginLeft: T.spacing.medium,
-    color: T.color.white,
-    fontSize: T.font.size.regular,
-    fontWeight: T.font.weight.bold,
+    color: T.color.text,
+    fontSize: T.font.size.base,
+    fontWeight: T.font.weight.semibold,
+    fontFamily: T.font.family.semibold,
   },
 })
 

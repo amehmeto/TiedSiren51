@@ -16,8 +16,8 @@ export function TiedSLinearBackground({
 
   return (
     <LinearGradient
-      colors={[T.color.darkBlue, T.color.purple]}
-      start={{ x: 0.1, y: 0.2 }}
+      colors={[T.color.darkBlue, T.color.gradientMid, T.color.purple]}
+      start={{ x: 0, y: 0 }}
       end={{ x: 1, y: 1 }}
       style={[
         styles.container,

@@ -5,6 +5,7 @@ export const reauthFormStyles = StyleSheet.create({
   description: {
     color: T.color.text,
     fontSize: T.font.size.regular,
+    fontFamily: T.font.family.primary,
     textAlign: 'center',
     marginBottom: T.spacing.medium,
   },

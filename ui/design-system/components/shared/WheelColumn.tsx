@@ -45,21 +45,21 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    color: T.color.grey,
+    color: T.color.textMuted,
     fontSize: T.font.size.small,
-    fontFamily: T.font.family.primary,
+    fontFamily: T.font.family.medium,
     fontWeight: T.font.weight.medium,
     marginBottom: T.spacing.small,
     textTransform: 'uppercase',
-    letterSpacing: T.font.letterSpacing.normal,
+    letterSpacing: T.font.letterSpacing.wide,
   },
   picker: {
     width: '100%',
   },
   wheelText: {
-    color: T.color.white,
+    color: T.color.text,
     fontSize: T.font.size.medium,
-    fontFamily: T.font.family.primary,
+    fontFamily: T.font.family.semibold,
     fontWeight: T.font.weight.semibold,
   },
   overlayItem: {

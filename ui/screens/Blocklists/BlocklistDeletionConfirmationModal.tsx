@@ -68,7 +68,7 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontSize: T.font.size.large,
     fontWeight: T.font.weight.bold,
-    fontFamily: T.font.family.primary,
+    fontFamily: T.font.family.heading,
     marginBottom: T.spacing.medium,
     textAlign: 'center',
   },
@@ -77,7 +77,7 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.base,
     fontFamily: T.font.family.primary,
     marginBottom: T.spacing.small,
-    lineHeight: T.font.size.base * T.font.lineHeight.normal,
+    lineHeight: T.font.size.base * T.font.lineHeight.relaxed,
   },
   sessionList: {
     marginVertical: T.spacing.small,
@@ -86,7 +86,7 @@ const styles = StyleSheet.create({
   sessionItem: {
     color: T.color.lightBlue,
     fontSize: T.font.size.base,
-    fontFamily: T.font.family.primary,
+    fontFamily: T.font.family.semibold,
     fontWeight: T.font.weight.semibold,
     marginBottom: T.spacing.extraSmall,
   },
