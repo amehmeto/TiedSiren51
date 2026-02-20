@@ -12,19 +12,26 @@ type TiedSToastProps = Readonly<{
 
 export function TiedSToast({ duration = 2000 }: TiedSToastProps) {
   const dispatch = useDispatch<AppDispatch>()
-  const { message } = useSelector(selectToast)
+  const { message, isDebug } = useSelector(selectToast)
 
   const fadeAnim = useFadeAnimation({
-    isActive: message !== null,
+    isActive: message !== null && !isDebug,
     duration,
     onAnimationComplete: () => dispatch(clearToast()),
   })
 
   if (!message) return null
 
+  const animatedStyle = isDebug ? undefined : { opacity: fadeAnim }
+
   return (
-    <Animated.View style={[styles.container, { opacity: fadeAnim }]}>
+    <Animated.View style={[styles.container, animatedStyle]}>
       <Text style={styles.message}>{message}</Text>
+      {isDebug && (
+        <Text onPress={() => dispatch(clearToast())} style={styles.closeText}>
+          ✕
+        </Text>
+      )}
     </Animated.View>
   )
 }
@@ -42,10 +49,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: T.elevation.overlay,
     elevation: T.elevation.highest,
+    flexDirection: 'row',
   },
   message: {
     color: T.color.text,
     fontSize: T.font.size.small,
-    textAlign: 'center',
+    flex: 1,
+  },
+  closeText: {
+    color: T.color.text,
+    fontSize: T.font.size.medium,
+    fontWeight: T.font.weight.bold,
+    marginLeft: T.spacing.small,
+    padding: T.spacing.small,
   },
 })
