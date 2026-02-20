@@ -14,7 +14,7 @@
       "env": {
         "EXPO_ROUTER_APP_ROOT": ".app/",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCLDrarLuQfE9oTVrN6JNOdSKiiVs6oiik",
-        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "tiedsiren.app",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "com-tiedsiren.firebaseapp.com",
         "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "com-tiedsiren",
         "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "com-tiedsiren.firebasestorage.app",
         "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "1095676718619",
@@ -38,7 +38,7 @@
       "env": {
         "EXPO_ROUTER_APP_ROOT": ".app/",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCLDrarLuQfE9oTVrN6JNOdSKiiVs6oiik",
-        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "tiedsiren.app",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "com-tiedsiren.firebaseapp.com",
         "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "com-tiedsiren",
         "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "com-tiedsiren.firebasestorage.app",
         "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "1095676718619",
@@ -57,7 +57,7 @@
       "env": {
         "EXPO_ROUTER_APP_ROOT": ".app/",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCLDrarLuQfE9oTVrN6JNOdSKiiVs6oiik",
-        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "tiedsiren.app",
+        "EXPO_PUBLIC_FIREBASE_AUTH_DOMAIN": "com-tiedsiren.firebaseapp.com",
         "EXPO_PUBLIC_FIREBASE_PROJECT_ID": "com-tiedsiren",
         "EXPO_PUBLIC_FIREBASE_STORAGE_BUCKET": "com-tiedsiren.firebasestorage.app",
         "EXPO_PUBLIC_FIREBASE_MESSAGING_SENDER_ID": "1095676718619",
