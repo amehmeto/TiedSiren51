@@ -96,6 +96,18 @@ export default {
           },
         },
       ],
+      [
+        'react-native-modal-datetime-picker',
+        {
+          android: {
+            timePickerDialog: {
+              textColorPrimary: { light: WHITE, dark: WHITE },
+              colorAccent: { light: LIGHT_BLUE, dark: LIGHT_BLUE },
+              windowBackground: { light: DARK_BLUE_GRAY, dark: DARK_BLUE_GRAY },
+            },
+          },
+        },
+      ],
       'expo-apple-authentication',
       'expo-router',
     ],
