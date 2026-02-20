@@ -43,6 +43,9 @@ export abstract class PrismaRepository {
       })
     }
     this.baseClient = PrismaRepository._sharedClient
+    // Eagerly start shared initialization (fire-and-forget) — first constructor wins.
+    // Errors are swallowed here and retried by ensureInitialized() on first method call.
+    this.initialize().catch(() => {})
   }
 
   private computeDbPath(): string {
