@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
+import { AuthProvider } from '@/core/auth/auth-user'
 import { userAuthenticated } from '@/core/auth/reducer'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
@@ -23,6 +24,7 @@ describe('onUserLoggedIn listener', () => {
       email: 'jul@gmail.com',
       isEmailVerified: true,
       username: 'Jul',
+      authProvider: AuthProvider.Email,
     }
     const expectedAction = userAuthenticated(userPayload)
 
@@ -54,6 +56,7 @@ describe('onUserLoggedIn listener', () => {
       email: 'test@test.com',
       isEmailVerified: true,
       username: 'Test',
+      authProvider: AuthProvider.Email,
     })
 
     const logs = logger.getLogs()

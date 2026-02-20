@@ -1,5 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { AuthGateway } from '@/core/_ports_/auth.gateway'
+import {
+  AuthGateway,
+  EmailVerificationResult,
+} from '@/core/_ports_/auth.gateway'
 import { Logger } from '@/core/_ports_/logger'
 import { AuthUser } from '@/core/auth/auth-user'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
@@ -84,8 +87,10 @@ export class FakeStorageAuthGateway implements AuthGateway {
     return this.fakeAuthGateway.sendVerificationEmail()
   }
 
-  async refreshEmailVerificationStatus(): Promise<boolean> {
-    return this.fakeAuthGateway.refreshEmailVerificationStatus()
+  async applyEmailVerificationCode(
+    oobCode: string,
+  ): Promise<EmailVerificationResult> {
+    return this.fakeAuthGateway.applyEmailVerificationCode(oobCode)
   }
 
   async deleteAccount(): Promise<void> {

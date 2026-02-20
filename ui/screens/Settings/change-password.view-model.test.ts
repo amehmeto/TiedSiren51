@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { stateBuilder } from '@/core/_tests_/state-builder'
+import { AuthProvider } from '@/core/auth/auth-user'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { selectChangePasswordViewModel } from './change-password.view-model'
 
@@ -17,6 +18,7 @@ describe('selectChangePasswordViewModel', () => {
         id: 'user-id',
         email: 'user@test.com',
         isEmailVerified: true,
+        authProvider: AuthProvider.Email,
       })
       .build()
     const expectedViewModel = {
@@ -39,6 +41,7 @@ describe('selectChangePasswordViewModel', () => {
         id: 'user-id',
         email: 'user@test.com',
         isEmailVerified: true,
+        authProvider: AuthProvider.Email,
       })
       .withLastReauthenticatedAt('2026-02-15T20:00:00.000Z')
       .build()
@@ -55,6 +58,7 @@ describe('selectChangePasswordViewModel', () => {
         id: 'user-id',
         email: 'user@test.com',
         isEmailVerified: true,
+        authProvider: AuthProvider.Email,
       })
       .withChangingPassword(true)
       .build()
@@ -74,6 +78,7 @@ describe('selectChangePasswordViewModel', () => {
         id: 'user-id',
         email: 'user@test.com',
         isEmailVerified: true,
+        authProvider: AuthProvider.Email,
       })
       .withChangePasswordError('Password is too weak.')
       .build()
@@ -92,6 +97,7 @@ describe('selectChangePasswordViewModel', () => {
         id: 'user-id',
         email: 'user@test.com',
         isEmailVerified: true,
+        authProvider: AuthProvider.Email,
       })
       .withHasChangePasswordSucceeded(true)
       .build()
