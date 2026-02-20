@@ -1,0 +1,11 @@
+{
+  "applinks": {
+    "apps": [],
+    "details": [
+      {
+        "appID": "TODO_TEAM_ID.com.tiedsiren.tiedsiren",
+        "paths": ["/reset-password*"]
+      }
+    ]
+  }
+}
