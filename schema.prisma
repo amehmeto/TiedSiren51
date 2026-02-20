@@ -15,6 +15,8 @@ model User {
   name String
 }
 
+// userId has no Prisma default — raw SQL in PrismaRepository.createMainTables()
+// uses DEFAULT '' for migration compatibility with pre-existing rows.
 model BlockSession {
   id                  String      @id @default(uuid())
   userId              String

@@ -6,6 +6,12 @@ import { Logger } from '@/core/_ports_/logger'
 
 type ColumnInfo = { name: string; type: string }
 
+export enum UserScopedTable {
+  SIREN = 'Siren',
+  BLOCKLIST = 'Blocklist',
+  BLOCK_SESSION = 'BlockSession',
+}
+
 export abstract class PrismaRepository {
   private _isInitialized = false
 
@@ -64,6 +70,7 @@ export abstract class PrismaRepository {
       if (this._isInitialized) return
       if (this._initPromise) await this._initPromise
     } catch (error) {
+      this._initPromise = null
       this.logger.error(
         `[PrismaRepository] Failed to ensureInitialized: ${error}`,
       )
@@ -214,9 +221,9 @@ export abstract class PrismaRepository {
 
   private async migrateUserIdColumns(): Promise<void> {
     try {
-      await this.addUserIdColumnIfMissing('Siren')
-      await this.addUserIdColumnIfMissing('Blocklist')
-      await this.addUserIdColumnIfMissing('BlockSession')
+      await this.addUserIdColumnIfMissing(UserScopedTable.SIREN)
+      await this.addUserIdColumnIfMissing(UserScopedTable.BLOCKLIST)
+      await this.addUserIdColumnIfMissing(UserScopedTable.BLOCK_SESSION)
     } catch (error) {
       this.logger.error(
         `[PrismaRepository] Error migrating userId columns: ${error}`,
@@ -226,8 +233,10 @@ export abstract class PrismaRepository {
   }
 
   // Uses $queryRawUnsafe because SQLite PRAGMAs don't support bound parameters.
-  // Safe: tableName is always a hardcoded internal string ('Siren', 'Blocklist', 'BlockSession').
-  private async addUserIdColumnIfMissing(tableName: string): Promise<void> {
+  // Safe: tableName is restricted to UserScopedTable enum values.
+  private async addUserIdColumnIfMissing(
+    tableName: UserScopedTable,
+  ): Promise<void> {
     const tableInfo = await this.baseClient.$queryRawUnsafe<ColumnInfo[]>(
       `PRAGMA table_info("${tableName}");`,
     )
@@ -254,7 +263,7 @@ export abstract class PrismaRepository {
   // On a shared device, rows created while logged out go to whoever signs in first.
   protected async claimOrphanedRows(
     userId: string,
-    tableName: string,
+    tableName: UserScopedTable,
   ): Promise<void> {
     try {
       const key = `${tableName}:${userId}`

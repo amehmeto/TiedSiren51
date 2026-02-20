@@ -1,25 +1,15 @@
 import { createSlice } from '@reduxjs/toolkit'
 import { loadUser } from '../auth/usecases/load-user.usecase'
 import { logOut } from '../auth/usecases/log-out.usecase'
-import { Sirens } from './sirens'
+import { EMPTY_SIRENS } from './sirens'
 import { addKeywordToSirens } from './usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from './usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from './usecases/fetch-available-sirens.usecase'
 
-const initialSirens: Sirens = {
-  android: [],
-  windows: [],
-  macos: [],
-  ios: [],
-  linux: [],
-  websites: [],
-  keywords: [],
-}
-
 export const sirenSlice = createSlice({
   name: 'siren',
   initialState: {
-    availableSirens: initialSirens,
+    availableSirens: EMPTY_SIRENS,
   },
   reducers: {
     setSirens: (state, action) => {
@@ -41,7 +31,7 @@ export const sirenSlice = createSlice({
         state.availableSirens.websites.push(action.payload)
       })
       .addCase(logOut.fulfilled, (state) => {
-        state.availableSirens = initialSirens
+        state.availableSirens = EMPTY_SIRENS
       })
   },
 })

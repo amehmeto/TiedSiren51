@@ -3,7 +3,10 @@ import uuid from 'react-native-uuid'
 import { Logger } from '@/core/_ports_/logger'
 import { SirensRepository } from '@/core/_ports_/sirens.repository'
 import { AndroidSiren, Sirens } from '@/core/siren/sirens'
-import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
+import {
+  PrismaRepository,
+  UserScopedTable,
+} from '@/infra/__abstract__/prisma.repository'
 
 export class PrismaSirensRepository
   extends PrismaRepository
@@ -18,7 +21,7 @@ export class PrismaSirensRepository
 
   async getSelectableSirens(userId: string): Promise<Sirens> {
     try {
-      await this.claimOrphanedRows(userId, 'Siren')
+      await this.claimOrphanedRows(userId, UserScopedTable.SIREN)
       const sirens = await this.baseClient.siren.findMany({
         where: { userId },
       })

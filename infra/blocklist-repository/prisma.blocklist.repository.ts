@@ -3,7 +3,10 @@ import { CreatePayload } from '@/core/_ports_/create.payload'
 import { Logger } from '@/core/_ports_/logger'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { Blocklist } from '@/core/blocklist/blocklist'
-import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
+import {
+  PrismaRepository,
+  UserScopedTable,
+} from '@/infra/__abstract__/prisma.repository'
 
 type DbBlocklist = {
   id: string
@@ -46,7 +49,7 @@ export class PrismaBlocklistRepository
 
   async findAll(userId: string): Promise<Blocklist[]> {
     try {
-      await this.claimOrphanedRows(userId, 'Blocklist')
+      await this.claimOrphanedRows(userId, UserScopedTable.BLOCKLIST)
       const blocklists = await this.baseClient.blocklist.findMany({
         where: { userId },
       })

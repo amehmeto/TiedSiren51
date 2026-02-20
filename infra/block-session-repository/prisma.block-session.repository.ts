@@ -5,7 +5,10 @@ import { assertHHmmString } from '@/core/_ports_/date-provider'
 import { Logger } from '@/core/_ports_/logger'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { BlockSession } from '@/core/block-session/block-session'
-import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
+import {
+  PrismaRepository,
+  UserScopedTable,
+} from '@/infra/__abstract__/prisma.repository'
 
 type DbBlocklist = {
   id: string
@@ -107,7 +110,7 @@ export class PrismaBlockSessionRepository
 
   async findAll(userId: string): Promise<BlockSession[]> {
     try {
-      await this.claimOrphanedRows(userId, 'BlockSession')
+      await this.claimOrphanedRows(userId, UserScopedTable.BLOCK_SESSION)
       const sessions = await this.baseClient.blockSession.findMany({
         where: { userId },
         include: {
@@ -200,8 +203,8 @@ export class PrismaBlockSessionRepository
         },
       })
 
-      await this.baseClient.blockSession.delete({
-        where: { id },
+      await this.baseClient.blockSession.deleteMany({
+        where: { id, userId },
       })
     } catch (error) {
       this.logger.error(
