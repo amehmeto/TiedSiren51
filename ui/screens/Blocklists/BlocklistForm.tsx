@@ -12,6 +12,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { z } from 'zod'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { Blocklist } from '@/core/blocklist/blocklist'
+import { clearBlocklistSaveError } from '@/core/blocklist/blocklist.slice'
+import { selectBlocklistSaveError } from '@/core/blocklist/selectors/selectBlocklistSaveError'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
 import { updateBlocklist } from '@/core/blocklist/usecases/update-blocklist.usecase'
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
@@ -105,9 +107,16 @@ export function BlocklistForm({
       : []),
   ]
 
+  const saveError = useSelector(selectBlocklistSaveError)
+
   useEffect(() => {
+    dispatch(clearBlocklistSaveError())
     dispatch(fetchAvailableSirens())
   }, [dispatch])
+
+  useEffect(() => {
+    if (saveError) dispatch(showToast(saveError))
+  }, [saveError, dispatch])
 
   const isSirenSelected = useCallback(
     (sirenType: SirenType, sirenId: string) =>

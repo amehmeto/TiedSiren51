@@ -8,12 +8,21 @@ import { duplicateBlocklist } from './usecases/duplicate-blocklist.usecase'
 import { renameBlocklist } from './usecases/rename-blocklist.usecase'
 import { updateBlocklist } from './usecases/update-blocklist.usecase'
 
+type BlocklistExtraState = {
+  saveError: string | null
+}
+
 export const blocklistSlice = createSlice({
   name: 'blocklist',
-  initialState: blocklistAdapter.getInitialState(),
+  initialState: blocklistAdapter.getInitialState<BlocklistExtraState>({
+    saveError: null,
+  }),
   reducers: {
     setBlocklists: (state, action) => {
       blocklistAdapter.setAll(state, action.payload)
+    },
+    clearBlocklistSaveError: (state) => {
+      state.saveError = null
     },
   },
   extraReducers(builder) {
@@ -21,14 +30,26 @@ export const blocklistSlice = createSlice({
       .addCase(loadUser.fulfilled, (state, action) => {
         blocklistAdapter.setAll(state, action.payload.blocklists)
       })
+      .addCase(createBlocklist.pending, (state) => {
+        state.saveError = null
+      })
       .addCase(createBlocklist.fulfilled, (state, action) => {
         blocklistAdapter.addOne(state, action.payload)
+      })
+      .addCase(createBlocklist.rejected, (state, action) => {
+        state.saveError = action.error.message ?? 'Failed to create blocklist'
+      })
+      .addCase(updateBlocklist.pending, (state) => {
+        state.saveError = null
       })
       .addCase(updateBlocklist.fulfilled, (state, action) => {
         blocklistAdapter.updateOne(state, {
           id: action.payload.id,
           changes: action.payload,
         })
+      })
+      .addCase(updateBlocklist.rejected, (state, action) => {
+        state.saveError = action.error.message ?? 'Failed to update blocklist'
       })
       .addCase(renameBlocklist.fulfilled, (state, action) => {
         blocklistAdapter.updateOne(state, {
@@ -48,4 +69,4 @@ export const blocklistSlice = createSlice({
   },
 })
 
-export const { setBlocklists } = blocklistSlice.actions
+export const { setBlocklists, clearBlocklistSaveError } = blocklistSlice.actions
