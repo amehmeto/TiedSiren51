@@ -24,7 +24,7 @@ export class FakeDataSirensRepository implements SirensRepository {
     ],
   }
 
-  addKeywordToSirens(keyword: string): Promise<void> {
+  addKeywordToSirens(_userId: string, keyword: string): Promise<void> {
     this.selectableSirens.keywords = [
       ...this.selectableSirens.keywords,
       keyword,
@@ -32,11 +32,11 @@ export class FakeDataSirensRepository implements SirensRepository {
     return Promise.resolve()
   }
 
-  getSelectableSirens(): Promise<Sirens> {
+  getSelectableSirens(_userId: string): Promise<Sirens> {
     return Promise.resolve(this.selectableSirens)
   }
 
-  addWebsiteToSirens(website: string): Promise<void> {
+  addWebsiteToSirens(_userId: string, website: string): Promise<void> {
     this.selectableSirens.websites = [
       ...this.selectableSirens.websites,
       website,
@@ -44,7 +44,10 @@ export class FakeDataSirensRepository implements SirensRepository {
     return Promise.resolve()
   }
 
-  addAndroidSirenToSirens(androidSiren: AndroidSiren): Promise<void> {
+  addAndroidSirenToSirens(
+    _userId: string,
+    androidSiren: AndroidSiren,
+  ): Promise<void> {
     this.selectableSirens.android = [
       ...this.selectableSirens.android,
       androidSiren,
@@ -52,7 +55,7 @@ export class FakeDataSirensRepository implements SirensRepository {
     return Promise.resolve()
   }
 
-  deleteAllSirens(): Promise<void> {
+  deleteAllSirens(_userId: string): Promise<void> {
     this.selectableSirens = {
       android: [],
       ios: [],

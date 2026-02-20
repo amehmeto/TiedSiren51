@@ -62,6 +62,8 @@ describe('extendTimer use case', () => {
   )
 
   it('should reject when user is not authenticated', async () => {
+    fixture.given.unauthenticatedUser()
+
     const action = await fixture.when.extendingTimerOf({ minutes: 30 })
 
     fixture.then.actionShouldBeRejectedWith(action, 'User not authenticated')

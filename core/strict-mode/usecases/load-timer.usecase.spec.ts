@@ -29,6 +29,8 @@ describe('loadTimer use case', () => {
   })
 
   it('should return null when user is not authenticated', async () => {
+    fixture.given.unauthenticatedUser()
+
     await fixture.when.loadingTimer()
 
     fixture.then.timerShouldBeLoadedAs(null)

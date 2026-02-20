@@ -16,8 +16,21 @@ import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 import { createStore } from '../_redux_/createStore'
 import { Dependencies } from '../_redux_/dependencies'
 import { rootReducer } from '../_redux_/rootReducer'
+import { buildAuthUser } from './data-builders/auth-user.builder'
+
+type PreloadedState = Partial<ReturnType<typeof rootReducer>>
+
+type TestStoreOptions = {
+  isAuthDefaultSkipped?: boolean
+}
 
 const defaultTestLogger = new InMemoryLogger()
+
+export const defaultTestUser = buildAuthUser({
+  id: 'test-user-id',
+  email: 'test@example.com',
+  isEmailVerified: true,
+})
 
 export const createTestStore = (
   {
@@ -37,9 +50,23 @@ export const createTestStore = (
     notificationService = new FakeNotificationService(logger),
     sirenTier = new InMemorySirenTier(logger),
   }: Partial<Dependencies> = {},
-  preloadedState?: Partial<ReturnType<typeof rootReducer>>,
-) =>
-  createStore(
+  preloadedState?: PreloadedState,
+  { isAuthDefaultSkipped = false }: TestStoreOptions = {},
+) => {
+  const resolvedAuth =
+    preloadedState?.auth ?? rootReducer(undefined, { type: 'unknown' }).auth
+  const authUser = isAuthDefaultSkipped
+    ? resolvedAuth.authUser
+    : (resolvedAuth.authUser ?? defaultTestUser)
+  const stateWithAuth: PreloadedState = {
+    ...preloadedState,
+    auth: {
+      ...resolvedAuth,
+      authUser,
+    },
+  }
+
+  return createStore(
     {
       authGateway,
       backgroundTaskService,
@@ -57,5 +84,6 @@ export const createTestStore = (
       sirensRepository,
       timerRepository,
     },
-    preloadedState,
+    stateWithAuth,
   )
+}

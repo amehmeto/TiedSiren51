@@ -18,7 +18,13 @@ export const onUserLoggedInListener = ({
   authGateway.onUserLoggedIn((user) => {
     try {
       store.dispatch(userAuthenticated(user))
-      store.dispatch(loadUser())
+      store.dispatch(loadUser()).then((action) => {
+        if (loadUser.rejected.match(action)) {
+          logger.error(
+            `[onUserLoggedIn] loadUser failed: ${action.error.message}`,
+          )
+        }
+      })
     } catch (error) {
       logger.error(`Error in onUserLoggedIn listener: ${error}`)
     }

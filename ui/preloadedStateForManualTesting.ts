@@ -7,10 +7,10 @@ import {
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { dependencies } from '@/ui/dependencies'
 
-export async function preloadedStateForManualTesting() {
+export async function preloadedStateForManualTesting(userId: string) {
   const { dateProvider, blocklistRepository, blockSessionRepository } =
     dependencies
-  const blocklists = await blocklistRepository.findAll()
+  const blocklists = await blocklistRepository.findAll(userId)
 
   const preloadedState: StateBuilderProvider = stateBuilderProvider()
   const preloadedBlockSessions = [

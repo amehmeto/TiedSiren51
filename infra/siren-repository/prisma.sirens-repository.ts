@@ -3,7 +3,10 @@ import uuid from 'react-native-uuid'
 import { Logger } from '@/core/_ports_/logger'
 import { SirensRepository } from '@/core/_ports_/sirens.repository'
 import { AndroidSiren, Sirens } from '@/core/siren/sirens'
-import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
+import {
+  PrismaRepository,
+  UserScopedTable,
+} from '@/infra/__abstract__/prisma.repository'
 
 export class PrismaSirensRepository
   extends PrismaRepository
@@ -16,9 +19,12 @@ export class PrismaSirensRepository
     this.logger = logger
   }
 
-  async getSelectableSirens(): Promise<Sirens> {
+  async getSelectableSirens(userId: string): Promise<Sirens> {
     try {
-      const sirens = await this.baseClient.siren.findMany()
+      await this.claimOrphanedRows(userId, UserScopedTable.SIREN)
+      const sirens = await this.baseClient.siren.findMany({
+        where: { userId },
+      })
       return {
         android: sirens
           .filter((s: PrismaSiren) => s.type === 'android')
@@ -46,11 +52,13 @@ export class PrismaSirensRepository
     }
   }
 
-  async addKeywordToSirens(keyword: string): Promise<void> {
+  async addKeywordToSirens(userId: string, keyword: string): Promise<void> {
     try {
+      await this.ensureInitialized()
       await this.baseClient.siren.create({
         data: {
           id: String(uuid.v4()),
+          userId,
           type: 'keyword',
           value: keyword,
         },
@@ -63,11 +71,13 @@ export class PrismaSirensRepository
     }
   }
 
-  async addWebsiteToSirens(website: string): Promise<void> {
+  async addWebsiteToSirens(userId: string, website: string): Promise<void> {
     try {
+      await this.ensureInitialized()
       await this.baseClient.siren.create({
         data: {
           id: String(uuid.v4()),
+          userId,
           type: 'website',
           value: website,
         },
@@ -80,11 +90,16 @@ export class PrismaSirensRepository
     }
   }
 
-  async addAndroidSirenToSirens(androidSiren: AndroidSiren): Promise<void> {
+  async addAndroidSirenToSirens(
+    userId: string,
+    androidSiren: AndroidSiren,
+  ): Promise<void> {
     try {
+      await this.ensureInitialized()
       await this.baseClient.siren.create({
         data: {
           id: String(uuid.v4()),
+          userId,
           type: 'android',
           value: androidSiren.packageName,
           name: androidSiren.appName,
@@ -99,9 +114,12 @@ export class PrismaSirensRepository
     }
   }
 
-  async deleteAllSirens(): Promise<void> {
+  async deleteAllSirens(userId: string): Promise<void> {
     try {
-      await this.baseClient.siren.deleteMany()
+      await this.ensureInitialized()
+      await this.baseClient.siren.deleteMany({
+        where: { userId },
+      })
     } catch (error) {
       this.logger.error(
         `[PrismaSirensRepository] Failed to delete all sirens: ${error}`,

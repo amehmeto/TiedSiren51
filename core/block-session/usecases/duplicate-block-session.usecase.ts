@@ -1,5 +1,6 @@
 import { differenceInSeconds } from 'date-fns'
 import { createAppAsyncThunk } from '../../_redux_/create-app-thunk'
+import { selectAuthUserId } from '../../auth/selectors/selectAuthUserId'
 
 type DuplicateBlockSessionPayload = { id: string; name: string }
 
@@ -7,9 +8,16 @@ export const duplicateBlockSession = createAppAsyncThunk(
   'blockSession/duplicateBlockSession',
   async (
     payload: DuplicateBlockSessionPayload,
-    { extra: { blockSessionRepository, notificationService, dateProvider } },
+    {
+      extra: { blockSessionRepository, notificationService, dateProvider },
+      getState,
+    },
   ) => {
-    const sessionToBeCopied = await blockSessionRepository.findById(payload.id)
+    const userId = selectAuthUserId(getState())
+    const sessionToBeCopied = await blockSessionRepository.findById(
+      userId,
+      payload.id,
+    )
 
     const now = dateProvider.getNow()
     const startedAt = dateProvider.recoverDate(sessionToBeCopied.startedAt)
@@ -38,6 +46,6 @@ export const duplicateBlockSession = createAppAsyncThunk(
       startNotificationId,
       endNotificationId,
     }
-    return blockSessionRepository.create(duplicatedSession)
+    return blockSessionRepository.create(userId, duplicatedSession)
   },
 )

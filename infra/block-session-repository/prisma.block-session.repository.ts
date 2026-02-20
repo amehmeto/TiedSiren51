@@ -5,7 +5,10 @@ import { assertHHmmString } from '@/core/_ports_/date-provider'
 import { Logger } from '@/core/_ports_/logger'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { BlockSession } from '@/core/block-session/block-session'
-import { PrismaRepository } from '@/infra/__abstract__/prisma.repository'
+import {
+  PrismaRepository,
+  UserScopedTable,
+} from '@/infra/__abstract__/prisma.repository'
 
 type DbBlocklist = {
   id: string
@@ -43,9 +46,11 @@ export class PrismaBlockSessionRepository
   }
 
   async create(
+    userId: string,
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
     try {
+      await this.ensureInitialized()
       const blocklistIds = sessionPayload.blocklistIds.map((id) => ({
         id,
       }))
@@ -62,6 +67,7 @@ export class PrismaBlockSessionRepository
       const created = await this.baseClient.blockSession.create({
         data: {
           id: String(uuid.v4()),
+          userId,
           name: sessionPayload.name,
           startedAt: sessionPayload.startedAt,
           endedAt: sessionPayload.endedAt,
@@ -103,9 +109,11 @@ export class PrismaBlockSessionRepository
     }
   }
 
-  async findAll(): Promise<BlockSession[]> {
+  async findAll(userId: string): Promise<BlockSession[]> {
     try {
+      await this.claimOrphanedRows(userId, UserScopedTable.BLOCK_SESSION)
       const sessions = await this.baseClient.blockSession.findMany({
+        where: { userId },
         include: {
           blocklists: true,
           devices: true,
@@ -121,10 +129,11 @@ export class PrismaBlockSessionRepository
     }
   }
 
-  async findById(id: string): Promise<BlockSession> {
+  async findById(userId: string, id: string): Promise<BlockSession> {
     try {
-      const session = await this.baseClient.blockSession.findUnique({
-        where: { id },
+      await this.ensureInitialized()
+      const session = await this.baseClient.blockSession.findFirst({
+        where: { id, userId },
         include: {
           blocklists: true,
           devices: true,
@@ -142,8 +151,19 @@ export class PrismaBlockSessionRepository
     }
   }
 
-  async update(payload: UpdatePayload<BlockSession>): Promise<void> {
+  async update(
+    userId: string,
+    payload: UpdatePayload<BlockSession>,
+  ): Promise<void> {
     try {
+      await this.ensureInitialized()
+      const session = await this.baseClient.blockSession.findFirst({
+        where: { id: payload.id, userId },
+      })
+
+      if (!session)
+        throw new Error(`BlockSession ${payload.id} not found for user`)
+
       const blocklistIds = payload.blocklistIds?.map((id) => ({ id }))
       const deviceIds = payload.devices?.map((d) => ({ id: d.id }))
 
@@ -158,16 +178,8 @@ export class PrismaBlockSessionRepository
           blockingConditions: payload.blockingConditions
             ? JSON.stringify(payload.blockingConditions)
             : undefined,
-          blocklists: blocklistIds
-            ? {
-                set: blocklistIds,
-              }
-            : undefined,
-          devices: deviceIds
-            ? {
-                set: deviceIds,
-              }
-            : undefined,
+          blocklists: blocklistIds ? { set: blocklistIds } : undefined,
+          devices: deviceIds ? { set: deviceIds } : undefined,
         },
       })
     } catch (error) {
@@ -178,8 +190,15 @@ export class PrismaBlockSessionRepository
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(userId: string, id: string): Promise<void> {
     try {
+      await this.ensureInitialized()
+      const session = await this.baseClient.blockSession.findFirst({
+        where: { id, userId },
+      })
+
+      if (!session) throw new Error(`BlockSession ${id} not found`)
+
       await this.baseClient.blockSession.update({
         where: { id },
         data: {
@@ -188,8 +207,8 @@ export class PrismaBlockSessionRepository
         },
       })
 
-      await this.baseClient.blockSession.delete({
-        where: { id },
+      await this.baseClient.blockSession.deleteMany({
+        where: { id, userId },
       })
     } catch (error) {
       this.logger.error(
@@ -199,9 +218,11 @@ export class PrismaBlockSessionRepository
     }
   }
 
-  async deleteAll(): Promise<void> {
+  async deleteAll(userId: string): Promise<void> {
     try {
+      await this.ensureInitialized()
       const sessions = await this.baseClient.blockSession.findMany({
+        where: { userId },
         select: { id: true },
       })
       const disconnectRelations = sessions.map((s) =>
@@ -211,7 +232,9 @@ export class PrismaBlockSessionRepository
         }),
       )
       await Promise.all(disconnectRelations)
-      await this.baseClient.blockSession.deleteMany()
+      await this.baseClient.blockSession.deleteMany({
+        where: { userId },
+      })
     } catch (error) {
       this.logger.error(
         `[PrismaBlockSessionRepository] Failed to delete all block sessions: ${error}`,

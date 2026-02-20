@@ -7,7 +7,7 @@ describe('selectToast', () => {
   test('should return toast state', () => {
     const store = createTestStore()
     store.dispatch(showToast('Test message'))
-    const expectedToast = { message: 'Test message' }
+    const expectedToast = { message: 'Test message', isDebug: false }
 
     const toast = selectToast(store.getState())
 

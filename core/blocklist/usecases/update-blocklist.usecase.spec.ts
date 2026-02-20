@@ -1,4 +1,5 @@
 import { beforeEach, describe, it } from 'vitest'
+import { UpdatePayload } from '../../_ports_/update.payload'
 import { buildBlocklist } from '../../_tests_/data-builders/blocklist.builder'
 import { Blocklist } from '../blocklist'
 import { blocklistFixture } from './blocklist.fixture'
@@ -11,8 +12,7 @@ describe('Feature: Updating blocklist', () => {
   })
 
   it('should update a blocklist', async () => {
-    const updateBlocklistPayload: Partial<Blocklist> &
-      Required<Pick<Blocklist, 'id'>> = {
+    const updateBlocklistPayload: UpdatePayload<Blocklist> = {
       id: 'blocklist-id',
       name: 'Distraction',
     }

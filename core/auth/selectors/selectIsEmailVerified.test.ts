@@ -9,6 +9,7 @@ describe('selectIsEmailVerified', () => {
     const store = createTestStore(
       {},
       stateBuilder().withoutAuthUser({}).build(),
+      { isAuthDefaultSkipped: true },
     )
 
     const isVerified = selectIsEmailVerified(store.getState())

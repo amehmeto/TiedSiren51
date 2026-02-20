@@ -24,3 +24,13 @@ export type Sirens = {
   websites: string[]
   keywords: string[]
 }
+
+export const EMPTY_SIRENS: Sirens = {
+  android: [],
+  windows: [],
+  macos: [],
+  ios: [],
+  linux: [],
+  websites: [],
+  keywords: [],
+}

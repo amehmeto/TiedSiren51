@@ -381,9 +381,10 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   private toEmailVerificationError(error: unknown): AuthError {
     if (this.isFirebaseAuthError(error)) {
-      const verificationMessages: Partial<
+      type VerificationMessageMap = Partial<
         Record<FirebaseAuthErrorCode, string>
-      > = {
+      >
+      const verificationMessages: VerificationMessageMap = {
         [FirebaseAuthErrorCode.ExpiredActionCode]:
           'Verification link has expired. Please request a new one.',
         [FirebaseAuthErrorCode.InvalidActionCode]: 'Invalid verification link.',

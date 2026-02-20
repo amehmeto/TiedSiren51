@@ -1,6 +1,7 @@
 import { differenceInSeconds } from 'date-fns'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
+import { selectAuthUserId } from '@/core/auth/selectors/selectAuthUserId'
 import { BlockSession } from '@/core/block-session/block-session'
 
 export type UpdateBlockSessionPayload = UpdatePayload<BlockSession>
@@ -9,9 +10,14 @@ export const updateBlockSession = createAppAsyncThunk(
   'blockSession/updateBlockSession',
   async (
     payload: UpdateBlockSessionPayload,
-    { extra: { blockSessionRepository, notificationService, dateProvider } },
+    {
+      extra: { blockSessionRepository, notificationService, dateProvider },
+      getState,
+    },
   ) => {
+    const userId = selectAuthUserId(getState())
     const existingBlockSession = await blockSessionRepository.findById(
+      userId,
       payload.id,
     )
     const now = dateProvider.getNow()
@@ -52,7 +58,7 @@ export const updateBlockSession = createAppAsyncThunk(
       endNotificationId:
         endNotificationId ?? existingBlockSession.endNotificationId,
     }
-    await blockSessionRepository.update(toUpdateBlockSession)
+    await blockSessionRepository.update(userId, toUpdateBlockSession)
     return toUpdateBlockSession
   },
 )

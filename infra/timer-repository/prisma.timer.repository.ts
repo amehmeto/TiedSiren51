@@ -16,6 +16,7 @@ export class PrismaTimerRepository
 
   async saveTimer(userId: string, endedAt: ISODateString): Promise<void> {
     try {
+      await this.ensureInitialized()
       await this.baseClient.timer.upsert({
         where: { id: userId },
         create: {
@@ -35,6 +36,7 @@ export class PrismaTimerRepository
 
   async loadTimer(userId: string): Promise<ISODateString | null> {
     try {
+      await this.ensureInitialized()
       const timer = await this.baseClient.timer.findUnique({
         where: { id: userId },
       })

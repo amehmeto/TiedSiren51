@@ -35,6 +35,14 @@ export function timerFixture(
     authProvider: AuthProvider.Email,
   }
 
+  const buildStore = () => {
+    const preloadedState = testStateBuilderProvider.getState()
+    const isAuthDefaultSkipped = preloadedState.auth.authUser === null
+    return createTestStore({ timerRepository, dateProvider }, preloadedState, {
+      isAuthDefaultSkipped,
+    })
+  }
+
   return {
     given: {
       existingTimer(endedAt: ISODateString) {
@@ -61,31 +69,19 @@ export function timerFixture(
     },
     when: {
       loadingTimer: async () => {
-        store = createTestStore(
-          { timerRepository, dateProvider },
-          testStateBuilderProvider.getState(),
-        )
+        store = buildStore()
         return store.dispatch(loadTimer())
       },
       startingTimer: async (payload: StartTimerPayload) => {
-        store = createTestStore(
-          { timerRepository, dateProvider },
-          testStateBuilderProvider.getState(),
-        )
+        store = buildStore()
         return store.dispatch(startTimer(payload))
       },
       extendingTimerOf: async (payload: ExtendTimerPayload) => {
-        store = createTestStore(
-          { timerRepository, dateProvider },
-          testStateBuilderProvider.getState(),
-        )
+        store = buildStore()
         return store.dispatch(extendTimer(payload))
       },
       notifyingLockedSiren: async () => {
-        store = createTestStore(
-          { timerRepository, dateProvider },
-          testStateBuilderProvider.getState(),
-        )
+        store = buildStore()
         return store.dispatch(notifyLockedSiren())
       },
     },

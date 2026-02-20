@@ -1,4 +1,5 @@
 import { createAppAsyncThunk } from '../../_redux_/create-app-thunk'
+import { selectAuthUserId } from '../../auth/selectors/selectAuthUserId'
 
 type RenameBlockSessionPayload = { id: string; name: string }
 
@@ -6,9 +7,10 @@ export const renameBlockSession = createAppAsyncThunk(
   'blockSession/renameBlockSession',
   async (
     payload: RenameBlockSessionPayload,
-    { extra: { blockSessionRepository } },
+    { extra: { blockSessionRepository }, getState },
   ) => {
-    await blockSessionRepository.update({
+    const userId = selectAuthUserId(getState())
+    await blockSessionRepository.update(userId, {
       ...payload,
     })
     return payload

@@ -15,8 +15,11 @@ model User {
   name String
 }
 
+// userId has no Prisma default — raw SQL in PrismaRepository.createMainTables()
+// uses DEFAULT '' for migration compatibility with pre-existing rows.
 model BlockSession {
   id                  String      @id @default(uuid())
+  userId              String
   name                String
   startedAt           String
   endedAt             String
@@ -30,6 +33,7 @@ model BlockSession {
 
 model Blocklist {
   id       String         @id @default(uuid())
+  userId   String
   name     String
   sirens   String // JSON string
   sessions BlockSession[]
@@ -43,11 +47,12 @@ model Device {
 }
 
 model Siren {
-  id    String  @id @default(uuid())
-  type  String // 'android', 'ios', 'website', 'keyword'
-  value String // package name for apps, URL for websites, or keyword
-  name  String?
-  icon  String?
+  id     String  @id @default(uuid())
+  userId String
+  type   String // 'android', 'ios', 'website', 'keyword'
+  value  String // package name for apps, URL for websites, or keyword
+  name   String?
+  icon   String?
 }
 
 model Timer {

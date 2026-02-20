@@ -1,16 +1,18 @@
 import uuid from 'react-native-uuid'
 
 import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
+import { CreatePayload } from '@/core/_ports_/create.payload'
 import { HHmmString } from '@/core/_ports_/date-provider'
+import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import {
   BlockingConditions,
   BlockSession,
 } from '@/core/block-session/block-session'
-import { InMemoryRepository } from '../__abstract__/in-memory.repository'
+import { UserScopedInMemoryRepository } from '@/infra/__abstract__/user-scoped-in-memory.repository'
 
 export class FakeDataBlockSessionRepository
-  extends InMemoryRepository<BlockSession>
+  extends UserScopedInMemoryRepository<BlockSession>
   implements BlockSessionRepository
 {
   private static readonly startedAt: HHmmString = '10:48'
@@ -95,29 +97,30 @@ export class FakeDataBlockSessionRepository
     FakeDataBlockSessionRepository.entries,
   )
 
-  delete(sessionId: string): Promise<void> {
-    return super.delete(sessionId)
+  delete(userId: string, sessionId: string): Promise<void> {
+    return super.delete(userId, sessionId)
   }
 
-  findById(sessionId: string): Promise<BlockSession> {
-    return super.findById(sessionId)
+  findById(userId: string, sessionId: string): Promise<BlockSession> {
+    return super.findById(userId, sessionId)
   }
 
-  update(
-    session: Partial<BlockSession> & Required<Pick<BlockSession, 'id'>>,
-  ): Promise<void> {
-    return super.update(session)
+  update(userId: string, session: UpdatePayload<BlockSession>): Promise<void> {
+    return super.update(userId, session)
   }
 
-  findAll(): Promise<BlockSession[]> {
-    return Promise.resolve(Array.from(this.entities.values()))
+  findAll(userId: string): Promise<BlockSession[]> {
+    return super.findAll(userId)
   }
 
-  create(sessionPayload: Omit<BlockSession, 'id'>): Promise<BlockSession> {
-    return super.create(sessionPayload)
+  create(
+    userId: string,
+    sessionPayload: CreatePayload<BlockSession>,
+  ): Promise<BlockSession> {
+    return super.create(userId, sessionPayload)
   }
 
-  deleteAll(): Promise<void> {
-    return super.deleteAll()
+  deleteAll(userId: string): Promise<void> {
+    return super.deleteAll(userId)
   }
 }

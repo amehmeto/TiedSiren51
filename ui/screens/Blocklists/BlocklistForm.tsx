@@ -12,6 +12,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import { z } from 'zod'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { Blocklist } from '@/core/blocklist/blocklist'
+import { clearBlocklistSaveError } from '@/core/blocklist/blocklist.slice'
+import { selectBlocklistSaveError } from '@/core/blocklist/selectors/selectBlocklistSaveError'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
 import { updateBlocklist } from '@/core/blocklist/usecases/update-blocklist.usecase'
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
@@ -19,7 +21,7 @@ import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
 import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
-import { showToast } from '@/core/toast/toast.slice'
+import { showDebugToast, showToast } from '@/core/toast/toast.slice'
 import { FeatureFlags } from '@/feature-flags'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -105,9 +107,16 @@ export function BlocklistForm({
       : []),
   ]
 
+  const saveError = useSelector(selectBlocklistSaveError)
+
   useEffect(() => {
+    dispatch(clearBlocklistSaveError())
     dispatch(fetchAvailableSirens())
   }, [dispatch])
+
+  useEffect(() => {
+    if (saveError) dispatch(showDebugToast(saveError))
+  }, [saveError, dispatch])
 
   const isSirenSelected = useCallback(
     (sirenType: SirenType, sirenId: string) =>
