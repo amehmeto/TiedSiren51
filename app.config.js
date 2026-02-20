@@ -101,7 +101,7 @@ export default {
         {
           android: {
             timePickerDialog: {
-              textColorPrimary: { light: WHITE, dark: WHITE },
+              textColorPrimary: { light: DARK_BLUE, dark: DARK_BLUE },
               textColor: { light: WHITE, dark: WHITE },
               textColorSecondary: { light: WHITE, dark: WHITE },
               colorAccent: { light: LIGHT_BLUE, dark: LIGHT_BLUE },
