@@ -6,17 +6,32 @@ export const fetchAvailableSirens = createAppAsyncThunk(
   'siren/fetchAvailableSirens',
   async (
     _,
-    { extra: { installedAppRepository, sirensRepository }, getState },
+    { extra: { installedAppRepository, sirensRepository, logger }, getState },
   ) => {
     const userId = selectAuthUserId(getState())
-    const installedApps = await installedAppRepository.getInstalledApps()
-    const remoteSirens: Sirens =
-      await sirensRepository.getSelectableSirens(userId)
+    const emptySirens: Sirens = {
+      android: [],
+      ios: [],
+      windows: [],
+      macos: [],
+      linux: [],
+      websites: [],
+      keywords: [],
+    }
+    const [installedApps, remoteSirens] = await Promise.all([
+      installedAppRepository.getInstalledApps(),
+      sirensRepository.getSelectableSirens(userId).catch((error) => {
+        logger.error(
+          `[fetchAvailableSirens] Failed to get remote sirens, using empty defaults: ${error}`,
+        )
+        return emptySirens
+      }),
+    ])
     const availableSirens: Sirens = {
-      android: installedApps.map((app) => ({
-        packageName: app.packageName,
-        appName: app.appName,
-        icon: app.icon,
+      android: installedApps.map(({ packageName, appName, icon }) => ({
+        packageName,
+        appName,
+        icon,
       })),
       ios: [],
       windows: [],

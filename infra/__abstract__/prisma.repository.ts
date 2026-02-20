@@ -9,6 +9,8 @@ type ColumnInfo = { name: string; type: string }
 export abstract class PrismaRepository {
   private _isInitialized = false
 
+  private _initPromise: Promise<void> | null = null
+
   private readonly dbName = 'app.db'
 
   private readonly dbPath: string
@@ -20,7 +22,7 @@ export abstract class PrismaRepository {
   protected constructor() {
     this.dbPath = this.getDbPath()
     this.baseClient = this.getPrismaClient()
-    this.initialize()
+    this._initPromise = this.initialize()
   }
 
   private getPrismaClient() {
@@ -54,6 +56,18 @@ export abstract class PrismaRepository {
         `[PrismaRepository] Failed to initialize database: ${error}`,
       )
       throw new Error(`Failed to initialize database: ${error}`)
+    }
+  }
+
+  protected async ensureInitialized(): Promise<void> {
+    try {
+      if (this._isInitialized) return
+      if (this._initPromise) await this._initPromise
+    } catch (error) {
+      this.logger.error(
+        `[PrismaRepository] Failed to ensureInitialized: ${error}`,
+      )
+      throw error
     }
   }
 
@@ -246,6 +260,7 @@ export abstract class PrismaRepository {
       const key = `${tableName}:${userId}`
       if (this.claimedUserTables.has(key)) return
 
+      await this.ensureInitialized()
       await this.baseClient.$executeRawUnsafe(
         `UPDATE "${tableName}" SET "userId" = ? WHERE "userId" = ''`,
         userId,

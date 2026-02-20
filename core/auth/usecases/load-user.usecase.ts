@@ -15,15 +15,34 @@ export const loadUser = createAppAsyncThunk<UserData>(
   async (
     _,
     {
-      extra: { blocklistRepository, blockSessionRepository, sirensRepository },
+      extra: {
+        blocklistRepository,
+        blockSessionRepository,
+        sirensRepository,
+        logger,
+      },
       getState,
     },
   ) => {
     const userId = selectAuthUserId(getState())
+    const emptySirens: Sirens = {
+      android: [],
+      ios: [],
+      windows: [],
+      macos: [],
+      linux: [],
+      websites: [],
+      keywords: [],
+    }
     const [blocklists, blockSessions, sirens] = await Promise.all([
       blocklistRepository.findAll(userId),
       blockSessionRepository.findAll(userId),
-      sirensRepository.getSelectableSirens(userId),
+      sirensRepository.getSelectableSirens(userId).catch((error) => {
+        logger.error(
+          `[loadUser] Failed to get sirens, using empty defaults: ${error}`,
+        )
+        return emptySirens
+      }),
     ])
 
     return {
