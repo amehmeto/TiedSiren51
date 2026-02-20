@@ -28,6 +28,11 @@ const styles = StyleSheet.create({
   iconContainer: {
     position: 'absolute',
     right: T.spacing.small,
-    top: T.spacing.small,
+    top: T.spacing.none,
+    bottom: T.spacing.none,
+    justifyContent: 'center',
+    paddingHorizontal: T.spacing.smallMedium,
+    minWidth: T.height.settingsRow,
+    alignItems: 'center',
   },
 })

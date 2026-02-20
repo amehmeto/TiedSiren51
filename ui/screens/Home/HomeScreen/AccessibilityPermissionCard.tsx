@@ -52,12 +52,14 @@ const styles = StyleSheet.create({
   title: {
     fontSize: T.font.size.medium,
     fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
     color: T.color.text,
     textAlign: 'center',
     marginBottom: T.spacing.small,
   },
   description: {
     fontSize: T.font.size.small,
+    fontFamily: T.font.family.primary,
     color: T.color.text,
     textAlign: 'center',
     lineHeight: T.font.size.medium,

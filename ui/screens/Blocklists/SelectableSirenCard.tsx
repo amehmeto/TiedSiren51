@@ -39,14 +39,14 @@ export function SelectableSirenCard({
     ) : sirenType === SirenType.WEBSITES ? (
       <MaterialCommunityIcons
         name={'web'}
-        color={T.color.white}
+        color={T.color.text}
         size={T.sirenIconSize}
         style={{ marginRight: T.spacing.small }}
       />
     ) : (
       <FontAwesome6
         name={'hashtag'}
-        color={T.color.white}
+        color={T.color.text}
         size={T.sirenIconSize}
         style={{ marginRight: T.spacing.small }}
       />
@@ -99,7 +99,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: T.spacing.small,
+    padding: T.spacing.smallMedium,
+    minHeight: T.height.settingsRow,
   },
   checkbox: {
     alignItems: 'flex-end',
@@ -111,6 +112,8 @@ const styles = StyleSheet.create({
   },
   appName: {
     color: T.color.text,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
     flexGrow: 1,
     flexShrink: 1,
     marginRight: T.spacing.small,

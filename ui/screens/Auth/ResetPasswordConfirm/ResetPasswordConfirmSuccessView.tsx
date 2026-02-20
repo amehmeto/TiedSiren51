@@ -43,11 +43,13 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontSize: T.font.size.large,
     fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
     marginBottom: T.spacing.medium,
   },
   messageText: {
     color: T.color.text,
     fontSize: T.font.size.regular,
+    fontFamily: T.font.family.primary,
     textAlign: 'center',
     marginBottom: T.spacing.large,
   },

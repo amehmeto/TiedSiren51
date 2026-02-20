@@ -18,6 +18,7 @@ const styles = StyleSheet.create({
   errorText: {
     color: T.color.red,
     fontSize: T.font.size.small,
+    fontFamily: T.font.family.heading,
     marginTop: T.spacing.extraSmall,
     fontWeight: T.font.weight.bold,
   },

@@ -46,14 +46,19 @@ export function SelectBlockingCondition({
 const styles = StyleSheet.create({
   label: {
     color: T.color.text,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
   },
   option: {
     color: T.color.lightBlue,
+    fontFamily: T.font.family.primary,
     textAlign: 'right',
   },
   blockingCondition: {
     flexDirection: 'row',
     justifyContent: 'space-between',
+    alignItems: 'center',
+    minHeight: T.height.settingsRow,
     paddingTop: T.spacing.medium,
     paddingBottom: T.spacing.medium,
     paddingLeft: T.spacing.small,

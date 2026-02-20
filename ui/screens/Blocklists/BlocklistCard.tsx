@@ -176,10 +176,13 @@ const styles = StyleSheet.create({
   name: {
     color: T.color.text,
     fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
+    fontSize: T.font.size.base,
     paddingBottom: T.spacing.extraSmall,
   },
   totalBlocks: {
-    color: T.color.text,
+    color: T.color.textMuted,
+    fontFamily: T.font.family.primary,
     fontSize: T.font.size.xSmall,
   },
   infoContainer: {
