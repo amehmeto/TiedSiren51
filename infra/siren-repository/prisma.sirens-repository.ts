@@ -54,6 +54,7 @@ export class PrismaSirensRepository
 
   async addKeywordToSirens(userId: string, keyword: string): Promise<void> {
     try {
+      await this.ensureInitialized()
       await this.baseClient.siren.create({
         data: {
           id: String(uuid.v4()),
@@ -72,6 +73,7 @@ export class PrismaSirensRepository
 
   async addWebsiteToSirens(userId: string, website: string): Promise<void> {
     try {
+      await this.ensureInitialized()
       await this.baseClient.siren.create({
         data: {
           id: String(uuid.v4()),
@@ -93,6 +95,7 @@ export class PrismaSirensRepository
     androidSiren: AndroidSiren,
   ): Promise<void> {
     try {
+      await this.ensureInitialized()
       await this.baseClient.siren.create({
         data: {
           id: String(uuid.v4()),
@@ -113,6 +116,7 @@ export class PrismaSirensRepository
 
   async deleteAllSirens(userId: string): Promise<void> {
     try {
+      await this.ensureInitialized()
       await this.baseClient.siren.deleteMany({
         where: { userId },
       })

@@ -51,7 +51,17 @@ export abstract class PrismaRepository {
   public async initialize(): Promise<void> {
     try {
       if (this._isInitialized) return
+      if (!this._initPromise) this._initPromise = this.performInitialization()
+      await this._initPromise
+    } catch (error) {
+      this._initPromise = null
+      this.logger.error(`[PrismaRepository] Failed to initialize: ${error}`)
+      throw error
+    }
+  }
 
+  private async performInitialization(): Promise<void> {
+    try {
       await this.ensureDatabaseFile()
       await this.connectToDatabase()
       await this.createAllTables()
@@ -67,10 +77,8 @@ export abstract class PrismaRepository {
 
   protected async ensureInitialized(): Promise<void> {
     try {
-      if (this._isInitialized) return
-      if (this._initPromise) await this._initPromise
+      await this.initialize()
     } catch (error) {
-      this._initPromise = null
       this.logger.error(
         `[PrismaRepository] Failed to ensureInitialized: ${error}`,
       )
@@ -221,9 +229,10 @@ export abstract class PrismaRepository {
 
   private async migrateUserIdColumns(): Promise<void> {
     try {
-      await this.addUserIdColumnIfMissing(UserScopedTable.SIREN)
-      await this.addUserIdColumnIfMissing(UserScopedTable.BLOCKLIST)
-      await this.addUserIdColumnIfMissing(UserScopedTable.BLOCK_SESSION)
+      const { SIREN, BLOCKLIST, BLOCK_SESSION } = UserScopedTable
+      await this.addUserIdColumnIfMissing(SIREN)
+      await this.addUserIdColumnIfMissing(BLOCKLIST)
+      await this.addUserIdColumnIfMissing(BLOCK_SESSION)
     } catch (error) {
       this.logger.error(
         `[PrismaRepository] Error migrating userId columns: ${error}`,
@@ -234,6 +243,8 @@ export abstract class PrismaRepository {
 
   // Uses $queryRawUnsafe because SQLite PRAGMAs don't support bound parameters.
   // Safe: tableName is restricted to UserScopedTable enum values.
+  // Handles concurrent calls: another repo instance may add the column first
+  // (duplicate column error is swallowed via .catch).
   private async addUserIdColumnIfMissing(
     tableName: UserScopedTable,
   ): Promise<void> {
@@ -244,9 +255,14 @@ export abstract class PrismaRepository {
     const hasUserIdColumn = tableInfo.some((col) => col.name === 'userId')
 
     if (!hasUserIdColumn) {
-      await this.baseClient.$executeRawUnsafe(
-        `ALTER TABLE "${tableName}" ADD COLUMN "userId" TEXT NOT NULL DEFAULT ''`,
-      )
+      await this.baseClient
+        .$executeRawUnsafe(
+          `ALTER TABLE "${tableName}" ADD COLUMN "userId" TEXT NOT NULL DEFAULT ''`,
+        )
+        .catch((error: unknown) => {
+          // Another repo instance may have added the column concurrently
+          if (!String(error).includes('duplicate column')) throw error
+        })
 
       this.logger.info(
         `[PrismaRepository] Migrated ${tableName} table: added userId column`,
@@ -292,6 +308,14 @@ export abstract class PrismaRepository {
         FOREIGN KEY ("B") REFERENCES "Blocklist"("id") ON DELETE CASCADE
       );
     `
+    await this.baseClient.$executeRaw`
+      CREATE UNIQUE INDEX IF NOT EXISTS "_BlockSessionToBlocklist_AB_unique"
+        ON "_BlockSessionToBlocklist"("A", "B");
+    `
+    await this.baseClient.$executeRaw`
+      CREATE INDEX IF NOT EXISTS "_BlockSessionToBlocklist_B_index"
+        ON "_BlockSessionToBlocklist"("B");
+    `
 
     await this.baseClient.$executeRaw`
       CREATE TABLE IF NOT EXISTS "_BlockSessionToDevice" (
@@ -300,6 +324,14 @@ export abstract class PrismaRepository {
         FOREIGN KEY ("A") REFERENCES "BlockSession"("id") ON DELETE CASCADE,
         FOREIGN KEY ("B") REFERENCES "Device"("id") ON DELETE CASCADE
       );
+    `
+    await this.baseClient.$executeRaw`
+      CREATE UNIQUE INDEX IF NOT EXISTS "_BlockSessionToDevice_AB_unique"
+        ON "_BlockSessionToDevice"("A", "B");
+    `
+    await this.baseClient.$executeRaw`
+      CREATE INDEX IF NOT EXISTS "_BlockSessionToDevice_B_index"
+        ON "_BlockSessionToDevice"("B");
     `
   }
 

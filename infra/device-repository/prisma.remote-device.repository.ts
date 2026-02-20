@@ -17,6 +17,7 @@ export class PrismaRemoteDeviceRepository
 
   async findAll(): Promise<Device[]> {
     try {
+      await this.ensureInitialized()
       const devices = await this.baseClient.device.findMany()
       return devices.map((device: PrismaDevice) => ({
         id: device.id,

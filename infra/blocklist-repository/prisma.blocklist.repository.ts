@@ -30,6 +30,7 @@ export class PrismaBlocklistRepository
     blocklistPayload: CreatePayload<Blocklist>,
   ): Promise<Blocklist> {
     try {
+      await this.ensureInitialized()
       const created = await this.baseClient.blocklist.create({
         data: {
           userId,
@@ -67,6 +68,7 @@ export class PrismaBlocklistRepository
     payload: UpdatePayload<Blocklist>,
   ): Promise<void> {
     try {
+      await this.ensureInitialized()
       const blocklist = await this.baseClient.blocklist.findFirst({
         where: { id: payload.id, userId },
       })
@@ -91,6 +93,7 @@ export class PrismaBlocklistRepository
 
   async findById(userId: string, id: string): Promise<Blocklist> {
     try {
+      await this.ensureInitialized()
       const blocklist = await this.baseClient.blocklist.findFirst({
         where: { id, userId },
       })
@@ -108,6 +111,7 @@ export class PrismaBlocklistRepository
 
   async delete(userId: string, id: string): Promise<void> {
     try {
+      await this.ensureInitialized()
       await this.baseClient.blocklist.deleteMany({
         where: { id, userId },
       })
@@ -121,6 +125,7 @@ export class PrismaBlocklistRepository
 
   async deleteAll(userId: string): Promise<void> {
     try {
+      await this.ensureInitialized()
       await this.baseClient.blocklist.deleteMany({
         where: { userId },
       })

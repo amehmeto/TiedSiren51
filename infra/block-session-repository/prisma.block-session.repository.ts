@@ -50,6 +50,7 @@ export class PrismaBlockSessionRepository
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
     try {
+      await this.ensureInitialized()
       const blocklistIds = sessionPayload.blocklistIds.map((id) => ({
         id,
       }))
@@ -130,6 +131,7 @@ export class PrismaBlockSessionRepository
 
   async findById(userId: string, id: string): Promise<BlockSession> {
     try {
+      await this.ensureInitialized()
       const session = await this.baseClient.blockSession.findFirst({
         where: { id, userId },
         include: {
@@ -154,6 +156,7 @@ export class PrismaBlockSessionRepository
     payload: UpdatePayload<BlockSession>,
   ): Promise<void> {
     try {
+      await this.ensureInitialized()
       const session = await this.baseClient.blockSession.findFirst({
         where: { id: payload.id, userId },
       })
@@ -189,6 +192,7 @@ export class PrismaBlockSessionRepository
 
   async delete(userId: string, id: string): Promise<void> {
     try {
+      await this.ensureInitialized()
       const session = await this.baseClient.blockSession.findFirst({
         where: { id, userId },
       })
@@ -216,6 +220,7 @@ export class PrismaBlockSessionRepository
 
   async deleteAll(userId: string): Promise<void> {
     try {
+      await this.ensureInitialized()
       const sessions = await this.baseClient.blockSession.findMany({
         where: { userId },
         select: { id: true },
