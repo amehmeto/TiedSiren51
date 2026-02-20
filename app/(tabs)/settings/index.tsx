@@ -1,3 +1,4 @@
+import * as Application from 'expo-application'
 import Constants from 'expo-constants'
 import { useRouter } from 'expo-router'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
@@ -18,6 +19,7 @@ export default function SettingsScreen() {
   const viewModel = useSelector(selectSettingsViewModel)
 
   const appVersion = Constants.expoConfig?.version ?? '0.0.0'
+  const buildNumber = Application.nativeBuildVersion ?? 'N/A'
 
   return (
     <ScrollView
@@ -74,7 +76,8 @@ export default function SettingsScreen() {
         />
       </SettingsSection>
 
-      <Text style={styles.version}>v{appVersion}</Text>
+      <Text style={styles.version}>Version {appVersion}</Text>
+      <Text style={styles.buildNumber}>Build {buildNumber}</Text>
     </ScrollView>
   )
 }
@@ -105,5 +108,11 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.small,
     textAlign: 'center',
     marginTop: T.spacing.large,
+  },
+  buildNumber: {
+    color: T.color.grey,
+    fontSize: T.font.size.small,
+    textAlign: 'center',
+    marginTop: T.spacing.extraExtraSmall,
   },
 })
