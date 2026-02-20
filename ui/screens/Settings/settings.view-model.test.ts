@@ -88,26 +88,6 @@ describe('selectSettingsViewModel', () => {
     expect(viewModel).toStrictEqual(expectedViewModel)
   })
 
-  it('should default to Password provider when authProvider is undefined', () => {
-    const state = stateBuilder()
-      .withAuthUser({
-        id: 'user-id',
-        email: 'user@test.com',
-        isEmailVerified: true,
-      })
-      .build()
-    const expectedViewModel = {
-      email: 'user@test.com',
-      authProviderLabel: 'Password',
-      hasPasswordProvider: true,
-      showResendVerificationEmail: false,
-    }
-
-    const viewModel = selectSettingsViewModel(state)
-
-    expect(viewModel).toStrictEqual(expectedViewModel)
-  })
-
   it('should return empty email when no auth user', () => {
     const state = stateBuilder().build()
     const expectedViewModel = {

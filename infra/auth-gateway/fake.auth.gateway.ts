@@ -2,13 +2,14 @@ import {
   AuthGateway,
   EmailVerificationResult,
 } from '@/core/_ports_/auth.gateway'
-import { AuthUser } from '@/core/auth/auth-user'
+import { AuthProvider, AuthUser } from '@/core/auth/auth-user'
 
 export class FakeAuthGateway implements AuthGateway {
   willResultWith: Promise<AuthUser> = Promise.resolve({
     id: 'fake-user-id',
     email: 'fake-user@gmail.com',
     isEmailVerified: false,
+    authProvider: AuthProvider.Email,
   })
 
   willReauthenticateWith: Promise<void> = Promise.resolve()

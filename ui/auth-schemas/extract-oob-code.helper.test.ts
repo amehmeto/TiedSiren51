@@ -1,79 +1,62 @@
 import { describe, expect, it } from 'vitest'
 import { extractOobCode, FirebaseDeepLinkMode } from './extract-oob-code.helper'
 
+const { VerifyEmail, ResetPassword } = FirebaseDeepLinkMode
+
+type OobCodeTestCase = {
+  scenario: string
+  url: string
+  mode: FirebaseDeepLinkMode
+  expected: string | null
+}
+
 describe('extractOobCode', () => {
-  describe('verifyEmail mode', () => {
-    it('should extract oobCode from a valid verifyEmail deep link', () => {
-      const url =
-        'tiedsiren://app?mode=verifyEmail&oobCode=abc123&continueUrl=https://example.com'
+  it.each<OobCodeTestCase>([
+    {
+      scenario: 'valid verifyEmail deep link',
+      url: 'tiedsiren://app?mode=verifyEmail&oobCode=abc123&continueUrl=https://example.com',
+      mode: VerifyEmail,
+      expected: 'abc123',
+    },
+    {
+      scenario: 'valid resetPassword deep link',
+      url: 'tiedsiren://app?mode=resetPassword&oobCode=abc123&continueUrl=https://example.com',
+      mode: ResetPassword,
+      expected: 'abc123',
+    },
+    {
+      scenario: 'mode mismatch (resetPassword URL with verifyEmail mode)',
+      url: 'tiedsiren://app?mode=resetPassword&oobCode=abc123',
+      mode: VerifyEmail,
+      expected: null,
+    },
+    {
+      scenario: 'mode mismatch (verifyEmail URL with resetPassword mode)',
+      url: 'tiedsiren://app?mode=verifyEmail&oobCode=abc123',
+      mode: ResetPassword,
+      expected: null,
+    },
+    {
+      scenario: 'missing oobCode',
+      url: 'tiedsiren://app?mode=verifyEmail',
+      mode: VerifyEmail,
+      expected: null,
+    },
+    {
+      scenario: 'missing mode',
+      url: 'tiedsiren://app?oobCode=abc123',
+      mode: VerifyEmail,
+      expected: null,
+    },
+    {
+      scenario: 'no query params',
+      url: 'tiedsiren://app',
+      mode: VerifyEmail,
+      expected: null,
+    },
+  ])('should return $expected for $scenario', ({ url, mode, expected }) => {
+    const extractedOobCode = extractOobCode(url, mode)
 
-      const extractedOobCode = extractOobCode(
-        url,
-        FirebaseDeepLinkMode.VerifyEmail,
-      )
-
-      expect(extractedOobCode).toBe('abc123')
-    })
-
-    it('should return null when mode is resetPassword', () => {
-      const extractedOobCode = extractOobCode(
-        'tiedsiren://app?mode=resetPassword&oobCode=abc123',
-        FirebaseDeepLinkMode.VerifyEmail,
-      )
-
-      expect(extractedOobCode).toBeNull()
-    })
-  })
-
-  describe('resetPassword mode', () => {
-    it('should extract oobCode from a valid resetPassword deep link', () => {
-      const url =
-        'tiedsiren://app?mode=resetPassword&oobCode=abc123&continueUrl=https://example.com'
-
-      const extractedOobCode = extractOobCode(
-        url,
-        FirebaseDeepLinkMode.ResetPassword,
-      )
-
-      expect(extractedOobCode).toBe('abc123')
-    })
-
-    it('should return null when mode is verifyEmail', () => {
-      const extractedOobCode = extractOobCode(
-        'tiedsiren://app?mode=verifyEmail&oobCode=abc123',
-        FirebaseDeepLinkMode.ResetPassword,
-      )
-
-      expect(extractedOobCode).toBeNull()
-    })
-  })
-
-  describe('shared behavior', () => {
-    it('should return null when oobCode is missing', () => {
-      const extractedOobCode = extractOobCode(
-        'tiedsiren://app?mode=verifyEmail',
-        FirebaseDeepLinkMode.VerifyEmail,
-      )
-
-      expect(extractedOobCode).toBeNull()
-    })
-
-    it('should return null when mode is missing', () => {
-      const extractedOobCode = extractOobCode(
-        'tiedsiren://app?oobCode=abc123',
-        FirebaseDeepLinkMode.VerifyEmail,
-      )
-
-      expect(extractedOobCode).toBeNull()
-    })
-
-    it('should return null for a URL with no query params', () => {
-      const extractedOobCode = extractOobCode(
-        'tiedsiren://app',
-        FirebaseDeepLinkMode.VerifyEmail,
-      )
-
-      expect(extractedOobCode).toBeNull()
-    })
+    expect(extractedOobCode).toBe(expected)
   })
 })
