@@ -13,48 +13,60 @@ export enum UserScopedTable {
 }
 
 export abstract class PrismaRepository {
-  private _isInitialized = false
+  // Shared across ALL PrismaRepository instances — single connection, single init
+  private static _sharedClient: PrismaClient | null = null
 
-  private _initPromise: Promise<void> | null = null
+  private static _isInitialized = false
 
-  private readonly dbName = 'app.db'
+  private static _initPromise: Promise<void> | null = null
 
-  private readonly dbPath: string
+  private static _dbPath: string | null = null
 
-  protected baseClient: PrismaClient
+  private static _claimedUserTables = new Set<string>()
+
+  private static readonly DB_NAME = 'app.db'
+
+  protected baseClient!: PrismaClient
 
   protected abstract readonly logger: Logger
 
   protected constructor() {
-    this.dbPath = this.getDbPath()
-    this.baseClient = this.getPrismaClient()
-    this._initPromise = this.initialize()
-  }
-
-  private getPrismaClient() {
-    return new PrismaClient({
-      log: [{ emit: 'stdout', level: 'error' }],
-      datasources: {
-        db: {
-          url: `file:${this.dbPath}`,
+    if (!PrismaRepository._sharedClient) {
+      PrismaRepository._dbPath = this.computeDbPath()
+      PrismaRepository._sharedClient = new PrismaClient({
+        log: [{ emit: 'stdout', level: 'error' }],
+        datasources: {
+          db: {
+            url: `file:${PrismaRepository._dbPath}`,
+          },
         },
-      },
-    })
+      })
+    }
+    this.baseClient = PrismaRepository._sharedClient
   }
 
-  public getDbPath() {
+  private computeDbPath(): string {
     return Platform.OS === 'android'
-      ? `${FileSystem.documentDirectory}databases/${this.dbName}`
-      : `${FileSystem.documentDirectory}${this.dbName}`
+      ? `${FileSystem.documentDirectory}databases/${PrismaRepository.DB_NAME}`
+      : `${FileSystem.documentDirectory}${PrismaRepository.DB_NAME}`
+  }
+
+  public getDbPath(): string {
+    if (!PrismaRepository._dbPath)
+      PrismaRepository._dbPath = this.computeDbPath()
+
+    return PrismaRepository._dbPath
   }
 
   public async initialize(): Promise<void> {
     try {
-      if (this._isInitialized) return
-      if (!this._initPromise) this._initPromise = this.performInitialization()
-      await this._initPromise
+      if (PrismaRepository._isInitialized) return
+      if (!PrismaRepository._initPromise)
+        PrismaRepository._initPromise = this.performInitialization()
+
+      await PrismaRepository._initPromise
     } catch (error) {
-      this._initPromise = null
+      PrismaRepository._initPromise = null
       this.logger.error(`[PrismaRepository] Failed to initialize: ${error}`)
       throw error
     }
@@ -66,7 +78,7 @@ export abstract class PrismaRepository {
       await this.connectToDatabase()
       await this.createAllTables()
       await this.loadInitialData()
-      this._isInitialized = true
+      PrismaRepository._isInitialized = true
     } catch (error) {
       this.logger.error(
         `[PrismaRepository] Failed to initialize database: ${error}`,
@@ -87,20 +99,22 @@ export abstract class PrismaRepository {
   }
 
   public getClient(): PrismaClient {
-    if (!this._isInitialized) throw new Error('Database not initialized')
+    if (!PrismaRepository._isInitialized)
+      throw new Error('Database not initialized')
 
     return this.baseClient
   }
 
   private async ensureDatabaseFile(): Promise<void> {
     try {
-      const fileInfo = await FileSystem.getInfoAsync(this.dbPath)
+      const dbPath = this.getDbPath()
+      const fileInfo = await FileSystem.getInfoAsync(dbPath)
 
       if (!fileInfo.exists) {
-        const dirPath = this.dbPath.substring(0, this.dbPath.lastIndexOf('/'))
+        const dirPath = dbPath.substring(0, dbPath.lastIndexOf('/'))
         await FileSystem.makeDirectoryAsync(dirPath, { intermediates: true })
 
-        await FileSystem.writeAsStringAsync(this.dbPath, '', {
+        await FileSystem.writeAsStringAsync(dbPath, '', {
           encoding: FileSystem.EncodingType.UTF8,
         })
       }
@@ -271,11 +285,8 @@ export abstract class PrismaRepository {
     }
   }
 
-  private claimedUserTables = new Set<string>()
-
   // Idempotent: UPDATE WHERE userId = '' is a no-op if rows were already claimed.
-  // Safe under concurrent calls — each repo instance has its own claimedUserTables
-  // Set, and the SQL itself is harmless to run multiple times.
+  // Shared across all instances so the claim check is consistent.
   // WARNING: The first user to read a table claims ALL orphaned rows (userId = '').
   // On a shared device, rows created while logged out go to whoever signs in first.
   protected async claimOrphanedRows(
@@ -284,14 +295,14 @@ export abstract class PrismaRepository {
   ): Promise<void> {
     try {
       const key = `${tableName}:${userId}`
-      if (this.claimedUserTables.has(key)) return
+      if (PrismaRepository._claimedUserTables.has(key)) return
 
       await this.ensureInitialized()
       await this.baseClient.$executeRawUnsafe(
         `UPDATE "${tableName}" SET "userId" = ? WHERE "userId" = ''`,
         userId,
       )
-      this.claimedUserTables.add(key)
+      PrismaRepository._claimedUserTables.add(key)
     } catch (error) {
       this.logger.error(
         `[PrismaRepository] Failed to claimOrphanedRows: ${error}`,
