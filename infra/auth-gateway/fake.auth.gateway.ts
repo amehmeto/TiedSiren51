@@ -26,8 +26,6 @@ export class FakeAuthGateway implements AuthGateway {
   willApplyEmailVerificationCodeWith: Promise<EmailVerificationResult> =
     Promise.resolve(EmailVerificationResult.Verified)
 
-  willRefreshEmailVerificationWith: Promise<boolean> = Promise.resolve(false)
-
   verificationEmailSentCount = 0
 
   logOutError: Error | null = null
@@ -90,10 +88,6 @@ export class FakeAuthGateway implements AuthGateway {
     _oobCode: string,
   ): Promise<EmailVerificationResult> {
     return this.willApplyEmailVerificationCodeWith
-  }
-
-  refreshEmailVerificationStatus(): Promise<boolean> {
-    return this.willRefreshEmailVerificationWith
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {

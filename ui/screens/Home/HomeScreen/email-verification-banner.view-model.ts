@@ -6,26 +6,14 @@ export enum EmailVerificationBannerViewState {
   Visible = 'VISIBLE',
 }
 
-type HiddenViewModel = {
-  type: EmailVerificationBannerViewState.Hidden
-}
-
-type VisibleViewModel = {
-  type: EmailVerificationBannerViewState.Visible
-}
-
-export type EmailVerificationBannerViewModel =
-  | HiddenViewModel
-  | VisibleViewModel
-
 export function selectEmailVerificationBannerViewModel(
   state: RootState,
-): EmailVerificationBannerViewModel {
+): EmailVerificationBannerViewState {
   const { authUser } = state.auth
 
   return !authUser ||
     authUser.isEmailVerified ||
     authUser.authProvider !== AuthProvider.Email
-    ? { type: EmailVerificationBannerViewState.Hidden }
-    : { type: EmailVerificationBannerViewState.Visible }
+    ? EmailVerificationBannerViewState.Hidden
+    : EmailVerificationBannerViewState.Visible
 }

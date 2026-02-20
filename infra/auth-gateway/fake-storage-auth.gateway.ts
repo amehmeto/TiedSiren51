@@ -93,10 +93,6 @@ export class FakeStorageAuthGateway implements AuthGateway {
     return this.fakeAuthGateway.applyEmailVerificationCode(oobCode)
   }
 
-  async refreshEmailVerificationStatus(): Promise<boolean> {
-    return this.fakeAuthGateway.refreshEmailVerificationStatus()
-  }
-
   async deleteAccount(): Promise<void> {
     await AsyncStorage.removeItem('fake-auth-user')
     return this.fakeAuthGateway.deleteAccount()

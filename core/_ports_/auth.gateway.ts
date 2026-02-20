@@ -21,7 +21,6 @@ export interface AuthGateway {
   sendVerificationEmail(): Promise<void>
   /** @param oobCode - Out-of-band code from Firebase email verification deep link */
   applyEmailVerificationCode(oobCode: string): Promise<EmailVerificationResult>
-  refreshEmailVerificationStatus(): Promise<boolean>
   deleteAccount(): Promise<void>
   logOut(): Promise<void>
 }

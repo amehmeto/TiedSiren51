@@ -9,6 +9,7 @@ import {
   extractOobCode,
   FirebaseDeepLinkMode,
 } from '@/ui/auth-schemas/extract-oob-code.helper'
+import { dependencies } from '@/ui/dependencies'
 
 export function usePasswordResetDeepLink() {
   const router = useRouter()
@@ -45,7 +46,11 @@ export function usePasswordResetDeepLink() {
       .then((url) => {
         if (!isUnmountedRef.current && url) handleUrl({ url })
       })
-      .catch(() => {})
+      .catch((error) =>
+        dependencies.logger.warn(
+          `[usePasswordResetDeepLink] getInitialURL failed: ${error}`,
+        ),
+      )
 
     return () => {
       isUnmountedRef.current = true

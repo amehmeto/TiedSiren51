@@ -398,7 +398,7 @@ export class FirebaseAuthGateway implements AuthGateway {
     return this.toAuthError(error)
   }
 
-  async refreshEmailVerificationStatus(): Promise<boolean> {
+  private async refreshEmailVerificationStatus(): Promise<boolean> {
     try {
       const user = this.auth.currentUser
       if (!user) throw new Error('No authenticated user found.')

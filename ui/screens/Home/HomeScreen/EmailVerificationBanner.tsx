@@ -1,21 +1,17 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { StyleSheet, Text } from 'react-native'
 import { useSelector } from 'react-redux'
-import { RootState } from '@/core/_redux_/createStore'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 import {
-  EmailVerificationBannerViewModel,
   EmailVerificationBannerViewState,
   selectEmailVerificationBannerViewModel,
 } from './email-verification-banner.view-model'
 
 export function EmailVerificationBanner() {
-  const viewModel = useSelector<RootState, EmailVerificationBannerViewModel>(
-    selectEmailVerificationBannerViewModel,
-  )
+  const viewState = useSelector(selectEmailVerificationBannerViewModel)
 
-  if (viewModel.type === EmailVerificationBannerViewState.Hidden) return null
+  if (viewState === EmailVerificationBannerViewState.Hidden) return null
 
   return (
     <TiedSCard style={styles.container}>
