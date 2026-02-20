@@ -150,16 +150,19 @@ const styles = StyleSheet.create({
   subtitle: {
     color: T.color.text,
     fontSize: T.font.size.large,
+    fontFamily: T.font.family.heading,
     marginBottom: T.spacing.large,
   },
   orText: {
-    color: T.color.text,
+    color: T.color.textMuted,
     fontSize: T.font.size.regular,
+    fontFamily: T.font.family.primary,
     marginVertical: T.spacing.medium,
   },
   errorText: {
     color: T.color.red,
     fontSize: T.font.size.regular,
+    fontFamily: T.font.family.primary,
     marginVertical: T.spacing.medium,
   },
 })

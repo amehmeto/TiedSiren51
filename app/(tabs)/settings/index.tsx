@@ -98,6 +98,7 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontSize: T.font.size.xLarge,
     fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
     marginBottom: T.spacing.large,
   },
   logoutContainer: {
@@ -110,12 +111,14 @@ const styles = StyleSheet.create({
   version: {
     color: T.color.grey,
     fontSize: T.font.size.small,
+    fontFamily: T.font.family.primary,
     textAlign: 'center',
     marginTop: T.spacing.large,
   },
   buildNumber: {
     color: T.color.grey,
     fontSize: T.font.size.small,
+    fontFamily: T.font.family.primary,
     textAlign: 'center',
     marginTop: T.spacing.extraExtraSmall,
   },

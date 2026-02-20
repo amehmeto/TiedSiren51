@@ -12,7 +12,7 @@ type TiedSMenuOptionProps = Readonly<TiedSMenuOptionOwnProps>
 
 export function TiedSMenuOption({ option }: TiedSMenuOptionProps) {
   const { name, iconName, isDisabled = false } = option
-  const enabledColor = isDisabled ? T.color.grey : T.color.white
+  const enabledColor = isDisabled ? T.color.grey : T.color.text
 
   return (
     <MenuOption
@@ -29,7 +29,7 @@ export function TiedSMenuOption({ option }: TiedSMenuOptionProps) {
 
 const styles = StyleSheet.create({
   menuOptionText: {
-    color: T.color.white,
+    color: T.color.text,
     fontSize: T.font.size.small,
     fontFamily: T.font.family.primary,
     flex: 1,

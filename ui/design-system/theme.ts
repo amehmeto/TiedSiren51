@@ -123,7 +123,7 @@ export const T = {
     },
   },
   shadow: {
-    color: '#020617',
+    color: 'rgba(2, 6, 23, 1)',
     offset: {
       width: 0,
       height: 4,

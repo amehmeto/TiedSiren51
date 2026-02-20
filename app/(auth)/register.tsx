@@ -45,6 +45,7 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontSize: T.font.size.large,
     fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
     marginBottom: T.spacing.large,
     textAlign: 'center',
   },
@@ -54,8 +55,9 @@ const styles = StyleSheet.create({
     marginBottom: T.spacing.x_large,
   },
   haveAccountText: {
-    color: T.color.text,
+    color: T.color.textMuted,
     fontSize: T.font.size.small,
+    fontFamily: T.font.family.primary,
     marginBottom: T.spacing.medium,
   },
   image: {

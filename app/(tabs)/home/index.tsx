@@ -107,10 +107,12 @@ const styles = StyleSheet.create({
   greetings: {
     color: T.color.text,
     fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
     fontSize: T.font.size.medium,
   },
   text: {
-    color: T.color.text,
+    color: T.color.textMuted,
+    fontFamily: T.font.family.primary,
     marginBottom: T.spacing.large,
   },
   image: {

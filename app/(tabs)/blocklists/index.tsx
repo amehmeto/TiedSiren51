@@ -48,7 +48,7 @@ export default function BlocklistScreen() {
         <Ionicons
           name={'add'}
           size={T.addButtonIconSize}
-          color={T.color.white}
+          color={T.color.darkBlue}
         />
       </Pressable>
     </>
@@ -63,7 +63,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: T.spacing.small,
     borderRadius: T.border.radius.fullRound,
-    backgroundColor: T.color.darkBlue,
+    backgroundColor: T.color.lightBlue,
     position: 'absolute',
     bottom: T.spacing.large,
     right: T.spacing.large,
