@@ -25,9 +25,21 @@ export const loadUser = createAppAsyncThunk<UserData>(
     },
   ) => {
     const userId = selectAuthUserId(getState())
+    logger.info(`[loadUser] Loading data for user ${userId}`)
+
     const [blocklists, blockSessions, sirens] = await Promise.all([
-      blocklistRepository.findAll(userId),
-      blockSessionRepository.findAll(userId),
+      blocklistRepository.findAll(userId).catch((error): Blocklist[] => {
+        logger.error(
+          `[loadUser] Failed to load blocklists, using empty defaults: ${error}`,
+        )
+        return []
+      }),
+      blockSessionRepository.findAll(userId).catch((error): BlockSession[] => {
+        logger.error(
+          `[loadUser] Failed to load block sessions, using empty defaults: ${error}`,
+        )
+        return []
+      }),
       sirensRepository.getSelectableSirens(userId).catch((error) => {
         logger.error(
           `[loadUser] Failed to get sirens, using empty defaults: ${error}`,
@@ -35,6 +47,10 @@ export const loadUser = createAppAsyncThunk<UserData>(
         return EMPTY_SIRENS
       }),
     ])
+
+    logger.info(
+      `[loadUser] Loaded ${blocklists.length} blocklists, ${blockSessions.length} block sessions`,
+    )
 
     return {
       blocklists,

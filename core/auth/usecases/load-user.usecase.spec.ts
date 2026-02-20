@@ -83,6 +83,64 @@ describe('loadUser usecase', () => {
     expect(availableSirens).toStrictEqual(emptySirens)
   })
 
+  test('should load block sessions and sirens even when blocklist repository fails', async () => {
+    const mockBlockSessions = [buildBlockSession({ id: 'session-1' })]
+    const mockSirens = buildSirens({ websites: ['example.com'] })
+
+    blocklistRepository.findAll = async () => {
+      throw new Error('Database not initialized')
+    }
+    blockSessionRepository.findAll = async () => mockBlockSessions
+    sirensRepository.getSelectableSirens = async () => mockSirens
+
+    const store = createTestStore({
+      blocklistRepository,
+      blockSessionRepository,
+      sirensRepository,
+    })
+
+    await store.dispatch(loadUser())
+
+    const { blocklist, blockSession, siren } = store.getState()
+    const blocklistKeys = Object.keys(blocklist.entities)
+    const blockSessionEntities = blockSession.entities
+    const availableSirens = siren.availableSirens
+
+    expect(blocklistKeys).toHaveLength(0)
+    expect(blockSessionEntities).toHaveProperty('session-1')
+    expect(availableSirens).toStrictEqual(mockSirens)
+  })
+
+  test('should load blocklists and sirens even when block session repository fails', async () => {
+    const mockBlocklists = [
+      buildBlocklist({ id: 'blocklist-1', name: 'Test Blocklist' }),
+    ]
+    const mockSirens = buildSirens({ keywords: ['test'] })
+
+    blocklistRepository.findAll = async () => mockBlocklists
+    blockSessionRepository.findAll = async () => {
+      throw new Error('Database not initialized')
+    }
+    sirensRepository.getSelectableSirens = async () => mockSirens
+
+    const store = createTestStore({
+      blocklistRepository,
+      blockSessionRepository,
+      sirensRepository,
+    })
+
+    await store.dispatch(loadUser())
+
+    const { blocklist, blockSession, siren } = store.getState()
+    const blocklistEntities = blocklist.entities
+    const blockSessionKeys = Object.keys(blockSession.entities)
+    const availableSirens = siren.availableSirens
+
+    expect(blocklistEntities).toHaveProperty('blocklist-1')
+    expect(blockSessionKeys).toHaveLength(0)
+    expect(availableSirens).toStrictEqual(mockSirens)
+  })
+
   test('should load blocklists and block sessions even when sirens repository fails', async () => {
     const mockBlocklists = [
       buildBlocklist({ id: 'blocklist-1', name: 'Test Blocklist' }),

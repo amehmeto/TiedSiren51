@@ -115,6 +115,7 @@ export abstract class PrismaRepository {
   private async connectToDatabase(): Promise<void> {
     try {
       await this.baseClient.$connect()
+      await this.baseClient.$executeRaw`PRAGMA busy_timeout = 5000;`
       await this.baseClient.$executeRaw`PRAGMA foreign_keys = ON;`
     } catch (error) {
       this.logger.error(
