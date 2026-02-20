@@ -51,4 +51,33 @@ describe('Feature: Fetching available sirens', () => {
       keywords: ['mma', 'ufc', 'boxing'],
     })
   })
+
+  it('should still return installed apps when sirens repository fails', async () => {
+    fixture.given.installedApps([
+      buildInstalledApp({
+        packageName: 'com.instagram.android',
+        appName: 'Instagram',
+        icon: YouTubeAppIcon,
+      }),
+    ])
+    fixture.given.failingSirensRepository()
+
+    await fixture.when.fetchingAvailableSirens()
+
+    fixture.then.availableSirensShouldBeStoredAs({
+      android: [
+        {
+          packageName: 'com.instagram.android',
+          appName: 'Instagram',
+          icon: YouTubeAppIcon,
+        },
+      ],
+      ios: [],
+      linux: [],
+      macos: [],
+      windows: [],
+      websites: [],
+      keywords: [],
+    })
+  })
 })

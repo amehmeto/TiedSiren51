@@ -82,4 +82,35 @@ describe('loadUser usecase', () => {
     expect(blockSessionKeys).toHaveLength(0)
     expect(availableSirens).toStrictEqual(emptySirens)
   })
+
+  test('should load blocklists and block sessions even when sirens repository fails', async () => {
+    const mockBlocklists = [
+      buildBlocklist({ id: 'blocklist-1', name: 'Test Blocklist' }),
+    ]
+    const mockBlockSessions = [buildBlockSession({ id: 'session-1' })]
+    const expectedEmptySirens = buildSirens()
+
+    blocklistRepository.findAll = async () => mockBlocklists
+    blockSessionRepository.findAll = async () => mockBlockSessions
+    sirensRepository.getSelectableSirens = async () => {
+      throw new Error('Database not initialized')
+    }
+
+    const store = createTestStore({
+      blocklistRepository,
+      blockSessionRepository,
+      sirensRepository,
+    })
+
+    await store.dispatch(loadUser())
+
+    const state = store.getState()
+    const blocklistEntities = state.blocklist.entities
+    const blockSessionEntities = state.blockSession.entities
+    const availableSirens = state.siren.availableSirens
+
+    expect(blocklistEntities).toHaveProperty('blocklist-1')
+    expect(blockSessionEntities).toHaveProperty('session-1')
+    expect(availableSirens).toStrictEqual(expectedEmptySirens)
+  })
 })

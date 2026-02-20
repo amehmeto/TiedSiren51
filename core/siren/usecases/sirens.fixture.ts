@@ -42,6 +42,11 @@ export function sirensFixture(
           keywords: existingRemoteSirens.keywords ?? [],
         }
       },
+      failingSirensRepository() {
+        sirensRepository.getSelectableSirens = async () => {
+          throw new Error('Database not initialized')
+        }
+      },
     },
     when: {
       addingWebsiteToSirens: async (website: string) => {
