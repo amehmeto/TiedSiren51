@@ -6,7 +6,10 @@ import { AppDispatch } from '@/core/_redux_/createStore'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { applyEmailVerificationCode } from '@/core/auth/usecases/apply-email-verification-code.usecase'
 import { showToast } from '@/core/toast/toast.slice'
-import { extractVerifyEmailOobCode } from '@/ui/auth-schemas/extract-verify-email-oob-code.helper'
+import {
+  extractOobCode,
+  FirebaseDeepLinkMode,
+} from '@/ui/auth-schemas/extract-oob-code.helper'
 
 export function useEmailVerificationDeepLink() {
   const router = useRouter()
@@ -30,7 +33,10 @@ export function useEmailVerificationDeepLink() {
 
     const handleUrl = async (event: { url: string }) => {
       if (!isAuthenticatedRef.current) return
-      const oobCode = extractVerifyEmailOobCode(event.url)
+      const oobCode = extractOobCode(
+        event.url,
+        FirebaseDeepLinkMode.VerifyEmail,
+      )
       if (!oobCode) return
 
       const verificationAction = await dispatch(

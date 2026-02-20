@@ -18,7 +18,6 @@ import { deleteAccount } from '@/core/auth/usecases/delete-account.usecase'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { reauthenticateWithGoogle } from '@/core/auth/usecases/reauthenticate-with-google.usecase'
 import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
-import { refreshEmailVerificationStatus } from '@/core/auth/usecases/refresh-email-verification-status.usecase'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
 import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
@@ -123,10 +122,6 @@ export function authentificationFixture(
           EmailVerificationResult.AlreadyVerified,
         )
       },
-      refreshEmailVerificationWillReturn(isVerified: boolean) {
-        authGateway.willRefreshEmailVerificationWith =
-          Promise.resolve(isVerified)
-      },
       nowIs(isoDate: ISODateString) {
         dateProvider.now = new Date(isoDate)
       },
@@ -179,9 +174,6 @@ export function authentificationFixture(
       },
       applyEmailVerificationCode(oobCode: string) {
         return store.dispatch(applyEmailVerificationCode(oobCode))
-      },
-      refreshEmailVerificationStatus() {
-        return store.dispatch(refreshEmailVerificationStatus())
       },
     },
     then: {

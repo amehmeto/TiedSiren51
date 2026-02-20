@@ -5,7 +5,10 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { clearConfirmPasswordResetState } from '@/core/auth/reducer'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
-import { extractPasswordResetOobCode } from '@/ui/auth-schemas/extract-password-reset-oob-code.helper'
+import {
+  extractOobCode,
+  FirebaseDeepLinkMode,
+} from '@/ui/auth-schemas/extract-oob-code.helper'
 
 export function usePasswordResetDeepLink() {
   const router = useRouter()
@@ -23,7 +26,10 @@ export function usePasswordResetDeepLink() {
 
     const handleUrl = (event: { url: string }) => {
       if (isAuthenticatedRef.current) return
-      const oobCode = extractPasswordResetOobCode(event.url)
+      const oobCode = extractOobCode(
+        event.url,
+        FirebaseDeepLinkMode.ResetPassword,
+      )
       if (oobCode) {
         dispatch(clearConfirmPasswordResetState())
         router.push({

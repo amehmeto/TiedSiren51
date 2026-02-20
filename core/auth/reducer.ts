@@ -18,7 +18,6 @@ import { changePassword } from './usecases/change-password.usecase'
 import { confirmPasswordReset } from './usecases/confirm-password-reset.usecase'
 import { reauthenticateWithGoogle } from './usecases/reauthenticate-with-google.usecase'
 import { reauthenticate } from './usecases/reauthenticate.usecase'
-import { refreshEmailVerificationStatus } from './usecases/refresh-email-verification-status.usecase'
 import { resetPassword } from './usecases/reset-password.usecase'
 import { sendVerificationEmail } from './usecases/send-verification-email.usecase'
 import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
@@ -186,17 +185,6 @@ export const reducer = createReducer<AuthState>(
       })
 
       .addCase(sendVerificationEmail.rejected, (state, action) => {
-        state.error = action.error.message ?? null
-        state.errorType = isAuthErrorType(action.error.code)
-          ? action.error.code
-          : null
-      })
-
-      .addCase(refreshEmailVerificationStatus.fulfilled, (state, action) => {
-        if (action.payload && state.authUser)
-          state.authUser.isEmailVerified = true
-      })
-      .addCase(refreshEmailVerificationStatus.rejected, (state, action) => {
         state.error = action.error.message ?? null
         state.errorType = isAuthErrorType(action.error.code)
           ? action.error.code
