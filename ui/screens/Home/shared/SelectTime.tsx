@@ -130,7 +130,10 @@ export function SelectTime({
         <Text style={styles.label}>
           {timeField === TimeField.StartedAt ? 'Start Time' : 'End Time'}
         </Text>
-        <Pressable onPress={() => setIsTimePickerVisible(true)}>
+        <Pressable
+          onPress={() => setIsTimePickerVisible(true)}
+          accessibilityRole="button"
+        >
           <Text style={styles.option}>{placeholder}</Text>
         </Pressable>
       </View>

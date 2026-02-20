@@ -109,14 +109,14 @@ const styles = StyleSheet.create({
     marginTop: T.spacing.none,
   },
   version: {
-    color: T.color.grey,
+    color: T.color.textMuted,
     fontSize: T.font.size.small,
     fontFamily: T.font.family.primary,
     textAlign: 'center',
     marginTop: T.spacing.large,
   },
   buildNumber: {
-    color: T.color.grey,
+    color: T.color.textMuted,
     fontSize: T.font.size.small,
     fontFamily: T.font.family.primary,
     textAlign: 'center',

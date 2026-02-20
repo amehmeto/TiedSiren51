@@ -18,7 +18,7 @@ export function PasswordToggle({
       <Ionicons
         name={isPasswordShown ? 'eye-outline' : 'eye-off-outline'}
         size={T.icon.size.large}
-        color={T.color.grey}
+        color={T.color.textMuted}
       />
     </Pressable>
   )

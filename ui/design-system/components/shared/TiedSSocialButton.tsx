@@ -1,6 +1,13 @@
 import { Ionicons } from '@expo/vector-icons'
-import React from 'react'
-import { Text, StyleSheet, Pressable, StyleProp, ViewStyle } from 'react-native'
+import React, { useState } from 'react'
+import {
+  Animated,
+  Pressable,
+  Text,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+} from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
 type IconName = 'logo-google' | 'logo-apple'
@@ -12,24 +19,50 @@ type TiedSSocialButtonProps = {
   style?: StyleProp<ViewStyle>
 }
 
+const PRESS_SCALE = 0.97
+const ANIMATION_DURATION = 100
+const INITIAL_SCALE = 1
+
 export function TiedSSocialButton({
   iconName,
   text,
   onPress,
   style,
 }: TiedSSocialButtonProps) {
+  const [scaleAnim] = useState(() => new Animated.Value(INITIAL_SCALE))
+
   return (
-    <Pressable
-      style={({ pressed: isPressed }) => [
-        styles.button,
-        style,
-        { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
-      ]}
-      onPress={onPress}
-    >
-      <Ionicons name={iconName} size={T.icon.size.large} color={T.color.text} />
-      <Text style={styles.buttonText}>{text}</Text>
-    </Pressable>
+    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, style]}>
+      <Pressable
+        style={({ pressed: isPressed }) => [
+          styles.button,
+          { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
+        ]}
+        onPress={onPress}
+        onPressIn={() =>
+          Animated.timing(scaleAnim, {
+            toValue: PRESS_SCALE,
+            duration: ANIMATION_DURATION,
+            useNativeDriver: true,
+          }).start()
+        }
+        onPressOut={() =>
+          Animated.timing(scaleAnim, {
+            toValue: INITIAL_SCALE,
+            duration: ANIMATION_DURATION,
+            useNativeDriver: true,
+          }).start()
+        }
+        accessibilityRole="button"
+      >
+        <Ionicons
+          name={iconName}
+          size={T.icon.size.large}
+          color={T.color.text}
+        />
+        <Text style={styles.buttonText}>{text}</Text>
+      </Pressable>
+    </Animated.View>
   )
 }
 

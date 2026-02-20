@@ -87,7 +87,6 @@ export default function ForgotPasswordScreen() {
         <TiedSTextInput
           placeholder="Your Email"
           accessibilityLabel="Email"
-          placeholderTextColor={T.color.grey}
           value={email}
           onChangeText={(text) => {
             setEmail(text)

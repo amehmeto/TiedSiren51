@@ -97,6 +97,7 @@ export function SessionCard({ session, type }: SessionCardProps) {
             params: { sessionId: session.id },
           })
         }}
+        accessibilityRole="button"
       >
         <TiedSCard>
           {type === SessionType.ACTIVE ? (

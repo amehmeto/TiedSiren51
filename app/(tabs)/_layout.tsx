@@ -106,7 +106,7 @@ export default function TabLayout() {
         tabBarLabelPosition: 'below-icon',
         tabBarStyle: styles.tabBar,
         tabBarActiveTintColor: T.color.lightBlue,
-        tabBarInactiveTintColor: T.color.inactive,
+        tabBarInactiveTintColor: T.color.textMuted,
         headerShown: false,
         tabBarIcon: (props) =>
           handleTabBarIcon({ ...props, route, strictModeIcon }),

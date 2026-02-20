@@ -59,7 +59,7 @@ export function SelectableSirenCard({
     : `siren-${sirenType}-${siren}`
 
   return (
-    <Pressable onPress={onPress} testID={baseTestId}>
+    <Pressable onPress={onPress} testID={baseTestId} accessibilityRole="button">
       <TiedSCard
         style={[
           styles.container,

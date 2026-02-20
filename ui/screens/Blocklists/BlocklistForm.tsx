@@ -308,5 +308,6 @@ const styles = StyleSheet.create({
     color: T.color.red,
     fontSize: T.font.size.small,
     fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
   },
 })

@@ -45,7 +45,7 @@ export function SettingsRow({
             <Ionicons
               name="chevron-forward"
               size={T.icon.size.small}
-              color={T.color.grey}
+              color={T.color.textMuted}
             />
           )}
         </View>

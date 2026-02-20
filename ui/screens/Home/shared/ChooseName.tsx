@@ -24,7 +24,10 @@ export function ChooseName({ values, onChange, onBlur }: ChooseNameProps) {
     <>
       <View style={styles.param}>
         <Text style={styles.label}>Name</Text>
-        <Pressable onPress={() => setIsNameModalVisible(true)}>
+        <Pressable
+          onPress={() => setIsNameModalVisible(true)}
+          accessibilityRole="button"
+        >
           <Text style={styles.option}>{displayName}</Text>
         </Pressable>
       </View>

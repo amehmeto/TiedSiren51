@@ -83,7 +83,6 @@ export function ResetPasswordConfirmForm({
         <TiedSTextInput
           placeholder="New Password"
           accessibilityLabel="New Password"
-          placeholderTextColor={T.color.grey}
           value={newPassword}
           onChangeText={(text) => {
             setNewPassword(text)
@@ -96,7 +95,6 @@ export function ResetPasswordConfirmForm({
         <TiedSTextInput
           placeholder="Confirm Password"
           accessibilityLabel="Confirm Password"
-          placeholderTextColor={T.color.grey}
           value={confirmPassword}
           onChangeText={(text) => {
             setConfirmPassword(text)

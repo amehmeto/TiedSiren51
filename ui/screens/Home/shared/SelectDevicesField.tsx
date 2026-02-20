@@ -28,7 +28,10 @@ export function SelectDevicesField({
     <>
       <View style={styles.param}>
         <Text style={styles.label}>Devices</Text>
-        <Pressable onPress={() => setIsModalOpen(true)}>
+        <Pressable
+          onPress={() => setIsModalOpen(true)}
+          accessibilityRole="button"
+        >
           <Text style={styles.option}>{displayText}</Text>
         </Pressable>
       </View>

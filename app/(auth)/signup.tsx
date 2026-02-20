@@ -94,7 +94,6 @@ export default function SignUpScreen() {
         <TiedSTextInput
           placeholder="Your Email"
           accessibilityLabel="Email"
-          placeholderTextColor={T.color.grey}
           value={viewModel.email}
           onChangeText={(text) => {
             dispatch(setEmail(text))
@@ -106,7 +105,6 @@ export default function SignUpScreen() {
         <TiedSTextInput
           placeholder="Create Password"
           accessibilityLabel="Password"
-          placeholderTextColor={T.color.grey}
           hasPasswordToggle
           value={viewModel.password}
           onChangeText={(text) => {
@@ -161,7 +159,7 @@ const styles = StyleSheet.create({
   },
   errorText: {
     color: T.color.red,
-    fontSize: T.font.size.regular,
+    fontSize: T.font.size.small,
     fontFamily: T.font.family.primary,
     marginVertical: T.spacing.medium,
   },

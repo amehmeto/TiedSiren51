@@ -60,10 +60,9 @@ const styles = StyleSheet.create({
   description: {
     fontSize: T.font.size.small,
     fontFamily: T.font.family.primary,
-    color: T.color.text,
+    color: T.color.textMuted,
     textAlign: 'center',
     lineHeight: T.font.size.medium,
-    opacity: T.opacity.semiTransparent,
   },
   buttonContainer: {
     width: T.layout.width.full,
