@@ -33,12 +33,16 @@ export function useEmailVerificationDeepLink() {
     isUnmountedRef.current = false
 
     const handleUrl = async (event: { url: string }) => {
-      if (!isAuthenticatedRef.current) return
       const oobCode = extractOobCode(
         event.url,
         FirebaseDeepLinkMode.VerifyEmail,
       )
       if (!oobCode) return
+
+      if (!isAuthenticatedRef.current) {
+        router.replace('/register')
+        return
+      }
 
       const verificationAction = await dispatch(
         applyEmailVerificationCode(oobCode),

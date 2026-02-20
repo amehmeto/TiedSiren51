@@ -25,6 +25,6 @@ export function selectSettingsViewModel(state: RootState): SettingsViewModel {
     authProviderLabel: AUTH_PROVIDER_LABELS[provider],
     hasPasswordProvider: provider === Email,
     showResendVerificationEmail:
-      provider === Email && authUser?.isEmailVerified === false,
+      authUser?.authProvider === Email && authUser.isEmailVerified === false,
   }
 }
