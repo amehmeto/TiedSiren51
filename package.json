@@ -131,7 +131,7 @@
     "react-native": "0.74.5",
     "react-native-elements": "^3.4.3",
     "react-native-gesture-handler": "~2.16.1",
-    "react-native-modal-datetime-picker": "^18.0.0",
+    "react-native-modal-datetime-picker": "github:amehmeto/react-native-modal-datetime-picker",
     "react-native-pager-view": "6.3.0",
     "react-native-popup-menu": "^0.16.1",
     "react-native-quick-base64": "2.1.2",
