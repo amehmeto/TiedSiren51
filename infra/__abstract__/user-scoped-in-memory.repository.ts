@@ -2,6 +2,9 @@ import uuid from 'react-native-uuid'
 import { CreatePayload } from '@/core/_ports_/create.payload'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 
+// Test double that accepts userId for port compliance but stores entities in a flat Map.
+// Isolation is achieved through instance lifecycle (each test creates a fresh instance),
+// not through userId filtering.
 export class UserScopedInMemoryRepository<T extends { id: string }> {
   entities: Map<string, T> = new Map()
 

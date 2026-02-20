@@ -236,6 +236,8 @@ export abstract class PrismaRepository {
   // Idempotent: UPDATE WHERE userId = '' is a no-op if rows were already claimed.
   // Safe under concurrent calls — each repo instance has its own claimedUserTables
   // Set, and the SQL itself is harmless to run multiple times.
+  // WARNING: The first user to read a table claims ALL orphaned rows (userId = '').
+  // On a shared device, rows created while logged out go to whoever signs in first.
   protected async claimOrphanedRows(
     userId: string,
     tableName: string,
