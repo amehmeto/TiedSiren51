@@ -44,6 +44,10 @@ export function AppsSelectionScene({
 
   const { sortedAndroidApps, lockedSirens, isLoadingInstalledApps } = viewModel
 
+  const contentContainerStyle = isLoadingInstalledApps
+    ? styles.loadingContentContainer
+    : [styles.listContent, { paddingBottom: insets.bottom }]
+
   return (
     <FlatList
       data={sortedAndroidApps}
@@ -53,13 +57,7 @@ export function AppsSelectionScene({
           : sectionEntry.siren.packageName
       }
       ListEmptyComponent={
-        isLoadingInstalledApps ? (
-          <ActivityIndicator
-            size="large"
-            color={T.color.lightBlue}
-            style={styles.loadingIndicator}
-          />
-        ) : undefined
+        <ActivityIndicator size="large" color={T.color.lightBlue} />
       }
       renderItem={({ item: sectionEntry }) => {
         if (sectionEntry.type === 'divider') return <SectionDivider />
@@ -86,15 +84,7 @@ export function AppsSelectionScene({
         )
       }}
       style={styles.list}
-      contentContainerStyle={
-        isLoadingInstalledApps
-          ? styles.loadingContentContainer
-          : {
-              paddingBottom:
-                Math.max(insets.bottom, T.scroll.padding.minBottom) +
-                T.scroll.padding.additional,
-            }
-      }
+      contentContainerStyle={contentContainerStyle}
       overScrollMode="never"
       bounces={false}
     />
@@ -105,8 +95,10 @@ const styles = StyleSheet.create({
   list: {
     flex: 1,
   },
-  loadingIndicator: {
-    marginTop: T.spacing.xxx_large,
+  listContent: {
+    paddingBottom:
+      Math.max(T.scroll.padding.minBottom, T.scroll.padding.minBottom) +
+      T.scroll.padding.additional,
   },
   loadingContentContainer: {
     flex: 1,
