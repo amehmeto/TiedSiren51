@@ -12,6 +12,6 @@ const styles = StyleSheet.create({
     width: T.component.roundDot,
     height: T.component.roundDot,
     borderRadius: T.component.roundDot / 2,
-    backgroundColor: T.color.accentGold,
+    backgroundColor: T.color.lightBlue,
   },
 })
