@@ -3,17 +3,25 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2026-02-16
+> Last updated: 2026-02-19
+
+## Validation Warnings
+
+The following issues were detected in the dependency graph:
+
+- **dangling_ref**: Node TiedSiren51#219 depends on non-existent node TiedSiren51#55
+
+---
 
 ## Graph Statistics
 
 | Metric | Value |
 |--------|-------|
-| Total Nodes | 103 |
-| Total Edges | 43 |
-| Root Nodes (no dependencies) | 74 |
-| Leaf Nodes (nothing depends on them) | 81 |
-| Orphan Nodes (isolated) | 62 |
+| Total Nodes | 114 |
+| Total Edges | 39 |
+| Root Nodes (no dependencies) | 90 |
+| Leaf Nodes (nothing depends on them) | 94 |
+| Orphan Nodes (isolated) | 79 |
 | Critical Path Length | 5 |
 
 ### Critical Path
@@ -37,32 +45,26 @@ The longest dependency chain in the graph:
 | #67 | [Initiative] Goal based locking/unlocking | - | #62 | - |
 
 
-### Epics (8)
+### Epics (2)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
-| #54 | [Epic] User Authentification | 🔴 21 | - | - |
-| #55 | [Epic] Blocking Apps on Android | 🔴 13 | - | #57, #58, #59, #61, #219 |
-| #57 | [Epic] Strict Mode | 🔴 8 | #55 | - |
-| #58 | [Epic] Block websites on Android | - | #55 | #59 |
-| #59 | [Epic] Blocking keywords on Android | - | #55, #58 | - |
-| #60 | [Epic] Polish design | - | - | - |
 | #61 | [Epic] Schedule recurring block sessions | - | #55 | - |
 | #219 | [Epic] Native Blocking Layer | 🔴 13 | #55 | - |
 
 
-### Bugs (1)
+### Bugs (2)
 | # | Title | SP | Severity | Related |
 |---|-------|----:|----------|---------| 
 | #80 | [Bug] Logout redirects to /login modal instead of /home, requires double close | - | medium | - |
+| #333 | fix: local Prisma database not scoped per user — data leaks between accounts | - | medium | - |
 
 
-### Features - Other (40)
+### Features - Other (52)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #1 | Add ability to filter between system apps and user-installed apps on Android | - | - | - |
 | #4 | Thanks for this module and request for tutorial or guide | - | - | - |
 | #10 | feat: Add uniqueBy option to deduplicate apps by package or activity | - | - | - |
-| #56 | Misc Maintenance | - | - | - |
 | #81 | [Refactor] 🐛 Unnecessary Store State Management in `useAppInitialization` Hook | - | - | - |
 | #87 | Implement Google Sign-In with Firebase | - | - | - |
 | #93 | Implementing env vars | - | - | - |
@@ -99,9 +101,22 @@ The longest dependency chain in the graph:
 | #299 | feat: add pre-merge-commit Husky hook for squash-merge safety gate | - | - | - |
 | #300 | fix(scripts): automate board sync in sync-project-data.sh | - | - | - |
 | #304 | fix(ci): retro workflow fails because claude-code-action doesn't expand custom slash commands | - | - | - |
+| #312 | fix(block-session): auto-focus name input and use proper placeholder in ChooseName modal | - | - | - |
+| #313 | fix(block-session): time picker modal blinks and requires double selection on Android | - | - | - |
+| #316 | refactor: split /start-issue into /prepare-worktree and /start-issue | - | - | - |
+| #322 | Cerberus: trigger build job when PR is marked as ready for review | - | - | - |
+| #328 | fix: Android time picker dark mode text colors (inner clock numbers & buttons) | - | - | - |
+| #329 | Redesign Settings screen with grouped sections layout | - | - | - |
+| #330 | feat: configure iOS Universal Links for deep linking | - | - | - |
+| #334 | feat: redesign strict mode timer with wheel picker component | - | - | - |
+| #335 | feat: auto-verify email via deep link instead of manual refresh | - | - | - |
+| #336 | Rename generic variables flagged by no-lame-naming and promote to error | - | - | - |
+| #338 | Add pre-commit guard against merged branches and fix eslint comments | - | - | - |
+| #340 | Adopt OpacityPressable across codebase to replace inline opacity pattern | - | - | - |
+| #342 | feat: add feature flags to hide unfinished UI sections before store submission | - | - | - |
 
 
-### Features - Blocking Architecture (30)
+### Features - Blocking Architecture (33)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #5 | Implement BlockingScheduler with schedule storage | - | - | #8, #7, #6 |
@@ -134,9 +149,12 @@ The longest dependency chain in the graph:
 | #208 | feat(listener): Re-evaluate blocking schedule on periodic tick | 🟠 5 | #180 | - |
 | #213 | Add confirmation modal before setting strict mode timer | 🟢 2 | - | - |
 | #267 | feat(strict-mode): prevent siren deselection from blocklists during strict mode | - | - | - |
+| #310 | fix(blocklist): simplify siren selection divider — remove labels, show only when needed | - | - | - |
+| #314 | fix(block-session): blocking condition selection accumulates instead of replacing | - | - | - |
+| #331 | chore: configure custom domain tiedsiren.app for Firebase Hosting | - | - | - |
 
 
-### Features - Authentication (18)
+### Features - Authentication (19)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #85 | Setup Firebase Authentication Infrastructure | - | - | - |
@@ -157,6 +175,7 @@ The longest dependency chain in the graph:
 | #282 | feat(auth): account deletion | - | - | - |
 | #290 | refactor(auth): strip password from Redux serialization/logging | - | - | - |
 | #298 | feat(auth): Google re-authentication for sensitive operations | - | - | - |
+| #311 | fix(auth): align Confirm and Cancel buttons horizontally in reauthentication modal | - | - | - |
 
 
 ---
@@ -249,14 +268,8 @@ flowchart LR
     end
     subgraph Epics
         direction TB
-        T_TS_219["✅ TS#219 Native Blocking Layer [13sp]"]:::epic1_done
-        T_TS_61["📝 TS#61 Schedule recurring block<br/>sessions"]:::epic1_todo
-        T_TS_60["📝 TS#60 Polish design"]:::epic0_todo
-        T_TS_59["📝 TS#59 Blocking keywords on Android"]:::epic1_todo
-        T_TS_58["📝 TS#58 Block websites on Android"]:::epic1_todo
-        T_TS_57["📝 TS#57 Strict Mode [8sp]"]:::epic1_todo
-        T_TS_55["✅ TS#55 Blocking Apps on Android [13sp]"]:::epic0_done
-        T_TS_54["📝 TS#54 User Authentification [21sp]"]:::epic0_todo
+        T_TS_219["✅ TS#219 Native Blocking Layer [13sp]"]:::epic0_done
+        T_TS_61["📝 TS#61 Schedule recurring block<br/>sessions"]:::epic0_todo
     end
     subgraph Epic_219["TS#219 Native Blocking Layer"]
         direction TB
@@ -271,61 +284,28 @@ flowchart LR
     end
     subgraph Epic_61["TS#61 Schedule recurring blo..."]
         direction TB
+        T_TS_342["🔄 TS#342 : add feature flags to hide<br/>unfinished UI sections before<br/>store submission"]:::auth0_in_progress
+        T_TS_340["📝 TS#340 OpacityPressable across<br/>codebase to replace inline<br/>opacity pattern"]:::auth0_todo
         T_TSBO_14["✅ TSBO#14 weekly recurrence in scheduler [5sp]"]:::blocking3_done
         T_TSBO_13["✅ TSBO#13 daily recurrence in scheduler [3sp]"]:::blocking2_done
     end
-    subgraph Epic_60["TS#60 Polish design"]
-        direction TB
-        T_TS_299["📝 TS#299 : add pre-merge-commit Husky<br/>hook for squash-merge safety<br/>gate"]:::other0_todo
-        T_TS_272["✅ TS#272 selected apps at top of<br/>blocklist screen"]:::other0_done
-    end
-    subgraph Epic_59["TS#59 Blocking keywords on A..."]
-        direction TB
-        T_TS_264["📝 TS#264 : Add caching for installed<br/>apps list"]:::blocking0_todo
-    end
-    subgraph Epic_57["TS#57 Strict Mode"]
-        direction TB
-        T_TS_278["✅ TS#278 : Extract BlocklistForm view<br/>model selector"]:::blocking0_done
-        T_TS_255["✅ TS#255 strict-mode: disable edit and<br/>delete actions on sessions and<br/>blocklists during strict mode"]:::blocking0_done
-        T_TS_213["✅ TS#213 confirmation modal before<br/>setting strict mode timer [2sp]"]:::blocking0_done
-        T_TS_200["✅ TS#200 strict-mode: block blocklist<br/>deletion during active strict<br/>mode sessions"]:::blocking0_done
-    end
-    subgraph Epic_55["TS#55 Blocking Apps on Android"]
-        direction TB
-        T_TS_208["✅ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [5sp]"]:::blocking2_done
-        T_TS_201["✅ TS#201 BlockSession to store<br/>blocklist IDs instead of<br/>embedded blocklists [5sp]"]:::blocking0_done
-        T_TS_185["✅ TS#185 legacy updateBlockedApps calls<br/>and related code [2sp]"]:::blocking2_done
-        T_TS_184["✅ TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_done
-        T_TS_183["✅ TS#183 dependency injection with new<br/>architecture [2sp]"]:::blocking1_done
-        T_TS_182["✅ TS#182 AndroidSirenTier to call<br/>setBlockingSchedule [3sp]"]:::blocking1_done
-        T_TS_170["✅ TS#170 android: Blocking overlay<br/>never triggers - JS bridge<br/>architecture mismatch [8sp]"]:::blocking0_done
-    end
-    subgraph Epic_54["TS#54 User Authentification"]
-        direction TB
-        T_TS_298["📝 TS#298 auth: Google re-authentication<br/>for sensitive operations"]:::auth0_todo
-        T_TS_290["📝 TS#290 auth: strip password from<br/>Redux serialization/logging"]:::auth0_todo
-        T_TS_282["📝 TS#282 auth: account deletion"]:::auth0_todo
-        T_TS_281["🔄 TS#281 auth: change password"]:::auth0_in_progress
-        T_TS_169["📝 TS#169 auth: deep link to email app<br/>after signup [2sp]"]:::auth0_todo
-        T_TS_168["📝 TS#168 auth: security notification<br/>emails [5sp]"]:::auth0_todo
-        T_TS_167["📝 TS#167 auth: brute force protection<br/>on login [2sp]"]:::auth0_todo
-        T_TS_166["📝 TS#166 auth: invalidate sessions<br/>after password reset [3sp]"]:::auth1_todo
-        T_TS_165["📝 TS#165 auth: resend password reset<br/>email [1sp]"]:::auth0_todo
-        T_TS_164["✅ TS#164 auth: re-authentication for<br/>sensitive operations [2sp]"]:::auth0_done
-        T_TS_163["✅ TS#163 auth: account deletion GDPR<br/>compliance [5sp]"]:::auth1_done
-        T_TS_162["✅ TS#162 auth: change password when<br/>logged in [2sp]"]:::auth1_done
-        T_TS_161["📝 TS#161 auth: implement email<br/>verification flow [3sp]"]:::auth0_todo
-        T_TS_160["📝 TS#160 auth: custom in-app password<br/>reset confirmation flow [5sp]"]:::auth0_todo
-        T_TS_89["✅ TS#89 Authentication Error Handling [3sp]"]:::auth0_done
-        T_TS_88["📝 TS#88 Apple Sign-In with Firebase [3sp]"]:::auth0_todo
-    end
     subgraph Ungrouped
         direction TB
+        T_TS_338["✅ TS#338 pre-commit guard against<br/>merged branches and fix eslint<br/>comments"]:::other0_done
+        T_TS_336["✅ TS#336 generic variables flagged by<br/>no-lame-naming and promote to<br/>error"]:::other0_done
+        T_TS_329["✅ TS#329 Settings screen with grouped<br/>sections layout"]:::other0_done
+        T_TS_322["✅ TS#322 : trigger build job when PR is<br/>marked as ready for review"]:::other0_done
+        T_TS_316["✅ TS#316 : split /start-issue into<br/>/prepare-worktree and<br/>/start-issue"]:::other0_done
+        T_TS_314["✅ TS#314 block-session: blocking<br/>condition selection<br/>accumulates instead of repl..."]:::blocking0_done
+        T_TS_313["✅ TS#313 block-session: time picker<br/>modal blinks and requires<br/>double selection on Android"]:::other0_done
+        T_TS_312["✅ TS#312 block-session: auto-focus name<br/>input and use proper<br/>placeholder in ChooseName m..."]:::other0_done
+        T_TS_311["✅ TS#311 auth: align Confirm and Cancel<br/>buttons horizontally in<br/>reauthentication modal"]:::auth0_done
+        T_TS_310["✅ TS#310 blocklist: simplify siren<br/>selection divider — remove<br/>labels, show only when needed"]:::blocking0_done
         T_TS_304["✅ TS#304 ci: retro workflow fails<br/>because claude-code-action<br/>doesn't expand custom slash..."]:::other0_done
         T_TS_292["✅ TS#292 : make start-issue.sh work<br/>from any worktree context"]:::other0_done
         T_TS_291["✅ TS#291 ci: auto-generate review<br/>retrospective on PR merge and<br/>post to Slack"]:::other0_done
-        T_TS_289["📝 TS#289 : promote<br/>prefer-extracted-long-params<br/>ESLint rule from warn to error"]:::other0_todo
-        T_TS_288["📝 TS#288 : promote<br/>no-inline-object-type ESLint<br/>rule from warn to error"]:::other0_todo
+        T_TS_289["✅ TS#289 : promote<br/>prefer-extracted-long-params<br/>ESLint rule from warn to error"]:::other0_done
+        T_TS_288["✅ TS#288 : promote<br/>no-inline-object-type ESLint<br/>rule from warn to error"]:::other0_done
         T_TS_287["✅ TS#287 : promote require-typed-each<br/>ESLint rule from warn to error"]:::other0_done
         T_TS_276["📝 TS#276 from ESLint to OxLint"]:::other0_todo
         T_TS_270["✅ TS#270 : add review-fix command,<br/>enhance start-issue with issue<br/>content, and add branch hyg..."]:::other0_done
@@ -364,19 +344,58 @@ flowchart LR
         T_TS_85["✅ TS#85 Firebase Authentication<br/>Infrastructure"]:::auth0_done
         T_TS_81["✅ TS#81 🐛 Unnecessary Store State<br/>Management in<br/>`useAppInitialization` Hook"]:::other0_done
         T_TS_80["✅ TS#80 Logout redirects to /login<br/>modal instead of /home,<br/>requires double close"]:::bug0_done
-        T_TS_56["✅ TS#56 Maintenance"]:::other0_done
         T_EFS_4["✅ EFS#4 for this module and request<br/>for tutorial or guide"]:::blocking0_done
         T_TSBO_5["✅ TSBO#5 BlockingScheduler with<br/>schedule storage"]:::blocking0_done
         T_ELIA_10["✅ ELIA#10 : Add uniqueBy option to<br/>deduplicate apps by package or<br/>activity"]:::other0_done
         T_ELIA_1["📝 ELIA#1 ability to filter between<br/>system apps and user-installed<br/>apps on Android"]:::other0_todo
+        T_TS_335["📝 TS#335 : auto-verify email via deep<br/>link instead of manual refresh"]:::auth0_todo
+        T_TS_334["🔄 TS#334 : redesign strict mode timer<br/>with wheel picker component"]:::blocking0_in_progress
+        T_TS_333["🔄 TS#333 : local Prisma database not<br/>scoped per user — data leaks<br/>between accounts"]:::bug0_in_progress
+        T_TS_331["📝 TS#331 : configure custom domain<br/>tiedsiren.app for Firebase<br/>Hosting"]:::blocking0_todo
+        T_TS_330["📝 TS#330 : configure iOS Universal<br/>Links for deep linking"]:::other0_todo
+        T_TS_328["📝 TS#328 : Android time picker dark<br/>mode text colors inner clock<br/>numbers & buttons"]:::other0_todo
         T_TS_300["✅ TS#300 scripts: automate board sync<br/>in sync-project-data.sh"]:::other0_done
+        T_TS_299["📝 TS#299 : add pre-merge-commit Husky<br/>hook for squash-merge safety<br/>gate"]:::other0_todo
+        T_TS_298["✅ TS#298 auth: Google re-authentication<br/>for sensitive operations"]:::auth0_done
+        T_TS_290["✅ TS#290 auth: strip password from<br/>Redux serialization/logging"]:::auth0_done
+        T_TS_282["✅ TS#282 auth: account deletion"]:::auth0_done
+        T_TS_281["✅ TS#281 auth: change password"]:::auth0_done
+        T_TS_278["✅ TS#278 : Extract BlocklistForm view<br/>model selector"]:::other0_done
+        T_TS_272["✅ TS#272 selected apps at top of<br/>blocklist screen"]:::other0_done
+        T_TS_264["📝 TS#264 : Add caching for installed<br/>apps list"]:::other0_todo
+        T_TS_255["✅ TS#255 strict-mode: disable edit and<br/>delete actions on sessions and<br/>blocklists during strict mode"]:::blocking0_done
+        T_TS_213["✅ TS#213 confirmation modal before<br/>setting strict mode timer [2sp]"]:::blocking0_done
+        T_TS_208["✅ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [5sp]"]:::blocking2_done
+        T_TS_201["✅ TS#201 BlockSession to store<br/>blocklist IDs instead of<br/>embedded blocklists [5sp]"]:::other0_done
+        T_TS_200["✅ TS#200 strict-mode: block blocklist<br/>deletion during active strict<br/>mode sessions"]:::blocking0_done
+        T_TS_185["✅ TS#185 legacy updateBlockedApps calls<br/>and related code [2sp]"]:::blocking2_done
+        T_TS_184["✅ TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_done
+        T_TS_183["✅ TS#183 dependency injection with new<br/>architecture [2sp]"]:::blocking1_done
+        T_TS_182["✅ TS#182 AndroidSirenTier to call<br/>setBlockingSchedule [3sp]"]:::blocking1_done
+        T_TS_170["✅ TS#170 android: Blocking overlay<br/>never triggers - JS bridge<br/>architecture mismatch [8sp]"]:::blocking0_done
+        T_TS_169["📝 TS#169 auth: deep link to email app<br/>after signup [2sp]"]:::auth0_todo
+        T_TS_168["📝 TS#168 auth: security notification<br/>emails [5sp]"]:::auth0_todo
+        T_TS_167["📝 TS#167 auth: brute force protection<br/>on login [2sp]"]:::auth0_todo
+        T_TS_166["📝 TS#166 auth: invalidate sessions<br/>after password reset [3sp]"]:::auth1_todo
+        T_TS_165["📝 TS#165 auth: resend password reset<br/>email [1sp]"]:::auth0_todo
+        T_TS_164["✅ TS#164 auth: re-authentication for<br/>sensitive operations [2sp]"]:::auth0_done
+        T_TS_163["✅ TS#163 auth: account deletion GDPR<br/>compliance [5sp]"]:::auth1_done
+        T_TS_162["✅ TS#162 auth: change password when<br/>logged in [2sp]"]:::auth1_done
+        T_TS_161["✅ TS#161 auth: implement email<br/>verification flow [3sp]"]:::auth0_done
+        T_TS_160["✅ TS#160 auth: custom in-app password<br/>reset confirmation flow [5sp]"]:::auth0_done
+        T_TS_89["✅ TS#89 Authentication Error Handling [3sp]"]:::auth0_done
+        T_TS_88["📝 TS#88 Apple Sign-In with Firebase [3sp]"]:::auth0_todo
     end
 
-    T_TS_55 --> T_TS_219
+    T_TS_180 --> T_TS_208
+    T_TS_180 --> T_TS_185
     T_TS_182 --> T_TS_185
     T_TS_184 --> T_TS_185
     T_TS_182 --> T_TS_184
+    T_TS_177 --> T_TS_183
+    T_TS_178 --> T_TS_183
     T_TS_182 --> T_TS_183
+    T_TS_177 --> T_TS_182
     T_TS_177 --> T_TS_181
     T_TS_178 --> T_TS_181
     T_TS_177 --> T_TS_180
@@ -392,11 +411,6 @@ flowchart LR
     T_TS_62 --> T_TS_64
     T_TS_63 --> T_TS_64
     T_TS_62 --> T_TS_63
-    T_TS_55 --> T_TS_61
-    T_TS_55 --> T_TS_59
-    T_TS_58 --> T_TS_59
-    T_TS_55 --> T_TS_58
-    T_TS_55 --> T_TS_57
     T_TSBO_9 --> T_TSBO_18
     T_TSBO_13 --> T_TSBO_14
     T_TSBO_10 --> T_TSBO_12
@@ -423,8 +437,6 @@ Quick reference showing what blocks what:
 | TSBO#10 | #12 |
 | TSBO#11 | #12 |
 | TSBO#13 | #14 |
-| #55 | #57, #58, #59, #61, #219 |
-| #58 | #59 |
 | #62 | #63, #64, #65, #66, #67 |
 | #63 | #64 |
 | #160 | #166 |
@@ -480,4 +492,4 @@ Quick reference showing what blocks what:
 
 ---
 
-*Auto-generated on 2026-02-16 from GitHub issue metadata*
+*Auto-generated on 2026-02-19 from GitHub issue metadata*
