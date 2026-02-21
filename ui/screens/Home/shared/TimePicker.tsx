@@ -1,5 +1,5 @@
 import React from 'react'
-import { Platform, StyleSheet } from 'react-native'
+import { Platform } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { HHmmString } from '@/core/_ports_/date-provider'
 import { T } from '@/ui/design-system/theme'
@@ -52,21 +52,9 @@ export function TimePicker({
       accentColor={T.color.lightBlue}
       buttonTextColorIOS={T.color.lightBlue}
       textColor={T.color.text}
-      pickerContainerStyleIOS={styles.pickerContainer}
-      modalStyleIOS={styles.modalStyle}
       onConfirm={onConfirm}
       onCancel={onCancel}
       onHide={onHide}
     />
   )
 }
-
-const styles = StyleSheet.create({
-  pickerContainer: {
-    borderRadius: T.border.radius.extraRounded,
-    overflow: 'hidden',
-  },
-  modalStyle: {
-    borderRadius: T.border.radius.extraRounded,
-  },
-})
