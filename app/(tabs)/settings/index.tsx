@@ -1,9 +1,11 @@
+import * as Application from 'expo-application'
 import Constants from 'expo-constants'
 import { useRouter } from 'expo-router'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
+import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
 import { SettingsRow } from '@/ui/design-system/components/shared/SettingsRow'
 import { SettingsSection } from '@/ui/design-system/components/shared/SettingsSection'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -17,6 +19,7 @@ export default function SettingsScreen() {
   const viewModel = useSelector(selectSettingsViewModel)
 
   const appVersion = Constants.expoConfig?.version ?? '0.0.0'
+  const buildNumber = Application.nativeBuildVersion ?? 'N/A'
 
   return (
     <ScrollView
@@ -35,8 +38,21 @@ export default function SettingsScreen() {
         <SettingsRow
           label={viewModel.authProviderLabel}
           icon="key-outline"
+          hasDivider={viewModel.showResendVerificationEmail}
           accessibilityLabel={`Sign-in method: ${viewModel.authProviderLabel}`}
         />
+        {viewModel.showResendVerificationEmail && (
+          <SettingsRow
+            label={viewModel.resendVerificationEmailLabel}
+            icon="send-outline"
+            onPress={
+              viewModel.isSendingVerificationEmail
+                ? undefined
+                : () => dispatch(sendVerificationEmail())
+            }
+            accessibilityLabel="Resend verification email"
+          />
+        )}
       </SettingsSection>
 
       {viewModel.hasPasswordProvider && (
@@ -64,7 +80,8 @@ export default function SettingsScreen() {
         />
       </SettingsSection>
 
-      <Text style={styles.version}>v{appVersion}</Text>
+      <Text style={styles.version}>Version {appVersion}</Text>
+      <Text style={styles.buildNumber}>Build {buildNumber}</Text>
     </ScrollView>
   )
 }
@@ -95,5 +112,11 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.small,
     textAlign: 'center',
     marginTop: T.spacing.large,
+  },
+  buildNumber: {
+    color: T.color.grey,
+    fontSize: T.font.size.small,
+    textAlign: 'center',
+    marginTop: T.spacing.extraExtraSmall,
   },
 })

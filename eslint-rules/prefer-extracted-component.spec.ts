@@ -109,6 +109,28 @@ function MyComponent() {
   return content
 }`,
         },
+        // Short opening tag with many children — line count from children, not props
+        {
+          code: `
+function SettingsScreen() {
+  const section = (
+    <SettingsSection title="Account">
+      <SettingsRow
+        label={email}
+        icon="mail-outline"
+        hasDivider
+        accessibilityLabel="Email"
+      />
+      <SettingsRow
+        label={provider}
+        icon="key-outline"
+        accessibilityLabel="Provider"
+      />
+    </SettingsSection>
+  )
+  return section
+}`,
+        },
         // Outside component function — not relevant
         {
           code: `
@@ -203,6 +225,7 @@ function MyComponent() {
       accessibilityRole="none"
       pointerEvents="box-none"
       collapsable={false}
+      hitSlop={T.spacing.small}
     >
       <Text>Hello</Text>
     </View>

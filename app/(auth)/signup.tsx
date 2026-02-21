@@ -20,6 +20,7 @@ import {
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
+import { FeatureFlags } from '@/feature-flags'
 import { validateSignUpInput } from '@/ui/auth-schemas/validation.helper'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
@@ -80,13 +81,15 @@ export default function SignUpScreen() {
             dispatch(signInWithGoogle())
           }}
         />
-        <TiedSSocialButton
-          iconName="logo-apple"
-          text="CONTINUE WITH APPLE"
-          onPress={() => {
-            dispatch(signInWithApple())
-          }}
-        />
+        {FeatureFlags.APPLE_SIGN_IN && (
+          <TiedSSocialButton
+            iconName="logo-apple"
+            text="CONTINUE WITH APPLE"
+            onPress={() => {
+              dispatch(signInWithApple())
+            }}
+          />
+        )}
         <Text style={styles.orText}>{'OR'}</Text>
         <TiedSTextInput
           placeholder="Your Email"

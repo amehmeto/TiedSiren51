@@ -5,7 +5,7 @@
   },
   "build": {
     "development": {
-      "node": "18.18.2",
+      "node": "22.14.0",
       "developmentClient": true,
       "distribution": "internal",
       "android": {
@@ -23,7 +23,7 @@
       }
     },
     "development-simulator": {
-      "node": "18.18.2",
+      "node": "22.14.0",
       "env": {
         "NODE_ENV": "development"
       },
@@ -34,7 +34,7 @@
       }
     },
     "preview": {
-      "node": "18.18.2",
+      "node": "22.14.0",
       "env": {
         "EXPO_ROUTER_APP_ROOT": ".app/",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCLDrarLuQfE9oTVrN6JNOdSKiiVs6oiik",
@@ -53,7 +53,7 @@
       }
     },
     "production": {
-      "node": "18.18.2",
+      "node": "22.14.0",
       "env": {
         "EXPO_ROUTER_APP_ROOT": ".app/",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCLDrarLuQfE9oTVrN6JNOdSKiiVs6oiik",
