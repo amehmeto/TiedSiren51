@@ -4,7 +4,10 @@ import { CreatePayload } from '@/core/_ports_/create.payload'
 import { assertHHmmString } from '@/core/_ports_/date-provider'
 import { Logger } from '@/core/_ports_/logger'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
-import { BlockSession } from '@/core/block-session/block-session'
+import {
+  BlockingConditions,
+  BlockSession,
+} from '@/core/block-session/block-session'
 import { Device } from '@/core/device/device'
 import {
   BlockSessionBlocklistRecord,
@@ -167,6 +170,8 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
       blockingConditions,
     } = payload
 
+    const serializedConditions = this.serializeConditions(blockingConditions)
+
     await this.db.execute(
       `UPDATE block_session SET
         name = COALESCE(?, name),
@@ -182,7 +187,7 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
         endedAt ?? null,
         startNotificationId ?? null,
         endNotificationId ?? null,
-        JSON.stringify(blockingConditions),
+        serializedConditions,
         id,
       ],
     )
@@ -266,6 +271,14 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
     const devices = await Promise.all(devicePromises)
 
     return this.mapToBlockSession(session, blocklistJunctions, devices)
+  }
+
+  private serializeConditions(
+    conditions: BlockingConditions[] | undefined,
+  ): string | null {
+    const resolved = conditions ?? null
+
+    return resolved && JSON.stringify(resolved)
   }
 
   private mapToBlockSession(

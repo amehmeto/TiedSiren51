@@ -22,6 +22,10 @@ export class PrismaDatabaseService
     return super.getDbPath()
   }
 
+  getDatabase(): unknown {
+    return super.getClient()
+  }
+
   async initialize(): Promise<void> {
     try {
       return super.initialize()

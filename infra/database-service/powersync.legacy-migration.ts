@@ -1,5 +1,5 @@
 import { open } from '@op-engineering/op-sqlite'
-import { AbstractPowerSyncDatabase } from '@powersync/common'
+import { AbstractPowerSyncDatabase, Transaction } from '@powersync/common'
 import * as FileSystem from 'expo-file-system'
 import { Platform } from 'react-native'
 import { Logger } from '@/core/_ports_/logger'
@@ -50,7 +50,10 @@ export class PowersyncLegacyMigration {
       this.logger.info(
         '[PowersyncLegacyMigration] No legacy database found, skipping migration',
       )
-      await this.markMigrationComplete()
+      await this.powersyncDb.execute(
+        'INSERT OR REPLACE INTO ps_kv (key, value) VALUES (?, ?)',
+        [PowersyncLegacyMigration.MIGRATION_FLAG_KEY, 'true'],
+      )
       return
     }
 
@@ -78,17 +81,22 @@ export class PowersyncLegacyMigration {
   }
 
   private async migrateAllTables(legacyDb: LegacyDb): Promise<void> {
-    await this.migrateSirens(legacyDb)
-    await this.migrateBlocklists(legacyDb)
-    await this.migrateDevices(legacyDb)
-    await this.migrateBlockSessions(legacyDb)
-    await this.migrateTimers(legacyDb)
-    await this.migrateBlocklistJunctions(legacyDb)
-    await this.migrateDeviceJunctions(legacyDb)
-    await this.markMigrationComplete()
+    await this.powersyncDb.writeTransaction(async (tx) => {
+      await this.migrateSirens(tx, legacyDb)
+      await this.migrateBlocklists(tx, legacyDb)
+      await this.migrateDevices(tx, legacyDb)
+      await this.migrateBlockSessions(tx, legacyDb)
+      await this.migrateTimers(tx, legacyDb)
+      await this.migrateBlocklistJunctions(tx, legacyDb)
+      await this.migrateDeviceJunctions(tx, legacyDb)
+      await this.markMigrationComplete(tx)
+    })
   }
 
-  private async migrateSirens(legacyDb: LegacyDb): Promise<void> {
+  private async migrateSirens(
+    tx: Transaction,
+    legacyDb: LegacyDb,
+  ): Promise<void> {
     const rows = await this.queryLegacy(legacyDb, 'SELECT * FROM "Siren"')
     this.logger.info(
       `[PowersyncLegacyMigration] Migrating ${rows.length} sirens`,
@@ -96,14 +104,17 @@ export class PowersyncLegacyMigration {
 
     for (const row of rows) {
       const { id, type, value, name, icon } = row
-      await this.powersyncDb.execute(
+      await tx.execute(
         'INSERT OR IGNORE INTO siren (id, type, value, name, icon) VALUES (?, ?, ?, ?, ?)',
         [id, type, value, name ?? '', icon ?? ''],
       )
     }
   }
 
-  private async migrateBlocklists(legacyDb: LegacyDb): Promise<void> {
+  private async migrateBlocklists(
+    tx: Transaction,
+    legacyDb: LegacyDb,
+  ): Promise<void> {
     const rows = await this.queryLegacy(legacyDb, 'SELECT * FROM "Blocklist"')
     this.logger.info(
       `[PowersyncLegacyMigration] Migrating ${rows.length} blocklists`,
@@ -111,14 +122,17 @@ export class PowersyncLegacyMigration {
 
     for (const row of rows) {
       const { id, name, sirens } = row
-      await this.powersyncDb.execute(
+      await tx.execute(
         'INSERT OR IGNORE INTO blocklist (id, name, sirens) VALUES (?, ?, ?)',
         [id, name, sirens],
       )
     }
   }
 
-  private async migrateDevices(legacyDb: LegacyDb): Promise<void> {
+  private async migrateDevices(
+    tx: Transaction,
+    legacyDb: LegacyDb,
+  ): Promise<void> {
     const rows = await this.queryLegacy(legacyDb, 'SELECT * FROM "Device"')
     this.logger.info(
       `[PowersyncLegacyMigration] Migrating ${rows.length} devices`,
@@ -126,14 +140,17 @@ export class PowersyncLegacyMigration {
 
     for (const row of rows) {
       const { id, type, name } = row
-      await this.powersyncDb.execute(
+      await tx.execute(
         'INSERT OR IGNORE INTO device (id, type, name) VALUES (?, ?, ?)',
         [id, type, name],
       )
     }
   }
 
-  private async migrateBlockSessions(legacyDb: LegacyDb): Promise<void> {
+  private async migrateBlockSessions(
+    tx: Transaction,
+    legacyDb: LegacyDb,
+  ): Promise<void> {
     const rows = await this.queryLegacy(
       legacyDb,
       'SELECT * FROM "BlockSession"',
@@ -152,7 +169,7 @@ export class PowersyncLegacyMigration {
         endNotificationId,
         blockingConditions,
       } = row
-      await this.powersyncDb.execute(
+      await tx.execute(
         `INSERT OR IGNORE INTO block_session
           (id, name, started_at, ended_at, start_notification_id, end_notification_id, blocking_conditions)
           VALUES (?, ?, ?, ?, ?, ?, ?)`,
@@ -169,7 +186,10 @@ export class PowersyncLegacyMigration {
     }
   }
 
-  private async migrateTimers(legacyDb: LegacyDb): Promise<void> {
+  private async migrateTimers(
+    tx: Transaction,
+    legacyDb: LegacyDb,
+  ): Promise<void> {
     const rows = await this.queryLegacy(legacyDb, 'SELECT * FROM "Timer"')
     this.logger.info(
       `[PowersyncLegacyMigration] Migrating ${rows.length} timers`,
@@ -177,14 +197,17 @@ export class PowersyncLegacyMigration {
 
     for (const row of rows) {
       const { id, userId, endedAt } = row
-      await this.powersyncDb.execute(
+      await tx.execute(
         'INSERT OR IGNORE INTO timer (id, user_id, ended_at) VALUES (?, ?, ?)',
         [id, userId, endedAt],
       )
     }
   }
 
-  private async migrateBlocklistJunctions(legacyDb: LegacyDb): Promise<void> {
+  private async migrateBlocklistJunctions(
+    tx: Transaction,
+    legacyDb: LegacyDb,
+  ): Promise<void> {
     const rows = await this.queryLegacy(
       legacyDb,
       'SELECT * FROM "_BlockSessionToBlocklist"',
@@ -194,14 +217,17 @@ export class PowersyncLegacyMigration {
     )
 
     for (const row of rows) {
-      await this.powersyncDb.execute(
+      await tx.execute(
         'INSERT OR IGNORE INTO block_session_blocklist (id, block_session_id, blocklist_id) VALUES (uuid(), ?, ?)',
         [row.A, row.B],
       )
     }
   }
 
-  private async migrateDeviceJunctions(legacyDb: LegacyDb): Promise<void> {
+  private async migrateDeviceJunctions(
+    tx: Transaction,
+    legacyDb: LegacyDb,
+  ): Promise<void> {
     const rows = await this.queryLegacy(
       legacyDb,
       'SELECT * FROM "_BlockSessionToDevice"',
@@ -211,15 +237,15 @@ export class PowersyncLegacyMigration {
     )
 
     for (const row of rows) {
-      await this.powersyncDb.execute(
+      await tx.execute(
         'INSERT OR IGNORE INTO block_session_device (id, block_session_id, device_id) VALUES (uuid(), ?, ?)',
         [row.A, row.B],
       )
     }
   }
 
-  private async markMigrationComplete(): Promise<void> {
-    await this.powersyncDb.execute(
+  private async markMigrationComplete(tx: Transaction): Promise<void> {
+    await tx.execute(
       'INSERT OR REPLACE INTO ps_kv (key, value) VALUES (?, ?)',
       [PowersyncLegacyMigration.MIGRATION_FLAG_KEY, 'true'],
     )
