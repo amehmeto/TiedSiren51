@@ -44,9 +44,11 @@ export function AppsSelectionScene({
 
   const { sortedAndroidApps, lockedSirens, isLoadingInstalledApps } = viewModel
 
-  const contentContainerStyle = isLoadingInstalledApps
-    ? styles.loadingContentContainer
-    : [styles.listContent, { paddingBottom: insets.bottom }]
+  const hasNoAppsYet = sortedAndroidApps.length === 0
+  const contentContainerStyle =
+    isLoadingInstalledApps && hasNoAppsYet
+      ? styles.loadingContentContainer
+      : [styles.listContent, { paddingBottom: insets.bottom }]
 
   return (
     <FlatList
