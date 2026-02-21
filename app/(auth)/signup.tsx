@@ -24,7 +24,7 @@ import { FeatureFlags } from '@/feature-flags'
 import { validateSignUpInput } from '@/ui/auth-schemas/validation.helper'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
-import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
+import { TiedSSocialButton } from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 import { selectSignUpViewModel } from '@/ui/screens/Auth/SignUp/sign-up.view-model'
@@ -94,7 +94,6 @@ export default function SignUpScreen() {
         <TiedSTextInput
           placeholder="Your Email"
           accessibilityLabel="Email"
-          placeholderTextColor={T.color.grey}
           value={viewModel.email}
           onChangeText={(text) => {
             dispatch(setEmail(text))
@@ -106,7 +105,6 @@ export default function SignUpScreen() {
         <TiedSTextInput
           placeholder="Create Password"
           accessibilityLabel="Password"
-          placeholderTextColor={T.color.grey}
           hasPasswordToggle
           value={viewModel.password}
           onChangeText={(text) => {
@@ -150,16 +148,19 @@ const styles = StyleSheet.create({
   subtitle: {
     color: T.color.text,
     fontSize: T.font.size.large,
+    fontFamily: T.font.family.heading,
     marginBottom: T.spacing.large,
   },
   orText: {
-    color: T.color.text,
+    color: T.color.textMuted,
     fontSize: T.font.size.regular,
+    fontFamily: T.font.family.primary,
     marginVertical: T.spacing.medium,
   },
   errorText: {
     color: T.color.red,
-    fontSize: T.font.size.regular,
+    fontSize: T.font.size.small,
+    fontFamily: T.font.family.primary,
     marginVertical: T.spacing.medium,
   },
 })

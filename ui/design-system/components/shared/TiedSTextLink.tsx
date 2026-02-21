@@ -40,6 +40,7 @@ export function TiedSTextLink({
 const styles = StyleSheet.create({
   base: {
     fontSize: T.font.size.regular,
+    fontFamily: T.font.family.medium,
   },
   default: {
     color: T.color.text,

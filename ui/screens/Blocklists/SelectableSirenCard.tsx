@@ -39,15 +39,15 @@ export function SelectableSirenCard({
     ) : sirenType === SirenType.WEBSITES ? (
       <MaterialCommunityIcons
         name={'web'}
-        color={T.color.white}
-        size={T.sirenIconSize}
+        color={T.color.text}
+        size={T.icon.size.small}
         style={{ marginRight: T.spacing.small }}
       />
     ) : (
       <FontAwesome6
         name={'hashtag'}
-        color={T.color.white}
-        size={T.sirenIconSize}
+        color={T.color.text}
+        size={T.icon.size.small}
         style={{ marginRight: T.spacing.small }}
       />
     )
@@ -59,7 +59,7 @@ export function SelectableSirenCard({
     : `siren-${sirenType}-${siren}`
 
   return (
-    <Pressable onPress={onPress} testID={baseTestId}>
+    <Pressable onPress={onPress} testID={baseTestId} accessibilityRole="button">
       <TiedSCard
         style={[
           styles.container,
@@ -99,7 +99,8 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    padding: T.spacing.small,
+    padding: T.spacing.smallMedium,
+    minHeight: T.height.settingsRow,
   },
   checkbox: {
     alignItems: 'flex-end',
@@ -111,14 +112,16 @@ const styles = StyleSheet.create({
   },
   appName: {
     color: T.color.text,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
     flexGrow: 1,
     flexShrink: 1,
     marginRight: T.spacing.small,
   },
   appIcon: {
     marginRight: T.spacing.small,
-    height: T.sirenIconSize,
-    width: T.sirenIconSize,
+    height: T.icon.size.small,
+    width: T.icon.size.small,
     borderRadius: T.border.radius.roundedMedium,
   },
   selected: {

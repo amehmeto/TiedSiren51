@@ -35,9 +35,9 @@ const styles = StyleSheet.create({
     position: 'relative',
   },
   title: {
-    color: T.color.white,
+    color: T.color.text,
     fontSize: T.font.size.xLarge,
-    fontWeight: T.font.weight.bold,
-    fontFamily: T.font.family.primary,
+    fontFamily: T.font.family.heading,
+    letterSpacing: T.font.letterSpacing.tight,
   },
 })

@@ -31,7 +31,7 @@ export const TimePicker = ({
         style={styles.picker}
         itemStyle={styles.pickerItem}
         mode={Platform.OS === 'android' ? 'dropdown' : 'dialog'}
-        dropdownIconColor={T.color.white}
+        dropdownIconColor={T.color.text}
       >
         {timeOptions.map((timeUnit) => (
           <Picker.Item
@@ -55,10 +55,10 @@ const styles = StyleSheet.create({
   },
   picker: {
     width: T.layout.width.full,
-    color: T.color.white,
+    color: T.color.text,
   },
   pickerItem: {
-    color: T.color.white,
+    color: T.color.text,
     fontSize: T.font.size.small,
     fontFamily: T.font.family.primary,
   },

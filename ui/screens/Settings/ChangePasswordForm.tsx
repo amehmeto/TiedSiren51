@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { StyleSheet, Text, TextInput, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { changePasswordSchema } from '@/ui/auth-schemas/auth.schema'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 
 type ChangePasswordFormFields = {
@@ -66,22 +67,22 @@ export function ChangePasswordForm({
     <View style={styles.content}>
       <Text style={styles.title}>Change Password</Text>
       <Text style={styles.instruction}>Enter your new password below.</Text>
-      <TextInput
-        style={styles.input}
+      <TiedSTextInput
         value={newPassword}
         onChangeText={setNewPassword}
         placeholder="New password"
-        placeholderTextColor={T.color.grey}
-        secureTextEntry
+        accessibilityLabel="New password"
+        placeholderTextColor={T.color.textMuted}
+        hasPasswordToggle
         autoCapitalize="none"
       />
-      <TextInput
-        style={styles.input}
+      <TiedSTextInput
         value={confirmPassword}
         onChangeText={setConfirmPassword}
         placeholder="Confirm new password"
-        placeholderTextColor={T.color.grey}
-        secureTextEntry
+        accessibilityLabel="Confirm new password"
+        placeholderTextColor={T.color.textMuted}
+        hasPasswordToggle
         autoCapitalize="none"
       />
       {displayError && <Text style={styles.error}>{displayError}</Text>}
@@ -105,34 +106,28 @@ const styles = StyleSheet.create({
   title: {
     color: T.color.text,
     fontSize: T.font.size.large,
-    fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
     marginBottom: T.spacing.medium,
   },
   instruction: {
     color: T.color.text,
     fontSize: T.font.size.base,
+    fontFamily: T.font.family.primary,
     marginBottom: T.spacing.medium,
     textAlign: 'center',
   },
-  input: {
-    width: '100%',
-    borderWidth: T.border.width.thin,
-    borderColor: T.color.grey,
-    borderRadius: T.border.radius.roundedMedium,
-    padding: T.spacing.small,
-    color: T.color.text,
-    fontSize: T.font.size.base,
-    marginBottom: T.spacing.medium,
-  },
+
   error: {
     color: T.color.red,
     fontSize: T.font.size.small,
+    fontFamily: T.font.family.primary,
     textAlign: 'center',
     marginBottom: T.spacing.small,
   },
   success: {
     color: T.color.lightBlue,
     fontSize: T.font.size.small,
+    fontFamily: T.font.family.primary,
     textAlign: 'center',
     marginBottom: T.spacing.small,
   },

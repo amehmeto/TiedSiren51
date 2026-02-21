@@ -23,11 +23,8 @@ export function TiedSTextInput({
       {label && <Text style={styles.text}>{label}</Text>}
       <View style={styles.inputContainer}>
         <TextInput
-          style={[
-            styles.input,
-            { borderColor: isFocused ? T.color.lightBlue : T.color.white },
-          ]}
-          placeholderTextColor={T.color.white}
+          style={[styles.input, isFocused && styles.inputFocused]}
+          placeholderTextColor={T.color.textMuted}
           secureTextEntry={
             hasPasswordToggle ? !isPasswordShown : isSecureTextEntry
           }
@@ -57,16 +54,26 @@ const styles = StyleSheet.create({
   },
   input: {
     height: T.width.textInputHeight,
-    padding: T.spacing.small,
+    paddingVertical: T.spacing.smallMedium,
+    paddingHorizontal: T.spacing.medium,
     fontSize: T.font.size.regular,
+    fontFamily: T.font.family.primary,
     borderWidth: T.border.width.thin,
-    borderColor: T.color.lightBlue,
-    borderRadius: T.border.radius.roundedSmall,
-    color: T.color.white,
+    borderColor: T.color.borderSubtle,
+    borderRadius: T.border.radius.roundedMedium,
+    color: T.color.text,
     width: T.layout.width.full,
+    backgroundColor: T.color.inputBackground,
+  },
+  inputFocused: {
+    borderColor: T.color.lightBlue,
+    borderWidth: T.border.width.medium,
   },
   text: {
-    color: T.color.white,
-    marginBottom: T.spacing.medium,
+    color: T.color.text,
+    fontFamily: T.font.family.medium,
+    fontSize: T.font.size.small,
+    letterSpacing: T.font.letterSpacing.tight,
+    marginBottom: T.spacing.small,
   },
 })
