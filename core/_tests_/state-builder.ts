@@ -67,6 +67,9 @@ const withHasChangePasswordSucceeded = createAction<boolean>(
 const withChangePasswordSuccessCount = createAction<number>(
   'withChangePasswordSuccessCount',
 )
+const withLoadingInstalledApps = createAction<boolean>(
+  'withLoadingInstalledApps',
+)
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -146,6 +149,9 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withChangePasswordSuccessCount, (state, action) => {
       state.auth.changePasswordSuccessCount = action.payload
     })
+    .addCase(withLoadingInstalledApps, (state, action) => {
+      state.siren.isLoadingInstalledApps = action.payload
+    })
 })
 
 export const stateBuilder = (baseState = initialState) => {
@@ -185,6 +191,7 @@ export const stateBuilder = (baseState = initialState) => {
     withChangePasswordError: reduce(withChangePasswordError),
     withHasChangePasswordSucceeded: reduce(withHasChangePasswordSucceeded),
     withChangePasswordSuccessCount: reduce(withChangePasswordSuccessCount),
+    withLoadingInstalledApps: reduce(withLoadingInstalledApps),
   }
 }
 

@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FlatList, StyleSheet } from 'react-native'
+import { ActivityIndicator, FlatList, StyleSheet } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
 
@@ -42,7 +42,17 @@ export function AppsSelectionScene({
     ),
   )
 
-  const { sortedAndroidApps, lockedSirens } = viewModel
+  const { sortedAndroidApps, lockedSirens, isLoadingInstalledApps } = viewModel
+
+  const hasNoAppsYet = sortedAndroidApps.length === 0
+  const contentContainerStyle =
+    isLoadingInstalledApps && hasNoAppsYet
+      ? styles.loadingContentContainer
+      : {
+          paddingBottom:
+            Math.max(insets.bottom, T.scroll.padding.minBottom) +
+            T.scroll.padding.additional,
+        }
 
   return (
     <FlatList
@@ -51,6 +61,9 @@ export function AppsSelectionScene({
         sectionEntry.type === 'divider'
           ? sectionEntry.id
           : sectionEntry.siren.packageName
+      }
+      ListEmptyComponent={
+        <ActivityIndicator size="large" color={T.color.lightBlue} />
       }
       renderItem={({ item: sectionEntry }) => {
         if (sectionEntry.type === 'divider') return <SectionDivider />
@@ -77,11 +90,7 @@ export function AppsSelectionScene({
         )
       }}
       style={styles.list}
-      contentContainerStyle={{
-        paddingBottom:
-          Math.max(insets.bottom, T.scroll.padding.minBottom) +
-          T.scroll.padding.additional,
-      }}
+      contentContainerStyle={contentContainerStyle}
       overScrollMode="never"
       bounces={false}
     />
@@ -91,5 +100,10 @@ export function AppsSelectionScene({
 const styles = StyleSheet.create({
   list: {
     flex: 1,
+  },
+  loadingContentContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 })

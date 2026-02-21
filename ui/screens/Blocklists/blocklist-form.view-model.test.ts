@@ -356,4 +356,33 @@ describe('selectBlocklistFormViewModel', () => {
 
     expect(viewModel).toMatchObject(expectedViewModel)
   })
+
+  test('isLoadingInstalledApps is false by default', () => {
+    const store = createTestStore({ dateProvider })
+
+    const viewModel = selectBlocklistFormViewModel(
+      store.getState(),
+      dateProvider,
+      FormMode.Create,
+      undefined,
+    )
+
+    expect(viewModel.isLoadingInstalledApps).toBe(false)
+  })
+
+  test('isLoadingInstalledApps reflects loading state from store', () => {
+    const store = createTestStore(
+      { dateProvider },
+      stateBuilder().withLoadingInstalledApps(true).build(),
+    )
+
+    const viewModel = selectBlocklistFormViewModel(
+      store.getState(),
+      dateProvider,
+      FormMode.Create,
+      undefined,
+    )
+
+    expect(viewModel.isLoadingInstalledApps).toBe(true)
+  })
 })
