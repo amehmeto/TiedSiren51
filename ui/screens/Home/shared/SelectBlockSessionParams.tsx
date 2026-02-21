@@ -23,7 +23,10 @@ type SelectBlockSessionParamsProps = {
 export function SelectBlockSessionParams({
   form,
 }: SelectBlockSessionParamsProps) {
-  const featureFlags = useSelector(selectFeatureFlags)
+  const {
+    MULTI_DEVICE: isMultiDevice,
+    BLOCKING_CONDITIONS: isBlockingConditions,
+  } = useSelector(selectFeatureFlags)
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
@@ -31,11 +34,11 @@ export function SelectBlockSessionParams({
     useState<boolean>(false)
 
   useEffect(() => {
-    if (!featureFlags.MULTI_DEVICE) return
+    if (!isMultiDevice) return
     dependencies.deviceRepository.findAll().then((foundDevices) => {
       setDevices(foundDevices)
     })
-  }, [featureFlags.MULTI_DEVICE])
+  }, [isMultiDevice])
 
   function hasFieldError(field: keyof BlockSessionFormValues): boolean {
     return !!form.touched[field] && !!form.errors[field]
@@ -63,14 +66,14 @@ export function SelectBlockSessionParams({
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
         )}
-        {featureFlags.MULTI_DEVICE && (
+        {isMultiDevice && (
           <SelectDevicesField
             selectedDevices={form.values.devices}
             setFieldValue={form.setFieldValue}
             availableDevices={devices}
           />
         )}
-        {featureFlags.MULTI_DEVICE && hasFieldError('devices') && (
+        {isMultiDevice && hasFieldError('devices') && (
           <FieldErrors errors={form.errors} fieldName={'devices'} />
         )}
         <SelectTime
@@ -97,16 +100,10 @@ export function SelectBlockSessionParams({
           initialOtherTime={form.initialValues.startedAt}
         />
         {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
-        {featureFlags.BLOCKING_CONDITIONS && (
-          <SelectBlockingCondition form={form} />
+        {isBlockingConditions && <SelectBlockingCondition form={form} />}
+        {isBlockingConditions && hasFieldError('blockingConditions') && (
+          <FieldErrors errors={form.errors} fieldName={'blockingConditions'} />
         )}
-        {featureFlags.BLOCKING_CONDITIONS &&
-          hasFieldError('blockingConditions') && (
-            <FieldErrors
-              errors={form.errors}
-              fieldName={'blockingConditions'}
-            />
-          )}
       </TiedSCard>
 
       <TiedSButton text={'START'} onPress={() => form.handleSubmit()} />

@@ -21,6 +21,7 @@ import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
 import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
 import { showToast } from '@/core/toast/toast.slice'
+import { DEFAULT_FEATURE_FLAGS } from '@/feature-flags'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -58,7 +59,10 @@ export function BlocklistForm({
 }: Readonly<BlocklistScreenProps>) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
-  const featureFlags = useSelector(selectFeatureFlags)
+  const {
+    WEBSITE_BLOCKING: isWebsiteBlocking,
+    KEYWORD_BLOCKING: isKeywordBlocking,
+  } = useSelector(selectFeatureFlags)
 
   const viewModel = useSelector((state: RootState) =>
     selectBlocklistFormViewModel(
@@ -98,10 +102,10 @@ export function BlocklistForm({
 
   const routes: BlocklistTabRoute[] = [
     { key: BlocklistTabKey.Apps, title: 'Apps' },
-    ...(featureFlags.WEBSITE_BLOCKING
+    ...(isWebsiteBlocking
       ? [{ key: BlocklistTabKey.Websites, title: 'Websites' }]
       : []),
-    ...(featureFlags.KEYWORD_BLOCKING
+    ...(isKeywordBlocking
       ? [{ key: BlocklistTabKey.Keywords, title: 'Keywords' }]
       : []),
   ]
@@ -230,7 +234,11 @@ export function BlocklistForm({
   const validateForm = useCallback(
     (submittedBlocklistForm: typeof blocklist) => {
       try {
-        blocklistFormSchema(featureFlags).parse(submittedBlocklistForm)
+        blocklistFormSchema({
+          ...DEFAULT_FEATURE_FLAGS,
+          WEBSITE_BLOCKING: isWebsiteBlocking,
+          KEYWORD_BLOCKING: isKeywordBlocking,
+        }).parse(submittedBlocklistForm)
         setErrors({})
         return true
       } catch (e) {
@@ -245,7 +253,7 @@ export function BlocklistForm({
         return false
       }
     },
-    [setErrors, featureFlags],
+    [setErrors, isWebsiteBlocking, isKeywordBlocking],
   )
 
   const saveBlocklist = useCallback(async () => {

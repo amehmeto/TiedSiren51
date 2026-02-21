@@ -9,11 +9,14 @@ export function ChooseBlockTabBar({
   navigationState: _navigationState,
   ...rest
 }: TabBarProps<Route>) {
-  const featureFlags = useSelector(selectFeatureFlags)
+  const {
+    WEBSITE_BLOCKING: isWebsiteBlocking,
+    KEYWORD_BLOCKING: isKeywordBlocking,
+  } = useSelector(selectFeatureFlags)
 
   const featureFlagByRouteKey: Record<string, boolean> = {
-    websites: featureFlags.WEBSITE_BLOCKING,
-    keywords: featureFlags.KEYWORD_BLOCKING,
+    websites: isWebsiteBlocking,
+    keywords: isKeywordBlocking,
   }
 
   const filteredRoutes = _navigationState.routes.filter(

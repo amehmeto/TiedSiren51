@@ -34,7 +34,7 @@ export default function LoginScreen() {
   const dispatch = useDispatch<AppDispatch>()
 
   const viewModel = useSelector(selectLoginViewModel)
-  const featureFlags = useSelector(selectFeatureFlags)
+  const { APPLE_SIGN_IN: isAppleSignIn } = useSelector(selectFeatureFlags)
   const { error, isUserAuthenticated } = viewModel
 
   useEffect(() => {
@@ -86,7 +86,7 @@ export default function LoginScreen() {
             dispatch(signInWithGoogle())
           }}
         />
-        {featureFlags.APPLE_SIGN_IN && (
+        {isAppleSignIn && (
           <TiedSSocialButton
             iconName="logo-apple"
             text="CONTINUE WITH APPLE"
