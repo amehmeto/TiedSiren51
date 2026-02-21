@@ -8,6 +8,8 @@ import { PrismaDatabaseService } from '@/infra/database-service/prisma.database.
 import { RealDateProvider } from '@/infra/date-provider/real.date-provider'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
+import { FirebaseFeatureFlagProvider } from '@/infra/feature-flag-provider/firebase.feature-flag.provider'
+import { InMemoryFeatureFlagProvider } from '@/infra/feature-flag-provider/in-memory.feature-flag.provider'
 import { AndroidForegroundService } from '@/infra/foreground-service/android.foreground.service'
 import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-repository/expo-list-installed-apps.repository'
 import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
@@ -30,6 +32,7 @@ const androidDependencies: Dependencies = {
   databaseService: new PrismaDatabaseService(logger),
   dateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
+  featureFlagProvider: new FirebaseFeatureFlagProvider(logger),
   foregroundService: new AndroidForegroundService(logger),
   installedAppRepository: new ExpoListInstalledAppsRepository(logger),
   logger,
@@ -57,6 +60,7 @@ const e2eTestsDependencies: Dependencies = {
   databaseService: new PrismaDatabaseService(logger),
   dateProvider: e2eDateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
+  featureFlagProvider: new InMemoryFeatureFlagProvider(),
   foregroundService: new AndroidForegroundService(logger),
   installedAppRepository: new FakeDataInstalledAppsRepository(),
   logger,

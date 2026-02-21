@@ -2,9 +2,11 @@ import { expect } from 'vitest'
 import { z } from 'zod'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { Fixture } from '@/core/_tests_/fixture.type'
+import { DEFAULT_FEATURE_FLAGS, FeatureFlagValues } from '@/feature-flags'
 import { blocklistFormSchema } from './blocklist-form.schema'
 
-export type BlockFormData = z.infer<typeof blocklistFormSchema>
+type BlocklistSchema = ReturnType<typeof blocklistFormSchema>
+export type BlockFormData = z.infer<BlocklistSchema>
 
 function buildValidBlocklistFormData(
   overrides: Parameters<typeof buildBlocklist>[0] = {},
@@ -21,11 +23,11 @@ function buildValidBlocklistFormData(
   }
 }
 
-export function blocklistFormFixture(): Fixture {
+export function blocklistFormFixture(
+  flags: FeatureFlagValues = DEFAULT_FEATURE_FLAGS,
+): Fixture {
   let blocklistData: BlockFormData
-  let validationResult:
-    | ReturnType<typeof blocklistFormSchema.safeParse>
-    | undefined
+  let validationResult: ReturnType<BlocklistSchema['safeParse']> | undefined
 
   return {
     given: {
@@ -118,7 +120,7 @@ export function blocklistFormFixture(): Fixture {
     },
     when: {
       validate: () => {
-        validationResult = blocklistFormSchema.safeParse(blocklistData)
+        validationResult = blocklistFormSchema(flags).safeParse(blocklistData)
         return validationResult
       },
     },

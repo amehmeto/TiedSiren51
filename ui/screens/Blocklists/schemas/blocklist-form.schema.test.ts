@@ -1,13 +1,6 @@
-import { afterEach, beforeEach, describe, it, vi } from 'vitest'
-import { FeatureFlags } from '@/feature-flags'
+import { beforeEach, describe, it } from 'vitest'
+import { DEFAULT_FEATURE_FLAGS, FeatureFlagKey } from '@/feature-flags'
 import { blocklistFormFixture } from './blocklist-form.fixture'
-
-vi.mock('@/feature-flags', () => ({
-  FeatureFlags: {
-    WEBSITE_BLOCKING: false,
-    KEYWORD_BLOCKING: false,
-  },
-}))
 
 describe('blocklistSchema', () => {
   let fixture: ReturnType<typeof blocklistFormFixture>
@@ -78,17 +71,15 @@ describe('blocklistSchema', () => {
 })
 
 describe('blocklistSchema with all feature flags enabled', () => {
+  const allFlagsEnabled = {
+    ...DEFAULT_FEATURE_FLAGS,
+    [FeatureFlagKey.WEBSITE_BLOCKING]: true,
+    [FeatureFlagKey.KEYWORD_BLOCKING]: true,
+  }
   let fixture: ReturnType<typeof blocklistFormFixture>
 
   beforeEach(() => {
-    FeatureFlags.WEBSITE_BLOCKING = true
-    FeatureFlags.KEYWORD_BLOCKING = true
-    fixture = blocklistFormFixture()
-  })
-
-  afterEach(() => {
-    FeatureFlags.WEBSITE_BLOCKING = false
-    FeatureFlags.KEYWORD_BLOCKING = false
+    fixture = blocklistFormFixture(allFlagsEnabled)
   })
 
   it('should fail if all sirens are empty', () => {
