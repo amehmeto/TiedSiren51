@@ -58,10 +58,12 @@ const styles = StyleSheet.create({
   label: {
     color: T.color.text,
     fontFamily: T.font.family.medium,
+    fontSize: T.font.size.base,
   },
   option: {
     color: T.color.lightBlue,
     fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
     textAlign: 'right',
   },
 })

@@ -1,5 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 
@@ -51,6 +54,7 @@ export function DeleteAccountForm({
         onPress={onDeleteAccount}
         text={buttonText}
         isDisabled={isDeleteDisabled}
+        variant={TiedSButtonVariant.Danger}
       />
     </View>
   )
@@ -88,7 +92,7 @@ const styles = StyleSheet.create({
   input: {
     width: '100%',
     borderWidth: T.border.width.thin,
-    borderColor: T.color.grey,
+    borderColor: T.color.borderSubtle,
     borderRadius: T.border.radius.roundedMedium,
     padding: T.spacing.smallMedium,
     color: T.color.text,

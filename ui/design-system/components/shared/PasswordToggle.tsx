@@ -14,7 +14,11 @@ export function PasswordToggle({
   onToggle,
 }: PasswordToggleProps) {
   return (
-    <Pressable style={styles.iconContainer} onPress={onToggle}>
+    <Pressable
+      style={styles.iconContainer}
+      onPress={onToggle}
+      accessibilityRole="button"
+    >
       <Ionicons
         name={isPasswordShown ? 'eye-outline' : 'eye-off-outline'}
         size={T.icon.size.large}

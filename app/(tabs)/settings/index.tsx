@@ -1,14 +1,13 @@
 import * as Application from 'expo-application'
 import Constants from 'expo-constants'
 import { useRouter } from 'expo-router'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { ScrollView, StyleSheet, Text } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
 import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
 import { SettingsRow } from '@/ui/design-system/components/shared/SettingsRow'
 import { SettingsSection } from '@/ui/design-system/components/shared/SettingsSection'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
 import { SecuritySection } from '@/ui/screens/Settings/SecuritySection'
 import { selectSettingsViewModel } from '@/ui/screens/Settings/settings.view-model'
@@ -63,13 +62,14 @@ export default function SettingsScreen() {
         />
       )}
 
-      <View style={styles.logoutContainer}>
-        <TiedSButton
-          text="Log Out"
+      <SettingsSection title="Session">
+        <SettingsRow
+          label="Log Out"
+          icon="log-out-outline"
           onPress={() => dispatch(logOut())}
-          style={styles.logoutButton}
+          accessibilityLabel="Log out"
         />
-      </View>
+      </SettingsSection>
 
       <SettingsSection title="Danger Zone">
         <SettingsRow
@@ -100,13 +100,6 @@ const styles = StyleSheet.create({
     fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.heading,
     marginBottom: T.spacing.large,
-  },
-  logoutContainer: {
-    marginBottom: T.spacing.medium,
-  },
-  logoutButton: {
-    backgroundColor: T.color.darkBlueGray,
-    marginTop: T.spacing.none,
   },
   version: {
     color: T.color.textMuted,

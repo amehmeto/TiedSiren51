@@ -106,6 +106,7 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
             params: { blocklistId: blocklist.id },
           })
         }
+        accessibilityRole="button"
       >
         <TiedSCard style={styles.container}>
           <View style={styles.infoContainer}>

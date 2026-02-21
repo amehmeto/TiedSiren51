@@ -42,7 +42,7 @@ export function BlocksPreviewCard({
   onPress,
 }: BlocksPreviewCardProps) {
   return (
-    <Pressable onPress={onPress}>
+    <Pressable onPress={onPress} accessibilityRole="button">
       <TiedSCard>
         <IconTag
           name={iconName}

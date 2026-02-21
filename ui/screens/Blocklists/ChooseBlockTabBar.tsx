@@ -35,6 +35,7 @@ export function ChooseBlockTabBar({
               backgroundColor: isFocused ? T.color.lightBlue : T.color.darkBlue,
             },
           ]}
+          accessibilityRole="tab"
         >
           <Text style={[styles.labelText, { color }]}>{route.title}</Text>
         </Pressable>

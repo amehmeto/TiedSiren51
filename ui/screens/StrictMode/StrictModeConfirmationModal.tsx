@@ -1,5 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
 
@@ -40,11 +43,12 @@ export function StrictModeConfirmationModal({
           style={styles.cancelButton}
           onPress={onCancel}
           text={'Cancel'}
+          variant={TiedSButtonVariant.Secondary}
         />
         <TiedSButton
-          style={styles.confirmButton}
           onPress={onConfirm}
           text={'Confirm'}
+          variant={TiedSButtonVariant.Danger}
         />
       </View>
     </TiedSModal>
@@ -79,8 +83,5 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     marginRight: T.spacing.small,
-  },
-  confirmButton: {
-    backgroundColor: T.color.red,
   },
 })

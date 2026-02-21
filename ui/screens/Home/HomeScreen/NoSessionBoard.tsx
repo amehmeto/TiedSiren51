@@ -32,5 +32,9 @@ const styles = StyleSheet.create({
     letterSpacing: T.font.letterSpacing.wide,
     textTransform: 'uppercase',
   },
-  text: { color: T.color.textMuted, fontFamily: T.font.family.primary },
+  text: {
+    color: T.color.textMuted,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
+  },
 })

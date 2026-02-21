@@ -23,6 +23,7 @@ export function BlockingConditionItem({
         { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
       ]}
       onPress={onSelect}
+      accessibilityRole="button"
     >
       <Ionicons
         name={iconName}

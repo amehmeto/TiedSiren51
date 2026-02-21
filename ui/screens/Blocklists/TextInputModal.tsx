@@ -1,6 +1,9 @@
 import { useState } from 'react'
 import { StyleSheet, View } from 'react-native'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
@@ -40,6 +43,7 @@ export function TextInputModal({
           style={styles.modalButton}
           onPress={onCancel}
           text={'Cancel'}
+          variant={TiedSButtonVariant.Secondary}
         />
         <TiedSButton
           style={styles.modalButton}

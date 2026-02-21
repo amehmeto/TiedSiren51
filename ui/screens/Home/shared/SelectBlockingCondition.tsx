@@ -25,6 +25,7 @@ export function SelectBlockingCondition({
       <Pressable
         style={styles.blockingCondition}
         onPress={() => setIsBlockingConditionModalVisible(true)}
+        accessibilityRole="button"
       >
         <Text style={styles.label}>{'Blocking Conditions'}</Text>
         <Text style={styles.option}>
@@ -52,6 +53,7 @@ const styles = StyleSheet.create({
   option: {
     color: T.color.lightBlue,
     fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
     textAlign: 'right',
   },
   blockingCondition: {
