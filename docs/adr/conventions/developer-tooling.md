@@ -153,15 +153,6 @@ Skills are invoked with `/skill-name` in Claude Code conversations.
 |-------|-------------|
 | `/worktree` | Manage git worktrees (create, list, prune, remove) |
 | `/arch-review` | Review PR for architecture compliance, update ADRs |
-| `/speckit.specify` | Create feature specification from description |
-| `/speckit.clarify` | Ask clarification questions for spec |
-| `/speckit.plan` | Generate implementation plan |
-| `/speckit.tasks` | Generate task list from spec/plan |
-| `/speckit.implement` | Execute tasks from tasks.md |
-| `/speckit.checklist` | Generate custom checklist for feature |
-| `/speckit.analyze` | Cross-artifact consistency analysis |
-| `/speckit.constitution` | Create/update project principles |
-| `/speckit.taskstoissues` | Convert tasks to GitHub issues |
 
 ### Naming Conventions
 
@@ -172,7 +163,7 @@ Skills are invoked with `/skill-name` in Claude Code conversations.
 | Node scripts (ESM) | `kebab-case.js` or `.mjs` | `track-coverage.js` |
 | Tooling packages | `kebab-case/` directory | `remark-lint-ticket/` |
 | Claude hooks | `validate-{what}.sh` | `validate-edit.sh` |
-| Claude skills | `{namespace}.{action}.md` | `speckit.specify.md` |
+| Claude skills | `{action}.md` | `commit-push.md` |
 | Husky helper scripts | `{check-name}.sh` | `branch-name-check.sh` |
 
 ### Adding New Tooling

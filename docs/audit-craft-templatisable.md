@@ -188,15 +188,6 @@
 
 | Commande | Fichier | Classification | Notes |
 |----------|---------|----------------|-------|
-| `speckit.specify` | `.claude/commands/speckit.specify.md` | 🟢 TEMPLATE | 366 lignes, 98% générique |
-| `speckit.clarify` | `.claude/commands/speckit.clarify.md` | 🟢 TEMPLATE | Max 5 questions ciblées |
-| `speckit.plan` | `.claude/commands/speckit.plan.md` | 🟢 TEMPLATE | Workflow de planification |
-| `speckit.tasks` | `.claude/commands/speckit.tasks.md` | 🟢 TEMPLATE | Génération de tâches ordonnées |
-| `speckit.analyze` | `.claude/commands/speckit.analyze.md` | 🟢 TEMPLATE | Analyse de cohérence |
-| `speckit.checklist` | `.claude/commands/speckit.checklist.md` | 🟢 TEMPLATE | "Unit Tests for English" |
-| `speckit.constitution` | `.claude/commands/speckit.constitution.md` | 🟢 TEMPLATE | Gestion de constitution projet |
-| `speckit.implement` | `.claude/commands/speckit.implement.md` | 🟢 TEMPLATE | Exécution des tâches |
-| `speckit.taskstoissues` | `.claude/commands/speckit.taskstoissues.md` | 🟢 TEMPLATE | Conversion tâches → issues |
 | `commit-push` | `.claude/commands/commit-push.md` | 🟢 TEMPLATE | Commit + push |
 | `fix-review` | `.claude/commands/fix-review.md` | 🟢 TEMPLATE | Fix review comments |
 | `retro` | `.claude/commands/retro.md` | 🟢 TEMPLATE | Analyse reviews |
@@ -466,28 +457,25 @@ core/{domain}/
 | 1. Architecture & scaffolding | 8 | 5 | 2 |
 | 2. ESLint (64 rules + config) | 60 | 4 | 0 |
 | 3. CI/CD (Cerberus & co.) | 10 | 12 | 2 |
-| 4. Claude Code config | 14 | 8 | 0 |
+| 4. Claude Code config | 5 | 8 | 0 |
 | 5. Infra adapters & ports | 6 | 7 | 10 |
 | 6. Core patterns | 8 | 5 | 8 |
 | 7. Scripts & tooling | 5 | 5 | 2 |
 | 8. Testing | 7 | 3 | 8 |
 | 9. ADRs | 25 | 5 | 8 |
-| **TOTAL** | **~143 (58%)** | **~54 (22%)** | **~40 (16%)** |
+| **TOTAL** | **~134 (57%)** | **~54 (23%)** | **~40 (17%)** |
 
 > ~10 éléments supplémentaires sont des fichiers de support (README, configs intermédiaires).
 
 ---
 
-## Trois Piliers de Valeur pour `craft`
+## Deux Piliers de Valeur pour `craft`
 
 ### Pilier 1 : 64 Règles ESLint Custom
 Presque toutes 🟢, directement packagées en `@craft/eslint-plugin`. Enforce l'architecture hexagonale, les naming conventions, le SRP, et les patterns Redux/testing.
 
-### Pilier 2 : Suite Speckit (9 commandes Claude Code)
-Système complet spec-driven development : specify → clarify → plan → tasks → analyze → checklist → implement → taskstoissues → constitution. 100% générique.
-
-### Pilier 3 : Patterns Architecturaux Documentés
-30+ ADRs génériques + state-builder + fixtures + test store factory + data builders. Infrastructure de test complète avec 142 fichiers de test et 98.83% couverture.
+### Pilier 2 : Patterns Architecturaux Documentés
+30+ ADRs génériques + state-builder + fixtures + test store factory + data builders. Infrastructure de test complète.
 
 ---
 
