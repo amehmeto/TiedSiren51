@@ -4,7 +4,7 @@ Date: 2026-02-19
 
 ## Status
 
-Accepted
+~~Accepted~~ Superseded by [Remote Feature Flags](remote-feature-flags.md)
 
 ## Context
 

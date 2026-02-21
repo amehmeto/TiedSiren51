@@ -20,7 +20,7 @@ import {
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
-import { FeatureFlags } from '@/feature-flags'
+import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
 import { validateSignUpInput } from '@/ui/auth-schemas/validation.helper'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
@@ -34,6 +34,7 @@ export default function SignUpScreen() {
   const dispatch = useDispatch<AppDispatch>()
 
   const viewModel = useSelector(selectSignUpViewModel)
+  const featureFlags = useSelector(selectFeatureFlags)
   const { error } = viewModel
 
   useEffect(() => {
@@ -81,7 +82,7 @@ export default function SignUpScreen() {
             dispatch(signInWithGoogle())
           }}
         />
-        {FeatureFlags.APPLE_SIGN_IN && (
+        {featureFlags.APPLE_SIGN_IN && (
           <TiedSSocialButton
             iconName="logo-apple"
             text="CONTINUE WITH APPLE"
