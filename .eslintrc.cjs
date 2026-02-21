@@ -92,6 +92,7 @@ module.exports = {
     'local-rules/one-usecase-per-file': 'error',
     'local-rules/core-test-file-naming': 'error',
     'local-rules/require-colocated-test': 'error',
+    'local-rules/require-feature-flag-destructuring': 'error',
     'local-rules/time-constant-multiplication': 'error',
     'local-rules/try-catch-isolation': 'error',
     'local-rules/inline-single-statement-handlers': 'error',

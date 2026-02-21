@@ -64,6 +64,7 @@ const reactPropsDestructuring = require('../eslint-rules/react-props-destructuri
 const reducerInDomainFolder = require('../eslint-rules/reducer-in-domain-folder.cjs')
 const repositoryImplementationNaming = require('../eslint-rules/repository-implementation-naming.cjs')
 const requireColocatedTest = require('../eslint-rules/require-colocated-test.cjs')
+const requireFeatureFlagDestructuring = require('../eslint-rules/require-feature-flag-destructuring.cjs')
 const requireLoggerInCatch = require('../eslint-rules/require-logger-in-catch.cjs')
 const requireNamedRegex = require('../eslint-rules/require-named-regex.cjs')
 const requireTypedEach = require('../eslint-rules/require-typed-each.cjs')
@@ -103,6 +104,7 @@ module.exports = {
     'no-new-in-test-body': noNewInTestBody,
     'no-thunk-result-in-component': noThunkResultInComponent,
     'require-colocated-test': requireColocatedTest,
+    'require-feature-flag-destructuring': requireFeatureFlagDestructuring,
     'require-logger-in-catch': requireLoggerInCatch,
     'use-data-builders': useDataBuilders,
     'no-data-builders-in-production': noDataBuildersInProduction,
