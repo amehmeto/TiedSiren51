@@ -12,6 +12,7 @@ describe('Feature: Delete account', () => {
     fixture.given.authUserIs({
       id: 'fake-joe-id',
       email: 'joe@gmail.com',
+      isEmailVerified: true,
       username: 'Joe',
     })
     fixture.given.accountDeletionWillSucceed()
@@ -26,6 +27,7 @@ describe('Feature: Delete account', () => {
     fixture.given.authUserIs({
       id: 'fake-joe-id',
       email: 'joe@gmail.com',
+      isEmailVerified: true,
       username: 'Joe',
     })
     fixture.given.accountDeletionWillFailWith(
@@ -37,6 +39,7 @@ describe('Feature: Delete account', () => {
     fixture.then.authUserShouldBe({
       id: 'fake-joe-id',
       email: 'joe@gmail.com',
+      isEmailVerified: true,
       username: 'Joe',
     })
     fixture.then.deleteAccountErrorShouldBe(

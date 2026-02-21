@@ -31,6 +31,8 @@ describe('no-lame-naming', () => {
         // "item" as part of a longer name is fine
         { code: 'const listItem = getFirst()' },
         { code: 'const menuItems = getMenu()' },
+        // "result" as part of a longer name is fine
+        { code: 'const validationResult = schema.safeParse(input)' },
         // Descriptive function names
         { code: 'function sortSirens() {}' },
         { code: 'const fetchApps = () => {}' },
@@ -41,6 +43,9 @@ describe('no-lame-naming', () => {
         },
         // Object method with descriptive name is fine
         { code: 'const obj = { sortSirens() { return [] } }' },
+        // Function name with non-forbidden camelCase segments
+        { code: 'function generatePickerValues() {}' },
+        { code: 'const fetchUserProfile = () => {}' },
         // Arrow function param with allowed name is fine
         { code: 'const fn = (user) => user.name' },
         // Destructuring variable declarator (not Identifier)
@@ -81,6 +86,16 @@ describe('no-lame-naming', () => {
             {
               messageId: 'noLameVariableName',
               data: { name: 'items' },
+            },
+          ],
+        },
+        // Forbidden variable: result
+        {
+          code: 'const result = schema.safeParse(input)',
+          errors: [
+            {
+              messageId: 'noLameVariableName',
+              data: { name: 'result' },
             },
           ],
         },
@@ -153,6 +168,34 @@ describe('no-lame-naming', () => {
             {
               messageId: 'noLameVariableName',
               data: { name: 'data' },
+            },
+          ],
+        },
+        // Function names containing forbidden words as camelCase segments
+        {
+          code: 'function generateItems() {}',
+          errors: [
+            {
+              messageId: 'noLameFunctionName',
+              data: { name: 'generateItems' },
+            },
+          ],
+        },
+        {
+          code: 'const fetchData = () => {}',
+          errors: [
+            {
+              messageId: 'noLameFunctionName',
+              data: { name: 'fetchData' },
+            },
+          ],
+        },
+        {
+          code: 'function processResult() {}',
+          errors: [
+            {
+              messageId: 'noLameFunctionName',
+              data: { name: 'processResult' },
             },
           ],
         },

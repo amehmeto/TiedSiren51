@@ -86,6 +86,9 @@ Coding conventions and style decisions across all layers.
 - [Class-Scoped Constants](conventions/class-scoped-constants.md)
 - [Developer Tooling](conventions/developer-tooling.md)
 - [Infrastructure Error Handling](conventions/infra-error-handling.md)
+- [No Nested Call Expressions](conventions/no-nested-call-expressions.md)
+- [Remote Feature Flags](conventions/remote-feature-flags.md)
+- ~~[Static Feature Flags](conventions/static-feature-flags.md)~~ *(Superseded by Remote Feature Flags)*
 - [Type Guards for Branded Types](conventions/type-guards-for-branded-types.md)
 
 ## Creating a New ADR

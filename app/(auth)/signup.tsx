@@ -20,10 +20,11 @@ import {
 import { signInWithApple } from '@/core/auth/usecases/sign-in-with-apple.usecase'
 import { signInWithGoogle } from '@/core/auth/usecases/sign-in-with-google.usecase'
 import { signUpWithEmail } from '@/core/auth/usecases/sign-up-with-email.usecase'
+import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
 import { validateSignUpInput } from '@/ui/auth-schemas/validation.helper'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
-import TiedSSocialButton from '@/ui/design-system/components/shared/TiedSSocialButton'
+import { TiedSSocialButton } from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 import { selectSignUpViewModel } from '@/ui/screens/Auth/SignUp/sign-up.view-model'
@@ -33,6 +34,7 @@ export default function SignUpScreen() {
   const dispatch = useDispatch<AppDispatch>()
 
   const viewModel = useSelector(selectSignUpViewModel)
+  const { APPLE_SIGN_IN: isAppleSignIn } = useSelector(selectFeatureFlags)
   const { error } = viewModel
 
   useEffect(() => {
@@ -80,18 +82,19 @@ export default function SignUpScreen() {
             dispatch(signInWithGoogle())
           }}
         />
-        <TiedSSocialButton
-          iconName="logo-apple"
-          text="CONTINUE WITH APPLE"
-          onPress={() => {
-            dispatch(signInWithApple())
-          }}
-        />
+        {isAppleSignIn && (
+          <TiedSSocialButton
+            iconName="logo-apple"
+            text="CONTINUE WITH APPLE"
+            onPress={() => {
+              dispatch(signInWithApple())
+            }}
+          />
+        )}
         <Text style={styles.orText}>{'OR'}</Text>
         <TiedSTextInput
           placeholder="Your Email"
           accessibilityLabel="Email"
-          placeholderTextColor={T.color.grey}
           value={viewModel.email}
           onChangeText={(text) => {
             dispatch(setEmail(text))
@@ -103,8 +106,7 @@ export default function SignUpScreen() {
         <TiedSTextInput
           placeholder="Create Password"
           accessibilityLabel="Password"
-          placeholderTextColor={T.color.grey}
-          hasPasswordToggle={true}
+          hasPasswordToggle
           value={viewModel.password}
           onChangeText={(text) => {
             dispatch(setPassword(text))
@@ -147,16 +149,19 @@ const styles = StyleSheet.create({
   subtitle: {
     color: T.color.text,
     fontSize: T.font.size.large,
+    fontFamily: T.font.family.heading,
     marginBottom: T.spacing.large,
   },
   orText: {
-    color: T.color.text,
+    color: T.color.textMuted,
     fontSize: T.font.size.regular,
+    fontFamily: T.font.family.primary,
     marginVertical: T.spacing.medium,
   },
   errorText: {
     color: T.color.red,
-    fontSize: T.font.size.regular,
+    fontSize: T.font.size.small,
+    fontFamily: T.font.family.primary,
     marginVertical: T.spacing.medium,
   },
 })

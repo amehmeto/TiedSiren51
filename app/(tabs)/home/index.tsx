@@ -12,6 +12,7 @@ import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { useAccessibilityPermission } from '@/ui/hooks/useAccessibilityPermission'
 import { useTick } from '@/ui/hooks/useTick'
 import { AccessibilityPermissionCard } from '@/ui/screens/Home/HomeScreen/AccessibilityPermissionCard'
+import { EmailVerificationBanner } from '@/ui/screens/Home/HomeScreen/EmailVerificationBanner'
 import { HomeViewModel } from '@/ui/screens/Home/HomeScreen/home-view-model.types'
 import { selectHomeViewModel } from '@/ui/screens/Home/HomeScreen/home.view-model'
 import { NoSessionBoard } from '@/ui/screens/Home/HomeScreen/NoSessionBoard'
@@ -85,6 +86,8 @@ export default function HomeScreen() {
       <Text style={styles.greetings}>{viewModel.greetings}</Text>
       <Text style={styles.text}>{"Let's make it productive"}</Text>
 
+      <EmailVerificationBanner />
+
       {!hasAccessibilityPermission && isAndroidSirenLookout(sirenLookout) && (
         <AccessibilityPermissionCard sirenLookout={sirenLookout} />
       )}
@@ -103,11 +106,12 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   greetings: {
     color: T.color.text,
-    fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
     fontSize: T.font.size.medium,
   },
   text: {
-    color: T.color.text,
+    color: T.color.textMuted,
+    fontFamily: T.font.family.primary,
     marginBottom: T.spacing.large,
   },
   image: {

@@ -16,4 +16,6 @@ export const FIREBASE_ERROR_TYPES: Record<
   [FirebaseAuthErrorCode.NetworkRequestFailed]: AuthErrorType.Network,
   [FirebaseAuthErrorCode.WrongPassword]: AuthErrorType.Credential,
   [FirebaseAuthErrorCode.RequiresRecentLogin]: AuthErrorType.Unknown,
+  [FirebaseAuthErrorCode.ExpiredActionCode]: AuthErrorType.Validation,
+  [FirebaseAuthErrorCode.InvalidActionCode]: AuthErrorType.Validation,
 }

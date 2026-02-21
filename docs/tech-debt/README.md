@@ -1,7 +1,7 @@
 # Technical Debt & Future Improvements
 
 > Created: January 28, 2025
-> Last Updated: January 19, 2026
+> Last Updated: February 20, 2026
 > Status: Living document
 > Purpose: Track planned improvements across the codebase
 
@@ -12,8 +12,7 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ## Active Technical Debt Items
 
 ### Infrastructure & Database
-- [Expo SDK 54 Upgrade](expo-sdk-54-upgrade.md) - 🔴 **BLOCKED** - Prisma incompatible with New Architecture
-- [Prisma Client Generation](prisma-client-generation.md) - ✅ **COMPLETED** - Automation scripts added
+- [Expo SDK 54 Upgrade](expo-sdk-54-upgrade.md) - 🔴 **BLOCKED** - Prisma incompatible with New Architecture (estimated H2 2025 fix is overdue — check [prisma-react-native#58](https://github.com/nicksrandall/prisma-react-native/issues/58) for updates)
 - [Error Handling Enhancement](error-handling.md) - 🚨 **HIGH PRIORITY** - Custom error types needed
 - [Database Configuration](database-configuration.md) - 📋 **LOW PRIORITY** - Configurable paths
 - [Migration Strategy](migration-strategy.md) - ⚠️ **MEDIUM PRIORITY** - Critical for app updates
@@ -22,14 +21,17 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ### Testing
 - [Testing Coverage](testing-coverage.md) - ⚠️ **MEDIUM PRIORITY** - Integration tests and Prisma test fixes
 
-### Performance
-- [Native Siren Filtering](native-siren-filtering.md) - 📋 **LOW PRIORITY** - Filter blocked apps at native level to reduce JS bridge calls
-
 ### UI/UX
 - [Android Time Picker Styling](android-time-picker-styling.md) - 📋 **LOW PRIORITY** - Border radius not supported on Android
+- [Android Time Picker Double Selection](android-time-picker-double-selection.md) - 📋 **LOW PRIORITY** - Upstream `react-native-modal-datetime-picker` race condition workaround (#321)
 
 ### Maintenance
 - [Scripts Audit](scripts-audit.md) - 📋 **LOW PRIORITY** - Inventory of all scripts with usage status
+
+## Archived Items
+
+- [Prisma Client Generation](prisma-client-generation.md) - ✅ **COMPLETED** - Automation scripts added
+- [Native Siren Filtering](native-siren-filtering.md) - ✅ **COMPLETED** - Superseded by native AccessibilityService blocking path
 
 
 ## Priority Levels
@@ -43,7 +45,7 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ## Trigger Points
 
 When to revisit these improvements:
-- **SDK 54 Upgrade**: When @prisma/react-native releases New Architecture support
+- **SDK 54 Upgrade**: When @prisma/react-native releases New Architecture support (H2 2025 estimate is overdue — revisit quarterly)
 - **Error Handling**: When seeing first error reports from users
 - **Migration Strategy**: Before first app update with schema changes
 - **Testing**: When reaching 1000 active users

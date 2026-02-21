@@ -28,7 +28,10 @@ export function SelectDevicesField({
     <>
       <View style={styles.param}>
         <Text style={styles.label}>Devices</Text>
-        <Pressable onPress={() => setIsModalOpen(true)}>
+        <Pressable
+          onPress={() => setIsModalOpen(true)}
+          accessibilityRole="button"
+        >
           <Text style={styles.option}>{displayText}</Text>
         </Pressable>
       </View>
@@ -54,9 +57,13 @@ const styles = StyleSheet.create({
   },
   label: {
     color: T.color.text,
+    fontFamily: T.font.family.medium,
+    fontSize: T.font.size.base,
   },
   option: {
     color: T.color.lightBlue,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
     textAlign: 'right',
   },
 })

@@ -1,4 +1,3 @@
-import { FormikErrors } from 'formik'
 import React, { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -7,34 +6,29 @@ import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextIn
 import { T } from '@/ui/design-system/theme'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 
+const NAME_PLACEHOLDER = 'Choose a name...'
+
 type ChooseNameFields = {
   values: BlockSessionFormValues
   onChange: (text: string) => void
   onBlur: () => (e: React.FocusEvent) => void
-  setFieldValue: (
-    field: string,
-    value: string,
-    shouldValidate?: boolean,
-  ) => Promise<void | FormikErrors<BlockSessionFormValues>>
 }
 
 type ChooseNameProps = Readonly<ChooseNameFields>
 
-export function ChooseName({
-  values,
-  onChange,
-  onBlur,
-  setFieldValue,
-}: ChooseNameProps) {
+export function ChooseName({ values, onChange, onBlur }: ChooseNameProps) {
   const [isNameModalVisible, setIsNameModalVisible] = useState<boolean>(false)
-  const blockSessionName = values.name ?? 'Choose a name...'
+  const displayName = values.name ? values.name : NAME_PLACEHOLDER
 
   return (
     <>
       <View style={styles.param}>
         <Text style={styles.label}>Name</Text>
-        <Pressable onPress={() => setIsNameModalVisible(true)}>
-          <Text style={styles.option}>{blockSessionName}</Text>
+        <Pressable
+          onPress={() => setIsNameModalVisible(true)}
+          accessibilityRole="button"
+        >
+          <Text style={styles.option}>{displayName}</Text>
         </Pressable>
       </View>
 
@@ -46,15 +40,14 @@ export function ChooseName({
         <TiedSTextInput
           onChangeText={onChange}
           onBlur={onBlur}
-          selectTextOnFocus={true}
-          value={blockSessionName}
+          autoFocus
+          selectTextOnFocus
+          placeholder={NAME_PLACEHOLDER}
+          value={values.name ?? ''}
         />
         <TiedSButton
           text={'SAVE'}
-          onPress={() => {
-            setFieldValue('name', blockSessionName)
-            setIsNameModalVisible(false)
-          }}
+          onPress={() => setIsNameModalVisible(false)}
         />
       </TiedSModal>
     </>
@@ -72,9 +65,13 @@ const styles = StyleSheet.create({
   },
   label: {
     color: T.color.text,
+    fontFamily: T.font.family.medium,
+    fontSize: T.font.size.base,
   },
   option: {
     color: T.color.lightBlue,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
     textAlign: 'right',
   },
   modal: {

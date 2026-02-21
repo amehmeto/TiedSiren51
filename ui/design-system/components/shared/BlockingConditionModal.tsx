@@ -12,7 +12,7 @@ type IconName =
   | 'hourglass-outline'
   | 'power-outline'
 
-type BlockingCondition = {
+export type BlockingCondition = {
   iconName: IconName
   title: string
   subtitle: string
@@ -72,9 +72,7 @@ export default function BlockingConditionModal({
           {CONDITIONS.map((condition) => (
             <BlockingConditionItem
               key={condition.title}
-              iconName={condition.iconName}
-              title={condition.title}
-              subtitle={condition.subtitle}
+              condition={condition}
               onSelect={() => onSelectCondition(condition.title)}
             />
           ))}
@@ -90,15 +88,14 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: T.font.size.large,
-    fontWeight: T.font.weight.bold,
-    fontFamily: T.font.family.primary,
-    color: T.color.white,
+    fontFamily: T.font.family.heading,
+    color: T.color.text,
     marginBottom: T.spacing.small,
   },
   modalSubtitle: {
     fontSize: T.font.size.small,
     fontFamily: T.font.family.primary,
-    color: T.color.grey,
+    color: T.color.textMuted,
     marginBottom: T.spacing.medium,
   },
   scrollViewContent: {

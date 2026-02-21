@@ -42,12 +42,12 @@ const styles = StyleSheet.create({
     gap: T.spacing.medium,
   },
   unlockLabel: {
-    color: T.color.white,
+    color: T.color.text,
     fontSize: T.font.size.regular,
-    fontFamily: T.font.family.primary,
+    fontFamily: T.font.family.medium,
   },
   unlockValue: {
-    color: T.color.grey,
+    color: T.color.textMuted,
     fontSize: T.font.size.regular,
     fontFamily: T.font.family.primary,
   },

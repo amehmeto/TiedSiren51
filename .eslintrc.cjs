@@ -18,7 +18,6 @@ const oxlintDisableRules = {}
 oxlintConfigs.forEach((item) => {
   if (item.rules) Object.assign(oxlintDisableRules, item.rules)
 })
-
 module.exports = {
   root: true,
   ignorePatterns: ['node_modules', '!.claude', 'eslint-rules/', 'oxlint-plugin-local-rules.js'],

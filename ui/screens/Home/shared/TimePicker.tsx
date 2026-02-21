@@ -1,5 +1,5 @@
 import React from 'react'
-import { Platform, StyleSheet } from 'react-native'
+import { Platform } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { HHmmString } from '@/core/_ports_/date-provider'
 import { T } from '@/ui/design-system/theme'
@@ -10,6 +10,7 @@ type TimePickerFields = {
   chosenTimeAsDate: Date
   onConfirm: (date: Date) => void
   onCancel: () => void
+  onHide?: () => void
   chosenTime: HHmmString
   handleChange: () => void
   setTime: (time: HHmmString) => void
@@ -23,6 +24,7 @@ export function TimePicker({
   chosenTimeAsDate,
   onConfirm,
   onCancel,
+  onHide,
   chosenTime,
   handleChange,
   setTime,
@@ -43,27 +45,16 @@ export function TimePicker({
     <DateTimePickerModal
       date={chosenTimeAsDate}
       isVisible={isVisible}
-      is24Hour={true}
+      is24Hour
       mode="time"
-      isDarkModeEnabled={true}
+      isDarkModeEnabled
       themeVariant="dark"
       accentColor={T.color.lightBlue}
       buttonTextColorIOS={T.color.lightBlue}
-      textColor={T.color.white}
-      pickerContainerStyleIOS={styles.pickerContainer}
-      modalStyleIOS={styles.modalStyle}
+      textColor={T.color.text}
       onConfirm={onConfirm}
       onCancel={onCancel}
+      onHide={onHide}
     />
   )
 }
-
-const styles = StyleSheet.create({
-  pickerContainer: {
-    borderRadius: T.border.radius.extraRounded,
-    overflow: 'hidden',
-  },
-  modalStyle: {
-    borderRadius: T.border.radius.extraRounded,
-  },
-})

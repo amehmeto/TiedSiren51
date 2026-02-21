@@ -104,6 +104,7 @@ oxlint-plugin-local-rules.js
 .claude-init.sh
 .claude-issue-prompt.md
 .claude/ralph-loop.local.md
+.claude/ralph-loop-prompt.local.md
 .claude/ralph-prompt.md
 
 # Git worktrees (nested inside repo for Claude Code compatibility)

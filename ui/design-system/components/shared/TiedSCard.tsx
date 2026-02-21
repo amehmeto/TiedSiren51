@@ -13,7 +13,7 @@ type TiedSCardProps = Readonly<TiedSCardOwnProps>
 export function TiedSCard({ children, style }: TiedSCardProps) {
   return (
     <BlurView
-      intensity={T.effects.blur.intensity.strong}
+      intensity={T.effects.blur.intensity.medium}
       style={[styles.container, style]}
       tint={'dark'}
     >
@@ -27,9 +27,11 @@ const styles = StyleSheet.create({
     padding: T.spacing.medium,
     marginTop: T.spacing.small,
     marginBottom: T.spacing.small,
-    borderRadius: T.border.radius.roundedSmall,
+    borderRadius: T.border.radius.roundedMedium,
     overflow: 'hidden',
     flexDirection: 'row',
     alignItems: 'center',
+    borderWidth: T.border.width.thin,
+    borderColor: T.color.borderSubtle,
   },
 })

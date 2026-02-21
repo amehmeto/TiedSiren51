@@ -1,7 +1,9 @@
 import { FormikProps } from 'formik'
 import { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
+import { useSelector } from 'react-redux'
 import { Device } from '@/core/device/device'
+import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -21,6 +23,10 @@ type SelectBlockSessionParamsProps = {
 export function SelectBlockSessionParams({
   form,
 }: SelectBlockSessionParamsProps) {
+  const {
+    MULTI_DEVICE: isMultiDevice,
+    BLOCKING_CONDITIONS: isBlockingConditions,
+  } = useSelector(selectFeatureFlags)
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
@@ -28,10 +34,11 @@ export function SelectBlockSessionParams({
     useState<boolean>(false)
 
   useEffect(() => {
+    if (!isMultiDevice) return
     dependencies.deviceRepository.findAll().then((foundDevices) => {
       setDevices(foundDevices)
     })
-  }, [])
+  }, [isMultiDevice])
 
   function hasFieldError(field: keyof BlockSessionFormValues): boolean {
     return !!form.touched[field] && !!form.errors[field]
@@ -40,12 +47,15 @@ export function SelectBlockSessionParams({
   const handleNameChange = form.handleChange('name')
 
   return (
-    <View>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.scrollContent}
+      keyboardShouldPersistTaps="handled"
+    >
       <TiedSCard style={styles.blockSession}>
         <ChooseName
           values={form.values}
           onChange={handleNameChange}
-          setFieldValue={form.setFieldValue}
           onBlur={() => form.handleBlur('name')}
         />
         {hasFieldError('name') && <FormError error={form.errors.name} />}
@@ -56,12 +66,14 @@ export function SelectBlockSessionParams({
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
         )}
-        <SelectDevicesField
-          selectedDevices={form.values.devices}
-          setFieldValue={form.setFieldValue}
-          availableDevices={devices}
-        />
-        {hasFieldError('devices') && (
+        {isMultiDevice && (
+          <SelectDevicesField
+            selectedDevices={form.values.devices}
+            setFieldValue={form.setFieldValue}
+            availableDevices={devices}
+          />
+        )}
+        {isMultiDevice && hasFieldError('devices') && (
           <FieldErrors errors={form.errors} fieldName={'devices'} />
         )}
         <SelectTime
@@ -88,18 +100,25 @@ export function SelectBlockSessionParams({
           initialOtherTime={form.initialValues.startedAt}
         />
         {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
-        <SelectBlockingCondition form={form} />
-        {hasFieldError('blockingConditions') && (
+        {isBlockingConditions && <SelectBlockingCondition form={form} />}
+        {isBlockingConditions && hasFieldError('blockingConditions') && (
           <FieldErrors errors={form.errors} fieldName={'blockingConditions'} />
         )}
       </TiedSCard>
 
       <TiedSButton text={'START'} onPress={() => form.handleSubmit()} />
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center' as const,
+  },
   blockSession: {
     flexDirection: 'column',
     alignItems: 'stretch',

@@ -14,6 +14,7 @@ import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
 import { updateBlocklist } from '@/core/blocklist/usecases/update-blocklist.usecase'
+import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
@@ -57,6 +58,11 @@ export function BlocklistForm({
 }: Readonly<BlocklistScreenProps>) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const featureFlags = useSelector(selectFeatureFlags)
+  const {
+    WEBSITE_BLOCKING: isWebsiteBlocking,
+    KEYWORD_BLOCKING: isKeywordBlocking,
+  } = featureFlags
 
   const viewModel = useSelector((state: RootState) =>
     selectBlocklistFormViewModel(
@@ -96,8 +102,12 @@ export function BlocklistForm({
 
   const routes: BlocklistTabRoute[] = [
     { key: BlocklistTabKey.Apps, title: 'Apps' },
-    { key: BlocklistTabKey.Websites, title: 'Websites' },
-    { key: BlocklistTabKey.Keywords, title: 'Keywords' },
+    ...(isWebsiteBlocking
+      ? [{ key: BlocklistTabKey.Websites, title: 'Websites' }]
+      : []),
+    ...(isKeywordBlocking
+      ? [{ key: BlocklistTabKey.Keywords, title: 'Keywords' }]
+      : []),
   ]
 
   useEffect(() => {
@@ -224,7 +234,7 @@ export function BlocklistForm({
   const validateForm = useCallback(
     (submittedBlocklistForm: typeof blocklist) => {
       try {
-        blocklistFormSchema.parse(submittedBlocklistForm)
+        blocklistFormSchema(featureFlags).parse(submittedBlocklistForm)
         setErrors({})
         return true
       } catch (e) {
@@ -239,7 +249,7 @@ export function BlocklistForm({
         return false
       }
     },
-    [setErrors],
+    [setErrors, featureFlags],
   )
 
   const saveBlocklist = useCallback(async () => {
@@ -291,16 +301,16 @@ export function BlocklistForm({
 
 const styles = StyleSheet.create({
   title: {
-    fontWeight: T.font.weight.bold,
     color: T.color.text,
-    fontFamily: T.font.family.primary,
+    fontFamily: T.font.family.semibold,
     fontSize: T.font.size.small,
     marginTop: T.spacing.small,
     marginBottom: T.spacing.small,
+    letterSpacing: T.font.letterSpacing.tight,
   },
   errorText: {
     color: T.color.red,
     fontSize: T.font.size.small,
-    fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
   },
 })

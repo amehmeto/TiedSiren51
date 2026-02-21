@@ -32,6 +32,7 @@ name: Cerberus
 
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.head_ref || github.ref }}
@@ -151,13 +152,18 @@ jobs:
 
   build:
     needs: [test, hecate]
-    # Only build if: not a draft PR AND this push contains app changes
-    # This prevents rebuilding when only docs/md files are pushed after earlier code changes
-    if: github.event.pull_request.draft == false && needs.hecate.outputs.app-changed-this-push == 'true'
+    # Only build if: tests passed, not a draft PR, AND (this push contains app changes OR PR was just marked ready with app changes)
+    if: >-
+      needs.test.result == 'success'
+      && github.event.pull_request.draft == false
+      && (needs.hecate.outputs.app-changed-this-push == 'true'
+          || (github.event.action == 'ready_for_review'
+              && needs.hecate.outputs.app-changed == 'true'))
     runs-on: ubuntu-latest
     permissions:
       contents: write
       pull-requests: write
+      issues: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -219,14 +225,16 @@ jobs:
           name: app-debug-${{ github.run_number }}
           path: ${{ steps.find_apk.outputs.apk_path }}
           retention-days: 7
-#      - name: Send APK notification to Slack
-#        if: success()
-#        env:
-#          SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-#        run: |
-#          bash scripts/send-slack-notification.sh \
-#            '${{ toJSON(github) }}' \
-#            '${{ toJSON(steps) }}'
+
+      - name: Notify QA on Slack
+        if: success()
+        continue-on-error: true
+        env:
+          SLACK_QA_WEBHOOK_URL: ${{ secrets.SLACK_QA_WEBHOOK_URL }}
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          bash scripts/send-slack-notification.sh \
+            '${{ toJSON(github) }}' '${{ toJSON(steps) }}'
 
 #      - name: EAS Cloud Preview Build
 #        run: eas build -p android --profile preview --non-interactive

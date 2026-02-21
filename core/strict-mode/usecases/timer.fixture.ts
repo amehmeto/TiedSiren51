@@ -4,7 +4,7 @@ import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { Fixture } from '@/core/_tests_/fixture.type'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
-import { AuthUser } from '@/core/auth/auth-user'
+import { AuthProvider, AuthUser } from '@/core/auth/auth-user'
 import { selectNullableAuthUserId } from '@/core/auth/selectors/selectNullableAuthUserId'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
@@ -31,6 +31,8 @@ export function timerFixture(
   const defaultAuthUser: AuthUser = {
     id: DEFAULT_USER_ID,
     email: 'test@example.com',
+    isEmailVerified: true,
+    authProvider: AuthProvider.Email,
   }
 
   return {

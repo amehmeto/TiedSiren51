@@ -15,6 +15,11 @@ import {
 import { Blocklist, blocklistAdapter } from '../blocklist/blocklist'
 import { Sirens } from '../siren/sirens'
 
+type AuthErrorPayload = {
+  message: string
+  errorType?: AuthErrorType
+}
+
 const initialState = rootReducer(undefined, { type: 'unknown' })
 
 const withBlockSessions = createAction<BlockSession[]>('withBlockSession')
@@ -22,28 +27,49 @@ const withBlocklists = createAction<Blocklist[]>('withBlocklists')
 const withAvailableSirens = createAction<Sirens>('withAvailableSirens')
 const withAuthUser = createAction<AuthUser>('withAuthUser')
 const withoutAuthUser = createAction<{}>('withoutAuthUser')
-type AuthErrorPayload = {
-  message: string
-  errorType?: AuthErrorType
-}
 const withAuthError = createAction<AuthErrorPayload>('withAuthError')
 const withAuthLoading = createAction<boolean>('withAuthLoading')
 const withStrictModeEndedAt = createAction<ISODateString | null>(
   'withStrictModeEndedAt',
 )
 const withPasswordResetSent = createAction<boolean>('withPasswordResetSent')
-const withEmail = createAction<string>('withEmail')
-const withPassword = createAction<string>('withPassword')
 const withLastReauthenticatedAt = createAction<ISODateString | null>(
   'withLastReauthenticatedAt',
 )
+const withSendingVerificationEmail = createAction<boolean>(
+  'withSendingVerificationEmail',
+)
 const withReauthenticating = createAction<boolean>('withReauthenticating')
 const withReauthError = createAction<string | null>('withReauthError')
+const withConfirmingPasswordReset = createAction<boolean>(
+  'withConfirmingPasswordReset',
+)
+const withConfirmPasswordResetError = createAction<string | null>(
+  'withConfirmPasswordResetError',
+)
+const withPasswordResetConfirmed = createAction<boolean>(
+  'withPasswordResetConfirmed',
+)
+const withEmail = createAction<string>('withEmail')
+const withPassword = createAction<string>('withPassword')
 const withDeletingAccount = createAction<boolean>('withDeletingAccount')
 const withDeleteAccountError = createAction<string | null>(
   'withDeleteAccountError',
 )
 const withDeleteConfirmText = createAction<string>('withDeleteConfirmText')
+const withChangingPassword = createAction<boolean>('withChangingPassword')
+const withChangePasswordError = createAction<string | null>(
+  'withChangePasswordError',
+)
+const withHasChangePasswordSucceeded = createAction<boolean>(
+  'withHasChangePasswordSucceeded',
+)
+const withChangePasswordSuccessCount = createAction<number>(
+  'withChangePasswordSuccessCount',
+)
+const withLoadingInstalledApps = createAction<boolean>(
+  'withLoadingInstalledApps',
+)
 
 const reducer = createReducer(initialState, (builder) => {
   builder
@@ -75,20 +101,32 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withPasswordResetSent, (state, action) => {
       state.auth.isPasswordResetSent = action.payload
     })
-    .addCase(withEmail, (state, action) => {
-      state.auth.email = action.payload
-    })
-    .addCase(withPassword, (state, action) => {
-      state.auth.password = action.payload
-    })
     .addCase(withLastReauthenticatedAt, (state, action) => {
       state.auth.lastReauthenticatedAt = action.payload
+    })
+    .addCase(withSendingVerificationEmail, (state, action) => {
+      state.auth.isSendingVerificationEmail = action.payload
     })
     .addCase(withReauthenticating, (state, action) => {
       state.auth.isReauthenticating = action.payload
     })
     .addCase(withReauthError, (state, action) => {
       state.auth.reauthError = action.payload
+    })
+    .addCase(withConfirmingPasswordReset, (state, action) => {
+      state.auth.isConfirmingPasswordReset = action.payload
+    })
+    .addCase(withConfirmPasswordResetError, (state, action) => {
+      state.auth.confirmPasswordResetError = action.payload
+    })
+    .addCase(withPasswordResetConfirmed, (state, action) => {
+      state.auth.isPasswordResetConfirmed = action.payload
+    })
+    .addCase(withEmail, (state, action) => {
+      state.auth.email = action.payload
+    })
+    .addCase(withPassword, (state, action) => {
+      state.auth.password = action.payload
     })
     .addCase(withDeletingAccount, (state, action) => {
       state.auth.isDeletingAccount = action.payload
@@ -98,6 +136,21 @@ const reducer = createReducer(initialState, (builder) => {
     })
     .addCase(withDeleteConfirmText, (state, action) => {
       state.auth.deleteConfirmText = action.payload
+    })
+    .addCase(withChangingPassword, (state, action) => {
+      state.auth.isChangingPassword = action.payload
+    })
+    .addCase(withChangePasswordError, (state, action) => {
+      state.auth.changePasswordError = action.payload
+    })
+    .addCase(withHasChangePasswordSucceeded, (state, action) => {
+      state.auth.hasChangePasswordSucceeded = action.payload
+    })
+    .addCase(withChangePasswordSuccessCount, (state, action) => {
+      state.auth.changePasswordSuccessCount = action.payload
+    })
+    .addCase(withLoadingInstalledApps, (state, action) => {
+      state.siren.isLoadingInstalledApps = action.payload
     })
 })
 
@@ -122,14 +175,23 @@ export const stateBuilder = (baseState = initialState) => {
     withAuthLoading: reduce(withAuthLoading),
     withStrictModeEndedAt: reduce(withStrictModeEndedAt),
     withPasswordResetSent: reduce(withPasswordResetSent),
+    withSendingVerificationEmail: reduce(withSendingVerificationEmail),
     withEmail: reduce(withEmail),
     withPassword: reduce(withPassword),
     withLastReauthenticatedAt: reduce(withLastReauthenticatedAt),
     withReauthenticating: reduce(withReauthenticating),
     withReauthError: reduce(withReauthError),
+    withConfirmingPasswordReset: reduce(withConfirmingPasswordReset),
+    withConfirmPasswordResetError: reduce(withConfirmPasswordResetError),
+    withPasswordResetConfirmed: reduce(withPasswordResetConfirmed),
     withDeletingAccount: reduce(withDeletingAccount),
     withDeleteAccountError: reduce(withDeleteAccountError),
     withDeleteConfirmText: reduce(withDeleteConfirmText),
+    withChangingPassword: reduce(withChangingPassword),
+    withChangePasswordError: reduce(withChangePasswordError),
+    withHasChangePasswordSucceeded: reduce(withHasChangePasswordSucceeded),
+    withChangePasswordSuccessCount: reduce(withChangePasswordSuccessCount),
+    withLoadingInstalledApps: reduce(withLoadingInstalledApps),
   }
 }
 

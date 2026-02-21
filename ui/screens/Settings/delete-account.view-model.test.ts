@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { stateBuilder } from '@/core/_tests_/state-builder'
+import { AuthProvider } from '@/core/auth/auth-user'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import {
   DeleteAccountViewState,
@@ -16,7 +17,12 @@ describe('selectDeleteAccountViewModel', () => {
 
   it('should return Form state when user is authenticated', () => {
     const state = stateBuilder()
-      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withAuthUser({
+        id: 'user-id',
+        email: 'user@test.com',
+        isEmailVerified: true,
+        authProvider: AuthProvider.Email,
+      })
       .build()
     const expectedViewModel = {
       type: DeleteAccountViewState.Form,
@@ -44,7 +50,12 @@ describe('selectDeleteAccountViewModel', () => {
 
   it('should mark as reauthed when lastReauthenticatedAt is within 5 minutes', () => {
     const state = stateBuilder()
-      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withAuthUser({
+        id: 'user-id',
+        email: 'user@test.com',
+        isEmailVerified: true,
+        authProvider: AuthProvider.Email,
+      })
       .withLastReauthenticatedAt('2026-02-15T20:00:00.000Z')
       .build()
     const expectedViewModel = {
@@ -59,7 +70,12 @@ describe('selectDeleteAccountViewModel', () => {
 
   it('should mark as not reauthed when lastReauthenticatedAt is older than 5 minutes', () => {
     const state = stateBuilder()
-      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withAuthUser({
+        id: 'user-id',
+        email: 'user@test.com',
+        isEmailVerified: true,
+        authProvider: AuthProvider.Email,
+      })
       .withLastReauthenticatedAt('2026-02-15T19:57:00.000Z')
       .build()
     const expectedViewModel = {
@@ -74,7 +90,12 @@ describe('selectDeleteAccountViewModel', () => {
 
   it('should return loading state when deleting', () => {
     const state = stateBuilder()
-      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withAuthUser({
+        id: 'user-id',
+        email: 'user@test.com',
+        isEmailVerified: true,
+        authProvider: AuthProvider.Email,
+      })
       .withDeletingAccount(true)
       .build()
     const expectedViewModel = {
@@ -91,7 +112,12 @@ describe('selectDeleteAccountViewModel', () => {
 
   it('should show error when deletion fails', () => {
     const state = stateBuilder()
-      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withAuthUser({
+        id: 'user-id',
+        email: 'user@test.com',
+        isEmailVerified: true,
+        authProvider: AuthProvider.Email,
+      })
       .withDeleteAccountError('Please re-authenticate to perform this action.')
       .build()
     const expectedViewModel = {
@@ -106,7 +132,12 @@ describe('selectDeleteAccountViewModel', () => {
 
   it('should enable delete button when confirmation text matches', () => {
     const state = stateBuilder()
-      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withAuthUser({
+        id: 'user-id',
+        email: 'user@test.com',
+        isEmailVerified: true,
+        authProvider: AuthProvider.Email,
+      })
       .withDeleteConfirmText('DELETE')
       .build()
     const expectedViewModel = {
@@ -123,7 +154,12 @@ describe('selectDeleteAccountViewModel', () => {
 
   it('should keep delete button disabled when confirmation text does not match', () => {
     const state = stateBuilder()
-      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withAuthUser({
+        id: 'user-id',
+        email: 'user@test.com',
+        isEmailVerified: true,
+        authProvider: AuthProvider.Email,
+      })
       .withDeleteConfirmText('DELE')
       .build()
     const expectedViewModel = {
@@ -140,7 +176,12 @@ describe('selectDeleteAccountViewModel', () => {
 
   it('should keep delete button disabled while deleting even if confirmed', () => {
     const state = stateBuilder()
-      .withAuthUser({ id: 'user-id', email: 'user@test.com' })
+      .withAuthUser({
+        id: 'user-id',
+        email: 'user@test.com',
+        isEmailVerified: true,
+        authProvider: AuthProvider.Email,
+      })
       .withDeleteConfirmText('DELETE')
       .withDeletingAccount(true)
       .build()

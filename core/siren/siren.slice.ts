@@ -19,6 +19,7 @@ export const sirenSlice = createSlice({
   name: 'siren',
   initialState: {
     availableSirens: initialSirens,
+    isLoadingInstalledApps: false,
   },
   reducers: {
     setSirens: (state, action) => {
@@ -30,8 +31,15 @@ export const sirenSlice = createSlice({
       .addCase(loadUser.fulfilled, (state, action) => {
         state.availableSirens = action.payload.sirens
       })
+      .addCase(fetchAvailableSirens.pending, (state) => {
+        state.isLoadingInstalledApps = true
+      })
       .addCase(fetchAvailableSirens.fulfilled, (state, action) => {
         state.availableSirens = action.payload
+        state.isLoadingInstalledApps = false
+      })
+      .addCase(fetchAvailableSirens.rejected, (state) => {
+        state.isLoadingInstalledApps = false
       })
       .addCase(addKeywordToSirens.fulfilled, (state, action) => {
         state.availableSirens.keywords.push(action.payload)

@@ -8,8 +8,11 @@ import {
   initializeApp,
 } from 'firebase/app'
 import {
+  applyActionCode,
   Auth,
+  confirmPasswordReset as firebaseConfirmPasswordReset,
   createUserWithEmailAndPassword,
+  deleteUser,
   EmailAuthProvider,
   getAuth,
   getReactNativePersistence,
@@ -17,14 +20,18 @@ import {
   initializeAuth,
   onAuthStateChanged,
   reauthenticateWithCredential,
+  sendEmailVerification,
   sendPasswordResetEmail,
-  deleteUser,
   signInWithCredential,
   signInWithEmailAndPassword,
   signOut,
+  updatePassword,
   User,
 } from 'firebase/auth'
-import { AuthGateway } from '@/core/_ports_/auth.gateway'
+import {
+  AuthGateway,
+  EmailVerificationResult,
+} from '@/core/_ports_/auth.gateway'
 import { Logger } from '@/core/_ports_/logger'
 import { AuthError } from '@/core/auth/auth-error'
 import { AuthErrorType } from '@/core/auth/auth-error-type'
@@ -122,6 +129,7 @@ export class FirebaseAuthGateway implements AuthGateway {
         this.onUserLoggedInListener({
           id: user.uid,
           email: user.email ?? '',
+          isEmailVerified: user.emailVerified,
           authProvider: this.getAuthProvider(user),
         })
         return
@@ -207,6 +215,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       return {
         id: signInResponse.user.uid,
         email: signInResponse.user.email ?? '',
+        isEmailVerified: signInResponse.user.emailVerified,
         authProvider: this.getAuthProvider(signInResponse.user),
       }
     } catch (error) {
@@ -224,9 +233,13 @@ export class FirebaseAuthGateway implements AuthGateway {
         email,
         password,
       )
+
+      this.trySendVerificationEmail(signUpResponse.user)
+
       return {
         id: signUpResponse.user.uid,
         email: signUpResponse.user.email ?? '',
+        isEmailVerified: signUpResponse.user.emailVerified,
         authProvider: this.getAuthProvider(signUpResponse.user),
       }
     } catch (error) {
@@ -254,6 +267,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       return {
         id: credential.user.uid,
         email: credential.user.email ?? '',
+        isEmailVerified: credential.user.emailVerified,
         username: credential.user.displayName ?? undefined,
         profilePicture: credential.user.photoURL ?? undefined,
         authProvider: this.getAuthProvider(credential.user),
@@ -277,12 +291,122 @@ export class FirebaseAuthGateway implements AuthGateway {
     }
   }
 
+  async changePassword(newPassword: string): Promise<void> {
+    try {
+      const user = this.auth.currentUser
+      if (!user) throw new Error('No authenticated user found.')
+
+      await updatePassword(user, newPassword)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to change password: ${error}`,
+      )
+      throw this.toAuthError(error)
+    }
+  }
+
   async resetPassword(email: string): Promise<void> {
     try {
       await sendPasswordResetEmail(this.auth, email)
     } catch (error) {
       this.logger.error(
         `[FirebaseAuthGateway] Failed to resetPassword: ${error}`,
+      )
+      throw this.toAuthError(error)
+    }
+  }
+
+  async confirmPasswordReset(
+    oobCode: string,
+    newPassword: string,
+  ): Promise<void> {
+    try {
+      await firebaseConfirmPasswordReset(this.auth, oobCode, newPassword)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to confirmPasswordReset: ${error}`,
+      )
+      throw this.toAuthError(error)
+    }
+  }
+
+  private trySendVerificationEmail(user: User): void {
+    sendEmailVerification(user).catch((error) => {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to send verification email: ${error}`,
+      )
+    })
+  }
+
+  async sendVerificationEmail(): Promise<void> {
+    try {
+      const user = this.auth.currentUser
+      if (!user) throw new Error('No authenticated user found.')
+      await sendEmailVerification(user)
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to sendVerificationEmail: ${error}`,
+      )
+      throw this.toAuthError(error)
+    }
+  }
+
+  async applyEmailVerificationCode(
+    oobCode: string,
+  ): Promise<EmailVerificationResult> {
+    try {
+      await applyActionCode(this.auth, oobCode)
+      return EmailVerificationResult.Verified
+    } catch (error) {
+      if (await this.isEmailAlreadyVerified())
+        return EmailVerificationResult.AlreadyVerified
+
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to applyEmailVerificationCode: ${error}`,
+      )
+      throw this.toEmailVerificationError(error)
+    }
+  }
+
+  private async isEmailAlreadyVerified(): Promise<boolean> {
+    try {
+      return await this.refreshEmailVerificationStatus()
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to isEmailAlreadyVerified: ${error}`,
+      )
+      return false
+    }
+  }
+
+  private toEmailVerificationError(error: unknown): AuthError {
+    if (this.isFirebaseAuthError(error)) {
+      const verificationMessages: Partial<
+        Record<FirebaseAuthErrorCode, string>
+      > = {
+        [FirebaseAuthErrorCode.ExpiredActionCode]:
+          'Verification link has expired. Please request a new one.',
+        [FirebaseAuthErrorCode.InvalidActionCode]: 'Invalid verification link.',
+        [FirebaseAuthErrorCode.NetworkRequestFailed]:
+          'Could not verify email. Please check your connection.',
+      }
+      const message =
+        verificationMessages[error.code] ?? FIREBASE_ERRORS[error.code]
+      return new AuthError(message, FIREBASE_ERROR_TYPES[error.code])
+    }
+
+    return this.toAuthError(error)
+  }
+
+  private async refreshEmailVerificationStatus(): Promise<boolean> {
+    try {
+      const user = this.auth.currentUser
+      if (!user) throw new Error('No authenticated user found.')
+      await user.reload()
+      return user.emailVerified
+    } catch (error) {
+      this.logger.error(
+        `[FirebaseAuthGateway] Failed to refreshEmailVerificationStatus: ${error}`,
       )
       throw this.toAuthError(error)
     }

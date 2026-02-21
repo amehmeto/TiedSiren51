@@ -1,5 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { AuthGateway } from '@/core/_ports_/auth.gateway'
+import {
+  AuthGateway,
+  EmailVerificationResult,
+} from '@/core/_ports_/auth.gateway'
 import { Logger } from '@/core/_ports_/logger'
 import { AuthUser } from '@/core/auth/auth-user'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
@@ -52,11 +55,6 @@ export class FakeStorageAuthGateway implements AuthGateway {
     this.fakeAuthGateway.onUserLoggedOut(listener)
   }
 
-  async deleteAccount(): Promise<void> {
-    await AsyncStorage.removeItem('fake-auth-user')
-    return this.fakeAuthGateway.deleteAccount()
-  }
-
   async logOut(): Promise<void> {
     await AsyncStorage.removeItem('fake-auth-user')
     return this.fakeAuthGateway.logOut()
@@ -66,12 +64,38 @@ export class FakeStorageAuthGateway implements AuthGateway {
     return this.fakeAuthGateway.reauthenticate(password)
   }
 
+  async changePassword(newPassword: string): Promise<void> {
+    return this.fakeAuthGateway.changePassword(newPassword)
+  }
+
   async reauthenticateWithGoogle(): Promise<void> {
     return this.fakeAuthGateway.reauthenticateWithGoogle()
   }
 
   async resetPassword(email: string): Promise<void> {
     return this.fakeAuthGateway.resetPassword(email)
+  }
+
+  async confirmPasswordReset(
+    oobCode: string,
+    newPassword: string,
+  ): Promise<void> {
+    return this.fakeAuthGateway.confirmPasswordReset(oobCode, newPassword)
+  }
+
+  async sendVerificationEmail(): Promise<void> {
+    return this.fakeAuthGateway.sendVerificationEmail()
+  }
+
+  async applyEmailVerificationCode(
+    oobCode: string,
+  ): Promise<EmailVerificationResult> {
+    return this.fakeAuthGateway.applyEmailVerificationCode(oobCode)
+  }
+
+  async deleteAccount(): Promise<void> {
+    await AsyncStorage.removeItem('fake-auth-user')
+    return this.fakeAuthGateway.deleteAccount()
   }
 
   private async verifyUserIsAuthenticated(): Promise<void> {

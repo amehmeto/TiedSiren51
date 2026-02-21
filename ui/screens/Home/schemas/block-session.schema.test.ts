@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { DEFAULT_FEATURE_FLAGS, FeatureFlagValues } from '@/feature-flags'
 import { blockSessionSchema } from './block-session.schema'
 
 type ValidationCase = {
@@ -17,32 +18,15 @@ const validBlockSession = {
   blockingConditions: ['condition1'],
 }
 
-const expectValidationSuccess = (
-  result: ReturnType<typeof blockSessionSchema.safeParse>,
-) => {
-  expect(result.success).toBe(true)
-}
-
-const expectValidationFailure = (
-  result: ReturnType<typeof blockSessionSchema.safeParse>,
-  expectedPath: string,
-  expectedMessage: string,
-) => {
-  expect(result.success).toBe(false)
-  if (!result.success) {
-    const error = result.error.issues.find(
-      (issue) => issue.path[0] === expectedPath,
-    )
-    expect(error).toBeDefined()
-    expect(error?.message).toBe(expectedMessage)
-  }
-}
+const createSchema = (overrides: Partial<FeatureFlagValues> = {}) =>
+  blockSessionSchema({ ...DEFAULT_FEATURE_FLAGS, ...overrides })
 
 describe('blockSessionSchema', () => {
   describe('Basic field validation', () => {
     it('should pass with valid data', () => {
-      const result = blockSessionSchema.safeParse(validBlockSession)
-      expectValidationSuccess(result)
+      const schema = createSchema()
+      const validation = schema.safeParse(validBlockSession)
+      expect(validation.success).toBe(true)
     })
 
     it.each<ValidationCase>([
@@ -59,38 +43,45 @@ describe('blockSessionSchema', () => {
     ])(
       'should fail when $field is invalid',
       ({ field, value, expectedMessage }) => {
-        const result = blockSessionSchema.safeParse({
-          ...validBlockSession,
-          [field]: value,
-        })
-        expectValidationFailure(result, field, expectedMessage)
+        const schema = createSchema()
+        expect(() =>
+          schema.parse({
+            ...validBlockSession,
+            [field]: value,
+          }),
+        ).toThrow(expectedMessage)
       },
     )
   })
 
   describe('Blocklists and devices validation', () => {
     it('should fail when blocklistIds is empty', () => {
-      const result = blockSessionSchema.safeParse({
-        ...validBlockSession,
-        blocklistIds: [],
-      })
-      expectValidationFailure(
-        result,
-        'blocklistIds',
-        'At least one blocklist must be selected',
-      )
+      const schema = createSchema()
+      expect(() =>
+        schema.parse({
+          ...validBlockSession,
+          blocklistIds: [],
+        }),
+      ).toThrow('At least one blocklist must be selected')
     })
 
-    it('should fail when devices is empty', () => {
-      const result = blockSessionSchema.safeParse({
+    it('should fail when devices is empty and MULTI_DEVICE is enabled', () => {
+      const schema = createSchema({ MULTI_DEVICE: true })
+      expect(() =>
+        schema.parse({
+          ...validBlockSession,
+          devices: [],
+        }),
+      ).toThrow('At least one device must be selected')
+    })
+
+    it('should pass when devices is empty and MULTI_DEVICE is disabled', () => {
+      const schema = createSchema({ MULTI_DEVICE: false })
+      const validation = schema.safeParse({
         ...validBlockSession,
         devices: [],
       })
-      expectValidationFailure(
-        result,
-        'devices',
-        'At least one device must be selected',
-      )
+      expect(validation.success).toBe(true)
     })
   })
 
@@ -119,26 +110,35 @@ describe('blockSessionSchema', () => {
     ])(
       'should fail when $field is invalid',
       ({ field, value, expectedMessage }) => {
-        const result = blockSessionSchema.safeParse({
-          ...validBlockSession,
-          [field]: value,
-        })
-        expectValidationFailure(result, field, expectedMessage)
+        const schema = createSchema()
+        expect(() =>
+          schema.parse({
+            ...validBlockSession,
+            [field]: value,
+          }),
+        ).toThrow(expectedMessage)
       },
     )
   })
 
   describe('Blocking conditions validation', () => {
-    it('should fail when blockingConditions is empty', () => {
-      const result = blockSessionSchema.safeParse({
+    it('should fail when blockingConditions is empty and BLOCKING_CONDITIONS is enabled', () => {
+      const schema = createSchema({ BLOCKING_CONDITIONS: true })
+      expect(() =>
+        schema.parse({
+          ...validBlockSession,
+          blockingConditions: [],
+        }),
+      ).toThrow('A blocking condition must be selected')
+    })
+
+    it('should pass when blockingConditions is empty and BLOCKING_CONDITIONS is disabled', () => {
+      const schema = createSchema({ BLOCKING_CONDITIONS: false })
+      const validation = schema.safeParse({
         ...validBlockSession,
         blockingConditions: [],
       })
-      expectValidationFailure(
-        result,
-        'blockingConditions',
-        'A blocking condition must be selected',
-      )
+      expect(validation.success).toBe(true)
     })
   })
 })

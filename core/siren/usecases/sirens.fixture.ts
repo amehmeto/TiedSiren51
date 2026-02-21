@@ -31,6 +31,9 @@ export function sirensFixture(
         )
         installedAppRepository.installedApps = new Map(appsByPackageName)
       },
+      installedAppsWillFailWith(error: Error) {
+        installedAppRepository.getInstalledApps = () => Promise.reject(error)
+      },
       existingRemoteSirens(existingRemoteSirens: Partial<Sirens>) {
         sirensRepository.selectableSirens = {
           android: existingRemoteSirens.android ?? [],
@@ -86,6 +89,11 @@ export function sirensFixture(
       availableSirensShouldBeStoredAs: (expectedSirens: Sirens) => {
         const retrievedSirens = selectAvailableSirens(store.getState())
         expect(retrievedSirens).toStrictEqual(expectedSirens)
+      },
+      installedAppsShouldNotBeLoading: () => {
+        const isLoadingInstalledApps =
+          store.getState().siren.isLoadingInstalledApps
+        expect(isLoadingInstalledApps).toBe(false)
       },
     },
   }

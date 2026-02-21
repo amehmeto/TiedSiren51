@@ -1,10 +1,15 @@
-import { AuthGateway } from '@/core/_ports_/auth.gateway'
-import { AuthUser } from '@/core/auth/auth-user'
+import {
+  AuthGateway,
+  EmailVerificationResult,
+} from '@/core/_ports_/auth.gateway'
+import { AuthProvider, AuthUser } from '@/core/auth/auth-user'
 
 export class FakeAuthGateway implements AuthGateway {
   willResultWith: Promise<AuthUser> = Promise.resolve({
     id: 'fake-user-id',
     email: 'fake-user@gmail.com',
+    isEmailVerified: false,
+    authProvider: AuthProvider.Email,
   })
 
   willReauthenticateWith: Promise<void> = Promise.resolve()
@@ -13,9 +18,22 @@ export class FakeAuthGateway implements AuthGateway {
 
   willDeleteAccountWith: Promise<void> = Promise.resolve()
 
+  willConfirmPasswordResetWith: Promise<void> = Promise.resolve()
+
+  willChangePasswordWith: Promise<void> = Promise.resolve()
+
+  willSendVerificationEmailWith: Promise<void> = Promise.resolve()
+
+  willApplyEmailVerificationCodeWith: Promise<EmailVerificationResult> =
+    Promise.resolve(EmailVerificationResult.Verified)
+
+  verificationEmailSentCount = 0
+
   logOutError: Error | null = null
 
   lastResetPasswordEmail: string | null = null
+
+  lastConfirmPasswordResetOobCode: string | null = null
 
   private onUserLoggedInListener: ((user: AuthUser) => void) | null = null
 
@@ -23,6 +41,10 @@ export class FakeAuthGateway implements AuthGateway {
 
   reauthenticate(_password: string): Promise<void> {
     return this.willReauthenticateWith
+  }
+
+  changePassword(_newPassword: string): Promise<void> {
+    return this.willChangePasswordWith
   }
 
   reauthenticateWithGoogle(): Promise<void> {
@@ -48,6 +70,25 @@ export class FakeAuthGateway implements AuthGateway {
   async resetPassword(email: string): Promise<void> {
     await this.willResultWith
     this.lastResetPasswordEmail = email
+  }
+
+  async confirmPasswordReset(
+    oobCode: string,
+    _newPassword: string,
+  ): Promise<void> {
+    await this.willConfirmPasswordResetWith
+    this.lastConfirmPasswordResetOobCode = oobCode
+  }
+
+  async sendVerificationEmail(): Promise<void> {
+    await this.willSendVerificationEmailWith
+    this.verificationEmailSentCount++
+  }
+
+  async applyEmailVerificationCode(
+    _oobCode: string,
+  ): Promise<EmailVerificationResult> {
+    return this.willApplyEmailVerificationCodeWith
   }
 
   onUserLoggedIn(listener: (user: AuthUser) => void): void {

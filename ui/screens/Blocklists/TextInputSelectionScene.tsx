@@ -16,8 +16,12 @@ import {
 import { SectionDivider } from '@/ui/screens/Blocklists/SectionDivider'
 import { SelectableSirenCard } from '@/ui/screens/Blocklists/SelectableSirenCard'
 
+type TextInputSubmitEvent = {
+  nativeEvent: { text: string }
+}
+
 type TextInputSelectionSceneProps = {
-  readonly onSubmitEditing: (event: { nativeEvent: { text: string } }) => void
+  readonly onSubmitEditing: (event: TextInputSubmitEvent) => void
   readonly placeholder: string
   readonly sirenType: SirenType.WEBSITES | SirenType.KEYWORDS
   readonly toggleSiren: (sirenType: SirenType, sirenId: string) => void
@@ -59,10 +63,10 @@ export function TextInputSelectionScene({
       <TextInput
         style={[
           styles.addWebsiteInput,
-          { borderColor: isFocused ? T.color.lightBlue : T.color.white },
+          { borderColor: isFocused ? T.color.lightBlue : T.color.borderSubtle },
         ]}
         placeholder={placeholder}
-        placeholderTextColor={T.color.white}
+        placeholderTextColor={T.color.textMuted}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         onSubmitEditing={onSubmitEditing}
@@ -73,8 +77,7 @@ export function TextInputSelectionScene({
           sectionEntry.type === 'divider' ? sectionEntry.id : sectionEntry.siren
         }
         renderItem={({ item: sectionEntry }) => {
-          if (sectionEntry.type === 'divider')
-            return <SectionDivider label={sectionEntry.label} />
+          if (sectionEntry.type === 'divider') return <SectionDivider />
 
           const isSelected = isSirenSelected(sirenType, sectionEntry.siren)
           const isLocked = isSirenLocked(
@@ -108,8 +111,11 @@ export function TextInputSelectionScene({
 const styles = StyleSheet.create({
   addWebsiteInput: {
     borderBottomWidth: T.border.width.medium,
-    padding: T.spacing.small,
-    color: T.color.white,
+    padding: T.spacing.smallMedium,
+    color: T.color.text,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
+    minHeight: T.height.settingsRow,
   },
   list: {
     flex: 1,

@@ -1,11 +1,19 @@
-import { Text } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { reauthenticateWithGoogle } from '@/core/auth/usecases/reauthenticate-with-google.usecase'
 import { reauthFormStyles } from '@/ui/design-system/components/shared/reauthFormStyles'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSSocialButton } from '@/ui/design-system/components/shared/TiedSSocialButton'
+import { T } from '@/ui/design-system/theme'
 
-export function GoogleReauthForm() {
+type GoogleReauthFormOwnProps = {
+  onCancel: () => void
+}
+
+type GoogleReauthFormProps = Readonly<GoogleReauthFormOwnProps>
+
+export function GoogleReauthForm({ onCancel }: GoogleReauthFormProps) {
   const dispatch = useDispatch<AppDispatch>()
 
   return (
@@ -18,6 +26,18 @@ export function GoogleReauthForm() {
         text="Sign in with Google"
         onPress={() => dispatch(reauthenticateWithGoogle())}
       />
+      <View style={styles.buttonContainer}>
+        <TiedSButton onPress={onCancel} text="Cancel" />
+      </View>
     </>
   )
 }
+
+const styles = StyleSheet.create({
+  buttonContainer: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    width: T.layout.width.full,
+    marginTop: T.spacing.medium,
+  },
+})

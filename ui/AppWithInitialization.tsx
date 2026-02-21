@@ -7,6 +7,8 @@ import { InitializingView } from '@/ui/design-system/components/shared/Initializ
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { TiedSToast } from '@/ui/design-system/components/shared/TiedSToast'
 import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
+import { useEmailVerificationDeepLink } from '@/ui/hooks/useEmailVerificationDeepLink'
+import { usePasswordResetDeepLink } from '@/ui/hooks/usePasswordResetDeepLink'
 
 type AppWithInitializationProps = Readonly<{
   store: AppStore
@@ -15,6 +17,8 @@ type AppWithInitializationProps = Readonly<{
 export function AppWithInitialization({ store }: AppWithInitializationProps) {
   const { error, isInitializing, isAuthenticated } = useAppInitialization(store)
   const router = useRouter()
+  usePasswordResetDeepLink()
+  useEmailVerificationDeepLink()
 
   useEffect(() => {
     if (isInitializing) return
@@ -29,6 +33,7 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
     '(auth)/login',
     '(auth)/signup',
     '(auth)/forgot-password',
+    '(auth)/reset-password-confirm',
     '(tabs)',
   ]
 

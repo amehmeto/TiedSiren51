@@ -22,7 +22,7 @@ export enum BlocklistFormViewState {
   EditingWithLockedSirens = 'EDITING_WITH_LOCKED_SIRENS',
 }
 
-type SectionedSirenDivider = { type: 'divider'; id: string; label: string }
+type SectionedSirenDivider = { type: 'divider'; id: string }
 export type SectionedSirenEntry<T> = { type: 'siren'; siren: T }
 
 export type SectionedSiren<T> = SectionedSirenEntry<T> | SectionedSirenDivider
@@ -38,6 +38,7 @@ type CommonFields = {
   lockedSirens: LockedSirens
   lockedToastMessage: string | null
   blocklistNamePlaceholder: string
+  isLoadingInstalledApps: boolean
 } & SortedSirens
 
 type CreatingViewModel = {
@@ -85,24 +86,12 @@ function sortSirensSelectedFirst<T>(
   const sectioned: SectionedSiren<T>[] = []
 
   if (selectedSirens.length > 0) {
-    sectioned.push({
-      type: 'divider',
-      id: 'divider-selected',
-      label: 'Selected',
-    })
     selectedSirens.forEach((siren) => sectioned.push({ type: 'siren', siren }))
+    if (unselectedSirens.length > 0)
+      sectioned.push({ type: 'divider', id: 'divider' })
   }
 
-  if (unselectedSirens.length > 0) {
-    sectioned.push({
-      type: 'divider',
-      id: 'divider-available',
-      label: 'Available',
-    })
-    unselectedSirens.forEach((siren) =>
-      sectioned.push({ type: 'siren', siren }),
-    )
-  }
+  unselectedSirens.forEach((siren) => sectioned.push({ type: 'siren', siren }))
 
   return sectioned
 }
@@ -164,7 +153,7 @@ export function selectBlocklistFormViewModel(
   blocklistId: string | undefined,
 ): BlocklistFormViewModel {
   const { Creating, Editing, EditingWithLockedSirens } = BlocklistFormViewState
-  const availableSirens = state.siren.availableSirens
+  const { availableSirens, isLoadingInstalledApps } = state.siren
 
   const defaultPlaceholder = 'Blocklist name'
 
@@ -176,6 +165,7 @@ export function selectBlocklistFormViewModel(
       lockedSirens: EMPTY_LOCKED_SIRENS,
       lockedToastMessage: null,
       blocklistNamePlaceholder: defaultPlaceholder,
+      isLoadingInstalledApps,
     }
   }
 
@@ -189,6 +179,7 @@ export function selectBlocklistFormViewModel(
       lockedSirens: EMPTY_LOCKED_SIRENS,
       lockedToastMessage: null,
       blocklistNamePlaceholder: defaultPlaceholder,
+      isLoadingInstalledApps,
     }
   }
 
@@ -212,6 +203,7 @@ export function selectBlocklistFormViewModel(
       lockedSirens,
       lockedToastMessage: `Locked (${timeLeftFormatted} left)`,
       blocklistNamePlaceholder,
+      isLoadingInstalledApps,
     }
   }
 
@@ -222,5 +214,6 @@ export function selectBlocklistFormViewModel(
     lockedSirens: EMPTY_LOCKED_SIRENS,
     lockedToastMessage: null,
     blocklistNamePlaceholder,
+    isLoadingInstalledApps,
   }
 }

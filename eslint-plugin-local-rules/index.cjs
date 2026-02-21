@@ -36,11 +36,13 @@ const noModuleLevelConstants = require('../eslint-rules/no-module-level-constant
 const noNestedCallExpressions = require('../eslint-rules/no-nested-call-expressions.cjs')
 const noNewInTestBody = require('../eslint-rules/no-new-in-test-body.cjs')
 const noRedundantNullishTernary = require('../eslint-rules/no-redundant-nullish-ternary.cjs')
+const noRedundantPropSpreading = require('../eslint-rules/no-redundant-prop-spreading.cjs')
 const noSelectorPropDrilling = require('../eslint-rules/no-selector-prop-drilling.cjs')
 const noStylesheetMagicNumbers = require('../eslint-rules/no-stylesheet-magic-numbers.cjs')
 const noThunkResultInComponent = require('../eslint-rules/no-thunk-result-in-component.cjs')
 const noTryCatchInCore = require('../eslint-rules/no-try-catch-in-core.cjs')
 const noUnusedTestId = require('../eslint-rules/no-unused-test-id.cjs')
+const noUnwrap = require('../eslint-rules/no-unwrap.cjs')
 const noUsecallbackSelectorWrapper = require('../eslint-rules/no-usecallback-selector-wrapper.cjs')
 const oneComponentPerFile = require('../eslint-rules/one-component-per-file.cjs')
 const oneListenerPerFile = require('../eslint-rules/one-listener-per-file.cjs')
@@ -49,17 +51,20 @@ const oneUsecasePerFile = require('../eslint-rules/one-usecase-per-file.cjs')
 const oneViewModelPerFile = require('../eslint-rules/one-view-model-per-file.cjs')
 const preferArrayDestructuring = require('../eslint-rules/prefer-array-destructuring.cjs')
 const preferEnumOverStringUnion = require('../eslint-rules/prefer-enum-over-string-union.cjs')
+const preferExtractedComponent = require('../eslint-rules/prefer-extracted-component.cjs')
 const preferExtractedLongParams = require('../eslint-rules/prefer-extracted-long-params.cjs')
 const preferInlineVariable = require('../eslint-rules/prefer-inline-variable.cjs')
 const preferJumpTable = require('../eslint-rules/prefer-jump-table.cjs')
 const preferNamedSelector = require('../eslint-rules/prefer-named-selector.cjs')
 const preferObjectDestructuring = require('../eslint-rules/prefer-object-destructuring.cjs')
+const preferShortCircuitJsx = require('../eslint-rules/prefer-short-circuit-jsx.cjs')
 const preferTernaryJsx = require('../eslint-rules/prefer-ternary-jsx.cjs')
 const preferTernaryReturn = require('../eslint-rules/prefer-ternary-return.cjs')
 const reactPropsDestructuring = require('../eslint-rules/react-props-destructuring.cjs')
 const reducerInDomainFolder = require('../eslint-rules/reducer-in-domain-folder.cjs')
 const repositoryImplementationNaming = require('../eslint-rules/repository-implementation-naming.cjs')
 const requireColocatedTest = require('../eslint-rules/require-colocated-test.cjs')
+const requireFeatureFlagDestructuring = require('../eslint-rules/require-feature-flag-destructuring.cjs')
 const requireLoggerInCatch = require('../eslint-rules/require-logger-in-catch.cjs')
 const requireNamedRegex = require('../eslint-rules/require-named-regex.cjs')
 const requireTypedEach = require('../eslint-rules/require-typed-each.cjs')
@@ -99,6 +104,7 @@ module.exports = {
     'no-new-in-test-body': noNewInTestBody,
     'no-thunk-result-in-component': noThunkResultInComponent,
     'require-colocated-test': requireColocatedTest,
+    'require-feature-flag-destructuring': requireFeatureFlagDestructuring,
     'require-logger-in-catch': requireLoggerInCatch,
     'use-data-builders': useDataBuilders,
     'no-data-builders-in-production': noDataBuildersInProduction,
@@ -120,6 +126,7 @@ module.exports = {
     'no-nested-call-expressions': noNestedCallExpressions,
     'no-unused-test-id': noUnusedTestId,
     'no-redundant-nullish-ternary': noRedundantNullishTernary,
+    'no-redundant-prop-spreading': noRedundantPropSpreading,
     'prefer-array-destructuring': preferArrayDestructuring,
     'prefer-object-destructuring': preferObjectDestructuring,
     'prefer-inline-variable': preferInlineVariable,
@@ -135,6 +142,7 @@ module.exports = {
     'prefer-named-selector': preferNamedSelector,
     'selector-state-first-param': selectorStateFirstParam,
     'no-selector-prop-drilling': noSelectorPropDrilling,
+    'prefer-short-circuit-jsx': preferShortCircuitJsx,
     'prefer-ternary-jsx': preferTernaryJsx,
     'prefer-ternary-return': preferTernaryReturn,
     'no-enum-value-as-string-literal': noEnumValueAsStringLiteral,
@@ -145,5 +153,7 @@ module.exports = {
     'require-typed-each': requireTypedEach,
     'no-inline-object-type': noInlineObjectType,
     'no-lame-naming': noLameNaming,
+    'no-unwrap': noUnwrap,
+    'prefer-extracted-component': preferExtractedComponent,
   },
 }

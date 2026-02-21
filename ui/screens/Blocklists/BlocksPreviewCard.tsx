@@ -42,7 +42,7 @@ export function BlocksPreviewCard({
   onPress,
 }: BlocksPreviewCardProps) {
   return (
-    <Pressable onPress={onPress}>
+    <Pressable onPress={onPress} accessibilityRole="button">
       <TiedSCard>
         <IconTag
           name={iconName}
@@ -69,9 +69,12 @@ const styles = StyleSheet.create({
   },
   blocksNumber: {
     color: T.color.text,
+    fontFamily: T.font.family.medium,
+    fontSize: T.font.size.base,
   },
   platform: {
-    color: T.color.text,
+    color: T.color.textMuted,
+    fontFamily: T.font.family.primary,
     fontSize: T.font.size.xSmall,
   },
 })
