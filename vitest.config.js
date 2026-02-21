@@ -37,6 +37,7 @@ export default {
         '**/_tests_/**',
         '**/data-builders/**',
         '**/node_modules/**',
+        'infra/**/powersync.*.ts',
       ],
       thresholds: {
         '**/*.schema.ts': {
