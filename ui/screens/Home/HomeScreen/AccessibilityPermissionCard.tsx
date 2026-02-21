@@ -19,7 +19,7 @@ export const AccessibilityPermissionCard = ({
       <View style={styles.content}>
         <MaterialCommunityIcons
           name="alert-circle"
-          size={T.largeIconSize}
+          size={T.icon.size.xxLarge}
           color={T.color.lightBlue}
         />
         <Text style={styles.title}>Enable App Blocking</Text>

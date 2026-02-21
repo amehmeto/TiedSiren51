@@ -44,6 +44,8 @@ export default function BlocklistScreen() {
         }}
         style={styles.roundButton}
         testID="addBlocklistButton"
+        accessibilityRole="button"
+        accessibilityLabel="Add blocklist"
       >
         <Ionicons
           name={'add'}
@@ -76,7 +78,7 @@ const styles = StyleSheet.create({
         shadowRadius: T.shadow.radius.large,
       },
       android: {
-        elevation: 20,
+        elevation: T.elevation.highest,
       },
       web: {
         boxShadow: `5px 5px 10px ${T.color.shadow}`,

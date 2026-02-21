@@ -60,6 +60,7 @@ const styles = StyleSheet.create({
     color: T.color.text,
     textAlign: 'center',
     fontFamily: T.font.family.medium,
+    fontSize: T.font.size.base,
   },
   tabBar: { backgroundColor: T.color.transparent },
   tabBarStyle: { marginLeft: T.spacing.none, paddingLeft: T.spacing.none },

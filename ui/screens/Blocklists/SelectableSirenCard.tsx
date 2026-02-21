@@ -40,14 +40,14 @@ export function SelectableSirenCard({
       <MaterialCommunityIcons
         name={'web'}
         color={T.color.text}
-        size={T.sirenIconSize}
+        size={T.icon.size.small}
         style={{ marginRight: T.spacing.small }}
       />
     ) : (
       <FontAwesome6
         name={'hashtag'}
         color={T.color.text}
-        size={T.sirenIconSize}
+        size={T.icon.size.small}
         style={{ marginRight: T.spacing.small }}
       />
     )
@@ -120,8 +120,8 @@ const styles = StyleSheet.create({
   },
   appIcon: {
     marginRight: T.spacing.small,
-    height: T.sirenIconSize,
-    width: T.sirenIconSize,
+    height: T.icon.size.small,
+    width: T.icon.size.small,
     borderRadius: T.border.radius.roundedMedium,
   },
   selected: {

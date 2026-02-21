@@ -72,5 +72,3 @@ const styles = StyleSheet.create({
     fontFamily: T.font.family.semibold,
   },
 })
-
-export default TiedSSocialButton

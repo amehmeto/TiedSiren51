@@ -179,9 +179,6 @@ export const T = {
   picker: {
     visibleItemCount: 5,
   },
-  // Legacy icon size constants (kept for backward compatibility)
-  sirenIconSize: 20,
-  largeIconSize: 32,
   iconProportion: 0.45,
   get addButtonIconSize() {
     return this.width.roundButton * this.iconProportion
