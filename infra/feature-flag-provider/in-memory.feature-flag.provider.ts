@@ -8,8 +8,15 @@ import {
 export class InMemoryFeatureFlagProvider implements FeatureFlagProvider {
   private flags: FeatureFlagValues = { ...DEFAULT_FEATURE_FLAGS }
 
+  private shouldThrow = false
+
+  simulateError(): void {
+    this.shouldThrow = true
+  }
+
   async fetchAndActivate(): Promise<void> {
-    // No-op for in-memory provider
+    if (this.shouldThrow)
+      throw new Error('Simulated fetch error for feature flags')
   }
 
   getBoolean(key: FeatureFlagKey): boolean {

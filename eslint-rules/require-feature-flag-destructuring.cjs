@@ -13,6 +13,75 @@ function toCamelCaseWithIsPrefix(upperSnakeCase) {
   return 'is' + camelCase.charAt(0).toUpperCase() + camelCase.slice(1)
 }
 
+function isSelectFeatureFlagsCall(node) {
+  if (
+    node.id.type !== 'Identifier' ||
+    !node.init ||
+    node.init.type !== 'CallExpression'
+  )
+    return false
+
+  const { callee } = node.init
+  if (callee.type !== 'Identifier' || callee.name !== 'useSelector')
+    return false
+
+  const [firstArg] = node.init.arguments
+  return (
+    firstArg &&
+    firstArg.type === 'Identifier' &&
+    firstArg.name === 'selectFeatureFlags'
+  )
+}
+
+function isDestructuringOf({ type, id, init }, refNode) {
+  return (
+    type === 'VariableDeclarator' &&
+    id.type === 'ObjectPattern' &&
+    init === refNode
+  )
+}
+
+function isMemberAccessOf({ type, object, computed }, refNode) {
+  return type === 'MemberExpression' && object === refNode && !computed
+}
+
+function classifyReferences(variable) {
+  const propertyMap = new Map()
+  let hasWholeObjectUsage = false
+  let hasDestructuringBinding = false
+
+  for (const ref of variable.references) {
+    if (ref.isWrite()) continue
+    const refNode = ref.identifier
+    const { parent } = refNode
+
+    if (isDestructuringOf(parent, refNode)) {
+      hasDestructuringBinding = true
+      continue
+    }
+
+    if (isMemberAccessOf(parent, refNode)) {
+      const camelAlias = toCamelCaseWithIsPrefix(parent.property.name)
+      propertyMap.set(parent.property.name, camelAlias)
+      continue
+    }
+
+    hasWholeObjectUsage = true
+  }
+
+  return { propertyMap, hasWholeObjectUsage, hasDestructuringBinding }
+}
+
+function shouldSkipReport({
+  hasDestructuringBinding,
+  hasWholeObjectUsage,
+  propertyMap,
+}) {
+  return (
+    hasDestructuringBinding || (hasWholeObjectUsage && propertyMap.size === 0)
+  )
+}
+
 module.exports = {
   meta: {
     type: 'suggestion',
@@ -35,63 +104,37 @@ module.exports = {
 
     return {
       VariableDeclarator(node) {
-        if (node.id.type !== 'Identifier') return
-        if (!node.init) return
-        if (node.init.type !== 'CallExpression') return
-
-        const { callee } = node.init
-        if (callee.type !== 'Identifier') return
-        if (callee.name !== 'useSelector') return
-
-        const [firstArg] = node.init.arguments
-        if (!firstArg) return
-        if (firstArg.type !== 'Identifier') return
-        if (firstArg.name !== 'selectFeatureFlags') return
-
-        pendingNodes.push(node)
+        if (isSelectFeatureFlagsCall(node)) pendingNodes.push(node)
       },
 
       'Program:exit'() {
-        const sourceCode = context.getSourceCode()
+        const sourceCode = context.sourceCode ?? context.getSourceCode()
 
         for (const node of pendingNodes) {
           const variableName = node.id.name
           const scope = sourceCode.getScope(node)
-          const variable = scope.variables.find(
-            (v) => v.name === variableName,
+          const variable = scope.variables.find((v) => v.name === variableName)
+
+          if (!variable) continue
+
+          const { propertyMap, hasWholeObjectUsage, hasDestructuringBinding } =
+            classifyReferences(variable)
+
+          if (
+            shouldSkipReport({
+              hasDestructuringBinding,
+              hasWholeObjectUsage,
+              propertyMap,
+            })
           )
-
-          const propertyMap = new Map()
-          let hasWholeObjectUsage = false
-
-          if (variable) {
-            for (const ref of variable.references) {
-              if (ref.isWrite()) continue
-              const refNode = ref.identifier
-              const { parent } = refNode
-
-              if (
-                parent.type === 'MemberExpression' &&
-                parent.object === refNode &&
-                !parent.computed
-              ) {
-                const prop = parent.property.name
-                if (!propertyMap.has(prop)) {
-                  propertyMap.set(prop, toCamelCaseWithIsPrefix(prop))
-                }
-              } else {
-                hasWholeObjectUsage = true
-              }
-            }
-          }
+            continue
 
           context.report({
             node: node.id,
             messageId: 'requireDestructuring',
             data: { name: variableName },
             *fix(fixer) {
-              if (hasWholeObjectUsage || propertyMap.size === 0 || !variable)
-                return
+              if (hasWholeObjectUsage || propertyMap.size === 0) return
 
               const entries = [...propertyMap.entries()]
               const destructuring = entries
@@ -104,11 +147,7 @@ module.exports = {
                 if (ref.isWrite()) continue
                 const { parent } = ref.identifier
 
-                if (
-                  parent.type === 'MemberExpression' &&
-                  parent.object === ref.identifier &&
-                  !parent.computed
-                ) {
+                if (isMemberAccessOf(parent, ref.identifier)) {
                   const alias = propertyMap.get(parent.property.name)
                   if (alias) yield fixer.replaceText(parent, alias)
                 }

@@ -44,11 +44,28 @@ Feature flag values are stored in a `featureFlag` Redux slice. The `loadFeatureF
 
 ### Convention 4: Reading Flags in Components
 
-Use the `selectFeatureFlags` Redux selector:
+Use the `selectFeatureFlags` Redux selector with destructuring. An ESLint rule (`require-feature-flag-destructuring`) enforces this pattern.
+
+**Direct destructuring** — when you only need individual flags:
+
+```typescript
+const { APPLE_SIGN_IN: isAppleSignIn } = useSelector(selectFeatureFlags)
+{isAppleSignIn && <AppleSignInButton />}
+```
+
+**Two-binding pattern** — when you also need the whole object (e.g. for schemas):
 
 ```typescript
 const featureFlags = useSelector(selectFeatureFlags)
-{featureFlags.APPLE_SIGN_IN && <AppleSignInButton />}
+const { WEBSITE_BLOCKING: isWebsiteBlocking } = featureFlags
+blocklistFormSchema(featureFlags).parse(data)
+```
+
+**Whole-object pattern** — when you only pass flags to a schema without using individual flags:
+
+```typescript
+const featureFlags = useSelector(selectFeatureFlags)
+const validateForm = validateBlockSessionForm(featureFlags)
 ```
 
 ### Convention 5: Reading Flags in Schemas

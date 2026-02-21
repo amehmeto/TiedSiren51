@@ -1,6 +1,6 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
-import { FeatureFlagKey } from '@/feature-flags'
+import { DEFAULT_FEATURE_FLAGS, FeatureFlagKey } from '@/feature-flags'
 import { InMemoryFeatureFlagProvider } from '@/infra/feature-flag-provider/in-memory.feature-flag.provider'
 import { loadFeatureFlags } from './load-feature-flags.usecase'
 
@@ -50,5 +50,15 @@ describe('loadFeatureFlags usecase', () => {
 
     const { flags } = store.getState().featureFlag
     expect(flags).toStrictEqual(expectedFlags)
+  })
+
+  test('should keep default feature flags when fetch fails', async () => {
+    featureFlagProvider.simulateError()
+    const store = createTestStore({ featureFlagProvider })
+
+    await store.dispatch(loadFeatureFlags())
+
+    const { flags } = store.getState().featureFlag
+    expect(flags).toStrictEqual(DEFAULT_FEATURE_FLAGS)
   })
 })

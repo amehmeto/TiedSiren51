@@ -21,7 +21,6 @@ import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
 import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
 import { showToast } from '@/core/toast/toast.slice'
-import { DEFAULT_FEATURE_FLAGS } from '@/feature-flags'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -59,10 +58,11 @@ export function BlocklistForm({
 }: Readonly<BlocklistScreenProps>) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const featureFlags = useSelector(selectFeatureFlags)
   const {
     WEBSITE_BLOCKING: isWebsiteBlocking,
     KEYWORD_BLOCKING: isKeywordBlocking,
-  } = useSelector(selectFeatureFlags)
+  } = featureFlags
 
   const viewModel = useSelector((state: RootState) =>
     selectBlocklistFormViewModel(
@@ -234,11 +234,7 @@ export function BlocklistForm({
   const validateForm = useCallback(
     (submittedBlocklistForm: typeof blocklist) => {
       try {
-        blocklistFormSchema({
-          ...DEFAULT_FEATURE_FLAGS,
-          WEBSITE_BLOCKING: isWebsiteBlocking,
-          KEYWORD_BLOCKING: isKeywordBlocking,
-        }).parse(submittedBlocklistForm)
+        blocklistFormSchema(featureFlags).parse(submittedBlocklistForm)
         setErrors({})
         return true
       } catch (e) {
@@ -253,7 +249,7 @@ export function BlocklistForm({
         return false
       }
     },
-    [setErrors, isWebsiteBlocking, isKeywordBlocking],
+    [setErrors, featureFlags],
   )
 
   const saveBlocklist = useCallback(async () => {

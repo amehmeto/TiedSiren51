@@ -36,6 +36,12 @@ describe('require-feature-flag-destructuring', () => {
         {
           code: `const flags = getFlags()`,
         },
+        {
+          code: `function Comp() { const featureFlags = useSelector(selectFeatureFlags); const { MULTI_DEVICE: isMultiDevice } = featureFlags; doSomething(featureFlags) }`,
+        },
+        {
+          code: `function Comp() { const featureFlags = useSelector(selectFeatureFlags); someFunc(featureFlags) }`,
+        },
       ],
 
       invalid: [
@@ -56,16 +62,6 @@ describe('require-feature-flag-destructuring', () => {
             {
               messageId: 'requireDestructuring',
               data: { name: 'flags' },
-            },
-          ],
-        },
-        {
-          code: `function Comp() { const featureFlags = useSelector(selectFeatureFlags); someFunc(featureFlags) }`,
-          output: null,
-          errors: [
-            {
-              messageId: 'requireDestructuring',
-              data: { name: 'featureFlags' },
             },
           ],
         },
