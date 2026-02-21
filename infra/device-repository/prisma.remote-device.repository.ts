@@ -1,3 +1,8 @@
+/**
+ * @deprecated OBSOLETE — Superseded by PowersyncRemoteDeviceRepository.
+ * Kept for rollback safety. Removal tracked in a follow-up issue.
+ * See docs/adr/infrastructure/powersync-op-sqlite.md
+ */
 import { Device as PrismaDevice } from '@prisma/client'
 import { Logger } from '@/core/_ports_/logger'
 import { RemoteDeviceRepository } from '@/core/_ports_/remote-device.repository'

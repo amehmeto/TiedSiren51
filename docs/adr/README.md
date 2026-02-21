@@ -47,7 +47,8 @@ Business logic: domain patterns, state management, use cases.
 External services, databases, adapters, platform-specific implementations.
 
 **Data Persistence:**
-- [Prisma ORM with SQLite](infrastructure/prisma-orm-sqlite.md)
+- [PowerSync + OP-SQLite](infrastructure/powersync-op-sqlite.md)
+- ~~[Prisma ORM with SQLite](infrastructure/prisma-orm-sqlite.md)~~ *(Superseded by PowerSync + OP-SQLite)*
 - [Abandon PouchDB](infrastructure/abandon-pouchdb.md)
 - [Platform-Specific Database Paths](infrastructure/platform-specific-db-paths.md)
 - [Local-First Architecture](infrastructure/local-first-architecture.md)

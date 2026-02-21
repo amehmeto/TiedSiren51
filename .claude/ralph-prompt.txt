@@ -1,0 +1,127 @@
+Implement the following GitHub issue in this worktree.
+
+PR: none
+
+## Context
+
+`@prisma/react-native` C++ bindings are incompatible with React Native's New Architecture (prisma/react-native-prisma#58 — open since Nov 2025, last release April 2024). Since Expo SDK 55 makes New Architecture mandatory, Prisma must be replaced before the SDK upgrade.
+
+Solution: Replace Prisma with PowerSync + OP-SQLite in local-only mode (no backend sync yet — skip connect()). The hexagonal architecture makes this a clean swap — only the infra layer changes.
+
+Prisma files are kept but marked obsolete (same pattern as the PouchDB to Prisma migration, see ADR abandon-pouchdb.md). Deletion will happen in a separate follow-up issue.
+
+## New Dependencies
+
+npx expo install @powersync/react-native @powersync/op-sqlite @op-engineering/op-sqlite
+
+Optional (for reactive queries / React hooks):
+npx expo install @powersync/react
+
+## Files to Create
+
+- infra/database-service/powersync.schema.ts (mirrors schema.prisma)
+- infra/database-service/powersync.database.service.ts (mirrors prisma.database.service.ts, implements DatabaseService)
+- infra/siren-repository/powersync.sirens-repository.ts (mirrors prisma.sirens-repository.ts, implements SirensRepository)
+- infra/block-session-repository/powersync.block-session.repository.ts (mirrors prisma.block-session.repository.ts, implements BlockSessionRepository)
+- infra/blocklist-repository/powersync.blocklist.repository.ts (mirrors prisma.blocklist.repository.ts, implements BlocklistRepository)
+- infra/timer-repository/powersync.timer.repository.ts (mirrors prisma.timer.repository.ts, implements TimerRepository)
+- infra/device-repository/powersync.remote-device.repository.ts (mirrors prisma.remote-device.repository.ts, implements RemoteDeviceRepository)
+- infra/database-service/legacy-prisma-migration.ts
+- docs/adr/infrastructure/powersync-op-sqlite.md
+
+## Files Marked Obsolete (NOT deleted)
+
+Following the PouchDB precedent — keep files for easy infra swap, remove in follow-up issue:
+
+- schema.prisma, prisma.d.ts
+- infra/__abstract__/prisma.repository.ts
+- infra/database-service/prisma.database.service.ts
+- infra/block-session-repository/prisma.block-session.repository.ts
+- infra/blocklist-repository/prisma.blocklist.repository.ts
+- infra/siren-repository/prisma.sirens-repository.ts
+- infra/timer-repository/prisma.timer.repository.ts
+- infra/device-repository/prisma.remote-device.repository.ts
+- All prisma.*.repository.test.ts files
+
+Prisma dependencies (@prisma/client, @prisma/react-native, prisma) also stay in package.json until the cleanup issue.
+
+## Files to Modify
+
+- ui/dependencies.ts — swap Prisma constructors to PowerSync constructors (both production and E2E test blocks)
+- app.config.js — add @op-engineering/op-sqlite plugin (keep @prisma/react-native until cleanup)
+- babel.config.cjs — add @babel/plugin-transform-async-generator-functions (required for PowerSync watched queries / async iterators)
+- metro.config.cjs — add OP-SQLite inline requires blocklist
+- docs/adr/infrastructure/prisma-orm-sqlite.md — update status to Superseded by powersync-op-sqlite.md
+
+## PowerSync Schema Definition
+
+Map the current Prisma schema to PowerSync's Table/column API in powersync.schema.ts.
+PowerSync auto-creates an id TEXT primary key on every table — no need to declare it.
+
+## Abstract Base Repository Strategy
+
+Decision: No abstract PowerSyncRepository base class. Instead:
+
+1. PowerSyncDatabaseService owns the PowerSyncDatabase instance and handles initialization
+2. Repositories receive the DB instance via constructor injection (simpler than the Prisma base class pattern)
+3. Each repository calls .execute() / .get() / .getAll() directly
+
+## Data Migration
+
+Existing users have data in Prisma's app.db. Create infra/database-service/legacy-prisma-migration.ts.
+
+Strategy:
+1. On first launch after update, PowerSyncDatabaseService.initialize() checks for legacy DB
+2. Open old app.db directly via OP-SQLite raw connection (NOT Prisma client)
+3. Read all rows from Prisma tables using raw SQL
+4. Map and insert into PowerSync tables
+5. Rename old file to app.db.migrated (do NOT delete — keep as backup)
+6. Set a flag in PowerSync DB to skip migration on subsequent launches
+
+Table Name Mapping:
+- Siren -> siren
+- Blocklist -> blocklist
+- BlockSession -> block_session
+- Device -> device
+- Timer -> timer
+- _BlockSessionToBlocklist -> block_session_blocklist
+- _BlockSessionToDevice -> block_session_device
+
+Column Mapping: Prisma uses camelCase columns (startedAt, endedAt), PowerSync schema uses snake_case (started_at, ended_at). Junction table columns: Prisma uses "A"/"B" -> PowerSync uses explicit block_session_id/blocklist_id.
+
+Error Handling:
+- Wrap full migration in a transaction — rollback on any failure
+- Log migration progress and errors via Logger port
+- On failure: leave app.db untouched, retry on next launch
+- On success: rename to app.db.migrated
+
+## ADR
+
+Create docs/adr/infrastructure/powersync-op-sqlite.md:
+- Status: Accepted (Supersedes prisma-orm-sqlite.md)
+- Context: Prisma incompatible with New Architecture, PowerSync + OP-SQLite as replacement
+- Decision: local-only mode, constructor injection, snake_case schema
+- Note: Prisma files kept for now (easy rollback), cleanup tracked separately
+
+Update docs/adr/infrastructure/prisma-orm-sqlite.md status to Superseded by powersync-op-sqlite.md.
+
+## Key Implementation Notes
+
+- Local-only mode: instantiate PowerSyncDatabase, do NOT call connect(). CRUD via .execute() / .get() / .getAll().
+- JSON fields: same pattern as Prisma — sirens in Blocklist and blockingConditions in BlockSession stored as JSON TEXT, parsed in repository mapping functions.
+- Junction tables: explicit block_session_blocklist and block_session_device tables with indexed foreign keys.
+- Column convention: snake_case in DB, camelCase in TypeScript domain models — repositories handle the mapping.
+
+## Verification
+
+- ALL acceptance criteria from the issue are met
+- All unit tests pass (npm test)
+- Lint passes (npm run lint)
+- Changes committed and pushed with /commit-push
+- CI passes on the PR
+- No merge conflicts with main
+- PR description updated to reflect ALL changes made
+
+Before making structural changes, read /docs/adr/README.md for architectural decisions that must be followed.
+
+When ALL criteria are met, output: COMPLETE
