@@ -67,7 +67,6 @@ export default {
     },
     plugins: [
       '@prisma/react-native',
-      '@op-engineering/op-sqlite',
       '@react-native-google-signin/google-signin',
       [
         '@sentry/react-native/expo',
