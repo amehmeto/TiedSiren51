@@ -51,7 +51,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: T.font.size.medium,
-    fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.heading,
     color: T.color.text,
     textAlign: 'center',

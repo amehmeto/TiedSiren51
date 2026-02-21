@@ -55,7 +55,6 @@ const styles = StyleSheet.create({
   },
   conditionTitle: {
     fontSize: T.font.size.regular,
-    fontWeight: T.font.weight.semibold,
     fontFamily: T.font.family.semibold,
     color: T.color.text,
   },

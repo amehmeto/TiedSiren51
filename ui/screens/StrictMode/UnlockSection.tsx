@@ -23,7 +23,6 @@ const styles = StyleSheet.create({
   sectionTitle: {
     color: T.color.textMuted,
     fontSize: T.font.size.small,
-    fontWeight: T.font.weight.semibold,
     fontFamily: T.font.family.semibold,
     marginBottom: T.spacing.medium,
     letterSpacing: T.font.letterSpacing.wide,

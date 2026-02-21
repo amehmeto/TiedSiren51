@@ -23,7 +23,6 @@ export function NoSessionBoard({ sessions }: NoSessionBoardProps) {
 
 const styles = StyleSheet.create({
   title: {
-    fontWeight: T.font.weight.semibold,
     fontFamily: T.font.family.semibold,
     color: T.color.text,
     fontSize: T.font.size.small,

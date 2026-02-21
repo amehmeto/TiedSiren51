@@ -80,7 +80,6 @@ const styles = StyleSheet.create({
   title: {
     color: T.color.text,
     fontSize: T.font.size.large,
-    fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.heading,
     textAlign: 'center',
     marginBottom: T.spacing.large,

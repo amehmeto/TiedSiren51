@@ -36,7 +36,6 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: T.font.size.medium,
-    fontWeight: T.font.weight.semibold,
     fontFamily: T.font.family.semibold,
     color: T.color.text,
     textAlign: 'center',

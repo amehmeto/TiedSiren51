@@ -1,4 +1,4 @@
-import { ReactNode, useState } from 'react'
+import { ReactNode } from 'react'
 import {
   Animated,
   Pressable,
@@ -8,6 +8,7 @@ import {
   TextStyle,
   ViewStyle,
 } from 'react-native'
+import { usePressScale } from '@/ui/design-system/hooks/usePressScale'
 import { T } from '@/ui/design-system/theme'
 
 export enum TiedSButtonVariant {
@@ -25,10 +26,6 @@ type TiedSButtonOwnProps = {
 }
 
 type TiedSButtonProps = Readonly<TiedSButtonOwnProps>
-
-const PRESS_SCALE = 0.97
-const ANIMATION_DURATION = 100
-const INITIAL_SCALE = 1
 
 const variantContainerStyles: Record<
   TiedSButtonVariant,
@@ -60,10 +57,10 @@ export function TiedSButton({
   isDisabled,
   variant = TiedSButtonVariant.Primary,
 }: TiedSButtonProps) {
-  const [scaleAnim] = useState(() => new Animated.Value(INITIAL_SCALE))
+  const { scaleStyle, handlers } = usePressScale()
 
   return (
-    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, style]}>
+    <Animated.View style={[scaleStyle, style]}>
       <Pressable
         style={({ pressed: isPressed }) => [
           styles.container,
@@ -72,20 +69,8 @@ export function TiedSButton({
           { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
         ]}
         onPress={onPress}
-        onPressIn={() =>
-          Animated.timing(scaleAnim, {
-            toValue: PRESS_SCALE,
-            duration: ANIMATION_DURATION,
-            useNativeDriver: true,
-          }).start()
-        }
-        onPressOut={() =>
-          Animated.timing(scaleAnim, {
-            toValue: INITIAL_SCALE,
-            duration: ANIMATION_DURATION,
-            useNativeDriver: true,
-          }).start()
-        }
+        onPressIn={handlers.onPressIn}
+        onPressOut={handlers.onPressOut}
         disabled={isDisabled}
         accessibilityRole="button"
         accessibilityState={{ disabled: !!isDisabled }}
@@ -119,7 +104,6 @@ const styles = StyleSheet.create({
     elevation: T.elevation.medium,
   },
   buttonText: {
-    fontWeight: T.font.weight.semibold,
     fontFamily: T.font.family.semibold,
     color: T.color.darkBlue,
     textAlign: 'center',

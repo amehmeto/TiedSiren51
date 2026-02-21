@@ -20,6 +20,5 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.small,
     fontFamily: T.font.family.heading,
     marginTop: T.spacing.extraSmall,
-    fontWeight: T.font.weight.bold,
   },
 })

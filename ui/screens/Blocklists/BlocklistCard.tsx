@@ -176,7 +176,6 @@ const styles = StyleSheet.create({
   },
   name: {
     color: T.color.text,
-    fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.heading,
     fontSize: T.font.size.base,
     paddingBottom: T.spacing.extraSmall,

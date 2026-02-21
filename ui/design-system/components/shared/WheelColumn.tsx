@@ -48,7 +48,6 @@ const styles = StyleSheet.create({
     color: T.color.textMuted,
     fontSize: T.font.size.small,
     fontFamily: T.font.family.medium,
-    fontWeight: T.font.weight.medium,
     marginBottom: T.spacing.small,
     textTransform: 'uppercase',
     letterSpacing: T.font.letterSpacing.wide,
@@ -60,7 +59,6 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontSize: T.font.size.medium,
     fontFamily: T.font.family.semibold,
-    fontWeight: T.font.weight.semibold,
   },
   overlayItem: {
     backgroundColor: T.color.lightBlueOverlay,

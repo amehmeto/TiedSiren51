@@ -31,7 +31,6 @@ export function SessionsBoard({ sessions, type }: SessionsBoardProps) {
 
 const styles = StyleSheet.create({
   title: {
-    fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.heading,
     color: T.color.text,
     fontSize: T.font.size.small,

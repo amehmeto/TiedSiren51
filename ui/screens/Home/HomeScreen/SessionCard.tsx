@@ -163,13 +163,11 @@ export function SessionCard({ session, type }: SessionCardProps) {
 const styles = StyleSheet.create({
   sessionName: {
     color: T.color.text,
-    fontWeight: T.font.weight.semibold,
     fontFamily: T.font.family.semibold,
     fontSize: T.font.size.base,
   },
   minutesLeft: {
     color: T.color.lightBlue,
-    fontWeight: T.font.weight.semibold,
     fontFamily: T.font.family.semibold,
     fontSize: T.font.size.small,
   },

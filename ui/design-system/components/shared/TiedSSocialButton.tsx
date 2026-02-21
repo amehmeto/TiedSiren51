@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
-import React, { useState } from 'react'
+import React from 'react'
 import {
   Animated,
   Pressable,
@@ -8,6 +8,7 @@ import {
   StyleProp,
   ViewStyle,
 } from 'react-native'
+import { usePressScale } from '@/ui/design-system/hooks/usePressScale'
 import { T } from '@/ui/design-system/theme'
 
 type IconName = 'logo-google' | 'logo-apple'
@@ -19,40 +20,24 @@ type TiedSSocialButtonProps = {
   style?: StyleProp<ViewStyle>
 }
 
-const PRESS_SCALE = 0.97
-const ANIMATION_DURATION = 100
-const INITIAL_SCALE = 1
-
 export function TiedSSocialButton({
   iconName,
   text,
   onPress,
   style,
 }: TiedSSocialButtonProps) {
-  const [scaleAnim] = useState(() => new Animated.Value(INITIAL_SCALE))
+  const { scaleStyle, handlers } = usePressScale()
 
   return (
-    <Animated.View style={[{ transform: [{ scale: scaleAnim }] }, style]}>
+    <Animated.View style={[scaleStyle, style]}>
       <Pressable
         style={({ pressed: isPressed }) => [
           styles.button,
           { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
         ]}
         onPress={onPress}
-        onPressIn={() =>
-          Animated.timing(scaleAnim, {
-            toValue: PRESS_SCALE,
-            duration: ANIMATION_DURATION,
-            useNativeDriver: true,
-          }).start()
-        }
-        onPressOut={() =>
-          Animated.timing(scaleAnim, {
-            toValue: INITIAL_SCALE,
-            duration: ANIMATION_DURATION,
-            useNativeDriver: true,
-          }).start()
-        }
+        onPressIn={handlers.onPressIn}
+        onPressOut={handlers.onPressOut}
         accessibilityRole="button"
       >
         <Ionicons
@@ -84,7 +69,6 @@ const styles = StyleSheet.create({
     marginLeft: T.spacing.medium,
     color: T.color.text,
     fontSize: T.font.size.base,
-    fontWeight: T.font.weight.semibold,
     fontFamily: T.font.family.semibold,
   },
 })

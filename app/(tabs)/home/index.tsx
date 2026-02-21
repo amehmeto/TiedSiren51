@@ -106,7 +106,6 @@ export default function HomeScreen() {
 const styles = StyleSheet.create({
   greetings: {
     color: T.color.text,
-    fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.heading,
     fontSize: T.font.size.medium,
   },

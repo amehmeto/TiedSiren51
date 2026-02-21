@@ -71,7 +71,6 @@ const styles = StyleSheet.create({
   title: {
     color: T.color.text,
     fontSize: T.font.size.large,
-    fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.heading,
     marginBottom: T.spacing.medium,
     textAlign: 'center',
@@ -91,7 +90,6 @@ const styles = StyleSheet.create({
     color: T.color.lightBlue,
     fontSize: T.font.size.base,
     fontFamily: T.font.family.semibold,
-    fontWeight: T.font.weight.semibold,
     marginBottom: T.spacing.extraSmall,
   },
   buttonContainer: {

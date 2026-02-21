@@ -1,5 +1,3 @@
-import { Platform } from 'react-native'
-
 export const T = {
   color: {
     transparent: 'transparent',
@@ -22,7 +20,6 @@ export const T = {
     lightBlueOverlay: 'rgba(56, 189, 248, 0.08)',
     surfaceElevated: 'rgba(22, 33, 62, 1)',
     borderSubtle: 'rgba(51, 65, 85, 0.4)',
-    accentGold: 'rgba(251, 191, 36, 1)',
     gradientMid: 'rgba(25, 32, 95, 1)',
     inputBackground: 'rgba(15, 23, 42, 0.3)',
   },
@@ -58,26 +55,10 @@ export const T = {
       extraWide: 3,
     },
     family: {
-      primary: Platform.select({
-        ios: 'Inter_400Regular',
-        android: 'Inter_400Regular',
-        default: 'Inter_400Regular',
-      }),
-      heading: Platform.select({
-        ios: 'Inter_700Bold',
-        android: 'Inter_700Bold',
-        default: 'Inter_700Bold',
-      }),
-      medium: Platform.select({
-        ios: 'Inter_500Medium',
-        android: 'Inter_500Medium',
-        default: 'Inter_500Medium',
-      }),
-      semibold: Platform.select({
-        ios: 'Inter_600SemiBold',
-        android: 'Inter_600SemiBold',
-        default: 'Inter_600SemiBold',
-      }),
+      primary: 'Inter_400Regular',
+      heading: 'Inter_700Bold',
+      medium: 'Inter_500Medium',
+      semibold: 'Inter_600SemiBold',
     },
   },
   component: {
@@ -121,10 +102,6 @@ export const T = {
   },
   shadow: {
     color: 'rgba(2, 6, 23, 1)',
-    offset: {
-      width: 0,
-      height: 4,
-    },
     opacity: 0.25,
     radius: {
       small: 4,

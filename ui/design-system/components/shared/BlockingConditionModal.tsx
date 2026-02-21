@@ -88,7 +88,6 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: T.font.size.large,
-    fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.heading,
     color: T.color.text,
     marginBottom: T.spacing.small,

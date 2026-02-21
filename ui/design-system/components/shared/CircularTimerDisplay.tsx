@@ -50,7 +50,6 @@ const styles = StyleSheet.create({
   timerText: {
     color: T.color.text,
     fontSize: T.font.size.xxLarge,
-    fontWeight: T.font.weight.bold,
     fontFamily: T.font.family.heading,
     letterSpacing: T.font.letterSpacing.tight,
   },

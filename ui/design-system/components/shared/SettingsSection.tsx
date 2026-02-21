@@ -25,7 +25,6 @@ const styles = StyleSheet.create({
   title: {
     color: T.color.textMuted,
     fontSize: T.font.size.small,
-    fontWeight: T.font.weight.medium,
     fontFamily: T.font.family.medium,
     textTransform: 'uppercase',
     letterSpacing: T.font.letterSpacing.wide,
