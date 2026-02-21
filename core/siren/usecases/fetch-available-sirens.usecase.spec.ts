@@ -10,6 +10,14 @@ describe('Feature: Fetching available sirens', () => {
     fixture = sirensFixture()
   })
 
+  it('should stop loading when fetching fails', async () => {
+    fixture.given.installedAppsWillFailWith(new Error('Device unavailable'))
+
+    await fixture.when.fetchingAvailableSirens()
+
+    fixture.then.installedAppsShouldNotBeLoading()
+  })
+
   it('should fetch the available sirens', async () => {
     fixture.given.installedApps([
       buildInstalledApp({

@@ -48,7 +48,11 @@ export function AppsSelectionScene({
   const contentContainerStyle =
     isLoadingInstalledApps && hasNoAppsYet
       ? styles.loadingContentContainer
-      : [styles.listContent, { paddingBottom: insets.bottom }]
+      : {
+          paddingBottom:
+            Math.max(insets.bottom, T.scroll.padding.minBottom) +
+            T.scroll.padding.additional,
+        }
 
   return (
     <FlatList
@@ -96,9 +100,6 @@ export function AppsSelectionScene({
 const styles = StyleSheet.create({
   list: {
     flex: 1,
-  },
-  listContent: {
-    paddingBottom: T.scroll.padding.minBottom + T.scroll.padding.additional,
   },
   loadingContentContainer: {
     flex: 1,

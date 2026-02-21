@@ -31,6 +31,9 @@ export function sirensFixture(
         )
         installedAppRepository.installedApps = new Map(appsByPackageName)
       },
+      installedAppsWillFailWith(error: Error) {
+        installedAppRepository.getInstalledApps = () => Promise.reject(error)
+      },
       existingRemoteSirens(existingRemoteSirens: Partial<Sirens>) {
         sirensRepository.selectableSirens = {
           android: existingRemoteSirens.android ?? [],
