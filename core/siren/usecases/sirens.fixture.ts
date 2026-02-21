@@ -87,6 +87,11 @@ export function sirensFixture(
         const retrievedSirens = selectAvailableSirens(store.getState())
         expect(retrievedSirens).toStrictEqual(expectedSirens)
       },
+      installedAppsShouldNotBeLoading: () => {
+        const isLoadingInstalledApps =
+          store.getState().siren.isLoadingInstalledApps
+        expect(isLoadingInstalledApps).toBe(false)
+      },
     },
   }
 }

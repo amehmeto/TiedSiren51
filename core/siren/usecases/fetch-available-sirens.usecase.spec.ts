@@ -30,6 +30,7 @@ describe('Feature: Fetching available sirens', () => {
 
     await fixture.when.fetchingAvailableSirens()
 
+    fixture.then.installedAppsShouldNotBeLoading()
     fixture.then.availableSirensShouldBeStoredAs({
       android: [
         {
