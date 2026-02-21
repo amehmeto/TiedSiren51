@@ -23,7 +23,7 @@ export const blockSessionSchema = z.object({
   blocklistIds: z
     .array(z.string())
     .min(1, { message: 'At least one blocklist must be selected' }),
-  /* v8 ignore next 3 */
+  /* v8 ignore next 4 */
   devices: FeatureFlags.MULTI_DEVICE
     ? z
         .array(deviceSchema)
@@ -47,7 +47,7 @@ export const blockSessionSchema = z.object({
     .refine((val) => val === null || isValidTimeFormat(val), {
       message: 'End time must be in HH:mm format (e.g. 07:00)',
     }),
-  /* v8 ignore next 3 */
+  /* v8 ignore next 4 */
   blockingConditions: FeatureFlags.BLOCKING_CONDITIONS
     ? z
         .array(z.string())
