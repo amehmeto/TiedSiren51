@@ -59,7 +59,7 @@ export const TimerPickerModal = ({
           onDurationChange={onDurationChange}
         />
 
-        <Text style={styles.endTimeText}>{endDateTime}</Text>
+        <Text style={styles.endTimeText}>Ends at {endDateTime}</Text>
 
         <TiedSButton
           onPress={handleSave}
@@ -74,6 +74,7 @@ export const TimerPickerModal = ({
 
 const styles = StyleSheet.create({
   container: {
+    paddingTop: T.spacing.x_large,
     paddingHorizontal: T.spacing.large,
     paddingBottom: T.spacing.x_large,
   },

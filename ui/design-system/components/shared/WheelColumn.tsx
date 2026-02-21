@@ -56,7 +56,7 @@ const styles = StyleSheet.create({
     width: '100%',
   },
   wheelText: {
-    color: T.color.text,
+    color: T.color.lightBlue,
     fontSize: T.font.size.medium,
     fontFamily: T.font.family.semibold,
   },

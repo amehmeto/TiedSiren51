@@ -27,7 +27,7 @@ export function TiedSModal({
       onRequestClose={onRequestClose}
     >
       <View style={styles.centeredView}>
-        <TiedSCard style={style}>{children}</TiedSCard>
+        <TiedSCard style={[styles.cardColumn, style]}>{children}</TiedSCard>
       </View>
     </Modal>
   )
@@ -40,6 +40,9 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     paddingHorizontal: T.spacing.medium,
     backgroundColor: T.color.modalBackgroundColor,
+  },
+  cardColumn: {
+    flexDirection: 'column',
   },
   modalView: {
     margin: T.spacing.large,
