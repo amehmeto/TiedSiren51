@@ -132,6 +132,7 @@
       "Bash(git stash:*)",
       "Bash(git status:*)",
       "Bash(git worktree:*)",
+      "Bash(grep expo-google-fonts:*)",
       "Bash(grep:*)",
       "Bash(jq:*)",
       "Bash(keytool:*)",

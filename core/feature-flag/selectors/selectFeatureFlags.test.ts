@@ -6,7 +6,13 @@ import { loadFeatureFlags } from '../usecases/load-feature-flags.usecase'
 import { selectFeatureFlags } from './selectFeatureFlags'
 
 describe('selectFeatureFlags', () => {
-  const { WEBSITE_BLOCKING, KEYWORD_BLOCKING, APPLE_SIGN_IN } = FeatureFlagKey
+  const {
+    WEBSITE_BLOCKING,
+    KEYWORD_BLOCKING,
+    APPLE_SIGN_IN,
+    MULTI_DEVICE,
+    BLOCKING_CONDITIONS,
+  } = FeatureFlagKey
 
   test('should return default feature flags', () => {
     const store = createTestStore()
@@ -14,6 +20,8 @@ describe('selectFeatureFlags', () => {
       [WEBSITE_BLOCKING]: false,
       [KEYWORD_BLOCKING]: false,
       [APPLE_SIGN_IN]: false,
+      [MULTI_DEVICE]: false,
+      [BLOCKING_CONDITIONS]: false,
     }
 
     const flags = selectFeatureFlags(store.getState())
@@ -35,6 +43,8 @@ describe('selectFeatureFlags', () => {
         [WEBSITE_BLOCKING]: true,
         [KEYWORD_BLOCKING]: false,
         [APPLE_SIGN_IN]: false,
+        [MULTI_DEVICE]: false,
+        [BLOCKING_CONDITIONS]: false,
       }
 
       await store.dispatch(loadFeatureFlags())

@@ -5,7 +5,13 @@ import { InMemoryFeatureFlagProvider } from '@/infra/feature-flag-provider/in-me
 import { loadFeatureFlags } from './load-feature-flags.usecase'
 
 describe('loadFeatureFlags usecase', () => {
-  const { WEBSITE_BLOCKING, KEYWORD_BLOCKING, APPLE_SIGN_IN } = FeatureFlagKey
+  const {
+    WEBSITE_BLOCKING,
+    KEYWORD_BLOCKING,
+    APPLE_SIGN_IN,
+    MULTI_DEVICE,
+    BLOCKING_CONDITIONS,
+  } = FeatureFlagKey
   let featureFlagProvider: InMemoryFeatureFlagProvider
 
   beforeEach(() => {
@@ -18,6 +24,8 @@ describe('loadFeatureFlags usecase', () => {
       [WEBSITE_BLOCKING]: false,
       [KEYWORD_BLOCKING]: false,
       [APPLE_SIGN_IN]: false,
+      [MULTI_DEVICE]: false,
+      [BLOCKING_CONDITIONS]: false,
     }
 
     await store.dispatch(loadFeatureFlags())
@@ -34,6 +42,8 @@ describe('loadFeatureFlags usecase', () => {
       [WEBSITE_BLOCKING]: true,
       [KEYWORD_BLOCKING]: false,
       [APPLE_SIGN_IN]: true,
+      [MULTI_DEVICE]: false,
+      [BLOCKING_CONDITIONS]: false,
     }
 
     await store.dispatch(loadFeatureFlags())

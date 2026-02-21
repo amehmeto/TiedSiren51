@@ -1,8 +1,9 @@
 import { FormikProps } from 'formik'
 import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
+import { useSelector } from 'react-redux'
 import { Device } from '@/core/device/device'
-import { FeatureFlags } from '@/feature-flags'
+import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -22,6 +23,7 @@ type SelectBlockSessionParamsProps = {
 export function SelectBlockSessionParams({
   form,
 }: SelectBlockSessionParamsProps) {
+  const featureFlags = useSelector(selectFeatureFlags)
   const [devices, setDevices] = useState<Device[]>([])
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
@@ -29,11 +31,11 @@ export function SelectBlockSessionParams({
     useState<boolean>(false)
 
   useEffect(() => {
-    if (!FeatureFlags.MULTI_DEVICE) return
+    if (!featureFlags.MULTI_DEVICE) return
     dependencies.deviceRepository.findAll().then((foundDevices) => {
       setDevices(foundDevices)
     })
-  }, [])
+  }, [featureFlags.MULTI_DEVICE])
 
   function hasFieldError(field: keyof BlockSessionFormValues): boolean {
     return !!form.touched[field] && !!form.errors[field]
@@ -61,14 +63,14 @@ export function SelectBlockSessionParams({
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
         )}
-        {FeatureFlags.MULTI_DEVICE && (
+        {featureFlags.MULTI_DEVICE && (
           <SelectDevicesField
             selectedDevices={form.values.devices}
             setFieldValue={form.setFieldValue}
             availableDevices={devices}
           />
         )}
-        {FeatureFlags.MULTI_DEVICE && hasFieldError('devices') && (
+        {featureFlags.MULTI_DEVICE && hasFieldError('devices') && (
           <FieldErrors errors={form.errors} fieldName={'devices'} />
         )}
         <SelectTime
@@ -95,10 +97,10 @@ export function SelectBlockSessionParams({
           initialOtherTime={form.initialValues.startedAt}
         />
         {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
-        {FeatureFlags.BLOCKING_CONDITIONS && (
+        {featureFlags.BLOCKING_CONDITIONS && (
           <SelectBlockingCondition form={form} />
         )}
-        {FeatureFlags.BLOCKING_CONDITIONS &&
+        {featureFlags.BLOCKING_CONDITIONS &&
           hasFieldError('blockingConditions') && (
             <FieldErrors
               errors={form.errors}

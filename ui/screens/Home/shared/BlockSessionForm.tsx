@@ -9,6 +9,7 @@ import { selectBlockSessionById } from '@/core/block-session/selectors/selectBlo
 import { createBlockSession } from '@/core/block-session/usecases/create-block-session.usecase'
 import { updateBlockSession } from '@/core/block-session/usecases/update-block-session.usecase'
 import { Device } from '@/core/device/device'
+import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
 import { assertBlockSessionFormComplete } from '@/ui/screens/Home/schemas/assert-block-session-form-complete'
 import { validateBlockSessionForm } from '@/ui/screens/Home/schemas/validate-block-session-form'
 import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
@@ -44,6 +45,7 @@ type BlockSessionFormProps = Readonly<
 export function BlockSessionForm({ mode, ...rest }: BlockSessionFormProps) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const featureFlags = useSelector(selectFeatureFlags)
   const sessionId = 'sessionId' in rest ? rest.sessionId : undefined
   const blockSession = useSelector((state: RootState) =>
     selectBlockSessionById(state, sessionId),
@@ -84,11 +86,14 @@ export function BlockSessionForm({ mode, ...rest }: BlockSessionFormProps) {
     }
   }
 
+  const validateForm = validateBlockSessionForm(featureFlags)
+  const handleSubmit = saveBlockSession()
+
   return (
     <Formik
       initialValues={initialValues}
-      validate={validateBlockSessionForm()}
-      onSubmit={saveBlockSession()}
+      validate={validateForm}
+      onSubmit={handleSubmit}
     >
       {(form) => <SelectBlockSessionParams form={form} />}
     </Formik>
