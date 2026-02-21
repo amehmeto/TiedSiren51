@@ -1,11 +1,10 @@
 Sync the current feature branch with main and push:
 
 1. **Fetch and merge main**:
-   - Run `git fetch origin main`
-   - Run `git merge origin/main --no-edit`
+   - Run `./scripts/sync-main.sh` to fetch origin/main and merge it into the current branch
 
 2. **Handle conflicts if any**:
-   - If the merge has conflicts, list them clearly and resolve each one
+   - If the script exits with conflicts, list them clearly and resolve each one
    - Prefer keeping both sides for additive changes (new rules, new imports, etc.)
    - For true conflicts, prefer the feature branch changes when intent is clear, otherwise ask
    - After resolving, verify no conflict markers remain with grep
