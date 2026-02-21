@@ -68,7 +68,6 @@ const styles = StyleSheet.create({
     justifyContent: 'space-evenly',
     alignItems: 'stretch',
     marginVertical: T.spacing.medium,
-    backgroundColor: T.color.darkBlueGray,
     borderRadius: T.border.radius.roundedMedium,
     paddingHorizontal: T.spacing.small,
     paddingVertical: T.spacing.medium,

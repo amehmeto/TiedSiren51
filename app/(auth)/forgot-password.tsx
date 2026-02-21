@@ -87,7 +87,6 @@ export default function ForgotPasswordScreen() {
         <TiedSTextInput
           placeholder="Your Email"
           accessibilityLabel="Email"
-          placeholderTextColor={T.color.grey}
           value={email}
           onChangeText={(text) => {
             setEmail(text)
@@ -126,12 +125,13 @@ const styles = StyleSheet.create({
   title: {
     color: T.color.text,
     fontSize: T.font.size.large,
-    fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
     marginBottom: T.spacing.medium,
   },
   subtitle: {
     color: T.color.text,
     fontSize: T.font.size.regular,
+    fontFamily: T.font.family.primary,
     textAlign: 'center',
     marginBottom: T.spacing.large,
   },
@@ -143,6 +143,7 @@ const styles = StyleSheet.create({
   backText: {
     color: T.color.text,
     fontSize: T.font.size.regular,
+    fontFamily: T.font.family.medium,
     marginBottom: T.spacing.large,
   },
 })

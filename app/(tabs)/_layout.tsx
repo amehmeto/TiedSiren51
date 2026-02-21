@@ -97,6 +97,7 @@ export default function TabLayout() {
       onPress={() => {
         navigation.navigate(route.name)
       }}
+      accessibilityRole="tab"
     />
   )
 
@@ -105,15 +106,16 @@ export default function TabLayout() {
       screenOptions={({ route, navigation }) => ({
         tabBarLabelPosition: 'below-icon',
         tabBarStyle: styles.tabBar,
+        tabBarLabelStyle: styles.tabBarLabel,
         tabBarActiveTintColor: T.color.lightBlue,
-        tabBarInactiveTintColor: T.color.inactive,
+        tabBarInactiveTintColor: T.color.textMuted,
         headerShown: false,
         tabBarIcon: (props) =>
           handleTabBarIcon({ ...props, route, strictModeIcon }),
         tabBarButton: (props) =>
           handleTabBarButton(props, { route, navigation }),
       })}
-      sceneContainerStyle={{ backgroundColor: T.color.transparent }}
+      sceneContainerStyle={styles.sceneContainer}
     >
       {tabs.map((tab) => (
         <Tabs.Screen
@@ -131,8 +133,18 @@ export default function TabLayout() {
 
 const styles = StyleSheet.create({
   tabBar: {
-    borderTopWidth: T.border.width.none,
-    backgroundColor: T.color.darkBlue,
-    padding: T.spacing.small,
+    borderTopWidth: T.border.width.thin,
+    borderTopColor: T.color.borderSubtle,
+    backgroundColor: T.color.darkBlueGray,
+    paddingTop: T.spacing.small,
+    height: T.tabBarHeight + T.spacing.large,
+  },
+  tabBarLabel: {
+    fontFamily: T.font.family.medium,
+    fontSize: T.font.size.xSmall,
+    letterSpacing: T.font.letterSpacing.tight,
+  },
+  sceneContainer: {
+    backgroundColor: T.color.transparent,
   },
 })

@@ -26,13 +26,14 @@ export function InitializingView({
 
 const styles = StyleSheet.create({
   text: {
-    color: T.color.white,
+    color: T.color.text,
     fontSize: T.font.size.regular,
+    fontFamily: T.font.family.primary,
   },
   view: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: T.color.darkBlueGray,
+    backgroundColor: T.color.darkBlue,
   },
 })

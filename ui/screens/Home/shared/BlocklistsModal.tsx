@@ -110,7 +110,11 @@ const styles = StyleSheet.create({
     flex: 1,
     padding: T.spacing.small,
   },
-  blocklistText: { color: T.color.text },
+  blocklistText: {
+    color: T.color.text,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
+  },
   button: {
     alignSelf: 'center',
     marginTop: T.spacing.medium,

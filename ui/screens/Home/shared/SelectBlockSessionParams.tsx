@@ -1,7 +1,8 @@
 import { FormikProps } from 'formik'
 import { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
 import { Device } from '@/core/device/device'
+import { FeatureFlags } from '@/feature-flags'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -28,6 +29,7 @@ export function SelectBlockSessionParams({
     useState<boolean>(false)
 
   useEffect(() => {
+    if (!FeatureFlags.MULTI_DEVICE) return
     dependencies.deviceRepository.findAll().then((foundDevices) => {
       setDevices(foundDevices)
     })
@@ -40,7 +42,11 @@ export function SelectBlockSessionParams({
   const handleNameChange = form.handleChange('name')
 
   return (
-    <View>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.scrollContent}
+      keyboardShouldPersistTaps="handled"
+    >
       <TiedSCard style={styles.blockSession}>
         <ChooseName
           values={form.values}
@@ -55,12 +61,14 @@ export function SelectBlockSessionParams({
         {hasFieldError('blocklistIds') && (
           <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
         )}
-        <SelectDevicesField
-          selectedDevices={form.values.devices}
-          setFieldValue={form.setFieldValue}
-          availableDevices={devices}
-        />
-        {hasFieldError('devices') && (
+        {FeatureFlags.MULTI_DEVICE && (
+          <SelectDevicesField
+            selectedDevices={form.values.devices}
+            setFieldValue={form.setFieldValue}
+            availableDevices={devices}
+          />
+        )}
+        {FeatureFlags.MULTI_DEVICE && hasFieldError('devices') && (
           <FieldErrors errors={form.errors} fieldName={'devices'} />
         )}
         <SelectTime
@@ -87,18 +95,31 @@ export function SelectBlockSessionParams({
           initialOtherTime={form.initialValues.startedAt}
         />
         {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
-        <SelectBlockingCondition form={form} />
-        {hasFieldError('blockingConditions') && (
-          <FieldErrors errors={form.errors} fieldName={'blockingConditions'} />
+        {FeatureFlags.BLOCKING_CONDITIONS && (
+          <SelectBlockingCondition form={form} />
         )}
+        {FeatureFlags.BLOCKING_CONDITIONS &&
+          hasFieldError('blockingConditions') && (
+            <FieldErrors
+              errors={form.errors}
+              fieldName={'blockingConditions'}
+            />
+          )}
       </TiedSCard>
 
       <TiedSButton text={'START'} onPress={() => form.handleSubmit()} />
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center' as const,
+  },
   blockSession: {
     flexDirection: 'column',
     alignItems: 'stretch',
