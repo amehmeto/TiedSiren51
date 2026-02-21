@@ -15,8 +15,8 @@
 const { buildFromOxlintConfigFile } = require('eslint-plugin-oxlint')
 const oxlintConfigs = buildFromOxlintConfigFile('.oxlintrc.json')
 const oxlintDisableRules = {}
-oxlintConfigs.forEach((item) => {
-  if (item.rules) Object.assign(oxlintDisableRules, item.rules)
+oxlintConfigs.forEach((configEntry) => {
+  if (configEntry.rules) Object.assign(oxlintDisableRules, configEntry.rules)
 })
 module.exports = {
   root: true,

@@ -16,6 +16,7 @@
 
     "react/rules-of-hooks": "error",
     "react/exhaustive-deps": "off",
+    "react/jsx-boolean-value": "error",
 
     "typescript/no-explicit-any": "error",
 
@@ -105,9 +106,16 @@
       }
     ],
     "local-rules/no-inline-object-type": "error",
-    "local-rules/no-lame-naming": "warn",
-    "local-rules/no-consecutive-duplicate-returns": "warn",
-    "local-rules/no-redundant-nullish-ternary": "warn",
+    "local-rules/no-unwrap": "error",
+    "local-rules/no-lame-naming": "error",
+    "local-rules/no-redundant-prop-spreading": [
+      "error",
+      { "ignoredObjects": ["styles", "form"] }
+    ],
+    "local-rules/prefer-short-circuit-jsx": "error",
+    "local-rules/prefer-extracted-component": "warn",
+    "local-rules/no-consecutive-duplicate-returns": "error",
+    "local-rules/no-redundant-nullish-ternary": "error",
     "local-rules/prefer-object-destructuring": [
       "warn",
       {

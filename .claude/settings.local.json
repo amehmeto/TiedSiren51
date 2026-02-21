@@ -49,6 +49,7 @@
       "Bash(do:*)",
       "Bash(done)",
       "Bash(eas:*)",
+      "Bash(echo Generated .js files already exist. Checking for unconverted require\\(\\)...:*)",
       "Bash(echo:*)",
       "Bash(export SKIP_E2E_CHECK=true)",
       "Bash(export:*)",
