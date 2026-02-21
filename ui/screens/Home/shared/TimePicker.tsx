@@ -51,7 +51,7 @@ export function TimePicker({
       themeVariant="dark"
       accentColor={T.color.lightBlue}
       buttonTextColorIOS={T.color.lightBlue}
-      textColor={T.color.white}
+      textColor={T.color.text}
       pickerContainerStyleIOS={styles.pickerContainer}
       modalStyleIOS={styles.modalStyle}
       onConfirm={onConfirm}

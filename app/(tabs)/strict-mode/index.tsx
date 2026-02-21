@@ -76,7 +76,9 @@ export default function StrictModeScreen() {
       >
         <TiedSTitle text="Strict Mode" />
 
-        <CircularTimerDisplay viewModel={viewModel} />
+        <View style={styles.timerContainer}>
+          <CircularTimerDisplay viewModel={viewModel} />
+        </View>
 
         <View style={styles.actionButtons}>
           <TiedSButton
@@ -131,9 +133,13 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
+    flexGrow: 1,
     paddingBottom: T.spacing.xx_large,
   },
-
+  timerContainer: {
+    flex: 1,
+    justifyContent: 'center',
+  },
   actionButtons: {
     paddingHorizontal: T.spacing.large,
     gap: T.spacing.medium,

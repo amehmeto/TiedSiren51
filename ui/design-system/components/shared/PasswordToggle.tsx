@@ -14,11 +14,15 @@ export function PasswordToggle({
   onToggle,
 }: PasswordToggleProps) {
   return (
-    <Pressable style={styles.iconContainer} onPress={onToggle}>
+    <Pressable
+      style={styles.iconContainer}
+      onPress={onToggle}
+      accessibilityRole="button"
+    >
       <Ionicons
         name={isPasswordShown ? 'eye-outline' : 'eye-off-outline'}
         size={T.icon.size.large}
-        color={T.color.grey}
+        color={T.color.textMuted}
       />
     </Pressable>
   )
@@ -28,6 +32,11 @@ const styles = StyleSheet.create({
   iconContainer: {
     position: 'absolute',
     right: T.spacing.small,
-    top: T.spacing.small,
+    top: T.spacing.none,
+    bottom: T.spacing.none,
+    justifyContent: 'center',
+    paddingHorizontal: T.spacing.smallMedium,
+    minWidth: T.height.settingsRow,
+    alignItems: 'center',
   },
 })

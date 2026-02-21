@@ -97,6 +97,7 @@ export function SessionCard({ session, type }: SessionCardProps) {
             params: { sessionId: session.id },
           })
         }}
+        accessibilityRole="button"
       >
         <TiedSCard>
           {type === SessionType.ACTIVE ? (
@@ -160,8 +161,20 @@ export function SessionCard({ session, type }: SessionCardProps) {
 }
 
 const styles = StyleSheet.create({
-  sessionName: { color: T.color.text, fontWeight: T.font.weight.bold },
-  minutesLeft: { color: T.color.lightBlue, fontWeight: T.font.weight.bold },
-  devices: { color: T.color.text },
+  sessionName: {
+    color: T.color.text,
+    fontFamily: T.font.family.semibold,
+    fontSize: T.font.size.base,
+  },
+  minutesLeft: {
+    color: T.color.lightBlue,
+    fontFamily: T.font.family.semibold,
+    fontSize: T.font.size.small,
+  },
+  devices: {
+    color: T.color.textMuted,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.small,
+  },
   menu: { marginLeft: 'auto', alignSelf: 'flex-start' },
 })

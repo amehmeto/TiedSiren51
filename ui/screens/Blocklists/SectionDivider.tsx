@@ -20,6 +20,6 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     height: T.border.width.thin,
-    backgroundColor: T.color.grey,
+    backgroundColor: T.color.borderSubtle,
   },
 })
