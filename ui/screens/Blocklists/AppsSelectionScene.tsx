@@ -98,9 +98,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   listContent: {
-    paddingBottom:
-      Math.max(T.scroll.padding.minBottom, T.scroll.padding.minBottom) +
-      T.scroll.padding.additional,
+    paddingBottom: T.scroll.padding.minBottom + T.scroll.padding.additional,
   },
   loadingContentContainer: {
     flex: 1,
