@@ -23,16 +23,19 @@ const styles = StyleSheet.create({
     marginBottom: T.spacing.medium,
   },
   title: {
-    color: T.color.grey,
+    color: T.color.textMuted,
     fontSize: T.font.size.small,
-    fontWeight: T.font.weight.medium,
+    fontFamily: T.font.family.medium,
     textTransform: 'uppercase',
+    letterSpacing: T.font.letterSpacing.wide,
     marginBottom: T.spacing.small,
     marginLeft: T.spacing.extraSmall,
   },
   card: {
-    backgroundColor: T.color.darkBlueGray,
+    backgroundColor: T.color.surfaceElevated,
     borderRadius: T.border.radius.roundedMedium,
     overflow: 'hidden',
+    borderWidth: T.border.width.thin,
+    borderColor: T.color.borderSubtle,
   },
 })

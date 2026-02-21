@@ -1,6 +1,14 @@
 import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
-import { Text, StyleSheet, Pressable, StyleProp, ViewStyle } from 'react-native'
+import {
+  Animated,
+  Pressable,
+  Text,
+  StyleSheet,
+  StyleProp,
+  ViewStyle,
+} from 'react-native'
+import { usePressScale } from '@/ui/design-system/hooks/usePressScale'
 import { T } from '@/ui/design-system/theme'
 
 type IconName = 'logo-google' | 'logo-apple'
@@ -18,22 +26,28 @@ export function TiedSSocialButton({
   onPress,
   style,
 }: TiedSSocialButtonProps) {
+  const { scaleStyle, handlers } = usePressScale()
+
   return (
-    <Pressable
-      style={({ pressed: isPressed }) => [
-        styles.button,
-        style,
-        { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
-      ]}
-      onPress={onPress}
-    >
-      <Ionicons
-        name={iconName}
-        size={T.icon.size.large}
-        color={T.color.white}
-      />
-      <Text style={styles.buttonText}>{text}</Text>
-    </Pressable>
+    <Animated.View style={[scaleStyle, style]}>
+      <Pressable
+        style={({ pressed: isPressed }) => [
+          styles.button,
+          { opacity: isPressed ? T.opacity.pressed : T.opacity.full },
+        ]}
+        onPress={onPress}
+        onPressIn={handlers.onPressIn}
+        onPressOut={handlers.onPressOut}
+        accessibilityRole="button"
+      >
+        <Ionicons
+          name={iconName}
+          size={T.icon.size.large}
+          color={T.color.text}
+        />
+        <Text style={styles.buttonText}>{text}</Text>
+      </Pressable>
+    </Animated.View>
   )
 }
 
@@ -43,17 +57,18 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     width: T.layout.width.nineTenths,
-    padding: T.spacing.medium,
+    paddingVertical: T.spacing.medium,
+    paddingHorizontal: T.spacing.large,
     marginBottom: T.spacing.medium,
     borderRadius: T.border.radius.roundedMedium,
-    backgroundColor: T.color.modalBackgroundColor,
+    backgroundColor: T.color.surfaceElevated,
+    borderWidth: T.border.width.thin,
+    borderColor: T.color.borderSubtle,
   },
   buttonText: {
     marginLeft: T.spacing.medium,
-    color: T.color.white,
-    fontSize: T.font.size.regular,
-    fontWeight: T.font.weight.bold,
+    color: T.color.text,
+    fontSize: T.font.size.base,
+    fontFamily: T.font.family.semibold,
   },
 })
-
-export default TiedSSocialButton

@@ -130,7 +130,10 @@ export function SelectTime({
         <Text style={styles.label}>
           {timeField === TimeField.StartedAt ? 'Start Time' : 'End Time'}
         </Text>
-        <Pressable onPress={() => setIsTimePickerVisible(true)}>
+        <Pressable
+          onPress={() => setIsTimePickerVisible(true)}
+          accessibilityRole="button"
+        >
           <Text style={styles.option}>{placeholder}</Text>
         </Pressable>
       </View>
@@ -162,9 +165,13 @@ const styles = StyleSheet.create({
   },
   label: {
     color: T.color.text,
+    fontFamily: T.font.family.medium,
+    fontSize: T.font.size.base,
   },
   option: {
     color: T.color.lightBlue,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
     textAlign: 'right',
   },
 })

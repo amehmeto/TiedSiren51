@@ -38,6 +38,7 @@ export function ChooseBlockTabBar({
               backgroundColor: isFocused ? T.color.lightBlue : T.color.darkBlue,
             },
           ]}
+          accessibilityRole="tab"
         >
           <Text style={[styles.labelText, { color }]}>{route.title}</Text>
         </Pressable>
@@ -55,8 +56,15 @@ const styles = StyleSheet.create({
     padding: T.spacing.medium,
     minWidth: T.width.chipMinWidth,
     margin: T.spacing.none,
+    borderWidth: T.border.width.thin,
+    borderColor: T.color.borderSubtle,
   },
-  labelText: { color: T.color.white, textAlign: 'center' },
+  labelText: {
+    color: T.color.text,
+    textAlign: 'center',
+    fontFamily: T.font.family.medium,
+    fontSize: T.font.size.base,
+  },
   tabBar: { backgroundColor: T.color.transparent },
   tabBarStyle: { marginLeft: T.spacing.none, paddingLeft: T.spacing.none },
   indicator: { height: T.spacing.none, display: 'none', width: T.spacing.none },

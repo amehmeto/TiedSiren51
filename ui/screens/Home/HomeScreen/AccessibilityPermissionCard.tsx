@@ -19,7 +19,7 @@ export const AccessibilityPermissionCard = ({
       <View style={styles.content}>
         <MaterialCommunityIcons
           name="alert-circle"
-          size={T.largeIconSize}
+          size={T.icon.size.xxLarge}
           color={T.color.lightBlue}
         />
         <Text style={styles.title}>Enable App Blocking</Text>
@@ -51,17 +51,17 @@ const styles = StyleSheet.create({
   },
   title: {
     fontSize: T.font.size.medium,
-    fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
     color: T.color.text,
     textAlign: 'center',
     marginBottom: T.spacing.small,
   },
   description: {
     fontSize: T.font.size.small,
-    color: T.color.text,
+    fontFamily: T.font.family.primary,
+    color: T.color.textMuted,
     textAlign: 'center',
     lineHeight: T.font.size.medium,
-    opacity: T.opacity.semiTransparent,
   },
   buttonContainer: {
     width: T.layout.width.full,

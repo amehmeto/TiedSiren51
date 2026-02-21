@@ -45,22 +45,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   label: {
-    color: T.color.grey,
+    color: T.color.textMuted,
     fontSize: T.font.size.small,
-    fontFamily: T.font.family.primary,
-    fontWeight: T.font.weight.medium,
+    fontFamily: T.font.family.medium,
     marginBottom: T.spacing.small,
     textTransform: 'uppercase',
-    letterSpacing: T.font.letterSpacing.normal,
+    letterSpacing: T.font.letterSpacing.wide,
   },
   picker: {
     width: '100%',
   },
   wheelText: {
-    color: T.color.white,
+    color: T.color.lightBlue,
     fontSize: T.font.size.medium,
-    fontFamily: T.font.family.primary,
-    fontWeight: T.font.weight.semibold,
+    fontFamily: T.font.family.semibold,
   },
   overlayItem: {
     backgroundColor: T.color.lightBlueOverlay,

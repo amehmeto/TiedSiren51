@@ -297,16 +297,16 @@ export function BlocklistForm({
 
 const styles = StyleSheet.create({
   title: {
-    fontWeight: T.font.weight.bold,
     color: T.color.text,
-    fontFamily: T.font.family.primary,
+    fontFamily: T.font.family.semibold,
     fontSize: T.font.size.small,
     marginTop: T.spacing.small,
     marginBottom: T.spacing.small,
+    letterSpacing: T.font.letterSpacing.tight,
   },
   errorText: {
     color: T.color.red,
     fontSize: T.font.size.small,
-    fontWeight: T.font.weight.bold,
+    fontFamily: T.font.family.heading,
   },
 })

@@ -1,5 +1,8 @@
 import { StyleSheet, Text, View } from 'react-native'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
 
@@ -40,11 +43,12 @@ export function StrictModeConfirmationModal({
           style={styles.cancelButton}
           onPress={onCancel}
           text={'Cancel'}
+          variant={TiedSButtonVariant.Secondary}
         />
         <TiedSButton
-          style={styles.confirmButton}
           onPress={onConfirm}
           text={'Confirm'}
+          variant={TiedSButtonVariant.Danger}
         />
       </View>
     </TiedSModal>
@@ -59,8 +63,7 @@ const styles = StyleSheet.create({
   title: {
     color: T.color.text,
     fontSize: T.font.size.large,
-    fontWeight: T.font.weight.bold,
-    fontFamily: T.font.family.primary,
+    fontFamily: T.font.family.heading,
     marginBottom: T.spacing.medium,
     textAlign: 'center',
   },
@@ -69,7 +72,7 @@ const styles = StyleSheet.create({
     fontSize: T.font.size.base,
     fontFamily: T.font.family.primary,
     marginBottom: T.spacing.small,
-    lineHeight: T.font.size.base * T.font.lineHeight.normal,
+    lineHeight: T.font.size.base * T.font.lineHeight.relaxed,
   },
   buttonContainer: {
     flexDirection: 'row',
@@ -79,8 +82,5 @@ const styles = StyleSheet.create({
   },
   cancelButton: {
     marginRight: T.spacing.small,
-  },
-  confirmButton: {
-    backgroundColor: T.color.red,
   },
 })

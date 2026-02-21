@@ -5,7 +5,7 @@ import { T } from '@/ui/design-system/theme'
 export function LoadingScreen() {
   return (
     <LinearGradient
-      colors={[T.color.darkBlue, T.color.darkBlueGray, T.color.darkBlue]}
+      colors={[T.color.darkBlue, T.color.gradientMid, T.color.darkBlue]}
       style={styles.container}
     >
       <ActivityIndicator size="large" color={T.color.lightBlue} />
@@ -16,5 +16,7 @@ export function LoadingScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
   },
 })

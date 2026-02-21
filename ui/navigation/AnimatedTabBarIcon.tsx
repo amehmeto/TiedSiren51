@@ -27,6 +27,10 @@ function isEntypoTab(tab: Tab): tab is EntypoTab {
   return tab.IconType === Entypo
 }
 
+const FOCUSED_SCALE = 1.1
+const DEFAULT_SCALE = 1
+const ANIMATION_DURATION = 250
+
 type AnimatedTabBarIconProps = {
   readonly tab: Tab
   readonly color: string
@@ -40,26 +44,20 @@ export function AnimatedTabBarIcon({
   size,
   isFocused,
 }: AnimatedTabBarIconProps) {
-  const scale = useSharedValue(1)
-  const opacity = useSharedValue(1)
+  const scale = useSharedValue(DEFAULT_SCALE)
 
   const animatedStyle = useAnimatedStyle(() => ({
     transform: [{ scale: scale.value }],
-    opacity: opacity.value,
   }))
 
   useEffect(() => {
+    const targetScale = isFocused ? FOCUSED_SCALE : DEFAULT_SCALE
     // eslint-disable-next-line react-hooks/immutability -- SharedValue.value is mutable by design in react-native-reanimated
-    scale.value = withTiming(isFocused ? 1.2 : 1, {
-      duration: 300,
+    scale.value = withTiming(targetScale, {
+      duration: ANIMATION_DURATION,
       easing: Easing.out(Easing.ease),
     })
-    // eslint-disable-next-line react-hooks/immutability -- SharedValue.value is mutable by design in react-native-reanimated
-    opacity.value = withTiming(isFocused ? 1 : 0.7, {
-      duration: 300,
-      easing: Easing.out(Easing.ease),
-    })
-  }, [isFocused, opacity, scale])
+  }, [isFocused, scale])
 
   return (
     <Animated.View style={animatedStyle}>

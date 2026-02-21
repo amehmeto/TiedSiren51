@@ -88,15 +88,14 @@ const styles = StyleSheet.create({
   },
   modalTitle: {
     fontSize: T.font.size.large,
-    fontWeight: T.font.weight.bold,
-    fontFamily: T.font.family.primary,
-    color: T.color.white,
+    fontFamily: T.font.family.heading,
+    color: T.color.text,
     marginBottom: T.spacing.small,
   },
   modalSubtitle: {
     fontSize: T.font.size.small,
     fontFamily: T.font.family.primary,
-    color: T.color.grey,
+    color: T.color.textMuted,
     marginBottom: T.spacing.medium,
   },
   scrollViewContent: {

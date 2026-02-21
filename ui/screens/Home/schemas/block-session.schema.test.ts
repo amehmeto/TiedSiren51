@@ -1,4 +1,5 @@
 import { describe, it, expect } from 'vitest'
+import { FeatureFlags } from '@/feature-flags'
 import { blockSessionSchema } from './block-session.schema'
 
 type ValidationCase = {
@@ -81,17 +82,31 @@ describe('blockSessionSchema', () => {
       )
     })
 
-    it('should fail when devices is empty', () => {
-      const validation = blockSessionSchema.safeParse({
-        ...validBlockSession,
-        devices: [],
-      })
-      expectValidationFailure(
-        validation,
-        'devices',
-        'At least one device must be selected',
-      )
-    })
+    it.runIf(FeatureFlags.MULTI_DEVICE)(
+      'should fail when devices is empty',
+      () => {
+        const validation = blockSessionSchema.safeParse({
+          ...validBlockSession,
+          devices: [],
+        })
+        expectValidationFailure(
+          validation,
+          'devices',
+          'At least one device must be selected',
+        )
+      },
+    )
+
+    it.skipIf(FeatureFlags.MULTI_DEVICE)(
+      'should pass when devices is empty (feature flag off)',
+      () => {
+        const validation = blockSessionSchema.safeParse({
+          ...validBlockSession,
+          devices: [],
+        })
+        expectValidationSuccess(validation)
+      },
+    )
   })
 
   describe('Time fields validation', () => {
@@ -129,16 +144,30 @@ describe('blockSessionSchema', () => {
   })
 
   describe('Blocking conditions validation', () => {
-    it('should fail when blockingConditions is empty', () => {
-      const validation = blockSessionSchema.safeParse({
-        ...validBlockSession,
-        blockingConditions: [],
-      })
-      expectValidationFailure(
-        validation,
-        'blockingConditions',
-        'A blocking condition must be selected',
-      )
-    })
+    it.runIf(FeatureFlags.BLOCKING_CONDITIONS)(
+      'should fail when blockingConditions is empty',
+      () => {
+        const validation = blockSessionSchema.safeParse({
+          ...validBlockSession,
+          blockingConditions: [],
+        })
+        expectValidationFailure(
+          validation,
+          'blockingConditions',
+          'A blocking condition must be selected',
+        )
+      },
+    )
+
+    it.skipIf(FeatureFlags.BLOCKING_CONDITIONS)(
+      'should pass when blockingConditions is empty (feature flag off)',
+      () => {
+        const validation = blockSessionSchema.safeParse({
+          ...validBlockSession,
+          blockingConditions: [],
+        })
+        expectValidationSuccess(validation)
+      },
+    )
   })
 })

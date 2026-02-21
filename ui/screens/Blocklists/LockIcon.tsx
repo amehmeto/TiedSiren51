@@ -12,7 +12,7 @@ export function LockIcon({ testID }: LockIconProps) {
       <Ionicons
         name="lock-closed"
         size={T.icon.size.large}
-        color={T.color.grey}
+        color={T.color.textMuted}
       />
     </View>
   )

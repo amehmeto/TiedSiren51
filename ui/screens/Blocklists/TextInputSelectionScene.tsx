@@ -63,10 +63,10 @@ export function TextInputSelectionScene({
       <TextInput
         style={[
           styles.addWebsiteInput,
-          { borderColor: isFocused ? T.color.lightBlue : T.color.white },
+          { borderColor: isFocused ? T.color.lightBlue : T.color.borderSubtle },
         ]}
         placeholder={placeholder}
-        placeholderTextColor={T.color.white}
+        placeholderTextColor={T.color.textMuted}
         onFocus={() => setIsFocused(true)}
         onBlur={() => setIsFocused(false)}
         onSubmitEditing={onSubmitEditing}
@@ -111,8 +111,11 @@ export function TextInputSelectionScene({
 const styles = StyleSheet.create({
   addWebsiteInput: {
     borderBottomWidth: T.border.width.medium,
-    padding: T.spacing.small,
-    color: T.color.white,
+    padding: T.spacing.smallMedium,
+    color: T.color.text,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
+    minHeight: T.height.settingsRow,
   },
   list: {
     flex: 1,
