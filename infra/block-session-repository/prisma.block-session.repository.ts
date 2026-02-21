@@ -1,3 +1,8 @@
+/**
+ * @deprecated OBSOLETE — Superseded by PowersyncBlockSessionRepository.
+ * Kept for rollback safety. Removal tracked in a follow-up issue.
+ * See docs/adr/infrastructure/powersync-op-sqlite.md
+ */
 import uuid from 'react-native-uuid'
 import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
 import { CreatePayload } from '@/core/_ports_/create.payload'

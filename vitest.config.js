@@ -14,6 +14,7 @@ export default {
     },
     exclude: [
       'infra/**/prisma.*.test.ts',
+      'infra/**/powersync.*.test.ts',
       '**/node_modules/**',
       '.worktrees/**',
     ],
@@ -36,6 +37,7 @@ export default {
         '**/_tests_/**',
         '**/data-builders/**',
         '**/node_modules/**',
+        'infra/**/powersync.*.ts',
       ],
       thresholds: {
         '**/*.schema.ts': {

@@ -1,3 +1,8 @@
+/**
+ * @deprecated OBSOLETE — Superseded by PowersyncSirensRepository.
+ * Kept for rollback safety. Removal tracked in a follow-up issue.
+ * See docs/adr/infrastructure/powersync-op-sqlite.md
+ */
 import { Siren as PrismaSiren } from '@prisma/client'
 import uuid from 'react-native-uuid'
 import { Logger } from '@/core/_ports_/logger'
