@@ -11,6 +11,7 @@ export function SecuritySection({ onChangePassword }: SecuritySectionProps) {
   return (
     <SettingsSection title="Security">
       <SettingsRow
+        icon="lock-closed-outline"
         label="Change Password"
         hasChevron
         onPress={onChangePassword}

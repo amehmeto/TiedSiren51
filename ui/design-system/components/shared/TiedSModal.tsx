@@ -1,5 +1,5 @@
 import React from 'react'
-import { Dimensions, Modal, StyleSheet, View } from 'react-native'
+import { Modal, StyleSheet, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { TiedSCard } from './TiedSCard'
 
@@ -20,7 +20,6 @@ export function TiedSModal({
 }: TiedSModalProps) {
   return (
     <Modal
-      style={styles.modalView}
       animationType="slide"
       transparent
       visible={isVisible}
@@ -43,17 +42,7 @@ const styles = StyleSheet.create({
   },
   cardColumn: {
     flexDirection: 'column',
-  },
-  modalView: {
-    margin: T.spacing.large,
-    borderRadius: T.border.radius.extraRounded,
-    padding: T.spacing.xx_large,
-    alignItems: 'center',
-    shadowColor: T.shadow.color,
-    shadowOffset: T.shadow.offsets.large,
-    width: Dimensions.get('window').width * 0.9,
-    shadowOpacity: T.shadow.opacity,
-    shadowRadius: T.shadow.radius.large,
-    elevation: T.elevation.high,
+    width: T.layout.width.nineTenths,
+    maxHeight: '80%',
   },
 })

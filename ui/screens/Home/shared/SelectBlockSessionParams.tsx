@@ -1,6 +1,6 @@
 import { FormikProps } from 'formik'
 import { useEffect, useState } from 'react'
-import { StyleSheet, View } from 'react-native'
+import { ScrollView, StyleSheet } from 'react-native'
 import { Device } from '@/core/device/device'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -40,7 +40,11 @@ export function SelectBlockSessionParams({
   const handleNameChange = form.handleChange('name')
 
   return (
-    <View>
+    <ScrollView
+      style={styles.scrollView}
+      contentContainerStyle={styles.scrollContent}
+      keyboardShouldPersistTaps="handled"
+    >
       <TiedSCard style={styles.blockSession}>
         <ChooseName
           values={form.values}
@@ -94,11 +98,18 @@ export function SelectBlockSessionParams({
       </TiedSCard>
 
       <TiedSButton text={'START'} onPress={() => form.handleSubmit()} />
-    </View>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+  },
+  scrollContent: {
+    flexGrow: 1,
+    justifyContent: 'center' as const,
+  },
   blockSession: {
     flexDirection: 'column',
     alignItems: 'stretch',
