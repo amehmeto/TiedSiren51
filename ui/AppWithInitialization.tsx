@@ -22,6 +22,7 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
 
   useEffect(() => {
     if (isInitializing) return
+    if (router.canDismiss()) router.dismissAll()
     router.replace(isAuthenticated ? '/home' : '/register')
   }, [isInitializing, isAuthenticated, router])
 
