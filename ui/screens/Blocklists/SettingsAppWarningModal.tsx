@@ -1,4 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/core/_redux_/createStore'
+import { formatDuration } from '@/core/strict-mode/format-duration'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
+import { dependencies } from '@/ui/dependencies'
 import {
   TiedSButton,
   TiedSButtonVariant,
@@ -8,7 +14,6 @@ import { T } from '@/ui/design-system/theme'
 
 type SettingsAppWarningModalProps = {
   readonly isVisible: boolean
-  readonly strictModeTimeLeft?: string
   readonly onRequestClose: () => void
   readonly onCancel: () => void
   readonly onConfirm: () => void
@@ -16,11 +21,20 @@ type SettingsAppWarningModalProps = {
 
 export function SettingsAppWarningModal({
   isVisible,
-  strictModeTimeLeft,
   onRequestClose,
   onCancel,
   onConfirm,
 }: SettingsAppWarningModalProps) {
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
+
+  const strictModeTimeLeft = useSelector((state: RootState) =>
+    selectStrictModeTimeLeft(state, dependencies.dateProvider),
+  )
+
+  const formattedTimeLeft = formatDuration(strictModeTimeLeft)
+
   return (
     <TiedSModal
       style={styles.modal}
@@ -33,9 +47,9 @@ export function SettingsAppWarningModal({
         Bluetooth, permissions, and app uninstallation — including TiedSiren
         itself.
       </Text>
-      {strictModeTimeLeft && (
+      {isStrictModeActive && (
         <Text style={styles.strictModeText}>
-          Strict mode is on ({strictModeTimeLeft} left). You will not be able to
+          Strict mode is on ({formattedTimeLeft} left). You will not be able to
           remove Settings from this blocklist until it expires.
         </Text>
       )}

@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
 import * as React from 'react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Dimensions, StyleSheet, Text } from 'react-native'
 import {
   Route,
@@ -20,10 +20,7 @@ import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
-import { formatDuration } from '@/core/strict-mode/format-duration'
 import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
-import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
-import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
 import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -78,18 +75,6 @@ export function BlocklistForm({
     ),
   )
 
-  const isStrictModeActive = useSelector((state: RootState) =>
-    selectIsStrictModeActive(state, dependencies.dateProvider),
-  )
-
-  const strictModeTimeLeft = useSelector((state: RootState) =>
-    selectStrictModeTimeLeft(state, dependencies.dateProvider),
-  )
-
-  const strictModeTimeLeftFormatted = isStrictModeActive
-    ? formatDuration(strictModeTimeLeft)
-    : undefined
-
   const {
     existingBlocklist,
     lockedSirens,
@@ -118,7 +103,8 @@ export function BlocklistForm({
   const [index, setIndex] = useState(0)
   const [isSettingsWarningVisible, setIsSettingsWarningVisible] =
     useState(false)
-  const pendingSettingsAppRef = useRef<AndroidSiren | null>(null)
+  const [pendingSettingsApp, setPendingSettingsApp] =
+    useState<AndroidSiren | null>(null)
 
   const routes: BlocklistTabRoute[] = [
     { key: BlocklistTabKey.Apps, title: 'Apps' },
@@ -199,7 +185,7 @@ export function BlocklistForm({
       const isAlreadySelected = isSirenSelected(sirenType, app.packageName)
 
       if (!isAlreadySelected && isSettingsApp(app.packageName)) {
-        pendingSettingsAppRef.current = app
+        setPendingSettingsApp(app)
         setIsSettingsWarningVisible(true)
         return
       }
@@ -220,16 +206,15 @@ export function BlocklistForm({
   )
 
   const dismissSettingsWarning = useCallback(() => {
-    pendingSettingsAppRef.current = null
+    setPendingSettingsApp(null)
     setIsSettingsWarningVisible(false)
   }, [])
 
   const confirmSettingsApp = useCallback(() => {
-    const app = pendingSettingsAppRef.current
-    if (app) addAppSiren(app)
-    pendingSettingsAppRef.current = null
+    if (pendingSettingsApp) addAppSiren(pendingSettingsApp)
+    setPendingSettingsApp(null)
     setIsSettingsWarningVisible(false)
-  }, [addAppSiren])
+  }, [addAppSiren, pendingSettingsApp])
 
   const renderScene = useCallback(
     ({
@@ -355,7 +340,6 @@ export function BlocklistForm({
 
       <SettingsAppWarningModal
         isVisible={isSettingsWarningVisible}
-        strictModeTimeLeft={strictModeTimeLeftFormatted}
         onRequestClose={dismissSettingsWarning}
         onCancel={dismissSettingsWarning}
         onConfirm={confirmSettingsApp}
