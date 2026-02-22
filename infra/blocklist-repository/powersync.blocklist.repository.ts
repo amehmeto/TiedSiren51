@@ -16,13 +16,21 @@ export class PowersyncBlocklistRepository implements BlocklistRepository {
     this.logger = logger
   }
 
-  async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
+  async create(
+    userId: string,
+    blocklistPayload: CreatePayload<Blocklist>,
+  ): Promise<Blocklist> {
     try {
       const { id } = await this.db.get<{ id: string }>('SELECT uuid() as id')
 
       await this.db.execute(
-        'INSERT INTO blocklist (id, name, sirens) VALUES (?, ?, ?)',
-        [id, blocklistPayload.name, JSON.stringify(blocklistPayload.sirens)],
+        'INSERT INTO blocklist (id, user_id, name, sirens) VALUES (?, ?, ?, ?)',
+        [
+          id,
+          userId,
+          blocklistPayload.name,
+          JSON.stringify(blocklistPayload.sirens),
+        ],
       )
 
       const created = await this.db.get<BlocklistRecord>(
@@ -39,10 +47,11 @@ export class PowersyncBlocklistRepository implements BlocklistRepository {
     }
   }
 
-  async findAll(): Promise<Blocklist[]> {
+  async findAll(userId: string): Promise<Blocklist[]> {
     try {
       const rows = await this.db.getAll<BlocklistRecord>(
-        'SELECT * FROM blocklist',
+        'SELECT * FROM blocklist WHERE user_id = ?',
+        [userId],
       )
 
       return rows.map(this.mapToBlocklist)
@@ -102,10 +111,14 @@ export class PowersyncBlocklistRepository implements BlocklistRepository {
     }
   }
 
-  async deleteAll(): Promise<void> {
+  async deleteAll(userId: string): Promise<void> {
     try {
-      await this.db.execute('DELETE FROM block_session_blocklist')
-      await this.db.execute('DELETE FROM blocklist')
+      await this.db.execute(
+        `DELETE FROM block_session_blocklist WHERE blocklist_id IN
+          (SELECT id FROM blocklist WHERE user_id = ?)`,
+        [userId],
+      )
+      await this.db.execute('DELETE FROM blocklist WHERE user_id = ?', [userId])
     } catch (error) {
       this.logger.error(
         `[PowersyncBlocklistRepository] Failed to delete all blocklists: ${error}`,

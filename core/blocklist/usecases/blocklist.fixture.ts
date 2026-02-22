@@ -4,6 +4,7 @@ import { AppStore } from '../../_redux_/createStore'
 import { createTestStore } from '../../_tests_/createTestStore'
 import { Fixture } from '../../_tests_/fixture.type'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
+import { AuthProvider } from '../../auth/auth-user'
 import { Blocklist, blocklistAdapter } from '../blocklist'
 import { selectBlocklistById } from '../selectors/selectBlocklistById'
 import { createBlocklist } from './create-blocklist.usecase'
@@ -20,6 +21,15 @@ export function blocklistFixture(
 ): Fixture {
   let store: AppStore
   const blocklistRepository = new FakeDataBlocklistRepository()
+
+  testStateBuilderProvider.setState((builder) =>
+    builder.withAuthUser({
+      id: 'test-user-id',
+      email: 'test@test.com',
+      isEmailVerified: true,
+      authProvider: AuthProvider.Email,
+    }),
+  )
 
   return {
     given: {
@@ -43,7 +53,10 @@ export function blocklistFixture(
         await store.dispatch(updateBlocklist(payload))
       },
       creatingBlocklist: async (payload: Blocklist) => {
-        store = createTestStore()
+        store = createTestStore(
+          { blocklistRepository },
+          testStateBuilderProvider.getState(),
+        )
         await store.dispatch(createBlocklist(payload))
       },
       renamingBlocklist: async (

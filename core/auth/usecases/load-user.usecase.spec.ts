@@ -3,10 +3,21 @@ import { createTestStore } from '@/core/_tests_/createTestStore'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { buildSirens } from '@/core/_tests_/data-builders/sirens.builder'
+import { stateBuilder } from '@/core/_tests_/state-builder'
+import { AuthProvider } from '@/core/auth/auth-user'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
 import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
 import { loadUser } from './load-user.usecase'
+
+const preloadedStateWithAuth = stateBuilder()
+  .withAuthUser({
+    id: 'test-user-id',
+    email: 'test@example.com',
+    isEmailVerified: true,
+    authProvider: AuthProvider.Email,
+  })
+  .build()
 
 describe('loadUser usecase', () => {
   let blocklistRepository: FakeDataBlocklistRepository
@@ -35,18 +46,21 @@ describe('loadUser usecase', () => {
     blockSessionRepository.findAll = async () => mockBlockSessions
     sirensRepository.getSelectableSirens = async () => mockSirens
 
-    const store = createTestStore({
-      blocklistRepository,
-      blockSessionRepository,
-      sirensRepository,
-    })
+    const store = createTestStore(
+      {
+        blocklistRepository,
+        blockSessionRepository,
+        sirensRepository,
+      },
+      preloadedStateWithAuth,
+    )
 
     await store.dispatch(loadUser())
 
-    const state = store.getState()
-    const blocklistEntities = state.blocklist.entities
-    const blockSessionEntities = state.blockSession.entities
-    const availableSirens = state.siren.availableSirens
+    const { blocklist, blockSession, siren } = store.getState()
+    const blocklistEntities = blocklist.entities
+    const blockSessionEntities = blockSession.entities
+    const availableSirens = siren.availableSirens
 
     expect(blocklistEntities).toHaveProperty('blocklist-1')
     expect(blockSessionEntities).toHaveProperty('session-1')
@@ -62,18 +76,21 @@ describe('loadUser usecase', () => {
     blockSessionRepository.findAll = async () => emptyBlockSessions
     sirensRepository.getSelectableSirens = async () => emptySirens
 
-    const store = createTestStore({
-      blocklistRepository,
-      blockSessionRepository,
-      sirensRepository,
-    })
+    const store = createTestStore(
+      {
+        blocklistRepository,
+        blockSessionRepository,
+        sirensRepository,
+      },
+      preloadedStateWithAuth,
+    )
 
     await store.dispatch(loadUser())
 
-    const state = store.getState()
-    const blocklistEntities = state.blocklist.entities
-    const blockSessionEntities = state.blockSession.entities
-    const availableSirens = state.siren.availableSirens
+    const { blocklist, blockSession, siren } = store.getState()
+    const blocklistEntities = blocklist.entities
+    const blockSessionEntities = blockSession.entities
+    const availableSirens = siren.availableSirens
 
     const blocklistKeys = Object.keys(blocklistEntities)
     const blockSessionKeys = Object.keys(blockSessionEntities)

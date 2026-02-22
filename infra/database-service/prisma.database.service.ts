@@ -26,6 +26,10 @@ export class PrismaDatabaseService
     return super.getClient()
   }
 
+  claimOrphanedRows(_userId: string): Promise<void> {
+    return Promise.resolve()
+  }
+
   async initialize(): Promise<void> {
     try {
       return super.initialize()

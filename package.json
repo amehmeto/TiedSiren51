@@ -12,7 +12,7 @@
     "postinstall": "npx prisma generate",
     "install:clean": "rm -rf node_modules && npm ci",
     "start": "expo start",
-    "android": "expo run:android",
+    "android": "npx expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "electron:dev": "concurrently \"BROWSER=none npm run web -- --port 19006\" \"wait-on http://localhost:19006 && npm run electron:start\"",

@@ -13,7 +13,7 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
     this.db = new PouchDB('pdb-block-sessions')
   }
 
-  async findAll(): Promise<BlockSession[]> {
+  async findAll(_userId: string): Promise<BlockSession[]> {
     try {
       const allDocsResponse = await this.db.allDocs({ include_docs: true })
       return allDocsResponse.rows
@@ -31,6 +31,7 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
   }
 
   async create(
+    _userId: string,
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
     try {
@@ -95,7 +96,7 @@ export class PouchdbBlockSessionRepository implements BlockSessionRepository {
     }
   }
 
-  async deleteAll(): Promise<void> {
+  async deleteAll(_userId: string): Promise<void> {
     try {
       const allDocsResponse = await this.db.allDocs()
       for (const row of allDocsResponse.rows) {

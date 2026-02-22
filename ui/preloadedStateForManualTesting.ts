@@ -10,7 +10,7 @@ import { dependencies } from '@/ui/dependencies'
 export async function preloadedStateForManualTesting() {
   const { dateProvider, blocklistRepository, blockSessionRepository } =
     dependencies
-  const blocklists = await blocklistRepository.findAll()
+  const blocklists = await blocklistRepository.findAll('manual-testing-user')
 
   const preloadedState: StateBuilderProvider = stateBuilderProvider()
   const preloadedBlockSessions = [

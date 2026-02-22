@@ -5,6 +5,7 @@ import { AppStore } from '../../_redux_/createStore'
 import { createTestStore } from '../../_tests_/createTestStore'
 import { Fixture } from '../../_tests_/fixture.type'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
+import { AuthProvider } from '../../auth/auth-user'
 import { InstalledApp } from '../../installed-app/installed-app'
 import { selectAvailableSirens } from '../selectors/selectAvailableSirens'
 import { Sirens } from '../sirens'
@@ -17,6 +18,15 @@ export function sirensFixture(
   let store: AppStore
   const installedAppRepository = new FakeDataInstalledAppsRepository()
   const sirensRepository = new FakeDataSirensRepository()
+
+  testStateBuilderProvider.setState((builder) =>
+    builder.withAuthUser({
+      id: 'test-user-id',
+      email: 'test@test.com',
+      isEmailVerified: true,
+      authProvider: AuthProvider.Email,
+    }),
+  )
 
   return {
     given: {
@@ -70,20 +80,25 @@ export function sirensFixture(
         await store.dispatch(addKeywordToSirens(keyword))
       },
       fetchingAvailableSirens: async () => {
-        store = createTestStore({
-          installedAppRepository,
-          sirensRepository,
-        })
+        store = createTestStore(
+          {
+            installedAppRepository,
+            sirensRepository,
+          },
+          testStateBuilderProvider.getState(),
+        )
         await store.dispatch(fetchAvailableSirens())
       },
     },
     then: {
       keywordShouldBeSaved: async (expectedKeyword: string) => {
-        const retrievedKeywords = await sirensRepository.getSelectableSirens()
+        const retrievedKeywords =
+          await sirensRepository.getSelectableSirens('test-user-id')
         expect(retrievedKeywords.keywords).toContain(expectedKeyword)
       },
       websiteShouldBeSaved: async (expectedWebsite: string) => {
-        const retrievedKeywords = await sirensRepository.getSelectableSirens()
+        const retrievedKeywords =
+          await sirensRepository.getSelectableSirens('test-user-id')
         expect(retrievedKeywords.websites).toContain(expectedWebsite)
       },
       availableSirensShouldBeStoredAs: (expectedSirens: Sirens) => {

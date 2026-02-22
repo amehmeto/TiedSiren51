@@ -27,7 +27,10 @@ export class PrismaBlocklistRepository
     this.logger = logger
   }
 
-  async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
+  async create(
+    _userId: string,
+    blocklistPayload: CreatePayload<Blocklist>,
+  ): Promise<Blocklist> {
     try {
       const created = await this.baseClient.blocklist.create({
         data: {
@@ -45,7 +48,7 @@ export class PrismaBlocklistRepository
     }
   }
 
-  async findAll(): Promise<Blocklist[]> {
+  async findAll(_userId: string): Promise<Blocklist[]> {
     try {
       const blocklists = await this.baseClient.blocklist.findMany()
       return blocklists.map(this.mapToBlocklist)
@@ -104,7 +107,7 @@ export class PrismaBlocklistRepository
     }
   }
 
-  async deleteAll(): Promise<void> {
+  async deleteAll(_userId: string): Promise<void> {
     try {
       await this.baseClient.blocklist.deleteMany()
     } catch (error) {

@@ -6,6 +6,8 @@ import { BlockSession } from '@/core/block-session/block-session'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PrismaBlockSessionRepository } from './prisma.block-session.repository'
 
+const testUserId = 'test-user-id'
+
 describe('PrismaBlockSessionRepository', () => {
   let repository: PrismaBlockSessionRepository
   let prismaClient: PrismaClient
@@ -57,14 +59,14 @@ describe('PrismaBlockSessionRepository', () => {
       id: expect.any(String),
     }
 
-    const created = await repository.create(sessionPayload)
+    const created = await repository.create(testUserId, sessionPayload)
 
     expect(created).toStrictEqual(expectedBlockSession)
   })
 
   it('should find a block session by id', async () => {
     const sessionPayload = await prepareSessionPayload()
-    const created = await repository.create(sessionPayload)
+    const created = await repository.create(testUserId, sessionPayload)
 
     const found = await repository.findById(created.id)
     expect(found).toStrictEqual(created)
@@ -98,11 +100,11 @@ describe('PrismaBlockSessionRepository', () => {
         name,
       }
 
-      const created = await repository.create(sessionWithCustomName)
+      const created = await repository.create(testUserId, sessionWithCustomName)
       createdSessions.push(created)
     }
 
-    const foundSessions = await repository.findAll()
+    const foundSessions = await repository.findAll(testUserId)
 
     expect(foundSessions).toHaveLength(createdSessions.length)
 
@@ -120,7 +122,7 @@ describe('PrismaBlockSessionRepository', () => {
 
   it('should update a block session', async () => {
     const sessionPayload = await prepareSessionPayload()
-    const created = await repository.create(sessionPayload)
+    const created = await repository.create(testUserId, sessionPayload)
 
     const updateSessionPayload: UpdatePayload<BlockSession> = {
       id: created.id,
@@ -140,7 +142,7 @@ describe('PrismaBlockSessionRepository', () => {
 
   it('should delete a block session', async () => {
     const sessionPayload = await prepareSessionPayload()
-    const created = await repository.create(sessionPayload)
+    const created = await repository.create(testUserId, sessionPayload)
     await repository.delete(created.id)
 
     const promise = repository.findById(created.id)

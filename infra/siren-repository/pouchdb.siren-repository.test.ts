@@ -3,6 +3,8 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PouchdbSirensRepository } from './pouchdb.sirens-repository'
 
+const testUserId = 'test-user-id'
+
 describe('PouchDBSirenRepository', () => {
   let sirenRepository: PouchdbSirensRepository
 
@@ -25,7 +27,7 @@ describe('PouchDBSirenRepository', () => {
       keywords: [],
     }
 
-    const sirens = await sirenRepository.getSelectableSirens()
+    const sirens = await sirenRepository.getSelectableSirens(testUserId)
 
     expect(sirens).toStrictEqual(expectedSirens)
   })
@@ -33,9 +35,9 @@ describe('PouchDBSirenRepository', () => {
   it('should add keywords to sirens', async () => {
     const expectedKeywords = ['keyword', 'justin bieber']
 
-    await sirenRepository.addKeywordToSirens('keyword')
-    await sirenRepository.addKeywordToSirens('justin bieber')
-    const sirens = await sirenRepository.getSelectableSirens()
+    await sirenRepository.addKeywordToSirens(testUserId, 'keyword')
+    await sirenRepository.addKeywordToSirens(testUserId, 'justin bieber')
+    const sirens = await sirenRepository.getSelectableSirens(testUserId)
 
     expect(sirens.keywords).toStrictEqual(expectedKeywords)
   })
@@ -43,9 +45,9 @@ describe('PouchDBSirenRepository', () => {
   it('should add websites to sirens', async () => {
     const expectedWebsites = ['www.google.com', 'www.facebook.com']
 
-    await sirenRepository.addWebsiteToSirens('www.google.com')
-    await sirenRepository.addWebsiteToSirens('www.facebook.com')
-    const sirens = await sirenRepository.getSelectableSirens()
+    await sirenRepository.addWebsiteToSirens(testUserId, 'www.google.com')
+    await sirenRepository.addWebsiteToSirens(testUserId, 'www.facebook.com')
+    const sirens = await sirenRepository.getSelectableSirens(testUserId)
 
     expect(sirens.websites).toStrictEqual(expectedWebsites)
   })
@@ -63,9 +65,9 @@ describe('PouchDBSirenRepository', () => {
     }
     const expectedAndroidSirens = [youtubeSiren, facebookSiren]
 
-    await sirenRepository.addAndroidSirenToSirens(youtubeSiren)
-    await sirenRepository.addAndroidSirenToSirens(facebookSiren)
-    const sirens = await sirenRepository.getSelectableSirens()
+    await sirenRepository.addAndroidSirenToSirens(testUserId, youtubeSiren)
+    await sirenRepository.addAndroidSirenToSirens(testUserId, facebookSiren)
+    const sirens = await sirenRepository.getSelectableSirens(testUserId)
 
     expect(sirens.android).toStrictEqual(expectedAndroidSirens)
   })

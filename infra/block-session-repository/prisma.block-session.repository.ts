@@ -48,6 +48,7 @@ export class PrismaBlockSessionRepository
   }
 
   async create(
+    _userId: string,
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
     try {
@@ -108,7 +109,7 @@ export class PrismaBlockSessionRepository
     }
   }
 
-  async findAll(): Promise<BlockSession[]> {
+  async findAll(_userId: string): Promise<BlockSession[]> {
     try {
       const sessions = await this.baseClient.blockSession.findMany({
         include: {
@@ -204,7 +205,7 @@ export class PrismaBlockSessionRepository
     }
   }
 
-  async deleteAll(): Promise<void> {
+  async deleteAll(_userId: string): Promise<void> {
     try {
       const sessions = await this.baseClient.blockSession.findMany({
         select: { id: true },

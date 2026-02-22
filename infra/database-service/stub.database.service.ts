@@ -12,4 +12,8 @@ export class StubDatabaseService implements DatabaseService {
   initialize(): Promise<void> {
     return Promise.resolve(undefined)
   }
+
+  claimOrphanedRows(_userId: string): Promise<void> {
+    return Promise.resolve()
+  }
 }

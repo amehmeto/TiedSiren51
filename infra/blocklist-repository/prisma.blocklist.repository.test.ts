@@ -9,6 +9,8 @@ class TestPrismaBlocklistRepository extends PrismaBlocklistRepository {
   }
 }
 
+const testUserId = 'test-user-id'
+
 describe('PrismaBlocklistRepository', () => {
   let repository: TestPrismaBlocklistRepository
 
@@ -28,7 +30,7 @@ describe('PrismaBlocklistRepository', () => {
       id: expect.any(String),
     }
 
-    const created = await repository.create(blocklistPayload)
+    const created = await repository.create(testUserId, blocklistPayload)
 
     expect(created).toStrictEqual(expectedBlocklist)
   })
@@ -38,7 +40,7 @@ describe('PrismaBlocklistRepository', () => {
     // @ts-expect-error - removing id for creation
     delete blocklistPayload.id
 
-    const created = await repository.create(blocklistPayload)
+    const created = await repository.create(testUserId, blocklistPayload)
     const found = await repository.findById(created.id)
     expect(found).toStrictEqual(created)
   })
@@ -52,11 +54,11 @@ describe('PrismaBlocklistRepository', () => {
 
     const createdBlocklists = []
     for (const blocklist of testBlocklists) {
-      const created = await repository.create(blocklist)
+      const created = await repository.create(testUserId, blocklist)
       createdBlocklists.push(created)
     }
 
-    const foundBlocklists = await repository.findAll()
+    const foundBlocklists = await repository.findAll(testUserId)
 
     expect(foundBlocklists).toHaveLength(createdBlocklists.length)
 
@@ -75,7 +77,7 @@ describe('PrismaBlocklistRepository', () => {
     // @ts-expect-error - removing id for creation
     delete blocklistPayload.id
 
-    const created = await repository.create(blocklistPayload)
+    const created = await repository.create(testUserId, blocklistPayload)
     const updatePayload = {
       ...created,
       name: 'updated name',
@@ -91,7 +93,7 @@ describe('PrismaBlocklistRepository', () => {
     // @ts-expect-error - removing id for creation
     delete blocklistPayload.id
 
-    const created = await repository.create(blocklistPayload)
+    const created = await repository.create(testUserId, blocklistPayload)
     await repository.delete(created.id)
 
     const promise = repository.findById(created.id)

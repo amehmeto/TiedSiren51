@@ -14,9 +14,12 @@ export class PowersyncRemoteDeviceRepository implements RemoteDeviceRepository {
     this.logger = logger
   }
 
-  async findAll(): Promise<Device[]> {
+  async findAll(userId: string): Promise<Device[]> {
     try {
-      const devices = await this.db.getAll<DeviceRecord>('SELECT * FROM device')
+      const devices = await this.db.getAll<DeviceRecord>(
+        'SELECT * FROM device WHERE user_id = ?',
+        [userId],
+      )
 
       return devices.map((d) => {
         const { id, name, type } = d

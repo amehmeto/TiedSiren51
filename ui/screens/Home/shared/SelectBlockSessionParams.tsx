@@ -1,10 +1,8 @@
 import { FormikProps } from 'formik'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
 import { useSelector } from 'react-redux'
-import { Device } from '@/core/device/device'
 import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
-import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
@@ -13,8 +11,9 @@ import { FieldErrors } from '@/ui/screens/Home/shared/FieldErrors'
 import { FormError } from '@/ui/screens/Home/shared/FormError'
 import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlockingCondition'
 import { SelectBlocklistsField } from '@/ui/screens/Home/shared/SelectBlocklistsField'
-import { SelectDevicesField } from '@/ui/screens/Home/shared/SelectDevicesField'
+import { SelectDevicesSection } from '@/ui/screens/Home/shared/SelectDevicesSection'
 import { SelectTime, TimeField } from '@/ui/screens/Home/shared/SelectTime'
+import { useDevices } from '@/ui/screens/Home/shared/useDevices'
 
 type SelectBlockSessionParamsProps = {
   form: FormikProps<BlockSessionFormValues>
@@ -24,27 +23,38 @@ export function SelectBlockSessionParams({
   form,
 }: SelectBlockSessionParamsProps) {
   const {
+    values,
+    errors,
+    touched,
+    setFieldValue,
+    handleChange,
+    handleBlur,
+    initialValues,
+  } = form
+
+  const {
+    name: nameError,
+    startedAt: startedAtError,
+    endedAt: endedAtError,
+  } = errors
+
+  const {
     MULTI_DEVICE: isMultiDevice,
     BLOCKING_CONDITIONS: isBlockingConditions,
   } = useSelector(selectFeatureFlags)
-  const [devices, setDevices] = useState<Device[]>([])
+
+  const devices = useDevices(isMultiDevice)
+
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
   const [isEndTimePickerVisible, setIsEndTimePickerVisible] =
     useState<boolean>(false)
 
-  useEffect(() => {
-    if (!isMultiDevice) return
-    dependencies.deviceRepository.findAll().then((foundDevices) => {
-      setDevices(foundDevices)
-    })
-  }, [isMultiDevice])
-
   function hasFieldError(field: keyof BlockSessionFormValues): boolean {
-    return !!form.touched[field] && !!form.errors[field]
+    return !!touched[field] && !!errors[field]
   }
 
-  const handleNameChange = form.handleChange('name')
+  const handleNameChange = handleChange('name')
 
   return (
     <ScrollView
@@ -54,55 +64,50 @@ export function SelectBlockSessionParams({
     >
       <TiedSCard style={styles.blockSession}>
         <ChooseName
-          values={form.values}
+          values={values}
           onChange={handleNameChange}
-          onBlur={() => form.handleBlur('name')}
+          onBlur={() => handleBlur('name')}
         />
-        {hasFieldError('name') && <FormError error={form.errors.name} />}
+        {hasFieldError('name') && <FormError error={nameError} />}
         <SelectBlocklistsField
-          blocklistIds={form.values.blocklistIds}
-          setFieldValue={form.setFieldValue}
+          blocklistIds={values.blocklistIds}
+          setFieldValue={setFieldValue}
         />
         {hasFieldError('blocklistIds') && (
-          <FieldErrors errors={form.errors} fieldName={'blocklistIds'} />
+          <FieldErrors errors={errors} fieldName={'blocklistIds'} />
         )}
         {isMultiDevice && (
-          <SelectDevicesField
-            selectedDevices={form.values.devices}
-            setFieldValue={form.setFieldValue}
-            availableDevices={devices}
+          <SelectDevicesSection
+            form={form}
+            devices={devices}
+            hasFieldError={hasFieldError}
           />
-        )}
-        {isMultiDevice && hasFieldError('devices') && (
-          <FieldErrors errors={form.errors} fieldName={'devices'} />
         )}
         <SelectTime
           timeField={TimeField.StartedAt}
           setIsTimePickerVisible={setIsStartTimePickerVisible}
-          values={form.values}
+          values={values}
           isTimePickerVisible={isStartTimePickerVisible}
-          setFieldValue={form.setFieldValue}
-          handleChange={form.handleChange}
-          initialTime={form.initialValues.startedAt}
-          initialOtherTime={form.initialValues.endedAt}
+          setFieldValue={setFieldValue}
+          handleChange={handleChange}
+          initialTime={initialValues.startedAt}
+          initialOtherTime={initialValues.endedAt}
         />
-        {hasFieldError('startedAt') && (
-          <FormError error={form.errors.startedAt} />
-        )}
+        {hasFieldError('startedAt') && <FormError error={startedAtError} />}
         <SelectTime
           timeField={TimeField.EndedAt}
           setIsTimePickerVisible={setIsEndTimePickerVisible}
-          values={form.values}
+          values={values}
           isTimePickerVisible={isEndTimePickerVisible}
-          setFieldValue={form.setFieldValue}
-          handleChange={form.handleChange}
-          initialTime={form.initialValues.endedAt}
-          initialOtherTime={form.initialValues.startedAt}
+          setFieldValue={setFieldValue}
+          handleChange={handleChange}
+          initialTime={initialValues.endedAt}
+          initialOtherTime={initialValues.startedAt}
         />
-        {hasFieldError('endedAt') && <FormError error={form.errors.endedAt} />}
+        {hasFieldError('endedAt') && <FormError error={endedAtError} />}
         {isBlockingConditions && <SelectBlockingCondition form={form} />}
         {isBlockingConditions && hasFieldError('blockingConditions') && (
-          <FieldErrors errors={form.errors} fieldName={'blockingConditions'} />
+          <FieldErrors errors={errors} fieldName={'blockingConditions'} />
         )}
       </TiedSCard>
 

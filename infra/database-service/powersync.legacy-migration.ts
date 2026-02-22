@@ -103,10 +103,10 @@ export class PowersyncLegacyMigration {
     )
 
     for (const row of rows) {
-      const { id, type, value, name, icon } = row
+      const { id, type, value, name, icon, userId } = row
       await tx.execute(
-        'INSERT OR IGNORE INTO siren (id, type, value, name, icon) VALUES (?, ?, ?, ?, ?)',
-        [id, type, value, name ?? '', icon ?? ''],
+        'INSERT OR IGNORE INTO siren (id, type, value, name, icon, user_id) VALUES (?, ?, ?, ?, ?, ?)',
+        [id, type, value, name ?? '', icon ?? '', userId ?? null],
       )
     }
   }
@@ -121,10 +121,10 @@ export class PowersyncLegacyMigration {
     )
 
     for (const row of rows) {
-      const { id, name, sirens } = row
+      const { id, name, sirens, userId } = row
       await tx.execute(
-        'INSERT OR IGNORE INTO blocklist (id, name, sirens) VALUES (?, ?, ?)',
-        [id, name, sirens],
+        'INSERT OR IGNORE INTO blocklist (id, name, sirens, user_id) VALUES (?, ?, ?, ?)',
+        [id, name, sirens, userId ?? null],
       )
     }
   }
@@ -139,10 +139,10 @@ export class PowersyncLegacyMigration {
     )
 
     for (const row of rows) {
-      const { id, type, name } = row
+      const { id, type, name, userId } = row
       await tx.execute(
-        'INSERT OR IGNORE INTO device (id, type, name) VALUES (?, ?, ?)',
-        [id, type, name],
+        'INSERT OR IGNORE INTO device (id, type, name, user_id) VALUES (?, ?, ?, ?)',
+        [id, type, name, userId ?? null],
       )
     }
   }
@@ -168,11 +168,12 @@ export class PowersyncLegacyMigration {
         startNotificationId,
         endNotificationId,
         blockingConditions,
+        userId,
       } = row
       await tx.execute(
         `INSERT OR IGNORE INTO block_session
-          (id, name, started_at, ended_at, start_notification_id, end_notification_id, blocking_conditions)
-          VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          (id, name, started_at, ended_at, start_notification_id, end_notification_id, blocking_conditions, user_id)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?)`,
         [
           id,
           name,
@@ -181,6 +182,7 @@ export class PowersyncLegacyMigration {
           startNotificationId,
           endNotificationId,
           blockingConditions,
+          userId ?? null,
         ],
       )
     }

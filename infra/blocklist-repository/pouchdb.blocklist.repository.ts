@@ -13,7 +13,10 @@ export class PouchdbBlocklistRepository implements BlocklistRepository {
     this.db = new PouchDB('pdb-blocklists')
   }
 
-  async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
+  async create(
+    _userId: string,
+    blocklistPayload: CreatePayload<Blocklist>,
+  ): Promise<Blocklist> {
     try {
       const createdId = uuid.v4().toString()
       const createdBlocklist = {
@@ -34,7 +37,7 @@ export class PouchdbBlocklistRepository implements BlocklistRepository {
     }
   }
 
-  findAll(): Promise<Blocklist[]> {
+  findAll(_userId: string): Promise<Blocklist[]> {
     return Promise.resolve([])
   }
 
@@ -82,7 +85,7 @@ export class PouchdbBlocklistRepository implements BlocklistRepository {
     }
   }
 
-  async deleteAll(): Promise<void> {
+  async deleteAll(_userId: string): Promise<void> {
     try {
       const allDocsResponse = await this.db.allDocs()
       for (const row of allDocsResponse.rows) {
