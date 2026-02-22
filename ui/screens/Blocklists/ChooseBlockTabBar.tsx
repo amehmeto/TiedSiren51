@@ -1,18 +1,28 @@
 import * as React from 'react'
+import { useMemo } from 'react'
 import { Pressable, StyleSheet, Text } from 'react-native'
 import { Route, TabBar, TabBarProps } from 'react-native-tab-view'
-import { FeatureFlags } from '@/feature-flags'
+import { useSelector } from 'react-redux'
+import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
 import { T } from '@/ui/design-system/theme'
-
-const featureFlagByRouteKey: Record<string, boolean> = {
-  websites: FeatureFlags.WEBSITE_BLOCKING,
-  keywords: FeatureFlags.KEYWORD_BLOCKING,
-}
 
 export function ChooseBlockTabBar({
   navigationState: _navigationState,
   ...rest
 }: TabBarProps<Route>) {
+  const {
+    WEBSITE_BLOCKING: isWebsiteBlocking,
+    KEYWORD_BLOCKING: isKeywordBlocking,
+  } = useSelector(selectFeatureFlags)
+
+  const featureFlagByRouteKey: Record<string, boolean> = useMemo(
+    () => ({
+      websites: isWebsiteBlocking,
+      keywords: isKeywordBlocking,
+    }),
+    [isWebsiteBlocking, isKeywordBlocking],
+  )
+
   const filteredRoutes = _navigationState.routes.filter(
     (route) => featureFlagByRouteKey[route.key] === true,
   )

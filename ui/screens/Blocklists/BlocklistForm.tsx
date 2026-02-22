@@ -14,13 +14,13 @@ import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
 import { updateBlocklist } from '@/core/blocklist/usecases/update-blocklist.usecase'
+import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
 import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
 import { showToast } from '@/core/toast/toast.slice'
-import { FeatureFlags } from '@/feature-flags'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -58,6 +58,11 @@ export function BlocklistForm({
 }: Readonly<BlocklistScreenProps>) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const featureFlags = useSelector(selectFeatureFlags)
+  const {
+    WEBSITE_BLOCKING: isWebsiteBlocking,
+    KEYWORD_BLOCKING: isKeywordBlocking,
+  } = featureFlags
 
   const viewModel = useSelector((state: RootState) =>
     selectBlocklistFormViewModel(
@@ -97,10 +102,10 @@ export function BlocklistForm({
 
   const routes: BlocklistTabRoute[] = [
     { key: BlocklistTabKey.Apps, title: 'Apps' },
-    ...(FeatureFlags.WEBSITE_BLOCKING
+    ...(isWebsiteBlocking
       ? [{ key: BlocklistTabKey.Websites, title: 'Websites' }]
       : []),
-    ...(FeatureFlags.KEYWORD_BLOCKING
+    ...(isKeywordBlocking
       ? [{ key: BlocklistTabKey.Keywords, title: 'Keywords' }]
       : []),
   ]
@@ -229,7 +234,7 @@ export function BlocklistForm({
   const validateForm = useCallback(
     (submittedBlocklistForm: typeof blocklist) => {
       try {
-        blocklistFormSchema.parse(submittedBlocklistForm)
+        blocklistFormSchema(featureFlags).parse(submittedBlocklistForm)
         setErrors({})
         return true
       } catch (e) {
@@ -244,7 +249,7 @@ export function BlocklistForm({
         return false
       }
     },
-    [setErrors],
+    [setErrors, featureFlags],
   )
 
   const saveBlocklist = useCallback(async () => {

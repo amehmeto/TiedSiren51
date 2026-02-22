@@ -5,6 +5,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, AppStore } from '@/core/_redux_/createStore'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { loadUser } from '@/core/auth/usecases/load-user.usecase'
+import { loadFeatureFlags } from '@/core/feature-flag/usecases/load-feature-flags.usecase'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { handleUIError } from '@/ui/utils/handleUIError'
@@ -23,6 +24,7 @@ export function useAppInitialization(store: AppStore) {
       await dependencies.backgroundTaskService.initialize(store)
       await sirenTier.initializeNativeBlocking()
 
+      await dispatch(loadFeatureFlags())
       await dispatch(loadUser())
 
       if (Platform.OS === 'android') {

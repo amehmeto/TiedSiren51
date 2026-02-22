@@ -1,11 +1,12 @@
 import { z } from 'zod'
+import { FeatureFlagValues } from '@/feature-flags'
 import { ErrorMessages } from '@/ui/error-messages.type'
 import { blockSessionSchema } from '@/ui/screens/Home/schemas/block-session.schema'
 
-export function validateBlockSessionForm() {
+export function validateBlockSessionForm(flags: FeatureFlagValues) {
   return (values: unknown) => {
     try {
-      blockSessionSchema.parse(values)
+      blockSessionSchema(flags).parse(values)
       return {}
     } catch (e) {
       if (!(e instanceof z.ZodError)) return {}
