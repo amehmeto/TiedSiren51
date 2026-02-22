@@ -8,6 +8,7 @@ import { T } from '@/ui/design-system/theme'
 
 type SettingsAppWarningModalProps = {
   readonly isVisible: boolean
+  readonly strictModeTimeLeft?: string
   readonly onRequestClose: () => void
   readonly onCancel: () => void
   readonly onConfirm: () => void
@@ -15,6 +16,7 @@ type SettingsAppWarningModalProps = {
 
 export function SettingsAppWarningModal({
   isVisible,
+  strictModeTimeLeft,
   onRequestClose,
   onCancel,
   onConfirm,
@@ -27,11 +29,16 @@ export function SettingsAppWarningModal({
     >
       <Text style={styles.title}>Block Settings?</Text>
       <Text style={styles.warningText}>
-        Blocking the Settings app will prevent you from accessing device
-        settings (Wi-Fi, Bluetooth, permissions, etc.) during active block
-        sessions. Make sure you have configured everything you need before
-        starting a session.
+        During active sessions, blocking Settings will prevent access to Wi-Fi,
+        Bluetooth, permissions, and app uninstallation — including TiedSiren
+        itself.
       </Text>
+      {strictModeTimeLeft && (
+        <Text style={styles.strictModeText}>
+          Strict mode is on ({strictModeTimeLeft} left). You will not be able to
+          remove Settings from this blocklist until it expires.
+        </Text>
+      )}
       <View style={styles.buttonContainer}>
         <TiedSButton
           style={styles.cancelButton}
@@ -65,6 +72,13 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontSize: T.font.size.base,
     fontFamily: T.font.family.primary,
+    marginBottom: T.spacing.small,
+    lineHeight: T.font.size.base * T.font.lineHeight.relaxed,
+  },
+  strictModeText: {
+    color: T.color.red,
+    fontSize: T.font.size.base,
+    fontFamily: T.font.family.semibold,
     marginBottom: T.spacing.small,
     lineHeight: T.font.size.base * T.font.lineHeight.relaxed,
   },

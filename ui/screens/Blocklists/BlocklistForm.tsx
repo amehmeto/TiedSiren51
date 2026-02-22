@@ -20,7 +20,10 @@ import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
 import { fetchAvailableSirens } from '@/core/siren/usecases/fetch-available-sirens.usecase'
+import { formatDuration } from '@/core/strict-mode/format-duration'
 import { isSirenLocked } from '@/core/strict-mode/is-siren-locked'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
 import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
@@ -74,6 +77,18 @@ export function BlocklistForm({
       blocklistId,
     ),
   )
+
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
+
+  const strictModeTimeLeft = useSelector((state: RootState) =>
+    selectStrictModeTimeLeft(state, dependencies.dateProvider),
+  )
+
+  const strictModeTimeLeftFormatted = isStrictModeActive
+    ? formatDuration(strictModeTimeLeft)
+    : undefined
 
   const {
     existingBlocklist,
@@ -340,6 +355,7 @@ export function BlocklistForm({
 
       <SettingsAppWarningModal
         isVisible={isSettingsWarningVisible}
+        strictModeTimeLeft={strictModeTimeLeftFormatted}
         onRequestClose={dismissSettingsWarning}
         onCancel={dismissSettingsWarning}
         onConfirm={confirmSettingsApp}
