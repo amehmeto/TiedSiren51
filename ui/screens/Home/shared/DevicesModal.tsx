@@ -1,4 +1,3 @@
-import * as ExpoDevice from 'expo-device'
 import { useState } from 'react'
 import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
@@ -10,21 +9,7 @@ import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
-
-const currentDevice: Device = {
-  id: ExpoDevice.modelId ?? 'unknown-current',
-  type: ExpoDevice.deviceType?.toString() ?? 'unknown',
-  name: generateDeviceName(),
-}
-
-function generateDeviceName() {
-  return (
-    (ExpoDevice.manufacturer ?? 'Unknown Manufacturer') +
-    ' ' +
-    (ExpoDevice.modelName ?? 'Unknown Device') +
-    ' (this device)'
-  )
-}
+import { currentDevice } from '@/ui/screens/Home/shared/current-device'
 
 type DevicesModalFields = {
   isVisible: boolean

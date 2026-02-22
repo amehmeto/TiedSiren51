@@ -2,23 +2,22 @@ import { describe, expect, it } from 'vitest'
 import { isSettingsApp } from './is-settings-app'
 
 describe('isSettingsApp', () => {
-  it('returns true for com.android.settings', () => {
-    const isSettings = isSettingsApp('com.android.settings')
-    expect(isSettings).toBe(true)
+  it.each<[string]>([
+    ['com.android.settings'],
+    ['com.samsung.android.settings'],
+    ['com.coloros.settings'],
+    ['com.oplus.settings'],
+    ['com.xiaomi.misettings'],
+  ])('returns true for settings package "%s"', (packageName) => {
+    expect(isSettingsApp(packageName)).toBe(true)
   })
 
-  it('returns true for com.samsung.android.settings', () => {
-    const isSettings = isSettingsApp('com.samsung.android.settings')
-    expect(isSettings).toBe(true)
-  })
-
-  it('returns false for other packages', () => {
-    const isSettings = isSettingsApp('com.example.app')
-    expect(isSettings).toBe(false)
-  })
-
-  it('returns false for partial matches', () => {
-    const isSettings = isSettingsApp('com.android.settings.backup')
-    expect(isSettings).toBe(false)
+  it.each<[string]>([
+    ['com.android.chrome'],
+    ['com.whatsapp'],
+    ['com.android.settings.backup'],
+    ['com.settings'],
+  ])('returns false for non-settings package "%s"', (packageName) => {
+    expect(isSettingsApp(packageName)).toBe(false)
   })
 })

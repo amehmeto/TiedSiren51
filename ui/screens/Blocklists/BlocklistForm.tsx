@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
 import * as React from 'react'
-import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useCallback, useEffect, useMemo, useState } from 'react'
 import { Dimensions, StyleSheet, Text } from 'react-native'
 import {
   Route,
@@ -35,7 +35,7 @@ import {
 } from '@/ui/screens/Blocklists/blocklist-form.view-model'
 import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/ChooseBlockTabBar'
 import { blocklistFormSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
-import { SettingsWarningModal } from '@/ui/screens/Blocklists/SettingsWarningModal'
+import { SettingsAppWarningModal } from '@/ui/screens/Blocklists/SettingsAppWarningModal'
 import { TextInputSelectionScene } from '@/ui/screens/Blocklists/TextInputSelectionScene'
 
 export type BlocklistScreenProps = {
@@ -103,7 +103,8 @@ export function BlocklistForm({
   const [index, setIndex] = useState(0)
   const [isSettingsWarningVisible, setIsSettingsWarningVisible] =
     useState(false)
-  const pendingSettingsApp = useRef<AndroidSiren | null>(null)
+  const [pendingSettingsApp, setPendingSettingsApp] =
+    useState<AndroidSiren | null>(null)
 
   const routes: BlocklistTabRoute[] = [
     { key: BlocklistTabKey.Apps, title: 'Apps' },
@@ -161,16 +162,15 @@ export function BlocklistForm({
     [guardLockedSiren, setBlocklist],
   )
 
-  const addAppToBlocklist = useCallback(
+  const addAppSiren = useCallback(
     (app: AndroidSiren) => {
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
 
-        updatedSirens.android = updatedSirens.android.includes(app)
-          ? updatedSirens.android.filter(
-              (selectedSiren) => selectedSiren.packageName !== app.packageName,
-            )
-          : [...updatedSirens.android, app]
+        updatedSirens[SirenType.ANDROID] = [
+          ...updatedSirens[SirenType.ANDROID],
+          app,
+        ]
 
         return { ...prevBlocklist, sirens: updatedSirens }
       })
@@ -184,29 +184,37 @@ export function BlocklistForm({
 
       const isAlreadySelected = isSirenSelected(sirenType, app.packageName)
 
-      if (isSettingsApp(app.packageName) && !isAlreadySelected) {
-        pendingSettingsApp.current = app
+      if (!isAlreadySelected && isSettingsApp(app.packageName)) {
+        setPendingSettingsApp(app)
         setIsSettingsWarningVisible(true)
         return
       }
 
-      addAppToBlocklist(app)
+      setBlocklist((prevBlocklist) => {
+        const updatedSirens = { ...prevBlocklist.sirens }
+
+        updatedSirens.android = updatedSirens.android.includes(app)
+          ? updatedSirens.android.filter(
+              (selectedSiren) => selectedSiren.packageName !== app.packageName,
+            )
+          : [...updatedSirens.android, app]
+
+        return { ...prevBlocklist, sirens: updatedSirens }
+      })
     },
-    [guardLockedSiren, isSirenSelected, addAppToBlocklist],
+    [guardLockedSiren, isSirenSelected, setBlocklist],
   )
 
-  const confirmSettingsApp = useCallback(() => {
-    if (pendingSettingsApp.current) {
-      addAppToBlocklist(pendingSettingsApp.current)
-      pendingSettingsApp.current = null
-    }
-    setIsSettingsWarningVisible(false)
-  }, [addAppToBlocklist])
-
-  const cancelSettingsWarning = useCallback(() => {
-    pendingSettingsApp.current = null
+  const dismissSettingsWarning = useCallback(() => {
+    setPendingSettingsApp(null)
     setIsSettingsWarningVisible(false)
   }, [])
+
+  const confirmSettingsApp = useCallback(() => {
+    if (pendingSettingsApp) addAppSiren(pendingSettingsApp)
+    setPendingSettingsApp(null)
+    setIsSettingsWarningVisible(false)
+  }, [addAppSiren, pendingSettingsApp])
 
   const renderScene = useCallback(
     ({
@@ -330,10 +338,10 @@ export function BlocklistForm({
 
       <TiedSButton text={'Save Blocklist'} onPress={saveBlocklist} />
 
-      <SettingsWarningModal
+      <SettingsAppWarningModal
         isVisible={isSettingsWarningVisible}
-        onRequestClose={cancelSettingsWarning}
-        onCancel={cancelSettingsWarning}
+        onRequestClose={dismissSettingsWarning}
+        onCancel={dismissSettingsWarning}
         onConfirm={confirmSettingsApp}
       />
     </>

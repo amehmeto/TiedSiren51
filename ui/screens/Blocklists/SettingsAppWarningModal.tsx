@@ -1,4 +1,10 @@
 import { StyleSheet, Text, View } from 'react-native'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/core/_redux_/createStore'
+import { formatDuration } from '@/core/strict-mode/format-duration'
+import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
+import { selectStrictModeTimeLeft } from '@/core/strict-mode/selectors/selectStrictModeTimeLeft'
+import { dependencies } from '@/ui/dependencies'
 import {
   TiedSButton,
   TiedSButtonVariant,
@@ -6,19 +12,29 @@ import {
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
 
-type SettingsWarningModalProps = {
+type SettingsAppWarningModalProps = {
   readonly isVisible: boolean
   readonly onRequestClose: () => void
   readonly onCancel: () => void
   readonly onConfirm: () => void
 }
 
-export function SettingsWarningModal({
+export function SettingsAppWarningModal({
   isVisible,
   onRequestClose,
   onCancel,
   onConfirm,
-}: SettingsWarningModalProps) {
+}: SettingsAppWarningModalProps) {
+  const isStrictModeActive = useSelector((state: RootState) =>
+    selectIsStrictModeActive(state, dependencies.dateProvider),
+  )
+
+  const strictModeTimeLeft = useSelector((state: RootState) =>
+    selectStrictModeTimeLeft(state, dependencies.dateProvider),
+  )
+
+  const formattedTimeLeft = formatDuration(strictModeTimeLeft)
+
   return (
     <TiedSModal
       style={styles.modal}
@@ -27,11 +43,16 @@ export function SettingsWarningModal({
     >
       <Text style={styles.title}>Block Settings?</Text>
       <Text style={styles.warningText}>
-        Blocking the Settings app will prevent you from accessing device
-        settings (Wi-Fi, Bluetooth, permissions, etc.) during active block
-        sessions. Make sure you have configured everything you need before
-        starting a session.
+        During active sessions, blocking Settings will prevent access to Wi-Fi,
+        Bluetooth, permissions, and app uninstallation — including TiedSiren
+        itself.
       </Text>
+      {isStrictModeActive && (
+        <Text style={styles.strictModeText}>
+          Strict mode is on ({formattedTimeLeft} left). You will not be able to
+          remove Settings from this blocklist until it expires.
+        </Text>
+      )}
       <View style={styles.buttonContainer}>
         <TiedSButton
           style={styles.cancelButton}
@@ -42,7 +63,7 @@ export function SettingsWarningModal({
         <TiedSButton
           onPress={onConfirm}
           text={'I understand, add it'}
-          variant={TiedSButtonVariant.Danger}
+          variant={TiedSButtonVariant.Primary}
         />
       </View>
     </TiedSModal>
@@ -65,6 +86,13 @@ const styles = StyleSheet.create({
     color: T.color.text,
     fontSize: T.font.size.base,
     fontFamily: T.font.family.primary,
+    marginBottom: T.spacing.small,
+    lineHeight: T.font.size.base * T.font.lineHeight.relaxed,
+  },
+  strictModeText: {
+    color: T.color.red,
+    fontSize: T.font.size.base,
+    fontFamily: T.font.family.semibold,
     marginBottom: T.spacing.small,
     lineHeight: T.font.size.base * T.font.lineHeight.relaxed,
   },

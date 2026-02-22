@@ -5,6 +5,10 @@ export class StubDatabaseService implements DatabaseService {
     return ''
   }
 
+  getDatabase(): unknown {
+    return null
+  }
+
   initialize(): Promise<void> {
     return Promise.resolve(undefined)
   }

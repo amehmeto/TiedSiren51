@@ -1,3 +1,8 @@
+/**
+ * @deprecated OBSOLETE — Superseded by PowersyncTimerRepository.
+ * Kept for rollback safety. Removal tracked in a follow-up issue.
+ * See docs/adr/infrastructure/powersync-op-sqlite.md
+ */
 import { ISODateString } from '@/core/_ports_/date-provider'
 import { Logger } from '@/core/_ports_/logger'
 import { TimerRepository } from '@/core/_ports_/timer.repository'

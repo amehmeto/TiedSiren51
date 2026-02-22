@@ -1,3 +1,8 @@
+/**
+ * @deprecated OBSOLETE — Superseded by PowerSync + OP-SQLite.
+ * Kept for rollback safety. Removal tracked in a follow-up issue.
+ * See docs/adr/infrastructure/powersync-op-sqlite.md
+ */
 import { PrismaClient } from '@prisma/client/react-native'
 import * as FileSystem from 'expo-file-system'
 import { Platform } from 'react-native'
