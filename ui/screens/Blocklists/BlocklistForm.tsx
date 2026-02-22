@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
 import * as React from 'react'
-import { useCallback, useEffect, useMemo, useState } from 'react'
+import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
 import { Dimensions, StyleSheet, Text } from 'react-native'
 import {
   Route,
@@ -15,6 +15,7 @@ import { Blocklist } from '@/core/blocklist/blocklist'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
 import { updateBlocklist } from '@/core/blocklist/usecases/update-blocklist.usecase'
 import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
+import { isSettingsApp } from '@/core/siren/is-settings-app'
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
@@ -34,6 +35,7 @@ import {
 } from '@/ui/screens/Blocklists/blocklist-form.view-model'
 import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/ChooseBlockTabBar'
 import { blocklistFormSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
+import { SettingsWarningModal } from '@/ui/screens/Blocklists/SettingsWarningModal'
 import { TextInputSelectionScene } from '@/ui/screens/Blocklists/TextInputSelectionScene'
 
 export type BlocklistScreenProps = {
@@ -99,6 +101,9 @@ export function BlocklistForm({
 
   const [errors, setErrors] = useState<ErrorMessages>({})
   const [index, setIndex] = useState(0)
+  const [isSettingsWarningVisible, setIsSettingsWarningVisible] =
+    useState(false)
+  const pendingSettingsApp = useRef<AndroidSiren | null>(null)
 
   const routes: BlocklistTabRoute[] = [
     { key: BlocklistTabKey.Apps, title: 'Apps' },
@@ -156,23 +161,52 @@ export function BlocklistForm({
     [guardLockedSiren, setBlocklist],
   )
 
-  const toggleAppSiren = useCallback(
-    (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
-      if (guardLockedSiren(sirenType, app.packageName)) return
+  const addAppToBlocklist = useCallback(
+    (app: AndroidSiren) => {
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
 
-        updatedSirens[sirenType] = updatedSirens[sirenType].includes(app)
-          ? updatedSirens[sirenType].filter(
+        updatedSirens.android = updatedSirens.android.includes(app)
+          ? updatedSirens.android.filter(
               (selectedSiren) => selectedSiren.packageName !== app.packageName,
             )
-          : [...updatedSirens[sirenType], app]
+          : [...updatedSirens.android, app]
 
         return { ...prevBlocklist, sirens: updatedSirens }
       })
     },
-    [guardLockedSiren, setBlocklist],
+    [setBlocklist],
   )
+
+  const toggleAppSiren = useCallback(
+    (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
+      if (guardLockedSiren(sirenType, app.packageName)) return
+
+      const isAlreadySelected = isSirenSelected(sirenType, app.packageName)
+
+      if (isSettingsApp(app.packageName) && !isAlreadySelected) {
+        pendingSettingsApp.current = app
+        setIsSettingsWarningVisible(true)
+        return
+      }
+
+      addAppToBlocklist(app)
+    },
+    [guardLockedSiren, isSirenSelected, addAppToBlocklist],
+  )
+
+  const confirmSettingsApp = useCallback(() => {
+    if (pendingSettingsApp.current) {
+      addAppToBlocklist(pendingSettingsApp.current)
+      pendingSettingsApp.current = null
+    }
+    setIsSettingsWarningVisible(false)
+  }, [addAppToBlocklist])
+
+  const cancelSettingsWarning = useCallback(() => {
+    pendingSettingsApp.current = null
+    setIsSettingsWarningVisible(false)
+  }, [])
 
   const renderScene = useCallback(
     ({
@@ -295,6 +329,13 @@ export function BlocklistForm({
       )}
 
       <TiedSButton text={'Save Blocklist'} onPress={saveBlocklist} />
+
+      <SettingsWarningModal
+        isVisible={isSettingsWarningVisible}
+        onRequestClose={cancelSettingsWarning}
+        onCancel={cancelSettingsWarning}
+        onConfirm={confirmSettingsApp}
+      />
     </>
   )
 }
