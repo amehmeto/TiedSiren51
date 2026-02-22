@@ -29,6 +29,10 @@ export default function HomeStackLayout() {
         options={{ ...subScreenOptions, title: 'New Session' }}
       />
       <Stack.Screen
+        name="accessibility-disclosure"
+        options={{ ...subScreenOptions, title: 'App Blocking Disclosure' }}
+      />
+      <Stack.Screen
         name="edit-block-session/[sessionId]"
         options={{ ...subScreenOptions, title: 'Edit Session' }}
       />

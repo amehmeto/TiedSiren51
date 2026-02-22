@@ -2,6 +2,7 @@ import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
+import { InMemoryConsentStorage } from '@/infra/consent-storage/in-memory.consent.storage'
 import { StubDatabaseService } from '@/infra/database-service/stub.database.service'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataDeviceRepository } from '@/infra/device-repository/fake-data.device.repository'
@@ -25,6 +26,7 @@ export const createTestStore = (
     authGateway = new FakeAuthGateway(),
     blockSessionRepository = new FakeDataBlockSessionRepository(),
     blocklistRepository = new FakeDataBlocklistRepository(),
+    consentStorage = new InMemoryConsentStorage(),
     databaseService = new StubDatabaseService(),
     dateProvider = new StubDateProvider(),
     deviceRepository = new FakeDataDeviceRepository(),
@@ -47,6 +49,7 @@ export const createTestStore = (
       backgroundTaskService,
       blockSessionRepository,
       blocklistRepository,
+      consentStorage,
       databaseService,
       dateProvider,
       deviceRepository,
