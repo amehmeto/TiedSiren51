@@ -18,6 +18,9 @@ export const accessibilityConsentSlice = createSlice({
     builder.addCase(loadAccessibilityConsent.fulfilled, (state, action) => {
       state.hasConsented = action.payload
     })
+    builder.addCase(loadAccessibilityConsent.rejected, (state) => {
+      state.hasConsented = false
+    })
     builder.addCase(giveAccessibilityConsent.fulfilled, (state) => {
       state.hasConsented = true
     })

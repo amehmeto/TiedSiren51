@@ -28,4 +28,14 @@ describe('loadAccessibilityConsent usecase', () => {
     const hasConsented = store.getState().accessibilityConsent.hasConsented
     expect(hasConsented).toBe(true)
   })
+
+  test('should fallback to false when storage fails', async () => {
+    consentStorage.simulateError()
+    const store = createTestStore({ consentStorage })
+
+    await store.dispatch(loadAccessibilityConsent())
+
+    const hasConsented = store.getState().accessibilityConsent.hasConsented
+    expect(hasConsented).toBe(false)
+  })
 })

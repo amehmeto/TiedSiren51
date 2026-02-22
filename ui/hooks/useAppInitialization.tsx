@@ -25,8 +25,10 @@ export function useAppInitialization(store: AppStore) {
       await dependencies.backgroundTaskService.initialize(store)
       await sirenTier.initializeNativeBlocking()
 
-      await dispatch(loadFeatureFlags())
-      await dispatch(loadAccessibilityConsent())
+      await Promise.all([
+        dispatch(loadFeatureFlags()),
+        dispatch(loadAccessibilityConsent()),
+      ])
       await dispatch(loadUser())
 
       if (Platform.OS === 'android') {
