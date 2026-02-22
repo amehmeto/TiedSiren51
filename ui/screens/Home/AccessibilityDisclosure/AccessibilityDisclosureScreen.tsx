@@ -1,11 +1,15 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { useDispatch } from 'react-redux'
 import { AndroidSirenLookout } from '@/core/_ports_/siren.lookout'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
-import { TiedSButtonVariant } from '@/ui/design-system/components/shared/TiedSButton'
+import { AppDispatch } from '@/core/_redux_/createStore'
+import { giveAccessibilityConsent } from '@/core/accessibility-consent/usecases/give-accessibility-consent.usecase'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
-import { useAccessibilityDisclosureConsent } from '@/ui/hooks/useAccessibilityDisclosureConsent'
 
 interface AccessibilityDisclosureScreenProps {
   sirenLookout: AndroidSirenLookout
@@ -15,10 +19,10 @@ export function AccessibilityDisclosureScreen({
   sirenLookout,
 }: AccessibilityDisclosureScreenProps) {
   const router = useRouter()
-  const { giveConsent } = useAccessibilityDisclosureConsent()
+  const dispatch = useDispatch<AppDispatch>()
 
   const handleAgree = async () => {
-    await giveConsent()
+    await dispatch(giveAccessibilityConsent())
     await sirenLookout.askPermission()
     router.back()
   }

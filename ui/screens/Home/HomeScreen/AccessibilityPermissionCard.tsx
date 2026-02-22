@@ -1,11 +1,12 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { Platform, StyleSheet, Text, View } from 'react-native'
+import { useSelector } from 'react-redux'
 import { AndroidSirenLookout } from '@/core/_ports_/siren.lookout'
+import { selectHasAccessibilityConsent } from '@/core/accessibility-consent/selectors/selectHasAccessibilityConsent'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
-import { useAccessibilityDisclosureConsent } from '@/ui/hooks/useAccessibilityDisclosureConsent'
 
 interface AccessibilityPermissionCardProps {
   sirenLookout: AndroidSirenLookout
@@ -15,7 +16,7 @@ export const AccessibilityPermissionCard = ({
   sirenLookout,
 }: AccessibilityPermissionCardProps) => {
   const router = useRouter()
-  const { hasConsented } = useAccessibilityDisclosureConsent()
+  const hasConsented = useSelector(selectHasAccessibilityConsent)
 
   if (Platform.OS !== 'android') return null
 
