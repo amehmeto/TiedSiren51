@@ -12,6 +12,7 @@ import { Device } from '@/core/device/device'
 import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
 import { assertBlockSessionFormComplete } from '@/ui/screens/Home/schemas/assert-block-session-form-complete'
 import { validateBlockSessionForm } from '@/ui/screens/Home/schemas/validate-block-session-form'
+import { currentDevice } from '@/ui/screens/Home/shared/current-device'
 import { SelectBlockSessionParams } from '@/ui/screens/Home/shared/SelectBlockSessionParams'
 
 export type BlockSessionFormValues = {
@@ -28,10 +29,10 @@ const defaultFormValues: BlockSessionFormValues = {
   id: uuid.v4().toString(),
   name: null,
   blocklistIds: [],
-  devices: [],
+  devices: [currentDevice],
   startedAt: null,
   endedAt: null,
-  blockingConditions: [],
+  blockingConditions: [BlockingConditions.TIME],
 }
 
 type BlockSessionFormCreateMode = { mode: 'create' }
