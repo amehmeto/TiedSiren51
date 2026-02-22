@@ -3,6 +3,8 @@ import { Platform } from 'react-native'
 import DateTimePickerModal from 'react-native-modal-datetime-picker'
 import { HHmmString } from '@/core/_ports_/date-provider'
 import { T } from '@/ui/design-system/theme'
+import { IOSCancelButton } from '@/ui/screens/Home/shared/IOSCancelButton'
+import { IOSConfirmButton } from '@/ui/screens/Home/shared/IOSConfirmButton'
 import { WebTimePicker } from '@/ui/screens/Home/shared/WebTimePicker'
 
 type TimePickerFields = {
@@ -52,6 +54,9 @@ export function TimePicker({
       accentColor={T.color.lightBlue}
       buttonTextColorIOS={T.color.lightBlue}
       textColor={T.color.text}
+      pickerContainerStyleIOS={{ backgroundColor: T.color.darkBlueGray }}
+      customConfirmButtonIOS={IOSConfirmButton}
+      customCancelButtonIOS={IOSCancelButton}
       onConfirm={onConfirm}
       onCancel={onCancel}
       onHide={onHide}
