@@ -193,11 +193,11 @@ export function BlocklistForm({
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
 
-        updatedSirens[sirenType] = updatedSirens[sirenType].includes(app)
-          ? updatedSirens[sirenType].filter(
+        updatedSirens.android = updatedSirens.android.includes(app)
+          ? updatedSirens.android.filter(
               (selectedSiren) => selectedSiren.packageName !== app.packageName,
             )
-          : [...updatedSirens[sirenType], app]
+          : [...updatedSirens.android, app]
 
         return { ...prevBlocklist, sirens: updatedSirens }
       })
