@@ -18,14 +18,16 @@ export class PowersyncBlocklistRepository implements BlocklistRepository {
 
   async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
     try {
-      const { insertId } = await this.db.execute(
-        'INSERT INTO blocklist (id, name, sirens) VALUES (uuid(), ?, ?)',
-        [blocklistPayload.name, JSON.stringify(blocklistPayload.sirens)],
+      const { id } = await this.db.get<{ id: string }>('SELECT uuid() as id')
+
+      await this.db.execute(
+        'INSERT INTO blocklist (id, name, sirens) VALUES (?, ?, ?)',
+        [id, blocklistPayload.name, JSON.stringify(blocklistPayload.sirens)],
       )
 
       const created = await this.db.get<BlocklistRecord>(
-        'SELECT * FROM blocklist WHERE rowid = ?',
-        [insertId],
+        'SELECT * FROM blocklist WHERE id = ?',
+        [id],
       )
 
       return this.mapToBlocklist(created)

@@ -41,11 +41,16 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
         devices,
       } = sessionPayload
 
-      const { insertId } = await this.db.execute(
+      const { id: sessionId } = await this.db.get<{ id: string }>(
+        'SELECT uuid() as id',
+      )
+
+      await this.db.execute(
         `INSERT INTO block_session
           (id, name, started_at, ended_at, start_notification_id, end_notification_id, blocking_conditions)
-          VALUES (uuid(), ?, ?, ?, ?, ?, ?)`,
+          VALUES (?, ?, ?, ?, ?, ?, ?)`,
         [
+          sessionId,
           name,
           startedAt,
           endedAt,
@@ -56,8 +61,8 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
       )
 
       const created = await this.db.get<BlockSessionRecord>(
-        'SELECT * FROM block_session WHERE rowid = ?',
-        [insertId],
+        'SELECT * FROM block_session WHERE id = ?',
+        [sessionId],
       )
 
       for (const blocklistId of blocklistIds) {
