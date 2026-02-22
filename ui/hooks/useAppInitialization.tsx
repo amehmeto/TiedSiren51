@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react'
 import { Platform } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, AppStore } from '@/core/_redux_/createStore'
+import { loadAccessibilityConsent } from '@/core/accessibility-consent/usecases/load-accessibility-consent.usecase'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { loadUser } from '@/core/auth/usecases/load-user.usecase'
 import { loadFeatureFlags } from '@/core/feature-flag/usecases/load-feature-flags.usecase'
@@ -24,7 +25,10 @@ export function useAppInitialization(store: AppStore) {
       await dependencies.backgroundTaskService.initialize(store)
       await sirenTier.initializeNativeBlocking()
 
-      await dispatch(loadFeatureFlags())
+      await Promise.all([
+        dispatch(loadFeatureFlags()),
+        dispatch(loadAccessibilityConsent()),
+      ])
       await dispatch(loadUser())
 
       if (Platform.OS === 'android') {
