@@ -89,6 +89,10 @@ export class PowersyncBlocklistRepository implements BlocklistRepository {
 
   async delete(id: string): Promise<void> {
     try {
+      await this.db.execute(
+        'DELETE FROM block_session_blocklist WHERE blocklist_id = ?',
+        [id],
+      )
       await this.db.execute('DELETE FROM blocklist WHERE id = ?', [id])
     } catch (error) {
       this.logger.error(
@@ -100,6 +104,7 @@ export class PowersyncBlocklistRepository implements BlocklistRepository {
 
   async deleteAll(): Promise<void> {
     try {
+      await this.db.execute('DELETE FROM block_session_blocklist')
       await this.db.execute('DELETE FROM blocklist')
     } catch (error) {
       this.logger.error(

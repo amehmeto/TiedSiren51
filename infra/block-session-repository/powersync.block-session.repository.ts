@@ -1,4 +1,4 @@
-import { AbstractPowerSyncDatabase } from '@powersync/common'
+import { AbstractPowerSyncDatabase, Transaction } from '@powersync/common'
 import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
 import { CreatePayload } from '@/core/_ports_/create.payload'
 import { assertHHmmString } from '@/core/_ports_/date-provider'
@@ -45,42 +45,39 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
         'SELECT uuid() as id',
       )
 
-      await this.db.execute(
-        `INSERT INTO block_session
-          (id, name, started_at, ended_at, start_notification_id, end_notification_id, blocking_conditions)
-          VALUES (?, ?, ?, ?, ?, ?, ?)`,
-        [
-          sessionId,
-          name,
-          startedAt,
-          endedAt,
-          startNotificationId,
-          endNotificationId,
-          JSON.stringify(blockingConditions),
-        ],
-      )
-
-      const created = await this.db.get<BlockSessionRecord>(
-        'SELECT * FROM block_session WHERE id = ?',
-        [sessionId],
-      )
-
-      for (const blocklistId of blocklistIds) {
-        await this.db.execute(
-          'INSERT INTO block_session_blocklist (id, block_session_id, blocklist_id) VALUES (uuid(), ?, ?)',
-          [created.id, blocklistId],
+      await this.db.writeTransaction(async (tx) => {
+        await tx.execute(
+          `INSERT INTO block_session
+            (id, name, started_at, ended_at, start_notification_id, end_notification_id, blocking_conditions)
+            VALUES (?, ?, ?, ?, ?, ?, ?)`,
+          [
+            sessionId,
+            name,
+            startedAt,
+            endedAt,
+            startNotificationId,
+            endNotificationId,
+            JSON.stringify(blockingConditions),
+          ],
         )
-      }
 
-      for (const device of devices) {
-        await this.upsertDevice(device)
-        await this.db.execute(
-          'INSERT INTO block_session_device (id, block_session_id, device_id) VALUES (uuid(), ?, ?)',
-          [created.id, device.id],
-        )
-      }
+        for (const blocklistId of blocklistIds) {
+          await tx.execute(
+            'INSERT INTO block_session_blocklist (id, block_session_id, blocklist_id) VALUES (uuid(), ?, ?)',
+            [sessionId, blocklistId],
+          )
+        }
 
-      return this.loadBlockSession(created.id)
+        for (const device of devices) {
+          await this.upsertDeviceInTx(tx, device)
+          await tx.execute(
+            'INSERT INTO block_session_device (id, block_session_id, device_id) VALUES (uuid(), ?, ?)',
+            [sessionId, device.id],
+          )
+        }
+      })
+
+      return this.loadBlockSession(sessionId)
     } catch (error) {
       this.logger.error(
         `[PowersyncBlockSessionRepository] Failed to create block session: ${error}`,
@@ -132,15 +129,17 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
 
   async delete(id: string): Promise<void> {
     try {
-      await this.db.execute(
-        'DELETE FROM block_session_blocklist WHERE block_session_id = ?',
-        [id],
-      )
-      await this.db.execute(
-        'DELETE FROM block_session_device WHERE block_session_id = ?',
-        [id],
-      )
-      await this.db.execute('DELETE FROM block_session WHERE id = ?', [id])
+      await this.db.writeTransaction(async (tx) => {
+        await tx.execute(
+          'DELETE FROM block_session_blocklist WHERE block_session_id = ?',
+          [id],
+        )
+        await tx.execute(
+          'DELETE FROM block_session_device WHERE block_session_id = ?',
+          [id],
+        )
+        await tx.execute('DELETE FROM block_session WHERE id = ?', [id])
+      })
     } catch (error) {
       this.logger.error(
         `[PowersyncBlockSessionRepository] Failed to delete block session ${id}: ${error}`,
@@ -151,9 +150,11 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
 
   async deleteAll(): Promise<void> {
     try {
-      await this.db.execute('DELETE FROM block_session_blocklist')
-      await this.db.execute('DELETE FROM block_session_device')
-      await this.db.execute('DELETE FROM block_session')
+      await this.db.writeTransaction(async (tx) => {
+        await tx.execute('DELETE FROM block_session_blocklist')
+        await tx.execute('DELETE FROM block_session_device')
+        await tx.execute('DELETE FROM block_session')
+      })
     } catch (error) {
       this.logger.error(
         `[PowersyncBlockSessionRepository] Failed to delete all block sessions: ${error}`,
@@ -234,18 +235,22 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
     }
   }
 
-  private async upsertDevice(device: Device): Promise<void> {
+  private async upsertDeviceInTx(
+    tx: Transaction,
+    device: Device,
+  ): Promise<void> {
     const { id, type, name } = device
-    const existing = await this.db.getOptional<DeviceRecord>(
+    const existing = await tx.getOptional<DeviceRecord>(
       'SELECT * FROM device WHERE id = ?',
       [id],
     )
 
     if (!existing) {
-      await this.db.execute(
-        'INSERT INTO device (id, type, name) VALUES (?, ?, ?)',
-        [id, type, name],
-      )
+      await tx.execute('INSERT INTO device (id, type, name) VALUES (?, ?, ?)', [
+        id,
+        type,
+        name,
+      ])
     }
   }
 

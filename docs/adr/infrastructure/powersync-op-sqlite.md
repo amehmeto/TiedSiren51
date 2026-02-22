@@ -36,6 +36,8 @@ Replace **Prisma ORM** with **PowerSync + OP-SQLite** in **local-only mode** (no
 
 6. **Prisma files kept**: Following the [PouchDB precedent](abandon-pouchdb.md), obsolete Prisma files are kept for easy rollback. Cleanup tracked in a separate follow-up issue.
 
+7. **UUID pre-generation for INSERTs**: PowerSync tables use `id TEXT` primary keys. SQLite's `last_insert_rowid()` is unreliable for text UUID primary keys, so repositories generate the UUID before INSERT via `SELECT uuid() as id`, then use it in both the INSERT and subsequent SELECT to return the created row.
+
 ### Implementation Details
 
 1. **Schema** (`/infra/database-service/powersync.schema.ts`)
