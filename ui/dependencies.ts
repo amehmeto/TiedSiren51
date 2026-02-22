@@ -4,6 +4,8 @@ import { FirebaseAuthGateway } from '@/infra/auth-gateway/firebase.auth.gateway'
 import { RealBackgroundTaskService } from '@/infra/background-task-service/real.background-task.service'
 import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/prisma.block-session.repository'
 import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.blocklist.repository'
+import { AsyncStorageConsentStorage } from '@/infra/consent-storage/async-storage.consent.storage'
+import { InMemoryConsentStorage } from '@/infra/consent-storage/in-memory.consent.storage'
 import { PrismaDatabaseService } from '@/infra/database-service/prisma.database.service'
 import { RealDateProvider } from '@/infra/date-provider/real.date-provider'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
@@ -29,6 +31,7 @@ const androidDependencies: Dependencies = {
   backgroundTaskService: new RealBackgroundTaskService(logger),
   blockSessionRepository: new PrismaBlockSessionRepository(logger),
   blocklistRepository: new PrismaBlocklistRepository(logger),
+  consentStorage: new AsyncStorageConsentStorage(logger),
   databaseService: new PrismaDatabaseService(logger),
   dateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),
@@ -57,6 +60,7 @@ const e2eTestsDependencies: Dependencies = {
   backgroundTaskService: new RealBackgroundTaskService(logger),
   blockSessionRepository: new PrismaBlockSessionRepository(logger),
   blocklistRepository: new PrismaBlocklistRepository(logger),
+  consentStorage: new InMemoryConsentStorage(),
   databaseService: new PrismaDatabaseService(logger),
   dateProvider: e2eDateProvider,
   deviceRepository: new PrismaRemoteDeviceRepository(logger),

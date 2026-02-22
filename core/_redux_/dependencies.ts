@@ -2,6 +2,7 @@ import { AuthGateway } from '@/core/_ports_/auth.gateway'
 import { BackgroundTaskService } from '@/core/_ports_/background-task.service'
 import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
 import { BlocklistRepository } from '@/core/_ports_/blocklist.repository'
+import { ConsentStorage } from '@/core/_ports_/consent.storage'
 import { DatabaseService } from '@/core/_ports_/database.service'
 import { DateProvider } from '@/core/_ports_/date-provider'
 import { FeatureFlagProvider } from '@/core/_ports_/feature-flag.provider'
@@ -20,6 +21,7 @@ export type Dependencies = {
   backgroundTaskService: BackgroundTaskService
   blockSessionRepository: BlockSessionRepository
   blocklistRepository: BlocklistRepository
+  consentStorage: ConsentStorage
   databaseService: DatabaseService
   dateProvider: DateProvider
   deviceRepository: RemoteDeviceRepository
