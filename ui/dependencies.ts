@@ -2,14 +2,14 @@ import { Dependencies } from '@/core/_redux_/dependencies'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { FirebaseAuthGateway } from '@/infra/auth-gateway/firebase.auth.gateway'
 import { RealBackgroundTaskService } from '@/infra/background-task-service/real.background-task.service'
-import { PrismaBlockSessionRepository } from '@/infra/block-session-repository/prisma.block-session.repository'
-import { PrismaBlocklistRepository } from '@/infra/blocklist-repository/prisma.blocklist.repository'
+import { PowersyncBlockSessionRepository } from '@/infra/block-session-repository/powersync.block-session.repository'
+import { PowersyncBlocklistRepository } from '@/infra/blocklist-repository/powersync.blocklist.repository'
 import { AsyncStorageConsentStorage } from '@/infra/consent-storage/async-storage.consent.storage'
 import { InMemoryConsentStorage } from '@/infra/consent-storage/in-memory.consent.storage'
-import { PrismaDatabaseService } from '@/infra/database-service/prisma.database.service'
+import { PowerSyncDatabaseService } from '@/infra/database-service/powersync.database.service'
 import { RealDateProvider } from '@/infra/date-provider/real.date-provider'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
-import { PrismaRemoteDeviceRepository } from '@/infra/device-repository/prisma.remote-device.repository'
+import { PowersyncRemoteDeviceRepository } from '@/infra/device-repository/powersync.remote-device.repository'
 import { FirebaseFeatureFlagProvider } from '@/infra/feature-flag-provider/firebase.feature-flag.provider'
 import { InMemoryFeatureFlagProvider } from '@/infra/feature-flag-provider/in-memory.feature-flag.provider'
 import { AndroidForegroundService } from '@/infra/foreground-service/android.foreground.service'
@@ -17,24 +17,27 @@ import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-reposito
 import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
 import { SentryLogger } from '@/infra/logger/sentry.logger'
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
-import { PrismaSirensRepository } from '@/infra/siren-repository/prisma.sirens-repository'
+import { PowersyncSirensRepository } from '@/infra/siren-repository/powersync.sirens-repository'
 import { RealAndroidSirenLookout } from '@/infra/siren-tier/android.siren-lookout'
 import { AndroidSirenTier } from '@/infra/siren-tier/android.siren-tier'
-import { PrismaTimerRepository } from '@/infra/timer-repository/prisma.timer.repository'
+import { PowersyncTimerRepository } from '@/infra/timer-repository/powersync.timer.repository'
 
 const logger = new SentryLogger()
 
 const dateProvider = new RealDateProvider()
 
+const databaseService = new PowerSyncDatabaseService(logger)
+const db = databaseService.getDatabase()
+
 const androidDependencies: Dependencies = {
   authGateway: new FirebaseAuthGateway(logger),
   backgroundTaskService: new RealBackgroundTaskService(logger),
-  blockSessionRepository: new PrismaBlockSessionRepository(logger),
-  blocklistRepository: new PrismaBlocklistRepository(logger),
+  blockSessionRepository: new PowersyncBlockSessionRepository(db, logger),
+  blocklistRepository: new PowersyncBlocklistRepository(db, logger),
   consentStorage: new AsyncStorageConsentStorage(logger),
-  databaseService: new PrismaDatabaseService(logger),
+  databaseService,
   dateProvider,
-  deviceRepository: new PrismaRemoteDeviceRepository(logger),
+  deviceRepository: new PowersyncRemoteDeviceRepository(db, logger),
   featureFlagProvider: new FirebaseFeatureFlagProvider(logger),
   foregroundService: new AndroidForegroundService(logger),
   installedAppRepository: new ExpoListInstalledAppsRepository(logger),
@@ -42,8 +45,8 @@ const androidDependencies: Dependencies = {
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),
   sirenTier: new AndroidSirenTier(logger, dateProvider),
-  sirensRepository: new PrismaSirensRepository(logger),
-  timerRepository: new PrismaTimerRepository(logger),
+  sirensRepository: new PowersyncSirensRepository(db, logger),
+  timerRepository: new PowersyncTimerRepository(db, logger),
 }
 
 function createE2EDateProvider(): StubDateProvider {
@@ -58,12 +61,12 @@ const e2eDateProvider = createE2EDateProvider()
 const e2eTestsDependencies: Dependencies = {
   authGateway: new FakeAuthGateway(),
   backgroundTaskService: new RealBackgroundTaskService(logger),
-  blockSessionRepository: new PrismaBlockSessionRepository(logger),
-  blocklistRepository: new PrismaBlocklistRepository(logger),
+  blockSessionRepository: new PowersyncBlockSessionRepository(db, logger),
+  blocklistRepository: new PowersyncBlocklistRepository(db, logger),
   consentStorage: new InMemoryConsentStorage(),
-  databaseService: new PrismaDatabaseService(logger),
+  databaseService,
   dateProvider: e2eDateProvider,
-  deviceRepository: new PrismaRemoteDeviceRepository(logger),
+  deviceRepository: new PowersyncRemoteDeviceRepository(db, logger),
   featureFlagProvider: new InMemoryFeatureFlagProvider(),
   foregroundService: new AndroidForegroundService(logger),
   installedAppRepository: new FakeDataInstalledAppsRepository(),
@@ -71,8 +74,8 @@ const e2eTestsDependencies: Dependencies = {
   notificationService: new ExpoNotificationService(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),
   sirenTier: new AndroidSirenTier(logger, e2eDateProvider),
-  sirensRepository: new PrismaSirensRepository(logger),
-  timerRepository: new PrismaTimerRepository(logger),
+  sirensRepository: new PowersyncSirensRepository(db, logger),
+  timerRepository: new PowersyncTimerRepository(db, logger),
 }
 
 export const dependencies: Dependencies = process.env.EXPO_PUBLIC_E2E

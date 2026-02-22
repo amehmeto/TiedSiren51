@@ -1,3 +1,8 @@
+/**
+ * @deprecated OBSOLETE — Superseded by PowersyncBlocklistRepository.
+ * Kept for rollback safety. Removal tracked in a follow-up issue.
+ * See docs/adr/infrastructure/powersync-op-sqlite.md
+ */
 import { BlocklistRepository } from '@/core/_ports_/blocklist.repository'
 import { CreatePayload } from '@/core/_ports_/create.payload'
 import { Logger } from '@/core/_ports_/logger'
