@@ -18,6 +18,7 @@ export const T = {
     modalTitleColor: 'rgba(100, 116, 139, 1)',
     darkBlueGray: 'rgba(15, 23, 42, 1)',
     lightBlueOverlay: 'rgba(56, 189, 248, 0.08)',
+    whiteOverlay: 'rgba(255, 255, 255, 0.1)',
     surfaceElevated: 'rgba(22, 33, 62, 1)',
     borderSubtle: 'rgba(51, 65, 85, 0.4)',
     gradientMid: 'rgba(25, 32, 95, 1)',
@@ -175,6 +176,7 @@ export const T = {
   height: {
     settingsRow: 44,
     pickerItem: 48,
+    pickerButton: 57,
   },
   picker: {
     visibleItemCount: 5,
