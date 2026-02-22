@@ -15,6 +15,7 @@ import { Blocklist } from '@/core/blocklist/blocklist'
 import { createBlocklist } from '@/core/blocklist/usecases/create-blocklist.usecase'
 import { updateBlocklist } from '@/core/blocklist/usecases/update-blocklist.usecase'
 import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
+import { isSettingsApp } from '@/core/siren/is-settings-app'
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { addKeywordToSirens } from '@/core/siren/usecases/add-keyword-to-sirens.usecase'
 import { addWebsiteToSirens } from '@/core/siren/usecases/add-website-to-sirens.usecase'
@@ -34,6 +35,7 @@ import {
 } from '@/ui/screens/Blocklists/blocklist-form.view-model'
 import { ChooseBlockTabBar } from '@/ui/screens/Blocklists/ChooseBlockTabBar'
 import { blocklistFormSchema } from '@/ui/screens/Blocklists/schemas/blocklist-form.schema'
+import { SettingsAppWarningModal } from '@/ui/screens/Blocklists/SettingsAppWarningModal'
 import { TextInputSelectionScene } from '@/ui/screens/Blocklists/TextInputSelectionScene'
 
 export type BlocklistScreenProps = {
@@ -99,6 +101,10 @@ export function BlocklistForm({
 
   const [errors, setErrors] = useState<ErrorMessages>({})
   const [index, setIndex] = useState(0)
+  const [isSettingsWarningVisible, setIsSettingsWarningVisible] =
+    useState(false)
+  const [pendingSettingsApp, setPendingSettingsApp] =
+    useState<AndroidSiren | null>(null)
 
   const routes: BlocklistTabRoute[] = [
     { key: BlocklistTabKey.Apps, title: 'Apps' },
@@ -156,9 +162,34 @@ export function BlocklistForm({
     [guardLockedSiren, setBlocklist],
   )
 
+  const addAppSiren = useCallback(
+    (app: AndroidSiren) => {
+      setBlocklist((prevBlocklist) => {
+        const updatedSirens = { ...prevBlocklist.sirens }
+
+        updatedSirens[SirenType.ANDROID] = [
+          ...updatedSirens[SirenType.ANDROID],
+          app,
+        ]
+
+        return { ...prevBlocklist, sirens: updatedSirens }
+      })
+    },
+    [setBlocklist],
+  )
+
   const toggleAppSiren = useCallback(
     (sirenType: SirenType.ANDROID, app: AndroidSiren) => {
       if (guardLockedSiren(sirenType, app.packageName)) return
+
+      const isAlreadySelected = isSirenSelected(sirenType, app.packageName)
+
+      if (!isAlreadySelected && isSettingsApp(app.packageName)) {
+        setPendingSettingsApp(app)
+        setIsSettingsWarningVisible(true)
+        return
+      }
+
       setBlocklist((prevBlocklist) => {
         const updatedSirens = { ...prevBlocklist.sirens }
 
@@ -171,8 +202,19 @@ export function BlocklistForm({
         return { ...prevBlocklist, sirens: updatedSirens }
       })
     },
-    [guardLockedSiren, setBlocklist],
+    [guardLockedSiren, isSirenSelected, setBlocklist],
   )
+
+  const dismissSettingsWarning = useCallback(() => {
+    setPendingSettingsApp(null)
+    setIsSettingsWarningVisible(false)
+  }, [])
+
+  const confirmSettingsApp = useCallback(() => {
+    if (pendingSettingsApp) addAppSiren(pendingSettingsApp)
+    setPendingSettingsApp(null)
+    setIsSettingsWarningVisible(false)
+  }, [addAppSiren, pendingSettingsApp])
 
   const renderScene = useCallback(
     ({
@@ -295,6 +337,13 @@ export function BlocklistForm({
       )}
 
       <TiedSButton text={'Save Blocklist'} onPress={saveBlocklist} />
+
+      <SettingsAppWarningModal
+        isVisible={isSettingsWarningVisible}
+        onRequestClose={dismissSettingsWarning}
+        onCancel={dismissSettingsWarning}
+        onConfirm={confirmSettingsApp}
+      />
     </>
   )
 }
