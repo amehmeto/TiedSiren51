@@ -1,18 +1,18 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
-import { InMemoryConsentStorage } from '@/infra/consent-storage/in-memory.consent.storage'
+import { InMemoryConsentRepository } from '@/infra/consent-repository/in-memory.consent.repository'
 import { giveAccessibilityConsent } from './give-accessibility-consent.usecase'
 import { loadAccessibilityConsent } from './load-accessibility-consent.usecase'
 
 describe('giveAccessibilityConsent usecase', () => {
-  let consentStorage: InMemoryConsentStorage
+  let consentRepository: InMemoryConsentRepository
 
   beforeEach(() => {
-    consentStorage = new InMemoryConsentStorage()
+    consentRepository = new InMemoryConsentRepository()
   })
 
   test('should set consent state to true', async () => {
-    const store = createTestStore({ consentStorage })
+    const store = createTestStore({ consentRepository })
 
     await store.dispatch(giveAccessibilityConsent())
 
@@ -21,7 +21,7 @@ describe('giveAccessibilityConsent usecase', () => {
   })
 
   test('should persist consent (roundtrip with load)', async () => {
-    const store = createTestStore({ consentStorage })
+    const store = createTestStore({ consentRepository })
 
     await store.dispatch(giveAccessibilityConsent())
     await store.dispatch(loadAccessibilityConsent())
