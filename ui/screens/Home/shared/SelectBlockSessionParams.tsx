@@ -40,13 +40,12 @@ export function SelectBlockSessionParams({
     endedAt: endedAtError,
   } = errors
 
+  const dispatch = useDispatch<AppDispatch>()
+  const userId = useSelector(selectNullableAuthUserId)
   const {
     MULTI_DEVICE: isMultiDevice,
     BLOCKING_CONDITIONS: isBlockingConditions,
   } = useSelector(selectFeatureFlags)
-
-  const dispatch = useDispatch<AppDispatch>()
-  const userId = useSelector(selectNullableAuthUserId)
 
   useEffect(() => {
     if (!isMultiDevice || !userId) return
