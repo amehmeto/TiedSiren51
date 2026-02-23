@@ -23,8 +23,8 @@ export class PowersyncConsentMigration {
       if (isAlreadyMigrated) return
 
       await this.migrateConsentValue()
-      await this.markMigrationComplete()
       await this.cleanupLegacyKey()
+      await this.markMigrationComplete()
     } catch (error) {
       this.logger.error(
         `[PowersyncConsentMigration] Failed to migrate: ${error}`,

@@ -1,8 +1,8 @@
 import { AbstractPowerSyncDatabase } from '@powersync/common'
-import { ConsentStorage } from '@/core/_ports_/consent.storage'
+import { ConsentRepository } from '@/core/_ports_/consent.repository'
 import { Logger } from '@/core/_ports_/logger'
 
-export class PowersyncConsentStorage implements ConsentStorage {
+export class PowersyncConsentRepository implements ConsentRepository {
   private static readonly KV_KEY = 'accessibility_disclosure_consent'
 
   private readonly db: AbstractPowerSyncDatabase
@@ -18,12 +18,12 @@ export class PowersyncConsentStorage implements ConsentStorage {
     try {
       const consentRecord = await this.db.getOptional<{ value: string }>(
         'SELECT value FROM ps_kv WHERE key = ?',
-        [PowersyncConsentStorage.KV_KEY],
+        [PowersyncConsentRepository.KV_KEY],
       )
       return consentRecord?.value === 'true'
     } catch (error) {
       this.logger.error(
-        `[PowersyncConsentStorage] Failed to hasConsented: ${error}`,
+        `[PowersyncConsentRepository] Failed to hasConsented: ${error}`,
       )
       throw error
     }
@@ -33,11 +33,11 @@ export class PowersyncConsentStorage implements ConsentStorage {
     try {
       await this.db.execute(
         'INSERT OR REPLACE INTO ps_kv (key, value) VALUES (?, ?)',
-        [PowersyncConsentStorage.KV_KEY, 'true'],
+        [PowersyncConsentRepository.KV_KEY, 'true'],
       )
     } catch (error) {
       this.logger.error(
-        `[PowersyncConsentStorage] Failed to giveConsent: ${error}`,
+        `[PowersyncConsentRepository] Failed to giveConsent: ${error}`,
       )
       throw error
     }
