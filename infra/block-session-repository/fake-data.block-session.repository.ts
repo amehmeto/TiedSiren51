@@ -8,8 +8,12 @@ import {
   BlockingConditions,
   BlockSession,
 } from '@/core/block-session/block-session'
+import { InMemoryRepository } from '../__abstract__/in-memory.repository'
 
-export class FakeDataBlockSessionRepository implements BlockSessionRepository {
+export class FakeDataBlockSessionRepository
+  extends InMemoryRepository<BlockSession>
+  implements BlockSessionRepository
+{
   private static readonly startedAt: HHmmString = '10:48'
 
   private static readonly endedAt: HHmmString = '13:58'
@@ -92,11 +96,13 @@ export class FakeDataBlockSessionRepository implements BlockSessionRepository {
     FakeDataBlockSessionRepository.entries,
   )
 
+  // @ts-expect-error -- userId-scoped override for BlockSessionRepository
   delete(_userId: string, sessionId: string): Promise<void> {
     this.entities.delete(sessionId)
     return Promise.resolve()
   }
 
+  // @ts-expect-error -- userId-scoped override for BlockSessionRepository
   findById(_userId: string, sessionId: string): Promise<BlockSession> {
     const entity = this.entities.get(sessionId)
     if (!entity) {
@@ -107,6 +113,7 @@ export class FakeDataBlockSessionRepository implements BlockSessionRepository {
     return Promise.resolve(entity)
   }
 
+  // @ts-expect-error -- userId-scoped override for BlockSessionRepository
   update(_userId: string, session: UpdatePayload<BlockSession>): Promise<void> {
     const entity = this.entities.get(session.id)
     if (!entity)
@@ -115,10 +122,12 @@ export class FakeDataBlockSessionRepository implements BlockSessionRepository {
     return Promise.resolve()
   }
 
+  // @ts-expect-error -- userId-scoped override for BlockSessionRepository
   findAll(_userId: string): Promise<BlockSession[]> {
     return Promise.resolve(Array.from(this.entities.values()))
   }
 
+  // @ts-expect-error -- userId-scoped override for BlockSessionRepository
   async create(
     _userId: string,
     sessionPayload: Omit<BlockSession, 'id'>,
@@ -130,6 +139,7 @@ export class FakeDataBlockSessionRepository implements BlockSessionRepository {
     return entity
   }
 
+  // @ts-expect-error -- userId-scoped override for BlockSessionRepository
   deleteAll(_userId: string): Promise<void> {
     this.entities.clear()
     return Promise.resolve()

@@ -1,9 +1,9 @@
 export const T = {
   color: {
     transparent: 'transparent',
-    text: 'rgba(255, 255, 255, 1)',
+    text: 'rgba(248, 250, 252, 1)',
     textSecondary: 'rgba(30, 41, 59, 1)',
-    textMuted: 'rgba(203, 213, 225, 1)',
+    textMuted: 'rgba(148, 163, 184, 1)',
     darkBlue: 'rgba(8, 12, 50, 1)',
     midBlue: 'rgba(22, 33, 94, 1)',
     lightBlue: 'rgba(56, 189, 248, 1)',

@@ -16,35 +16,41 @@ export const updateBlockSession = createAppAsyncThunk(
     },
   ) => {
     const userId = selectAuthUserId(getState())
+    const {
+      id,
+      startedAt: payloadStartedAt,
+      endedAt: payloadEndedAt,
+      name,
+    } = payload
     const existingBlockSession = await blockSessionRepository.findById(
       userId,
-      payload.id,
+      id,
     )
     const now = dateProvider.getNow()
 
     let startedAt, endedAt, startNotificationId, endNotificationId
-    if (payload.startedAt) {
+    if (payloadStartedAt) {
       await notificationService.cancelScheduledNotifications(
         existingBlockSession.startNotificationId,
       )
-      startedAt = dateProvider.recoverDate(payload.startedAt)
+      startedAt = dateProvider.recoverDate(payloadStartedAt)
       startNotificationId = await notificationService.scheduleLocalNotification(
         'Tied Siren',
-        `Block session "${payload.name}" has started`,
+        `Block session "${name}" has started`,
         {
           seconds: differenceInSeconds(startedAt, now),
         },
       )
     }
 
-    if (payload.endedAt) {
+    if (payloadEndedAt) {
       await notificationService.cancelScheduledNotifications(
         existingBlockSession.endNotificationId,
       )
-      endedAt = dateProvider.recoverDate(payload.endedAt)
+      endedAt = dateProvider.recoverDate(payloadEndedAt)
       endNotificationId = await notificationService.scheduleLocalNotification(
         'Tied Siren',
-        `Block session "${payload.name}" has ended`,
+        `Block session "${name}" has ended`,
         {
           seconds: differenceInSeconds(endedAt, now),
         },

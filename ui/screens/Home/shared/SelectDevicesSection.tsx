@@ -2,28 +2,26 @@ import { FormikProps } from 'formik'
 import { BlockSessionFormValues } from '@/ui/screens/Home/shared/BlockSessionForm'
 import { FieldErrors } from '@/ui/screens/Home/shared/FieldErrors'
 import { SelectDevicesField } from '@/ui/screens/Home/shared/SelectDevicesField'
-import { useDevices } from '@/ui/screens/Home/shared/useDevices'
 
 type SelectDevicesSectionProps = {
   form: FormikProps<BlockSessionFormValues>
-  devices: ReturnType<typeof useDevices>
   hasFieldError: (field: keyof BlockSessionFormValues) => boolean
 }
 
 export function SelectDevicesSection({
   form,
-  devices,
   hasFieldError,
 }: SelectDevicesSectionProps) {
+  const { values, setFieldValue, errors } = form
+
   return (
     <>
       <SelectDevicesField
-        selectedDevices={form.values.devices}
-        setFieldValue={form.setFieldValue}
-        availableDevices={devices}
+        selectedDevices={values.devices}
+        setFieldValue={setFieldValue}
       />
       {hasFieldError('devices') && (
-        <FieldErrors errors={form.errors} fieldName={'devices'} />
+        <FieldErrors errors={errors} fieldName={'devices'} />
       )}
     </>
   )
