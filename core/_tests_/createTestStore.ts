@@ -1,5 +1,4 @@
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
-import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
 import { InMemoryConsentRepository } from '@/infra/consent-repository/in-memory.consent.repository'
@@ -38,7 +37,6 @@ export const createTestStore = (
     sirenLookout = new InMemorySirenLookout(),
     sirensRepository = new FakeDataSirensRepository(),
     timerRepository = new FakeDataTimerRepository(),
-    backgroundTaskService = new FakeBackgroundTaskService(logger),
     notificationService = new FakeNotificationService(logger),
     orphanClaimFlagStorage = new InMemoryOrphanClaimFlagStorage(),
     sirenTier = new InMemorySirenTier(logger),
@@ -48,7 +46,6 @@ export const createTestStore = (
   createStore(
     {
       authGateway,
-      backgroundTaskService,
       blockSessionRepository,
       blocklistRepository,
       consentRepository,

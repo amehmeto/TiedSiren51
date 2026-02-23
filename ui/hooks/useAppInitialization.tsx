@@ -22,7 +22,6 @@ export function useAppInitialization(store: AppStore) {
       logger.initialize()
       await dependencies.databaseService.initialize()
       await dependencies.notificationService.initialize()
-      await dependencies.backgroundTaskService.initialize(store)
       await sirenTier.initializeNativeBlocking()
 
       await Promise.all([

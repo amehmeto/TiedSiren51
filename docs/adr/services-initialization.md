@@ -12,7 +12,6 @@ The application requires several services to be initialized before it can functi
 - Logger (including error monitoring like Sentry)
 - Database (Prisma)
 - Notification service
-- Background task service
 - Initial data loading (sirens, user)
 
 These initializations must happen in a specific order and need to be orchestrated from a single location. The question is where this orchestration should happen.
@@ -37,9 +36,8 @@ const initializeServices = async (appStore: AppStore) => {
   logger.initialize()           // 1. Logger first (to capture errors)
   await databaseService.initialize()    // 2. Database
   await notificationService.initialize() // 3. Notifications
-  await backgroundTaskService.initialize(appStore) // 4. Background tasks
 
-  await appStore.dispatch(loadUser())     // 5. Load user state
+  await appStore.dispatch(loadUser())     // 4. Load user state
 }
 ```
 
