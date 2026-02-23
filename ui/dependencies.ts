@@ -4,8 +4,8 @@ import { FirebaseAuthGateway } from '@/infra/auth-gateway/firebase.auth.gateway'
 import { RealBackgroundTaskService } from '@/infra/background-task-service/real.background-task.service'
 import { PowersyncBlockSessionRepository } from '@/infra/block-session-repository/powersync.block-session.repository'
 import { PowersyncBlocklistRepository } from '@/infra/blocklist-repository/powersync.blocklist.repository'
-import { AsyncStorageConsentStorage } from '@/infra/consent-storage/async-storage.consent.storage'
 import { InMemoryConsentStorage } from '@/infra/consent-storage/in-memory.consent.storage'
+import { PowersyncConsentStorage } from '@/infra/consent-storage/powersync.consent.storage'
 import { PowerSyncDatabaseService } from '@/infra/database-service/powersync.database.service'
 import { RealDateProvider } from '@/infra/date-provider/real.date-provider'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
@@ -34,7 +34,7 @@ const androidDependencies: Dependencies = {
   backgroundTaskService: new RealBackgroundTaskService(logger),
   blockSessionRepository: new PowersyncBlockSessionRepository(db, logger),
   blocklistRepository: new PowersyncBlocklistRepository(db, logger),
-  consentStorage: new AsyncStorageConsentStorage(logger),
+  consentStorage: new PowersyncConsentStorage(db, logger),
   databaseService,
   dateProvider,
   deviceRepository: new PowersyncRemoteDeviceRepository(db, logger),

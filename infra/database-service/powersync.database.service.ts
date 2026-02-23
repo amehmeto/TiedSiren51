@@ -3,6 +3,7 @@ import { OPSqliteOpenFactory } from '@powersync/op-sqlite'
 import { PowerSyncDatabase } from '@powersync/react-native'
 import { DatabaseService } from '@/core/_ports_/database.service'
 import { Logger } from '@/core/_ports_/logger'
+import { PowersyncConsentMigration } from './powersync.consent-migration'
 import { PowersyncLegacyMigration } from './powersync.legacy-migration'
 import { powersyncSchema } from './powersync.schema'
 
@@ -32,8 +33,14 @@ export class PowerSyncDatabaseService implements DatabaseService {
 
   async initialize(): Promise<void> {
     try {
-      const migration = new PowersyncLegacyMigration(this.db, this.logger)
-      await migration.migrate()
+      const legacyMigration = new PowersyncLegacyMigration(this.db, this.logger)
+      await legacyMigration.migrate()
+
+      const consentMigration = new PowersyncConsentMigration(
+        this.db,
+        this.logger,
+      )
+      await consentMigration.migrate()
 
       this.logger.info(
         '[PowerSyncDatabaseService] Database initialized successfully',
