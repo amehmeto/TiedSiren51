@@ -15,79 +15,84 @@ export class FakeDataBlockSessionRepository implements BlockSessionRepository {
 
   private static readonly endedAt: HHmmString = '13:58'
 
-  private static readonly initialBlockSessions = [
-    buildBlockSession({
-      id: String(uuid.v4()),
-      name: 'Sleeping time',
-      blocklistIds: ['blocklist-id', 'blocklist-id-2'],
-      devices: [
-        {
-          id: 'device-id',
-          type: 'android',
-          name: 'Huawei P30',
-        },
-        {
-          id: 'device-id-2',
-          type: 'android',
-          name: 'Google Pixel 3a',
-        },
-      ],
-      startedAt: FakeDataBlockSessionRepository.startedAt,
-      endedAt: FakeDataBlockSessionRepository.endedAt,
-      startNotificationId: 'start-notification-id',
-      endNotificationId: 'end-notification-id',
-    }),
-    buildBlockSession({
-      id: String(uuid.v4()),
-      name: 'Playing time',
-      blocklistIds: ['blocklist-id', 'blocklist-id-2'],
-      devices: [
-        {
-          id: 'device-id',
-          type: 'android',
-          name: 'Huawei P30',
-        },
-        {
-          id: 'device-id-2',
-          type: 'android',
-          name: 'Google Pixel 3a',
-        },
-      ],
-      startedAt: FakeDataBlockSessionRepository.startedAt,
-      endedAt: FakeDataBlockSessionRepository.endedAt,
-      startNotificationId: 'start-notification-id',
-      endNotificationId: 'end-notification-id',
-      blockingConditions: [BlockingConditions.TIME],
-    }),
-    buildBlockSession({
-      id: String(uuid.v4()),
-      name: 'Sleeping time',
-      blocklistIds: ['blocklist-id', 'blocklist-id-2'],
-      devices: [
-        {
-          id: 'device-id',
-          type: 'android',
-          name: 'Huawei P30',
-        },
-        {
-          id: 'device-id-2',
-          type: 'android',
-          name: 'Google Pixel 3a',
-        },
-      ],
-      startedAt: FakeDataBlockSessionRepository.startedAt,
-      endedAt: FakeDataBlockSessionRepository.endedAt,
-      startNotificationId: 'start-notification-id',
-      endNotificationId: 'end-notification-id',
-      blockingConditions: [BlockingConditions.TIME],
-    }),
-  ]
+  private static readonly initialBlockSessions = (() => {
+    const { startedAt, endedAt } = FakeDataBlockSessionRepository
+    return [
+      buildBlockSession({
+        id: String(uuid.v4()),
+        name: 'Sleeping time',
+        blocklistIds: ['blocklist-id', 'blocklist-id-2'],
+        devices: [
+          {
+            id: 'device-id',
+            type: 'android',
+            name: 'Huawei P30',
+          },
+          {
+            id: 'device-id-2',
+            type: 'android',
+            name: 'Google Pixel 3a',
+          },
+        ],
+        startedAt,
+        endedAt,
+        startNotificationId: 'start-notification-id',
+        endNotificationId: 'end-notification-id',
+      }),
+      buildBlockSession({
+        id: String(uuid.v4()),
+        name: 'Playing time',
+        blocklistIds: ['blocklist-id', 'blocklist-id-2'],
+        devices: [
+          {
+            id: 'device-id',
+            type: 'android',
+            name: 'Huawei P30',
+          },
+          {
+            id: 'device-id-2',
+            type: 'android',
+            name: 'Google Pixel 3a',
+          },
+        ],
+        startedAt,
+        endedAt,
+        startNotificationId: 'start-notification-id',
+        endNotificationId: 'end-notification-id',
+        blockingConditions: [BlockingConditions.TIME],
+      }),
+      buildBlockSession({
+        id: String(uuid.v4()),
+        name: 'Sleeping time',
+        blocklistIds: ['blocklist-id', 'blocklist-id-2'],
+        devices: [
+          {
+            id: 'device-id',
+            type: 'android',
+            name: 'Huawei P30',
+          },
+          {
+            id: 'device-id-2',
+            type: 'android',
+            name: 'Google Pixel 3a',
+          },
+        ],
+        startedAt,
+        endedAt,
+        startNotificationId: 'start-notification-id',
+        endNotificationId: 'end-notification-id',
+        blockingConditions: [BlockingConditions.TIME],
+      }),
+    ]
+  })()
 
-  private static readonly entries: [string, BlockSession][] =
-    FakeDataBlockSessionRepository.initialBlockSessions.map((blockSession) => [
+  private static readonly entries: [string, BlockSession][] = (() => {
+    const { initialBlockSessions } = FakeDataBlockSessionRepository
+    return initialBlockSessions.map((blockSession) => [
       blockSession.id,
       blockSession,
     ])
+  })()
 
   private readonly store = new InMemoryRepository<BlockSession>()
 
@@ -100,8 +105,8 @@ export class FakeDataBlockSessionRepository implements BlockSessionRepository {
   }
 
   constructor() {
-    for (const [id, session] of FakeDataBlockSessionRepository.entries)
-      this.store.entities.set(id, session)
+    const { entries } = FakeDataBlockSessionRepository
+    for (const [id, session] of entries) this.store.entities.set(id, session)
   }
 
   findById(_userId: string, sessionId: string): Promise<BlockSession> {

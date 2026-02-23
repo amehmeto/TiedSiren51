@@ -25,7 +25,7 @@ export const AccessibilityPermissionCard = ({
       await sirenLookout.askPermission()
       return
     }
-    router.push('/(tabs)/home/accessibility-disclosure')
+    router.push('/home/accessibility-disclosure')
   }
 
   return (
