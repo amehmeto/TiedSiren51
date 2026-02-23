@@ -1,18 +1,11 @@
-import { AbstractPowerSyncDatabase } from '@powersync/common'
 import { ConsentRepository } from '@/core/_ports_/consent.repository'
-import { Logger } from '@/core/_ports_/logger'
+import { PowersyncRepository } from '@/infra/__abstract__/powersync.repository'
 
-export class PowersyncConsentRepository implements ConsentRepository {
+export class PowersyncConsentRepository
+  extends PowersyncRepository
+  implements ConsentRepository
+{
   private static readonly KV_KEY = 'accessibility_disclosure_consent'
-
-  private readonly db: AbstractPowerSyncDatabase
-
-  private readonly logger: Logger
-
-  constructor(db: AbstractPowerSyncDatabase, logger: Logger) {
-    this.db = db
-    this.logger = logger
-  }
 
   async hasConsented(): Promise<boolean> {
     try {
