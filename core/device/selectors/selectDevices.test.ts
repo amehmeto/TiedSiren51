@@ -1,25 +1,27 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
-import { AuthProvider } from '@/core/auth/auth-user'
+import { TEST_AUTH_USER, TEST_USER_ID } from '@/core/_tests_/test-constants'
 import { selectDevices } from '@/core/device/selectors/selectDevices'
 import { FakeDataDeviceRepository } from '@/infra/device-repository/fake-data.device.repository'
 import { loadDevices } from '../usecases/load-devices.usecase'
 
 const preloadedStateWithAuth = stateBuilder()
-  .withAuthUser({
-    id: 'test-user-id',
-    email: 'test@example.com',
-    isEmailVerified: true,
-    authProvider: AuthProvider.Email,
-  })
+  .withAuthUser(TEST_AUTH_USER)
   .build()
+
+const fakeDevices = [
+  { id: '1', type: 'phone', name: 'iPhone 12' },
+  { id: '2', type: 'tablet', name: 'iPad Pro' },
+  { id: '3', type: 'laptop', name: 'MacBook Pro' },
+]
 
 describe('selectDevices', () => {
   let deviceRepository: FakeDataDeviceRepository
 
   beforeEach(() => {
     deviceRepository = new FakeDataDeviceRepository()
+    deviceRepository.feedDevicesForUser(TEST_USER_ID, fakeDevices)
   })
 
   test('should return empty list when no devices loaded', () => {
@@ -35,12 +37,7 @@ describe('selectDevices', () => {
 
     await store.dispatch(loadDevices())
 
-    const expectedDevices = [
-      { id: '1', type: 'phone', name: 'iPhone 12' },
-      { id: '2', type: 'tablet', name: 'iPad Pro' },
-      { id: '3', type: 'laptop', name: 'MacBook Pro' },
-    ]
     const devices = selectDevices(store.getState())
-    expect(devices).toStrictEqual(expectedDevices)
+    expect(devices).toStrictEqual(fakeDevices)
   })
 })

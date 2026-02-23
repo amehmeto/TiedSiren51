@@ -4,19 +4,14 @@ import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.bu
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
 import { buildSirens } from '@/core/_tests_/data-builders/sirens.builder'
 import { stateBuilder } from '@/core/_tests_/state-builder'
-import { AuthProvider } from '@/core/auth/auth-user'
+import { TEST_AUTH_USER } from '@/core/_tests_/test-constants'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
 import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
 import { loadUser } from './load-user.usecase'
 
 const preloadedStateWithAuth = stateBuilder()
-  .withAuthUser({
-    id: 'test-user-id',
-    email: 'test@example.com',
-    isEmailVerified: true,
-    authProvider: AuthProvider.Email,
-  })
+  .withAuthUser(TEST_AUTH_USER)
   .build()
 
 describe('loadUser usecase', () => {

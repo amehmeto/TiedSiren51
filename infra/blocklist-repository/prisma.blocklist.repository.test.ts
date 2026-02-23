@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
+import { TEST_USER_ID } from '@/core/_tests_/test-constants'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PrismaBlocklistRepository } from './prisma.blocklist.repository'
 
@@ -9,7 +10,7 @@ class TestPrismaBlocklistRepository extends PrismaBlocklistRepository {
   }
 }
 
-const testUserId = 'test-user-id'
+const testUserId = TEST_USER_ID
 
 describe('PrismaBlocklistRepository', () => {
   let repository: TestPrismaBlocklistRepository

@@ -9,7 +9,7 @@ import { createTestStore } from '../../_tests_/createTestStore'
 import { dateFixture } from '../../_tests_/date.fixture'
 import { Fixture } from '../../_tests_/fixture.type'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
-import { AuthProvider } from '../../auth/auth-user'
+import { TEST_AUTH_USER } from '../../_tests_/test-constants'
 import { BlockSession, blockSessionAdapter } from '../block-session'
 import { selectAllBlockSessionIds } from '../selectors/selectAllBlockSessionIds'
 import { selectBlockSessionById } from '../selectors/selectBlockSessionById'
@@ -41,12 +41,7 @@ export function blockSessionFixture(
   const dateTest = dateFixture(dateProvider)
 
   testStateBuilderProvider.setState((builder) =>
-    builder.withAuthUser({
-      id: 'test-user-id',
-      email: 'test@test.com',
-      isEmailVerified: true,
-      authProvider: AuthProvider.Email,
-    }),
+    builder.withAuthUser(TEST_AUTH_USER),
   )
 
   return {

@@ -5,7 +5,7 @@ import { AppStore } from '../../_redux_/createStore'
 import { createTestStore } from '../../_tests_/createTestStore'
 import { Fixture } from '../../_tests_/fixture.type'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
-import { AuthProvider } from '../../auth/auth-user'
+import { TEST_AUTH_USER, TEST_USER_ID } from '../../_tests_/test-constants'
 import { InstalledApp } from '../../installed-app/installed-app'
 import { selectAvailableSirens } from '../selectors/selectAvailableSirens'
 import { Sirens } from '../sirens'
@@ -20,12 +20,7 @@ export function sirensFixture(
   const sirensRepository = new FakeDataSirensRepository()
 
   testStateBuilderProvider.setState((builder) =>
-    builder.withAuthUser({
-      id: 'test-user-id',
-      email: 'test@test.com',
-      isEmailVerified: true,
-      authProvider: AuthProvider.Email,
-    }),
+    builder.withAuthUser(TEST_AUTH_USER),
   )
 
   return {
@@ -93,12 +88,12 @@ export function sirensFixture(
     then: {
       keywordShouldBeSaved: async (expectedKeyword: string) => {
         const retrievedKeywords =
-          await sirensRepository.getSelectableSirens('test-user-id')
+          await sirensRepository.getSelectableSirens(TEST_USER_ID)
         expect(retrievedKeywords.keywords).toContain(expectedKeyword)
       },
       websiteShouldBeSaved: async (expectedWebsite: string) => {
         const retrievedKeywords =
-          await sirensRepository.getSelectableSirens('test-user-id')
+          await sirensRepository.getSelectableSirens(TEST_USER_ID)
         expect(retrievedKeywords.websites).toContain(expectedWebsite)
       },
       availableSirensShouldBeStoredAs: (expectedSirens: Sirens) => {

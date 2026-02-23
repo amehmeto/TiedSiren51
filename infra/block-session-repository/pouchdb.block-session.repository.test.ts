@@ -3,11 +3,12 @@ import { beforeEach, describe, expect, it } from 'vitest'
 import { CreatePayload } from '@/core/_ports_/create.payload'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
+import { TEST_USER_ID } from '@/core/_tests_/test-constants'
 import { BlockSession } from '@/core/block-session/block-session'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PouchdbBlockSessionRepository } from './pouchdb.block-session.repository'
 
-const testUserId = 'test-user-id'
+const testUserId = TEST_USER_ID
 
 describe('PouchDBBlockSessionRepository', () => {
   let blockSessionRepository: PouchdbBlockSessionRepository

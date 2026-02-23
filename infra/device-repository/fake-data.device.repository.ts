@@ -2,11 +2,13 @@ import { RemoteDeviceRepository } from '@/core/_ports_/remote-device.repository'
 import { Device } from '@/core/device/device'
 
 export class FakeDataDeviceRepository implements RemoteDeviceRepository {
-  async findAll(_userId: string): Promise<Device[]> {
-    return [
-      { id: '1', type: 'phone', name: 'iPhone 12' },
-      { id: '2', type: 'tablet', name: 'iPad Pro' },
-      { id: '3', type: 'laptop', name: 'MacBook Pro' },
-    ]
+  private devicesByUser = new Map<string, Device[]>()
+
+  feedDevicesForUser(userId: string, devices: Device[]): void {
+    this.devicesByUser.set(userId, devices)
+  }
+
+  async findAll(userId: string): Promise<Device[]> {
+    return this.devicesByUser.get(userId) ?? []
   }
 }

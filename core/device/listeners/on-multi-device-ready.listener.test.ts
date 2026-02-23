@@ -1,20 +1,13 @@
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
-import { AuthProvider } from '@/core/auth/auth-user'
+import { TEST_AUTH_USER } from '@/core/_tests_/test-constants'
 import { loadFeatureFlags } from '@/core/feature-flag/usecases/load-feature-flags.usecase'
 import { FeatureFlagKey } from '@/feature-flags'
 import { InMemoryFeatureFlagProvider } from '@/infra/feature-flag-provider/in-memory.feature-flag.provider'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 
-const authenticatedState = stateBuilder()
-  .withAuthUser({
-    id: 'test-user-id',
-    email: 'test@test.com',
-    isEmailVerified: true,
-    authProvider: AuthProvider.Email,
-  })
-  .build()
+const authenticatedState = stateBuilder().withAuthUser(TEST_AUTH_USER).build()
 
 describe('onMultiDeviceReady listener', () => {
   let featureFlagProvider: InMemoryFeatureFlagProvider

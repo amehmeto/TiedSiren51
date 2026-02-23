@@ -1,8 +1,9 @@
 import { beforeEach, describe, expect, it } from 'vitest'
+import { TEST_USER_ID } from '@/core/_tests_/test-constants'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PrismaSirensRepository } from './prisma.sirens-repository'
 
-const testUserId = 'test-user-id'
+const testUserId = TEST_USER_ID
 
 describe('PrismaSirensRepository', () => {
   let repository: PrismaSirensRepository
