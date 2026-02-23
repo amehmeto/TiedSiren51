@@ -45,26 +45,4 @@ export class PowerSyncDatabaseService implements DatabaseService {
   getDatabase(): AbstractPowerSyncDatabase {
     return this.db
   }
-
-  async claimOrphanedRows(userId: string): Promise<void> {
-    try {
-      const tables = ['siren', 'blocklist', 'block_session', 'device', 'timer']
-      await this.db.writeTransaction(async (tx) => {
-        for (const table of tables) {
-          await tx.execute(
-            `UPDATE ${table} SET user_id = ? WHERE user_id IS NULL`,
-            [userId],
-          )
-        }
-      })
-      this.logger.info(
-        `[PowerSyncDatabaseService] Claimed orphaned rows for user ${userId}`,
-      )
-    } catch (error) {
-      this.logger.error(
-        `[PowerSyncDatabaseService] Failed to claimOrphanedRows: ${error}`,
-      )
-      throw error
-    }
-  }
 }

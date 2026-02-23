@@ -16,8 +16,6 @@ import { ExpoListInstalledAppsRepository } from '@/infra/installed-apps-reposito
 import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
 import { SentryLogger } from '@/infra/logger/sentry.logger'
 import { ExpoNotificationService } from '@/infra/notification-service/expo.notification.service'
-import { AsyncStorageOrphanClaimFlagStorage } from '@/infra/orphan-claim-flag/async-storage.orphan-claim-flag.storage'
-import { InMemoryOrphanClaimFlagStorage } from '@/infra/orphan-claim-flag/in-memory.orphan-claim-flag.storage'
 import { PowersyncSirensRepository } from '@/infra/siren-repository/powersync.sirens-repository'
 import { RealAndroidSirenLookout } from '@/infra/siren-tier/android.siren-lookout'
 import { AndroidSirenTier } from '@/infra/siren-tier/android.siren-tier'
@@ -43,7 +41,6 @@ const androidDependencies: Dependencies = {
   installedAppRepository: new ExpoListInstalledAppsRepository(logger),
   logger,
   notificationService: new ExpoNotificationService(logger),
-  orphanClaimFlagStorage: new AsyncStorageOrphanClaimFlagStorage(logger),
   sirenLookout: new RealAndroidSirenLookout(logger),
   sirenTier: new AndroidSirenTier(logger, dateProvider),
   sirensRepository: new PowersyncSirensRepository(db, logger),
@@ -72,7 +69,6 @@ const e2eTestsDependencies: Dependencies = {
   installedAppRepository: new FakeDataInstalledAppsRepository(),
   logger,
   notificationService: new ExpoNotificationService(logger),
-  orphanClaimFlagStorage: new InMemoryOrphanClaimFlagStorage(),
   sirenLookout: new RealAndroidSirenLookout(logger),
   sirenTier: new AndroidSirenTier(logger, e2eDateProvider),
   sirensRepository: new PowersyncSirensRepository(db, logger),

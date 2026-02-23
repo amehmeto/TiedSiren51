@@ -10,7 +10,6 @@ import { InMemoryForegroundService } from '@/infra/foreground-service/in-memory.
 import { FakeDataInstalledAppsRepository } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { FakeNotificationService } from '@/infra/notification-service/fake.notification.service'
-import { InMemoryOrphanClaimFlagStorage } from '@/infra/orphan-claim-flag/in-memory.orphan-claim-flag.storage'
 import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
 import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
@@ -38,7 +37,6 @@ export const createTestStore = (
     sirensRepository = new FakeDataSirensRepository(),
     timerRepository = new FakeDataTimerRepository(),
     notificationService = new FakeNotificationService(logger),
-    orphanClaimFlagStorage = new InMemoryOrphanClaimFlagStorage(),
     sirenTier = new InMemorySirenTier(logger),
   }: Partial<Dependencies> = {},
   preloadedState?: Partial<ReturnType<typeof rootReducer>>,
@@ -57,7 +55,6 @@ export const createTestStore = (
       installedAppRepository,
       logger,
       notificationService,
-      orphanClaimFlagStorage,
       sirenLookout,
       sirenTier,
       sirensRepository,

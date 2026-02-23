@@ -1,10 +1,7 @@
 import { FormikProps } from 'formik'
-import { useEffect, useState } from 'react'
+import { useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
-import { useDispatch, useSelector } from 'react-redux'
-import type { AppDispatch } from '@/core/_redux_/createStore'
-import { selectNullableAuthUserId } from '@/core/auth/selectors/selectNullableAuthUserId'
-import { loadDevices } from '@/core/device/usecases/load-devices.usecase'
+import { useSelector } from 'react-redux'
 import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -40,17 +37,10 @@ export function SelectBlockSessionParams({
     endedAt: endedAtError,
   } = errors
 
-  const dispatch = useDispatch<AppDispatch>()
-  const userId = useSelector(selectNullableAuthUserId)
   const {
     MULTI_DEVICE: isMultiDevice,
     BLOCKING_CONDITIONS: isBlockingConditions,
   } = useSelector(selectFeatureFlags)
-
-  useEffect(() => {
-    if (!isMultiDevice || !userId) return
-    void dispatch(loadDevices())
-  }, [dispatch, isMultiDevice, userId])
 
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
