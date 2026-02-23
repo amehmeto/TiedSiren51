@@ -7,6 +7,7 @@ import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 import { selectEmailVerificationBannerViewModel } from './email-verification-banner.view-model'
+import { OpenEmailAppButton } from './OpenEmailAppButton'
 
 export function EmailVerificationBanner() {
   const viewModel = useSelector(selectEmailVerificationBannerViewModel)
@@ -25,6 +26,7 @@ export function EmailVerificationBanner() {
       <Text style={styles.description}>
         Check your inbox and tap the verification link.
       </Text>
+      <OpenEmailAppButton email={viewModel.userEmail} />
       <TiedSButton
         text={viewModel.resendVerificationEmailLabel}
         onPress={() => dispatch(sendVerificationEmail())}

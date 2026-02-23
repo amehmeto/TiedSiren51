@@ -74,6 +74,7 @@ describe('selectEmailVerificationBannerViewModel', () => {
       visible: true,
       isSendingVerificationEmail: false,
       resendVerificationEmailLabel: 'Resend Verification Email',
+      userEmail: 'test@example.com',
     }
 
     const viewModel = selectEmailVerificationBannerViewModel(state)
@@ -95,6 +96,7 @@ describe('selectEmailVerificationBannerViewModel', () => {
       visible: true,
       isSendingVerificationEmail: true,
       resendVerificationEmailLabel: 'Sending...',
+      userEmail: 'test@example.com',
     }
 
     const viewModel = selectEmailVerificationBannerViewModel(state)
