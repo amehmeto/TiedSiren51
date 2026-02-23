@@ -76,6 +76,7 @@ export class FakeDataBlocklistRepository implements BlocklistRepository {
   }
 
   update(
+    _userId: string,
     payload: Partial<Blocklist> & Required<Pick<Blocklist, 'id'>>,
   ): Promise<void> {
     const blocklist = this.blocklists.get(payload.id)
@@ -84,13 +85,13 @@ export class FakeDataBlocklistRepository implements BlocklistRepository {
     return Promise.resolve()
   }
 
-  findById(blocklistId: string): Promise<Blocklist> {
+  findById(_userId: string, blocklistId: string): Promise<Blocklist> {
     const blocklist = this.blocklists.get(blocklistId)
     if (!blocklist) throw new Error('Blocklist not found')
     return Promise.resolve(blocklist)
   }
 
-  delete(blocklistId: string): Promise<void> {
+  delete(_userId: string, blocklistId: string): Promise<void> {
     this.blocklists.delete(blocklistId)
     return Promise.resolve()
   }

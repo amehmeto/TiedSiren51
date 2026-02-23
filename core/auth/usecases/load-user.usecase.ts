@@ -21,11 +21,16 @@ export const loadUser = createAppAsyncThunk<UserData>(
         blockSessionRepository,
         sirensRepository,
         databaseService,
+        orphanClaimFlagStorage,
       },
     },
   ) => {
     const userId = selectAuthUserId(getState())
-    await databaseService.claimOrphanedRows(userId)
+    const hasAlreadyClaimed = await orphanClaimFlagStorage.hasClaimed()
+    if (!hasAlreadyClaimed) {
+      await databaseService.claimOrphanedRows(userId)
+      await orphanClaimFlagStorage.markClaimed()
+    }
     const [blocklists, blockSessions, sirens] = await Promise.all([
       blocklistRepository.findAll(userId),
       blockSessionRepository.findAll(userId),

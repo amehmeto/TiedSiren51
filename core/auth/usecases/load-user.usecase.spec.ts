@@ -1,4 +1,5 @@
 import { beforeEach, describe, expect, test } from 'vitest'
+import { DatabaseService } from '@/core/_ports_/database.service'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
@@ -7,8 +8,29 @@ import { stateBuilder } from '@/core/_tests_/state-builder'
 import { AuthProvider } from '@/core/auth/auth-user'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
+import { StubDatabaseService } from '@/infra/database-service/stub.database.service'
+import { InMemoryOrphanClaimFlagStorage } from '@/infra/orphan-claim-flag/in-memory.orphan-claim-flag.storage'
 import { FakeDataSirensRepository } from '@/infra/siren-repository/fake-data.sirens-repository'
 import { loadUser } from './load-user.usecase'
+
+function createClaimCountingDatabaseService(): DatabaseService & {
+  claimOrphanedRowsCallCount: number
+} {
+  let count = 0
+  const stub = new StubDatabaseService()
+  return {
+    getDbPath: () => stub.getDbPath(),
+    getDatabase: () => stub.getDatabase(),
+    initialize: () => stub.initialize(),
+    async claimOrphanedRows(userId: string) {
+      count++
+      await stub.claimOrphanedRows(userId)
+    },
+    get claimOrphanedRowsCallCount() {
+      return count
+    },
+  }
+}
 
 const preloadedStateWithAuth = stateBuilder()
   .withAuthUser({
@@ -23,11 +45,15 @@ describe('loadUser usecase', () => {
   let blocklistRepository: FakeDataBlocklistRepository
   let blockSessionRepository: FakeDataBlockSessionRepository
   let sirensRepository: FakeDataSirensRepository
+  let claimCountingDb: ReturnType<typeof createClaimCountingDatabaseService>
+  let orphanClaimFlagStorage: InMemoryOrphanClaimFlagStorage
 
   beforeEach(() => {
     blocklistRepository = new FakeDataBlocklistRepository()
     blockSessionRepository = new FakeDataBlockSessionRepository()
     sirensRepository = new FakeDataSirensRepository()
+    claimCountingDb = createClaimCountingDatabaseService()
+    orphanClaimFlagStorage = new InMemoryOrphanClaimFlagStorage()
   })
 
   test('should load user data from repositories', async () => {
@@ -65,6 +91,31 @@ describe('loadUser usecase', () => {
     expect(blocklistEntities).toHaveProperty('blocklist-1')
     expect(blockSessionEntities).toHaveProperty('session-1')
     expect(availableSirens).toStrictEqual(mockSirens)
+  })
+
+  test('should call claimOrphanedRows only once (run-once migration flag)', async () => {
+    blocklistRepository.findAll = async () => []
+    blockSessionRepository.findAll = async () => []
+    sirensRepository.getSelectableSirens = async () => buildSirens()
+
+    const store = createTestStore(
+      {
+        blocklistRepository,
+        blockSessionRepository,
+        sirensRepository,
+        databaseService: claimCountingDb,
+        orphanClaimFlagStorage,
+      },
+      preloadedStateWithAuth,
+    )
+
+    await store.dispatch(loadUser())
+    const countAfterFirstLoad = claimCountingDb.claimOrphanedRowsCallCount
+    expect(countAfterFirstLoad).toBe(1)
+
+    await store.dispatch(loadUser())
+    const countAfterSecondLoad = claimCountingDb.claimOrphanedRowsCallCount
+    expect(countAfterSecondLoad).toBe(1)
   })
 
   test('should handle empty repositories', async () => {

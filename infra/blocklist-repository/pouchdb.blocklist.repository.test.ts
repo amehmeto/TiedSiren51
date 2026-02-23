@@ -48,6 +48,7 @@ describe('PouchDBBlocklistRepository', () => {
     )
 
     const foundBlocklist = await blocklistRepository.findById(
+      testUserId,
       createdBlocklist.id,
     )
     expect(foundBlocklist).toStrictEqual(createdBlocklist)
@@ -80,9 +81,10 @@ describe('PouchDBBlocklistRepository', () => {
       name: 'updated name',
     }
 
-    await blocklistRepository.update(updatedBlocklist)
+    await blocklistRepository.update(testUserId, updatedBlocklist)
 
     const foundBlocklist = await blocklistRepository.findById(
+      testUserId,
       createdBlocklist.id,
     )
 
@@ -97,9 +99,12 @@ describe('PouchDBBlocklistRepository', () => {
       blocklistPayload,
     )
 
-    await blocklistRepository.delete(createdBlocklist.id)
+    await blocklistRepository.delete(testUserId, createdBlocklist.id)
 
-    const promise = blocklistRepository.findById(createdBlocklist.id)
+    const promise = blocklistRepository.findById(
+      testUserId,
+      createdBlocklist.id,
+    )
 
     await expect(promise).rejects.toThrow()
   })

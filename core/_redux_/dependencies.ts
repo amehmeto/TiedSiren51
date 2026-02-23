@@ -10,6 +10,7 @@ import { ForegroundService } from '@/core/_ports_/foreground.service'
 import { InstalledAppRepository } from '@/core/_ports_/installed-app.repository'
 import { Logger } from '@/core/_ports_/logger'
 import { NotificationService } from '@/core/_ports_/notification.service'
+import { OrphanClaimFlagStorage } from '@/core/_ports_/orphan-claim-flag.storage'
 import { RemoteDeviceRepository } from '@/core/_ports_/remote-device.repository'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { SirenTier } from '@/core/_ports_/siren.tier'
@@ -30,6 +31,7 @@ export type Dependencies = {
   installedAppRepository: InstalledAppRepository
   logger: Logger
   notificationService: NotificationService
+  orphanClaimFlagStorage: OrphanClaimFlagStorage
   sirenLookout: SirenLookout
   sirenTier: SirenTier
   sirensRepository: SirensRepository

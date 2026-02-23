@@ -34,31 +34,37 @@ export function ChangePasswordForm({
   const [localError, setLocalError] = useState<string | null>(null)
 
   const validatePasswords = (): PasswordValidation => {
-    const validation = changePasswordSchema.safeParse({
+    const {
+      success: isSuccess,
+      error,
+      data,
+    } = changePasswordSchema.safeParse({
       newPassword,
       confirmPassword,
     })
 
-    if (!validation.success) {
+    if (!isSuccess) {
       return {
         isValid: false,
-        error: validation.error.errors[0].message,
+        error: error.errors[0].message,
       }
     }
 
-    return { isValid: true, newPassword: validation.data.newPassword }
+    return { isValid: true, newPassword: data.newPassword }
   }
 
   const handleSubmit = () => {
     setLocalError(null)
     const passwordValidation = validatePasswords()
 
-    if (!passwordValidation.isValid) {
-      setLocalError(passwordValidation.error)
+    if (passwordValidation.isValid) {
+      const { newPassword } = passwordValidation
+      onChangePassword(newPassword)
       return
     }
 
-    onChangePassword(passwordValidation.newPassword)
+    const { error } = passwordValidation
+    setLocalError(error)
   }
 
   const displayError = localError ?? changePasswordError

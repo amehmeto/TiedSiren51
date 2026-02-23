@@ -41,7 +41,7 @@ export class PouchdbBlocklistRepository implements BlocklistRepository {
     return Promise.resolve([])
   }
 
-  async findById(blocklistId: string): Promise<Blocklist> {
+  async findById(_userId: string, blocklistId: string): Promise<Blocklist> {
     try {
       const retrievedBlocklist = await this.db.get(blocklistId)
       const { _id, _rev, ...blocklistWithoutInternalIds } = retrievedBlocklist
@@ -54,7 +54,10 @@ export class PouchdbBlocklistRepository implements BlocklistRepository {
     }
   }
 
-  async update(updateBlocklist: UpdatePayload<Blocklist>): Promise<void> {
+  async update(
+    _userId: string,
+    updateBlocklist: UpdatePayload<Blocklist>,
+  ): Promise<void> {
     try {
       await this.db.get(updateBlocklist.id).then(async (doc) => {
         await this.db.put({
@@ -72,7 +75,7 @@ export class PouchdbBlocklistRepository implements BlocklistRepository {
     }
   }
 
-  async delete(blocklistId: string): Promise<void> {
+  async delete(_userId: string, blocklistId: string): Promise<void> {
     try {
       await this.db.get(blocklistId).then(async (doc) => {
         await this.db.remove(doc._id, doc._rev)

@@ -1,3 +1,4 @@
+import { createSelector } from '@reduxjs/toolkit'
 import { RootState } from '@/core/_redux_/createStore'
 import { AuthBaseViewModel } from '@/ui/screens/Auth/auth-view-model-base'
 
@@ -14,8 +15,8 @@ export type LoginViewModel = AuthBaseViewModel<LoginViewState> & {
   isUserAuthenticated: boolean
 }
 
-export function selectLoginViewModel(state: RootState): LoginViewModel {
-  const { isLoading, error, email, password, authUser } = state.auth
+function buildLoginViewModel(auth: RootState['auth']): LoginViewModel {
+  const { isLoading, error, email, password, authUser } = auth
   const isUserAuthenticated = authUser !== null
   const { Loading, Error, Idle } = LoginViewState
 
@@ -53,3 +54,8 @@ export function selectLoginViewModel(state: RootState): LoginViewModel {
     isUserAuthenticated,
   }
 }
+
+export const selectLoginViewModel = createSelector(
+  [(state: RootState) => state.auth],
+  buildLoginViewModel,
+)

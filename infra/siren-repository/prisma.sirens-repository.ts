@@ -27,11 +27,14 @@ export class PrismaSirensRepository
       return {
         android: sirens
           .filter((s: PrismaSiren) => s.type === 'android')
-          .map((s: PrismaSiren) => ({
-            packageName: s.value,
-            appName: s.name ?? '',
-            icon: s.icon ?? '',
-          })),
+          .map((s: PrismaSiren) => {
+            const { value, name, icon } = s
+            return {
+              packageName: value,
+              appName: name ?? '',
+              icon: icon ?? '',
+            }
+          }),
         ios: [],
         windows: [],
         macos: [],
@@ -90,13 +93,14 @@ export class PrismaSirensRepository
     androidSiren: AndroidSiren,
   ): Promise<void> {
     try {
+      const { packageName, appName, icon } = androidSiren
       await this.baseClient.siren.create({
         data: {
           id: String(uuid.v4()),
           type: 'android',
-          value: androidSiren.packageName,
-          name: androidSiren.appName,
-          icon: androidSiren.icon,
+          value: packageName,
+          name: appName,
+          icon,
         },
       })
     } catch (error) {

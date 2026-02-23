@@ -14,7 +14,10 @@ export const duplicateBlockSession = createAppAsyncThunk(
     },
   ) => {
     const userId = selectAuthUserId(getState())
-    const sessionToBeCopied = await blockSessionRepository.findById(payload.id)
+    const sessionToBeCopied = await blockSessionRepository.findById(
+      userId,
+      payload.id,
+    )
 
     const now = dateProvider.getNow()
     const startedAt = dateProvider.recoverDate(sessionToBeCopied.startedAt)

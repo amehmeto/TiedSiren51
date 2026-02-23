@@ -68,7 +68,7 @@ describe('PrismaBlockSessionRepository', () => {
     const sessionPayload = await prepareSessionPayload()
     const created = await repository.create(testUserId, sessionPayload)
 
-    const found = await repository.findById(created.id)
+    const found = await repository.findById(testUserId, created.id)
     expect(found).toStrictEqual(created)
   })
 
@@ -134,8 +134,8 @@ describe('PrismaBlockSessionRepository', () => {
       name: 'Updated name',
     }
 
-    await repository.update(updateSessionPayload)
-    const updated = await repository.findById(created.id)
+    await repository.update(testUserId, updateSessionPayload)
+    const updated = await repository.findById(testUserId, created.id)
 
     expect(updated).toStrictEqual(expectedBlockSession)
   })
@@ -143,9 +143,9 @@ describe('PrismaBlockSessionRepository', () => {
   it('should delete a block session', async () => {
     const sessionPayload = await prepareSessionPayload()
     const created = await repository.create(testUserId, sessionPayload)
-    await repository.delete(created.id)
+    await repository.delete(testUserId, created.id)
 
-    const promise = repository.findById(created.id)
+    const promise = repository.findById(testUserId, created.id)
 
     await expect(promise).rejects.toThrow(
       `BlockSession ${created.id} not found`,

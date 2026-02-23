@@ -92,12 +92,12 @@ export class FakeDataBlockSessionRepository implements BlockSessionRepository {
     FakeDataBlockSessionRepository.entries,
   )
 
-  delete(sessionId: string): Promise<void> {
+  delete(_userId: string, sessionId: string): Promise<void> {
     this.entities.delete(sessionId)
     return Promise.resolve()
   }
 
-  findById(sessionId: string): Promise<BlockSession> {
+  findById(_userId: string, sessionId: string): Promise<BlockSession> {
     const entity = this.entities.get(sessionId)
     if (!entity) {
       throw new Error(
@@ -107,7 +107,7 @@ export class FakeDataBlockSessionRepository implements BlockSessionRepository {
     return Promise.resolve(entity)
   }
 
-  update(session: UpdatePayload<BlockSession>): Promise<void> {
+  update(_userId: string, session: UpdatePayload<BlockSession>): Promise<void> {
     const entity = this.entities.get(session.id)
     if (!entity)
       throw new Error('Entity not found and not updated inside InMemory')

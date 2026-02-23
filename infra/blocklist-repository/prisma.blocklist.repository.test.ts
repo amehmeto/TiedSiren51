@@ -41,7 +41,7 @@ describe('PrismaBlocklistRepository', () => {
     delete blocklistPayload.id
 
     const created = await repository.create(testUserId, blocklistPayload)
-    const found = await repository.findById(created.id)
+    const found = await repository.findById(testUserId, created.id)
     expect(found).toStrictEqual(created)
   })
 
@@ -83,8 +83,8 @@ describe('PrismaBlocklistRepository', () => {
       name: 'updated name',
     }
 
-    await repository.update(updatePayload)
-    const found = await repository.findById(created.id)
+    await repository.update(testUserId, updatePayload)
+    const found = await repository.findById(testUserId, created.id)
     expect(found).toStrictEqual(updatePayload)
   })
 
@@ -94,9 +94,9 @@ describe('PrismaBlocklistRepository', () => {
     delete blocklistPayload.id
 
     const created = await repository.create(testUserId, blocklistPayload)
-    await repository.delete(created.id)
+    await repository.delete(testUserId, created.id)
 
-    const promise = repository.findById(created.id)
+    const promise = repository.findById(testUserId, created.id)
 
     await expect(promise).rejects.toThrow()
   })

@@ -79,7 +79,7 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
         }
       })
 
-      return this.loadBlockSession(sessionId)
+      return this.loadBlockSession(userId, sessionId)
     } catch (error) {
       this.logger.error(
         `[PowersyncBlockSessionRepository] Failed to create block session: ${error}`,
@@ -95,7 +95,9 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
         [userId],
       )
 
-      const loadPromises = sessions.map((s) => this.loadBlockSession(s.id))
+      const loadPromises = sessions.map((s) =>
+        this.loadBlockSession(userId, s.id),
+      )
       return await Promise.all(loadPromises)
     } catch (error) {
       this.logger.error(
@@ -105,9 +107,9 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
     }
   }
 
-  async findById(id: string): Promise<BlockSession> {
+  async findById(userId: string, id: string): Promise<BlockSession> {
     try {
-      return await this.loadBlockSession(id)
+      return await this.loadBlockSession(userId, id)
     } catch (error) {
       this.logger.error(
         `[PowersyncBlockSessionRepository] Failed to find block session ${id}: ${error}`,
@@ -116,10 +118,13 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
     }
   }
 
-  async update(payload: UpdatePayload<BlockSession>): Promise<void> {
+  async update(
+    userId: string,
+    payload: UpdatePayload<BlockSession>,
+  ): Promise<void> {
     try {
       const { id, blocklistIds, devices } = payload
-      await this.updateSessionFields(payload)
+      await this.updateSessionFields(userId, payload)
       await this.replaceBlocklistJunctions(id, blocklistIds)
       await this.replaceDeviceJunctions(id, devices)
     } catch (error) {
@@ -130,18 +135,21 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(userId: string, id: string): Promise<void> {
     try {
       await this.db.writeTransaction(async (tx) => {
         await tx.execute(
-          'DELETE FROM block_session_blocklist WHERE block_session_id = ?',
-          [id],
+          'DELETE FROM block_session_blocklist WHERE block_session_id = ? AND block_session_id IN (SELECT id FROM block_session WHERE user_id = ?)',
+          [id, userId],
         )
         await tx.execute(
-          'DELETE FROM block_session_device WHERE block_session_id = ?',
-          [id],
+          'DELETE FROM block_session_device WHERE block_session_id = ? AND block_session_id IN (SELECT id FROM block_session WHERE user_id = ?)',
+          [id, userId],
         )
-        await tx.execute('DELETE FROM block_session WHERE id = ?', [id])
+        await tx.execute(
+          'DELETE FROM block_session WHERE id = ? AND user_id = ?',
+          [id, userId],
+        )
       })
     } catch (error) {
       this.logger.error(
@@ -177,6 +185,7 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
   }
 
   private async updateSessionFields(
+    userId: string,
     payload: UpdatePayload<BlockSession>,
   ): Promise<void> {
     const {
@@ -199,7 +208,7 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
         start_notification_id = COALESCE(?, start_notification_id),
         end_notification_id = COALESCE(?, end_notification_id),
         blocking_conditions = COALESCE(?, blocking_conditions)
-      WHERE id = ?`,
+      WHERE id = ? AND user_id = ?`,
       [
         name ?? null,
         startedAt ?? null,
@@ -208,6 +217,7 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
         endNotificationId ?? null,
         serializedConditions,
         id,
+        userId,
       ],
     )
   }
@@ -267,10 +277,13 @@ export class PowersyncBlockSessionRepository implements BlockSessionRepository {
     }
   }
 
-  private async loadBlockSession(id: string): Promise<BlockSession> {
+  private async loadBlockSession(
+    userId: string,
+    id: string,
+  ): Promise<BlockSession> {
     const session = await this.db.getOptional<BlockSessionRecord>(
-      'SELECT * FROM block_session WHERE id = ?',
-      [id],
+      'SELECT * FROM block_session WHERE id = ? AND user_id = ?',
+      [id, userId],
     )
 
     if (!session) throw new Error(`BlockSession ${id} not found`)

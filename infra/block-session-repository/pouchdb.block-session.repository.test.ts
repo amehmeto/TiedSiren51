@@ -50,6 +50,7 @@ describe('PouchDBBlockSessionRepository', () => {
     )
 
     const foundBlockSession = await blockSessionRepository.findById(
+      testUserId,
       createdBlockSession.id,
     )
     expect(foundBlockSession).toStrictEqual(createdBlockSession)
@@ -95,8 +96,9 @@ describe('PouchDBBlockSessionRepository', () => {
       name: 'Updated name',
     }
 
-    await blockSessionRepository.update(updateSessionPayload)
+    await blockSessionRepository.update(testUserId, updateSessionPayload)
     const updatedBlockSession = await blockSessionRepository.findById(
+      testUserId,
       updateSessionPayload.id,
     )
 
@@ -111,9 +113,12 @@ describe('PouchDBBlockSessionRepository', () => {
       createSessionPayload,
     )
 
-    await blockSessionRepository.delete(createdBlockSession.id)
+    await blockSessionRepository.delete(testUserId, createdBlockSession.id)
 
-    const promise = blockSessionRepository.findById(createdBlockSession.id)
+    const promise = blockSessionRepository.findById(
+      testUserId,
+      createdBlockSession.id,
+    )
 
     await expect(promise).rejects.toThrow()
   })

@@ -1,23 +1,20 @@
-import { useEffect, useState } from 'react'
-import { useSelector } from 'react-redux'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import type { AppDispatch } from '@/core/_redux_/createStore'
 import { selectNullableAuthUserId } from '@/core/auth/selectors/selectNullableAuthUserId'
 import { Device } from '@/core/device/device'
-import { dependencies } from '@/ui/dependencies'
+import { selectDevices } from '@/core/device/selectors/selectDevices'
+import { loadDevices } from '@/core/device/usecases/load-devices.usecase'
 
 export function useDevices(isMultiDevice: boolean): Device[] {
+  const dispatch = useDispatch<AppDispatch>()
   const userId = useSelector(selectNullableAuthUserId)
-  const [devices, setDevices] = useState<Device[]>([])
+  const devices = useSelector(selectDevices)
 
   useEffect(() => {
     if (!isMultiDevice || !userId) return
-    let isIgnored = false
-    dependencies.deviceRepository.findAll(userId).then((foundDevices) => {
-      if (!isIgnored) setDevices(foundDevices)
-    })
-    return () => {
-      isIgnored = true
-    }
-  }, [isMultiDevice, userId])
+    void dispatch(loadDevices())
+  }, [dispatch, isMultiDevice, userId])
 
   return devices
 }

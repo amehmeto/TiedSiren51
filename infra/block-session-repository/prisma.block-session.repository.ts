@@ -52,29 +52,35 @@ export class PrismaBlockSessionRepository
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
     try {
-      const blocklistIds = sessionPayload.blocklistIds.map((id) => ({
-        id,
-      }))
-
-      const deviceIds = sessionPayload.devices.map((d) => ({
-        where: { id: d.id },
-        create: {
-          id: d.id,
-          type: d.type,
-          name: d.name,
-        },
-      }))
+      const {
+        blocklistIds,
+        devices,
+        name,
+        startedAt,
+        endedAt,
+        startNotificationId,
+        endNotificationId,
+        blockingConditions,
+      } = sessionPayload
+      const blocklistIdRefs = blocklistIds.map((id) => ({ id }))
+      const deviceIds = devices.map((d) => {
+        const { id, type, name: deviceName } = d
+        return {
+          where: { id },
+          create: { id, type, name: deviceName },
+        }
+      })
 
       const created = await this.baseClient.blockSession.create({
         data: {
           id: String(uuid.v4()),
-          name: sessionPayload.name,
-          startedAt: sessionPayload.startedAt,
-          endedAt: sessionPayload.endedAt,
-          startNotificationId: sessionPayload.startNotificationId,
-          endNotificationId: sessionPayload.endNotificationId,
-          blockingConditions: JSON.stringify(sessionPayload.blockingConditions),
-          blocklists: { connect: blocklistIds },
+          name,
+          startedAt,
+          endedAt,
+          startNotificationId,
+          endNotificationId,
+          blockingConditions: JSON.stringify(blockingConditions),
+          blocklists: { connect: blocklistIdRefs },
           devices: { connectOrCreate: deviceIds },
         },
         include: {
@@ -93,19 +99,30 @@ export class PrismaBlockSessionRepository
   }
 
   private mapToBlockSession(dbSession: DbBlockSession): BlockSession {
-    assertHHmmString(dbSession.startedAt)
-    assertHHmmString(dbSession.endedAt)
+    const {
+      startedAt,
+      endedAt,
+      id,
+      name,
+      startNotificationId,
+      endNotificationId,
+      blockingConditions,
+      blocklists,
+      devices,
+    } = dbSession
+    assertHHmmString(startedAt)
+    assertHHmmString(endedAt)
 
     return {
-      id: dbSession.id,
-      name: dbSession.name,
-      startedAt: dbSession.startedAt,
-      endedAt: dbSession.endedAt,
-      startNotificationId: dbSession.startNotificationId,
-      endNotificationId: dbSession.endNotificationId,
-      blockingConditions: JSON.parse(dbSession.blockingConditions),
-      blocklistIds: dbSession.blocklists.map((b) => b.id),
-      devices: dbSession.devices,
+      id,
+      name,
+      startedAt,
+      endedAt,
+      startNotificationId,
+      endNotificationId,
+      blockingConditions: JSON.parse(blockingConditions),
+      blocklistIds: blocklists.map((b) => b.id),
+      devices,
     }
   }
 
@@ -127,7 +144,7 @@ export class PrismaBlockSessionRepository
     }
   }
 
-  async findById(id: string): Promise<BlockSession> {
+  async findById(_userId: string, id: string): Promise<BlockSession> {
     try {
       const session = await this.baseClient.blockSession.findUnique({
         where: { id },
@@ -148,22 +165,34 @@ export class PrismaBlockSessionRepository
     }
   }
 
-  async update(payload: UpdatePayload<BlockSession>): Promise<void> {
+  async update(
+    _userId: string,
+    payload: UpdatePayload<BlockSession>,
+  ): Promise<void> {
     try {
-      const blocklistIds = payload.blocklistIds?.map((id) => ({ id }))
-      const deviceIds = payload.devices?.map((d) => ({ id: d.id }))
+      const {
+        blocklistIds: payloadBlocklistIds,
+        devices: payloadDevices,
+        id,
+        name,
+        startedAt,
+        endedAt,
+        startNotificationId,
+        endNotificationId,
+        blockingConditions,
+      } = payload
+      const blocklistIds = payloadBlocklistIds?.map((id) => ({ id }))
+      const deviceIds = payloadDevices?.map((d) => ({ id: d.id }))
 
       await this.baseClient.blockSession.update({
-        where: { id: payload.id },
+        where: { id },
         data: {
-          name: payload.name,
-          startedAt: payload.startedAt,
-          endedAt: payload.endedAt,
-          startNotificationId: payload.startNotificationId,
-          endNotificationId: payload.endNotificationId,
-          blockingConditions: payload.blockingConditions
-            ? JSON.stringify(payload.blockingConditions)
-            : undefined,
+          name,
+          startedAt,
+          endedAt,
+          startNotificationId,
+          endNotificationId,
+          blockingConditions: JSON.stringify(blockingConditions),
           blocklists: blocklistIds
             ? {
                 set: blocklistIds,
@@ -184,7 +213,7 @@ export class PrismaBlockSessionRepository
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(_userId: string, id: string): Promise<void> {
     try {
       await this.baseClient.blockSession.update({
         where: { id },

@@ -10,7 +10,10 @@ export const duplicateBlocklist = createAppAsyncThunk(
     { getState, extra: { blocklistRepository } },
   ) => {
     const userId = selectAuthUserId(getState())
-    const blocklistToBeCopied = await blocklistRepository.findById(payload.id)
+    const blocklistToBeCopied = await blocklistRepository.findById(
+      userId,
+      payload.id,
+    )
     const { id: _id, ...blocklistToBeCopiedWithoutId } = blocklistToBeCopied
     return blocklistRepository.create(userId, {
       ...blocklistToBeCopiedWithoutId,

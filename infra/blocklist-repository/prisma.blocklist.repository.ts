@@ -60,7 +60,10 @@ export class PrismaBlocklistRepository
     }
   }
 
-  async update(payload: UpdatePayload<Blocklist>): Promise<void> {
+  async update(
+    _userId: string,
+    payload: UpdatePayload<Blocklist>,
+  ): Promise<void> {
     try {
       await this.baseClient.blocklist.update({
         where: { id: payload.id },
@@ -77,7 +80,7 @@ export class PrismaBlocklistRepository
     }
   }
 
-  async findById(id: string): Promise<Blocklist> {
+  async findById(_userId: string, id: string): Promise<Blocklist> {
     try {
       const blocklist = await this.baseClient.blocklist.findUnique({
         where: { id },
@@ -94,7 +97,7 @@ export class PrismaBlocklistRepository
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(_userId: string, id: string): Promise<void> {
     try {
       await this.baseClient.blocklist.delete({
         where: { id },

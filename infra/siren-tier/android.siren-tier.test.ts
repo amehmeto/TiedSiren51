@@ -208,12 +208,13 @@ describe('toNativeBlockingWindows', () => {
 
     const blockingWindows = toNativeBlockingWindows(schedules, dateProvider)
     const [firstWindow] = blockingWindows
+    const { id, startTime, endTime, packageNames } = firstWindow
 
     expect(blockingWindows).toHaveLength(1)
-    expect(firstWindow.id).toBe('schedule-1')
-    expect(firstWindow.startTime).toMatch(/^\d{2}:\d{2}$/)
-    expect(firstWindow.endTime).toMatch(/^\d{2}:\d{2}$/)
-    expect(firstWindow.packageNames).toStrictEqual(['com.facebook.katana'])
+    expect(id).toBe('schedule-1')
+    expect(startTime).toMatch(/^\d{2}:\d{2}$/)
+    expect(endTime).toMatch(/^\d{2}:\d{2}$/)
+    expect(packageNames).toStrictEqual(['com.facebook.katana'])
   })
 
   it('extracts package names from Android sirens', () => {
