@@ -3,6 +3,7 @@ import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { Device } from '@/core/device/device'
+import { selectDevices } from '@/core/device/selectors/selectDevices'
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
@@ -16,7 +17,6 @@ type DevicesModalFields = {
   currentSelections: Device[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: Device[]) => void
-  devices: Device[]
 }
 
 type DevicesModalProps = Readonly<DevicesModalFields>
@@ -26,9 +26,9 @@ export function DevicesModal({
   currentSelections,
   onRequestClose,
   setFieldValue,
-  devices,
 }: DevicesModalProps) {
   const dispatch = useDispatch<AppDispatch>()
+  const devices = useSelector(selectDevices)
   const isStrictModeActive = useSelector((state: RootState) =>
     selectIsStrictModeActive(state, dependencies.dateProvider),
   )

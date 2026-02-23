@@ -8,6 +8,7 @@ import {
   BlockingConditions,
   BlockSession,
 } from '@/core/block-session/block-session'
+import { InMemoryRepository } from '@/infra/__abstract__/in-memory.repository'
 
 export class FakeDataBlockSessionRepository implements BlockSessionRepository {
   private static readonly startedAt: HHmmString = '10:48'
@@ -88,50 +89,46 @@ export class FakeDataBlockSessionRepository implements BlockSessionRepository {
       blockSession,
     ])
 
-  entities: Map<string, BlockSession> = new Map(
-    FakeDataBlockSessionRepository.entries,
-  )
+  private readonly store = new InMemoryRepository<BlockSession>()
 
-  delete(_userId: string, sessionId: string): Promise<void> {
-    this.entities.delete(sessionId)
-    return Promise.resolve()
+  get entities(): Map<string, BlockSession> {
+    return this.store.entities
+  }
+
+  set entities(value: Map<string, BlockSession>) {
+    this.store.entities = value
+  }
+
+  constructor() {
+    for (const [id, session] of FakeDataBlockSessionRepository.entries)
+      this.store.entities.set(id, session)
   }
 
   findById(_userId: string, sessionId: string): Promise<BlockSession> {
-    const entity = this.entities.get(sessionId)
-    if (!entity) {
-      throw new Error(
-        `Entity not found in FakeDataBlockSessionRepository for ${sessionId}`,
-      )
-    }
-    return Promise.resolve(entity)
-  }
-
-  update(_userId: string, session: UpdatePayload<BlockSession>): Promise<void> {
-    const entity = this.entities.get(session.id)
-    if (!entity)
-      throw new Error('Entity not found and not updated inside InMemory')
-    this.entities.set(session.id, { ...entity, ...session })
-    return Promise.resolve()
+    return this.store.findById(sessionId)
   }
 
   findAll(_userId: string): Promise<BlockSession[]> {
-    return Promise.resolve(Array.from(this.entities.values()))
+    return this.store.findAll()
   }
 
-  async create(
+  create(
     _userId: string,
     sessionPayload: Omit<BlockSession, 'id'>,
   ): Promise<BlockSession> {
-    const id = String(uuid.v4())
-    // eslint-disable-next-line @typescript-eslint/consistent-type-assertions
-    const entity = { id, ...sessionPayload } as BlockSession
-    this.entities.set(id, entity)
-    return entity
+    return this.store.create(sessionPayload)
+  }
+
+  update(_userId: string, session: UpdatePayload<BlockSession>): Promise<void> {
+    this.store.update(session)
+    return Promise.resolve()
+  }
+
+  delete(_userId: string, sessionId: string): Promise<void> {
+    return this.store.delete(sessionId)
   }
 
   deleteAll(_userId: string): Promise<void> {
-    this.entities.clear()
-    return Promise.resolve()
+    return this.store.deleteAll()
   }
 }

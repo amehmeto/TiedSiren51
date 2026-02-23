@@ -10,7 +10,7 @@ export const renameBlockSession = createAppAsyncThunk(
     { getState, extra: { blockSessionRepository } },
   ) => {
     const userId = selectAuthUserId(getState())
-    await blockSessionRepository.update(userId, { ...payload })
+    await blockSessionRepository.update(userId, payload)
     return payload
   },
 )

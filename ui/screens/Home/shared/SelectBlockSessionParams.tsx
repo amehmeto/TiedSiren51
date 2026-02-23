@@ -1,7 +1,10 @@
 import { FormikProps } from 'formik'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { ScrollView, StyleSheet } from 'react-native'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import type { AppDispatch } from '@/core/_redux_/createStore'
+import { selectNullableAuthUserId } from '@/core/auth/selectors/selectNullableAuthUserId'
+import { loadDevices } from '@/core/device/usecases/load-devices.usecase'
 import { selectFeatureFlags } from '@/core/feature-flag/selectors/selectFeatureFlags'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
@@ -13,7 +16,6 @@ import { SelectBlockingCondition } from '@/ui/screens/Home/shared/SelectBlocking
 import { SelectBlocklistsField } from '@/ui/screens/Home/shared/SelectBlocklistsField'
 import { SelectDevicesSection } from '@/ui/screens/Home/shared/SelectDevicesSection'
 import { SelectTime, TimeField } from '@/ui/screens/Home/shared/SelectTime'
-import { useDevices } from '@/ui/screens/Home/shared/useDevices'
 
 type SelectBlockSessionParamsProps = {
   form: FormikProps<BlockSessionFormValues>
@@ -38,12 +40,17 @@ export function SelectBlockSessionParams({
     endedAt: endedAtError,
   } = errors
 
+  const dispatch = useDispatch<AppDispatch>()
+  const userId = useSelector(selectNullableAuthUserId)
   const {
     MULTI_DEVICE: isMultiDevice,
     BLOCKING_CONDITIONS: isBlockingConditions,
   } = useSelector(selectFeatureFlags)
 
-  const devices = useDevices(isMultiDevice)
+  useEffect(() => {
+    if (!isMultiDevice || !userId) return
+    void dispatch(loadDevices())
+  }, [dispatch, isMultiDevice, userId])
 
   const [isStartTimePickerVisible, setIsStartTimePickerVisible] =
     useState<boolean>(false)
@@ -77,11 +84,7 @@ export function SelectBlockSessionParams({
           <FieldErrors errors={errors} fieldName={'blocklistIds'} />
         )}
         {isMultiDevice && (
-          <SelectDevicesSection
-            form={form}
-            devices={devices}
-            hasFieldError={hasFieldError}
-          />
+          <SelectDevicesSection form={form} hasFieldError={hasFieldError} />
         )}
         <SelectTime
           timeField={TimeField.StartedAt}
