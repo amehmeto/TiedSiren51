@@ -3,7 +3,7 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2026-02-21
+> Last updated: 2026-02-22
 
 ## Validation Warnings
 
@@ -46,18 +46,12 @@ The longest dependency chain in the graph:
 | #333 | fix: local Prisma database not scoped per user — data leaks between accounts | - | medium | - |
 
 
-### Features - Other (60)
+### Features - Other (62)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #1 | Add ability to filter between system apps and user-installed apps on Android | - | - | - |
 | #4 | Thanks for this module and request for tutorial or guide | - | - | - |
 | #10 | feat: Add uniqueBy option to deduplicate apps by package or activity | - | - | - |
-| #81 | [Refactor] 🐛 Unnecessary Store State Management in `useAppInitialization` Hook | - | - | - |
-| #87 | Implement Google Sign-In with Firebase | - | - | - |
-| #93 | Implementing env vars | - | - | - |
-| #95 | Create expo-accessibility-service Module with isEnabled() and askPermission() - 3 sp | - | - | - |
-| #96 | Setup Phase - Guided Permission Setup - 3sp | 🟢 3 | - | - |
-| #97 | App Launch Monitoring via AccessibilityService - 2 sp | - | - | - |
 | #103 | Handle Accessibility Permission on App Start - 3 sp | - | - | - |
 | #199 | feat(blocklist): add confirmation modal when deleting blocklist used in active sessions | - | - | - |
 | #200 | feat(strict-mode): block blocklist deletion during active strict mode sessions | - | - | - |
@@ -109,9 +103,17 @@ The longest dependency chain in the graph:
 | #355 | feat: upgrade Expo SDK 51 → 55 | - | - | - |
 | #357 | Modernize visual design — refresh colors, typography, and component styling | - | - | - |
 | #359 | chore(docs): update dependency graph, tech debt tracker, and Claude settings | - | - | - |
+| #361 | chore(docs): refresh dependency graph after sync-project | - | - | - |
+| #363 | chore: uninstall speckit | - | - | - |
+| #366 | feat: migrate feature flags to Firebase Remote Config | - | - | - |
+| #367 | Add loading spinner while listing installed apps | - | - | - |
+| #372 | Add prominent AccessibilityService disclosure screen for Google Play compliance | - | - | - |
+| #375 | Match iOS time picker modal colors to app's design palette | - | - | - |
+| #377 | refactor: migrate ConsentStorage from AsyncStorage to Prisma repository | - | - | - |
+| #381 | Scope PowerSync local database by userId to prevent data leaks between users | - | - | - |
 
 
-### Features - Blocking Architecture (33)
+### Features - Blocking Architecture (34)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #5 | Implement BlockingScheduler with schedule storage | - | - | #8, #7, #6 |
@@ -147,15 +149,12 @@ The longest dependency chain in the graph:
 | #310 | fix(blocklist): simplify siren selection divider — remove labels, show only when needed | - | - | - |
 | #314 | fix(block-session): blocking condition selection accumulates instead of replacing | - | - | - |
 | #331 | chore: configure custom domain tiedsiren.app for Firebase Hosting | - | - | - |
+| #374 | Add warning modal when selecting Settings app in blocklist siren selection | - | - | - |
 
 
-### Features - Authentication (19)
+### Features - Authentication (16)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
-| #85 | Setup Firebase Authentication Infrastructure | - | - | - |
-| #86 | Implement Email/Password Authentication with Firebase | - | - | - |
-| #88 | Implement Apple Sign-In with Firebase | 🟢 3 | - | - |
-| #89 | Add Authentication Error Handling | 🟢 3 | - | - |
 | #160 | feat(auth): custom in-app password reset confirmation flow | 🟠 5 | - | #166 |
 | #161 | feat(auth): implement email verification flow | 🟢 3 | - | - |
 | #162 | feat(auth): change password when logged in | 🟢 2 | #164 | - |
@@ -171,6 +170,7 @@ The longest dependency chain in the graph:
 | #290 | refactor(auth): strip password from Redux serialization/logging | - | - | - |
 | #298 | feat(auth): Google re-authentication for sensitive operations | - | - | - |
 | #311 | fix(auth): align Confirm and Cancel buttons horizontally in reauthentication modal | - | - | - |
+| #379 | fix(auth): Android back button returns to authenticated screen after logout | - | - | - |
 
 
 ---
@@ -269,10 +269,20 @@ flowchart LR
     end
     subgraph Ungrouped
         direction TB
+        T_TS_381["📝 TS#381 PowerSync local database by<br/>userId to prevent data leaks<br/>between users"]:::other0_todo
+        T_TS_379["📝 TS#379 auth: Android back button<br/>returns to authenticated<br/>screen after logout"]:::auth0_todo
+        T_TS_377["📝 TS#377 : migrate ConsentStorage from<br/>AsyncStorage to Prisma<br/>repository"]:::other0_todo
+        T_TS_375["✅ TS#375 iOS time picker modal colors<br/>to app's design palette"]:::other0_done
+        T_TS_374["✅ TS#374 warning modal when selecting<br/>Settings app in blocklist<br/>siren selection"]:::blocking0_done
+        T_TS_372["✅ TS#372 prominent AccessibilityService<br/>disclosure screen for Google<br/>Play compliance"]:::other0_done
+        T_TS_367["✅ TS#367 loading spinner while listing<br/>installed apps"]:::other0_done
+        T_TS_366["✅ TS#366 : migrate feature flags to<br/>Firebase Remote Config"]:::other0_done
+        T_TS_363["✅ TS#363 : uninstall speckit"]:::other0_done
+        T_TS_361["✅ TS#361 docs: refresh dependency graph<br/>after sync-project"]:::other0_done
         T_TS_359["✅ TS#359 docs: update dependency graph,<br/>tech debt tracker, and Claude<br/>settings"]:::other0_done
-        T_TS_357["📝 TS#357 visual design — refresh<br/>colors, typography, and<br/>component styling"]:::auth0_todo
+        T_TS_357["✅ TS#357 visual design — refresh<br/>colors, typography, and<br/>component styling"]:::auth0_done
         T_TS_355["📝 TS#355 : upgrade Expo SDK 51 → 55"]:::other0_todo
-        T_TS_354["📝 TS#354 : migrate Prisma → PowerSync +<br/>OP-SQLite local-only"]:::other0_todo
+        T_TS_354["✅ TS#354 : migrate Prisma → PowerSync +<br/>OP-SQLite local-only"]:::other0_done
         T_TS_353["✅ TS#353 : upgrade Node.js 18 → 22 LTS"]:::other0_done
         T_TS_352["📝 TS#352 : 'Resend Verification Email'<br/>not visible in Settings<br/>despite correct logic"]:::other0_todo
         T_TS_350["✅ TS#350 feature flag to hide Apple<br/>Sign In"]:::other0_done
@@ -321,20 +331,12 @@ flowchart LR
         T_TS_103["✅ TS#103 Accessibility Permission on<br/>App Start - 3 sp"]:::blocking0_done
         T_TS_102["✅ TS#102 Expo Module: Android Blocking<br/>Overlay Launcher - 1 sp"]:::blocking0_done
         T_TS_101["✅ TS#101 Decision Logic - 2 sp"]:::blocking0_done
-        T_TS_97["✅ TS#97 Launch Monitoring via<br/>AccessibilityService - 2 sp"]:::blocking0_done
-        T_TS_96["✅ TS#96 Phase - Guided Permission<br/>Setup - 3sp [3sp]"]:::other0_done
-        T_TS_95["✅ TS#95 expo-accessibility-service<br/>Module with isEnabled and<br/>askPermission - 3 sp"]:::other0_done
-        T_TS_93["✅ TS#93 env vars"]:::other0_done
-        T_TS_87["✅ TS#87 Google Sign-In with Firebase"]:::auth0_done
-        T_TS_86["✅ TS#86 Email/Password Authentication<br/>with Firebase"]:::auth0_done
-        T_TS_85["✅ TS#85 Firebase Authentication<br/>Infrastructure"]:::auth0_done
-        T_TS_81["✅ TS#81 🐛 Unnecessary Store State<br/>Management in<br/>`useAppInitialization` Hook"]:::other0_done
         T_EFS_4["✅ EFS#4 for this module and request<br/>for tutorial or guide"]:::blocking0_done
         T_TSBO_5["✅ TSBO#5 BlockingScheduler with<br/>schedule storage"]:::blocking0_done
         T_ELIA_10["✅ ELIA#10 : Add uniqueBy option to<br/>deduplicate apps by package or<br/>activity"]:::other0_done
         T_ELIA_1["📝 ELIA#1 ability to filter between<br/>system apps and user-installed<br/>apps on Android"]:::other0_todo
         T_TS_342["✅ TS#342 : add feature flags to hide<br/>unfinished UI sections before<br/>store submission"]:::other0_done
-        T_TS_340["📝 TS#340 OpacityPressable across<br/>codebase to replace inline<br/>opacity pattern"]:::other0_todo
+        T_TS_340["✅ TS#340 OpacityPressable across<br/>codebase to replace inline<br/>opacity pattern"]:::other0_done
         T_TS_335["✅ TS#335 : auto-verify email via deep<br/>link instead of manual refresh"]:::auth0_done
         T_TS_334["✅ TS#334 : redesign strict mode timer<br/>with wheel picker component"]:::blocking0_done
         T_TS_333["📝 TS#333 : local Prisma database not<br/>scoped per user — data leaks<br/>between accounts"]:::bug0_todo
@@ -370,8 +372,6 @@ flowchart LR
         T_TS_162["✅ TS#162 auth: change password when<br/>logged in [2sp]"]:::auth1_done
         T_TS_161["✅ TS#161 auth: implement email<br/>verification flow [3sp]"]:::auth0_done
         T_TS_160["✅ TS#160 auth: custom in-app password<br/>reset confirmation flow [5sp]"]:::auth0_done
-        T_TS_89["✅ TS#89 Authentication Error Handling [3sp]"]:::auth0_done
-        T_TS_88["📝 TS#88 Apple Sign-In with Firebase [3sp]"]:::auth0_todo
         T_TSBO_14["✅ TSBO#14 weekly recurrence in scheduler [5sp]"]:::blocking3_done
         T_TSBO_13["✅ TSBO#13 daily recurrence in scheduler [3sp]"]:::blocking2_done
     end
@@ -473,4 +473,4 @@ Quick reference showing what blocks what:
 
 ---
 
-*Auto-generated on 2026-02-21 from GitHub issue metadata*
+*Auto-generated on 2026-02-22 from GitHub issue metadata*
