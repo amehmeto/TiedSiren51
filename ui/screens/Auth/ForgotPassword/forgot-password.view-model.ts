@@ -1,3 +1,4 @@
+import { ISODateString } from '@/core/_ports_/date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 import { AuthBaseViewModel } from '@/ui/screens/Auth/auth-view-model-base'
 
@@ -10,6 +11,7 @@ export enum ForgotPasswordViewState {
 
 type SuccessViewModel = {
   type: ForgotPasswordViewState.Success
+  lastPasswordResetRequestAt: ISODateString | null
 }
 
 type FormViewModel = AuthBaseViewModel<
@@ -23,12 +25,14 @@ export type ForgotPasswordViewModel = FormViewModel | SuccessViewModel
 export function selectForgotPasswordViewModel(
   state: RootState,
 ): ForgotPasswordViewModel {
-  const { isLoading, error, isPasswordResetSent } = state.auth
+  const { isLoading, error, isPasswordResetSent, lastPasswordResetRequestAt } =
+    state.auth
   const { Success, Loading, Error, Idle } = ForgotPasswordViewState
 
   if (isPasswordResetSent) {
     return {
       type: Success,
+      lastPasswordResetRequestAt,
     }
   }
 

@@ -207,6 +207,10 @@ export function authentificationFixture(
       passwordResetShouldNotBeSent() {
         expect(authGateway.lastResetPasswordEmail).toBeNull()
       },
+      lastPasswordResetRequestAtShouldBe(expected: ISODateString) {
+        const { lastPasswordResetRequestAt } = store.getState().auth
+        expect(lastPasswordResetRequestAt).toBe(expected)
+      },
       passwordShouldBeCleared() {
         expect(store.getState().auth.password).toBe('')
       },

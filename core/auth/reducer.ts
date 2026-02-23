@@ -28,6 +28,7 @@ export type AuthState = {
   error: string | null
   errorType: AuthErrorType | null
   isPasswordResetSent: boolean
+  lastPasswordResetRequestAt: ISODateString | null
   isSendingVerificationEmail: boolean
   email: string
   password: string
@@ -93,6 +94,7 @@ function createInitialAuthState(): AuthState {
     error: null,
     errorType: null,
     isPasswordResetSent: false,
+    lastPasswordResetRequestAt: null,
     isSendingVerificationEmail: false,
     email: '',
     password: '',
@@ -177,14 +179,13 @@ export const reducer = createReducer<AuthState>(
         state.error = null
         state.errorType = null
         state.isPasswordResetSent = false
+        state.lastPasswordResetRequestAt = null
         state.email = ''
         state.password = ''
       })
-      .addCase(resetPassword.pending, (state) => {
-        state.isPasswordResetSent = false
-      })
-      .addCase(resetPassword.fulfilled, (state) => {
+      .addCase(resetPassword.fulfilled, (state, action) => {
         state.isPasswordResetSent = true
+        state.lastPasswordResetRequestAt = action.payload
       })
 
       .addCase(sendVerificationEmail.pending, (state) => {

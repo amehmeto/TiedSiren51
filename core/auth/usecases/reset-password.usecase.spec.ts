@@ -9,10 +9,24 @@ describe('Feature: Reset Password', () => {
   })
 
   it('should send password reset email successfully', async () => {
+    fixture.given.nowIs('2024-01-15T10:00:00.000Z')
+
     await fixture.when.resetPasswordFor('user@example.com')
 
     fixture.then.passwordResetShouldBeSentTo('user@example.com')
+    fixture.then.lastPasswordResetRequestAtShouldBe('2024-01-15T10:00:00.000Z')
     fixture.then.authShouldNotBeLoading()
+  })
+
+  it('should show toast when resending password reset email', async () => {
+    fixture.given.nowIs('2024-01-15T10:00:00.000Z')
+    await fixture.when.resetPasswordFor('user@example.com')
+
+    fixture.given.nowIs('2024-01-15T10:01:00.000Z')
+    await fixture.when.resetPasswordFor('user@example.com')
+
+    fixture.then.toastShouldShow('Password reset email sent! Check your inbox.')
+    fixture.then.lastPasswordResetRequestAtShouldBe('2024-01-15T10:01:00.000Z')
   })
 
   it('should fail when user is not found', async () => {

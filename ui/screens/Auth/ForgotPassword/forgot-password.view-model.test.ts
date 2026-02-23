@@ -62,6 +62,22 @@ describe('selectForgotPasswordViewModel', () => {
       const state = stateBuilder().withPasswordResetSent(true).build()
       const expectedViewModel: ForgotPasswordViewModel = {
         type: ForgotPasswordViewState.Success,
+        lastPasswordResetRequestAt: null,
+      }
+
+      const viewModel = selectForgotPasswordViewModel(state)
+
+      expect(viewModel).toStrictEqual(expectedViewModel)
+    })
+
+    it('should include lastPasswordResetRequestAt when available', () => {
+      const state = stateBuilder()
+        .withPasswordResetSent(true)
+        .withLastPasswordResetRequestAt('2024-01-15T10:00:00.000Z')
+        .build()
+      const expectedViewModel: ForgotPasswordViewModel = {
+        type: ForgotPasswordViewState.Success,
+        lastPasswordResetRequestAt: '2024-01-15T10:00:00.000Z',
       }
 
       const viewModel = selectForgotPasswordViewModel(state)
