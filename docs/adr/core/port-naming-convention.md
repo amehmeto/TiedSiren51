@@ -40,7 +40,7 @@ Use **no prefix** for port interfaces. Name them descriptively based on their ro
 - Pattern: `{Technology/Specificity}{PortName}`
 - Examples:
   - `FirebaseAuthGateway` implements `AuthGateway`
-  - `PrismaBlockSessionRepository` implements `BlockSessionRepository`
+  - `PowersyncBlockSessionRepository` implements `BlockSessionRepository`
   - `AndroidSirenTier` implements `SirenTier`
   - `RealNotificationService` implements `NotificationService`
 
@@ -68,7 +68,7 @@ Use **no prefix** for port interfaces. Name them descriptively based on their ro
 - Examples:
   - `/infra/auth-gateway/firebase.auth.gateway.ts` exports `FirebaseAuthGateway`
   - `/infra/siren-tier/AndroidSirenTier.ts` exports `AndroidSirenTier`
-  - `/infra/block-session-repository/prisma.block-session.repository.ts` exports `PrismaBlockSessionRepository`
+  - `/infra/block-session-repository/powersync.block-session.repository.ts` exports `PowersyncBlockSessionRepository`
 
 ## Examples
 
