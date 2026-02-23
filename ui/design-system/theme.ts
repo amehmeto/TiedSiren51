@@ -166,6 +166,10 @@ export const T = {
         strong: 80,
         modal: 95,
       },
+      reductionFactor: 4,
+      tint: {
+        dark: 'systemMaterialDark' as const,
+      },
     },
   },
   scroll: {
