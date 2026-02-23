@@ -1,17 +1,18 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { StyleSheet, Text } from 'react-native'
-import { useSelector } from 'react-redux'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch } from '@/core/_redux_/createStore'
+import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
+import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
-import {
-  EmailVerificationBannerViewState,
-  selectEmailVerificationBannerViewModel,
-} from './email-verification-banner.view-model'
+import { selectEmailVerificationBannerViewModel } from './email-verification-banner.view-model'
 
 export function EmailVerificationBanner() {
-  const viewState = useSelector(selectEmailVerificationBannerViewModel)
+  const viewModel = useSelector(selectEmailVerificationBannerViewModel)
+  const dispatch = useDispatch<AppDispatch>()
 
-  if (viewState === EmailVerificationBannerViewState.Hidden) return null
+  if (!viewModel.visible) return null
 
   return (
     <TiedSCard style={styles.container}>
@@ -24,6 +25,12 @@ export function EmailVerificationBanner() {
       <Text style={styles.description}>
         Check your inbox and tap the verification link.
       </Text>
+      <TiedSButton
+        text={viewModel.resendVerificationEmailLabel}
+        onPress={() => dispatch(sendVerificationEmail())}
+        isDisabled={viewModel.isSendingVerificationEmail}
+        style={styles.button}
+      />
     </TiedSCard>
   )
 }
@@ -46,5 +53,8 @@ const styles = StyleSheet.create({
     fontFamily: T.font.family.primary,
     color: T.color.textMuted,
     textAlign: 'center',
+  },
+  button: {
+    marginTop: T.spacing.medium,
   },
 })
