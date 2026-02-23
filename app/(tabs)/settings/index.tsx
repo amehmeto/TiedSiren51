@@ -5,7 +5,6 @@ import { ScrollView, StyleSheet, Text } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { logOut } from '@/core/auth/usecases/log-out.usecase'
-import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
 import { SettingsRow } from '@/ui/design-system/components/shared/SettingsRow'
 import { SettingsSection } from '@/ui/design-system/components/shared/SettingsSection'
 import { T } from '@/ui/design-system/theme'
@@ -37,21 +36,8 @@ export default function SettingsScreen() {
         <SettingsRow
           label={viewModel.authProviderLabel}
           icon="key-outline"
-          hasDivider={viewModel.showResendVerificationEmail}
           accessibilityLabel={`Sign-in method: ${viewModel.authProviderLabel}`}
         />
-        {viewModel.showResendVerificationEmail && (
-          <SettingsRow
-            label={viewModel.resendVerificationEmailLabel}
-            icon="send-outline"
-            onPress={
-              viewModel.isSendingVerificationEmail
-                ? undefined
-                : () => dispatch(sendVerificationEmail())
-            }
-            accessibilityLabel="Resend verification email"
-          />
-        )}
       </SettingsSection>
 
       {viewModel.hasPasswordProvider && (

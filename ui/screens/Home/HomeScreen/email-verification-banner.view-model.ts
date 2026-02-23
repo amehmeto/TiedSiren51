@@ -1,19 +1,35 @@
 import { RootState } from '@/core/_redux_/createStore'
 import { AuthProvider } from '@/core/auth/auth-user'
 
-export enum EmailVerificationBannerViewState {
-  Hidden = 'HIDDEN',
-  Visible = 'VISIBLE',
+type HiddenBanner = {
+  visible: false
 }
+
+type VisibleBanner = {
+  visible: true
+  isSendingVerificationEmail: boolean
+  resendVerificationEmailLabel: string
+}
+
+type EmailVerificationBannerViewModel = HiddenBanner | VisibleBanner
 
 export function selectEmailVerificationBannerViewModel(
   state: RootState,
-): EmailVerificationBannerViewState {
-  const { authUser } = state.auth
+): EmailVerificationBannerViewModel {
+  const { authUser, isSendingVerificationEmail } = state.auth
 
-  return !authUser ||
+  if (
+    !authUser ||
     authUser.isEmailVerified ||
     authUser.authProvider !== AuthProvider.Email
-    ? EmailVerificationBannerViewState.Hidden
-    : EmailVerificationBannerViewState.Visible
+  )
+    return { visible: false }
+
+  return {
+    visible: true,
+    isSendingVerificationEmail,
+    resendVerificationEmailLabel: isSendingVerificationEmail
+      ? 'Sending...'
+      : 'Resend Verification Email',
+  }
 }
