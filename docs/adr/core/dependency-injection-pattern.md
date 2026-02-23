@@ -12,7 +12,7 @@ TiedSiren51's hexagonal architecture requires injecting infrastructure dependenc
 
 - Repositories (BlockSession, Blocklist, Siren, RemoteDevice)
 - External services (Auth, Notifications, Database)
-- Utilities (Date provider, Background tasks)
+- Utilities (Date provider)
 
 Requirements:
 - **Testability**: Easily swap real implementations for fakes/stubs in tests
@@ -46,7 +46,6 @@ export type Dependencies = {
   notificationService: NotificationService
   databaseService: DatabaseService
   dateProvider: DateProvider
-  backgroundTaskService: BackgroundTaskService
 }
 ```
 

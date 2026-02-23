@@ -1,5 +1,4 @@
 import { expect } from 'vitest'
-import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
@@ -38,7 +37,6 @@ export function blockSessionFixture(
   const dateProvider = new StubDateProvider()
   const logger = new InMemoryLogger()
   const notificationService = new FakeNotificationService(logger)
-  const backgroundTaskService = new FakeBackgroundTaskService(logger)
   const dateTest = dateFixture(dateProvider)
 
   return {
@@ -59,7 +57,6 @@ export function blockSessionFixture(
         store = createTestStore({
           notificationService,
           dateProvider,
-          backgroundTaskService,
         })
         await store.dispatch(createBlockSession(payload))
       },
@@ -146,9 +143,6 @@ export function blockSessionFixture(
       ) {
         const lastCancelled = notificationService.lastCancelledNotificationIds
         expect(lastCancelled).toEqual(expectedNotificationIds)
-      },
-      backgroundTasksShouldBeScheduled(expectedTasks: string[]) {
-        expect(backgroundTaskService.lastScheduledTasks).toEqual(expectedTasks)
       },
     },
   }
