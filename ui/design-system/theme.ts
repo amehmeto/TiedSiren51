@@ -1,9 +1,9 @@
 export const T = {
   color: {
     transparent: 'transparent',
-    text: 'rgba(248, 250, 252, 1)',
+    text: 'rgba(255, 255, 255, 1)',
     textSecondary: 'rgba(30, 41, 59, 1)',
-    textMuted: 'rgba(148, 163, 184, 1)',
+    textMuted: 'rgba(203, 213, 225, 1)',
     darkBlue: 'rgba(8, 12, 50, 1)',
     midBlue: 'rgba(22, 33, 94, 1)',
     lightBlue: 'rgba(56, 189, 248, 1)',
@@ -20,6 +20,7 @@ export const T = {
     lightBlueOverlay: 'rgba(56, 189, 248, 0.08)',
     whiteOverlay: 'rgba(255, 255, 255, 0.1)',
     surfaceElevated: 'rgba(22, 33, 62, 1)',
+    cardBackground: 'rgba(18, 28, 52, 0.92)',
     borderSubtle: 'rgba(51, 65, 85, 0.4)',
     gradientMid: 'rgba(25, 32, 95, 1)',
     inputBackground: 'rgba(15, 23, 42, 0.3)',
@@ -164,7 +165,6 @@ export const T = {
         light: 25,
         medium: 50,
         strong: 80,
-        modal: 95,
       },
     },
   },
@@ -175,6 +175,7 @@ export const T = {
     },
   },
   height: {
+    header: 56,
     settingsRow: 44,
     pickerItem: 48,
     pickerButton: 57,

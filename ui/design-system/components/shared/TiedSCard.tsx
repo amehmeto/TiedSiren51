@@ -17,7 +17,7 @@ export function TiedSCard({ children, style }: TiedSCardProps) {
       experimentalBlurMethod={
         Platform.OS === 'android' ? 'dimezisBlurView' : undefined
       }
-      intensity={T.effects.blur.intensity.modal}
+      intensity={T.effects.blur.intensity.strong}
       style={[styles.container, style]}
       tint="systemMaterialDark"
     >
@@ -28,6 +28,7 @@ export function TiedSCard({ children, style }: TiedSCardProps) {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: T.color.cardBackground,
     padding: T.spacing.medium,
     marginTop: T.spacing.small,
     marginBottom: T.spacing.small,
