@@ -164,6 +164,14 @@ export const T = {
         light: 25,
         medium: 50,
         strong: 80,
+        modal: 95,
+      },
+      reductionFactor: 4,
+      method: {
+        android: 'dimezisBlurView' as const,
+      },
+      tint: {
+        dark: 'systemMaterialDark' as const,
       },
     },
   },
