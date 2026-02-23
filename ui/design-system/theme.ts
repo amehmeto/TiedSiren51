@@ -164,6 +164,7 @@ export const T = {
         light: 25,
         medium: 50,
         strong: 80,
+        modal: 95,
       },
     },
   },
