@@ -346,7 +346,6 @@ Upgrade to SDK 54 but disable New Architecture.
 ## Related Documentation
 
 - [Migration Strategy](migration-strategy.md) - Database migration approach
-- [Prisma Client Generation](prisma-client-generation.md) - Current Prisma setup
 - [Database Configuration](database-configuration.md) - Database paths and config
 
 ## External References
