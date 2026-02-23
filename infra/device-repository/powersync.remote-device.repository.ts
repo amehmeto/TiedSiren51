@@ -1,19 +1,12 @@
-import { AbstractPowerSyncDatabase } from '@powersync/common'
-import { Logger } from '@/core/_ports_/logger'
 import { RemoteDeviceRepository } from '@/core/_ports_/remote-device.repository'
 import { Device } from '@/core/device/device'
+import { PowersyncRepository } from '@/infra/__abstract__/powersync.repository'
 import { DeviceRecord } from '@/infra/database-service/powersync.schema'
 
-export class PowersyncRemoteDeviceRepository implements RemoteDeviceRepository {
-  private readonly logger: Logger
-
-  private readonly db: AbstractPowerSyncDatabase
-
-  constructor(db: AbstractPowerSyncDatabase, logger: Logger) {
-    this.db = db
-    this.logger = logger
-  }
-
+export class PowersyncRemoteDeviceRepository
+  extends PowersyncRepository
+  implements RemoteDeviceRepository
+{
   async findAll(): Promise<Device[]> {
     try {
       const devices = await this.db.getAll<DeviceRecord>('SELECT * FROM device')

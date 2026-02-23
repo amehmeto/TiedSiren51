@@ -1,19 +1,12 @@
-import { AbstractPowerSyncDatabase } from '@powersync/common'
-import { Logger } from '@/core/_ports_/logger'
 import { SirensRepository } from '@/core/_ports_/sirens.repository'
 import { AndroidSiren, Sirens } from '@/core/siren/sirens'
+import { PowersyncRepository } from '@/infra/__abstract__/powersync.repository'
 import { SirenRecord } from '@/infra/database-service/powersync.schema'
 
-export class PowersyncSirensRepository implements SirensRepository {
-  private readonly logger: Logger
-
-  private readonly db: AbstractPowerSyncDatabase
-
-  constructor(db: AbstractPowerSyncDatabase, logger: Logger) {
-    this.db = db
-    this.logger = logger
-  }
-
+export class PowersyncSirensRepository
+  extends PowersyncRepository
+  implements SirensRepository
+{
   async getSelectableSirens(): Promise<Sirens> {
     try {
       const sirens = await this.db.getAll<SirenRecord>('SELECT * FROM siren')

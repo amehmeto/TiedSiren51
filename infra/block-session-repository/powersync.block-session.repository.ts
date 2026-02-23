@@ -1,14 +1,14 @@
-import { AbstractPowerSyncDatabase, Transaction } from '@powersync/common'
+import { Transaction } from '@powersync/common'
 import { BlockSessionRepository } from '@/core/_ports_/block-session.repository'
 import { CreatePayload } from '@/core/_ports_/create.payload'
 import { assertHHmmString } from '@/core/_ports_/date-provider'
-import { Logger } from '@/core/_ports_/logger'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import {
   BlockingConditions,
   BlockSession,
 } from '@/core/block-session/block-session'
 import { Device } from '@/core/device/device'
+import { PowersyncRepository } from '@/infra/__abstract__/powersync.repository'
 import {
   BlockSessionBlocklistRecord,
   BlockSessionDeviceRecord,
@@ -16,16 +16,10 @@ import {
   DeviceRecord,
 } from '@/infra/database-service/powersync.schema'
 
-export class PowersyncBlockSessionRepository implements BlockSessionRepository {
-  private readonly logger: Logger
-
-  private readonly db: AbstractPowerSyncDatabase
-
-  constructor(db: AbstractPowerSyncDatabase, logger: Logger) {
-    this.db = db
-    this.logger = logger
-  }
-
+export class PowersyncBlockSessionRepository
+  extends PowersyncRepository
+  implements BlockSessionRepository
+{
   async create(
     sessionPayload: CreatePayload<BlockSession>,
   ): Promise<BlockSession> {
