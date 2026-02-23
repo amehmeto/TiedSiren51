@@ -30,7 +30,7 @@ export function selectSettingsViewModel(state: RootState): SettingsViewModel {
     authProviderLabel: AUTH_PROVIDER_LABELS[authProvider],
     hasPasswordProvider: authProvider === Email,
     showResendVerificationEmail:
-      authProvider === Email && isEmailVerified === false,
+      authUser !== null && authProvider === Email && isEmailVerified === false,
     isSendingVerificationEmail,
     resendVerificationEmailLabel: isSendingVerificationEmail
       ? 'Sending...'
