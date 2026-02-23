@@ -1,19 +1,12 @@
-import { AbstractPowerSyncDatabase } from '@powersync/common'
 import { ISODateString } from '@/core/_ports_/date-provider'
-import { Logger } from '@/core/_ports_/logger'
 import { TimerRepository } from '@/core/_ports_/timer.repository'
+import { PowersyncRepository } from '@/infra/__abstract__/powersync.repository'
 import { TimerRecord } from '@/infra/database-service/powersync.schema'
 
-export class PowersyncTimerRepository implements TimerRepository {
-  private readonly logger: Logger
-
-  private readonly db: AbstractPowerSyncDatabase
-
-  constructor(db: AbstractPowerSyncDatabase, logger: Logger) {
-    this.db = db
-    this.logger = logger
-  }
-
+export class PowersyncTimerRepository
+  extends PowersyncRepository
+  implements TimerRepository
+{
   async saveTimer(userId: string, endedAt: ISODateString): Promise<void> {
     try {
       const existing = await this.db.getOptional<TimerRecord>(
