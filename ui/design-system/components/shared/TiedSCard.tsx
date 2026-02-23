@@ -10,14 +10,16 @@ type TiedSCardOwnProps = {
 
 type TiedSCardProps = Readonly<TiedSCardOwnProps>
 
+const isAndroid = Platform.OS === 'android'
+
 export function TiedSCard({ children, style }: TiedSCardProps) {
   return (
     <BlurView
       blurReductionFactor={
-        Platform.OS === 'android' ? T.effects.blur.reductionFactor : undefined
+        isAndroid ? T.effects.blur.reductionFactor : undefined
       }
       experimentalBlurMethod={
-        Platform.OS === 'android' ? 'dimezisBlurView' : undefined
+        isAndroid ? T.effects.blur.method.android : undefined
       }
       intensity={T.effects.blur.intensity.modal}
       style={[styles.container, style]}

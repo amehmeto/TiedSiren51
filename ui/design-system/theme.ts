@@ -167,6 +167,9 @@ export const T = {
         modal: 95,
       },
       reductionFactor: 4,
+      method: {
+        android: 'dimezisBlurView' as const,
+      },
       tint: {
         dark: 'systemMaterialDark' as const,
       },
@@ -179,7 +182,6 @@ export const T = {
     },
   },
   height: {
-    header: 56,
     settingsRow: 44,
     pickerItem: 48,
     pickerButton: 57,
