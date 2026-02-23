@@ -54,19 +54,19 @@ function resolveEmailProviders(): Record<string, EmailProvider> {
     'icloud.com': {
       name: 'Apple Mail',
       iosDeepLink: 'message://',
-      androidDeepLink: 'message://',
+      androidDeepLink: '',
       webUrl: 'https://www.icloud.com/mail',
     },
     'me.com': {
       name: 'Apple Mail',
       iosDeepLink: 'message://',
-      androidDeepLink: 'message://',
+      androidDeepLink: '',
       webUrl: 'https://www.icloud.com/mail',
     },
     'mac.com': {
       name: 'Apple Mail',
       iosDeepLink: 'message://',
-      androidDeepLink: 'message://',
+      androidDeepLink: '',
       webUrl: 'https://www.icloud.com/mail',
     },
     'protonmail.com': {

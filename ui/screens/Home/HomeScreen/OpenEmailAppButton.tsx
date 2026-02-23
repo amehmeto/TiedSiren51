@@ -15,30 +15,41 @@ interface OpenEmailAppButtonProps {
   email: string
 }
 
-export function OpenEmailAppButton({ email }: OpenEmailAppButtonProps) {
-  const label = getOpenEmailLabel(email)
-
-  const handleOpenEmail = async () => {
+async function openEmailApp(email: string): Promise<void> {
+  try {
     const provider = getEmailProvider(email)
 
     if (provider) {
       const deepLink =
         Platform.OS === 'ios' ? provider.iosDeepLink : provider.androidDeepLink
-      const canOpen = await Linking.canOpenURL(deepLink)
-      if (canOpen) {
-        await Linking.openURL(deepLink)
-        return
+      if (deepLink) {
+        const canOpen = await Linking.canOpenURL(deepLink)
+        if (canOpen) {
+          await Linking.openURL(deepLink)
+          return
+        }
       }
     }
 
     const webUrl = getWebUrl(email)
-    if (webUrl) await Linking.openURL(webUrl)
+    if (webUrl) {
+      await Linking.openURL(webUrl)
+      return
+    }
+
+    await Linking.openURL(`mailto:${email}`)
+  } catch {
+    // Silently fail — user can manually open their email app
   }
+}
+
+export function OpenEmailAppButton({ email }: OpenEmailAppButtonProps) {
+  const label = getOpenEmailLabel(email)
 
   return (
     <TiedSButton
       text={label}
-      onPress={handleOpenEmail}
+      onPress={() => openEmailApp(email)}
       variant={TiedSButtonVariant.Secondary}
       style={styles.button}
     />
