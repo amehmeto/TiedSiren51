@@ -175,6 +175,7 @@ export const T = {
     },
   },
   height: {
+    header: 56,
     settingsRow: 44,
     pickerItem: 48,
     pickerButton: 57,

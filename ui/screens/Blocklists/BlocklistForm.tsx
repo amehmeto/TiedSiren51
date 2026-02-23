@@ -1,7 +1,8 @@
 import { useRouter } from 'expo-router'
 import * as React from 'react'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { Dimensions, StyleSheet, Text } from 'react-native'
+import { Dimensions, StyleSheet, Text, View } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import {
   Route,
   SceneRendererProps,
@@ -60,6 +61,7 @@ export function BlocklistForm({
 }: Readonly<BlocklistScreenProps>) {
   const dispatch = useDispatch<AppDispatch>()
   const router = useRouter()
+  const insets = useSafeAreaInsets()
   const featureFlags = useSelector(selectFeatureFlags)
   const {
     WEBSITE_BLOCKING: isWebsiteBlocking,
@@ -315,7 +317,9 @@ export function BlocklistForm({
   )
 
   return (
-    <>
+    <View
+      style={[styles.container, { paddingTop: insets.top + T.height.header }]}
+    >
       <Text style={styles.title}>Name</Text>
       <TiedSCard>
         <TiedSTextInput
@@ -344,11 +348,14 @@ export function BlocklistForm({
         onCancel={dismissSettingsWarning}
         onConfirm={confirmSettingsApp}
       />
-    </>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+  },
   title: {
     color: T.color.text,
     fontFamily: T.font.family.semibold,
