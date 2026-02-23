@@ -32,6 +32,7 @@ export function TiedSCard({ children, style }: TiedSCardProps) {
 
 const styles = StyleSheet.create({
   container: {
+    backgroundColor: T.color.cardBackground,
     padding: T.spacing.medium,
     marginTop: T.spacing.small,
     marginBottom: T.spacing.small,

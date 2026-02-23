@@ -26,7 +26,7 @@ export class PouchdbSirensRepository implements SirensRepository {
     return sirens
   }
 
-  async getSelectableSirens(): Promise<Sirens> {
+  async getSelectableSirens(_userId: string): Promise<Sirens> {
     try {
       const { _id, _rev, ...sirens } = await this.db.get('sirens')
       return sirens
@@ -38,7 +38,7 @@ export class PouchdbSirensRepository implements SirensRepository {
     }
   }
 
-  async addKeywordToSirens(keyword: string): Promise<void> {
+  async addKeywordToSirens(_userId: string, keyword: string): Promise<void> {
     try {
       await this.db.get('sirens').then(async (doc) => {
         return this.db.put({
@@ -56,7 +56,7 @@ export class PouchdbSirensRepository implements SirensRepository {
     }
   }
 
-  async addWebsiteToSirens(website: string): Promise<void> {
+  async addWebsiteToSirens(_userId: string, website: string): Promise<void> {
     try {
       await this.db.get('sirens').then(async (doc) => {
         return this.db.put({
@@ -74,7 +74,10 @@ export class PouchdbSirensRepository implements SirensRepository {
     }
   }
 
-  async addAndroidSirenToSirens(androidSiren: AndroidSiren): Promise<void> {
+  async addAndroidSirenToSirens(
+    _userId: string,
+    androidSiren: AndroidSiren,
+  ): Promise<void> {
     try {
       await this.db.get('sirens').then(async (doc) => {
         return this.db.put({
@@ -92,7 +95,7 @@ export class PouchdbSirensRepository implements SirensRepository {
     }
   }
 
-  async deleteAllSirens(): Promise<void> {
+  async deleteAllSirens(_userId: string): Promise<void> {
     try {
       const doc = await this.db.get('sirens')
       await this.db.put({

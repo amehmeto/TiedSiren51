@@ -9,13 +9,21 @@ export class PowersyncBlocklistRepository
   extends PowersyncRepository
   implements BlocklistRepository
 {
-  async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
+  async create(
+    userId: string,
+    blocklistPayload: CreatePayload<Blocklist>,
+  ): Promise<Blocklist> {
     try {
       const { id } = await this.db.get<{ id: string }>('SELECT uuid() as id')
 
       await this.db.execute(
-        'INSERT INTO blocklist (id, name, sirens) VALUES (?, ?, ?)',
-        [id, blocklistPayload.name, JSON.stringify(blocklistPayload.sirens)],
+        'INSERT INTO blocklist (id, user_id, name, sirens) VALUES (?, ?, ?, ?)',
+        [
+          id,
+          userId,
+          blocklistPayload.name,
+          JSON.stringify(blocklistPayload.sirens),
+        ],
       )
 
       const created = await this.db.get<BlocklistRecord>(
@@ -32,10 +40,11 @@ export class PowersyncBlocklistRepository
     }
   }
 
-  async findAll(): Promise<Blocklist[]> {
+  async findAll(userId: string): Promise<Blocklist[]> {
     try {
       const rows = await this.db.getAll<BlocklistRecord>(
-        'SELECT * FROM blocklist',
+        'SELECT * FROM blocklist WHERE user_id = ?',
+        [userId],
       )
 
       return rows.map(this.mapToBlocklist)
@@ -47,12 +56,15 @@ export class PowersyncBlocklistRepository
     }
   }
 
-  async update(payload: UpdatePayload<Blocklist>): Promise<void> {
+  async update(
+    userId: string,
+    payload: UpdatePayload<Blocklist>,
+  ): Promise<void> {
     try {
       const { name, sirens, id } = payload
       await this.db.execute(
-        'UPDATE blocklist SET name = ?, sirens = ? WHERE id = ?',
-        [name, JSON.stringify(sirens), id],
+        'UPDATE blocklist SET name = ?, sirens = ? WHERE id = ? AND user_id = ?',
+        [name, JSON.stringify(sirens), id, userId],
       )
     } catch (error) {
       this.logger.error(
@@ -62,11 +74,11 @@ export class PowersyncBlocklistRepository
     }
   }
 
-  async findById(id: string): Promise<Blocklist> {
+  async findById(userId: string, id: string): Promise<Blocklist> {
     try {
       const row = await this.db.getOptional<BlocklistRecord>(
-        'SELECT * FROM blocklist WHERE id = ?',
-        [id],
+        'SELECT * FROM blocklist WHERE id = ? AND user_id = ?',
+        [id, userId],
       )
 
       if (!row) throw new Error(`Blocklist ${id} not found`)
@@ -80,13 +92,16 @@ export class PowersyncBlocklistRepository
     }
   }
 
-  async delete(id: string): Promise<void> {
+  async delete(userId: string, id: string): Promise<void> {
     try {
       await this.db.execute(
-        'DELETE FROM block_session_blocklist WHERE blocklist_id = ?',
-        [id],
+        'DELETE FROM block_session_blocklist WHERE blocklist_id = ? AND blocklist_id IN (SELECT id FROM blocklist WHERE user_id = ?)',
+        [id, userId],
       )
-      await this.db.execute('DELETE FROM blocklist WHERE id = ?', [id])
+      await this.db.execute(
+        'DELETE FROM blocklist WHERE id = ? AND user_id = ?',
+        [id, userId],
+      )
     } catch (error) {
       this.logger.error(
         `[PowersyncBlocklistRepository] Failed to delete blocklist ${id}: ${error}`,
@@ -95,10 +110,14 @@ export class PowersyncBlocklistRepository
     }
   }
 
-  async deleteAll(): Promise<void> {
+  async deleteAll(userId: string): Promise<void> {
     try {
-      await this.db.execute('DELETE FROM block_session_blocklist')
-      await this.db.execute('DELETE FROM blocklist')
+      await this.db.execute(
+        `DELETE FROM block_session_blocklist WHERE blocklist_id IN
+          (SELECT id FROM blocklist WHERE user_id = ?)`,
+        [userId],
+      )
+      await this.db.execute('DELETE FROM blocklist WHERE user_id = ?', [userId])
     } catch (error) {
       this.logger.error(
         `[PowersyncBlocklistRepository] Failed to delete all blocklists: ${error}`,

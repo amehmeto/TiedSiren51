@@ -1,5 +1,6 @@
 import { beforeEach, describe, expect, it } from 'vitest'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'
+import { TEST_USER_ID } from '@/core/_tests_/test-constants'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { PrismaBlocklistRepository } from './prisma.blocklist.repository'
 
@@ -8,6 +9,8 @@ class TestPrismaBlocklistRepository extends PrismaBlocklistRepository {
     await this.baseClient.blocklist.deleteMany()
   }
 }
+
+const testUserId = TEST_USER_ID
 
 describe('PrismaBlocklistRepository', () => {
   let repository: TestPrismaBlocklistRepository
@@ -28,7 +31,7 @@ describe('PrismaBlocklistRepository', () => {
       id: expect.any(String),
     }
 
-    const created = await repository.create(blocklistPayload)
+    const created = await repository.create(testUserId, blocklistPayload)
 
     expect(created).toStrictEqual(expectedBlocklist)
   })
@@ -38,8 +41,8 @@ describe('PrismaBlocklistRepository', () => {
     // @ts-expect-error - removing id for creation
     delete blocklistPayload.id
 
-    const created = await repository.create(blocklistPayload)
-    const found = await repository.findById(created.id)
+    const created = await repository.create(testUserId, blocklistPayload)
+    const found = await repository.findById(testUserId, created.id)
     expect(found).toStrictEqual(created)
   })
 
@@ -52,11 +55,11 @@ describe('PrismaBlocklistRepository', () => {
 
     const createdBlocklists = []
     for (const blocklist of testBlocklists) {
-      const created = await repository.create(blocklist)
+      const created = await repository.create(testUserId, blocklist)
       createdBlocklists.push(created)
     }
 
-    const foundBlocklists = await repository.findAll()
+    const foundBlocklists = await repository.findAll(testUserId)
 
     expect(foundBlocklists).toHaveLength(createdBlocklists.length)
 
@@ -75,14 +78,14 @@ describe('PrismaBlocklistRepository', () => {
     // @ts-expect-error - removing id for creation
     delete blocklistPayload.id
 
-    const created = await repository.create(blocklistPayload)
+    const created = await repository.create(testUserId, blocklistPayload)
     const updatePayload = {
       ...created,
       name: 'updated name',
     }
 
-    await repository.update(updatePayload)
-    const found = await repository.findById(created.id)
+    await repository.update(testUserId, updatePayload)
+    const found = await repository.findById(testUserId, created.id)
     expect(found).toStrictEqual(updatePayload)
   })
 
@@ -91,10 +94,10 @@ describe('PrismaBlocklistRepository', () => {
     // @ts-expect-error - removing id for creation
     delete blocklistPayload.id
 
-    const created = await repository.create(blocklistPayload)
-    await repository.delete(created.id)
+    const created = await repository.create(testUserId, blocklistPayload)
+    await repository.delete(testUserId, created.id)
 
-    const promise = repository.findById(created.id)
+    const promise = repository.findById(testUserId, created.id)
 
     await expect(promise).rejects.toThrow()
   })

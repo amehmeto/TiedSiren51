@@ -9,6 +9,7 @@ import { createTestStore } from '../../_tests_/createTestStore'
 import { dateFixture } from '../../_tests_/date.fixture'
 import { Fixture } from '../../_tests_/fixture.type'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
+import { TEST_AUTH_USER } from '../../_tests_/test-constants'
 import { BlockSession, blockSessionAdapter } from '../block-session'
 import { selectAllBlockSessionIds } from '../selectors/selectAllBlockSessionIds'
 import { selectBlockSessionById } from '../selectors/selectBlockSessionById'
@@ -39,6 +40,10 @@ export function blockSessionFixture(
   const notificationService = new FakeNotificationService(logger)
   const dateTest = dateFixture(dateProvider)
 
+  testStateBuilderProvider.setState((builder) =>
+    builder.withAuthUser(TEST_AUTH_USER),
+  )
+
   return {
     given: {
       existingBlockSession(givenBlockSession: BlockSession) {
@@ -54,10 +59,13 @@ export function blockSessionFixture(
     },
     when: {
       creatingBlockSession: async (payload: CreateBlockSessionPayload) => {
-        store = createTestStore({
-          notificationService,
-          dateProvider,
-        })
+        store = createTestStore(
+          {
+            notificationService,
+            dateProvider,
+          },
+          testStateBuilderProvider.getState(),
+        )
         await store.dispatch(createBlockSession(payload))
       },
       duplicatingBlockSession: async (

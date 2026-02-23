@@ -2,6 +2,7 @@ import { column, Schema, Table } from '@powersync/react-native'
 
 const siren = new Table(
   {
+    user_id: column.text,
     type: column.text,
     value: column.text,
     name: column.text,
@@ -12,6 +13,7 @@ const siren = new Table(
 
 const blocklist = new Table(
   {
+    user_id: column.text,
     name: column.text,
     sirens: column.text,
   },
@@ -20,6 +22,7 @@ const blocklist = new Table(
 
 const block_session = new Table(
   {
+    user_id: column.text,
     name: column.text,
     started_at: column.text,
     ended_at: column.text,
@@ -32,6 +35,7 @@ const block_session = new Table(
 
 const device = new Table(
   {
+    user_id: column.text,
     type: column.text,
     name: column.text,
   },

@@ -1,5 +1,6 @@
 import { differenceInSeconds } from 'date-fns'
 import { createAppAsyncThunk } from '../../_redux_/create-app-thunk'
+import { selectAuthUserId } from '../../auth/selectors/selectAuthUserId'
 import { BlockSession } from '../block-session'
 
 export type CreateBlockSessionPayload = Omit<
@@ -10,15 +11,20 @@ export const createBlockSession = createAppAsyncThunk(
   'blockSession/createBlockSession',
   async (
     payload: CreateBlockSessionPayload,
-    { extra: { blockSessionRepository, notificationService, dateProvider } },
+    {
+      getState,
+      extra: { blockSessionRepository, notificationService, dateProvider },
+    },
   ) => {
+    const userId = selectAuthUserId(getState())
+    const { startedAt: rawStartedAt, endedAt: rawEndedAt, name } = payload
     const now = dateProvider.getNow()
-    const startedAt = dateProvider.recoverDate(payload.startedAt)
-    const endedAt = dateProvider.recoverDate(payload.endedAt)
+    const startedAt = dateProvider.recoverDate(rawStartedAt)
+    const endedAt = dateProvider.recoverDate(rawEndedAt)
     const startNotificationId =
       await notificationService.scheduleLocalNotification(
         'Tied Siren',
-        `Block session "${payload.name}" has started`,
+        `Block session "${name}" has started`,
         {
           seconds: differenceInSeconds(startedAt, now),
         },
@@ -26,12 +32,12 @@ export const createBlockSession = createAppAsyncThunk(
     const endNotificationId =
       await notificationService.scheduleLocalNotification(
         'Tied Siren',
-        `Block session "${payload.name}" has ended`,
+        `Block session "${name}" has ended`,
         {
           seconds: differenceInSeconds(endedAt, now),
         },
       )
-    return blockSessionRepository.create({
+    return blockSessionRepository.create(userId, {
       ...payload,
       startNotificationId,
       endNotificationId,

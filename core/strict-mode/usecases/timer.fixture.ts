@@ -4,7 +4,8 @@ import { AppStore } from '@/core/_redux_/createStore'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { Fixture } from '@/core/_tests_/fixture.type'
 import { stateBuilderProvider } from '@/core/_tests_/state-builder'
-import { AuthProvider, AuthUser } from '@/core/auth/auth-user'
+import { TEST_AUTH_USER, TEST_USER_ID } from '@/core/_tests_/test-constants'
+import { AuthUser } from '@/core/auth/auth-user'
 import { selectNullableAuthUserId } from '@/core/auth/selectors/selectNullableAuthUserId'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
@@ -12,8 +13,6 @@ import { extendTimer, ExtendTimerPayload } from './extend-timer.usecase'
 import { loadTimer } from './load-timer.usecase'
 import { notifyLockedSiren } from './notify-locked-siren.usecase'
 import { startTimer, StartTimerPayload } from './start-timer.usecase'
-
-const DEFAULT_USER_ID = 'test-user-id'
 
 const DEFAULT_TEST_DATE = new Date('2024-01-01T00:00:00.000Z')
 
@@ -28,17 +27,12 @@ export function timerFixture(
   const timerRepository = new FakeDataTimerRepository()
   const dateProvider = new StubDateProvider()
   dateProvider.now = new Date(DEFAULT_TEST_DATE)
-  const defaultAuthUser: AuthUser = {
-    id: DEFAULT_USER_ID,
-    email: 'test@example.com',
-    isEmailVerified: true,
-    authProvider: AuthProvider.Email,
-  }
+  const defaultAuthUser: AuthUser = TEST_AUTH_USER
 
   return {
     given: {
       existingTimer(endedAt: ISODateString) {
-        timerRepository.saveTimer(DEFAULT_USER_ID, endedAt)
+        timerRepository.saveTimer(TEST_USER_ID, endedAt)
         testStateBuilderProvider.setState((builder) =>
           builder.withAuthUser(defaultAuthUser).withStrictModeEndedAt(endedAt),
         )
@@ -106,7 +100,7 @@ export function timerFixture(
       },
       async timerShouldBePersisted(expectedEndedAt: string) {
         const userId =
-          selectNullableAuthUserId(store.getState()) ?? DEFAULT_USER_ID
+          selectNullableAuthUserId(store.getState()) ?? TEST_USER_ID
         const endedAt = await timerRepository.loadTimer(userId)
         expect(endedAt).toStrictEqual(expectedEndedAt)
       },

@@ -20,6 +20,7 @@ export const T = {
     lightBlueOverlay: 'rgba(56, 189, 248, 0.08)',
     whiteOverlay: 'rgba(255, 255, 255, 0.1)',
     surfaceElevated: 'rgba(22, 33, 62, 1)',
+    cardBackground: 'rgba(18, 28, 52, 0.92)',
     borderSubtle: 'rgba(51, 65, 85, 0.4)',
     gradientMid: 'rgba(25, 32, 95, 1)',
     inputBackground: 'rgba(15, 23, 42, 0.3)',
@@ -182,6 +183,7 @@ export const T = {
     },
   },
   height: {
+    header: 56,
     settingsRow: 44,
     pickerItem: 48,
     pickerButton: 57,

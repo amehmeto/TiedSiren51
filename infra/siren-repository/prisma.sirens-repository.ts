@@ -21,17 +21,20 @@ export class PrismaSirensRepository
     this.logger = logger
   }
 
-  async getSelectableSirens(): Promise<Sirens> {
+  async getSelectableSirens(_userId: string): Promise<Sirens> {
     try {
       const sirens = await this.baseClient.siren.findMany()
       return {
         android: sirens
           .filter((s: PrismaSiren) => s.type === 'android')
-          .map((s: PrismaSiren) => ({
-            packageName: s.value,
-            appName: s.name ?? '',
-            icon: s.icon ?? '',
-          })),
+          .map((s: PrismaSiren) => {
+            const { value, name, icon } = s
+            return {
+              packageName: value,
+              appName: name ?? '',
+              icon: icon ?? '',
+            }
+          }),
         ios: [],
         windows: [],
         macos: [],
@@ -51,7 +54,7 @@ export class PrismaSirensRepository
     }
   }
 
-  async addKeywordToSirens(keyword: string): Promise<void> {
+  async addKeywordToSirens(_userId: string, keyword: string): Promise<void> {
     try {
       await this.baseClient.siren.create({
         data: {
@@ -68,7 +71,7 @@ export class PrismaSirensRepository
     }
   }
 
-  async addWebsiteToSirens(website: string): Promise<void> {
+  async addWebsiteToSirens(_userId: string, website: string): Promise<void> {
     try {
       await this.baseClient.siren.create({
         data: {
@@ -85,15 +88,19 @@ export class PrismaSirensRepository
     }
   }
 
-  async addAndroidSirenToSirens(androidSiren: AndroidSiren): Promise<void> {
+  async addAndroidSirenToSirens(
+    _userId: string,
+    androidSiren: AndroidSiren,
+  ): Promise<void> {
     try {
+      const { packageName, appName, icon } = androidSiren
       await this.baseClient.siren.create({
         data: {
           id: String(uuid.v4()),
           type: 'android',
-          value: androidSiren.packageName,
-          name: androidSiren.appName,
-          icon: androidSiren.icon,
+          value: packageName,
+          name: appName,
+          icon,
         },
       })
     } catch (error) {
@@ -104,7 +111,7 @@ export class PrismaSirensRepository
     }
   }
 
-  async deleteAllSirens(): Promise<void> {
+  async deleteAllSirens(_userId: string): Promise<void> {
     try {
       await this.baseClient.siren.deleteMany()
     } catch (error) {

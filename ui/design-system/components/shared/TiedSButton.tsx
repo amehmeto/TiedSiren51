@@ -17,12 +17,16 @@ export enum TiedSButtonVariant {
   Danger = 'danger',
 }
 
+const { Primary, Secondary, Danger } = TiedSButtonVariant
+
 type TiedSButtonOwnProps = {
   onPress: () => void
   text: string | ReactNode
   style?: StyleProp<ViewStyle>
   isDisabled?: boolean
   variant?: TiedSButtonVariant
+  testID?: string
+  accessibilityLabel?: string
 }
 
 type TiedSButtonProps = Readonly<TiedSButtonOwnProps>
@@ -31,23 +35,23 @@ const variantContainerStyles: Record<
   TiedSButtonVariant,
   StyleProp<ViewStyle>
 > = {
-  [TiedSButtonVariant.Primary]: null,
-  [TiedSButtonVariant.Secondary]: {
+  [Primary]: null,
+  [Secondary]: {
     backgroundColor: T.color.surfaceElevated,
     borderWidth: T.border.width.thin,
     borderColor: T.color.borderSubtle,
     shadowOpacity: T.spacing.none,
     elevation: T.elevation.none,
   },
-  [TiedSButtonVariant.Danger]: {
+  [Danger]: {
     backgroundColor: T.color.red,
   },
 }
 
 const variantTextStyles: Record<TiedSButtonVariant, StyleProp<TextStyle>> = {
-  [TiedSButtonVariant.Primary]: null,
-  [TiedSButtonVariant.Secondary]: { color: T.color.text },
-  [TiedSButtonVariant.Danger]: { color: T.color.text },
+  [Primary]: null,
+  [Secondary]: { color: T.color.text },
+  [Danger]: { color: T.color.text },
 }
 
 export function TiedSButton({
@@ -55,7 +59,9 @@ export function TiedSButton({
   text,
   style,
   isDisabled,
-  variant = TiedSButtonVariant.Primary,
+  variant = Primary,
+  testID,
+  accessibilityLabel,
 }: TiedSButtonProps) {
   const { scaleStyle, handlers } = usePressScale()
 
@@ -73,7 +79,9 @@ export function TiedSButton({
         onPressOut={handlers.onPressOut}
         disabled={isDisabled}
         accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
         accessibilityState={{ disabled: !!isDisabled }}
+        testID={testID}
       >
         {typeof text === 'string' ? (
           <Text style={[styles.buttonText, variantTextStyles[variant]]}>

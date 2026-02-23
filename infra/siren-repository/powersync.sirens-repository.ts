@@ -7,9 +7,12 @@ export class PowersyncSirensRepository
   extends PowersyncRepository
   implements SirensRepository
 {
-  async getSelectableSirens(): Promise<Sirens> {
+  async getSelectableSirens(userId: string): Promise<Sirens> {
     try {
-      const sirens = await this.db.getAll<SirenRecord>('SELECT * FROM siren')
+      const sirens = await this.db.getAll<SirenRecord>(
+        'SELECT * FROM siren WHERE user_id = ?',
+        [userId],
+      )
 
       return {
         android: sirens
@@ -42,11 +45,11 @@ export class PowersyncSirensRepository
     }
   }
 
-  async addKeywordToSirens(keyword: string): Promise<void> {
+  async addKeywordToSirens(userId: string, keyword: string): Promise<void> {
     try {
       await this.db.execute(
-        'INSERT INTO siren (id, type, value, name, icon) VALUES (uuid(), ?, ?, ?, ?)',
-        ['keyword', keyword, '', ''],
+        'INSERT INTO siren (id, user_id, type, value, name, icon) VALUES (uuid(), ?, ?, ?, ?, ?)',
+        [userId, 'keyword', keyword, '', ''],
       )
     } catch (error) {
       this.logger.error(
@@ -56,11 +59,11 @@ export class PowersyncSirensRepository
     }
   }
 
-  async addWebsiteToSirens(website: string): Promise<void> {
+  async addWebsiteToSirens(userId: string, website: string): Promise<void> {
     try {
       await this.db.execute(
-        'INSERT INTO siren (id, type, value, name, icon) VALUES (uuid(), ?, ?, ?, ?)',
-        ['website', website, '', ''],
+        'INSERT INTO siren (id, user_id, type, value, name, icon) VALUES (uuid(), ?, ?, ?, ?, ?)',
+        [userId, 'website', website, '', ''],
       )
     } catch (error) {
       this.logger.error(
@@ -70,12 +73,15 @@ export class PowersyncSirensRepository
     }
   }
 
-  async addAndroidSirenToSirens(androidSiren: AndroidSiren): Promise<void> {
+  async addAndroidSirenToSirens(
+    userId: string,
+    androidSiren: AndroidSiren,
+  ): Promise<void> {
     try {
       const { packageName, appName, icon } = androidSiren
       await this.db.execute(
-        'INSERT INTO siren (id, type, value, name, icon) VALUES (uuid(), ?, ?, ?, ?)',
-        ['android', packageName, appName, icon],
+        'INSERT INTO siren (id, user_id, type, value, name, icon) VALUES (uuid(), ?, ?, ?, ?, ?)',
+        [userId, 'android', packageName, appName, icon],
       )
     } catch (error) {
       this.logger.error(
@@ -85,9 +91,9 @@ export class PowersyncSirensRepository
     }
   }
 
-  async deleteAllSirens(): Promise<void> {
+  async deleteAllSirens(userId: string): Promise<void> {
     try {
-      await this.db.execute('DELETE FROM siren')
+      await this.db.execute('DELETE FROM siren WHERE user_id = ?', [userId])
     } catch (error) {
       this.logger.error(
         `[PowersyncSirensRepository] Failed to delete all sirens: ${error}`,

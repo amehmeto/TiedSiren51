@@ -57,12 +57,6 @@ Replace **Prisma ORM** with **PowerSync + OP-SQLite** in **local-only mode** (no
    - Raw SQL queries via PowerSync's `.execute()`, `.get()`, `.getAll()`, `.getOptional()`
    - JSON serialization for `sirens` (Blocklist) and `blockingConditions` (BlockSession)
 
-4. **Legacy Migration** (`/infra/database-service/powersync.legacy-migration.ts`)
-   - Reads Prisma's `app.db` via OP-SQLite raw connection
-   - Maps camelCase columns to snake_case and `"A"`/`"B"` junction columns to explicit foreign keys
-   - Renames old file to `app.db.migrated` on success
-   - Uses `ps_kv` flag to skip migration on subsequent launches
-
 ### Migration from Prisma
 
 - Prisma files moved to obsolete status (not deleted)

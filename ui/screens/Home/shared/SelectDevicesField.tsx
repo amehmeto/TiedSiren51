@@ -7,7 +7,6 @@ import { DevicesModal } from '@/ui/screens/Home/shared/DevicesModal'
 type SelectDevicesFieldFields = {
   selectedDevices: Device[]
   setFieldValue: (field: string, value: Device[]) => void
-  availableDevices: Device[]
 }
 
 type SelectDevicesFieldProps = Readonly<SelectDevicesFieldFields>
@@ -15,7 +14,6 @@ type SelectDevicesFieldProps = Readonly<SelectDevicesFieldFields>
 export function SelectDevicesField({
   selectedDevices,
   setFieldValue,
-  availableDevices,
 }: SelectDevicesFieldProps) {
   const [isModalOpen, setIsModalOpen] = useState(false)
 
@@ -40,7 +38,6 @@ export function SelectDevicesField({
         currentSelections={selectedDevices}
         onRequestClose={() => setIsModalOpen(false)}
         setFieldValue={setFieldValue}
-        devices={availableDevices}
       />
     </>
   )
