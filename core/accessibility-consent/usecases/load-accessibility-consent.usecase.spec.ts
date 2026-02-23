@@ -1,17 +1,17 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
-import { InMemoryConsentStorage } from '@/infra/consent-storage/in-memory.consent.storage'
+import { InMemoryConsentRepository } from '@/infra/consent-repository/in-memory.consent.repository'
 import { loadAccessibilityConsent } from './load-accessibility-consent.usecase'
 
 describe('loadAccessibilityConsent usecase', () => {
-  let consentStorage: InMemoryConsentStorage
+  let consentRepository: InMemoryConsentRepository
 
   beforeEach(() => {
-    consentStorage = new InMemoryConsentStorage()
+    consentRepository = new InMemoryConsentRepository()
   })
 
   test('should load false when user has not consented', async () => {
-    const store = createTestStore({ consentStorage })
+    const store = createTestStore({ consentRepository })
 
     await store.dispatch(loadAccessibilityConsent())
 
@@ -20,8 +20,8 @@ describe('loadAccessibilityConsent usecase', () => {
   })
 
   test('should load true when user has already consented', async () => {
-    await consentStorage.giveConsent()
-    const store = createTestStore({ consentStorage })
+    await consentRepository.giveConsent()
+    const store = createTestStore({ consentRepository })
 
     await store.dispatch(loadAccessibilityConsent())
 
@@ -30,8 +30,8 @@ describe('loadAccessibilityConsent usecase', () => {
   })
 
   test('should fallback to false when storage fails', async () => {
-    consentStorage.simulateError()
-    const store = createTestStore({ consentStorage })
+    consentRepository.simulateError()
+    const store = createTestStore({ consentRepository })
 
     await store.dispatch(loadAccessibilityConsent())
 

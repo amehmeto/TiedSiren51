@@ -1,6 +1,6 @@
-import { ConsentStorage } from '@/core/_ports_/consent.storage'
+import { ConsentRepository } from '@/core/_ports_/consent.repository'
 
-export class InMemoryConsentStorage implements ConsentStorage {
+export class InMemoryConsentRepository implements ConsentRepository {
   private hasGivenConsent = false
 
   private shouldThrow = false
@@ -10,7 +10,7 @@ export class InMemoryConsentStorage implements ConsentStorage {
   }
 
   async hasConsented(): Promise<boolean> {
-    if (this.shouldThrow) throw new Error('Simulated consent storage error')
+    if (this.shouldThrow) throw new Error('Simulated consent repository error')
     return this.hasGivenConsent
   }
 
