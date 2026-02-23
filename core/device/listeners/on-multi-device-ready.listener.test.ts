@@ -1,10 +1,11 @@
-import { beforeEach, describe, expect, it } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { AuthProvider } from '@/core/auth/auth-user'
 import { loadFeatureFlags } from '@/core/feature-flag/usecases/load-feature-flags.usecase'
 import { FeatureFlagKey } from '@/feature-flags'
 import { InMemoryFeatureFlagProvider } from '@/infra/feature-flag-provider/in-memory.feature-flag.provider'
+import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 
 const authenticatedState = stateBuilder()
   .withAuthUser({
@@ -17,15 +18,20 @@ const authenticatedState = stateBuilder()
 
 describe('onMultiDeviceReady listener', () => {
   let featureFlagProvider: InMemoryFeatureFlagProvider
+  let logger: InMemoryLogger
 
   beforeEach(() => {
     featureFlagProvider = new InMemoryFeatureFlagProvider()
+    logger = new InMemoryLogger()
   })
 
   it('should dispatch loadDevices when MULTI_DEVICE becomes enabled for authenticated user', async () => {
     featureFlagProvider.setFlag(FeatureFlagKey.MULTI_DEVICE, true)
 
-    const store = createTestStore({ featureFlagProvider }, authenticatedState)
+    const store = createTestStore(
+      { featureFlagProvider, logger },
+      authenticatedState,
+    )
 
     await store.dispatch(loadFeatureFlags())
 
@@ -38,7 +44,10 @@ describe('onMultiDeviceReady listener', () => {
   })
 
   it('should not dispatch loadDevices when MULTI_DEVICE stays disabled', async () => {
-    const store = createTestStore({ featureFlagProvider }, authenticatedState)
+    const store = createTestStore(
+      { featureFlagProvider, logger },
+      authenticatedState,
+    )
 
     await store.dispatch(loadFeatureFlags())
 
@@ -48,5 +57,47 @@ describe('onMultiDeviceReady listener', () => {
     )
 
     expect(hasLoadDevicesPending).toBe(false)
+  })
+
+  it('should not dispatch loadDevices when MULTI_DEVICE is enabled but user is not authenticated', async () => {
+    featureFlagProvider.setFlag(FeatureFlagKey.MULTI_DEVICE, true)
+
+    const store = createTestStore({ featureFlagProvider, logger })
+
+    await store.dispatch(loadFeatureFlags())
+
+    const dispatchedActions = store.getActions()
+    const hasLoadDevicesPending = dispatchedActions.some(
+      (action) => action.type === 'device/loadDevices/pending',
+    )
+
+    expect(hasLoadDevicesPending).toBe(false)
+  })
+
+  it('should log error when dispatch throws', async () => {
+    featureFlagProvider.setFlag(FeatureFlagKey.MULTI_DEVICE, true)
+
+    const store = createTestStore(
+      { featureFlagProvider, logger },
+      authenticatedState,
+    )
+
+    const realDispatch = store.dispatch
+
+    // eslint-disable-next-line no-restricted-properties -- store.dispatch can't be injected
+    vi.spyOn(store, 'dispatch').mockImplementation(() => {
+      throw new Error('Dispatch failed')
+    })
+
+    await realDispatch(loadFeatureFlags())
+
+    const logs = logger.getLogs()
+    const hasErrorLog = logs.some(
+      (log) =>
+        log.level === 'error' &&
+        log.message.includes('[onMultiDeviceReadyListener]'),
+    )
+
+    expect(hasErrorLog).toBe(true)
   })
 })
