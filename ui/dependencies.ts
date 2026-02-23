@@ -1,7 +1,6 @@
 import { Dependencies } from '@/core/_redux_/dependencies'
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
 import { FirebaseAuthGateway } from '@/infra/auth-gateway/firebase.auth.gateway'
-import { RealBackgroundTaskService } from '@/infra/background-task-service/real.background-task.service'
 import { PowersyncBlockSessionRepository } from '@/infra/block-session-repository/powersync.block-session.repository'
 import { PowersyncBlocklistRepository } from '@/infra/blocklist-repository/powersync.blocklist.repository'
 import { InMemoryConsentRepository } from '@/infra/consent-repository/in-memory.consent.repository'
@@ -31,7 +30,6 @@ const db = databaseService.getDatabase()
 
 const androidDependencies: Dependencies = {
   authGateway: new FirebaseAuthGateway(logger),
-  backgroundTaskService: new RealBackgroundTaskService(logger),
   blockSessionRepository: new PowersyncBlockSessionRepository(db, logger),
   blocklistRepository: new PowersyncBlocklistRepository(db, logger),
   consentRepository: new PowersyncConsentRepository(db, logger),
@@ -60,7 +58,6 @@ const e2eDateProvider = createE2EDateProvider()
 
 const e2eTestsDependencies: Dependencies = {
   authGateway: new FakeAuthGateway(),
-  backgroundTaskService: new RealBackgroundTaskService(logger),
   blockSessionRepository: new PowersyncBlockSessionRepository(db, logger),
   blocklistRepository: new PowersyncBlocklistRepository(db, logger),
   consentRepository: new InMemoryConsentRepository(),
