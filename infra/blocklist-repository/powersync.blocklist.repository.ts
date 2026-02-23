@@ -1,21 +1,14 @@
-import { AbstractPowerSyncDatabase } from '@powersync/common'
 import { BlocklistRepository } from '@/core/_ports_/blocklist.repository'
 import { CreatePayload } from '@/core/_ports_/create.payload'
-import { Logger } from '@/core/_ports_/logger'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { Blocklist } from '@/core/blocklist/blocklist'
+import { PowersyncRepository } from '@/infra/__abstract__/powersync.repository'
 import { BlocklistRecord } from '@/infra/database-service/powersync.schema'
 
-export class PowersyncBlocklistRepository implements BlocklistRepository {
-  private readonly logger: Logger
-
-  private readonly db: AbstractPowerSyncDatabase
-
-  constructor(db: AbstractPowerSyncDatabase, logger: Logger) {
-    this.db = db
-    this.logger = logger
-  }
-
+export class PowersyncBlocklistRepository
+  extends PowersyncRepository
+  implements BlocklistRepository
+{
   async create(blocklistPayload: CreatePayload<Blocklist>): Promise<Blocklist> {
     try {
       const { id } = await this.db.get<{ id: string }>('SELECT uuid() as id')
