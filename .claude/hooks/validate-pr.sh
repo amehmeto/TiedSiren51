@@ -109,7 +109,20 @@ errors=()
 title=$(extract_title "$command" 2>/dev/null || echo "")
 body=$(extract_body "$command" 2>/dev/null || echo "")
 
-# Skip validation if no body (might be interactive)
+# Block gh pr create without a body
+if [ -z "$body" ] && [[ "$command" =~ gh\ pr\ create ]]; then
+  jq -n \
+    --arg reason "gh pr create must include a --body flag with PR description." \
+    --arg hint "Add --body with ## Summary, ## 🔗 Hierarchy (with clickable issue link), and ## Test plan sections." \
+    '{
+      "decision": "block",
+      "reason": $reason,
+      "hint": $hint
+    }'
+  exit 2
+fi
+
+# Skip validation if no body on edit (might be updating title/labels only)
 if [ -z "$body" ]; then
   exit 0
 fi
@@ -128,13 +141,13 @@ if ! echo "$body" | grep -qiE '^## Test [Pp]lan'; then
   errors+=("❌ Missing required section: ## Test plan")
 fi
 
-# Rule 3: Body must have a ## 🔗 Hierarchy section with issue link
+# Rule 3: Body must have a ## 🔗 Hierarchy section with clickable issue link
 if ! echo "$body" | grep -qE '^## 🔗 Hierarchy'; then
   errors+=("❌ Missing required section: ## 🔗 Hierarchy")
 else
-  # Check for issue link in hierarchy table (📋 Issue row with Closes/Fixes/Resolves #NNN or markdown link)
-  if ! echo "$body" | grep -qE '📋 Issue.*#[0-9]+'; then
-    errors+=("❌ Hierarchy section must include '📋 Issue' row with issue reference (e.g., 'Closes #184')")
+  # Check for 📋 Issue row with a full clickable GitHub issue URL
+  if ! echo "$body" | grep -qE '📋 Issue.*https://github\.com/[^/]+/[^/]+/issues/[0-9]+'; then
+    errors+=("❌ Hierarchy section must include '📋 Issue' row with a clickable GitHub link (e.g., '[Closes #184](https://github.com/amehmeto/TiedSiren51/issues/184)')")
   fi
 fi
 
@@ -171,7 +184,7 @@ Body:
 |-------|------|
 | 🚀 Initiative | [#XX - Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
 | 🏔️ Epic | [#XX - Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
-| 📋 Issue | Closes #ISSUE_NUMBER |  ← 'Closes/Fixes/Resolves' auto-closes issue on merge
+| 📋 Issue | [Closes #NNN](https://github.com/amehmeto/TiedSiren51/issues/NNN) |  ← full clickable link required
 
 ## Test plan
 - [x] Tests pass
