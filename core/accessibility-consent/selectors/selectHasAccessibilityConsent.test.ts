@@ -1,18 +1,18 @@
 import { beforeEach, describe, expect, test } from 'vitest'
 import { createTestStore } from '@/core/_tests_/createTestStore'
-import { InMemoryConsentStorage } from '@/infra/consent-storage/in-memory.consent.storage'
+import { InMemoryConsentRepository } from '@/infra/consent-repository/in-memory.consent.repository'
 import { loadAccessibilityConsent } from '../usecases/load-accessibility-consent.usecase'
 import { selectHasAccessibilityConsent } from './selectHasAccessibilityConsent'
 
 describe('selectHasAccessibilityConsent', () => {
-  let consentStorage: InMemoryConsentStorage
+  let consentRepository: InMemoryConsentRepository
 
   beforeEach(() => {
-    consentStorage = new InMemoryConsentStorage()
+    consentRepository = new InMemoryConsentRepository()
   })
 
   test('should return null initially', () => {
-    const store = createTestStore({ consentStorage })
+    const store = createTestStore({ consentRepository })
 
     const hasConsented = selectHasAccessibilityConsent(store.getState())
 
@@ -20,7 +20,7 @@ describe('selectHasAccessibilityConsent', () => {
   })
 
   test('should return false when user has not consented', async () => {
-    const store = createTestStore({ consentStorage })
+    const store = createTestStore({ consentRepository })
 
     await store.dispatch(loadAccessibilityConsent())
     const hasConsented = selectHasAccessibilityConsent(store.getState())
@@ -29,8 +29,8 @@ describe('selectHasAccessibilityConsent', () => {
   })
 
   test('should return true when user has consented', async () => {
-    await consentStorage.giveConsent()
-    const store = createTestStore({ consentStorage })
+    await consentRepository.giveConsent()
+    const store = createTestStore({ consentRepository })
 
     await store.dispatch(loadAccessibilityConsent())
     const hasConsented = selectHasAccessibilityConsent(store.getState())

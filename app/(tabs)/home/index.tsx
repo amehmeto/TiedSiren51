@@ -83,6 +83,7 @@ export default function HomeScreen() {
   return (
     <ScrollView
       contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
       showsVerticalScrollIndicator={false}
     >
       <Image style={styles.image} source={logoSource} />
