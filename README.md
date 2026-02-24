@@ -8,7 +8,7 @@ A React Native app blocker that helps users stay focused. Create "sirens" (apps,
 - **TypeScript** - Type-safe JavaScript
 - **Redux Toolkit** - State management
 - **Firebase Auth** - User authentication
-- **Prisma** - Database ORM
+- **PowerSync** - Offline-first sync with OP-SQLite
 
 ### Custom Expo Modules
 
@@ -146,17 +146,6 @@ npm run android
    ```
 
    This will create a `.env.local` file with development env variables.
-
-5. Set up Prisma (if using database features)
-
-   The project already has a Prisma schema configured (`schema.prisma`).
-
-   The Prisma Client is automatically generated during `npm install` (via postinstall hook).
-
-   To apply database migrations:
-   ```bash
-   npx prisma migrate dev
-   ```
 
 ## Development
 

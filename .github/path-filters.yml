@@ -53,6 +53,5 @@ config:
   - 'babel.config.cjs'
   - 'metro.config.cjs'
   - 'eas.json'
-  - 'schema.prisma'
   - 'index.js'
   - 'assets/**'

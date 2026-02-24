@@ -107,15 +107,6 @@ jobs:
       - name: Install platform-specific binaries
         run: npm install --no-save @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu
 
-      - name: Cache Prisma Client
-        uses: actions/cache@v4
-        with:
-          path: node_modules/.prisma
-          key: prisma-${{ hashFiles('schema.prisma') }}
-
-      - name: Generate Prisma Client
-        run: npx prisma generate
-
       - name: Run tests with coverage
         run: npm run test:cov
 
