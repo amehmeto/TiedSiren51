@@ -24,7 +24,10 @@ export function EmailVerificationBanner() {
       />
       <Text style={styles.title}>{viewModel.title}</Text>
       <Text style={styles.description}>{viewModel.description}</Text>
-      <OpenEmailAppButton email={viewModel.userEmail} />
+      <OpenEmailAppButton
+        email={viewModel.userEmail}
+        label={viewModel.openEmailLabel}
+      />
       <TiedSButton
         text={viewModel.resendVerificationEmailLabel}
         onPress={() => dispatch(sendVerificationEmail())}

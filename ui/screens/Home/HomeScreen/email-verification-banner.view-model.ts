@@ -1,5 +1,6 @@
 import { RootState } from '@/core/_redux_/createStore'
 import { AuthProvider } from '@/core/auth/auth-user'
+import { getOpenEmailLabel } from '@/core/auth/email-provider'
 
 type HiddenBanner = {
   visible: false
@@ -10,6 +11,7 @@ type VisibleBanner = {
   title: string
   description: string
   isSendingVerificationEmail: boolean
+  openEmailLabel: string
   resendVerificationEmailLabel: string
   userEmail: string
 }
@@ -32,6 +34,7 @@ export function selectEmailVerificationBannerViewModel(
     visible: true,
     title: 'Verify your email',
     description: 'Check your inbox and tap the verification link.',
+    openEmailLabel: getOpenEmailLabel(email),
     isSendingVerificationEmail,
     resendVerificationEmailLabel: isSendingVerificationEmail
       ? 'Sending...'

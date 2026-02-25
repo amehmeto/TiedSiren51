@@ -7,90 +7,34 @@ import {
 } from './email-provider'
 
 describe('extractDomain', () => {
-  test('should extract domain from email', () => {
-    const extractedDomain = extractDomain('user@gmail.com')
+  test.each<[string, string]>([
+    ['user@gmail.com', 'gmail.com'],
+    ['user@GMAIL.COM', 'gmail.com'],
+    ['invalid', ''],
+  ])('extractDomain("%s") → "%s"', (email, expectedDomain) => {
+    const extractedDomain = extractDomain(email)
 
-    expect(extractedDomain).toBe('gmail.com')
-  })
-
-  test('should lowercase the domain', () => {
-    const extractedDomain = extractDomain('user@GMAIL.COM')
-
-    expect(extractedDomain).toBe('gmail.com')
-  })
-
-  test('should return empty string for invalid email', () => {
-    const extractedDomain = extractDomain('invalid')
-
-    expect(extractedDomain).toBe('')
+    expect(extractedDomain).toBe(expectedDomain)
   })
 })
 
 describe('getEmailProvider', () => {
-  test('should return Gmail for gmail.com', () => {
-    const provider = getEmailProvider('user@gmail.com')
+  test.each<[string, string]>([
+    ['user@gmail.com', 'Gmail'],
+    ['user@googlemail.com', 'Gmail'],
+    ['user@outlook.com', 'Outlook'],
+    ['user@hotmail.com', 'Outlook'],
+    ['user@live.com', 'Outlook'],
+    ['user@yahoo.com', 'Yahoo Mail'],
+    ['user@icloud.com', 'Apple Mail'],
+    ['user@me.com', 'Apple Mail'],
+    ['user@mac.com', 'Apple Mail'],
+    ['user@protonmail.com', 'Proton Mail'],
+    ['user@proton.me', 'Proton Mail'],
+  ])('should identify %s as %s', (email, expectedName) => {
+    const provider = getEmailProvider(email)
 
-    expect(provider?.name).toBe('Gmail')
-  })
-
-  test('should return Gmail for googlemail.com', () => {
-    const provider = getEmailProvider('user@googlemail.com')
-
-    expect(provider?.name).toBe('Gmail')
-  })
-
-  test('should return Outlook for outlook.com', () => {
-    const provider = getEmailProvider('user@outlook.com')
-
-    expect(provider?.name).toBe('Outlook')
-  })
-
-  test('should return Outlook for hotmail.com', () => {
-    const provider = getEmailProvider('user@hotmail.com')
-
-    expect(provider?.name).toBe('Outlook')
-  })
-
-  test('should return Outlook for live.com', () => {
-    const provider = getEmailProvider('user@live.com')
-
-    expect(provider?.name).toBe('Outlook')
-  })
-
-  test('should return Yahoo Mail for yahoo.com', () => {
-    const provider = getEmailProvider('user@yahoo.com')
-
-    expect(provider?.name).toBe('Yahoo Mail')
-  })
-
-  test('should return Apple Mail for icloud.com', () => {
-    const provider = getEmailProvider('user@icloud.com')
-
-    expect(provider?.name).toBe('Apple Mail')
-  })
-
-  test('should return Apple Mail for me.com', () => {
-    const provider = getEmailProvider('user@me.com')
-
-    expect(provider?.name).toBe('Apple Mail')
-  })
-
-  test('should return Apple Mail for mac.com', () => {
-    const provider = getEmailProvider('user@mac.com')
-
-    expect(provider?.name).toBe('Apple Mail')
-  })
-
-  test('should return Proton Mail for protonmail.com', () => {
-    const provider = getEmailProvider('user@protonmail.com')
-
-    expect(provider?.name).toBe('Proton Mail')
-  })
-
-  test('should return Proton Mail for proton.me', () => {
-    const provider = getEmailProvider('user@proton.me')
-
-    expect(provider?.name).toBe('Proton Mail')
+    expect(provider?.name).toBe(expectedName)
   })
 
   test('should return null for unknown domain', () => {

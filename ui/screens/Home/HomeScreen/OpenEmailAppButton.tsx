@@ -1,10 +1,6 @@
 import * as Linking from 'expo-linking'
 import { StyleSheet } from 'react-native'
-import {
-  getEmailProvider,
-  getOpenEmailLabel,
-  getWebUrl,
-} from '@/core/auth/email-provider'
+import { getEmailProvider, getWebUrl } from '@/core/auth/email-provider'
 import { dependencies } from '@/ui/dependencies'
 import {
   TiedSButton,
@@ -14,6 +10,7 @@ import { T } from '@/ui/design-system/theme'
 
 interface OpenEmailAppButtonProps {
   email: string
+  label: string
 }
 
 async function openEmailApp(email: string): Promise<void> {
@@ -42,9 +39,7 @@ async function openEmailApp(email: string): Promise<void> {
   }
 }
 
-export function OpenEmailAppButton({ email }: OpenEmailAppButtonProps) {
-  const label = getOpenEmailLabel(email)
-
+export function OpenEmailAppButton({ email, label }: OpenEmailAppButtonProps) {
   return (
     <TiedSButton
       text={label}
