@@ -21,12 +21,27 @@ describe('Feature: Authenticate with Email', () => {
 
     await fixture.when.signUpWithEmail('amehmeto@gmail.com', 'validPass123')
 
-    fixture.then.userShouldBeAuthenticated({
+    fixture.then.authUserShouldBe({
       id: 'auth-user-id',
       email: 'amehmeto@gmail.com',
       username: 'Arthur',
     })
     fixture.then.authShouldNotBeLoading()
+  })
+
+  it('should send verification email after successful signup', async () => {
+    fixture.given.authenticationWithEmailWillSucceedForUser(
+      {
+        id: 'auth-user-id',
+        email: 'amehmeto@gmail.com',
+        username: 'Arthur',
+      },
+      'validPass123',
+    )
+
+    await fixture.when.signUpWithEmail('amehmeto@gmail.com', 'validPass123')
+
+    fixture.then.verificationEmailShouldBeSent()
   })
 
   it('should show error when email is already in use', async () => {

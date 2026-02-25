@@ -9,6 +9,7 @@ type VisibleBanner = {
   visible: true
   isSendingVerificationEmail: boolean
   resendVerificationEmailLabel: string
+  error: string | null
 }
 
 type EmailVerificationBannerViewModel = HiddenBanner | VisibleBanner
@@ -16,7 +17,7 @@ type EmailVerificationBannerViewModel = HiddenBanner | VisibleBanner
 export function selectEmailVerificationBannerViewModel(
   state: RootState,
 ): EmailVerificationBannerViewModel {
-  const { authUser, isSendingVerificationEmail } = state.auth
+  const { authUser, isSendingVerificationEmail, error } = state.auth
 
   if (
     !authUser ||
@@ -31,5 +32,6 @@ export function selectEmailVerificationBannerViewModel(
     resendVerificationEmailLabel: isSendingVerificationEmail
       ? 'Sending...'
       : 'Resend Verification Email',
+    error: error?.message ?? null,
   }
 }
