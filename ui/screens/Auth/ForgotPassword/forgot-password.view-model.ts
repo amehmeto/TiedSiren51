@@ -2,7 +2,7 @@ import { ISODateString } from '@/core/_ports_/date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 import { AuthBaseViewModel } from '@/ui/screens/Auth/auth-view-model-base'
 
-export const RESEND_COOLDOWN_SECONDS = 60
+const RESEND_COOLDOWN_SECONDS = 60
 
 export enum ForgotPasswordViewState {
   Idle = 'IDLE',
@@ -28,7 +28,7 @@ export type ForgotPasswordViewModel = FormViewModel | SuccessViewModel
 
 export function resendCooldownSecondsRemaining(
   lastRequestAt: ISODateString,
-  now: number = Date.now(),
+  now: number,
 ): number {
   const elapsedMs = now - new Date(lastRequestAt).getTime()
   const remaining = RESEND_COOLDOWN_SECONDS - Math.floor(elapsedMs / 1000)
@@ -37,7 +37,7 @@ export function resendCooldownSecondsRemaining(
 
 function deriveResendState(
   lastPasswordResetRequestAt: ISODateString,
-  now?: number,
+  now: number,
 ): Pick<SuccessViewModel, 'isResendDisabled' | 'resendButtonText'> {
   const remainingSeconds = resendCooldownSecondsRemaining(
     lastPasswordResetRequestAt,
@@ -55,7 +55,10 @@ export type ResendState = Pick<
   'isResendDisabled' | 'resendButtonText'
 >
 
-export function selectResendState(state: RootState, now?: number): ResendState {
+export function selectResendState(
+  state: RootState,
+  now: number = Date.now(),
+): ResendState {
   const { lastPasswordResetRequestAt } = state.auth
   return lastPasswordResetRequestAt
     ? deriveResendState(lastPasswordResetRequestAt, now)
@@ -64,7 +67,7 @@ export function selectResendState(state: RootState, now?: number): ResendState {
 
 export function selectForgotPasswordViewModel(
   state: RootState,
-  now?: number,
+  now: number = Date.now(),
 ): ForgotPasswordViewModel {
   const { isLoading, lastPasswordResetRequestAt } = state.auth
   const error = state.auth.error?.message ?? null

@@ -175,7 +175,6 @@ export const reducer = createReducer<AuthState>(
       .addCase(clearAuthState, (state) => {
         state.isLoading = false
         state.error = null
-        state.lastPasswordResetRequestAt = null
         state.email = ''
         state.password = ''
       })
