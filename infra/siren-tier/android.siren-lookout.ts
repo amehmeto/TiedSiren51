@@ -87,6 +87,7 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
             this.listener({
               type: DetectedSirenType.App,
               identifier: packageName,
+              // eslint-disable-next-line local-rules/no-date-now
               timestamp: Date.now(),
             })
           }

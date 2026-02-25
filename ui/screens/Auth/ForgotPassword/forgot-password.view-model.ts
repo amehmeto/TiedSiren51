@@ -55,10 +55,7 @@ export type ResendState = Pick<
   'isResendDisabled' | 'resendButtonText'
 >
 
-export function selectResendState(
-  state: RootState,
-  now: number = Date.now(),
-): ResendState {
+export function selectResendState(state: RootState, now: number): ResendState {
   const { lastPasswordResetRequestAt } = state.auth
   return lastPasswordResetRequestAt
     ? deriveResendState(lastPasswordResetRequestAt, now)
@@ -67,7 +64,7 @@ export function selectResendState(
 
 export function selectForgotPasswordViewModel(
   state: RootState,
-  now: number = Date.now(),
+  now: number,
 ): ForgotPasswordViewModel {
   const { isLoading, lastPasswordResetRequestAt } = state.auth
   const error = state.auth.error?.message ?? null

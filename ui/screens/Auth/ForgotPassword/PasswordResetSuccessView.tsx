@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
+import { dependencies } from '@/ui/dependencies'
 import {
   TiedSButton,
   TiedSButtonVariant,
@@ -22,7 +23,7 @@ export function PasswordResetSuccessView({
   onBackToLogin,
   onResend,
 }: PasswordResetSuccessViewProps) {
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(() => dependencies.dateProvider.getNowMs())
 
   const { isResendDisabled, resendButtonText } = useSelector(
     (state: RootState) => selectResendState(state, now),
@@ -30,7 +31,10 @@ export function PasswordResetSuccessView({
 
   useEffect(() => {
     if (!isResendDisabled) return
-    const timer = setTimeout(() => setNow(Date.now()), 1000)
+    const timer = setTimeout(
+      () => setNow(dependencies.dateProvider.getNowMs()),
+      1000,
+    )
     return () => clearTimeout(timer)
   }, [isResendDisabled, now])
 

@@ -15,6 +15,7 @@ const dateProvider = new StubDateProvider()
 describe('selectForgotPasswordViewModel', () => {
   describe('Idle state', () => {
     it('should return idle view model when not loading and no error', () => {
+      const now = Date.now()
       const state = stateBuilder().build()
       const expectedViewModel: ForgotPasswordViewModel = {
         type: ForgotPasswordViewState.Idle,
@@ -23,7 +24,7 @@ describe('selectForgotPasswordViewModel', () => {
         error: null,
       }
 
-      const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state, now)
 
       expect(viewModel).toStrictEqual(expectedViewModel)
     })
@@ -31,6 +32,7 @@ describe('selectForgotPasswordViewModel', () => {
 
   describe('Loading state', () => {
     it('should return loading view model when auth is loading', () => {
+      const now = Date.now()
       const state = stateBuilder().withAuthLoading(true).build()
       const expectedViewModel: ForgotPasswordViewModel = {
         type: ForgotPasswordViewState.Loading,
@@ -39,7 +41,7 @@ describe('selectForgotPasswordViewModel', () => {
         error: null,
       }
 
-      const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state, now)
 
       expect(viewModel).toStrictEqual(expectedViewModel)
     })
@@ -47,6 +49,7 @@ describe('selectForgotPasswordViewModel', () => {
 
   describe('Error state', () => {
     it('should return error view model when error is present', () => {
+      const now = Date.now()
       const state = stateBuilder()
         .withAuthError({ message: 'No account found' })
         .build()
@@ -57,7 +60,7 @@ describe('selectForgotPasswordViewModel', () => {
         error: 'No account found',
       }
 
-      const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state, now)
 
       expect(viewModel).toStrictEqual(expectedViewModel)
     })
@@ -65,13 +68,14 @@ describe('selectForgotPasswordViewModel', () => {
 
   describe('Success state', () => {
     it('should return success view model when password reset was requested', () => {
+      const now = Date.now()
       const requestedAt: ISODateString = '2024-01-15T10:00:00.000Z'
       const state = stateBuilder()
         .withLastPasswordResetRequestAt(requestedAt)
         .build()
       const expectedSuccessType = ForgotPasswordViewState.Success
 
-      const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state, now)
 
       expect(viewModel.type).toBe(expectedSuccessType)
     })
@@ -120,13 +124,14 @@ describe('selectForgotPasswordViewModel', () => {
 
 describe('selectResendState', () => {
   it('should return enabled state when no password reset was requested', () => {
+    const now = Date.now()
     const state = stateBuilder().build()
     const expectedResendState = {
       isResendDisabled: false,
       resendButtonText: 'RESEND EMAIL',
     }
 
-    const resendState = selectResendState(state)
+    const resendState = selectResendState(state, now)
 
     expect(resendState).toStrictEqual(expectedResendState)
   })
