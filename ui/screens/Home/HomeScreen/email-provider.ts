@@ -1,7 +1,6 @@
 export type EmailProvider = {
   name: string
-  iosDeepLink: string
-  androidDeepLink: string
+  deepLink: string
   webUrl: string
 }
 
@@ -13,72 +12,57 @@ function resolveEmailProviders(): Record<string, EmailProvider> {
   return {
     'gmail.com': {
       name: 'Gmail',
-      iosDeepLink: 'googlegmail://',
-      androidDeepLink: 'intent://#Intent;package=com.google.android.gm;end',
+      deepLink: 'googlegmail://',
       webUrl: 'https://mail.google.com',
     },
     'googlemail.com': {
       name: 'Gmail',
-      iosDeepLink: 'googlegmail://',
-      androidDeepLink: 'intent://#Intent;package=com.google.android.gm;end',
+      deepLink: 'googlegmail://',
       webUrl: 'https://mail.google.com',
     },
     'outlook.com': {
       name: 'Outlook',
-      iosDeepLink: 'ms-outlook://',
-      androidDeepLink:
-        'intent://#Intent;package=com.microsoft.office.outlook;end',
+      deepLink: 'ms-outlook://',
       webUrl: 'https://outlook.live.com',
     },
     'hotmail.com': {
       name: 'Outlook',
-      iosDeepLink: 'ms-outlook://',
-      androidDeepLink:
-        'intent://#Intent;package=com.microsoft.office.outlook;end',
+      deepLink: 'ms-outlook://',
       webUrl: 'https://outlook.live.com',
     },
     'live.com': {
       name: 'Outlook',
-      iosDeepLink: 'ms-outlook://',
-      androidDeepLink:
-        'intent://#Intent;package=com.microsoft.office.outlook;end',
+      deepLink: 'ms-outlook://',
       webUrl: 'https://outlook.live.com',
     },
     'yahoo.com': {
       name: 'Yahoo Mail',
-      iosDeepLink: 'ymail://',
-      androidDeepLink:
-        'intent://#Intent;package=com.yahoo.mobile.client.android.mail;end',
+      deepLink: 'ymail://',
       webUrl: 'https://mail.yahoo.com',
     },
     'icloud.com': {
       name: 'Apple Mail',
-      iosDeepLink: 'message://',
-      androidDeepLink: '',
+      deepLink: 'message://',
       webUrl: 'https://www.icloud.com/mail',
     },
     'me.com': {
       name: 'Apple Mail',
-      iosDeepLink: 'message://',
-      androidDeepLink: '',
+      deepLink: 'message://',
       webUrl: 'https://www.icloud.com/mail',
     },
     'mac.com': {
       name: 'Apple Mail',
-      iosDeepLink: 'message://',
-      androidDeepLink: '',
+      deepLink: 'message://',
       webUrl: 'https://www.icloud.com/mail',
     },
     'protonmail.com': {
       name: 'Proton Mail',
-      iosDeepLink: 'protonmail://',
-      androidDeepLink: 'intent://#Intent;package=ch.protonmail.android;end',
+      deepLink: 'protonmail://',
       webUrl: 'https://mail.proton.me',
     },
     'proton.me': {
       name: 'Proton Mail',
-      iosDeepLink: 'protonmail://',
-      androidDeepLink: 'intent://#Intent;package=ch.protonmail.android;end',
+      deepLink: 'protonmail://',
       webUrl: 'https://mail.proton.me',
     },
   }

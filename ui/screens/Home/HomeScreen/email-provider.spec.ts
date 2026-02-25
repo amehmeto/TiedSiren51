@@ -96,8 +96,7 @@ describe('getEmailProvider', () => {
   test('should include deep link URLs for known provider', () => {
     const provider = getEmailProvider('user@gmail.com')
 
-    expect(provider?.iosDeepLink).toBe('googlegmail://')
-    expect(provider?.androidDeepLink).toContain('com.google.android.gm')
+    expect(provider?.deepLink).toBe('googlegmail://')
   })
 })
 

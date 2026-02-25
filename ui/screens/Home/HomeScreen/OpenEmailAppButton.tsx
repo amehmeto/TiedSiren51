@@ -1,5 +1,5 @@
 import * as Linking from 'expo-linking'
-import { Platform, StyleSheet } from 'react-native'
+import { StyleSheet } from 'react-native'
 import {
   TiedSButton,
   TiedSButtonVariant,
@@ -20,14 +20,10 @@ async function openEmailApp(email: string): Promise<void> {
     const provider = getEmailProvider(email)
 
     if (provider) {
-      const deepLink =
-        Platform.OS === 'ios' ? provider.iosDeepLink : provider.androidDeepLink
-      if (deepLink) {
-        const canOpen = await Linking.canOpenURL(deepLink)
-        if (canOpen) {
-          await Linking.openURL(deepLink)
-          return
-        }
+      const canOpen = await Linking.canOpenURL(provider.deepLink)
+      if (canOpen) {
+        await Linking.openURL(provider.deepLink)
+        return
       }
     }
 
