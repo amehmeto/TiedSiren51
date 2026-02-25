@@ -312,8 +312,6 @@ module.exports = {
         'local-rules/no-generic-result-variable': 'error',
         // Require type parameter on it.each / test.each / describe.each
         'local-rules/require-typed-each': 'error',
-        // Allow Date.now() in tests — not production code
-        'local-rules/no-date-now': 'off',
       },
     },
     // No data builders in production code

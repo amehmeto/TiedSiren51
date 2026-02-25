@@ -4,6 +4,7 @@ import type {
 } from '@amehmeto/expo-accessibility-service'
 import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { RealAndroidSirenLookout } from './android.siren-lookout'
 
@@ -28,11 +29,13 @@ const mockAskPermission = vi.mocked(AccessibilityService.askPermission)
 describe('RealAndroidSirenLookout', () => {
   let lookout: RealAndroidSirenLookout
   let logger: InMemoryLogger
+  let dateProvider: StubDateProvider
 
   beforeEach(() => {
     vi.clearAllMocks()
     logger = new InMemoryLogger()
-    lookout = new RealAndroidSirenLookout(logger)
+    dateProvider = new StubDateProvider()
+    lookout = new RealAndroidSirenLookout(logger, dateProvider)
   })
 
   describe('isEnabled', () => {
@@ -171,7 +174,7 @@ describe('RealAndroidSirenLookout', () => {
       const event: AccessibilityEvent = {
         packageName,
         className: 'MainActivity',
-        timestamp: Date.now(),
+        timestamp: dateProvider.getNowMs(),
       }
 
       lookout.onSirenDetected(listener)
@@ -211,7 +214,7 @@ describe('RealAndroidSirenLookout', () => {
       const event: AccessibilityEvent = {
         packageName: '',
         className: 'MainActivity',
-        timestamp: Date.now(),
+        timestamp: dateProvider.getNowMs(),
       }
 
       lookout.onSirenDetected(listener)
