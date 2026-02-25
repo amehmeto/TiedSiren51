@@ -1,12 +1,16 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { StyleSheet, Text } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
 import { selectEmailVerificationBannerViewModel } from './email-verification-banner.view-model'
+import { OpenEmailAppButton } from './OpenEmailAppButton'
 
 export function EmailVerificationBanner() {
   const viewModel = useSelector(selectEmailVerificationBannerViewModel)
@@ -21,16 +25,22 @@ export function EmailVerificationBanner() {
         size={T.icon.size.large}
         color={T.color.lightBlue}
       />
-      <Text style={styles.title}>Verify your email</Text>
-      <Text style={styles.description}>
-        Check your inbox and tap the verification link.
-      </Text>
-      <TiedSButton
-        text={viewModel.resendVerificationEmailLabel}
-        onPress={() => dispatch(sendVerificationEmail())}
-        isDisabled={viewModel.isSendingVerificationEmail}
-        style={styles.button}
-      />
+      <Text style={styles.title}>{viewModel.title}</Text>
+      <Text style={styles.description}>{viewModel.description}</Text>
+      <View style={styles.buttonRow}>
+        <TiedSButton
+          text={viewModel.resendVerificationEmailLabel}
+          onPress={() => dispatch(sendVerificationEmail())}
+          isDisabled={viewModel.isSendingVerificationEmail}
+          variant={TiedSButtonVariant.Secondary}
+          style={styles.rowButton}
+        />
+        <OpenEmailAppButton
+          email={viewModel.userEmail}
+          label={viewModel.openEmailLabel}
+          style={styles.rowButton}
+        />
+      </View>
     </TiedSCard>
   )
 }
@@ -54,7 +64,13 @@ const styles = StyleSheet.create({
     color: T.color.textMuted,
     textAlign: 'center',
   },
-  button: {
+  buttonRow: {
+    flexDirection: 'row',
+    gap: T.spacing.small,
     marginTop: T.spacing.medium,
+    alignSelf: 'stretch',
+  },
+  rowButton: {
+    flex: 1,
   },
 })
