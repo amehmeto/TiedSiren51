@@ -1,56 +1,48 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { ISODateString } from '@/core/_ports_/date-provider'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/core/_redux_/createStore'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSButtonVariant } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
+import { TiedSTextLink } from '@/ui/design-system/components/shared/TiedSTextLink'
 import { T } from '@/ui/design-system/theme'
-
-const RESEND_COOLDOWN_SECONDS = 60
+import {
+  ForgotPasswordViewState,
+  selectForgotPasswordViewModel,
+} from './forgot-password.view-model'
 
 interface PasswordResetSuccessViewProps {
   onClose: () => void
   onBackToLogin: () => void
   onResend: () => void
-  lastPasswordResetRequestAt: ISODateString | null
-}
-
-function resendCooldownSecondsRemaining(
-  lastRequestAt: ISODateString | null,
-): number {
-  if (!lastRequestAt) return 0
-  const elapsedMs = Date.now() - new Date(lastRequestAt).getTime()
-  const remaining = RESEND_COOLDOWN_SECONDS - Math.floor(elapsedMs / 1000)
-  return Math.max(0, remaining)
 }
 
 export function PasswordResetSuccessView({
   onClose,
   onBackToLogin,
   onResend,
-  lastPasswordResetRequestAt,
 }: PasswordResetSuccessViewProps) {
-  const [tick, setTick] = useState(0)
+  const [now, setNow] = useState(() => Date.now())
 
-  const remainingSeconds = resendCooldownSecondsRemaining(
-    lastPasswordResetRequestAt,
+  const viewModel = useSelector((state: RootState) =>
+    selectForgotPasswordViewModel(state, now),
   )
-  const isResendDisabled = remainingSeconds > 0
+
+  const isResendDisabled =
+    viewModel.type === ForgotPasswordViewState.Success
+      ? viewModel.isResendDisabled
+      : false
+  const resendButtonText =
+    viewModel.type === ForgotPasswordViewState.Success
+      ? viewModel.resendButtonText
+      : 'RESEND EMAIL'
 
   useEffect(() => {
     if (!isResendDisabled) return
-    const timer = setTimeout(() => setTick((t) => t + 1), 1000)
+    const timer = setTimeout(() => setNow(Date.now()), 1000)
     return () => clearTimeout(timer)
-  }, [isResendDisabled, tick])
-
-  const handleResend = useCallback(() => {
-    if (isResendDisabled) return
-    onResend()
-  }, [isResendDisabled, onResend])
-
-  const resendButtonText = isResendDisabled
-    ? `RESEND EMAIL (${remainingSeconds}s)`
-    : 'RESEND EMAIL'
+  }, [isResendDisabled, now])
 
   return (
     <View style={styles.mainContainer}>
@@ -60,18 +52,16 @@ export function PasswordResetSuccessView({
         <Text style={styles.messageText}>
           {"We've sent a password reset link to your email address."}
         </Text>
-        <TiedSButton
-          onPress={onBackToLogin}
-          text={'BACK TO LOGIN'}
-          style={styles.button}
-        />
-        <TiedSButton
-          onPress={handleResend}
-          text={resendButtonText}
-          style={styles.resendButton}
-          isDisabled={isResendDisabled}
-          variant={TiedSButtonVariant.Secondary}
-        />
+        <View style={styles.actionsRow}>
+          <TiedSTextLink text={'Back to Login'} onPress={onBackToLogin} />
+          <TiedSButton
+            onPress={onResend}
+            text={resendButtonText}
+            style={styles.resendButton}
+            isDisabled={isResendDisabled}
+            variant={TiedSButtonVariant.Secondary}
+          />
+        </View>
       </View>
     </View>
   )
@@ -100,10 +90,10 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: T.spacing.large,
   },
-  button: {
-    paddingVertical: T.spacing.small,
-    paddingHorizontal: T.spacing.xx_large,
-    marginBottom: T.spacing.x_large,
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: T.spacing.large,
   },
   resendButton: {
     paddingVertical: T.spacing.small,

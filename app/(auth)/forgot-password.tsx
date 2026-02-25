@@ -68,7 +68,6 @@ export default function ForgotPasswordScreen() {
         onClose={handleClose}
         onBackToLogin={handleBackToLogin}
         onResend={() => dispatch(resetPassword({ email }))}
-        lastPasswordResetRequestAt={viewModel.lastPasswordResetRequestAt}
       />
     )
   }

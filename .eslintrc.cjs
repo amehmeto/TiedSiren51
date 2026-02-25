@@ -133,7 +133,7 @@ module.exports = {
     'local-rules/prefer-object-destructuring': [
       'warn',
       {
-        threshold: 3,
+        threshold: 4,
         ignoredObjects: [
           'T',
           'styles',

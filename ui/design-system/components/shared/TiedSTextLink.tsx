@@ -41,6 +41,7 @@ const styles = StyleSheet.create({
   base: {
     fontSize: T.font.size.regular,
     fontFamily: T.font.family.medium,
+    textDecorationLine: 'underline',
   },
   default: {
     color: T.color.text,

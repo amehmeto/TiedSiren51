@@ -1,10 +1,20 @@
 import { describe, expect, it } from 'vitest'
+import {
+  assertISODateString,
+  ISODateString,
+} from '@/core/_ports_/date-provider'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import {
   ForgotPasswordViewModel,
   ForgotPasswordViewState,
   selectForgotPasswordViewModel,
 } from './forgot-password.view-model'
+
+function isoDateSecondsAgo(seconds: number, now: number): ISODateString {
+  const isoString = new Date(now - seconds * 1000).toISOString()
+  assertISODateString(isoString)
+  return isoString
+}
 
 describe('selectForgotPasswordViewModel', () => {
   describe('Idle state', () => {
@@ -58,29 +68,50 @@ describe('selectForgotPasswordViewModel', () => {
   })
 
   describe('Success state', () => {
-    it('should return success view model when password reset sent', () => {
-      const state = stateBuilder().withPasswordResetSent(true).build()
-      const expectedViewModel: ForgotPasswordViewModel = {
-        type: ForgotPasswordViewState.Success,
-        lastPasswordResetRequestAt: null,
-      }
+    it('should return success view model when password reset was requested', () => {
+      const requestedAt: ISODateString = '2024-01-15T10:00:00.000Z'
+      const state = stateBuilder()
+        .withLastPasswordResetRequestAt(requestedAt)
+        .build()
+      const expectedSuccessType = ForgotPasswordViewState.Success
 
       const viewModel = selectForgotPasswordViewModel(state)
+
+      expect(viewModel.type).toBe(expectedSuccessType)
+    })
+
+    it('should disable resend button during cooldown', () => {
+      const now = Date.now()
+      const requestedTenSecondsAgo = isoDateSecondsAgo(10, now)
+      const state = stateBuilder()
+        .withLastPasswordResetRequestAt(requestedTenSecondsAgo)
+        .build()
+      const expectedViewModel = {
+        type: ForgotPasswordViewState.Success,
+        lastPasswordResetRequestAt: requestedTenSecondsAgo,
+        isResendDisabled: true,
+        resendButtonText: 'RESEND EMAIL (50s)',
+      }
+
+      const viewModel = selectForgotPasswordViewModel(state, now)
 
       expect(viewModel).toStrictEqual(expectedViewModel)
     })
 
-    it('should include lastPasswordResetRequestAt when available', () => {
+    it('should enable resend button after cooldown expires', () => {
+      const now = Date.now()
+      const requestedTwoMinutesAgo = isoDateSecondsAgo(120, now)
       const state = stateBuilder()
-        .withPasswordResetSent(true)
-        .withLastPasswordResetRequestAt('2024-01-15T10:00:00.000Z')
+        .withLastPasswordResetRequestAt(requestedTwoMinutesAgo)
         .build()
-      const expectedViewModel: ForgotPasswordViewModel = {
+      const expectedViewModel = {
         type: ForgotPasswordViewState.Success,
-        lastPasswordResetRequestAt: '2024-01-15T10:00:00.000Z',
+        lastPasswordResetRequestAt: requestedTwoMinutesAgo,
+        isResendDisabled: false,
+        resendButtonText: 'RESEND EMAIL',
       }
 
-      const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state, now)
 
       expect(viewModel).toStrictEqual(expectedViewModel)
     })

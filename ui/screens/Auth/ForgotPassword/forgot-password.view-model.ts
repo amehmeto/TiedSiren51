@@ -2,6 +2,8 @@ import { ISODateString } from '@/core/_ports_/date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 import { AuthBaseViewModel } from '@/ui/screens/Auth/auth-view-model-base'
 
+export const RESEND_COOLDOWN_SECONDS = 60
+
 export enum ForgotPasswordViewState {
   Idle = 'IDLE',
   Loading = 'LOADING',
@@ -11,7 +13,9 @@ export enum ForgotPasswordViewState {
 
 type SuccessViewModel = {
   type: ForgotPasswordViewState.Success
-  lastPasswordResetRequestAt: ISODateString | null
+  lastPasswordResetRequestAt: ISODateString
+  isResendDisabled: boolean
+  resendButtonText: string
 }
 
 type FormViewModel = AuthBaseViewModel<
@@ -22,17 +26,42 @@ type FormViewModel = AuthBaseViewModel<
 
 export type ForgotPasswordViewModel = FormViewModel | SuccessViewModel
 
+export function resendCooldownSecondsRemaining(
+  lastRequestAt: ISODateString,
+  now: number = Date.now(),
+): number {
+  const elapsedMs = now - new Date(lastRequestAt).getTime()
+  const remaining = RESEND_COOLDOWN_SECONDS - Math.floor(elapsedMs / 1000)
+  return Math.max(0, remaining)
+}
+
+function deriveResendState(
+  lastPasswordResetRequestAt: ISODateString,
+  now?: number,
+): Pick<SuccessViewModel, 'isResendDisabled' | 'resendButtonText'> {
+  const remainingSeconds = resendCooldownSecondsRemaining(
+    lastPasswordResetRequestAt,
+    now,
+  )
+  const isResendDisabled = remainingSeconds > 0
+  const resendButtonText = isResendDisabled
+    ? `RESEND EMAIL (${remainingSeconds}s)`
+    : 'RESEND EMAIL'
+  return { isResendDisabled, resendButtonText }
+}
+
 export function selectForgotPasswordViewModel(
   state: RootState,
+  now?: number,
 ): ForgotPasswordViewModel {
-  const { isLoading, error, isPasswordResetSent, lastPasswordResetRequestAt } =
-    state.auth
+  const { isLoading, error, lastPasswordResetRequestAt } = state.auth
   const { Success, Loading, Error, Idle } = ForgotPasswordViewState
 
-  if (isPasswordResetSent) {
+  if (lastPasswordResetRequestAt) {
     return {
       type: Success,
       lastPasswordResetRequestAt,
+      ...deriveResendState(lastPasswordResetRequestAt, now),
     }
   }
 
