@@ -46,6 +46,8 @@
       "Bash(brew list:*)",
       "Bash(brew upgrade:*)",
       "Bash(cat:*)",
+      "Bash(cd /Users/arthurmehmetoglu/Development/expo-list-installed-apps && rm -rf node_modules package-lock.json && npm install 2>&1)",
+      "Bash(cd:*)",
       "Bash(claude mcp:*)",
       "Bash(cloc:*)",
       "Bash(diff:*)",

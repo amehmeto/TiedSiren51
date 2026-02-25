@@ -115,7 +115,6 @@ export default function TabLayout() {
         tabBarButton: (props) =>
           handleTabBarButton(props, { route, navigation }),
       })}
-      sceneContainerStyle={styles.sceneContainer}
     >
       {tabs.map((tab) => (
         <Tabs.Screen
@@ -143,8 +142,5 @@ const styles = StyleSheet.create({
     fontFamily: T.font.family.medium,
     fontSize: T.font.size.xSmall,
     letterSpacing: T.font.letterSpacing.tight,
-  },
-  sceneContainer: {
-    backgroundColor: T.color.transparent,
   },
 })

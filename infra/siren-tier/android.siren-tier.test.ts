@@ -1,4 +1,4 @@
-import { setCallbackClass } from '@amehmeto/expo-foreground-service'
+import { addCallbackClass } from '@amehmeto/expo-foreground-service'
 import {
   BLOCKING_CALLBACK_CLASS,
   setBlockedApps,
@@ -15,7 +15,7 @@ import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { AndroidSirenTier, toNativeBlockingWindows } from './android.siren-tier'
 
 vi.mock('@amehmeto/expo-foreground-service', () => ({
-  setCallbackClass: vi.fn(),
+  addCallbackClass: vi.fn(),
 }))
 
 vi.mock('@amehmeto/tied-siren-blocking-overlay', () => ({
@@ -24,7 +24,7 @@ vi.mock('@amehmeto/tied-siren-blocking-overlay', () => ({
   setBlockingSchedule: vi.fn(),
 }))
 
-const mockSetCallbackClass = vi.mocked(setCallbackClass)
+const mockSetCallbackClass = vi.mocked(addCallbackClass)
 const mockSetBlockedApps = vi.mocked(setBlockedApps)
 const mockSetBlockingSchedule = vi.mocked(setBlockingSchedule)
 
@@ -144,7 +144,7 @@ describe('AndroidSirenTier', () => {
   })
 
   describe('initializeNativeBlocking', () => {
-    it('calls setCallbackClass with BLOCKING_CALLBACK_CLASS', async () => {
+    it('calls addCallbackClass with BLOCKING_CALLBACK_CLASS', async () => {
       mockSetCallbackClass.mockResolvedValueOnce(undefined)
 
       await androidSirenTier.initializeNativeBlocking()
