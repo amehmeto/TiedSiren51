@@ -1,16 +1,17 @@
 import * as Linking from 'expo-linking'
-import { StyleSheet } from 'react-native'
+import { Platform, type StyleProp, type ViewStyle } from 'react-native'
 import { getEmailProvider, getWebUrl } from '@/core/auth/email-provider'
 import { dependencies } from '@/ui/dependencies'
 import {
   TiedSButton,
-  TiedSButtonVariant,
+  type TiedSButtonVariant,
 } from '@/ui/design-system/components/shared/TiedSButton'
-import { T } from '@/ui/design-system/theme'
 
 interface OpenEmailAppButtonProps {
   email: string
   label: string
+  variant?: TiedSButtonVariant
+  style?: StyleProp<ViewStyle>
 }
 
 async function openEmailApp(email: string): Promise<void> {
@@ -18,10 +19,19 @@ async function openEmailApp(email: string): Promise<void> {
     const provider = getEmailProvider(email)
 
     if (provider) {
-      const canOpen = await Linking.canOpenURL(provider.deepLink)
-      if (canOpen) {
-        await Linking.openURL(provider.deepLink)
-        return
+      if (Platform.OS === 'android') {
+        try {
+          await Linking.openURL(provider.deepLink)
+          return
+        } catch {
+          // App not installed, fall through to web/mailto fallback
+        }
+      } else {
+        const canOpen = await Linking.canOpenURL(provider.deepLink)
+        if (canOpen) {
+          await Linking.openURL(provider.deepLink)
+          return
+        }
       }
     }
 
@@ -39,19 +49,18 @@ async function openEmailApp(email: string): Promise<void> {
   }
 }
 
-export function OpenEmailAppButton({ email, label }: OpenEmailAppButtonProps) {
+export function OpenEmailAppButton({
+  email,
+  label,
+  variant,
+  style,
+}: OpenEmailAppButtonProps) {
   return (
     <TiedSButton
       text={label}
       onPress={() => openEmailApp(email)}
-      variant={TiedSButtonVariant.Secondary}
-      style={styles.button}
+      variant={variant}
+      style={style}
     />
   )
 }
-
-const styles = StyleSheet.create({
-  button: {
-    marginTop: T.spacing.small,
-  },
-})
