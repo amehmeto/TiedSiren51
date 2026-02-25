@@ -67,6 +67,42 @@ describe('prefer-parameterized-test', () => {
           `,
           filename: '/project/core/auth/email.ts',
         },
+        // Describe with non-function callback — should not crash
+        {
+          code: `
+            describe('edge case', someVariable)
+          `,
+          filename: '/project/core/auth/email.spec.ts',
+        },
+        // Tests without callback — should not crash
+        {
+          code: `
+            describe('edge', () => {
+              test('a')
+              test('b')
+              test('c')
+            })
+          `,
+          filename: '/project/core/auth/email.spec.ts',
+        },
+        // Describe with only one argument
+        {
+          code: `
+            describe('no callback')
+          `,
+          filename: '/project/core/auth/email.spec.ts',
+        },
+        // Mixed test and non-test statements
+        {
+          code: `
+            describe('mixed', () => {
+              const setup = () => {}
+              test('a', () => { expect(fn('a')).toBe('A') })
+              test('b', () => { expect(fn('b')).toBe('B') })
+            })
+          `,
+          filename: '/project/core/auth/email.spec.ts',
+        },
       ],
 
       invalid: [
@@ -89,6 +125,27 @@ describe('prefer-parameterized-test', () => {
             })
           `,
           filename: '/project/core/auth/email.spec.ts',
+          errors: [{ messageId: 'preferParameterized' }],
+        },
+        // Works with it() as well
+        {
+          code: `
+            describe('getProvider', () => {
+              it('should return Gmail', () => {
+                const p = getProvider('user@gmail.com')
+                expect(p).toBe('Gmail')
+              })
+              it('should return Outlook', () => {
+                const p = getProvider('user@outlook.com')
+                expect(p).toBe('Outlook')
+              })
+              it('should return Yahoo', () => {
+                const p = getProvider('user@yahoo.com')
+                expect(p).toBe('Yahoo')
+              })
+            })
+          `,
+          filename: '/project/core/auth/email.test.ts',
           errors: [{ messageId: 'preferParameterized' }],
         },
       ],
