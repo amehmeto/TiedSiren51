@@ -91,8 +91,10 @@ const reducer = createReducer(initialState, (builder) => {
       state.siren.availableSirens = action.payload
     })
     .addCase(withAuthError, (state, action) => {
-      state.auth.error = action.payload.message
-      state.auth.errorType = action.payload.errorType ?? null
+      state.auth.error = {
+        message: action.payload.message,
+        type: action.payload.errorType ?? null,
+      }
     })
     .addCase(withAuthLoading, (state, action) => {
       state.auth.isLoading = action.payload

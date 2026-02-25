@@ -129,6 +129,7 @@ module.exports = {
     // See: docs/adr/conventions/no-nested-call-expressions.md
     'local-rules/no-nested-call-expressions': 'off',
     'local-rules/no-redundant-nullish-ternary': 'error',
+    'local-rules/no-ternary-false-fallback': 'error',
     'local-rules/prefer-array-destructuring': 'error',
     'local-rules/prefer-object-destructuring': [
       'warn',

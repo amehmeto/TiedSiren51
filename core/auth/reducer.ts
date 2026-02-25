@@ -22,11 +22,15 @@ import { resetPassword } from './usecases/reset-password.usecase'
 import { sendVerificationEmail } from './usecases/send-verification-email.usecase'
 import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
 
+export type AuthStateError = {
+  message: string
+  type: AuthErrorType | null
+}
+
 export type AuthState = {
   authUser: AuthUser | null
   isLoading: boolean
-  error: string | null
-  errorType: AuthErrorType | null
+  error: AuthStateError | null
   lastPasswordResetRequestAt: ISODateString | null
   isSendingVerificationEmail: boolean
   email: string
@@ -91,7 +95,6 @@ function createInitialAuthState(): AuthState {
     authUser: null,
     isLoading: false,
     error: null,
-    errorType: null,
     lastPasswordResetRequestAt: null,
     isSendingVerificationEmail: false,
     email: '',
@@ -116,8 +119,8 @@ export const reducer = createReducer<AuthState>(
   createInitialAuthState(),
   (builder) => {
     // All auth thunks share the same pending/fulfilled/rejected state transitions
-    // (loading, error, errorType). The addMatcher calls below handle this shared
-    // logic, while thunk-specific behavior (e.g. setting authUser) stays in addCase.
+    // (loading, error). The addMatcher calls below handle this shared logic,
+    // while thunk-specific behavior (e.g. setting authUser) stays in addCase.
     const authThunks = [
       signInWithEmail,
       signUpWithEmail,
@@ -131,16 +134,13 @@ export const reducer = createReducer<AuthState>(
       .addCase(userAuthenticated, (state, action) => {
         state.authUser = action.payload
         state.error = null
-        state.errorType = null
         state.isLoading = false
       })
       .addCase(clearError, (state) => {
         state.error = null
-        state.errorType = null
       })
       .addCase(setError, (state, action) => {
-        state.error = action.payload
-        state.errorType = null
+        state.error = { message: action.payload, type: null }
       })
       .addCase(setEmail, (state, action) => {
         state.email = action.payload
@@ -175,7 +175,6 @@ export const reducer = createReducer<AuthState>(
       .addCase(clearAuthState, (state) => {
         state.isLoading = false
         state.error = null
-        state.errorType = null
         state.lastPasswordResetRequestAt = null
         state.email = ''
         state.password = ''
@@ -192,9 +191,13 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(sendVerificationEmail.rejected, (state, action) => {
         state.isSendingVerificationEmail = false
-        state.error = action.error.message ?? null
-        state.errorType = isAuthErrorType(action.error.code)
-          ? action.error.code
+        state.error = action.error.message
+          ? {
+              message: action.error.message,
+              type: isAuthErrorType(action.error.code)
+                ? action.error.code
+                : null,
+            }
           : null
       })
 
@@ -294,21 +297,23 @@ export const reducer = createReducer<AuthState>(
       .addMatcher(isPending(...authThunks), (state) => {
         state.isLoading = true
         state.error = null
-        state.errorType = null
       })
       .addMatcher(isFulfilled(...authThunks), (state) => {
         state.error = null
-        state.errorType = null
         state.isLoading = false
         state.password = ''
       })
       .addMatcher(isRejected(...authThunks), (state, action) => {
         state.isLoading = false
-        state.error = action.error.message ?? null
-        state.errorType = isAuthErrorType(action.error.code)
-          ? action.error.code
+        state.error = action.error.message
+          ? {
+              message: action.error.message,
+              type: isAuthErrorType(action.error.code)
+                ? action.error.code
+                : null,
+            }
           : null
-        if (state.errorType === AuthErrorType.Credential) state.password = ''
+        if (state.error?.type === AuthErrorType.Credential) state.password = ''
       })
   },
 )

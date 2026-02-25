@@ -187,11 +187,11 @@ export function authentificationFixture(
       },
       authenticationErrorsShouldBe(expectedError: string) {
         const state = store.getState()
-        expect(state.auth.error).toBe(expectedError)
+        expect(state.auth.error?.message).toBe(expectedError)
       },
       authErrorTypeShouldBe(expected: AuthErrorType) {
         const state = store.getState()
-        expect(state.auth.errorType).toBe(expected)
+        expect(state.auth.error?.type).toBe(expected)
       },
       authShouldBeLoading(isLoading: boolean) {
         const state = store.getState()

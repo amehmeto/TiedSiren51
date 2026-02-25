@@ -7,10 +7,7 @@ import { TiedSButtonVariant } from '@/ui/design-system/components/shared/TiedSBu
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import { TiedSTextLink } from '@/ui/design-system/components/shared/TiedSTextLink'
 import { T } from '@/ui/design-system/theme'
-import {
-  ForgotPasswordViewState,
-  selectForgotPasswordViewModel,
-} from './forgot-password.view-model'
+import { selectResendState } from './forgot-password.view-model'
 
 interface PasswordResetSuccessViewProps {
   onClose: () => void
@@ -25,18 +22,9 @@ export function PasswordResetSuccessView({
 }: PasswordResetSuccessViewProps) {
   const [now, setNow] = useState(() => Date.now())
 
-  const viewModel = useSelector((state: RootState) =>
-    selectForgotPasswordViewModel(state, now),
+  const { isResendDisabled, resendButtonText } = useSelector(
+    (state: RootState) => selectResendState(state, now),
   )
-
-  const isResendDisabled =
-    viewModel.type === ForgotPasswordViewState.Success
-      ? viewModel.isResendDisabled
-      : false
-  const resendButtonText =
-    viewModel.type === ForgotPasswordViewState.Success
-      ? viewModel.resendButtonText
-      : 'RESEND EMAIL'
 
   useEffect(() => {
     if (!isResendDisabled) return
