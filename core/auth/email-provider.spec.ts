@@ -75,6 +75,12 @@ describe('getEmailProvider', () => {
     expect(provider?.name).toBe('Apple Mail')
   })
 
+  test('should return Apple Mail for mac.com', () => {
+    const provider = getEmailProvider('user@mac.com')
+
+    expect(provider?.name).toBe('Apple Mail')
+  })
+
   test('should return Proton Mail for protonmail.com', () => {
     const provider = getEmailProvider('user@protonmail.com')
 
