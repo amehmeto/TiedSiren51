@@ -1,15 +1,15 @@
 import * as Linking from 'expo-linking'
 import { StyleSheet } from 'react-native'
 import {
+  getEmailProvider,
+  getOpenEmailLabel,
+  getWebUrl,
+} from '@/core/auth/email-provider'
+import {
   TiedSButton,
   TiedSButtonVariant,
 } from '@/ui/design-system/components/shared/TiedSButton'
 import { T } from '@/ui/design-system/theme'
-import {
-  getEmailProvider,
-  getOpenEmailLabel,
-  getWebUrl,
-} from './email-provider'
 
 interface OpenEmailAppButtonProps {
   email: string
