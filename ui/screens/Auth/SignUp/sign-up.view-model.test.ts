@@ -44,55 +44,22 @@ describe('selectSignUpViewModel', () => {
   })
 
   describe('Error state', () => {
-    it('should return error view model for email already in use', () => {
+    it.each<[string, string]>([
+      ['email already in use', 'Invalid email or password.'],
+      ['weak password', 'Password must be at least 6 characters.'],
+      [
+        'network error',
+        'No internet connection. Please check your network and try again.',
+      ],
+    ])('should return error view model for %s', (_scenario, errorMessage) => {
       const state = stateBuilder()
-        .withAuthError({ message: 'Invalid email or password.' })
+        .withAuthError({ message: errorMessage })
         .build()
       const expectedViewModel: SignUpViewModel = {
         type: SignUpViewState.Error,
         buttonText: 'CREATE YOUR ACCOUNT',
         isInputDisabled: false,
-        error: 'Invalid email or password.',
-        email: '',
-        password: '',
-      }
-
-      const viewModel = selectSignUpViewModel(state)
-
-      expect(viewModel).toStrictEqual(expectedViewModel)
-    })
-
-    it('should return error view model for weak password', () => {
-      const state = stateBuilder()
-        .withAuthError({ message: 'Password must be at least 6 characters.' })
-        .build()
-      const expectedViewModel: SignUpViewModel = {
-        type: SignUpViewState.Error,
-        buttonText: 'CREATE YOUR ACCOUNT',
-        isInputDisabled: false,
-        error: 'Password must be at least 6 characters.',
-        email: '',
-        password: '',
-      }
-
-      const viewModel = selectSignUpViewModel(state)
-
-      expect(viewModel).toStrictEqual(expectedViewModel)
-    })
-
-    it('should return error view model for network error', () => {
-      const state = stateBuilder()
-        .withAuthError({
-          message:
-            'No internet connection. Please check your network and try again.',
-        })
-        .build()
-      const expectedViewModel: SignUpViewModel = {
-        type: SignUpViewState.Error,
-        buttonText: 'CREATE YOUR ACCOUNT',
-        isInputDisabled: false,
-        error:
-          'No internet connection. Please check your network and try again.',
+        error: errorMessage,
         email: '',
         password: '',
       }
