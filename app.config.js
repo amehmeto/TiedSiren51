@@ -31,6 +31,15 @@ export default {
       googleServicesFile: './GoogleService-Info.plist',
       usesAppleSignIn: true,
       associatedDomains: [`applinks:${APP_DOMAIN}`],
+      infoPlist: {
+        LSApplicationQueriesSchemes: [
+          'googlegmail',
+          'ms-outlook',
+          'ymail',
+          'message',
+          'protonmail',
+        ],
+      },
     },
     android: {
       adaptiveIcon: {

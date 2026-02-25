@@ -59,6 +59,7 @@ const preferInlineVariable = require('../eslint-rules/prefer-inline-variable.cjs
 const preferJumpTable = require('../eslint-rules/prefer-jump-table.cjs')
 const preferNamedSelector = require('../eslint-rules/prefer-named-selector.cjs')
 const preferObjectDestructuring = require('../eslint-rules/prefer-object-destructuring.cjs')
+const preferParameterizedTest = require('../eslint-rules/prefer-parameterized-test.cjs')
 const preferShortCircuitJsx = require('../eslint-rules/prefer-short-circuit-jsx.cjs')
 const preferTernaryJsx = require('../eslint-rules/prefer-ternary-jsx.cjs')
 const preferTernaryReturn = require('../eslint-rules/prefer-ternary-return.cjs')
@@ -159,5 +160,6 @@ module.exports = {
     'no-lame-naming': noLameNaming,
     'no-unwrap': noUnwrap,
     'prefer-extracted-component': preferExtractedComponent,
+    'prefer-parameterized-test': preferParameterizedTest,
   },
 }

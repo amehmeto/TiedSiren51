@@ -29,38 +29,24 @@ describe('Feature: Reset Password', () => {
     fixture.then.lastPasswordResetRequestAtShouldBe('2024-01-15T10:01:00.000Z')
   })
 
-  it('should fail when user is not found', async () => {
-    fixture.given.authGatewayWillRejectWith('No account found with this email.')
-
-    await fixture.when.resetPasswordFor('nonexistent@example.com')
-
-    fixture.then.authenticationErrorsShouldBe(
+  it.each<[string, string, string]>([
+    [
+      'user is not found',
       'No account found with this email.',
-    )
-    fixture.then.passwordResetShouldNotBeSent()
-    fixture.then.authShouldNotBeLoading()
-  })
-
-  it('should fail when rate limited', async () => {
-    fixture.given.authGatewayWillRejectWith(
+      'nonexistent@example.com',
+    ],
+    [
+      'rate limited',
       'Too many requests. Please try again later.',
-    )
+      'user@example.com',
+    ],
+    ['invalid email', 'Invalid email address.', 'invalid-email'],
+  ])('should fail when %s', async (_scenario, errorMessage, email) => {
+    fixture.given.authGatewayWillRejectWith(errorMessage)
 
-    await fixture.when.resetPasswordFor('user@example.com')
+    await fixture.when.resetPasswordFor(email)
 
-    fixture.then.authenticationErrorsShouldBe(
-      'Too many requests. Please try again later.',
-    )
-    fixture.then.passwordResetShouldNotBeSent()
-    fixture.then.authShouldNotBeLoading()
-  })
-
-  it('should fail with invalid email', async () => {
-    fixture.given.authGatewayWillRejectWith('Invalid email address.')
-
-    await fixture.when.resetPasswordFor('invalid-email')
-
-    fixture.then.authenticationErrorsShouldBe('Invalid email address.')
+    fixture.then.authenticationErrorsShouldBe(errorMessage)
     fixture.then.passwordResetShouldNotBeSent()
     fixture.then.authShouldNotBeLoading()
   })

@@ -312,6 +312,7 @@ module.exports = {
         'local-rules/no-generic-result-variable': 'error',
         // Require type parameter on it.each / test.each / describe.each
         'local-rules/require-typed-each': 'error',
+        'local-rules/prefer-parameterized-test': 'error',
       },
     },
     // No data builders in production code
