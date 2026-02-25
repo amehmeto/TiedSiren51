@@ -211,6 +211,10 @@ export function authentificationFixture(
         const { lastPasswordResetRequestAt } = store.getState().auth
         expect(lastPasswordResetRequestAt).toBe(expected)
       },
+      lastPasswordResetRequestAtShouldBeNull() {
+        const { lastPasswordResetRequestAt } = store.getState().auth
+        expect(lastPasswordResetRequestAt).toBeNull()
+      },
       passwordShouldBeCleared() {
         expect(store.getState().auth.password).toBe('')
       },

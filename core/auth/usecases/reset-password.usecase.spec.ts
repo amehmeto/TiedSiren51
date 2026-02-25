@@ -48,6 +48,7 @@ describe('Feature: Reset Password', () => {
 
     fixture.then.authenticationErrorsShouldBe(errorMessage)
     fixture.then.passwordResetShouldNotBeSent()
+    fixture.then.lastPasswordResetRequestAtShouldBeNull()
     fixture.then.authShouldNotBeLoading()
   })
 })

@@ -2,7 +2,7 @@ import * as Linking from 'expo-linking'
 import { Platform } from 'react-native'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { openEmailApp } from './OpenEmailAppButton'
+import { openEmailApp } from './open-email-app'
 
 type LogEntry = { level: string; message: string }
 
@@ -27,7 +27,6 @@ vi.mock('expo-linking', () => ({
 
 vi.mock('react-native', () => ({
   Platform: { OS: 'android' },
-  StyleSheet: { create: vi.fn((s: unknown) => s) },
 }))
 
 vi.mock('@/ui/dependencies', () => ({
@@ -121,7 +120,7 @@ describe('openEmailApp', () => {
       const expectedLogEntry = {
         level: 'error',
         message: expect.stringContaining(
-          '[OpenEmailAppButton] Failed to open email app',
+          '[openEmailApp] Failed to open email app',
         ),
       }
       mockOpenURL.mockRejectedValueOnce(new Error('Cannot open URL'))

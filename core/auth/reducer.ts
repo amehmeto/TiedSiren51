@@ -90,6 +90,16 @@ export const setDeleteConfirmText = createAction<string>(
   'auth/setDeleteConfirmText',
 )
 
+type SerializedError = { message?: string; code?: string }
+
+function toAuthStateError(error: SerializedError): AuthStateError | null {
+  if (!error.message) return null
+  return {
+    message: error.message,
+    type: isAuthErrorType(error.code) ? error.code : null,
+  }
+}
+
 function createInitialAuthState(): AuthState {
   return {
     authUser: null,
@@ -190,14 +200,7 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(sendVerificationEmail.rejected, (state, action) => {
         state.isSendingVerificationEmail = false
-        state.error = action.error.message
-          ? {
-              message: action.error.message,
-              type: isAuthErrorType(action.error.code)
-                ? action.error.code
-                : null,
-            }
-          : null
+        state.error = toAuthStateError(action.error)
       })
 
       .addCase(applyEmailVerificationCode.fulfilled, (state) => {
@@ -304,14 +307,7 @@ export const reducer = createReducer<AuthState>(
       })
       .addMatcher(isRejected(...authThunks), (state, action) => {
         state.isLoading = false
-        state.error = action.error.message
-          ? {
-              message: action.error.message,
-              type: isAuthErrorType(action.error.code)
-                ? action.error.code
-                : null,
-            }
-          : null
+        state.error = toAuthStateError(action.error)
         if (state.error?.type === AuthErrorType.Credential) state.password = ''
       })
   },

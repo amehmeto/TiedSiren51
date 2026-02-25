@@ -2,6 +2,8 @@ import { ISODateString } from '@/core/_ports_/date-provider'
 import { RootState } from '@/core/_redux_/createStore'
 import { AuthBaseViewModel } from '@/ui/screens/Auth/auth-view-model-base'
 
+// Client-side UX guard; Firebase enforces its own server-side rate limit
+// (auth/too-many-requests) which is dynamic and not configurable.
 const RESEND_COOLDOWN_SECONDS = 60
 
 export enum ForgotPasswordViewState {
