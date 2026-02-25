@@ -76,10 +76,10 @@
     ]
   },
   "dependencies": {
-    "@amehmeto/expo-accessibility-service": "github:amehmeto/expo-accessibility-service",
-    "@amehmeto/expo-foreground-service": "github:amehmeto/expo-foreground-service",
-    "@amehmeto/expo-list-installed-apps": "github:amehmeto/expo-list-installed-apps",
-    "@amehmeto/tied-siren-blocking-overlay": "github:amehmeto/tied-siren-blocking-overlay",
+    "@amehmeto/expo-accessibility-service": "github:amehmeto/expo-accessibility-service#feat/expo-sdk-55",
+    "@amehmeto/expo-foreground-service": "github:amehmeto/expo-foreground-service#feat/expo-sdk-55",
+    "@amehmeto/expo-list-installed-apps": "github:amehmeto/expo-list-installed-apps#feat/expo-sdk-55",
+    "@amehmeto/tied-siren-blocking-overlay": "github:amehmeto/tied-siren-blocking-overlay#feat/expo-sdk-55",
     "@expo-google-fonts/inter": "^0.4.2",
     "@expo/vector-icons": "^15.0.2",
     "@faker-js/faker": "^8.4.1",
