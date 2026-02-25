@@ -5,6 +5,7 @@ import {
   getOpenEmailLabel,
   getWebUrl,
 } from '@/core/auth/email-provider'
+import { dependencies } from '@/ui/dependencies'
 import {
   TiedSButton,
   TiedSButtonVariant,
@@ -34,8 +35,10 @@ async function openEmailApp(email: string): Promise<void> {
     }
 
     await Linking.openURL(`mailto:${email}`)
-  } catch {
-    // Silently fail — user can manually open their email app
+  } catch (error) {
+    dependencies.logger.error(
+      `[OpenEmailAppButton] Failed to open email app: ${error}`,
+    )
   }
 }
 
