@@ -2,8 +2,10 @@ import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
-import { TiedSButtonVariant } from '@/ui/design-system/components/shared/TiedSButton'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import { TiedSTextLink } from '@/ui/design-system/components/shared/TiedSTextLink'
 import { T } from '@/ui/design-system/theme'

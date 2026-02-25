@@ -1,9 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import {
-  assertISODateString,
-  ISODateString,
-} from '@/core/_ports_/date-provider'
+import { SECOND } from '@/core/__constants__/time'
+import { ISODateString } from '@/core/_ports_/date-provider'
 import { stateBuilder } from '@/core/_tests_/state-builder'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import {
   ForgotPasswordViewModel,
   ForgotPasswordViewState,
@@ -11,11 +10,7 @@ import {
   selectResendState,
 } from './forgot-password.view-model'
 
-function isoDateSecondsAgo(seconds: number, now: number): ISODateString {
-  const isoString = new Date(now - seconds * 1000).toISOString()
-  assertISODateString(isoString)
-  return isoString
-}
+const dateProvider = new StubDateProvider()
 
 describe('selectForgotPasswordViewModel', () => {
   describe('Idle state', () => {
@@ -83,7 +78,9 @@ describe('selectForgotPasswordViewModel', () => {
 
     it('should disable resend button during cooldown', () => {
       const now = Date.now()
-      const requestedTenSecondsAgo = isoDateSecondsAgo(10, now)
+      const requestedTenSecondsAgo = dateProvider.msToISOString(
+        now - 10 * SECOND,
+      )
       const state = stateBuilder()
         .withLastPasswordResetRequestAt(requestedTenSecondsAgo)
         .build()
@@ -101,7 +98,9 @@ describe('selectForgotPasswordViewModel', () => {
 
     it('should enable resend button after cooldown expires', () => {
       const now = Date.now()
-      const requestedTwoMinutesAgo = isoDateSecondsAgo(120, now)
+      const requestedTwoMinutesAgo = dateProvider.msToISOString(
+        now - 120 * SECOND,
+      )
       const state = stateBuilder()
         .withLastPasswordResetRequestAt(requestedTwoMinutesAgo)
         .build()
@@ -134,7 +133,7 @@ describe('selectResendState', () => {
 
   it('should return disabled state during cooldown', () => {
     const now = Date.now()
-    const requestedTenSecondsAgo = isoDateSecondsAgo(10, now)
+    const requestedTenSecondsAgo = dateProvider.msToISOString(now - 10 * SECOND)
     const state = stateBuilder()
       .withLastPasswordResetRequestAt(requestedTenSecondsAgo)
       .build()
@@ -150,7 +149,9 @@ describe('selectResendState', () => {
 
   it('should return enabled state after cooldown expires', () => {
     const now = Date.now()
-    const requestedTwoMinutesAgo = isoDateSecondsAgo(120, now)
+    const requestedTwoMinutesAgo = dateProvider.msToISOString(
+      now - 120 * SECOND,
+    )
     const state = stateBuilder()
       .withLastPasswordResetRequestAt(requestedTwoMinutesAgo)
       .build()
