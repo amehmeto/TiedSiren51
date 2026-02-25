@@ -9,7 +9,6 @@
   },
   "scripts": {
     "preinstall": "npx only-allow npm",
-    "postinstall": "npx prisma generate",
     "install:clean": "rm -rf node_modules && npm ci",
     "start": "expo start",
     "android": "npx expo run:android",
@@ -28,7 +27,6 @@
     "lint:ticket:fix": "remark --output --rc-path .remarkrc.fix.mjs .github/ISSUE_TEMPLATE/",
     "lint:sh": "bash scripts/lint-sh.sh",
     "lint:workflow": "bash scripts/lint-workflow-scripts.sh",
-    "lint:schema": "npx prisma validate",
     "test": "vitest",
     "test:prepush": "vitest --run",
     "test:affected": "vitest --run --changed",
@@ -51,7 +49,6 @@
     "prepare": "is-ci || husky",
     "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
     "expo:lint": "expo lint",
-    "generate:schema": "npx prisma generate",
     "graph": "node scripts/ticket-graph/generate-dependency-graph.mjs",
     "graph:view": "node scripts/ticket-graph/generate-dependency-graph.mjs --ascii",
     "graph:live": "node scripts/ticket-graph/generate-dependency-graph.mjs --live"
@@ -76,9 +73,6 @@
     "*.{yml,yaml}": [
       "npm run lint:format:fix --",
       "npm run lint:workflow --"
-    ],
-    "schema.prisma": [
-      "npm run lint:schema"
     ]
   },
   "dependencies": {
@@ -93,8 +87,6 @@
     "@powersync/op-sqlite": "^0.9.1",
     "@powersync/react": "^1.8.3",
     "@powersync/react-native": "^1.30.1",
-    "@prisma/client": "5.22.0",
-    "@prisma/react-native": "^6.0.1",
     "@quidone/react-native-wheel-picker": "^1.6.1",
     "@quidone/react-native-wheel-picker-feedback": "^2.0.0",
     "@react-native-async-storage/async-storage": "1.23.1",
@@ -128,8 +120,6 @@
     "firebase": "^11.9.1",
     "formik": "^2.4.5",
     "is-ci": "^4.1.0",
-    "pouchdb": "^8.0.1",
-    "prisma": "^5.22.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.5",
@@ -154,7 +144,6 @@
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@types/eslint": "^9.6.1",
-    "@types/pouchdb": "^6.4.2",
     "@types/react": "~18.2.45",
     "@types/react-test-renderer": "^18.0.7",
     "@vitest/coverage-v8": "^1.6.0",

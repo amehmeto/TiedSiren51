@@ -4,7 +4,9 @@ Date: 2025-01-28
 
 ## Status
 
-Accepted (Temporary)
+Superseded — Prisma was fully removed in TS-401 (replaced by PowerSync + OP-SQLite).
+All Prisma repository files, tests, and the vitest exclusion pattern have been deleted.
+This ADR is kept for historical reference only.
 
 ## Context
 

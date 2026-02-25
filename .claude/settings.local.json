@@ -172,7 +172,6 @@
       "Bash(npx lint-staged:*)",
       "Bash(npx mocha eslint-rules/react-props-destructuring.spec.cjs)",
       "Bash(npx prettier:*)",
-      "Bash(npx prisma generate:*)",
       "Bash(npx remark:*)",
       "Bash(npx shellcheck:*)",
       "Bash(npx tsc:*)",

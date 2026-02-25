@@ -4,16 +4,11 @@ export default {
   test: {
     server: {
       deps: {
-        inline: [
-          'react-native-url-polyfill',
-          '@prisma/client',
-          '@prisma/react-native',
-        ],
+        inline: ['react-native-url-polyfill'],
         interopDefault: true,
       },
     },
     exclude: [
-      'infra/**/prisma.*.test.ts',
       'infra/**/powersync.*.test.ts',
       '**/node_modules/**',
       '.worktrees/**',
