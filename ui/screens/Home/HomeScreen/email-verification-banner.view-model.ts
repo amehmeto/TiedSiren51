@@ -38,7 +38,7 @@ export function selectEmailVerificationBannerViewModel(
     isSendingVerificationEmail,
     resendVerificationEmailLabel: isSendingVerificationEmail
       ? 'Sending...'
-      : 'Resend Verification Email',
+      : 'Resend email',
     userEmail: email,
   }
 }

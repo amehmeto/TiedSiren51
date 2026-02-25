@@ -76,7 +76,7 @@ describe('selectEmailVerificationBannerViewModel', () => {
       description: 'Check your inbox and tap the verification link.',
       openEmailLabel: 'Open your email app',
       isSendingVerificationEmail: false,
-      resendVerificationEmailLabel: 'Resend Verification Email',
+      resendVerificationEmailLabel: 'Resend email',
       userEmail: 'test@example.com',
     }
 
