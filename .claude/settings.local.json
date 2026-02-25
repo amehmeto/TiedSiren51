@@ -235,6 +235,7 @@
       "WebFetch(domain:support.google.com)",
       "WebFetch(domain:www.andromo.com)",
       "WebFetch(domain:www.npmjs.com)",
+      "WebFetch(domain:www.techopt.io)",
       "WebSearch",
       "Write",
       "Write(.claude/ralph-prompt.md)",
