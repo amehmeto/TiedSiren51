@@ -7,6 +7,8 @@ type HiddenBanner = {
 
 type VisibleBanner = {
   visible: true
+  title: string
+  description: string
   isSendingVerificationEmail: boolean
   resendVerificationEmailLabel: string
   userEmail: string
@@ -28,6 +30,8 @@ export function selectEmailVerificationBannerViewModel(
 
   return {
     visible: true,
+    title: 'Verify your email',
+    description: 'Check your inbox and tap the verification link.',
     isSendingVerificationEmail,
     resendVerificationEmailLabel: isSendingVerificationEmail
       ? 'Sending...'

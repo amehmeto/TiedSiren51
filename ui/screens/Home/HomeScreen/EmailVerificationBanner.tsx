@@ -22,10 +22,8 @@ export function EmailVerificationBanner() {
         size={T.icon.size.large}
         color={T.color.lightBlue}
       />
-      <Text style={styles.title}>Verify your email</Text>
-      <Text style={styles.description}>
-        Check your inbox and tap the verification link.
-      </Text>
+      <Text style={styles.title}>{viewModel.title}</Text>
+      <Text style={styles.description}>{viewModel.description}</Text>
       <OpenEmailAppButton email={viewModel.userEmail} />
       <TiedSButton
         text={viewModel.resendVerificationEmailLabel}

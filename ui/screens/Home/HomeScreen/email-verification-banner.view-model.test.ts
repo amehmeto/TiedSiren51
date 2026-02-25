@@ -72,6 +72,8 @@ describe('selectEmailVerificationBannerViewModel', () => {
       .build()
     const expectedViewModel = {
       visible: true,
+      title: 'Verify your email',
+      description: 'Check your inbox and tap the verification link.',
       isSendingVerificationEmail: false,
       resendVerificationEmailLabel: 'Resend Verification Email',
       userEmail: 'test@example.com',
@@ -94,6 +96,8 @@ describe('selectEmailVerificationBannerViewModel', () => {
       .build()
     const expectedViewModel = {
       visible: true,
+      title: 'Verify your email',
+      description: 'Check your inbox and tap the verification link.',
       isSendingVerificationEmail: true,
       resendVerificationEmailLabel: 'Sending...',
       userEmail: 'test@example.com',
