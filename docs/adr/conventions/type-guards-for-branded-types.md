@@ -156,7 +156,7 @@ Rejected: Comments are not enforced, assertions bypass type checking, scattered 
 - `core/_ports_/date-provider.ts` - Add type guards
 - `infra/date-provider/real.date-provider.ts` - Replace assertions
 - `infra/date-provider/stub.date-provider.ts` - Replace assertions
-- `infra/block-session-repository/prisma.block-session.repository.ts` - Replace assertions
+- `infra/block-session-repository/powersync.block-session.repository.ts` - Replace assertions
 
 ---
 

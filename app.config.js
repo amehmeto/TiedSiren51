@@ -75,7 +75,6 @@ export default {
       favicon: './assets/images/favicon.png',
     },
     plugins: [
-      '@prisma/react-native',
       '@react-native-google-signin/google-signin',
       [
         '@sentry/react-native/expo',

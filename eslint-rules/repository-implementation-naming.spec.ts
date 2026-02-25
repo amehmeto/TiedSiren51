@@ -22,9 +22,9 @@ describe('repository-implementation-naming', () => {
       valid: [
         // Correct class export
         {
-          code: `export class PrismaBlockSessionRepository {}`,
+          code: `export class PowersyncBlockSessionRepository {}`,
           filename:
-            '/project/infra/block-session-repository/prisma.block-session.repository.ts',
+            '/project/infra/block-session-repository/powersync.block-session.repository.ts',
         },
         // Named export via class
         {
@@ -34,9 +34,9 @@ describe('repository-implementation-naming', () => {
         },
         // Multi-word prefix
         {
-          code: `export class PowersyncBlockSessionRepository {}`,
+          code: `export class FakeDataSirensRepository {}`,
           filename:
-            '/project/infra/block-session-repository/powersync.block-session.repository.ts',
+            '/project/infra/siren-repository/fake-data.sirens.repository.ts',
         },
         // Non-repository file - should not apply
         {
@@ -46,25 +46,25 @@ describe('repository-implementation-naming', () => {
         // Not in infra - should not apply
         {
           code: `export class Wrong {}`,
-          filename: '/project/core/auth/prisma.auth.repository.ts',
+          filename: '/project/core/auth/powersync.auth.repository.ts',
         },
         // Test file - should not apply
         {
           code: `export class Wrong {}`,
           filename:
-            '/project/infra/auth-repository/prisma.auth.repository.test.ts',
+            '/project/infra/auth-repository/powersync.auth.repository.test.ts',
         },
         // Spec file - should not apply
         {
           code: `export class Wrong {}`,
           filename:
-            '/project/infra/auth-repository/prisma.auth.repository.spec.ts',
+            '/project/infra/auth-repository/powersync.auth.repository.spec.ts',
         },
         // node_modules - should skip
         {
           code: `export class Wrong {}`,
           filename:
-            '/project/node_modules/package/infra/prisma.auth.repository.ts',
+            '/project/node_modules/package/infra/powersync.auth.repository.ts',
         },
       ],
 
@@ -72,13 +72,14 @@ describe('repository-implementation-naming', () => {
         // Wrong class name
         {
           code: `export class WrongRepository {}`,
-          filename: '/project/infra/auth-repository/prisma.auth.repository.ts',
+          filename:
+            '/project/infra/auth-repository/powersync.auth.repository.ts',
           errors: [
             {
               messageId: 'missingExport',
               data: {
-                filename: 'prisma.auth.repository.ts',
-                expectedName: 'PrismaAuthRepository',
+                filename: 'powersync.auth.repository.ts',
+                expectedName: 'PowersyncAuthRepository',
                 foundExports: 'WrongRepository',
               },
             },
@@ -86,14 +87,15 @@ describe('repository-implementation-naming', () => {
         },
         // Missing export entirely
         {
-          code: `class PrismaAuthRepository {}`,
-          filename: '/project/infra/auth-repository/prisma.auth.repository.ts',
+          code: `class PowersyncAuthRepository {}`,
+          filename:
+            '/project/infra/auth-repository/powersync.auth.repository.ts',
           errors: [
             {
               messageId: 'missingExport',
               data: {
-                filename: 'prisma.auth.repository.ts',
-                expectedName: 'PrismaAuthRepository',
+                filename: 'powersync.auth.repository.ts',
+                expectedName: 'PowersyncAuthRepository',
                 foundExports: 'none',
               },
             },
@@ -106,13 +108,13 @@ describe('repository-implementation-naming', () => {
         export class OtherRepository {}
       `,
           filename:
-            '/project/infra/siren-repository/pouchdb.siren.repository.ts',
+            '/project/infra/siren-repository/firebase.siren.repository.ts',
           errors: [
             {
               messageId: 'missingExport',
               data: {
-                filename: 'pouchdb.siren.repository.ts',
-                expectedName: 'PouchdbSirenRepository',
+                filename: 'firebase.siren.repository.ts',
+                expectedName: 'FirebaseSirenRepository',
                 foundExports: 'Helper, OtherRepository',
               },
             },

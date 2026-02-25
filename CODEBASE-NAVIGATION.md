@@ -14,7 +14,7 @@ Reference for navigating and modifying this codebase.
 | `foo.fixture.ts` | `fooFixture` or `createFooFixture` | `auth.fixture.ts` → `authFixture` |
 | `foo.schema.ts` | `fooSchema` | `block-session.schema.ts` → `blockSessionSchema` |
 | `foo.slice.ts` | `fooSlice` (in folder `foo/`) | `block-session/block-session.slice.ts` → `blockSessionSlice` |
-| `prefix.domain.repository.ts` | `PrefixDomainRepository` | `pouchdb.blocklist.repository.ts` → `PouchdbBlocklistRepository` |
+| `prefix.domain.repository.ts` | `PrefixDomainRepository` | `powersync.blocklist.repository.ts` → `PowersyncBlocklistRepository` |
 | `prefix.domain.gateway.ts` | `PrefixDomainGateway` | `firebase.auth.gateway.ts` → `FirebaseAuthGateway` |
 
 ## File Locations
@@ -53,7 +53,7 @@ Copy from these when creating new files:
 | Builder | `core/_tests_/data-builders/block-session.builder.ts` |
 | Fixture | `core/auth/authentification.fixture.ts` |
 | Repository (port) | `core/_ports_/block-session.repository.ts` |
-| Repository (impl) | `infra/block-session-repository/pouchdb.block-session.repository.ts` |
+| Repository (impl) | `infra/block-session-repository/powersync.block-session.repository.ts` |
 | Gateway (port) | `core/_ports_/auth.gateway.ts` |
 | Gateway (impl) | `infra/auth-gateway/firebase.auth.gateway.ts` |
 
@@ -92,7 +92,7 @@ Copy from these when creating new files:
 ### Adding a Repository/Gateway Implementation
 
 1. Create in `infra/{domain}-{type}/{prefix}.{domain}.{type}.ts`
-2. Class name: `{Prefix}{Domain}{Type}` (e.g., `PouchdbBlocklistRepository`)
+2. Class name: `{Prefix}{Domain}{Type}` (e.g., `PowersyncBlocklistRepository`)
 3. Must `implement` the port interface from `core/_ports_/`
 4. Create co-located test file
 

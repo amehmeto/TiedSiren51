@@ -4,7 +4,9 @@ Date: 2025-01-28
 
 ## Status
 
-Accepted (Supersedes initial PouchDB decision)
+Accepted (Supersedes initial PouchDB decision).
+All PouchDB code was deleted in TS-401. Both PouchDB and its successor Prisma
+have been fully replaced by PowerSync + OP-SQLite.
 
 ## Context
 
@@ -26,10 +28,10 @@ TiedSiren51 initially adopted PouchDB for local-first data persistence:
 - **Testing complexity**: Hard to create clean test databases
 - **Migration difficulty**: Schema changes require custom migration scripts
 
-**Evidence of PouchDB Remnants**:
-- `/infra/siren-repository/pouchdb.sirens-repository.ts` (still exists but unused)
-- Test files reference PouchDB repositories
-- Some dead code not yet removed
+**Evidence of PouchDB Remnants** (all deleted in TS-401):
+- `/infra/siren-repository/pouchdb.sirens-repository.ts` — deleted
+- All PouchDB test files — deleted
+- All PouchDB dependencies — removed from package.json
 
 ## Decision
 
@@ -154,14 +156,11 @@ export class PrismaSirensRepository implements ISirensRepository {
 "@prisma/react-native": "^1.x",
 ```
 
-**Repository Migration**:
-- ✅ `/infra/block-session-repository/prisma.block-session.repository.ts`
-- ✅ `/infra/blocklist-repository/prisma.blocklist.repository.ts`
-- ✅ `/infra/siren-repository/prisma.sirens-repository.ts`
-- ✅ `/infra/device-repository/prisma.remote-device.repository.ts`
-
-**Deprecated (kept for reference)**:
-- `/infra/siren-repository/pouchdb.sirens-repository.ts` - No longer used
+**Repository Migration** (Prisma repositories also deleted in TS-401, replaced by PowerSync):
+- ✅ `/infra/block-session-repository/powersync.block-session.repository.ts`
+- ✅ `/infra/blocklist-repository/powersync.blocklist.repository.ts`
+- ✅ `/infra/siren-repository/powersync.sirens-repository.ts`
+- ✅ `/infra/device-repository/powersync.remote-device.repository.ts`
 
 **Data Migration**:
 - No production data to migrate (early development stage)

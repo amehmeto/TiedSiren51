@@ -30,7 +30,6 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 
 ## Archived Items
 
-- [Prisma Client Generation](prisma-client-generation.md) - ✅ **COMPLETED** - Automation scripts added
 - [Native Siren Filtering](native-siren-filtering.md) - ✅ **COMPLETED** - Superseded by native AccessibilityService blocking path
 
 
