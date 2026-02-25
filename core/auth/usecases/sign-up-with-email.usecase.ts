@@ -1,14 +1,11 @@
 import { createAppAsyncThunk } from '@/core/_redux_/create-app-thunk'
 import { AuthUser } from '../auth-user'
 import { SignUpCredentials } from '../auth.type'
-import { sendVerificationEmail } from './send-verification-email.usecase'
 
 export const signUpWithEmail = createAppAsyncThunk<AuthUser, SignUpCredentials>(
   'auth/signUpWithEmail',
-  async (payload: SignUpCredentials, { extra: { authGateway }, dispatch }) => {
+  async (payload: SignUpCredentials, { extra: { authGateway } }) => {
     const { email, password } = payload
-    const authUser = await authGateway.signUpWithEmail(email, password)
-    dispatch(sendVerificationEmail())
-    return authUser
+    return authGateway.signUpWithEmail(email, password)
   },
 )
