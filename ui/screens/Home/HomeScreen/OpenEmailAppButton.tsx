@@ -14,7 +14,7 @@ interface OpenEmailAppButtonProps {
   style?: StyleProp<ViewStyle>
 }
 
-async function openEmailApp(email: string): Promise<void> {
+export async function openEmailApp(email: string): Promise<void> {
   try {
     const provider = getEmailProvider(email)
 
