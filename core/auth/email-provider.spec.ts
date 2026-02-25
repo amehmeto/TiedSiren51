@@ -43,10 +43,22 @@ describe('getEmailProvider', () => {
     expect(provider).toBeNull()
   })
 
-  test('should include deep link URLs for known provider', () => {
-    const provider = getEmailProvider('user@gmail.com')
+  test.each<[string, string]>([
+    ['user@gmail.com', 'googlegmail://'],
+    ['user@googlemail.com', 'googlegmail://'],
+    ['user@outlook.com', 'ms-outlook://'],
+    ['user@hotmail.com', 'ms-outlook://'],
+    ['user@live.com', 'ms-outlook://'],
+    ['user@yahoo.com', 'ymail://'],
+    ['user@icloud.com', 'message://'],
+    ['user@me.com', 'message://'],
+    ['user@mac.com', 'message://'],
+    ['user@protonmail.com', 'protonmail://'],
+    ['user@proton.me', 'protonmail://'],
+  ])('should resolve deep link for %s as %s', (email, expectedDeepLink) => {
+    const provider = getEmailProvider(email)
 
-    expect(provider?.deepLink).toBe('googlegmail://')
+    expect(provider?.deepLink).toBe(expectedDeepLink)
   })
 })
 
@@ -65,10 +77,22 @@ describe('getOpenEmailLabel', () => {
 })
 
 describe('getWebUrl', () => {
-  test('should return web URL for known provider', () => {
-    const webUrl = getWebUrl('user@gmail.com')
+  test.each<[string, string]>([
+    ['user@gmail.com', 'https://mail.google.com'],
+    ['user@googlemail.com', 'https://mail.google.com'],
+    ['user@outlook.com', 'https://outlook.live.com'],
+    ['user@hotmail.com', 'https://outlook.live.com'],
+    ['user@live.com', 'https://outlook.live.com'],
+    ['user@yahoo.com', 'https://mail.yahoo.com'],
+    ['user@icloud.com', 'https://www.icloud.com/mail'],
+    ['user@me.com', 'https://www.icloud.com/mail'],
+    ['user@mac.com', 'https://www.icloud.com/mail'],
+    ['user@protonmail.com', 'https://mail.proton.me'],
+    ['user@proton.me', 'https://mail.proton.me'],
+  ])('should return web URL for %s as %s', (email, expectedWebUrl) => {
+    const webUrl = getWebUrl(email)
 
-    expect(webUrl).toBe('https://mail.google.com')
+    expect(webUrl).toBe(expectedWebUrl)
   })
 
   test('should return null for unknown domain', () => {
