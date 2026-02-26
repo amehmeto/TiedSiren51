@@ -1,5 +1,5 @@
-import { Redirect } from 'expo-router'
+import { View } from 'react-native'
 
-export default function TabsIndex() {
-  return <Redirect href="/home" />
+export default function IndexScreen() {
+  return <View />
 }
