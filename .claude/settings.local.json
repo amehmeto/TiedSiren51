@@ -223,6 +223,7 @@
       "WebFetch(domain:copyprogramming.com)",
       "WebFetch(domain:docs.expo.dev)",
       "WebFetch(domain:docs.powersync.com)",
+      "WebFetch(domain:docs.sentry.io)",
       "WebFetch(domain:expo.dev)",
       "WebFetch(domain:firebase.google.com)",
       "WebFetch(domain:github.com)",

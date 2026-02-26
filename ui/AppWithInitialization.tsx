@@ -1,4 +1,4 @@
-import { Stack, useRouter } from 'expo-router'
+import { Redirect, Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
@@ -29,18 +29,14 @@ export function AppWithInitialization({
   isFontsLoaded,
 }: AppWithInitializationProps) {
   const { isInitializing, isAuthenticated } = useAppInitialization(store)
-  const router = useRouter()
   usePasswordResetDeepLink()
   useEmailVerificationDeepLink()
 
   const isReady = isFontsLoaded && !isInitializing
 
   useEffect(() => {
-    if (!isReady) return
-    SplashScreen.hideAsync()
-    if (router.canDismiss()) router.dismissAll()
-    router.replace(isAuthenticated ? '/home' : '/register')
-  }, [isReady, isAuthenticated, router])
+    if (isReady) SplashScreen.hideAsync()
+  }, [isReady])
 
   return (
     <MenuProvider>
@@ -65,6 +61,7 @@ export function AppWithInitialization({
         </Stack>
       </TiedSLinearBackground>
       <TiedSToast />
+      {isReady && <Redirect href={isAuthenticated ? '/home' : '/register'} />}
     </MenuProvider>
   )
 }
