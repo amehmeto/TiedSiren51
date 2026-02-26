@@ -11,7 +11,7 @@ type VisibleBanner = {
   title: string
   description: string
   isSendingVerificationEmail: boolean
-  openEmailLabel: string
+  openEmailLabel: string | null
   resendVerificationEmailLabel: string
   userEmail: string
   error: string | null

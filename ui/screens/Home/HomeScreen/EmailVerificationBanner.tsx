@@ -41,11 +41,13 @@ export function EmailVerificationBanner() {
           variant={TiedSButtonVariant.Secondary}
           style={styles.rowButton}
         />
-        <OpenEmailAppButton
-          email={viewModel.userEmail}
-          label={viewModel.openEmailLabel}
-          style={styles.rowButton}
-        />
+        {viewModel.openEmailLabel && (
+          <OpenEmailAppButton
+            email={viewModel.userEmail}
+            label={viewModel.openEmailLabel}
+            style={styles.rowButton}
+          />
+        )}
       </View>
       {viewModel.error && (
         <Text style={styles.errorText}>{viewModel.error}</Text>
