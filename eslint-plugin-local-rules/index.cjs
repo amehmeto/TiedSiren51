@@ -22,6 +22,7 @@ const noComplexJsxInConditionals = require('../eslint-rules/no-complex-jsx-in-co
 const noConsecutiveDuplicateReturns = require('../eslint-rules/no-consecutive-duplicate-returns.cjs')
 const noCrossLayerImports = require('../eslint-rules/no-cross-layer-imports.cjs')
 const noDataBuildersInProduction = require('../eslint-rules/no-data-builders-in-production.cjs')
+const noDateNow = require('../eslint-rules/no-date-now.cjs')
 const noElseIf = require('../eslint-rules/no-else-if.cjs')
 const noEntireStateSelector = require('../eslint-rules/no-entire-state-selector.cjs')
 const noEnumValueAsStringLiteral = require('../eslint-rules/no-enum-value-as-string-literal.cjs')
@@ -39,6 +40,7 @@ const noRedundantNullishTernary = require('../eslint-rules/no-redundant-nullish-
 const noRedundantPropSpreading = require('../eslint-rules/no-redundant-prop-spreading.cjs')
 const noSelectorPropDrilling = require('../eslint-rules/no-selector-prop-drilling.cjs')
 const noStylesheetMagicNumbers = require('../eslint-rules/no-stylesheet-magic-numbers.cjs')
+const noTernaryFalseFallback = require('../eslint-rules/no-ternary-false-fallback.cjs')
 const noThunkResultInComponent = require('../eslint-rules/no-thunk-result-in-component.cjs')
 const noTryCatchInCore = require('../eslint-rules/no-try-catch-in-core.cjs')
 const noUnusedTestId = require('../eslint-rules/no-unused-test-id.cjs')
@@ -109,6 +111,7 @@ module.exports = {
     'require-logger-in-catch': requireLoggerInCatch,
     'use-data-builders': useDataBuilders,
     'no-data-builders-in-production': noDataBuildersInProduction,
+    'no-date-now': noDateNow,
     'usecase-matches-filename': usecaseMatchesFilename,
     'no-cross-layer-imports': noCrossLayerImports,
     'listener-matches-filename': listenerMatchesFilename,
@@ -127,6 +130,7 @@ module.exports = {
     'no-nested-call-expressions': noNestedCallExpressions,
     'no-unused-test-id': noUnusedTestId,
     'no-redundant-nullish-ternary': noRedundantNullishTernary,
+    'no-ternary-false-fallback': noTernaryFalseFallback,
     'no-redundant-prop-spreading': noRedundantPropSpreading,
     'prefer-array-destructuring': preferArrayDestructuring,
     'prefer-object-destructuring': preferObjectDestructuring,

@@ -3,7 +3,10 @@ import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { reauthenticateWithGoogle } from '@/core/auth/usecases/reauthenticate-with-google.usecase'
 import { reauthFormStyles } from '@/ui/design-system/components/shared/reauthFormStyles'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSSocialButton } from '@/ui/design-system/components/shared/TiedSSocialButton'
 import { T } from '@/ui/design-system/theme'
 
@@ -27,7 +30,11 @@ export function GoogleReauthForm({ onCancel }: GoogleReauthFormProps) {
         onPress={() => dispatch(reauthenticateWithGoogle())}
       />
       <View style={styles.buttonContainer}>
-        <TiedSButton onPress={onCancel} text="Cancel" />
+        <TiedSButton
+          onPress={onCancel}
+          text="Cancel"
+          variant={TiedSButtonVariant.Secondary}
+        />
       </View>
     </>
   )

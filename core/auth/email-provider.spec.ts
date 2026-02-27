@@ -69,10 +69,10 @@ describe('getOpenEmailLabel', () => {
     expect(label).toBe('Open Gmail')
   })
 
-  test('should return generic label for unknown domain', () => {
+  test('should return null for unknown domain', () => {
     const label = getOpenEmailLabel('user@company.com')
 
-    expect(label).toBe('Open your email app')
+    expect(label).toBeNull()
   })
 })
 

@@ -18,7 +18,7 @@ export function blockingScheduleChangedFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ) {
   const dateProvider = new StubDateProvider()
-  const sirenLookout = new InMemorySirenLookout()
+  const sirenLookout = new InMemorySirenLookout(dateProvider)
   const logger = new InMemoryLogger()
   const sirenTier = new InMemorySirenTier(logger)
   const foregroundService = new InMemoryForegroundService()

@@ -32,7 +32,9 @@ const withAuthLoading = createAction<boolean>('withAuthLoading')
 const withStrictModeEndedAt = createAction<ISODateString | null>(
   'withStrictModeEndedAt',
 )
-const withPasswordResetSent = createAction<boolean>('withPasswordResetSent')
+const withLastPasswordResetRequestAt = createAction<ISODateString | null>(
+  'withLastPasswordResetRequestAt',
+)
 const withLastReauthenticatedAt = createAction<ISODateString | null>(
   'withLastReauthenticatedAt',
 )
@@ -89,8 +91,10 @@ const reducer = createReducer(initialState, (builder) => {
       state.siren.availableSirens = action.payload
     })
     .addCase(withAuthError, (state, action) => {
-      state.auth.error = action.payload.message
-      state.auth.errorType = action.payload.errorType ?? null
+      state.auth.error = {
+        message: action.payload.message,
+        type: action.payload.errorType ?? null,
+      }
     })
     .addCase(withAuthLoading, (state, action) => {
       state.auth.isLoading = action.payload
@@ -98,8 +102,8 @@ const reducer = createReducer(initialState, (builder) => {
     .addCase(withStrictModeEndedAt, (state, action) => {
       state.strictMode.endedAt = action.payload
     })
-    .addCase(withPasswordResetSent, (state, action) => {
-      state.auth.isPasswordResetSent = action.payload
+    .addCase(withLastPasswordResetRequestAt, (state, action) => {
+      state.auth.lastPasswordResetRequestAt = action.payload
     })
     .addCase(withLastReauthenticatedAt, (state, action) => {
       state.auth.lastReauthenticatedAt = action.payload
@@ -174,7 +178,7 @@ export const stateBuilder = (baseState = initialState) => {
     withAuthError: reduce(withAuthError),
     withAuthLoading: reduce(withAuthLoading),
     withStrictModeEndedAt: reduce(withStrictModeEndedAt),
-    withPasswordResetSent: reduce(withPasswordResetSent),
+    withLastPasswordResetRequestAt: reduce(withLastPasswordResetRequestAt),
     withSendingVerificationEmail: reduce(withSendingVerificationEmail),
     withEmail: reduce(withEmail),
     withPassword: reduce(withPassword),

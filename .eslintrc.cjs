@@ -79,6 +79,7 @@ module.exports = {
     'react-native/no-single-element-style-arrays': 'error',
     'react-native/no-unused-styles': 'error',
     // Custom local rules
+    'local-rules/no-date-now': 'error',
     'local-rules/no-icon-size-magic-numbers': 'error',
     'local-rules/no-stylesheet-magic-numbers': 'error',
     'local-rules/no-complex-jsx-in-conditionals': [
@@ -129,11 +130,12 @@ module.exports = {
     // See: docs/adr/conventions/no-nested-call-expressions.md
     'local-rules/no-nested-call-expressions': 'off',
     'local-rules/no-redundant-nullish-ternary': 'error',
+    'local-rules/no-ternary-false-fallback': 'error',
     'local-rules/prefer-array-destructuring': 'error',
     'local-rules/prefer-object-destructuring': [
       'warn',
       {
-        threshold: 3,
+        threshold: 4,
         ignoredObjects: [
           'T',
           'styles',
@@ -521,6 +523,13 @@ module.exports = {
       files: ['core/_ports_/**/*.ts', 'core/**/*.fixture.ts'],
       rules: {
         'no-restricted-globals': 'off',
+      },
+    },
+    // Allow Date.now() in the real date provider (the legitimate wrapper)
+    {
+      files: ['infra/date-provider/real.date-provider.ts'],
+      rules: {
+        'local-rules/no-date-now': 'off',
       },
     },
     // Enforce boolean naming convention on type properties in core (our domain types)
