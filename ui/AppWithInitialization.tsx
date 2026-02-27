@@ -10,9 +10,18 @@ import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
 import { useEmailVerificationDeepLink } from '@/ui/hooks/useEmailVerificationDeepLink'
 import { usePasswordResetDeepLink } from '@/ui/hooks/usePasswordResetDeepLink'
 
-type AppWithInitializationProps = Readonly<{
+type AppWithInitializationProps = {
   store: AppStore
-}>
+}
+
+const routes = [
+  '(auth)/register',
+  '(auth)/login',
+  '(auth)/signup',
+  '(auth)/forgot-password',
+  '(auth)/reset-password-confirm',
+  '(tabs)',
+]
 
 export function AppWithInitialization({ store }: AppWithInitializationProps) {
   const { error, isInitializing, isAuthenticated } = useAppInitialization(store)
@@ -21,22 +30,11 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
   useEmailVerificationDeepLink()
 
   useEffect(() => {
-    if (isInitializing) return
-    if (router.canDismiss()) router.dismissAll()
+    if (isInitializing || error) return
     router.replace(isAuthenticated ? '/home' : '/register')
-  }, [isInitializing, isAuthenticated, router])
+  }, [isInitializing, isAuthenticated, error, router])
 
-  if (isInitializing)
-    return <InitializingView isInitializing={isInitializing} error={error} />
-
-  const routes = [
-    '(auth)/register',
-    '(auth)/login',
-    '(auth)/signup',
-    '(auth)/forgot-password',
-    '(auth)/reset-password-confirm',
-    '(tabs)',
-  ]
+  if (error) return <InitializingView isInitializing={false} error={error} />
 
   return (
     <MenuProvider>

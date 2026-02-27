@@ -1,4 +1,4 @@
-import { setCallbackClass } from '@amehmeto/expo-foreground-service'
+import { addCallbackClass } from '@amehmeto/expo-foreground-service'
 import {
   BlockingWindow,
   BLOCKING_CALLBACK_CLASS,
@@ -37,7 +37,7 @@ export class AndroidSirenTier implements SirenTier {
 
   async initializeNativeBlocking(): Promise<void> {
     try {
-      await setCallbackClass(BLOCKING_CALLBACK_CLASS)
+      await addCallbackClass(BLOCKING_CALLBACK_CLASS)
       this.logger.info('[AndroidSirenTier] Native blocking initialized')
     } catch (error) {
       this.logger.error(

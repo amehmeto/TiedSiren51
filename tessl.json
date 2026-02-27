@@ -1,0 +1,13 @@
+{
+  "name": "my-project",
+  "mode": "vendored",
+  "dependencies": {
+    "mattpocock/skills": {
+      "version": "78649baa3e6e4c241ce85ee8dc93ecc0b53e4515",
+      "source": "https://github.com/mattpocock/skills",
+      "include": {
+        "skills": ["tdd"]
+      }
+    }
+  }
+}

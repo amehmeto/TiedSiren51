@@ -1,0 +1,22 @@
+{
+  "name": "mattpocock/skills",
+  "version": "78649baa3e6e4c241ce85ee8dc93ecc0b53e4515",
+  "summary": "Auto-generated tile from GitHub (8 skills)",
+  "private": true,
+  "skills": {
+    "tdd": {
+      "path": "tdd/SKILL.md"
+    }
+  },
+  "excludes": {
+    "skills": [
+      "design-an-interface",
+      "edit-article",
+      "git-guardrails-claude-code",
+      "migrate-to-shoehorn",
+      "request-refactor-plan",
+      "setup-pre-commit",
+      "write-a-skill"
+    ]
+  }
+}

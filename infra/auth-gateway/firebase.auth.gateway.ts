@@ -1,5 +1,8 @@
 import AsyncStorage from '@react-native-async-storage/async-storage'
-import { GoogleSignin } from '@react-native-google-signin/google-signin'
+import {
+  GoogleSignin,
+  isSuccessResponse,
+} from '@react-native-google-signin/google-signin'
 import {
   FirebaseApp,
   FirebaseError,
@@ -191,8 +194,10 @@ export class FirebaseAuthGateway implements AuthGateway {
       if (!user) throw new Error('No authenticated user found.')
 
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
-      const userInfo = await GoogleSignin.signIn()
-      const idToken = userInfo.idToken
+      const response = await GoogleSignin.signIn()
+      if (!isSuccessResponse(response))
+        throw new Error(GoogleSignInError.MissingIdToken)
+      const { idToken } = response.data
       if (!idToken) throw new Error(GoogleSignInError.MissingIdToken)
 
       const googleCredential = GoogleAuthProvider.credential(idToken)
@@ -254,9 +259,10 @@ export class FirebaseAuthGateway implements AuthGateway {
     try {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
 
-      const userInfo = await GoogleSignin.signIn()
-
-      const idToken = userInfo.idToken
+      const response = await GoogleSignin.signIn()
+      if (!isSuccessResponse(response))
+        throw new Error(GoogleSignInError.MissingIdToken)
+      const { idToken } = response.data
 
       if (!idToken) throw new Error(GoogleSignInError.MissingIdToken)
 
@@ -436,7 +442,7 @@ export class FirebaseAuthGateway implements AuthGateway {
 
   async logOut(): Promise<void> {
     try {
-      if (await GoogleSignin.isSignedIn()) await GoogleSignin.signOut()
+      if (GoogleSignin.getCurrentUser()) await GoogleSignin.signOut()
       await signOut(this.auth)
     } catch (error) {
       this.logger.error(`[FirebaseAuthGateway] Failed to logOut: ${error}`)

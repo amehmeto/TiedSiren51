@@ -2,6 +2,7 @@ import { Entypo, Ionicons } from '@expo/vector-icons'
 import { Tabs } from 'expo-router'
 import React from 'react'
 import { Pressable, PressableProps, StyleSheet } from 'react-native'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useSelector } from 'react-redux'
 import { RootState } from '@/core/_redux_/createStore'
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
@@ -81,6 +82,7 @@ function handleTabBarIcon({
 }
 
 export default function TabLayout() {
+  const insets = useSafeAreaInsets()
   const isStrictModeActive = useSelector((state: RootState) =>
     selectIsStrictModeActive(state, dependencies.dateProvider),
   )
@@ -104,8 +106,15 @@ export default function TabLayout() {
   return (
     <Tabs
       screenOptions={({ route, navigation }) => ({
+        sceneStyle: { backgroundColor: T.color.transparent },
         tabBarLabelPosition: 'below-icon',
-        tabBarStyle: styles.tabBar,
+        tabBarStyle: [
+          styles.tabBar,
+          {
+            paddingBottom: insets.bottom,
+            height: TAB_BAR_HEIGHT + insets.bottom,
+          },
+        ],
         tabBarLabelStyle: styles.tabBarLabel,
         tabBarActiveTintColor: T.color.lightBlue,
         tabBarInactiveTintColor: T.color.textMuted,
@@ -115,7 +124,6 @@ export default function TabLayout() {
         tabBarButton: (props) =>
           handleTabBarButton(props, { route, navigation }),
       })}
-      sceneContainerStyle={styles.sceneContainer}
     >
       {tabs.map((tab) => (
         <Tabs.Screen
@@ -131,20 +139,19 @@ export default function TabLayout() {
   )
 }
 
+const TAB_BAR_HEIGHT = T.tabBarHeight + T.spacing.large
+
 const styles = StyleSheet.create({
   tabBar: {
     borderTopWidth: T.border.width.thin,
     borderTopColor: T.color.borderSubtle,
     backgroundColor: T.color.darkBlueGray,
     paddingTop: T.spacing.small,
-    height: T.tabBarHeight + T.spacing.large,
+    height: TAB_BAR_HEIGHT,
   },
   tabBarLabel: {
     fontFamily: T.font.family.medium,
     fontSize: T.font.size.xSmall,
     letterSpacing: T.font.letterSpacing.tight,
-  },
-  sceneContainer: {
-    backgroundColor: T.color.transparent,
   },
 })
