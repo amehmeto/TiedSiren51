@@ -18,7 +18,9 @@ export const T = {
     modalTitleColor: 'rgba(100, 116, 139, 1)',
     darkBlueGray: 'rgba(15, 23, 42, 1)',
     lightBlueOverlay: 'rgba(56, 189, 248, 0.08)',
+    whiteOverlay: 'rgba(255, 255, 255, 0.1)',
     surfaceElevated: 'rgba(22, 33, 62, 1)',
+    cardBackground: 'rgba(18, 28, 52, 0.92)',
     borderSubtle: 'rgba(51, 65, 85, 0.4)',
     gradientMid: 'rgba(25, 32, 95, 1)',
     inputBackground: 'rgba(15, 23, 42, 0.3)',
@@ -163,6 +165,14 @@ export const T = {
         light: 25,
         medium: 50,
         strong: 80,
+        modal: 95,
+      },
+      reductionFactor: 4,
+      method: {
+        android: 'dimezisBlurView' as const,
+      },
+      tint: {
+        dark: 'systemMaterialDark' as const,
       },
     },
   },
@@ -173,8 +183,10 @@ export const T = {
     },
   },
   height: {
+    header: 56,
     settingsRow: 44,
     pickerItem: 48,
+    pickerButton: 57,
   },
   picker: {
     visibleItemCount: 5,

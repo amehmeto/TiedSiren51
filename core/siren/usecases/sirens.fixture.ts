@@ -5,6 +5,7 @@ import { AppStore } from '../../_redux_/createStore'
 import { createTestStore } from '../../_tests_/createTestStore'
 import { Fixture } from '../../_tests_/fixture.type'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
+import { TEST_AUTH_USER, TEST_USER_ID } from '../../_tests_/test-constants'
 import { InstalledApp } from '../../installed-app/installed-app'
 import { selectAvailableSirens } from '../selectors/selectAvailableSirens'
 import { Sirens } from '../sirens'
@@ -17,6 +18,10 @@ export function sirensFixture(
   let store: AppStore
   const installedAppRepository = new FakeDataInstalledAppsRepository()
   const sirensRepository = new FakeDataSirensRepository()
+
+  testStateBuilderProvider.setState((builder) =>
+    builder.withAuthUser(TEST_AUTH_USER),
+  )
 
   return {
     given: {
@@ -70,20 +75,25 @@ export function sirensFixture(
         await store.dispatch(addKeywordToSirens(keyword))
       },
       fetchingAvailableSirens: async () => {
-        store = createTestStore({
-          installedAppRepository,
-          sirensRepository,
-        })
+        store = createTestStore(
+          {
+            installedAppRepository,
+            sirensRepository,
+          },
+          testStateBuilderProvider.getState(),
+        )
         await store.dispatch(fetchAvailableSirens())
       },
     },
     then: {
       keywordShouldBeSaved: async (expectedKeyword: string) => {
-        const retrievedKeywords = await sirensRepository.getSelectableSirens()
+        const retrievedKeywords =
+          await sirensRepository.getSelectableSirens(TEST_USER_ID)
         expect(retrievedKeywords.keywords).toContain(expectedKeyword)
       },
       websiteShouldBeSaved: async (expectedWebsite: string) => {
-        const retrievedKeywords = await sirensRepository.getSelectableSirens()
+        const retrievedKeywords =
+          await sirensRepository.getSelectableSirens(TEST_USER_ID)
         expect(retrievedKeywords.websites).toContain(expectedWebsite)
       },
       availableSirensShouldBeStoredAs: (expectedSirens: Sirens) => {

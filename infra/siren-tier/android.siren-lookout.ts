@@ -1,5 +1,6 @@
 import * as AccessibilityService from '@amehmeto/expo-accessibility-service'
 import type { AccessibilityEventSubscription } from '@amehmeto/expo-accessibility-service'
+import { DateProvider } from '@/core/_ports_/date-provider'
 import { Logger } from '@/core/_ports_/logger'
 import {
   AndroidSirenLookout,
@@ -12,7 +13,10 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
 
   private subscription?: AccessibilityEventSubscription
 
-  constructor(private readonly logger: Logger) {}
+  constructor(
+    private readonly logger: Logger,
+    private readonly dateProvider: DateProvider,
+  ) {}
 
   async initialize(): Promise<void> {
     try {
@@ -87,7 +91,7 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
             this.listener({
               type: DetectedSirenType.App,
               identifier: packageName,
-              timestamp: Date.now(),
+              timestamp: this.dateProvider.getNowMs(),
             })
           }
         },

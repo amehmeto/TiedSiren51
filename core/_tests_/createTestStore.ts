@@ -1,7 +1,7 @@
 import { FakeAuthGateway } from '@/infra/auth-gateway/fake.auth.gateway'
-import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { FakeDataBlocklistRepository } from '@/infra/blocklist-repository/fake-data.blocklist.repository'
+import { InMemoryConsentRepository } from '@/infra/consent-repository/in-memory.consent.repository'
 import { StubDatabaseService } from '@/infra/database-service/stub.database.service'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataDeviceRepository } from '@/infra/device-repository/fake-data.device.repository'
@@ -25,6 +25,7 @@ export const createTestStore = (
     authGateway = new FakeAuthGateway(),
     blockSessionRepository = new FakeDataBlockSessionRepository(),
     blocklistRepository = new FakeDataBlocklistRepository(),
+    consentRepository = new InMemoryConsentRepository(),
     databaseService = new StubDatabaseService(),
     dateProvider = new StubDateProvider(),
     deviceRepository = new FakeDataDeviceRepository(),
@@ -32,10 +33,9 @@ export const createTestStore = (
     foregroundService = new InMemoryForegroundService(),
     installedAppRepository = new FakeDataInstalledAppsRepository(),
     logger = defaultTestLogger,
-    sirenLookout = new InMemorySirenLookout(),
+    sirenLookout = new InMemorySirenLookout(dateProvider),
     sirensRepository = new FakeDataSirensRepository(),
     timerRepository = new FakeDataTimerRepository(),
-    backgroundTaskService = new FakeBackgroundTaskService(logger),
     notificationService = new FakeNotificationService(logger),
     sirenTier = new InMemorySirenTier(logger),
   }: Partial<Dependencies> = {},
@@ -44,9 +44,9 @@ export const createTestStore = (
   createStore(
     {
       authGateway,
-      backgroundTaskService,
       blockSessionRepository,
       blocklistRepository,
+      consentRepository,
       databaseService,
       dateProvider,
       deviceRepository,

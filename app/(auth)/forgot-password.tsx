@@ -9,10 +9,11 @@ import {
   Text,
 } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { AppDispatch } from '@/core/_redux_/createStore'
+import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { clearAuthState, clearError, setError } from '@/core/auth/reducer'
 import { resetPassword } from '@/core/auth/usecases/reset-password.usecase'
 import { getForgotPasswordValidationError } from '@/ui/auth-schemas/validation.helper'
+import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
@@ -29,7 +30,10 @@ export default function ForgotPasswordScreen() {
   const dispatch = useDispatch<AppDispatch>()
   const [email, setEmail] = useState('')
 
-  const viewModel = useSelector(selectForgotPasswordViewModel)
+  const now = dependencies.dateProvider.getNowMs()
+  const viewModel = useSelector((state: RootState) =>
+    selectForgotPasswordViewModel(state, now),
+  )
 
   useEffect(() => {
     dispatch(clearAuthState())
@@ -67,6 +71,7 @@ export default function ForgotPasswordScreen() {
       <PasswordResetSuccessView
         onClose={handleClose}
         onBackToLogin={handleBackToLogin}
+        onResend={() => dispatch(resetPassword({ email }))}
       />
     )
   }

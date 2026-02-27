@@ -24,7 +24,7 @@
       "@assets/*": ["./assets/*"],
       "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
     },
-    "typeRoots": ["./node_modules/@types", "./prisma.d.ts"]
+    "typeRoots": ["./node_modules/@types"]
   },
   "include": ["**/*.ts", "**/*.tsx", ".expo/types/**/*.ts", "expo-env.d.ts"],
   "exclude": ["eslint-rules/**"]

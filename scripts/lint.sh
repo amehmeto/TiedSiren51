@@ -29,6 +29,5 @@ run_lint "lint:format${FIX_SUFFIX}" "**/*.{js,ts,jsx,tsx,json,yml,yaml}"
 run_lint lint:md "."
 run_lint lint:sh
 run_lint lint:workflow
-run_lint lint:schema
 
 echo "All linting passed!"

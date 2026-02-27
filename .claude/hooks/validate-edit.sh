@@ -86,18 +86,6 @@ case "$extension" in
       exit 2
     fi
     ;;
-  prisma)
-    # Prisma validate for schema files
-    if [[ "$filename" == "schema.prisma" ]]; then
-      output=$(npx prisma validate 2>&1)
-      exit_code=$?
-      if [ $exit_code -ne 0 ]; then
-        jq -n --arg reason "Prisma validation failed" --arg errors "$output" \
-          '{"decision": "block", "reason": $reason, "errors": $errors}'
-        exit 2
-      fi
-    fi
-    ;;
 esac
 
 exit 0

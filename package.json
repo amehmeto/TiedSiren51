@@ -9,10 +9,10 @@
   },
   "scripts": {
     "preinstall": "npx only-allow npm",
-    "postinstall": "npx prisma generate && bash scripts/generate-esm-rules.sh",
+    "postinstall": "bash scripts/generate-esm-rules.sh",
     "install:clean": "rm -rf node_modules && npm ci",
     "start": "expo start",
-    "android": "expo run:android",
+    "android": "npx expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
     "electron:dev": "concurrently \"BROWSER=none npm run web -- --port 19006\" \"wait-on http://localhost:19006 && npm run electron:start\"",
@@ -31,7 +31,6 @@
     "lint:ticket:fix": "remark --output --rc-path .remarkrc.fix.mjs .github/ISSUE_TEMPLATE/",
     "lint:sh": "bash scripts/lint-sh.sh",
     "lint:workflow": "bash scripts/lint-workflow-scripts.sh",
-    "lint:schema": "npx prisma validate",
     "test": "vitest",
     "test:prepush": "vitest --run",
     "test:affected": "vitest --run --changed",
@@ -54,7 +53,6 @@
     "prepare": "is-ci || husky",
     "check:uncommitted": "git diff-index --quiet HEAD || exit 1",
     "expo:lint": "expo lint",
-    "generate:schema": "npx prisma generate",
     "graph": "node scripts/ticket-graph/generate-dependency-graph.mjs",
     "graph:view": "node scripts/ticket-graph/generate-dependency-graph.mjs --ascii",
     "graph:live": "node scripts/ticket-graph/generate-dependency-graph.mjs --live"
@@ -80,9 +78,6 @@
     "*.{yml,yaml}": [
       "npm run lint:format:fix --",
       "npm run lint:workflow --"
-    ],
-    "schema.prisma": [
-      "npm run lint:schema"
     ]
   },
   "dependencies": {
@@ -93,8 +88,10 @@
     "@expo-google-fonts/inter": "^0.4.2",
     "@expo/vector-icons": "14.0.3",
     "@faker-js/faker": "^8.4.1",
-    "@prisma/client": "5.22.0",
-    "@prisma/react-native": "^6.0.1",
+    "@op-engineering/op-sqlite": "^14.1.4",
+    "@powersync/op-sqlite": "^0.9.1",
+    "@powersync/react": "^1.8.3",
+    "@powersync/react-native": "^1.30.1",
     "@quidone/react-native-wheel-picker": "^1.6.1",
     "@quidone/react-native-wheel-picker-feedback": "^2.0.0",
     "@react-native-async-storage/async-storage": "1.23.1",
@@ -111,11 +108,11 @@
     "expo": "~51.0.39",
     "expo-apple-authentication": "~6.4.2",
     "expo-application": "~5.9.1",
-    "expo-background-fetch": "^12.0.1",
     "expo-blur": "~13.0.3",
     "expo-constants": "~16.0.2",
     "expo-device": "~6.0.2",
     "expo-font": "~12.0.10",
+    "expo-intent-launcher": "~11.0.1",
     "expo-linear-gradient": "^13.0.2",
     "expo-linking": "~6.3.1",
     "expo-navigation-bar": "~3.0.4",
@@ -124,13 +121,10 @@
     "expo-splash-screen": "~0.27.7",
     "expo-status-bar": "~1.12.1",
     "expo-system-ui": "~3.0.7",
-    "expo-task-manager": "^11.8.2",
     "expo-web-browser": "~13.0.3",
     "firebase": "^11.9.1",
     "formik": "^2.4.5",
     "is-ci": "^4.1.0",
-    "pouchdb": "^8.0.1",
-    "prisma": "^5.22.0",
     "react": "18.2.0",
     "react-dom": "18.2.0",
     "react-native": "0.74.5",
@@ -151,6 +145,7 @@
   },
   "devDependencies": {
     "@babel/core": "^7.20.0",
+    "@babel/plugin-transform-async-generator-functions": "^7.29.0",
     "@semantic-release/changelog": "^6.0.3",
     "@semantic-release/git": "^10.0.1",
     "@types/pouchdb": "^6.4.2",

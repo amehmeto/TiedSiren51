@@ -27,6 +27,20 @@ if [[ ! "$command" =~ ^gh\ issue\ (create|edit) ]] && \
   exit 0
 fi
 
+# Require --label or -l on gh issue create commands
+if [[ "$command" =~ gh\ issue\ create ]] && \
+   [[ ! "$command" =~ --label ]] && [[ ! "$command" =~ \ -l\  ]]; then
+  jq -n \
+    --arg reason "gh issue create must include at least one --label flag." \
+    --arg hint "Add --label \"<label>\" to the command. Common labels: bug, enhancement, auth, tooling, needs-refinement" \
+    '{
+      "decision": "block",
+      "reason": $reason,
+      "hint": $hint
+    }'
+  exit 2
+fi
+
 # Extract the body content from the command
 # Handles HEREDOC, double-quoted, and single-quoted --body arguments
 extract_body() {
@@ -64,7 +78,20 @@ extract_body() {
 # Extract body content
 body=$(extract_body "$command" 2>/dev/null || echo "")
 
-# If no body found, skip validation (might be interactive or using stdin)
+# Block gh issue create without a body
+if [ -z "$body" ] && [[ "$command" =~ gh\ issue\ create ]]; then
+  jq -n \
+    --arg reason "gh issue create must include a --body flag with issue description." \
+    --arg hint "Add --body with ## 📝 Summary, ## 🎯 Context, ## ✅ Acceptance Criteria, and ## 🔗 Hierarchy sections." \
+    '{
+      "decision": "block",
+      "reason": $reason,
+      "hint": $hint
+    }'
+  exit 2
+fi
+
+# Skip validation if no body on edit (might be updating title/labels only)
 if [ -z "$body" ]; then
   exit 0
 fi

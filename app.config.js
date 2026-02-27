@@ -31,6 +31,15 @@ export default {
       googleServicesFile: './GoogleService-Info.plist',
       usesAppleSignIn: true,
       associatedDomains: [`applinks:${APP_DOMAIN}`],
+      infoPlist: {
+        LSApplicationQueriesSchemes: [
+          'googlegmail',
+          'ms-outlook',
+          'ymail',
+          'message',
+          'protonmail',
+        ],
+      },
     },
     android: {
       adaptiveIcon: {
@@ -66,7 +75,6 @@ export default {
       favicon: './assets/images/favicon.png',
     },
     plugins: [
-      '@prisma/react-native',
       '@react-native-google-signin/google-signin',
       [
         '@sentry/react-native/expo',

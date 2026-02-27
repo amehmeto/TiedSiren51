@@ -1,17 +1,28 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
-import { StyleSheet, Text } from 'react-native'
-import { useSelector } from 'react-redux'
+import { StyleSheet, Text, View } from 'react-native'
+import { useDispatch, useSelector } from 'react-redux'
+import { AppDispatch } from '@/core/_redux_/createStore'
+import { clearError } from '@/core/auth/reducer'
+import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
-import {
-  EmailVerificationBannerViewState,
-  selectEmailVerificationBannerViewModel,
-} from './email-verification-banner.view-model'
+import { selectEmailVerificationBannerViewModel } from './email-verification-banner.view-model'
+import { OpenEmailAppButton } from './OpenEmailAppButton'
 
 export function EmailVerificationBanner() {
-  const viewState = useSelector(selectEmailVerificationBannerViewModel)
+  const viewModel = useSelector(selectEmailVerificationBannerViewModel)
+  const dispatch = useDispatch<AppDispatch>()
 
-  if (viewState === EmailVerificationBannerViewState.Hidden) return null
+  if (!viewModel.visible) return null
+
+  const handleResend = () => {
+    dispatch(clearError())
+    dispatch(sendVerificationEmail())
+  }
 
   return (
     <TiedSCard style={styles.container}>
@@ -20,10 +31,27 @@ export function EmailVerificationBanner() {
         size={T.icon.size.large}
         color={T.color.lightBlue}
       />
-      <Text style={styles.title}>Verify your email</Text>
-      <Text style={styles.description}>
-        Check your inbox and tap the verification link.
-      </Text>
+      <Text style={styles.title}>{viewModel.title}</Text>
+      <Text style={styles.description}>{viewModel.description}</Text>
+      <View style={styles.buttonRow}>
+        <TiedSButton
+          text={viewModel.resendVerificationEmailLabel}
+          onPress={handleResend}
+          isDisabled={viewModel.isSendingVerificationEmail}
+          variant={TiedSButtonVariant.Secondary}
+          style={styles.rowButton}
+        />
+        {viewModel.openEmailLabel && (
+          <OpenEmailAppButton
+            email={viewModel.userEmail}
+            label={viewModel.openEmailLabel}
+            style={styles.rowButton}
+          />
+        )}
+      </View>
+      {viewModel.error && (
+        <Text style={styles.errorText}>{viewModel.error}</Text>
+      )}
     </TiedSCard>
   )
 }
@@ -46,5 +74,21 @@ const styles = StyleSheet.create({
     fontFamily: T.font.family.primary,
     color: T.color.textMuted,
     textAlign: 'center',
+  },
+  buttonRow: {
+    flexDirection: 'row',
+    gap: T.spacing.small,
+    marginTop: T.spacing.medium,
+    alignSelf: 'stretch',
+  },
+  rowButton: {
+    flex: 1,
+  },
+  errorText: {
+    color: T.color.red,
+    fontSize: T.font.size.small,
+    fontFamily: T.font.family.primary,
+    textAlign: 'center',
+    marginTop: T.spacing.small,
   },
 })

@@ -1,18 +1,43 @@
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import { StyleSheet, Text, View } from 'react-native'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/core/_redux_/createStore'
+import { dependencies } from '@/ui/dependencies'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSCloseButton } from '@/ui/design-system/components/shared/TiedSCloseButton'
+import { TiedSTextLink } from '@/ui/design-system/components/shared/TiedSTextLink'
 import { T } from '@/ui/design-system/theme'
+import { selectResendState } from './forgot-password.view-model'
 
 interface PasswordResetSuccessViewProps {
   onClose: () => void
   onBackToLogin: () => void
+  onResend: () => void
 }
 
 export function PasswordResetSuccessView({
   onClose,
   onBackToLogin,
+  onResend,
 }: PasswordResetSuccessViewProps) {
+  const [now, setNow] = useState(() => dependencies.dateProvider.getNowMs())
+
+  const { isResendDisabled, resendButtonText } = useSelector(
+    (state: RootState) => selectResendState(state, now),
+  )
+
+  useEffect(() => {
+    if (!isResendDisabled) return
+    const timer = setTimeout(
+      () => setNow(dependencies.dateProvider.getNowMs()),
+      1000,
+    )
+    return () => clearTimeout(timer)
+  }, [isResendDisabled, now])
+
   return (
     <View style={styles.mainContainer}>
       <TiedSCloseButton onClose={onClose} />
@@ -21,11 +46,16 @@ export function PasswordResetSuccessView({
         <Text style={styles.messageText}>
           {"We've sent a password reset link to your email address."}
         </Text>
-        <TiedSButton
-          onPress={onBackToLogin}
-          text={'BACK TO LOGIN'}
-          style={styles.button}
-        />
+        <View style={styles.actionsRow}>
+          <TiedSTextLink text={'Back to Login'} onPress={onBackToLogin} />
+          <TiedSButton
+            onPress={onResend}
+            text={resendButtonText}
+            style={styles.resendButton}
+            isDisabled={isResendDisabled}
+            variant={TiedSButtonVariant.Secondary}
+          />
+        </View>
       </View>
     </View>
   )
@@ -54,9 +84,13 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     marginBottom: T.spacing.large,
   },
-  button: {
+  actionsRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: T.spacing.large,
+  },
+  resendButton: {
     paddingVertical: T.spacing.small,
     paddingHorizontal: T.spacing.xx_large,
-    marginBottom: T.spacing.x_large,
   },
 })

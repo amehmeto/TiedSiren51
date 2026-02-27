@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
 import React, { ReactNode } from 'react'
-import { Image, StyleSheet, Text } from 'react-native'
+import { Image, ScrollView, StyleSheet, Text } from 'react-native'
 import 'react-native-gesture-handler'
 import { useSelector } from 'react-redux'
 import { isAndroidSirenLookout } from '@/core/_ports_/siren.lookout'
@@ -77,7 +77,11 @@ export default function HomeScreen() {
   })()
 
   return (
-    <>
+    <ScrollView
+      contentContainerStyle={styles.container}
+      keyboardShouldPersistTaps="handled"
+      showsVerticalScrollIndicator={false}
+    >
       <Image style={styles.image} source={logoSource} />
       <Text style={styles.greetings}>{viewModel.greetings}</Text>
       <Text style={styles.text}>{"Let's make it productive"}</Text>
@@ -95,11 +99,15 @@ export default function HomeScreen() {
         text={'CREATE A BLOCK SESSION'}
         onPress={() => router.push('/(tabs)/home/create-block-session')}
       />
-    </>
+    </ScrollView>
   )
 }
 
 const styles = StyleSheet.create({
+  container: {
+    flexGrow: 1,
+    paddingBottom: T.spacing.xxx_large,
+  },
   greetings: {
     color: T.color.text,
     fontFamily: T.font.family.heading,

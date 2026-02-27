@@ -44,13 +44,13 @@ function validateWithSchema<T>(
   schema: z.ZodSchema<T>,
   input: unknown,
 ): ValidationResult<T> {
-  const validation = schema.safeParse(input)
+  const { success: isSuccess, error, data } = schema.safeParse(input)
 
-  if (!validation.success) {
+  if (!isSuccess) {
     const fieldErrors: Record<string, string> = {}
-    validation.error.errors.forEach((error) => {
-      const [key] = error.path
-      if (typeof key === 'string') fieldErrors[key] = error.message
+    error.errors.forEach((err) => {
+      const [key] = err.path
+      if (typeof key === 'string') fieldErrors[key] = err.message
     })
 
     const errorMessage = Object.values(fieldErrors).join(', ')
@@ -60,6 +60,6 @@ function validateWithSchema<T>(
 
   return {
     errorMessage: null,
-    data: validation.data,
+    data,
   }
 }

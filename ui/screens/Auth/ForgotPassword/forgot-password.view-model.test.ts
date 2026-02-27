@@ -1,14 +1,21 @@
 import { describe, expect, it } from 'vitest'
+import { SECOND } from '@/core/__constants__/time'
+import { ISODateString } from '@/core/_ports_/date-provider'
 import { stateBuilder } from '@/core/_tests_/state-builder'
+import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import {
   ForgotPasswordViewModel,
   ForgotPasswordViewState,
   selectForgotPasswordViewModel,
+  selectResendState,
 } from './forgot-password.view-model'
+
+const dateProvider = new StubDateProvider()
 
 describe('selectForgotPasswordViewModel', () => {
   describe('Idle state', () => {
     it('should return idle view model when not loading and no error', () => {
+      const now = dateProvider.getNowMs()
       const state = stateBuilder().build()
       const expectedViewModel: ForgotPasswordViewModel = {
         type: ForgotPasswordViewState.Idle,
@@ -17,7 +24,7 @@ describe('selectForgotPasswordViewModel', () => {
         error: null,
       }
 
-      const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state, now)
 
       expect(viewModel).toStrictEqual(expectedViewModel)
     })
@@ -25,6 +32,7 @@ describe('selectForgotPasswordViewModel', () => {
 
   describe('Loading state', () => {
     it('should return loading view model when auth is loading', () => {
+      const now = dateProvider.getNowMs()
       const state = stateBuilder().withAuthLoading(true).build()
       const expectedViewModel: ForgotPasswordViewModel = {
         type: ForgotPasswordViewState.Loading,
@@ -33,7 +41,7 @@ describe('selectForgotPasswordViewModel', () => {
         error: null,
       }
 
-      const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state, now)
 
       expect(viewModel).toStrictEqual(expectedViewModel)
     })
@@ -41,6 +49,7 @@ describe('selectForgotPasswordViewModel', () => {
 
   describe('Error state', () => {
     it('should return error view model when error is present', () => {
+      const now = dateProvider.getNowMs()
       const state = stateBuilder()
         .withAuthError({ message: 'No account found' })
         .build()
@@ -51,22 +60,113 @@ describe('selectForgotPasswordViewModel', () => {
         error: 'No account found',
       }
 
-      const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state, now)
 
       expect(viewModel).toStrictEqual(expectedViewModel)
     })
   })
 
   describe('Success state', () => {
-    it('should return success view model when password reset sent', () => {
-      const state = stateBuilder().withPasswordResetSent(true).build()
-      const expectedViewModel: ForgotPasswordViewModel = {
+    it('should return success view model when password reset was requested', () => {
+      const now = dateProvider.getNowMs()
+      const requestedAt: ISODateString = '2024-01-15T10:00:00.000Z'
+      const state = stateBuilder()
+        .withLastPasswordResetRequestAt(requestedAt)
+        .build()
+      const expectedSuccessType = ForgotPasswordViewState.Success
+
+      const viewModel = selectForgotPasswordViewModel(state, now)
+
+      expect(viewModel.type).toBe(expectedSuccessType)
+    })
+
+    it('should disable resend button during cooldown', () => {
+      const now = dateProvider.getNowMs()
+      const requestedTenSecondsAgo = dateProvider.msToISOString(
+        now - 10 * SECOND,
+      )
+      const state = stateBuilder()
+        .withLastPasswordResetRequestAt(requestedTenSecondsAgo)
+        .build()
+      const expectedViewModel = {
         type: ForgotPasswordViewState.Success,
+        lastPasswordResetRequestAt: requestedTenSecondsAgo,
+        isResendDisabled: true,
+        resendButtonText: 'RESEND EMAIL (50s)',
       }
 
-      const viewModel = selectForgotPasswordViewModel(state)
+      const viewModel = selectForgotPasswordViewModel(state, now)
 
       expect(viewModel).toStrictEqual(expectedViewModel)
     })
+
+    it('should enable resend button after cooldown expires', () => {
+      const now = dateProvider.getNowMs()
+      const requestedTwoMinutesAgo = dateProvider.msToISOString(
+        now - 120 * SECOND,
+      )
+      const state = stateBuilder()
+        .withLastPasswordResetRequestAt(requestedTwoMinutesAgo)
+        .build()
+      const expectedViewModel = {
+        type: ForgotPasswordViewState.Success,
+        lastPasswordResetRequestAt: requestedTwoMinutesAgo,
+        isResendDisabled: false,
+        resendButtonText: 'RESEND EMAIL',
+      }
+
+      const viewModel = selectForgotPasswordViewModel(state, now)
+
+      expect(viewModel).toStrictEqual(expectedViewModel)
+    })
+  })
+})
+
+describe('selectResendState', () => {
+  it('should return enabled state when no password reset was requested', () => {
+    const now = dateProvider.getNowMs()
+    const state = stateBuilder().build()
+    const expectedResendState = {
+      isResendDisabled: false,
+      resendButtonText: 'RESEND EMAIL',
+    }
+
+    const resendState = selectResendState(state, now)
+
+    expect(resendState).toStrictEqual(expectedResendState)
+  })
+
+  it('should return disabled state during cooldown', () => {
+    const now = dateProvider.getNowMs()
+    const requestedTenSecondsAgo = dateProvider.msToISOString(now - 10 * SECOND)
+    const state = stateBuilder()
+      .withLastPasswordResetRequestAt(requestedTenSecondsAgo)
+      .build()
+    const expectedResendState = {
+      isResendDisabled: true,
+      resendButtonText: 'RESEND EMAIL (50s)',
+    }
+
+    const resendState = selectResendState(state, now)
+
+    expect(resendState).toStrictEqual(expectedResendState)
+  })
+
+  it('should return enabled state after cooldown expires', () => {
+    const now = dateProvider.getNowMs()
+    const requestedTwoMinutesAgo = dateProvider.msToISOString(
+      now - 120 * SECOND,
+    )
+    const state = stateBuilder()
+      .withLastPasswordResetRequestAt(requestedTwoMinutesAgo)
+      .build()
+    const expectedResendState = {
+      isResendDisabled: false,
+      resendButtonText: 'RESEND EMAIL',
+    }
+
+    const resendState = selectResendState(state, now)
+
+    expect(resendState).toStrictEqual(expectedResendState)
   })
 })

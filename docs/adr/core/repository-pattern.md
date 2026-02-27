@@ -10,7 +10,7 @@ Accepted
 
 TiedSiren51's hexagonal architecture requires abstracting data access from the core business logic:
 
-- **Separation of concerns**: Core shouldn't know about Prisma, SQLite, or any specific database
+- **Separation of concerns**: Core shouldn't know about PowerSync, SQLite, or any specific database
 - **Testability**: Need to swap real database with in-memory fakes for testing
 - **Flexibility**: Should be able to change database technology without touching core
 - **Type safety**: Data access operations should be type-safe
@@ -41,39 +41,41 @@ export interface BlockSessionRepository {
 
 ```typescript
 // Infrastructure provides how it's done
-export class PrismaBlockSessionRepository implements BlockSessionRepository {
-  constructor(private prisma: PrismaClient) {}
+export class PowersyncBlockSessionRepository implements BlockSessionRepository {
+  constructor(private db: AbstractPowerSyncDatabase) {}
 
   async save(session: BlockSession): Promise<void> {
-    await this.prisma.blockSession.create({
-      data: session,
-    })
+    await this.db.execute(
+      'INSERT INTO block_sessions (...) VALUES (...)',
+      [session.id, session.name, ...],
+    )
   }
 
   async findById(id: string): Promise<BlockSession | null> {
-    return await this.prisma.blockSession.findUnique({
-      where: { id },
-    })
+    const result = await this.db.getOptional(
+      'SELECT * FROM block_sessions WHERE id = ?',
+      [id],
+    )
+    return result ? toBlockSession(result) : null
   }
 
   // ... other methods
 }
 ```
 
-**3. Abstract Base Repository** (`/infra/__abstract__/prisma.repository.ts`)
+**3. Abstract Base Repository** (`/infra/__abstract__/powersync.repository.ts`)
 
-Shared functionality for all Prisma repositories:
+Shared functionality for all PowerSync repositories:
 - Database initialization
-- Platform-specific path handling
-- Common Prisma client setup
+- Common PowerSync database access
 - Error handling patterns
 
 **4. Multiple Implementations**
 
 Production:
-- `PrismaBlockSessionRepository` - Real database
-- `PrismaBlocklistRepository` - Real database
-- `PrismaSirensRepository` - Real database
+- `PowersyncBlockSessionRepository` - Real database
+- `PowersyncBlocklistRepository` - Real database
+- `PowersyncSirensRepository` - Real database
 
 Testing:
 - `FakeDataBlockSessionRepository` - In-memory array
@@ -97,13 +99,13 @@ export const loadBlockSessions = createAppAsyncThunk(
 
 ### Positive
 
-- **Decoupling**: Core doesn't depend on Prisma or any database
+- **Decoupling**: Core doesn't depend on PowerSync or any database
 - **Testability**: Easy to swap real database with fake for tests
 - **Flexibility**: Can change database without touching business logic
 - **Type safety**: Repository interface enforces type contracts
 - **Consistency**: All data access follows same pattern
 - **Single Responsibility**: Repositories only handle data access
-- **Easy migration**: Migrated from PouchDB to Prisma by swapping repositories
+- **Easy migration**: Migrated from PouchDB to Prisma to PowerSync by swapping repositories
 - **Clean architecture**: Respects hexagonal architecture boundaries
 - **Reusability**: Same repository interface can have multiple implementations
 - **Encapsulation**: Database-specific logic hidden from core
@@ -124,9 +126,9 @@ export const loadBlockSessions = createAppAsyncThunk(
 
 ## Alternatives Considered
 
-### 1. Direct Prisma Usage in Core
+### 1. Direct Database Usage in Core
 **Rejected because**:
-- Couples core to Prisma
+- Couples core to specific database technology
 - Impossible to test without real database
 - Violates hexagonal architecture
 - Hard to migrate database technology
@@ -161,10 +163,10 @@ export const loadBlockSessions = createAppAsyncThunk(
 - `/core/_ports_/block-session.repository.ts` - Interface
 - `/core/_ports_/blocklist.repository.ts` - Interface
 - `/core/_ports_/sirens.repository.ts` - Interface
-- `/infra/block-session-repository/prisma.block-session.repository.ts` - Implementation
-- `/infra/blocklist-repository/prisma.blocklist.repository.ts` - Implementation
-- `/infra/siren-repository/prisma.sirens-repository.ts` - Implementation
-- `/infra/__abstract__/prisma.repository.ts` - Base class
+- `/infra/block-session-repository/powersync.block-session.repository.ts` - Implementation
+- `/infra/blocklist-repository/powersync.blocklist.repository.ts` - Implementation
+- `/infra/siren-repository/powersync.sirens-repository.ts` - Implementation
+- `/infra/__abstract__/powersync.repository.ts` - Base class
 
 ### Repository Interface Pattern
 
@@ -186,14 +188,13 @@ export interface {Entity}Repository {
 ### Abstract Repository Benefits
 
 ```typescript
-// /infra/__abstract__/prisma.repository.ts
-export abstract class PrismaRepository {
-  protected prisma: PrismaClient
+// /infra/__abstract__/powersync.repository.ts
+export abstract class PowersyncRepository {
+  protected db: AbstractPowerSyncDatabase
 
   async initialize(): Promise<void> {
     // Shared initialization logic
-    // Platform-specific database path
-    // Migration handling
+    // Common database access
   }
 
   protected handleError(error: unknown): never {
@@ -202,7 +203,7 @@ export abstract class PrismaRepository {
 }
 
 // Domain repositories extend base
-export class PrismaBlockSessionRepository extends PrismaRepository
+export class PowersyncBlockSessionRepository extends PowersyncRepository
   implements BlockSessionRepository {
   // Inherits initialization, error handling, etc.
 }
@@ -241,7 +242,7 @@ export interface BlockSessionRepository {
 - [Hexagonal Architecture](../hexagonal-architecture.md)
 - [Port Naming Convention](port-naming-convention.md) - No I-prefix for port interfaces
 - [Dependency Injection Pattern](dependency-injection-pattern.md)
-- [Prisma ORM with SQLite](../infrastructure/prisma-orm-sqlite.md)
+- [PowerSync + OP-SQLite](../infrastructure/powersync-op-sqlite.md)
 
 ## References
 

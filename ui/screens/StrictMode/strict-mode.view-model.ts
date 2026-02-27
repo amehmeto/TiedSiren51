@@ -29,16 +29,17 @@ type ActiveViewModel = {
 export type StrictModeViewModel = InactiveViewModel | ActiveViewModel
 
 function formatCountdown(timeLeft: TimeLeft): string {
+  const { days, hours, minutes, seconds } = timeLeft
   const parts: string[] = []
 
-  const hasDays = timeLeft.days > 0
-  const hasHours = timeLeft.hours > 0
-  const hasMinutes = timeLeft.minutes > 0
+  const hasDays = days > 0
+  const hasHours = hours > 0
+  const hasMinutes = minutes > 0
 
-  if (hasDays) parts.push(`${timeLeft.days}d`)
-  if (hasHours || hasDays) parts.push(`${timeLeft.hours}h`)
-  if (hasMinutes || hasHours || hasDays) parts.push(`${timeLeft.minutes}m`)
-  parts.push(`${timeLeft.seconds}s`)
+  if (hasDays) parts.push(`${days}d`)
+  if (hasHours || hasDays) parts.push(`${hours}h`)
+  if (hasMinutes || hasHours || hasDays) parts.push(`${minutes}m`)
+  parts.push(`${seconds}s`)
 
   return parts.join(' ')
 }
@@ -59,6 +60,7 @@ export function selectStrictModeViewModel(
   }
 
   const timeLeft = selectStrictModeTimeLeft(state, dateProvider)
+  const { days, hours, minutes } = timeLeft
   const countdown = formatCountdown(timeLeft)
 
   return {
@@ -66,9 +68,9 @@ export function selectStrictModeViewModel(
     countdown,
     endDateTime: formatEndFromOffsets({
       now: dateProvider.getNow(),
-      days: timeLeft.days,
-      hours: timeLeft.hours,
-      minutes: timeLeft.minutes,
+      days,
+      hours,
+      minutes,
       dateProvider,
     }),
     inlineRemaining: countdown,

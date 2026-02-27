@@ -1,5 +1,4 @@
 import { expect } from 'vitest'
-import { FakeBackgroundTaskService } from '@/infra/background-task-service/fake.background-task.service'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
@@ -10,6 +9,7 @@ import { createTestStore } from '../../_tests_/createTestStore'
 import { dateFixture } from '../../_tests_/date.fixture'
 import { Fixture } from '../../_tests_/fixture.type'
 import { stateBuilderProvider } from '../../_tests_/state-builder'
+import { TEST_AUTH_USER } from '../../_tests_/test-constants'
 import { BlockSession, blockSessionAdapter } from '../block-session'
 import { selectAllBlockSessionIds } from '../selectors/selectAllBlockSessionIds'
 import { selectBlockSessionById } from '../selectors/selectBlockSessionById'
@@ -38,8 +38,11 @@ export function blockSessionFixture(
   const dateProvider = new StubDateProvider()
   const logger = new InMemoryLogger()
   const notificationService = new FakeNotificationService(logger)
-  const backgroundTaskService = new FakeBackgroundTaskService(logger)
   const dateTest = dateFixture(dateProvider)
+
+  testStateBuilderProvider.setState((builder) =>
+    builder.withAuthUser(TEST_AUTH_USER),
+  )
 
   return {
     given: {
@@ -56,11 +59,13 @@ export function blockSessionFixture(
     },
     when: {
       creatingBlockSession: async (payload: CreateBlockSessionPayload) => {
-        store = createTestStore({
-          notificationService,
-          dateProvider,
-          backgroundTaskService,
-        })
+        store = createTestStore(
+          {
+            notificationService,
+            dateProvider,
+          },
+          testStateBuilderProvider.getState(),
+        )
         await store.dispatch(createBlockSession(payload))
       },
       duplicatingBlockSession: async (
@@ -146,9 +151,6 @@ export function blockSessionFixture(
       ) {
         const lastCancelled = notificationService.lastCancelledNotificationIds
         expect(lastCancelled).toEqual(expectedNotificationIds)
-      },
-      backgroundTasksShouldBeScheduled(expectedTasks: string[]) {
-        expect(backgroundTaskService.lastScheduledTasks).toEqual(expectedTasks)
       },
     },
   }

@@ -1,37 +1,22 @@
-import * as ExpoDevice from 'expo-device'
 import { useState } from 'react'
 import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { Device } from '@/core/device/device'
+import { selectDevices } from '@/core/device/selectors/selectDevices'
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
-
-const currentDevice: Device = {
-  id: ExpoDevice.modelId ?? 'unknown-current',
-  type: ExpoDevice.deviceType?.toString() ?? 'unknown',
-  name: generateDeviceName(),
-}
-
-function generateDeviceName() {
-  return (
-    (ExpoDevice.manufacturer ?? 'Unknown Manufacturer') +
-    ' ' +
-    (ExpoDevice.modelName ?? 'Unknown Device') +
-    ' (this device)'
-  )
-}
+import { currentDevice } from '@/ui/screens/Home/shared/current-device'
 
 type DevicesModalFields = {
   isVisible: boolean
   currentSelections: Device[]
   onRequestClose: () => void
   setFieldValue: (field: string, value: Device[]) => void
-  devices: Device[]
 }
 
 type DevicesModalProps = Readonly<DevicesModalFields>
@@ -41,9 +26,9 @@ export function DevicesModal({
   currentSelections,
   onRequestClose,
   setFieldValue,
-  devices,
 }: DevicesModalProps) {
   const dispatch = useDispatch<AppDispatch>()
+  const devices = useSelector(selectDevices)
   const isStrictModeActive = useSelector((state: RootState) =>
     selectIsStrictModeActive(state, dependencies.dateProvider),
   )

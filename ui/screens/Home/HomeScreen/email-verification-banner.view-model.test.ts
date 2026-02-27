@@ -1,21 +1,19 @@
 import { describe, expect, test } from 'vitest'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { AuthProvider } from '@/core/auth/auth-user'
-import {
-  EmailVerificationBannerViewState,
-  selectEmailVerificationBannerViewModel,
-} from './email-verification-banner.view-model'
+import { selectEmailVerificationBannerViewModel } from './email-verification-banner.view-model'
 
 describe('selectEmailVerificationBannerViewModel', () => {
-  test('should return Hidden when no user is authenticated', () => {
+  test('should return hidden when no user is authenticated', () => {
     const state = stateBuilder().withoutAuthUser({}).build()
+    const expectedViewModel = { visible: false }
 
-    const viewState = selectEmailVerificationBannerViewModel(state)
+    const viewModel = selectEmailVerificationBannerViewModel(state)
 
-    expect(viewState).toBe(EmailVerificationBannerViewState.Hidden)
+    expect(viewModel).toStrictEqual(expectedViewModel)
   })
 
-  test('should return Hidden when user email is verified', () => {
+  test('should return hidden when user email is verified', () => {
     const state = stateBuilder()
       .withAuthUser({
         id: 'user-123',
@@ -24,13 +22,14 @@ describe('selectEmailVerificationBannerViewModel', () => {
         authProvider: AuthProvider.Email,
       })
       .build()
+    const expectedViewModel = { visible: false }
 
-    const viewState = selectEmailVerificationBannerViewModel(state)
+    const viewModel = selectEmailVerificationBannerViewModel(state)
 
-    expect(viewState).toBe(EmailVerificationBannerViewState.Hidden)
+    expect(viewModel).toStrictEqual(expectedViewModel)
   })
 
-  test('should return Hidden for Google-authenticated users', () => {
+  test('should return hidden for Google-authenticated users', () => {
     const state = stateBuilder()
       .withAuthUser({
         id: 'user-123',
@@ -39,13 +38,14 @@ describe('selectEmailVerificationBannerViewModel', () => {
         authProvider: AuthProvider.Google,
       })
       .build()
+    const expectedViewModel = { visible: false }
 
-    const viewState = selectEmailVerificationBannerViewModel(state)
+    const viewModel = selectEmailVerificationBannerViewModel(state)
 
-    expect(viewState).toBe(EmailVerificationBannerViewState.Hidden)
+    expect(viewModel).toStrictEqual(expectedViewModel)
   })
 
-  test('should return Hidden for Apple-authenticated users', () => {
+  test('should return hidden for Apple-authenticated users', () => {
     const state = stateBuilder()
       .withAuthUser({
         id: 'user-123',
@@ -54,13 +54,14 @@ describe('selectEmailVerificationBannerViewModel', () => {
         authProvider: AuthProvider.Apple,
       })
       .build()
+    const expectedViewModel = { visible: false }
 
-    const viewState = selectEmailVerificationBannerViewModel(state)
+    const viewModel = selectEmailVerificationBannerViewModel(state)
 
-    expect(viewState).toBe(EmailVerificationBannerViewState.Hidden)
+    expect(viewModel).toStrictEqual(expectedViewModel)
   })
 
-  test('should return Visible for unverified email user', () => {
+  test('should return visible with resend label for unverified email user', () => {
     const state = stateBuilder()
       .withAuthUser({
         id: 'user-123',
@@ -69,9 +70,71 @@ describe('selectEmailVerificationBannerViewModel', () => {
         authProvider: AuthProvider.Email,
       })
       .build()
+    const expectedViewModel = {
+      visible: true,
+      title: 'Verify your email',
+      description: 'Check your inbox and tap the verification link.',
+      openEmailLabel: null,
+      isSendingVerificationEmail: false,
+      resendVerificationEmailLabel: 'Resend email',
+      userEmail: 'test@example.com',
+      error: null,
+    }
 
-    const viewState = selectEmailVerificationBannerViewModel(state)
+    const viewModel = selectEmailVerificationBannerViewModel(state)
 
-    expect(viewState).toBe(EmailVerificationBannerViewState.Visible)
+    expect(viewModel).toStrictEqual(expectedViewModel)
+  })
+
+  test('should show error message when verification email fails', () => {
+    const state = stateBuilder()
+      .withAuthUser({
+        id: 'user-123',
+        email: 'test@example.com',
+        isEmailVerified: false,
+        authProvider: AuthProvider.Email,
+      })
+      .withAuthError({ message: 'Too many requests. Try again later.' })
+      .build()
+    const expectedViewModel = {
+      visible: true,
+      title: 'Verify your email',
+      description: 'Check your inbox and tap the verification link.',
+      openEmailLabel: null,
+      isSendingVerificationEmail: false,
+      resendVerificationEmailLabel: 'Resend email',
+      userEmail: 'test@example.com',
+      error: 'Too many requests. Try again later.',
+    }
+
+    const viewModel = selectEmailVerificationBannerViewModel(state)
+
+    expect(viewModel).toStrictEqual(expectedViewModel)
+  })
+
+  test('should show sending label while verification email is being sent', () => {
+    const state = stateBuilder()
+      .withAuthUser({
+        id: 'user-123',
+        email: 'test@example.com',
+        isEmailVerified: false,
+        authProvider: AuthProvider.Email,
+      })
+      .withSendingVerificationEmail(true)
+      .build()
+    const expectedViewModel = {
+      visible: true,
+      title: 'Verify your email',
+      description: 'Check your inbox and tap the verification link.',
+      openEmailLabel: null,
+      isSendingVerificationEmail: true,
+      resendVerificationEmailLabel: 'Sending...',
+      userEmail: 'test@example.com',
+      error: null,
+    }
+
+    const viewModel = selectEmailVerificationBannerViewModel(state)
+
+    expect(viewModel).toStrictEqual(expectedViewModel)
   })
 })

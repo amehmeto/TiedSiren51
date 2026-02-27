@@ -18,10 +18,11 @@ const defaultEndTime: ISODateString = defaultEndTimeValue
 export function buildBlockingSchedule(
   wantedSchedule: PartialDeep<BlockingSchedule> = {},
 ): BlockingSchedule {
+  const { id, startTime, endTime, sirens } = wantedSchedule
   return {
-    id: wantedSchedule.id ?? faker.string.uuid(),
-    startTime: wantedSchedule.startTime ?? defaultStartTime,
-    endTime: wantedSchedule.endTime ?? defaultEndTime,
-    sirens: buildSirens(wantedSchedule.sirens),
+    id: id ?? faker.string.uuid(),
+    startTime: startTime ?? defaultStartTime,
+    endTime: endTime ?? defaultEndTime,
+    sirens: buildSirens(sirens),
   }
 }

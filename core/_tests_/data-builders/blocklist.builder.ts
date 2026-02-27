@@ -3,6 +3,8 @@ import type { PartialDeep } from 'type-fest'
 import { Blocklist } from '../../blocklist/blocklist'
 import { buildAndroidSiren } from './android-siren.builder'
 
+const { internet, lorem, string, helpers } = faker
+
 export function buildBlocklist(
   wantedBlocklist: PartialDeep<Blocklist> = {},
 ): Blocklist {
@@ -24,13 +26,16 @@ export function buildBlocklist(
     linux: [],
     macos: [],
     windows: [],
-    websites: [faker.internet.domainName()],
-    keywords: [faker.lorem.word()],
+    websites: [internet.domainName()],
+    keywords: [lorem.word()],
   }
 
+  const { android, ios, linux, macos, windows, websites, keywords } =
+    defaultSirens
+
   const randomBlocklist: Blocklist = {
-    id: faker.string.uuid(),
-    name: faker.helpers.arrayElement(blocklistNameExamples),
+    id: string.uuid(),
+    name: helpers.arrayElement(blocklistNameExamples),
     sirens: defaultSirens,
   }
 
@@ -39,13 +44,13 @@ export function buildBlocklist(
     ...wantedBlocklist,
     sirens: wantedBlocklist.sirens
       ? {
-          android: wantedBlocklist.sirens.android ?? defaultSirens.android,
-          ios: wantedBlocklist.sirens.ios ?? defaultSirens.ios,
-          linux: wantedBlocklist.sirens.linux ?? defaultSirens.linux,
-          macos: wantedBlocklist.sirens.macos ?? defaultSirens.macos,
-          windows: wantedBlocklist.sirens.windows ?? defaultSirens.windows,
-          websites: wantedBlocklist.sirens.websites ?? defaultSirens.websites,
-          keywords: wantedBlocklist.sirens.keywords ?? defaultSirens.keywords,
+          android: wantedBlocklist.sirens.android ?? android,
+          ios: wantedBlocklist.sirens.ios ?? ios,
+          linux: wantedBlocklist.sirens.linux ?? linux,
+          macos: wantedBlocklist.sirens.macos ?? macos,
+          windows: wantedBlocklist.sirens.windows ?? windows,
+          websites: wantedBlocklist.sirens.websites ?? websites,
+          keywords: wantedBlocklist.sirens.keywords ?? keywords,
         }
       : defaultSirens,
   }

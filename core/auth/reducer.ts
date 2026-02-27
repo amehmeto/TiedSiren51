@@ -22,12 +22,16 @@ import { resetPassword } from './usecases/reset-password.usecase'
 import { sendVerificationEmail } from './usecases/send-verification-email.usecase'
 import { signInWithEmail } from './usecases/sign-in-with-email.usecase'
 
+export type AuthStateError = {
+  message: string
+  type: AuthErrorType | null
+}
+
 export type AuthState = {
   authUser: AuthUser | null
   isLoading: boolean
-  error: string | null
-  errorType: AuthErrorType | null
-  isPasswordResetSent: boolean
+  error: AuthStateError | null
+  lastPasswordResetRequestAt: ISODateString | null
   isSendingVerificationEmail: boolean
   email: string
   password: string
@@ -86,13 +90,22 @@ export const setDeleteConfirmText = createAction<string>(
   'auth/setDeleteConfirmText',
 )
 
+type SerializedError = { message?: string; code?: string }
+
+function toAuthStateError(error: SerializedError): AuthStateError | null {
+  if (!error.message) return null
+  return {
+    message: error.message,
+    type: isAuthErrorType(error.code) ? error.code : null,
+  }
+}
+
 function createInitialAuthState(): AuthState {
   return {
     authUser: null,
     isLoading: false,
     error: null,
-    errorType: null,
-    isPasswordResetSent: false,
+    lastPasswordResetRequestAt: null,
     isSendingVerificationEmail: false,
     email: '',
     password: '',
@@ -116,8 +129,8 @@ export const reducer = createReducer<AuthState>(
   createInitialAuthState(),
   (builder) => {
     // All auth thunks share the same pending/fulfilled/rejected state transitions
-    // (loading, error, errorType). The addMatcher calls below handle this shared
-    // logic, while thunk-specific behavior (e.g. setting authUser) stays in addCase.
+    // (loading, error). The addMatcher calls below handle this shared logic,
+    // while thunk-specific behavior (e.g. setting authUser) stays in addCase.
     const authThunks = [
       signInWithEmail,
       signUpWithEmail,
@@ -131,16 +144,13 @@ export const reducer = createReducer<AuthState>(
       .addCase(userAuthenticated, (state, action) => {
         state.authUser = action.payload
         state.error = null
-        state.errorType = null
         state.isLoading = false
       })
       .addCase(clearError, (state) => {
         state.error = null
-        state.errorType = null
       })
       .addCase(setError, (state, action) => {
-        state.error = action.payload
-        state.errorType = null
+        state.error = { message: action.payload, type: null }
       })
       .addCase(setEmail, (state, action) => {
         state.email = action.payload
@@ -175,16 +185,11 @@ export const reducer = createReducer<AuthState>(
       .addCase(clearAuthState, (state) => {
         state.isLoading = false
         state.error = null
-        state.errorType = null
-        state.isPasswordResetSent = false
         state.email = ''
         state.password = ''
       })
-      .addCase(resetPassword.pending, (state) => {
-        state.isPasswordResetSent = false
-      })
-      .addCase(resetPassword.fulfilled, (state) => {
-        state.isPasswordResetSent = true
+      .addCase(resetPassword.fulfilled, (state, action) => {
+        state.lastPasswordResetRequestAt = action.payload
       })
 
       .addCase(sendVerificationEmail.pending, (state) => {
@@ -195,10 +200,7 @@ export const reducer = createReducer<AuthState>(
       })
       .addCase(sendVerificationEmail.rejected, (state, action) => {
         state.isSendingVerificationEmail = false
-        state.error = action.error.message ?? null
-        state.errorType = isAuthErrorType(action.error.code)
-          ? action.error.code
-          : null
+        state.error = toAuthStateError(action.error)
       })
 
       .addCase(applyEmailVerificationCode.fulfilled, (state) => {
@@ -297,21 +299,16 @@ export const reducer = createReducer<AuthState>(
       .addMatcher(isPending(...authThunks), (state) => {
         state.isLoading = true
         state.error = null
-        state.errorType = null
       })
       .addMatcher(isFulfilled(...authThunks), (state) => {
         state.error = null
-        state.errorType = null
         state.isLoading = false
         state.password = ''
       })
       .addMatcher(isRejected(...authThunks), (state, action) => {
         state.isLoading = false
-        state.error = action.error.message ?? null
-        state.errorType = isAuthErrorType(action.error.code)
-          ? action.error.code
-          : null
-        if (state.errorType === AuthErrorType.Credential) state.password = ''
+        state.error = toAuthStateError(action.error)
+        if (state.error?.type === AuthErrorType.Credential) state.password = ''
       })
   },
 )

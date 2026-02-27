@@ -13,7 +13,7 @@ core/         → Business logic, Redux slices, ports (interfaces)
   _ports_/    → Interface definitions for external dependencies
   _redux_/    → Store setup, listener registration
   {domain}/   → Domain logic (auth, block-session, blocklist, siren)
-infra/        → Adapter implementations (Firebase, Prisma, Expo APIs)
+infra/        → Adapter implementations (Firebase, PowerSync, Expo APIs)
 tests/        → Test utilities, fixtures, builders
 ```
 
@@ -57,7 +57,6 @@ Custom native modules in sibling repositories (cloned to parent directory):
 npm test              # Run tests (watch mode)
 npm run lint          # TypeScript + ESLint + Prettier
 npm run lint:fix      # Auto-fix lint issues
-npx prisma generate   # Regenerate Prisma client after schema changes
 
 # Quick package.json inspection
 jq '.scripts' package.json        # View npm scripts (alias: jqs)
@@ -79,7 +78,7 @@ Three Husky hooks run automatically during the commit-push cycle:
 - Blocks commits to `main`/`demo` branches
 - Blocks commits on branches whose PR was already merged
 - Runs `tsc --noEmit` (full project type check)
-- Runs lint-staged: ESLint fix + Prettier fix on staged `.ts/.tsx/.js/.json` files, remark on `.md`, shell linter on `.sh`, Prisma validation on `schema.prisma`
+- Runs lint-staged: ESLint fix + Prettier fix on staged `.ts/.tsx/.js/.json` files, remark on `.md`, shell linter on `.sh`
 
 **Pre-push** (`git push`):
 - Prompts for e2e test confirmation (skip with `SKIP_E2E_CHECK=true`)
