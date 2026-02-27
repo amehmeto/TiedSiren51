@@ -3,6 +3,7 @@ import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { MenuProvider } from 'react-native-popup-menu'
 import { AppStore } from '@/core/_redux_/createStore'
+import { InitializingView } from '@/ui/design-system/components/shared/InitializingView'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
 import { TiedSToast } from '@/ui/design-system/components/shared/TiedSToast'
 import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
@@ -23,15 +24,17 @@ const routes = [
 ]
 
 export function AppWithInitialization({ store }: AppWithInitializationProps) {
-  const { isInitializing, isAuthenticated } = useAppInitialization(store)
+  const { error, isInitializing, isAuthenticated } = useAppInitialization(store)
   const router = useRouter()
   usePasswordResetDeepLink()
   useEmailVerificationDeepLink()
 
   useEffect(() => {
-    if (isInitializing) return
+    if (isInitializing || error) return
     router.replace(isAuthenticated ? '/home' : '/register')
-  }, [isInitializing, isAuthenticated, router])
+  }, [isInitializing, isAuthenticated, error, router])
+
+  if (error) return <InitializingView isInitializing={false} error={error} />
 
   return (
     <MenuProvider>

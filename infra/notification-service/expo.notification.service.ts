@@ -115,7 +115,7 @@ export class ExpoNotificationService implements NotificationService {
         seconds: trigger.seconds,
         repeats: trigger.shouldRepeat,
       }
-      return Notifications.scheduleNotificationAsync({
+      return await Notifications.scheduleNotificationAsync({
         content: {
           title,
           body,
