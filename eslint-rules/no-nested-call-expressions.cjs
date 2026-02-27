@@ -1,8 +1,59 @@
 /**
  * @fileoverview Disallow nested function calls as arguments
  * Nested calls like `a(b(x))` should be extracted to variables for readability.
+ *
+ * Path-based option selection (replaces ESLint excludedFiles overrides):
+ * - core selectors (non-test): allowedPatterns for entity adapter methods
+ * - fixture files: allowNoArguments
+ * - ui files (non-test): allowNoArguments
+ * - Test files: rule disabled
+ *
  * @author TiedSiren
  */
+
+const SELECTOR_ALLOWED_PATTERNS = [
+  '^map$',
+  '^filter$',
+  '^flatMap$',
+  '^find$',
+  '^some$',
+  '^every$',
+  '^selectAll$',
+  '^selectById$',
+  '^selectIds$',
+  '^selectEntities$',
+  '^getSelectors$',
+]
+
+function getOptionsForFile(filename, explicitOptions) {
+  // If explicit options are provided (ESLint/RuleTester usage), use them directly
+  if (explicitOptions) return explicitOptions
+
+  const normalized = filename.replace(/\\/g, '/')
+
+  // RuleTester or unknown filename: enable with default (strict) options
+  if (!normalized.includes('/') && !normalized.includes('\\'))
+    return {}
+
+  // Test files: disabled
+  if (normalized.includes('.test.ts') || normalized.includes('.spec.ts'))
+    return null
+
+  // Selectors in core (non-test): allowedPatterns
+  if (normalized.includes('/core/') && normalized.includes('/selectors/'))
+    return { allowedPatterns: SELECTOR_ALLOWED_PATTERNS }
+
+  // Fixture files: allowNoArguments
+  if (normalized.includes('.fixture.ts'))
+    return { allowNoArguments: true }
+
+  // UI files (non-test): allowNoArguments
+  if (normalized.includes('/ui/'))
+    return { allowNoArguments: true }
+
+  // All other files: disabled (not yet progressively enabled)
+  return null
+}
 
 module.exports = {
   meta: {
@@ -38,17 +89,22 @@ module.exports = {
   },
 
   create(context) {
-    const options = context.options[0] || {}
-    const allowedPatterns = (options.allowedPatterns || []).map(
+    const filename = context.getFilename()
+    const explicitOptions = context.options[0]
+    const resolvedOptions = getOptionsForFile(filename, explicitOptions)
+
+    // Disabled for this file path
+    if (!resolvedOptions) return {}
+
+    const allowedPatterns = (resolvedOptions.allowedPatterns || []).map(
       (p) => new RegExp(p),
     )
-    const allowNoArguments = options.allowNoArguments || false
+    const allowNoArguments = resolvedOptions.allowNoArguments || false
 
     function getCallName(node) {
       if (node.callee.type === 'Identifier') return node.callee.name
 
       if (node.callee.type === 'MemberExpression') {
-        // Return just the method name for matching against allowed patterns
         if (node.callee.property.type === 'Identifier')
           return node.callee.property.name
 
@@ -58,7 +114,6 @@ module.exports = {
       return '...'
     }
 
-    // Idiomatic patterns that are always allowed (outer call)
     const alwaysAllowedOuter = ['dispatch']
 
     function isAllowed(name) {
@@ -79,7 +134,6 @@ module.exports = {
             const innerName = getCallName(arg)
             if (isAllowed(innerName)) continue
 
-            // Allow nested calls with no arguments (e.g., getState())
             if (allowNoArguments && arg.arguments.length === 0) continue
 
             context.report({

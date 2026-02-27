@@ -24,7 +24,7 @@ run_lint() {
 
 run_lint lint:types
 run_lint "lint:oxlint${FIX_SUFFIX}"
-run_lint "lint:js${FIX_SUFFIX}" "**/*.{js,ts,jsx,tsx}" ".claude/**/*.json" "tsconfig*.json"
+run_lint "lint:json${FIX_SUFFIX}" "**/*.json" ".claude/**/*.json" "tsconfig*.json"
 run_lint "lint:format${FIX_SUFFIX}" "**/*.{js,ts,jsx,tsx,json,yml,yaml}"
 run_lint lint:md "."
 run_lint lint:sh

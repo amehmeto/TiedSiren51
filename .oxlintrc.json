@@ -1,7 +1,11 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
   "plugins": ["react", "typescript", "unicorn", "jest", "vitest", "import"],
-  "jsPlugins": ["./oxlint-plugin-local-rules.js"],
+  "jsPlugins": [
+    "./oxlint-plugin-local-rules.js",
+    { "name": "sonarjs", "specifier": "./oxlint-plugin-sonarjs.js" },
+    { "name": "react-native", "specifier": "./oxlint-plugin-react-native.js" }
+  ],
   "rules": {
     "no-console": "error",
     "eqeqeq": "error",
@@ -19,12 +23,45 @@
     "react/jsx-boolean-value": "error",
 
     "typescript/no-explicit-any": "error",
+    "typescript/no-unnecessary-condition": "error",
+    "typescript/consistent-type-assertions": [
+      "error",
+      { "assertionStyle": "never" }
+    ],
+    "typescript/prefer-optional-chain": "error",
+    "typescript/prefer-nullish-coalescing": "error",
+    "typescript/restrict-template-expressions": "off",
+    "typescript/no-floating-promises": "off",
+    "typescript/unbound-method": "off",
 
     "unicorn/no-nested-ternary": "off",
     "unicorn/no-thenable": "off",
+    "unicorn/prefer-ternary": "error",
+
+    "import/no-duplicates": "error",
 
     "jest/expect-expect": "off",
     "jest/require-to-throw-message": "off",
+
+    "sonarjs/no-collapsible-if": "error",
+    "sonarjs/no-collection-size-mischeck": "error",
+    "sonarjs/no-duplicated-branches": "error",
+    "sonarjs/no-gratuitous-expressions": "error",
+    "sonarjs/no-identical-functions": "error",
+    "sonarjs/no-redundant-boolean": "error",
+    "sonarjs/no-redundant-jump": "error",
+    "sonarjs/no-same-line-conditional": "error",
+    "sonarjs/no-unused-collection": "error",
+    "sonarjs/no-useless-catch": "error",
+    "sonarjs/prefer-immediate-return": "error",
+    "sonarjs/prefer-object-literal": "error",
+    "sonarjs/prefer-single-boolean-return": "error",
+
+    "react-native/no-color-literals": "error",
+    "react-native/no-inline-styles": "error",
+    "react-native/no-raw-text": "error",
+    "react-native/no-single-element-style-arrays": "error",
+    "react-native/no-unused-styles": "error",
 
     "local-rules/no-icon-size-magic-numbers": "error",
     "local-rules/no-stylesheet-magic-numbers": "error",
@@ -132,7 +169,21 @@
         ]
       }
     ],
-    "local-rules/no-i-prefix-in-imports": "error"
+    "local-rules/no-i-prefix-in-imports": "error",
+    "local-rules/no-data-builders-in-production": "error",
+    "local-rules/no-nested-call-expressions": "error",
+    "local-rules/no-unused-test-id": "error",
+    "local-rules/core-no-restricted-globals": "error",
+    "local-rules/core-no-restricted-imports": "error",
+    "local-rules/core-no-restricted-properties": "error",
+    "local-rules/core-test-no-restricted-properties": "error",
+    "local-rules/naming-convention-boolean-prefix": "error",
+    "local-rules/lines-between-class-members": "error",
+    "local-rules/max-statements-per-line": ["error", { "max": 1 }],
+    "local-rules/padding-line-between-block-like": "error",
+    "local-rules/object-shorthand": "error",
+    "local-rules/curly-multi-or-nest": "error",
+    "local-rules/no-switch": "error"
   },
   "overrides": [
     {
@@ -161,6 +212,8 @@
     "!.claude",
     "eslint-rules/",
     "oxlint-plugin-local-rules.js",
+    "oxlint-plugin-sonarjs.js",
+    "oxlint-plugin-react-native.js",
     "scripts/"
   ]
 }

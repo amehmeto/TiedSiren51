@@ -31,7 +31,7 @@ describe('Feature: Listen to user logged out events', () => {
       level: 'error',
       message: 'Error in onUserLoggedOut listener: Error: Dispatch failed',
     }
-    // eslint-disable-next-line no-restricted-properties -- store.dispatch can't be injected
+    // eslint-disable-next-line local-rules/core-test-no-restricted-properties -- store.dispatch can't be injected
     vi.spyOn(store, 'dispatch').mockImplementation(() => {
       throw new Error('Dispatch failed')
     })

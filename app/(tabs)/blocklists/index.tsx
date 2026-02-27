@@ -1,4 +1,3 @@
-/* eslint-disable no-switch-statements/no-switch */
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import React, { ReactNode } from 'react'
@@ -8,7 +7,6 @@ import { BlocklistViewModel } from '@/core/blocklist/selectors/blocklist-view-mo
 import { selectBlocklistViewModel } from '@/core/blocklist/selectors/blocklist.view-model'
 import { TiedSTitle } from '@/ui/design-system/components/shared/TiedSTitle'
 import { T } from '@/ui/design-system/theme'
-import { exhaustiveGuard } from '@/ui/exhaustive-guard'
 import { BlocklistCard } from '@/ui/screens/Blocklists/BlocklistCard'
 import { NoBlocklistMessage } from '@/ui/screens/Blocklists/NoBlocklistMessage'
 
@@ -18,22 +16,18 @@ export default function BlocklistScreen() {
   const router = useRouter()
 
   const blocklistsNode: ReactNode = (() => {
-    switch (viewModel.type) {
-      case BlocklistViewModel.NoBlocklist:
-        return <NoBlocklistMessage message={viewModel.message} />
-      case BlocklistViewModel.WithBlockLists:
-        return (
-          <FlatList
-            data={viewModel.blocklists}
-            keyExtractor={(blocklist) => blocklist.id}
-            renderItem={({ item: blocklist }) => (
-              <BlocklistCard blocklist={blocklist} />
-            )}
-          />
-        )
-      default:
-        return exhaustiveGuard(viewModel)
-    }
+    if (viewModel.type === BlocklistViewModel.NoBlocklist)
+      return <NoBlocklistMessage message={viewModel.message} />
+
+    return (
+      <FlatList
+        data={viewModel.blocklists}
+        keyExtractor={(blocklist) => blocklist.id}
+        renderItem={({ item: blocklist }) => (
+          <BlocklistCard blocklist={blocklist} />
+        )}
+      />
+    )
   })()
 
   return (
