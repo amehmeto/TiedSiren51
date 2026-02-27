@@ -167,6 +167,7 @@
       "Bash(npm update:*)",
       "Bash(npm view:*)",
       "Bash(npm why:*)",
+      "Bash(npm:*)",
       "Bash(npx eslint:*)",
       "Bash(npx expo config:*)",
       "Bash(npx expo export:*)",
