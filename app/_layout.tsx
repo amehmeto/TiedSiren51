@@ -4,7 +4,6 @@ import {
   Inter_600SemiBold,
   Inter_700Bold,
 } from '@expo-google-fonts/inter'
-import * as Sentry from '@sentry/react-native'
 import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
@@ -17,7 +16,7 @@ SplashScreen.preventAutoHideAsync()
 
 const store = createStore(dependencies)
 
-function RootLayout() {
+export default function RootLayout() {
   const [isFontsLoaded] = useFonts({
     Inter_400Regular,
     Inter_500Medium,
@@ -25,13 +24,13 @@ function RootLayout() {
     Inter_700Bold,
   })
 
+  if (!isFontsLoaded) return null
+
   return (
     <SafeAreaProvider>
       <Provider store={store}>
-        <AppWithInitialization store={store} isFontsLoaded={isFontsLoaded} />
+        <AppWithInitialization store={store} />
       </Provider>
     </SafeAreaProvider>
   )
 }
-
-export default Sentry.wrap(RootLayout)
