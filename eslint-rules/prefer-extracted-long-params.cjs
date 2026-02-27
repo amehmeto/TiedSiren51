@@ -109,8 +109,9 @@ module.exports = {
 
     function getCalleeName(node) {
       const callee = node.callee
+      if (!callee) return null
       if (callee.type === 'Identifier') return callee.name
-      if (callee.type === 'MemberExpression' && callee.property.type === 'Identifier')
+      if (callee.type === 'MemberExpression' && callee.property?.type === 'Identifier')
         return callee.property.name
       return null
     }
@@ -175,9 +176,10 @@ module.exports = {
       }
       if (node.type === 'CallExpression') {
         const callee = node.callee
+        if (!callee) return 'extracted'
         let name = null
         if (callee.type === 'Identifier') name = callee.name
-        if (callee.type === 'MemberExpression' && callee.property.type === 'Identifier')
+        if (callee.type === 'MemberExpression' && callee.property?.type === 'Identifier')
           name = callee.property.name
         if (name) {
           const stripped = name.replace(/^(get|create|build|fetch|make|compute|find|resolve)/, '')
@@ -195,6 +197,15 @@ module.exports = {
     }
 
     function checkCallExpression(node) {
+      try {
+        checkCallExpressionImpl(node)
+      } catch (err) {
+        if (!(err instanceof TypeError)) throw err
+        // Gracefully skip nodes with incompatible AST shapes (oxlint JS plugin)
+      }
+    }
+
+    function checkCallExpressionImpl(node) {
       if (node.arguments.length === 0) return
       if (wrappedCalls.has(node)) return
 

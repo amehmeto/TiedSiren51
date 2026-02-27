@@ -77,7 +77,7 @@ describe('onMultiDeviceReady listener', () => {
 
     const realDispatch = store.dispatch
 
-    // eslint-disable-next-line no-restricted-properties -- store.dispatch can't be injected
+    // eslint-disable-next-line local-rules/core-test-no-restricted-properties -- store.dispatch can't be injected
     vi.spyOn(store, 'dispatch').mockImplementation(() => {
       throw new Error('Dispatch failed')
     })
@@ -85,12 +85,11 @@ describe('onMultiDeviceReady listener', () => {
     await realDispatch(loadFeatureFlags())
 
     const logs = logger.getLogs()
-    const hasErrorLog = logs.some(
-      (log) =>
-        log.level === 'error' &&
-        log.message.includes('[onMultiDeviceReadyListener]'),
-    )
 
-    expect(hasErrorLog).toBe(true)
+    const objectContaining = expect.objectContaining({
+      level: 'error',
+      message: expect.stringContaining('[onMultiDeviceReadyListener]'),
+    })
+    expect(logs).toContainEqual(objectContaining)
   })
 })

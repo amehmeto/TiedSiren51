@@ -18,7 +18,7 @@ type ChooseNameProps = Readonly<ChooseNameFields>
 
 export function ChooseName({ values, onChange, onBlur }: ChooseNameProps) {
   const [isNameModalVisible, setIsNameModalVisible] = useState<boolean>(false)
-  const displayName = values.name ? values.name : NAME_PLACEHOLDER
+  const displayName = values.name ?? NAME_PLACEHOLDER
 
   return (
     <>

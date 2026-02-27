@@ -62,8 +62,9 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   private getGoogleSignInErrorPattern(error: Error): GoogleSignInError | null {
-    for (const pattern of Object.values(GoogleSignInError))
+    for (const pattern of Object.values(GoogleSignInError)) {
       if (error.message.includes(pattern)) return pattern
+    }
 
     return null
   }

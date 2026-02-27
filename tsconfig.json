@@ -14,15 +14,14 @@
     "noImplicitReturns": true,
     "noFallthroughCasesInSwitch": true,
 
-    // Path Aliases
-    "baseUrl": ".",
+    // Path Aliases (no baseUrl — resolved relative to tsconfig.json location)
     "paths": {
       "@/*": ["./*"],
-      "@core/*": ["core/*"],
-      "@infra/*": ["infra/*"],
-      "@ui/*": ["ui/*"],
-      "@app/*": ["app/*"],
-      "@assets/*": ["assets/*"],
+      "@core/*": ["./core/*"],
+      "@infra/*": ["./infra/*"],
+      "@ui/*": ["./ui/*"],
+      "@app/*": ["./app/*"],
+      "@assets/*": ["./assets/*"],
       "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
     },
     "typeRoots": ["./node_modules/@types"]

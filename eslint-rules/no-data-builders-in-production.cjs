@@ -49,6 +49,16 @@ module.exports = {
       return {}
     }
 
+    // Allow in fake-data files (test seed data)
+    if (/fake-data\.[^/\\]+\.ts$/.test(filename)) {
+      return {}
+    }
+
+    // Allow in manual testing preloaded state
+    if (filename.includes('preloadedStateForManualTesting')) {
+      return {}
+    }
+
     return {
       CallExpression(node) {
         // Check if it's a function call with name starting with 'build'

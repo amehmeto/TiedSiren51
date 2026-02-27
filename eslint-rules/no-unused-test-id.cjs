@@ -4,8 +4,22 @@
  * Hardcoded testID strings (e.g., testID="foo-bar") are often leftovers
  * that no test references. Prefer passing testID from props or removing it.
  *
+ * Scoped to ui/**\/*.ts(x), excluding test files.
+ * Replaces ESLint's file-override scoping for OxLint.
+ *
  * @author TiedSiren
  */
+
+function isUiProductionFile(filename) {
+  const normalized = filename.replace(/\\/g, '/')
+  // RuleTester or unknown filename: enable
+  if (!normalized.includes('/') && !normalized.includes('\\'))
+    return true
+  if (!normalized.includes('/ui/')) return false
+  if (normalized.includes('.test.ts')) return false
+  if (normalized.includes('.spec.ts')) return false
+  return true
+}
 
 module.exports = {
   meta: {
@@ -24,6 +38,9 @@ module.exports = {
   },
 
   create(context) {
+    const filename = context.getFilename()
+    if (!isUiProductionFile(filename)) return {}
+
     return {
       JSXAttribute(node) {
         if (node.name.name !== 'testID') return

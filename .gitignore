@@ -95,6 +95,11 @@ app.db
 google-services.json
 GoogleService-Info.plist
 
+# OxLint generated ESM rules (source of truth: eslint-rules/*.cjs)
+# Regenerate with: npm run generate:esm-rules
+eslint-rules/*.js
+oxlint-plugin-local-rules.js
+
 # Claude Code automation
 .claude-init.sh
 .claude-issue-prompt.md
