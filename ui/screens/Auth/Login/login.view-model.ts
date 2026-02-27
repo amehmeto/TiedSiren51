@@ -18,7 +18,8 @@ export type LoginViewModel = AuthBaseViewModel<LoginViewState> & {
 export const selectLoginViewModel = createSelector(
   [(state: RootState) => state.auth],
   (auth): LoginViewModel => {
-    const { isLoading, error, email, password, authUser } = auth
+    const { isLoading, email, password, authUser } = auth
+    const error = auth.error?.message ?? null
     const isUserAuthenticated = authUser !== null
     const { Loading, Error, Idle } = LoginViewState
 

@@ -1,8 +1,9 @@
+import * as IntentLauncher from 'expo-intent-launcher'
 import * as Linking from 'expo-linking'
 import { Platform } from 'react-native'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
-import { openEmailApp } from './OpenEmailAppButton'
+import { openEmailApp } from './open-email-app'
 
 type LogEntry = { level: string; message: string }
 
@@ -20,6 +21,10 @@ const { mockLogger } = vi.hoisted(() => {
   }
 })
 
+vi.mock('expo-intent-launcher', () => ({
+  startActivityAsync: vi.fn(),
+}))
+
 vi.mock('expo-linking', () => ({
   openURL: vi.fn(),
   canOpenURL: vi.fn(),
@@ -27,7 +32,6 @@ vi.mock('expo-linking', () => ({
 
 vi.mock('react-native', () => ({
   Platform: { OS: 'android' },
-  StyleSheet: { create: vi.fn((s: unknown) => s) },
 }))
 
 vi.mock('@/ui/dependencies', () => ({
@@ -36,6 +40,7 @@ vi.mock('@/ui/dependencies', () => ({
   },
 }))
 
+const mockStartActivity = vi.mocked(IntentLauncher.startActivityAsync)
 const mockOpenURL = vi.mocked(Linking.openURL)
 const mockCanOpenURL = vi.mocked(Linking.canOpenURL)
 
@@ -50,18 +55,35 @@ describe('openEmailApp', () => {
       Platform.OS = 'android'
     })
 
-    it('should open deep link directly without canOpenURL check', async () => {
+    it('should launch Gmail via intent launcher', async () => {
+      mockStartActivity.mockResolvedValueOnce({ resultCode: -1 })
+
+      await openEmailApp('user@gmail.com')
+
+      expect(mockStartActivity).toHaveBeenCalledWith(
+        'android.intent.action.MAIN',
+        {
+          packageName: 'com.google.android.gm',
+          category: 'android.intent.category.LAUNCHER',
+        },
+      )
+      expect(mockOpenURL).not.toHaveBeenCalled()
+    })
+
+    it('should fall back to deep link when intent launcher fails', async () => {
+      mockStartActivity.mockRejectedValueOnce(new Error('Activity not found'))
       mockOpenURL.mockResolvedValueOnce(true)
 
       await openEmailApp('user@gmail.com')
 
-      expect(mockCanOpenURL).not.toHaveBeenCalled()
+      expect(mockStartActivity).toHaveBeenCalled()
       expect(mockOpenURL).toHaveBeenCalledWith('googlegmail://')
     })
 
-    it('should fall back to web URL when deep link throws', async () => {
+    it('should fall back to web URL when both intent and deep link fail', async () => {
+      mockStartActivity.mockRejectedValueOnce(new Error('Activity not found'))
       mockOpenURL
-        .mockRejectedValueOnce(new Error('Activity not found'))
+        .mockRejectedValueOnce(new Error('Cannot open URL'))
         .mockResolvedValueOnce(true)
 
       await openEmailApp('user@gmail.com')
@@ -70,11 +92,12 @@ describe('openEmailApp', () => {
       expect(mockOpenURL).toHaveBeenNthCalledWith(2, 'https://mail.google.com')
     })
 
-    it('should fall back to mailto when deep link throws for unknown provider', async () => {
+    it('should fall back to mailto for unknown provider', async () => {
       mockOpenURL.mockResolvedValueOnce(true)
 
       await openEmailApp('user@company.com')
 
+      expect(mockStartActivity).not.toHaveBeenCalled()
       expect(mockOpenURL).toHaveBeenCalledWith('mailto:user@company.com')
     })
   })
@@ -90,6 +113,7 @@ describe('openEmailApp', () => {
 
       await openEmailApp('user@gmail.com')
 
+      expect(mockStartActivity).not.toHaveBeenCalled()
       expect(mockCanOpenURL).toHaveBeenCalledWith('googlegmail://')
       expect(mockOpenURL).toHaveBeenCalledWith('googlegmail://')
     })
@@ -121,7 +145,7 @@ describe('openEmailApp', () => {
       const expectedLogEntry = {
         level: 'error',
         message: expect.stringContaining(
-          '[OpenEmailAppButton] Failed to open email app',
+          '[openEmailApp] Failed to open email app',
         ),
       }
       mockOpenURL.mockRejectedValueOnce(new Error('Cannot open URL'))

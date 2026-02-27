@@ -5,7 +5,10 @@ import { AppDispatch } from '@/core/_redux_/createStore'
 import { selectReauthStatus } from '@/core/auth/selectors/selectReauthStatus'
 import { reauthenticate } from '@/core/auth/usecases/reauthenticate.usecase'
 import { reauthFormStyles } from '@/ui/design-system/components/shared/reauthFormStyles'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSTextInput } from '@/ui/design-system/components/shared/TiedSTextInput'
 import { T } from '@/ui/design-system/theme'
 
@@ -37,6 +40,7 @@ export function PasswordReauthForm({ onCancel }: PasswordReauthFormProps) {
           style={styles.cancelButton}
           onPress={onCancel}
           text="Cancel"
+          variant={TiedSButtonVariant.Secondary}
         />
         <TiedSButton
           onPress={() => dispatch(reauthenticate({ password }))}

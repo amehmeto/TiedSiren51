@@ -2,6 +2,7 @@ import { MaterialCommunityIcons } from '@expo/vector-icons'
 import { StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
+import { clearError } from '@/core/auth/reducer'
 import { sendVerificationEmail } from '@/core/auth/usecases/send-verification-email.usecase'
 import {
   TiedSButton,
@@ -18,6 +19,11 @@ export function EmailVerificationBanner() {
 
   if (!viewModel.visible) return null
 
+  const handleResend = () => {
+    dispatch(clearError())
+    dispatch(sendVerificationEmail())
+  }
+
   return (
     <TiedSCard style={styles.container}>
       <MaterialCommunityIcons
@@ -30,17 +36,22 @@ export function EmailVerificationBanner() {
       <View style={styles.buttonRow}>
         <TiedSButton
           text={viewModel.resendVerificationEmailLabel}
-          onPress={() => dispatch(sendVerificationEmail())}
+          onPress={handleResend}
           isDisabled={viewModel.isSendingVerificationEmail}
           variant={TiedSButtonVariant.Secondary}
           style={styles.rowButton}
         />
-        <OpenEmailAppButton
-          email={viewModel.userEmail}
-          label={viewModel.openEmailLabel}
-          style={styles.rowButton}
-        />
+        {viewModel.openEmailLabel && (
+          <OpenEmailAppButton
+            email={viewModel.userEmail}
+            label={viewModel.openEmailLabel}
+            style={styles.rowButton}
+          />
+        )}
       </View>
+      {viewModel.error && (
+        <Text style={styles.errorText}>{viewModel.error}</Text>
+      )}
     </TiedSCard>
   )
 }
@@ -72,5 +83,12 @@ const styles = StyleSheet.create({
   },
   rowButton: {
     flex: 1,
+  },
+  errorText: {
+    color: T.color.red,
+    fontSize: T.font.size.small,
+    fontFamily: T.font.family.primary,
+    textAlign: 'center',
+    marginTop: T.spacing.small,
   },
 })

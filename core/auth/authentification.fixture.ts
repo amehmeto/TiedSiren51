@@ -187,11 +187,11 @@ export function authentificationFixture(
       },
       authenticationErrorsShouldBe(expectedError: string) {
         const state = store.getState()
-        expect(state.auth.error).toBe(expectedError)
+        expect(state.auth.error?.message).toBe(expectedError)
       },
       authErrorTypeShouldBe(expected: AuthErrorType) {
         const state = store.getState()
-        expect(state.auth.errorType).toBe(expected)
+        expect(state.auth.error?.type).toBe(expected)
       },
       authShouldBeLoading(isLoading: boolean) {
         const state = store.getState()
@@ -206,6 +206,14 @@ export function authentificationFixture(
       },
       passwordResetShouldNotBeSent() {
         expect(authGateway.lastResetPasswordEmail).toBeNull()
+      },
+      lastPasswordResetRequestAtShouldBe(expected: ISODateString) {
+        const { lastPasswordResetRequestAt } = store.getState().auth
+        expect(lastPasswordResetRequestAt).toBe(expected)
+      },
+      lastPasswordResetRequestAtShouldBeNull() {
+        const { lastPasswordResetRequestAt } = store.getState().auth
+        expect(lastPasswordResetRequestAt).toBeNull()
       },
       passwordShouldBeCleared() {
         expect(store.getState().auth.password).toBe('')

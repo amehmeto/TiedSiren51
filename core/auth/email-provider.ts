@@ -55,9 +55,9 @@ export function getEmailProvider(email: string): EmailProvider | null {
   return resolveEmailProviders()[domain] ?? null
 }
 
-export function getOpenEmailLabel(email: string): string {
+export function getOpenEmailLabel(email: string): string | null {
   const provider = getEmailProvider(email)
-  return provider ? `Open ${provider.name}` : 'Open your email app'
+  return provider ? `Open ${provider.name}` : null
 }
 
 export function getWebUrl(email: string): string | null {

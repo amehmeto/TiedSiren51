@@ -1,3 +1,4 @@
+import { DateProvider } from '@/core/_ports_/date-provider'
 import {
   AndroidSirenLookout,
   DetectedSiren,
@@ -22,6 +23,8 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
   shouldThrowOnStart = false
 
   shouldThrowOnStop = false
+
+  constructor(private readonly dateProvider: DateProvider) {}
 
   async initialize(): Promise<void> {
     // No-op for in-memory implementation
@@ -48,7 +51,7 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
       this.listener({
         type: DetectedSirenType.App,
         identifier: packageName,
-        timestamp: Date.now(),
+        timestamp: this.dateProvider.getNowMs(),
       })
     }
   }

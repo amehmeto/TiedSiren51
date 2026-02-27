@@ -14,7 +14,8 @@ export type SignUpViewModel = AuthBaseViewModel<SignUpViewState> & {
 }
 
 export function selectSignUpViewModel(state: RootState): SignUpViewModel {
-  const { isLoading, error, email, password } = state.auth
+  const { isLoading, email, password } = state.auth
+  const error = state.auth.error?.message ?? null
   const { Loading, Error, Idle } = SignUpViewState
 
   if (isLoading) {

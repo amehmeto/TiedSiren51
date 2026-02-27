@@ -74,10 +74,37 @@ describe('selectEmailVerificationBannerViewModel', () => {
       visible: true,
       title: 'Verify your email',
       description: 'Check your inbox and tap the verification link.',
-      openEmailLabel: 'Open your email app',
+      openEmailLabel: null,
       isSendingVerificationEmail: false,
       resendVerificationEmailLabel: 'Resend email',
       userEmail: 'test@example.com',
+      error: null,
+    }
+
+    const viewModel = selectEmailVerificationBannerViewModel(state)
+
+    expect(viewModel).toStrictEqual(expectedViewModel)
+  })
+
+  test('should show error message when verification email fails', () => {
+    const state = stateBuilder()
+      .withAuthUser({
+        id: 'user-123',
+        email: 'test@example.com',
+        isEmailVerified: false,
+        authProvider: AuthProvider.Email,
+      })
+      .withAuthError({ message: 'Too many requests. Try again later.' })
+      .build()
+    const expectedViewModel = {
+      visible: true,
+      title: 'Verify your email',
+      description: 'Check your inbox and tap the verification link.',
+      openEmailLabel: null,
+      isSendingVerificationEmail: false,
+      resendVerificationEmailLabel: 'Resend email',
+      userEmail: 'test@example.com',
+      error: 'Too many requests. Try again later.',
     }
 
     const viewModel = selectEmailVerificationBannerViewModel(state)
@@ -99,10 +126,11 @@ describe('selectEmailVerificationBannerViewModel', () => {
       visible: true,
       title: 'Verify your email',
       description: 'Check your inbox and tap the verification link.',
-      openEmailLabel: 'Open your email app',
+      openEmailLabel: null,
       isSendingVerificationEmail: true,
       resendVerificationEmailLabel: 'Sending...',
       userEmail: 'test@example.com',
+      error: null,
     }
 
     const viewModel = selectEmailVerificationBannerViewModel(state)
