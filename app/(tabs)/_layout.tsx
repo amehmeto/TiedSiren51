@@ -24,7 +24,7 @@ const tabs: Tab[] = [
     IconType: Entypo,
   },
   {
-    name: 'strict-mode/index',
+    name: 'strict-mode',
     title: TabScreens.STRICT_MODE,
     icon: 'lock-open-outline',
     IconType: Ionicons,
@@ -62,7 +62,7 @@ function handleTabBarIcon({
   if (!tab) return null
 
   const resolvedTab: Tab =
-    tab.name === 'strict-mode/index'
+    tab.name === 'strict-mode'
       ? {
           name: tab.name,
           title: tab.title,

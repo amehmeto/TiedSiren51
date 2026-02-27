@@ -93,7 +93,6 @@
     "@react-native-community/datetimepicker": "^8.2.0",
     "@react-native-google-signin/google-signin": "^16.1.1",
     "@react-native-picker/picker": "2.11.4",
-    "@react-navigation/elements": "^2.9.5",
     "@reduxjs/toolkit": "^2.2.5",
     "@sentry/react-native": "~7.11.0",
     "@types/react-redux": "^7.1.33",
@@ -189,6 +188,9 @@
     "vitest": "^1.6.0",
     "vitest-tsconfig-paths": "^3.4.1",
     "wait-on": "^7.2.0"
+  },
+  "overrides": {
+    "@react-navigation/native": "7.1.28"
   },
   "expo": {
     "install": {
