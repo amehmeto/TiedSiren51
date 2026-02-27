@@ -1,6 +1,5 @@
-import { Stack, useRouter } from 'expo-router'
+import { Stack } from 'expo-router'
 import { StatusBar } from 'expo-status-bar'
-import { useEffect } from 'react'
 import { MenuProvider } from 'react-native-popup-menu'
 import { AppStore } from '@/core/_redux_/createStore'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
@@ -23,15 +22,9 @@ const routes = [
 ]
 
 export function AppWithInitialization({ store }: AppWithInitializationProps) {
-  const { isInitializing, isAuthenticated } = useAppInitialization(store)
-  const router = useRouter()
+  useAppInitialization(store)
   usePasswordResetDeepLink()
   useEmailVerificationDeepLink()
-
-  useEffect(() => {
-    if (isInitializing) return
-    router.replace(isAuthenticated ? '/home' : '/register')
-  }, [isInitializing, isAuthenticated, router])
 
   return (
     <MenuProvider>

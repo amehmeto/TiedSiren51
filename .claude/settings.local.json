@@ -207,6 +207,8 @@
       "Bash(which gh:*)",
       "Bash(which:*)",
       "Bash(while read f)",
+      "Bash(while true:*)",
+      "Bash(while:*)",
       "Bash(xargs cloc:*)",
       "Bash(xxd:*)",
       "Edit",
