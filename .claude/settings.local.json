@@ -141,6 +141,7 @@
       "Bash(git worktree:*)",
       "Bash(grep expo-google-fonts:*)",
       "Bash(grep:*)",
+      "Bash(head:*)",
       "Bash(jq:*)",
       "Bash(keytool:*)",
       "Bash(ls:*)",

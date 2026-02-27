@@ -1,5 +1,4 @@
 import { Stack, useRouter } from 'expo-router'
-import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
 import { MenuProvider } from 'react-native-popup-menu'
@@ -31,7 +30,6 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
 
   useEffect(() => {
     if (isInitializing) return
-    SplashScreen.hideAsync()
     router.replace(isAuthenticated ? '/home' : '/register')
   }, [isInitializing, isAuthenticated, router])
 

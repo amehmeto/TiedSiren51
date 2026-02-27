@@ -5,14 +5,11 @@ import {
   Inter_700Bold,
 } from '@expo-google-fonts/inter'
 import { useFonts } from 'expo-font'
-import * as SplashScreen from 'expo-splash-screen'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { Provider } from 'react-redux'
 import { createStore } from '@/core/_redux_/createStore'
 import { AppWithInitialization } from '@/ui/AppWithInitialization'
 import { dependencies } from '@/ui/dependencies'
-
-SplashScreen.preventAutoHideAsync()
 
 const store = createStore(dependencies)
 
