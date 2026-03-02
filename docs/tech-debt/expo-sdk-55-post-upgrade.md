@@ -68,6 +68,34 @@ Location: `package.json` `overrides` field
 
 **Recommendation**: Remove the override after upgrading to a future expo-router version that resolves this deduplication natively.
 
+### 6. Firebase Remote Config `indexedDB` guard in React Native
+
+**Priority**: ⚠️ MEDIUM
+**Risk**: Firebase web SDK's Remote Config requires `indexedDB` for caching, which is unavailable in React Native. Without the guard, `fetchAndActivate()` crashes at runtime.
+**Impact**: Feature flags fall back to defaults in RN; remote config fetch is silently skipped.
+
+Location: `infra/feature-flag-provider/firebase.feature-flag.provider.ts:24`
+
+References:
+- [firebase-js-sdk#2804](https://github.com/firebase/firebase-js-sdk/issues/2804) — Firebase intentionally bubbles indexedDB errors (PR #2381)
+- [firebase-js-sdk#3339](https://github.com/firebase/firebase-js-sdk/issues/3339) — `firebase.remoteConfig` not available in Expo/RN
+
+**Recommendation**: Migrate to `@react-native-firebase/remote-config` which uses native SDKs instead of the web SDK. This eliminates the `indexedDB` dependency entirely and enables proper caching on device.
+
+### 7. Firebase Auth `getReactNativePersistence` missing TypeScript types
+
+**Priority**: 📋 LOW
+**Risk**: None at runtime. The function works correctly via Metro resolution. Only TypeScript types are affected.
+**Impact**: Requires a module augmentation `.d.ts` file to satisfy the compiler.
+
+Location: `infra/auth-gateway/firebase-auth-rn.d.ts`
+
+References:
+- [firebase-js-sdk#8332](https://github.com/firebase/firebase-js-sdk/issues/8332) — TS types only cover browser targets
+- [firebase-js-sdk#9316](https://github.com/firebase/firebase-js-sdk/issues/9316) — Still unresolved as of Oct 2025
+
+**Recommendation**: Remove `.d.ts` when Firebase ships proper RN type definitions. The official workaround (tsconfig paths to `index.rn.d.ts`) is fragile with nested `node_modules`.
+
 ## Resolved During Upgrade
 
 - ✅ Prisma/New Architecture blocker — Replaced with PowerSync
