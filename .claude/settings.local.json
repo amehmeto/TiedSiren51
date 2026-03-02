@@ -423,7 +423,6 @@
       "Write(/**/.claude/**)"
     ]
   },
-  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["tessl"],
   "hooks": {
     "Notification": [
@@ -476,5 +475,6 @@
         ]
       }
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true
 }
