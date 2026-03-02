@@ -392,7 +392,6 @@
       "Bash(docker:*)",
       "Bash(gh api:*)",
       "Bash(gh issue close:*)",
-      "Bash(gh pr:*)",
       "Bash(gh run rerun:*)",
       "Bash(gh secret:*)",
       "Bash(gh workflow run:*)",
@@ -421,6 +420,7 @@
       "Write(/**/.claude/**)"
     ]
   },
+  "enabledMcpjsonServers": ["tessl"],
   "hooks": {
     "Notification": [
       {
@@ -472,5 +472,6 @@
         ]
       }
     ]
-  }
+  },
+  "enableAllProjectMcpServers": true
 }
