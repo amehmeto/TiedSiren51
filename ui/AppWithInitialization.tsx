@@ -1,7 +1,7 @@
 import { Stack, useRouter } from 'expo-router'
+import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
-import { MenuProvider } from 'react-native-popup-menu'
 import { AppStore } from '@/core/_redux_/createStore'
 import { InitializingView } from '@/ui/design-system/components/shared/InitializingView'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
@@ -10,9 +10,11 @@ import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
 import { useEmailVerificationDeepLink } from '@/ui/hooks/useEmailVerificationDeepLink'
 import { usePasswordResetDeepLink } from '@/ui/hooks/usePasswordResetDeepLink'
 
-type AppWithInitializationProps = {
+SplashScreen.preventAutoHideAsync()
+
+type AppWithInitializationProps = Readonly<{
   store: AppStore
-}
+}>
 
 const routes = [
   '(auth)/register',
@@ -34,10 +36,14 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
     router.replace(isAuthenticated ? '/home' : '/register')
   }, [isInitializing, isAuthenticated, error, router])
 
+  useEffect(() => {
+    if (!isInitializing) SplashScreen.hideAsync()
+  }, [isInitializing])
+
   if (error) return <InitializingView isInitializing={false} error={error} />
 
   return (
-    <MenuProvider>
+    <>
       <StatusBar style={'auto'} />
       <TiedSLinearBackground>
         <Stack
@@ -59,6 +65,6 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
         </Stack>
       </TiedSLinearBackground>
       <TiedSToast />
-    </MenuProvider>
+    </>
   )
 }

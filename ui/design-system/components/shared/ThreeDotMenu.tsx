@@ -1,12 +1,13 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useMemo } from 'react'
+import { useCallback, useMemo, useState } from 'react'
 import {
+  Modal,
+  Pressable,
   StyleProp,
   StyleSheet,
   useWindowDimensions,
   ViewStyle,
 } from 'react-native'
-import { Menu, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { showToast } from '@/core/toast/toast.slice'
@@ -36,6 +37,7 @@ type ThreeDotMenuOwnProps = {
 type ThreeDotMenuProps = Readonly<ThreeDotMenuOwnProps>
 
 export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
+  const [isVisible, setIsVisible] = useState(false)
   const { width: windowWidth } = useWindowDimensions()
   const dispatch = useDispatch<AppDispatch>()
 
@@ -48,66 +50,58 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
     return Math.min(lowerBound, seventyPercent)
   }, [windowWidth])
 
-  const selectMenuOption = (optionName: TiedSMenu['name']) => {
-    const selectedOption = menuOptions.find(
-      (option) => option.name === optionName,
-    )
-    if (!selectedOption) throw new Error('Invalid menu option')
+  const selectMenuOption = useCallback(
+    (optionName: TiedSMenu['name']) => {
+      const selectedOption = menuOptions.find(
+        (option) => option.name === optionName,
+      )
+      if (!selectedOption) throw new Error('Invalid menu option')
 
-    if (selectedOption.isDisabled) {
-      const message =
-        selectedOption.disabledMessage ?? 'This action is currently disabled'
-      dispatch(showToast(message))
-      return
-    }
+      if (selectedOption.isDisabled) {
+        const message =
+          selectedOption.disabledMessage ?? 'This action is currently disabled'
+        dispatch(showToast(message))
+        setIsVisible(false)
+        return
+      }
 
-    selectedOption.action()
-  }
-
-  const dynamicStyles = useMemo(
-    () => ({
-      menuOption: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: menuWidth - T.spacing.medium * 2,
-        padding: T.spacing.small,
-        backgroundColor: T.color.transparent,
-      },
-      optionsContainer: {
-        backgroundColor: T.color.transparent,
-        borderRadius: T.border.radius.roundedSmall,
-        width: menuWidth,
-        marginTop: T.spacing.medium + 5,
-        marginLeft: T.spacing.medium,
-        padding: T.spacing.small,
-      },
-    }),
-    [menuWidth],
+      setIsVisible(false)
+      selectedOption.action()
+    },
+    [menuOptions, dispatch],
   )
 
   return (
-    <Menu onSelect={selectMenuOption} style={style}>
-      <MenuTrigger style={styles.menuTrigger}>
+    <>
+      <Pressable
+        onPress={() => setIsVisible(true)}
+        style={[styles.menuTrigger, style]}
+      >
         <Ionicons
           name={'ellipsis-horizontal'}
           size={T.icon.size.xxLarge}
           color={T.color.text}
         />
-      </MenuTrigger>
-      <MenuOptions
-        customStyles={{
-          optionsContainer: dynamicStyles.optionsContainer,
-        }}
+      </Pressable>
+      <Modal
+        visible={isVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsVisible(false)}
       >
-        <TiedSCard style={styles.menuOptions}>
-          {menuOptions.map((menuOption) => (
-            <TiedSMenuOption key={menuOption.name} option={menuOption} />
-          ))}
-        </TiedSCard>
-      </MenuOptions>
-    </Menu>
+        <Pressable style={styles.overlay} onPress={() => setIsVisible(false)}>
+          <TiedSCard style={[styles.menuOptions, { width: menuWidth }]}>
+            {menuOptions.map((menuOption) => (
+              <TiedSMenuOption
+                key={menuOption.name}
+                option={menuOption}
+                onSelect={selectMenuOption}
+              />
+            ))}
+          </TiedSCard>
+        </Pressable>
+      </Modal>
+    </>
   )
 }
 
@@ -115,11 +109,15 @@ const styles = StyleSheet.create({
   menuTrigger: {
     padding: T.spacing.small,
   },
+  overlay: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: T.color.modalBackgroundColor,
+  },
   menuOptions: {
     flexDirection: 'column',
     alignItems: 'flex-start',
     margin: T.spacing.none,
-    marginTop: T.spacing.none,
-    marginBottom: T.spacing.none,
   },
 })
