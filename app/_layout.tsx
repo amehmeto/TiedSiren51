@@ -6,7 +6,6 @@ import {
 } from '@expo-google-fonts/inter'
 import { useFonts } from 'expo-font'
 import * as SplashScreen from 'expo-splash-screen'
-import { useEffect } from 'react'
 import { SafeAreaProvider } from 'react-native-safe-area-context'
 import { Provider } from 'react-redux'
 import { createStore } from '@/core/_redux_/createStore'
@@ -25,11 +24,9 @@ export default function RootLayout() {
     Inter_700Bold,
   })
 
-  useEffect(() => {
-    if (isFontsLoaded) SplashScreen.hideAsync()
-  }, [isFontsLoaded])
-
   if (!isFontsLoaded) return null
+
+  SplashScreen.hideAsync()
 
   return (
     <SafeAreaProvider>
