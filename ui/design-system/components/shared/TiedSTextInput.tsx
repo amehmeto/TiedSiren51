@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { StyleSheet, TextInput, TextInputProps, View, Text } from 'react-native'
+import { StyleSheet, Text, TextInput, TextInputProps, View } from 'react-native'
 import { PasswordToggle } from '@/ui/design-system/components/shared/PasswordToggle'
 import { T } from '@/ui/design-system/theme'
 

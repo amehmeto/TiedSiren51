@@ -4,8 +4,8 @@ import { CreatePayload } from '@/core/_ports_/create.payload'
 import { assertHHmmString } from '@/core/_ports_/date-provider'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import {
-  BlockingConditions,
   BlockSession,
+  BlockingConditions,
 } from '@/core/block-session/block-session'
 import { Device } from '@/core/device/device'
 import { PowersyncRepository } from '@/infra/__abstract__/powersync.repository'

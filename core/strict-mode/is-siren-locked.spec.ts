@@ -1,7 +1,7 @@
 import { describe, expect, test } from 'vitest'
 import { buildLockedSirens } from '@/core/_tests_/data-builders/locked-sirens.builder'
 import { Sirens } from '@/core/siren/sirens'
-import { isSirenLocked, LockedSirens } from '@/core/strict-mode/is-siren-locked'
+import { LockedSirens, isSirenLocked } from '@/core/strict-mode/is-siren-locked'
 
 type IsSirenLockedTestCase = {
   scenario: string

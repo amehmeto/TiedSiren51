@@ -183,7 +183,12 @@
     "local-rules/padding-line-between-block-like": "error",
     "local-rules/object-shorthand": "error",
     "local-rules/curly-multi-or-nest": "error",
-    "local-rules/no-switch": "error"
+    "local-rules/no-switch": "error",
+    "local-rules/require-feature-flag-destructuring": "error",
+    "local-rules/no-date-now": "error",
+    "local-rules/no-ternary-false-fallback": "error",
+
+    "sort-imports": ["error", { "ignoreDeclarationSort": true }]
   },
   "overrides": [
     {
@@ -203,7 +208,8 @@
         "local-rules/no-new-in-test-body": "error",
         "local-rules/use-data-builders": "error",
         "local-rules/no-generic-result-variable": "warn",
-        "local-rules/require-typed-each": "error"
+        "local-rules/require-typed-each": "error",
+        "local-rules/prefer-parameterized-test": "error"
       }
     }
   ],

@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
 import { YouTubeAppIcon } from '@/assets/base64AppIcon/youTubeAppIcon'
 import { buildInstalledApp } from '@/infra/installed-apps-repository/fake-data.installed-apps.repository'
 import { sirensFixture } from './sirens.fixture'

@@ -52,7 +52,6 @@ export function AnimatedTabBarIcon({
 
   useEffect(() => {
     const targetScale = isFocused ? FOCUSED_SCALE : DEFAULT_SCALE
-    // eslint-disable-next-line react-hooks/immutability -- SharedValue.value is mutable by design in react-native-reanimated
     scale.value = withTiming(targetScale, {
       duration: ANIMATION_DURATION,
       easing: Easing.out(Easing.ease),

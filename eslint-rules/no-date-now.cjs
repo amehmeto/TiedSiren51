@@ -28,6 +28,18 @@ module.exports = {
   },
 
   create(context) {
+    const filename = context.getFilename()
+    const normalized = filename.replace(/\\/g, '/')
+
+    // Only enforce in core/ and ui/ production code
+    const isTarget =
+      /\/core\//.test(normalized) || /\/ui\//.test(normalized)
+    const isExcluded =
+      /\.(test|spec|fixture|builder)\.[jt]sx?$/.test(normalized) ||
+      /\/_tests_\//.test(normalized)
+
+    if (!isTarget || isExcluded) return {}
+
     return {
       CallExpression(node) {
         const { callee } = node

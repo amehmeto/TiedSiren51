@@ -1,5 +1,5 @@
 import * as Sentry from '@sentry/react-native'
-import { describe, it, expect, beforeEach, vi } from 'vitest'
+import { beforeEach, describe, expect, it, vi } from 'vitest'
 import { SentryLogger } from './sentry.logger'
 
 // Define __DEV__ for test environment (React Native global)

@@ -1,4 +1,4 @@
-import { column, Schema, Table } from '@powersync/react-native'
+import { Schema, Table, column } from '@powersync/react-native'
 
 const siren = new Table(
   {

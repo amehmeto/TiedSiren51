@@ -1,8 +1,8 @@
 import { createStore } from '@/core/_redux_/createStore'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import {
-  stateBuilderProvider,
   StateBuilderProvider,
+  stateBuilderProvider,
 } from '@/core/_tests_/state-builder'
 import { FakeDataBlockSessionRepository } from '@/infra/block-session-repository/fake-data.block-session.repository'
 import { dependencies } from '@/ui/dependencies'

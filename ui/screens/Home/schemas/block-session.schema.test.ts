@@ -1,4 +1,4 @@
-import { describe, it, expect } from 'vitest'
+import { describe, expect, it } from 'vitest'
 import { DEFAULT_FEATURE_FLAGS, FeatureFlagValues } from '@/feature-flags'
 import { blockSessionSchema } from './block-session.schema'
 

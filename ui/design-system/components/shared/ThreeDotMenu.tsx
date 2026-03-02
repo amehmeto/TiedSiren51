@@ -3,8 +3,8 @@ import { useMemo } from 'react'
 import {
   StyleProp,
   StyleSheet,
-  useWindowDimensions,
   ViewStyle,
+  useWindowDimensions,
 } from 'react-native'
 import { Menu, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
 import { useDispatch } from 'react-redux'

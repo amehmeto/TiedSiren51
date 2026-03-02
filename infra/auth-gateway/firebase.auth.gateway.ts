@@ -8,15 +8,16 @@ import {
   initializeApp,
 } from 'firebase/app'
 import {
-  applyActionCode,
   Auth,
-  confirmPasswordReset as firebaseConfirmPasswordReset,
+  EmailAuthProvider,
+  GoogleAuthProvider,
+  User,
+  applyActionCode,
   createUserWithEmailAndPassword,
   deleteUser,
-  EmailAuthProvider,
+  confirmPasswordReset as firebaseConfirmPasswordReset,
   getAuth,
   getReactNativePersistence,
-  GoogleAuthProvider,
   initializeAuth,
   onAuthStateChanged,
   reauthenticateWithCredential,
@@ -26,7 +27,6 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updatePassword,
-  User,
 } from 'firebase/auth'
 import {
   AuthGateway,

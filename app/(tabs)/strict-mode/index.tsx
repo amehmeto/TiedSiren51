@@ -21,8 +21,8 @@ import { T } from '@/ui/design-system/theme'
 import { useAppForeground } from '@/ui/hooks/useAppForeground'
 import { useTick } from '@/ui/hooks/useTick'
 import {
-  selectStrictModeViewModel,
   StrictModeViewState,
+  selectStrictModeViewModel,
 } from '@ui/screens/StrictMode/strict-mode.view-model'
 import { StrictModeConfirmationModal } from '@ui/screens/StrictMode/StrictModeConfirmationModal'
 import { UnlockSection } from '@ui/screens/StrictMode/UnlockSection'

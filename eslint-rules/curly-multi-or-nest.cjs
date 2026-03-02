@@ -14,7 +14,7 @@ module.exports = {
       category: 'Best Practices',
       recommended: false,
     },
-    fixable: 'code',
+    fixable: null,
     messages: {
       needsBraces:
         'Expected curly braces around {{ keyword }} body containing multiple statements or nested block.',
