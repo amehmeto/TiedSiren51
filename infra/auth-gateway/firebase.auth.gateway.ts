@@ -196,7 +196,7 @@ export class FirebaseAuthGateway implements AuthGateway {
       await GoogleSignin.hasPlayServices({ showPlayServicesUpdateDialog: true })
       const response = await GoogleSignin.signIn()
       if (!isSuccessResponse(response))
-        throw new Error(GoogleSignInError.MissingIdToken)
+        throw new Error(GoogleSignInError.SignInCancelled)
       const { idToken } = response.data
       if (!idToken) throw new Error(GoogleSignInError.MissingIdToken)
 
@@ -261,7 +261,7 @@ export class FirebaseAuthGateway implements AuthGateway {
 
       const response = await GoogleSignin.signIn()
       if (!isSuccessResponse(response))
-        throw new Error(GoogleSignInError.MissingIdToken)
+        throw new Error(GoogleSignInError.SignInCancelled)
       const { idToken } = response.data
 
       if (!idToken) throw new Error(GoogleSignInError.MissingIdToken)

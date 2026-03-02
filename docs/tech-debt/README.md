@@ -12,7 +12,7 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ## Active Technical Debt Items
 
 ### Infrastructure & Database
-- [Expo SDK 55 Post-Upgrade](expo-sdk-55-post-upgrade.md) - ⚠️ **MEDIUM PRIORITY** - Unmaintained deps (`react-native-popup-menu`, `react-native-elements`), Metro package exports disabled, `@react-navigation/native` override
+- [Expo SDK 55 Post-Upgrade](expo-sdk-55-post-upgrade.md) - ⚠️ **MEDIUM PRIORITY** - Metro package exports disabled, `@react-navigation/native` override, Firebase indexedDB guard
 - [Error Handling Enhancement](error-handling.md) - 🚨 **HIGH PRIORITY** - Custom error types needed
 - [Database Configuration](database-configuration.md) - 📋 **LOW PRIORITY** - Configurable paths
 - [Migration Strategy](migration-strategy.md) - ⚠️ **MEDIUM PRIORITY** - Critical for app updates
@@ -45,7 +45,6 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ## Trigger Points
 
 When to revisit these improvements:
-- **Post-Upgrade Cleanup**: Replace `react-native-popup-menu` and `react-native-elements` when working on related screens
 - **Metro Package Exports**: Re-evaluate `unstable_enablePackageExports` after firebase/PowerSync updates
 - **Navigation Override**: Remove `@react-navigation/native` override after next expo-router version bump
 - **Error Handling**: When seeing first error reports from users

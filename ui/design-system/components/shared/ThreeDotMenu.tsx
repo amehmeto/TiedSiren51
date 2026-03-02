@@ -1,11 +1,12 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import {
   Modal,
   Pressable,
   StyleProp,
   StyleSheet,
   useWindowDimensions,
+  View,
   ViewStyle,
 } from 'react-native'
 import { useDispatch } from 'react-redux'
@@ -36,10 +37,20 @@ type ThreeDotMenuOwnProps = {
 
 type ThreeDotMenuProps = Readonly<ThreeDotMenuOwnProps>
 
+type MenuPosition = {
+  top: number
+  right: number
+}
+
 export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
   const [isVisible, setIsVisible] = useState(false)
+  const [menuPosition, setMenuPosition] = useState<MenuPosition>({
+    top: 0,
+    right: 0,
+  })
   const { width: windowWidth } = useWindowDimensions()
   const dispatch = useDispatch<AppDispatch>()
+  const triggerRef = useRef<View>(null)
 
   const menuWidth = useMemo(() => {
     const fortyPercent = windowWidth * 0.4
@@ -49,6 +60,18 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
     const lowerBound = Math.max(fortyPercent, minWidth)
     return Math.min(lowerBound, seventyPercent)
   }, [windowWidth])
+
+  const openMenu = useCallback(() => {
+    triggerRef.current?.measureInWindow((x, y, width, height) => {
+      setMenuPosition({
+        top: y + height,
+        right: windowWidth - (x + width),
+      })
+      setIsVisible(true)
+    })
+  }, [windowWidth])
+
+  const closeMenu = useCallback(() => setIsVisible(false), [])
 
   const selectMenuOption = useCallback(
     (optionName: TiedSMenu['name']) => {
@@ -74,7 +97,8 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
   return (
     <>
       <Pressable
-        onPress={() => setIsVisible(true)}
+        ref={triggerRef}
+        onPress={openMenu}
         style={[styles.menuTrigger, style]}
       >
         <Ionicons
@@ -87,10 +111,19 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
         visible={isVisible}
         transparent
         animationType="fade"
-        onRequestClose={() => setIsVisible(false)}
+        onRequestClose={closeMenu}
       >
-        <Pressable style={styles.overlay} onPress={() => setIsVisible(false)}>
-          <TiedSCard style={[styles.menuOptions, { width: menuWidth }]}>
+        <Pressable style={styles.overlay} onPress={closeMenu}>
+          <TiedSCard
+            style={[
+              styles.menuOptions,
+              {
+                width: menuWidth,
+                top: menuPosition.top,
+                right: menuPosition.right,
+              },
+            ]}
+          >
             {menuOptions.map((menuOption) => (
               <TiedSMenuOption
                 key={menuOption.name}
@@ -111,11 +144,10 @@ const styles = StyleSheet.create({
   },
   overlay: {
     flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
     backgroundColor: T.color.modalBackgroundColor,
   },
   menuOptions: {
+    position: 'absolute',
     flexDirection: 'column',
     alignItems: 'flex-start',
     margin: T.spacing.none,

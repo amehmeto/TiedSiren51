@@ -10,31 +10,13 @@ The SDK 55 upgrade resolved the Prisma/New Architecture blocker by migrating to 
 
 ## Items
 
-### 1. `react-native-popup-menu` v0.16.1 — Unmaintained
+### ~~1. `react-native-popup-menu` v0.16.1 — Unmaintained~~ ✅ RESOLVED
 
-**Priority**: ⚠️ MEDIUM
-**Risk**: Class components with `defaultProps` (deprecated in React 19, removed for function components)
-**Impact**: Wraps the entire app via `<MenuProvider>`
+Replaced with custom `Modal` + `Pressable` popup in PR #405. `MenuProvider` removed from `AppWithInitialization.tsx`.
 
-Used in:
-- `ui/AppWithInitialization.tsx` — `MenuProvider`
-- `ui/design-system/components/shared/ThreeDotMenu.tsx` — `Menu`, `MenuOptions`, `MenuTrigger`
-- `ui/design-system/components/shared/TiedSMenuOption.tsx` — `MenuOption`
+### ~~2. `react-native-elements` v3.4.3 — Unmaintained~~ ✅ RESOLVED
 
-**Why it works now**: `defaultProps` on class components is deprecated but still functional in React 19. No crash risk today.
-
-**Recommendation**: Replace with `zeego` or `@react-native-menu/menu` when time permits. These use native platform menus and support New Architecture.
-
-### 2. `react-native-elements` v3.4.3 — Unmaintained
-
-**Priority**: 📋 LOW
-**Risk**: Library uses class components with `defaultProps` internally
-**Impact**: Only `CheckBox` is imported (functional component — safe)
-
-Used in:
-- `ui/screens/Blocklists/SelectableSirenCard.tsx`
-
-**Recommendation**: Replace `CheckBox` with a custom component or migrate to `@rneui/themed` v4 (the official successor).
+Replaced `CheckBox` with custom `CheckboxIndicator` component in PR #405. Dependency uninstalled.
 
 ### 3. `unstable_enablePackageExports = false` in Metro config
 
@@ -105,3 +87,5 @@ References:
 - ✅ `ViewStyle`/`TextStyle` mismatch in `TiedSTextLink.tsx` — Fixed
 - ✅ `newArchEnabled` config — Not present (correct for SDK 55 where it's mandatory)
 - ✅ `experiments.typedRoutes` — Still works in expo-router v4
+- ✅ `react-native-popup-menu` — Replaced with custom `Modal` + `Pressable` popup (PR #405)
+- ✅ `react-native-elements` — Replaced `CheckBox` with custom `CheckboxIndicator` (PR #405)
