@@ -62,18 +62,23 @@ export default function HomeScreen() {
         />,
       ]
 
-    return [
-      <SessionsBoard
-        key={0}
-        sessions={viewModel.activeSessions}
-        type={SessionType.ACTIVE}
-      />,
-      <SessionsBoard
-        key={1}
-        sessions={viewModel.scheduledSessions}
-        type={SessionType.SCHEDULED}
-      />,
-    ]
+    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- exhaustive type guard
+    if (viewModel.type === HomeViewModel.WithBothSessionTypes)
+      return [
+        <SessionsBoard
+          key={0}
+          sessions={viewModel.activeSessions}
+          type={SessionType.ACTIVE}
+        />,
+        <SessionsBoard
+          key={1}
+          sessions={viewModel.scheduledSessions}
+          type={SessionType.SCHEDULED}
+        />,
+      ]
+
+    const _exhaustiveCheck: never = viewModel
+    return _exhaustiveCheck
   })()
 
   return (

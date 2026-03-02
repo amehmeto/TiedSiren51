@@ -68,6 +68,13 @@ describe('object-shorthand', () => {
         {
           code: `const obj = { fn: function() { return 1 } }`,
           errors: [{ messageId: 'useMethodShorthand', data: { name: 'fn' } }],
+          output: `const obj = { fn() { return 1 } }`,
+        },
+        // Async method shorthand possible - NOT OK
+        {
+          code: `const obj = { fn: async function(a, b) { return a } }`,
+          errors: [{ messageId: 'useMethodShorthand', data: { name: 'fn' } }],
+          output: `const obj = { async fn(a, b) { return a } }`,
         },
       ],
     })
