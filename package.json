@@ -101,7 +101,7 @@
     "env-var": "^7.5.0",
     "eslint-config-lint": "^1.0.1",
     "events": "^3.3.0",
-    "expo": "~55.0.2",
+    "expo": "~55.0.4",
     "expo-apple-authentication": "~55.0.8",
     "expo-application": "~55.0.8",
     "expo-blur": "~55.0.8",
