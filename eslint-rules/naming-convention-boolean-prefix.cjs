@@ -87,8 +87,14 @@ module.exports = {
           checkBooleanName(node.id, node.id.name, 'variable')
       },
 
-      // Boolean parameters
-      'FunctionDeclaration > Identifier, ArrowFunctionExpression > Identifier'(node) {
+      // Boolean parameters (split into separate visitors for OxLint compat)
+      'FunctionDeclaration > Identifier'(node) {
+        if (!checkBooleans) return
+        if (node.parent.params && node.parent.params.includes(node))
+          if (hasBooleanAnnotation(node))
+            checkBooleanName(node, node.name, 'parameter')
+      },
+      'ArrowFunctionExpression > Identifier'(node) {
         if (!checkBooleans) return
         if (node.parent.params && node.parent.params.includes(node))
           if (hasBooleanAnnotation(node))

@@ -128,35 +128,37 @@ export type HomeViewModelType =
   | WithBothSessionTypes
 ```
 
-**3. Component Usage with Exhaustive Switch**
+**3. Component Usage with Exhaustive If-Else**
 
 ```typescript
 export default function HomeScreen() {
   const { dateProvider } = dependencies
-  const [now, setNow] = useState<Date>(dateProvider.getNow())
+
+  useTick()
 
   // Select view model with dateProvider for time formatting
   const viewModel = useSelector<RootState, HomeViewModelType>(
-    (state) => selectHomeViewModel(state, now, dateProvider)
+    (state) => selectHomeViewModel(state, dateProvider.getNow(), dateProvider)
   )
 
-  // Exhaustive switch ensures all states handled
+  // Exhaustive if-else ensures all states handled
   const [activeNode, scheduledNode] = (() => {
-    switch (viewModel.type) {
-      case HomeViewModel.WithoutActiveNorScheduledSessions:
-        return [
-          <NoSessionBoard sessions={viewModel.activeSessions} />,
-          <NoSessionBoard sessions={viewModel.scheduledSessions} />,
-        ]
-      case HomeViewModel.WithActiveWithoutScheduledSessions:
-        return [
-          <SessionsBoard sessions={viewModel.activeSessions} />,
-          <NoSessionBoard sessions={viewModel.scheduledSessions} />,
-        ]
-      // ... other cases
-      default:
-        return exhaustiveGuard(viewModel) // TypeScript compile error if case missed
-    }
+    if (viewModel.type === HomeViewModel.WithoutActiveNorScheduledSessions)
+      return [
+        <NoSessionBoard sessions={viewModel.activeSessions} />,
+        <NoSessionBoard sessions={viewModel.scheduledSessions} />,
+      ]
+
+    if (viewModel.type === HomeViewModel.WithActiveWithoutScheduledSessions)
+      return [
+        <SessionsBoard sessions={viewModel.activeSessions} />,
+        <NoSessionBoard sessions={viewModel.scheduledSessions} />,
+      ]
+
+    // ... other cases
+
+    const _exhaustiveCheck: never = viewModel // TypeScript compile error if case missed
+    return _exhaustiveCheck
   })()
 
   return (

@@ -65,23 +65,28 @@ module.exports = {
             messageId: 'useMethodShorthand',
             data: { name: key.name },
             fix(fixer) {
-              const keyText = sourceCode.getText(key)
-              const func = value
-              const paramsText =
-                func.params.length > 0
-                  ? sourceCode
-                      .getText()
-                      .slice(
-                        func.params[0].range[0],
-                        func.params[func.params.length - 1].range[1],
-                      )
-                  : ''
-              const bodyText = sourceCode.getText(func.body)
-              const asyncPrefix = func.async ? 'async ' : ''
-              return fixer.replaceText(
-                node,
-                `${asyncPrefix}${keyText}(${paramsText}) ${bodyText}`,
-              )
+              try {
+                const keyText = sourceCode.getText(key)
+                const func = value
+                const paramsText =
+                  func.params.length > 0
+                    ? sourceCode
+                        .getText()
+                        .slice(
+                          func.params[0].range[0],
+                          func.params[func.params.length - 1].range[1],
+                        )
+                    : ''
+                const bodyText = sourceCode.getText(func.body)
+                const asyncPrefix = func.async ? 'async ' : ''
+                return fixer.replaceText(
+                  node,
+                  `${asyncPrefix}${keyText}(${paramsText}) ${bodyText}`,
+                )
+              } catch {
+                // OxLint AST may lack range — skip fix, keep diagnostic
+                return null
+              }
             },
           })
       },

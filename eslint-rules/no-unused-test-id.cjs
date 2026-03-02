@@ -16,8 +16,7 @@ function isUiProductionFile(filename) {
   if (!normalized.includes('/') && !normalized.includes('\\'))
     return true
   if (!normalized.includes('/ui/')) return false
-  if (normalized.includes('.test.ts')) return false
-  if (normalized.includes('.spec.ts')) return false
+  if (/\.(test|spec)\.[jt]sx?$/.test(normalized)) return false
   return true
 }
 

@@ -116,12 +116,12 @@ describe('FirebaseAuthGateway - Error Translation', () => {
       async ({ code, expected, method }) => {
         const mockError = new FirebaseError(code, `Firebase: Error (${code}).`)
 
-        /* oxlint-disable jest/no-conditional-in-test -- selecting mock based on parameterized test input */
+        /* oxlint-disable vitest/no-conditional-in-test -- selecting mock based on parameterized test input */
         const authMethod =
           method === AuthMethod.SignUpWithEmail
             ? firebaseAuth.createUserWithEmailAndPassword
             : firebaseAuth.signInWithEmailAndPassword
-        /* oxlint-enable jest/no-conditional-in-test */
+        /* oxlint-enable vitest/no-conditional-in-test */
 
         vi.mocked(authMethod).mockRejectedValue(mockError)
 

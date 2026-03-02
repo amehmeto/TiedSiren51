@@ -492,7 +492,7 @@ module.exports = {
           // Other non-component .ts files can be:
           // - PascalCase for type/enum files (e.g., SessionType.ts, TabScreens.ts)
           // - camelCase for function/utility files (e.g., assertIsBlockSession.ts, preloadedStateForManualTesting.ts)
-          // - kebab-case for utilities (e.g., auth-schemas.ts, validation-helper.ts, exhaustive-guard.ts)
+          // - kebab-case for utilities (e.g., auth-schemas.ts, validation-helper.ts)
           else if (
             isTs &&
             !basename.includes('.type.') &&

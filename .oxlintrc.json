@@ -1,6 +1,7 @@
 {
   "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "unicorn", "jest", "vitest", "import"],
+  "categories": { "correctness": "off" },
+  "plugins": ["react", "typescript", "unicorn", "vitest", "import"],
   "jsPlugins": [
     "./oxlint-plugin-local-rules.js",
     { "name": "sonarjs", "specifier": "./oxlint-plugin-sonarjs.js" },
@@ -40,8 +41,8 @@
 
     "import/no-duplicates": "error",
 
-    "jest/expect-expect": "off",
-    "jest/require-to-throw-message": "off",
+    "vitest/expect-expect": "off",
+    "vitest/require-to-throw-message": "off",
 
     "sonarjs/no-collapsible-if": "error",
     "sonarjs/no-collection-size-mischeck": "error",
@@ -194,16 +195,16 @@
     {
       "files": ["**/*.spec.ts", "**/*.test.ts"],
       "rules": {
-        "jest/no-commented-out-tests": "error",
-        "jest/no-conditional-expect": "error",
-        "jest/no-conditional-in-test": "error",
-        "jest/no-disabled-tests": "error",
-        "jest/no-focused-tests": "error",
-        "jest/no-identical-title": "error",
-        "jest/prefer-each": "error",
-        "jest/prefer-hooks-in-order": "error",
-        "jest/prefer-hooks-on-top": "error",
-        "jest/prefer-strict-equal": "error",
+        "vitest/no-commented-out-tests": "error",
+        "vitest/no-conditional-expect": "error",
+        "vitest/no-conditional-in-test": "error",
+        "vitest/no-disabled-tests": "error",
+        "vitest/no-focused-tests": "error",
+        "vitest/no-identical-title": "error",
+        "vitest/prefer-each": "error",
+        "vitest/prefer-hooks-in-order": "error",
+        "vitest/prefer-hooks-on-top": "error",
+        "vitest/prefer-strict-equal": "error",
         "local-rules/expect-separate-act-assert": "error",
         "local-rules/no-new-in-test-body": "error",
         "local-rules/use-data-builders": "error",

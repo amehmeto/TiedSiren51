@@ -25,8 +25,6 @@ module.exports = {
   },
 
   create(context) {
-    const sourceCode = context.getSourceCode()
-
     function isNested(node) {
       return (
         node.type === 'IfStatement' ||
