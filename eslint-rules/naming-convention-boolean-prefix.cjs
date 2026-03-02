@@ -54,7 +54,6 @@ module.exports = {
     const filename = context.getFilename()
     if (!isTypeScriptFile(filename)) return {}
 
-    const checkBooleans = true
     const checkTypeProperties = isCoreProductionFile(filename)
 
     function checkBooleanName(node, name, kind) {
@@ -65,6 +64,12 @@ module.exports = {
         messageId: 'booleanPrefix',
         data: { name, kind, prefixes: BOOLEAN_PREFIXES.join(', ') },
       })
+    }
+
+    function isBooleanParam(node) {
+      if (node.type !== 'Identifier') return false
+      if (!node.parent || !node.parent.params) return false
+      return node.parent.params.includes(node) && hasBooleanAnnotation(node)
     }
 
     return {
@@ -81,29 +86,27 @@ module.exports = {
 
       // Boolean variable declarations (annotation-based only)
       VariableDeclarator(node) {
-        if (!checkBooleans) return
         if (node.id.type !== 'Identifier') return
         if (hasBooleanAnnotation(node.id))
           checkBooleanName(node.id, node.id.name, 'variable')
       },
 
-      // Boolean parameters (split into separate visitors for OxLint compat)
-      'FunctionDeclaration > Identifier'(node) {
-        if (!checkBooleans) return
-        if (node.parent.params && node.parent.params.includes(node))
-          if (hasBooleanAnnotation(node))
-            checkBooleanName(node, node.name, 'parameter')
-      },
-      'ArrowFunctionExpression > Identifier'(node) {
-        if (!checkBooleans) return
-        if (node.parent.params && node.parent.params.includes(node))
-          if (hasBooleanAnnotation(node))
-            checkBooleanName(node, node.name, 'parameter')
+      // Boolean parameters — plain Identifier visitor with parent check
+      // (avoids child combinator selectors that OxLint may not support)
+      Identifier(node) {
+        const parentType = node.parent && node.parent.type
+        if (
+          parentType !== 'FunctionDeclaration' &&
+          parentType !== 'ArrowFunctionExpression' &&
+          parentType !== 'FunctionExpression'
+        )
+          return
+        if (isBooleanParam(node))
+          checkBooleanName(node, node.name, 'parameter')
       },
 
       // Boolean class properties (annotation-based only)
       PropertyDefinition(node) {
-        if (!checkBooleans) return
         if (node.key.type !== 'Identifier') return
         if (hasBooleanAnnotation(node)) {
           const name = node.key.name

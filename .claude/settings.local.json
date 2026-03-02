@@ -125,6 +125,7 @@
       "Bash(git fetch origin main && git merge origin/main --no-edit)",
       "Bash(git fetch:*)",
       "Bash(git log:*)",
+      "Bash(git ls-files:*)",
       "Bash(git ls-tree:*)",
       "Bash(git merge main:*)",
       "Bash(git merge origin/main --no-edit:*)",

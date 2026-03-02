@@ -29,8 +29,6 @@ module.exports = {
       Property(node) {
         // Skip computed properties
         if (node.computed) return
-        // Skip spread elements
-        if (node.type === 'SpreadElement') return
         // Already shorthand
         if (node.shorthand) return
         if (node.method) return
