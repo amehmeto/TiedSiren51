@@ -49,6 +49,43 @@ if (x) {
         {
           code: `for (let i = 0; i < 10; i++) doSomething()`,
         },
+        // For-in without braces, single statement - OK
+        {
+          code: `for (const k in obj) doSomething(k)`,
+        },
+        // For-of without braces, single statement - OK
+        {
+          code: `for (const x of arr) doSomething(x)`,
+        },
+        // Do-while with braces (multi-statement) - OK
+        {
+          code: `
+do {
+  doA()
+  doB()
+} while (x)
+`,
+        },
+        // Braces around single multi-line statement - OK (readability exception)
+        {
+          code: `
+if (x) {
+  doSomething(
+    a,
+    b
+  )
+}
+`,
+        },
+        // Braces around nested block in block - OK (multiple statements)
+        {
+          code: `
+if (x) {
+  if (y) doA()
+  doB()
+}
+`,
+        },
       ],
 
       invalid: [
@@ -84,6 +121,20 @@ else { doB() }
 `,
           errors: [
             { messageId: 'unnecessaryBraces', data: { keyword: 'else' } },
+          ],
+        },
+        // For-in with unnecessary braces - NOT OK
+        {
+          code: `for (const k in obj) { doSomething(k) }`,
+          errors: [
+            { messageId: 'unnecessaryBraces', data: { keyword: 'for-in' } },
+          ],
+        },
+        // Do-while with unnecessary braces around single statement - NOT OK
+        {
+          code: `do { doSomething() } while (x)`,
+          errors: [
+            { messageId: 'unnecessaryBraces', data: { keyword: 'do-while' } },
           ],
         },
       ],

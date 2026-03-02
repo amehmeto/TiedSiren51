@@ -60,6 +60,21 @@ describe('core-no-restricted-properties', () => {
           code: `const val = Math.floor(1.5)`,
           filename: '/project/core/auth/auth.slice.ts',
         },
+        // Math.random in test file (.test.ts) - OK (excluded)
+        {
+          code: `const val = Math.random()`,
+          filename: '/project/core/auth/auth.test.ts',
+        },
+        // Computed property access - OK (property is not Identifier)
+        {
+          code: `const val = Math['random']()`,
+          filename: '/project/core/auth/auth.slice.ts',
+        },
+        // Non-identifier object - OK (object is not Identifier)
+        {
+          code: `const val = getObj().random()`,
+          filename: '/project/core/auth/auth.slice.ts',
+        },
       ],
 
       invalid: [

@@ -58,7 +58,7 @@ module.exports = {
           key.type === 'Identifier' &&
           value.type === 'FunctionExpression' &&
           !value.generator &&
-          !node.kind
+          node.kind === 'init'
         )
           context.report({
             node,

@@ -45,6 +45,15 @@ function foo() {
         {
           code: `const a = 1;`,
         },
+        // Two statements allowed with max: 2 option
+        {
+          code: `const a = 1; const b = 2`,
+          options: [{ max: 2 }],
+        },
+        // Empty statements are skipped
+        {
+          code: `;;; const a = 1`,
+        },
       ],
 
       invalid: [

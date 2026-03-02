@@ -48,6 +48,10 @@ describe('no-generic-result-variable', () => {
           code: 'function check(expected) {}',
           options: [{ forbiddenParams: ['stuff'] }],
         },
+        // Destructured variable - OK (not Identifier, skipped)
+        { code: 'const { result } = doSomething()' },
+        // Destructured parameter - OK (not Identifier, skipped)
+        { code: 'function check({ expected }) {}' },
       ],
 
       invalid: [

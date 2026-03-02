@@ -111,6 +111,16 @@ describe('no-data-builders-in-production', () => {
           code: `import { SessionType } from 'data-builders'`,
           filename: '/project/core/session/session.slice.ts',
         },
+        // Using builder in fake-data file - OK (excluded)
+        {
+          code: `const session = buildBlockSession()`,
+          filename: '/project/core/seed/fake-data.sessions.ts',
+        },
+        // Using builder in preloadedStateForManualTesting - OK (excluded)
+        {
+          code: `const session = buildBlockSession()`,
+          filename: '/project/core/preloadedStateForManualTesting.ts',
+        },
       ],
 
       invalid: [

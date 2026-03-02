@@ -65,6 +65,21 @@ describe('core-no-restricted-globals', () => {
           code: `const now = new Date()`,
           filename: '/project/core/auth/auth.builder.ts',
         },
+        // Function parameter named Date - OK (declaration)
+        {
+          code: `function format(Date) {}`,
+          filename: '/project/core/auth/auth.slice.ts',
+        },
+        // Arrow function parameter named Date - OK (declaration)
+        {
+          code: `const format = (Date) => {}`,
+          filename: '/project/core/auth/auth.slice.ts',
+        },
+        // Import specifier for Date - OK (import)
+        {
+          code: `import { Date } from 'custom-date'`,
+          filename: '/project/core/auth/auth.slice.ts',
+        },
       ],
 
       invalid: [

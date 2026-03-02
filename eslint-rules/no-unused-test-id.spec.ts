@@ -37,6 +37,21 @@ describe('no-unused-test-id', () => {
         {
           code: '<Text accessibilityLabel="some-label" />',
         },
+        // Hardcoded testID in test file - OK (excluded by path)
+        {
+          code: '<View testID="my-component" />',
+          filename: '/project/ui/screens/Home/Home.test.ts',
+        },
+        // Hardcoded testID in spec file - OK (excluded by path)
+        {
+          code: '<View testID="my-component" />',
+          filename: '/project/ui/screens/Home/Home.spec.ts',
+        },
+        // Hardcoded testID outside ui/ - OK (not scoped)
+        {
+          code: '<View testID="my-component" />',
+          filename: '/project/core/auth/auth.slice.ts',
+        },
       ],
 
       invalid: [

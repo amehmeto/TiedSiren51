@@ -131,6 +131,66 @@ for (let i = 0; i < 10; i++) {
 `,
           errors: [{ messageId: 'missing' }],
         },
+        // Two do-while blocks without blank line - NOT OK
+        {
+          code: `
+do {
+  doA()
+} while (a)
+do {
+  doB()
+} while (b)
+`,
+          output: `
+do {
+  doA()
+} while (a)
+\ndo {
+  doB()
+} while (b)
+`,
+          errors: [{ messageId: 'missing' }],
+        },
+        // Two try-catch blocks without blank line - NOT OK
+        {
+          code: `
+try {
+  doA()
+} catch (e) {}
+try {
+  doB()
+} catch (e) {}
+`,
+          output: `
+try {
+  doA()
+} catch (e) {}
+\ntry {
+  doB()
+} catch (e) {}
+`,
+          errors: [{ messageId: 'missing' }],
+        },
+        // Two class declarations without blank line - NOT OK
+        {
+          code: `
+class Foo {
+  method() {}
+}
+class Bar {
+  method() {}
+}
+`,
+          output: `
+class Foo {
+  method() {}
+}
+\nclass Bar {
+  method() {}
+}
+`,
+          errors: [{ messageId: 'missing' }],
+        },
       ],
     })
   })

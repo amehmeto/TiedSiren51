@@ -50,6 +50,16 @@ describe('core-test-no-restricted-properties', () => {
           code: `vi.fn()`,
           filename: '/project/core/auth/auth.spec.ts',
         },
+        // Computed property access - OK (property is not Identifier)
+        {
+          code: `vi['spyOn'](obj, 'method')`,
+          filename: '/project/core/auth/auth.spec.ts',
+        },
+        // Non-identifier object - OK (object is not Identifier)
+        {
+          code: `getVi().spyOn(obj, 'method')`,
+          filename: '/project/core/auth/auth.spec.ts',
+        },
       ],
 
       invalid: [

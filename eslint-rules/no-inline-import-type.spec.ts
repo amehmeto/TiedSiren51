@@ -60,6 +60,11 @@ describe('no-inline-import-type', () => {
           code: `function fn(): import('module').Type { return value }`,
           errors: [{ messageId: 'noInlineImportType' }],
         },
+        // Inline import type without qualifier - NOT OK (falls back to 'Type')
+        {
+          code: `type Foo = import('bar')`,
+          errors: [{ messageId: 'noInlineImportType' }],
+        },
       ],
     })
   })

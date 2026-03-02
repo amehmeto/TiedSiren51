@@ -64,6 +64,11 @@ describe('object-shorthand', () => {
           errors: [{ messageId: 'useShorthand', data: { name: 'b' } }],
           output: `const obj = { a, b, c: d }`,
         },
+        // Method shorthand possible: { fn: function() {} } - NOT OK
+        {
+          code: `const obj = { fn: function() { return 1 } }`,
+          errors: [{ messageId: 'useMethodShorthand', data: { name: 'fn' } }],
+        },
       ],
     })
   })
