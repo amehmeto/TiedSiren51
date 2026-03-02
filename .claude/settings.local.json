@@ -145,6 +145,9 @@
       "Bash(keytool:*)",
       "Bash(ls:*)",
       "Bash(lsof:*)",
+      "Bash(mas list:*)",
+      "Bash(mas search:*)",
+      "Bash(mas upgrade:*)",
       "Bash(mkdir:*)",
       "Bash(mv:*)",
       "Bash(node /Users/arthurmehmetoglu/Development/tied-siren-project/TiedSiren51/eslint-rules/no-complex-inline-arguments.spec.cjs:*)",
@@ -392,7 +395,6 @@
       "Bash(docker:*)",
       "Bash(gh api:*)",
       "Bash(gh issue close:*)",
-      "Bash(gh pr:*)",
       "Bash(gh run rerun:*)",
       "Bash(gh secret:*)",
       "Bash(gh workflow run:*)",
@@ -421,6 +423,8 @@
       "Write(/**/.claude/**)"
     ]
   },
+  "enableAllProjectMcpServers": true,
+  "enabledMcpjsonServers": ["tessl"],
   "hooks": {
     "Notification": [
       {
