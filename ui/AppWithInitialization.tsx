@@ -1,7 +1,7 @@
 import { Stack, useRouter } from 'expo-router'
+import * as SplashScreen from 'expo-splash-screen'
 import { StatusBar } from 'expo-status-bar'
 import { useEffect } from 'react'
-import { MenuProvider } from 'react-native-popup-menu'
 import { AppStore } from '@/core/_redux_/createStore'
 import { InitializingView } from '@/ui/design-system/components/shared/InitializingView'
 import { TiedSLinearBackground } from '@/ui/design-system/components/shared/TiedSLinearBackground'
@@ -10,9 +10,20 @@ import { useAppInitialization } from '@/ui/hooks/useAppInitialization'
 import { useEmailVerificationDeepLink } from '@/ui/hooks/useEmailVerificationDeepLink'
 import { usePasswordResetDeepLink } from '@/ui/hooks/usePasswordResetDeepLink'
 
+SplashScreen.preventAutoHideAsync()
+
 type AppWithInitializationProps = Readonly<{
   store: AppStore
 }>
+
+const routes = [
+  '(auth)/register',
+  '(auth)/login',
+  '(auth)/signup',
+  '(auth)/forgot-password',
+  '(auth)/reset-password-confirm',
+  '(tabs)',
+]
 
 export function AppWithInitialization({ store }: AppWithInitializationProps) {
   const { error, isInitializing, isAuthenticated } = useAppInitialization(store)
@@ -22,24 +33,14 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
 
   useEffect(() => {
     if (isInitializing) return
-    if (router.canDismiss()) router.dismissAll()
-    router.replace(isAuthenticated ? '/home' : '/register')
-  }, [isInitializing, isAuthenticated, router])
+    if (!error) router.replace(isAuthenticated ? '/home' : '/register')
+    SplashScreen.hideAsync()
+  }, [isInitializing, isAuthenticated, error, router])
 
-  if (isInitializing)
-    return <InitializingView isInitializing={isInitializing} error={error} />
-
-  const routes = [
-    '(auth)/register',
-    '(auth)/login',
-    '(auth)/signup',
-    '(auth)/forgot-password',
-    '(auth)/reset-password-confirm',
-    '(tabs)',
-  ]
+  if (error) return <InitializingView isInitializing={false} error={error} />
 
   return (
-    <MenuProvider>
+    <>
       <StatusBar style={'auto'} />
       <TiedSLinearBackground>
         <Stack
@@ -61,6 +62,6 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
         </Stack>
       </TiedSLinearBackground>
       <TiedSToast />
-    </MenuProvider>
+    </>
   )
 }

@@ -129,6 +129,25 @@ function SettingsScreen() {
   return section
 }`,
         },
+        // Complex style prop excluded — style is presentational, not behavioral
+        {
+          code: `
+function SelectableCard() {
+  const content = (
+    <Card
+      style={[
+        styles.container,
+        { marginVertical: spacing },
+        isSelected ? styles.selected : null,
+        isLocked ? styles.locked : null,
+      ]}
+    >
+      <Text>Content</Text>
+    </Card>
+  )
+  return content
+}`,
+        },
         // Outside component function — not relevant
         {
           code: `

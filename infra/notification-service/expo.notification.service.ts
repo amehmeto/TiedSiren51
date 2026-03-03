@@ -2,7 +2,10 @@ import Constants from 'expo-constants'
 import * as Notifications from 'expo-notifications'
 import { Platform } from 'react-native'
 import { Logger } from '@/core/_ports_/logger'
-import { NotificationService } from '@/core/_ports_/notification.service'
+import {
+  NotificationService,
+  NotificationTrigger,
+} from '@/core/_ports_/notification.service'
 
 export class ExpoNotificationService implements NotificationService {
   constructor(private readonly logger: Logger) {}
@@ -11,7 +14,8 @@ export class ExpoNotificationService implements NotificationService {
     try {
       Notifications.setNotificationHandler({
         handleNotification: async () => ({
-          shouldShowAlert: true,
+          shouldShowBanner: true,
+          shouldShowList: true,
           shouldPlaySound: false,
           shouldSetBadge: false,
         }),
@@ -99,21 +103,26 @@ export class ExpoNotificationService implements NotificationService {
   async scheduleLocalNotification(
     title: string,
     body: string,
-    trigger: Notifications.NotificationTriggerInput,
+    trigger: NotificationTrigger,
   ): Promise<string> {
     try {
       if (Platform.OS === 'web')
         return 'Local notifications are not supported on web'
 
       await this.requestNotificationPermissions()
-      return Notifications.scheduleNotificationAsync({
+      const expoTrigger: Notifications.NotificationTriggerInput = {
+        type: Notifications.SchedulableTriggerInputTypes.TIME_INTERVAL,
+        seconds: trigger.seconds,
+        repeats: trigger.shouldRepeat,
+      }
+      return await Notifications.scheduleNotificationAsync({
         content: {
           title,
           body,
           sound: 'default',
           data: { data: 'goes here' },
         },
-        trigger,
+        trigger: expoTrigger,
       })
     } catch (error) {
       this.logger.error(

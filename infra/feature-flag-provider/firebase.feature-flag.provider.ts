@@ -21,6 +21,12 @@ export class FirebaseFeatureFlagProvider implements FeatureFlagProvider {
 
   async fetchAndActivate(): Promise<void> {
     try {
+      if (typeof indexedDB === 'undefined') {
+        this.logger.info(
+          '[FirebaseFeatureFlagProvider] indexedDB unavailable, using defaults',
+        )
+        return
+      }
       await fetchAndActivate(this.remoteConfig)
     } catch (error) {
       this.logger.error(
