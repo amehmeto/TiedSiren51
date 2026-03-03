@@ -13,8 +13,8 @@ if [ -z "$file_path" ]; then
   exit 0
 fi
 
-# Skip node_modules and non-existent files
-if [[ "$file_path" =~ node_modules ]] || [ ! -f "$file_path" ]; then
+# Skip node_modules, non-existent files, and plan files
+if [[ "$file_path" =~ node_modules ]] || [ ! -f "$file_path" ] || [[ "$file_path" =~ \.claude/plans/ ]]; then
   exit 0
 fi
 
