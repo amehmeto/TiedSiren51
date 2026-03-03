@@ -1,4 +1,4 @@
-import { createContext, RefObject, useContext } from 'react'
+import { RefObject, createContext, useContext } from 'react'
 import { View } from 'react-native'
 
 export const BlurTargetContext = createContext<RefObject<View | null> | null>(

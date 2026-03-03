@@ -190,6 +190,7 @@
       "Bash(npx shellcheck:*)",
       "Bash(npx tsc:*)",
       "Bash(npx vitest:*)",
+      "Bash(npx:*)",
       "Bash(nvm install:*)",
       "Bash(nvm use:*)",
       "Bash(pbcopy:*)",
@@ -431,6 +432,7 @@
       "Write(/**/.claude/**)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["tessl"],
   "hooks": {
     "Notification": [
@@ -483,6 +485,5 @@
         ]
       }
     ]
-  },
-  "enableAllProjectMcpServers": true
+  }
 }
