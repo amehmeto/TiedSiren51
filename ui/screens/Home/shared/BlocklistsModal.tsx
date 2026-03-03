@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { ScrollView, StyleSheet, Text, View } from 'react-native'
+import { StyleSheet, Text } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
@@ -69,48 +69,48 @@ export function BlocklistsModal({
   }
 
   return (
-    <TiedSModal isVisible={isVisible} onRequestClose={onRequestClose}>
-      <View style={styles.content}>
-        {blocklists.length === 0 && (
-          <Text style={styles.emptyText}>No blocklists available</Text>
-        )}
+    <TiedSModal
+      isVisible={isVisible}
+      onRequestClose={onRequestClose}
+      style={styles.modal}
+    >
+      {blocklists.length === 0 && (
+        <Text style={styles.emptyText}>No blocklists available</Text>
+      )}
 
-        <ScrollView>
-          {blocklists.map((blocklist) => {
-            const isSelected = selectedIds.includes(blocklist.id)
-            return (
-              <BlocklistRow
-                key={blocklist.id}
-                name={blocklist.name}
-                isSelected={isSelected}
-                onToggle={(isNowSelected) =>
-                  toggleBlocklist(blocklist.id, isNowSelected)
-                }
-                onNavigate={() => navigateToEditBlocklist(blocklist.id)}
-              />
-            )
-          })}
-        </ScrollView>
-        {blocklists.length === 0 ? (
-          <TiedSButton
-            style={styles.button}
-            onPress={() => {
-              router.push('/(tabs)/blocklists/create-blocklist-screen')
-              onRequestClose()
-            }}
-            text={'CREATE BLOCKLIST'}
+      {blocklists.map((blocklist) => {
+        const isSelected = selectedIds.includes(blocklist.id)
+        return (
+          <BlocklistRow
+            key={blocklist.id}
+            name={blocklist.name}
+            isSelected={isSelected}
+            onToggle={(isNowSelected) =>
+              toggleBlocklist(blocklist.id, isNowSelected)
+            }
+            onNavigate={() => navigateToEditBlocklist(blocklist.id)}
           />
-        ) : (
-          <TiedSButton style={styles.button} onPress={saveList} text={'SAVE'} />
-        )}
-      </View>
+        )
+      })}
+      {blocklists.length === 0 ? (
+        <TiedSButton
+          style={styles.button}
+          onPress={() => {
+            router.push('/(tabs)/blocklists/create-blocklist-screen')
+            onRequestClose()
+          }}
+          text={'CREATE BLOCKLIST'}
+        />
+      ) : (
+        <TiedSButton style={styles.button} onPress={saveList} text={'SAVE'} />
+      )}
     </TiedSModal>
   )
 }
 
 const styles = StyleSheet.create({
-  content: {
-    flexShrink: 1,
+  modal: {
+    flexDirection: 'column',
   },
   emptyText: {
     color: T.color.text,
