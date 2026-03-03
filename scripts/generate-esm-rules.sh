@@ -90,13 +90,13 @@ if grep -l "require(" "$RULES_DIR"/*.js 2>/dev/null; then
   exit 1
 fi
 
-# --- Step 4: Format generated files (best-effort, may fail during postinstall) ---
+# --- Step 4: Format generated files ---
 
 echo "Formatting generated files..."
-if npx prettier --write "$RULES_DIR"/*.js "$PLUGIN_FILE" --log-level warn 2>/dev/null; then
-  :
+if [ -x ./node_modules/.bin/prettier ]; then
+  ./node_modules/.bin/prettier --write "$RULES_DIR"/*.js "$PLUGIN_FILE" --log-level warn
 else
-  echo "  Prettier not available, skipping formatting (files still usable)."
+  echo "  WARNING: Prettier not installed, generated files may not be formatted."
 fi
 
 echo "Done! Generated ${#rules[@]} ESM rules + plugin entry point."
