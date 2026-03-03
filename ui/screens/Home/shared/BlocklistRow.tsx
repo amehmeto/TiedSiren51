@@ -1,8 +1,5 @@
 import { StyleSheet, Switch, View } from 'react-native'
-import {
-  TiedSTextLink,
-  TiedSTextLinkVariant,
-} from '@/ui/design-system/components/shared/TiedSTextLink'
+import { TiedSTextLink } from '@/ui/design-system/components/shared/TiedSTextLink'
 import { T } from '@/ui/design-system/theme'
 
 type BlocklistRowFields = {
@@ -26,7 +23,6 @@ export function BlocklistRow({
         <TiedSTextLink
           text={name}
           onPress={onNavigate}
-          variant={TiedSTextLinkVariant.Highlight}
           style={styles.nameLink}
         />
       </View>
