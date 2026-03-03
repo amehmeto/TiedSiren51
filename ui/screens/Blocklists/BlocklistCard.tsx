@@ -1,3 +1,4 @@
+import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
@@ -100,20 +101,32 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
   return (
     <>
       <Pressable
-        onPress={() =>
+        onPress={() => {
+          if (isStrictModeActive) return
           router.push({
             pathname: '/(tabs)/blocklists/edit-blocklist-screen/[blocklistId]',
             params: { blocklistId: blocklist.id },
           })
-        }
+        }}
         accessibilityRole="button"
       >
-        <TiedSCard style={styles.container}>
+        <TiedSCard
+          style={[styles.container, isStrictModeActive && styles.locked]}
+        >
           <View style={styles.infoContainer}>
             <Text style={styles.name}>{blocklist.name}</Text>
             <Text style={styles.totalBlocks}>{blocklist.totalBlocks}</Text>
           </View>
-          <ThreeDotMenu menuOptions={blocklistCardMenu} style={styles.menu} />
+          {isStrictModeActive ? (
+            <Ionicons
+              name="lock-closed"
+              size={T.icon.size.large}
+              color={T.color.textMuted}
+              style={styles.lockIcon}
+            />
+          ) : (
+            <ThreeDotMenu menuOptions={blocklistCardMenu} style={styles.menu} />
+          )}
         </TiedSCard>
       </Pressable>
 
@@ -174,6 +187,9 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     alignItems: 'center',
   },
+  locked: {
+    opacity: T.opacity.disabled,
+  },
   name: {
     color: T.color.text,
     fontFamily: T.font.family.heading,
@@ -188,6 +204,9 @@ const styles = StyleSheet.create({
   infoContainer: {
     flex: 1,
     flexDirection: 'column',
+  },
+  lockIcon: {
+    marginRight: T.spacing.small,
   },
   menu: {
     marginRight: T.spacing.small,
