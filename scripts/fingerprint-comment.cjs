@@ -2,12 +2,13 @@
  * Manage the fingerprint skip comment on a PR.
  *
  * Called from actions/github-script with { github, context } plus
- * a `nativeChanged` boolean injected by the workflow.
+ * the raw `nativeChanged` step output string.
  *
- * - nativeChanged === false → create/update a "build skipped" comment
- * - nativeChanged === true  → delete any existing skip comment
+ * - nativeChanged !== 'false' → delete any existing skip comment
+ * - nativeChanged === 'false' → create/update a "build skipped" comment
  */
 module.exports = async ({ github, context, nativeChanged }) => {
+  const hasNativeChanges = nativeChanged !== 'false'
   const marker = '<!-- fingerprint-skip-comment -->'
 
   const { data: comments } = await github.rest.issues.listComments({
@@ -17,7 +18,7 @@ module.exports = async ({ github, context, nativeChanged }) => {
   })
   const existing = comments.find((c) => c.body.includes(marker))
 
-  if (!nativeChanged) {
+  if (!hasNativeChanges) {
     const body = [
       marker,
       '**Build skipped** — no native changes detected by Expo fingerprint.',

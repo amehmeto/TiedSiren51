@@ -193,7 +193,7 @@ jobs:
         uses: actions/github-script@v7
         with:
           script: |
-            const nativeChanged = '${{ steps.compare.outputs.native-changed }}' !== 'false';
+            const nativeChanged = '${{ steps.compare.outputs.native-changed }}';
             await require('./scripts/fingerprint-comment.cjs')({ github, context, nativeChanged });
 
   build:
