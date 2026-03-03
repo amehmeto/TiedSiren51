@@ -1,6 +1,13 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { FlatList, StyleSheet, Switch, Text, View } from 'react-native'
+import {
+  FlatList,
+  Pressable,
+  StyleSheet,
+  Switch,
+  Text,
+  View,
+} from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
@@ -59,9 +66,17 @@ export function BlocklistsModal({
     setSelectedIds(newSelections)
   }
 
+  function navigateToEditBlocklist(blocklistId: string) {
+    onRequestClose()
+    router.push({
+      pathname: '/(tabs)/blocklists/edit-blocklist-screen/[blocklistId]',
+      params: { blocklistId },
+    })
+  }
+
   return (
     <TiedSModal isVisible={isVisible} onRequestClose={onRequestClose}>
-      <View>
+      <View style={styles.content}>
         {blocklists.length === 0 && (
           <Text style={styles.blocklistText}>No blocklists available</Text>
         )}
@@ -73,7 +88,12 @@ export function BlocklistsModal({
             const isBlocklistSelected = selectedIds.includes(blocklist.id)
             return (
               <View style={styles.blocklist}>
-                <Text style={styles.blocklistText}>{blocklist.name}</Text>
+                <Pressable
+                  onPress={() => navigateToEditBlocklist(blocklist.id)}
+                  style={styles.blocklistNameContainer}
+                >
+                  <Text style={styles.blocklistLink}>{blocklist.name}</Text>
+                </Pressable>
                 <Switch
                   accessibilityLabel={`Toggle ${blocklist.name}`}
                   style={styles.blocklistSelector}
@@ -104,16 +124,30 @@ export function BlocklistsModal({
 }
 
 const styles = StyleSheet.create({
+  content: {
+    flexShrink: 1,
+  },
   blocklist: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    flex: 1,
+    alignItems: 'center',
     padding: T.spacing.small,
+  },
+  blocklistNameContainer: {
+    flexShrink: 1,
+    flexGrow: 1,
+    marginRight: T.spacing.small,
   },
   blocklistText: {
     color: T.color.text,
     fontFamily: T.font.family.primary,
     fontSize: T.font.size.base,
+  },
+  blocklistLink: {
+    color: T.color.lightBlue,
+    fontFamily: T.font.family.primary,
+    fontSize: T.font.size.base,
+    textDecorationLine: 'underline',
   },
   button: {
     alignSelf: 'center',
