@@ -62,7 +62,7 @@ export default function HomeScreen() {
         />,
       ]
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- exhaustive type guard
+    // oxlint-disable-next-line typescript/no-unnecessary-condition -- exhaustive type guard
     if (viewModel.type === HomeViewModel.WithBothSessionTypes)
       return [
         <SessionsBoard

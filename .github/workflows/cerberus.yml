@@ -80,9 +80,7 @@ jobs:
         run: npm ci
 
       - name: Install platform-specific binaries
-        run: |
-          OXLINT_VERSION=$(node -p "require('./package-lock.json').packages['node_modules/oxlint'].version")
-          npm install --no-save "@oxlint/binding-linux-x64-gnu@$OXLINT_VERSION"
+        run: bash scripts/install-platform-binaries.sh
 
       - name: Lint
         run: npm run lint
@@ -109,9 +107,7 @@ jobs:
         run: npm ci
 
       - name: Install platform-specific binaries
-        run: |
-          OXLINT_VERSION=$(node -p "require('./package-lock.json').packages['node_modules/oxlint'].version")
-          npm install --no-save @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu "@oxlint/binding-linux-x64-gnu@$OXLINT_VERSION"
+        run: bash scripts/install-platform-binaries.sh @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu
 
       - name: Lint
         run: npm run lint

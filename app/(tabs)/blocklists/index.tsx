@@ -20,7 +20,7 @@ export default function BlocklistScreen() {
     if (viewModel.type === BlocklistViewModel.NoBlocklist)
       return <NoBlocklistMessage message={viewModel.message} />
 
-    // eslint-disable-next-line @typescript-eslint/no-unnecessary-condition -- exhaustive type guard
+    // oxlint-disable-next-line typescript/no-unnecessary-condition -- exhaustive type guard
     if (viewModel.type === BlocklistViewModel.WithBlockLists)
       return (
         <FlatList

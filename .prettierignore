@@ -12,6 +12,4 @@ coverage
 # Generated files
 *.generated.*
 package-lock.json
-eslint-rules/*.js
-oxlint-plugin-local-rules.js
 

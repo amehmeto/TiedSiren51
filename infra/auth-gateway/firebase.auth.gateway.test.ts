@@ -2,7 +2,6 @@ import { GoogleSignin } from '@react-native-google-signin/google-signin'
 import { FirebaseError } from 'firebase/app'
 import * as firebaseAuth from 'firebase/auth'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
-import { AuthMethod } from '@/core/auth/auth.type'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { FirebaseAuthGateway } from './firebase.auth.gateway'
 
@@ -76,60 +75,79 @@ describe('FirebaseAuthGateway - Error Translation', () => {
   type FirebaseAuthErrorCase = {
     code: string
     expected: string
-    method: AuthMethod
   }
 
   describe('Firebase Auth Error Messages', () => {
-    it.each<FirebaseAuthErrorCase>([
-      {
-        code: 'auth/email-already-in-use',
-        expected: 'Invalid email or password.',
-        method: AuthMethod.SignUpWithEmail,
-      },
-      {
-        code: 'auth/invalid-email',
-        expected: 'Invalid email address.',
-        method: AuthMethod.SignInWithEmail,
-      },
-      {
-        code: 'auth/weak-password',
-        expected: 'Password must be at least 6 characters.',
-        method: AuthMethod.SignUpWithEmail,
-      },
-      {
-        code: 'auth/invalid-credential',
-        expected: 'Invalid email or password.',
-        method: AuthMethod.SignInWithEmail,
-      },
-      {
-        code: 'auth/popup-closed-by-user',
-        expected: 'Sign-in cancelled.',
-        method: AuthMethod.SignInWithEmail,
-      },
-      {
-        code: 'auth/cancelled-popup-request',
-        expected: 'Sign-in cancelled.',
-        method: AuthMethod.SignInWithEmail,
-      },
-    ])(
-      'should translate $code to "$expected"',
-      async ({ code, expected, method }) => {
-        const mockError = new FirebaseError(code, `Firebase: Error (${code}).`)
+    describe('signInWithEmail errors', () => {
+      it.each<FirebaseAuthErrorCase>([
+        {
+          code: 'auth/invalid-email',
+          expected: 'Invalid email address.',
+        },
+        {
+          code: 'auth/invalid-credential',
+          expected: 'Invalid email or password.',
+        },
+        {
+          code: 'auth/popup-closed-by-user',
+          expected: 'Sign-in cancelled.',
+        },
+        {
+          code: 'auth/cancelled-popup-request',
+          expected: 'Sign-in cancelled.',
+        },
+      ])(
+        'should translate $code to "$expected"',
+        async ({ code, expected }) => {
+          const mockError = new FirebaseError(
+            code,
+            `Firebase: Error (${code}).`,
+          )
 
-        /* oxlint-disable vitest/no-conditional-in-test -- selecting mock based on parameterized test input */
-        const authMethod =
-          method === AuthMethod.SignUpWithEmail
-            ? firebaseAuth.createUserWithEmailAndPassword
-            : firebaseAuth.signInWithEmailAndPassword
-        /* oxlint-enable vitest/no-conditional-in-test */
+          vi.mocked(firebaseAuth.signInWithEmailAndPassword).mockRejectedValue(
+            mockError,
+          )
 
-        vi.mocked(authMethod).mockRejectedValue(mockError)
+          const promise = gateway.signInWithEmail(
+            'test@example.com',
+            'password123',
+          )
 
-        const promise = gateway[method]('test@example.com', 'password123')
+          await expect(promise).rejects.toThrow(expected)
+        },
+      )
+    })
 
-        await expect(promise).rejects.toThrow(expected)
-      },
-    )
+    describe('signUpWithEmail errors', () => {
+      it.each<FirebaseAuthErrorCase>([
+        {
+          code: 'auth/email-already-in-use',
+          expected: 'Invalid email or password.',
+        },
+        {
+          code: 'auth/weak-password',
+          expected: 'Password must be at least 6 characters.',
+        },
+      ])(
+        'should translate $code to "$expected"',
+        async ({ code, expected }) => {
+          const mockError = new FirebaseError(
+            code,
+            `Firebase: Error (${code}).`,
+          )
+
+          const signUpMock = firebaseAuth.createUserWithEmailAndPassword
+          vi.mocked(signUpMock).mockRejectedValue(mockError)
+
+          const promise = gateway.signUpWithEmail(
+            'test@example.com',
+            'password123',
+          )
+
+          await expect(promise).rejects.toThrow(expected)
+        },
+      )
+    })
 
     it('should return original Firebase error message for unknown error codes', async () => {
       const mockError = new FirebaseError(

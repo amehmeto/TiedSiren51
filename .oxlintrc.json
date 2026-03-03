@@ -208,7 +208,7 @@
         "local-rules/expect-separate-act-assert": "error",
         "local-rules/no-new-in-test-body": "error",
         "local-rules/use-data-builders": "error",
-        "local-rules/no-generic-result-variable": "warn",
+        "local-rules/no-generic-result-variable": "error",
         "local-rules/require-typed-each": "error",
         "local-rules/prefer-parameterized-test": "error"
       }
