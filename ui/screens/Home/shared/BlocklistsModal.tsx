@@ -1,13 +1,6 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import {
-  FlatList,
-  Pressable,
-  StyleSheet,
-  Switch,
-  Text,
-  View,
-} from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
@@ -17,6 +10,7 @@ import { dependencies } from '@/ui/dependencies'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
+import { BlocklistRow } from '@/ui/screens/Home/shared/BlocklistRow'
 
 type BlocklistsModalFields = {
   isVisible: boolean
@@ -78,34 +72,25 @@ export function BlocklistsModal({
     <TiedSModal isVisible={isVisible} onRequestClose={onRequestClose}>
       <View style={styles.content}>
         {blocklists.length === 0 && (
-          <Text style={styles.blocklistText}>No blocklists available</Text>
+          <Text style={styles.emptyText}>No blocklists available</Text>
         )}
 
-        <FlatList
-          data={blocklists}
-          keyExtractor={(blocklist) => blocklist.id}
-          renderItem={({ item: blocklist }) => {
-            const isBlocklistSelected = selectedIds.includes(blocklist.id)
+        <ScrollView>
+          {blocklists.map((blocklist) => {
+            const isSelected = selectedIds.includes(blocklist.id)
             return (
-              <View style={styles.blocklist}>
-                <Pressable
-                  onPress={() => navigateToEditBlocklist(blocklist.id)}
-                  style={styles.blocklistNameContainer}
-                >
-                  <Text style={styles.blocklistLink}>{blocklist.name}</Text>
-                </Pressable>
-                <Switch
-                  accessibilityLabel={`Toggle ${blocklist.name}`}
-                  style={styles.blocklistSelector}
-                  value={isBlocklistSelected}
-                  onValueChange={(isNowSelected) =>
-                    toggleBlocklist(blocklist.id, isNowSelected)
-                  }
-                />
-              </View>
+              <BlocklistRow
+                key={blocklist.id}
+                name={blocklist.name}
+                isSelected={isSelected}
+                onToggle={(isNowSelected) =>
+                  toggleBlocklist(blocklist.id, isNowSelected)
+                }
+                onNavigate={() => navigateToEditBlocklist(blocklist.id)}
+              />
             )
-          }}
-        />
+          })}
+        </ScrollView>
         {blocklists.length === 0 ? (
           <TiedSButton
             style={styles.button}
@@ -127,31 +112,13 @@ const styles = StyleSheet.create({
   content: {
     flexShrink: 1,
   },
-  blocklist: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-    padding: T.spacing.small,
-  },
-  blocklistNameContainer: {
-    flexShrink: 1,
-    flexGrow: 1,
-    marginRight: T.spacing.small,
-  },
-  blocklistText: {
+  emptyText: {
     color: T.color.text,
     fontFamily: T.font.family.primary,
     fontSize: T.font.size.base,
-  },
-  blocklistLink: {
-    color: T.color.lightBlue,
-    fontFamily: T.font.family.primary,
-    fontSize: T.font.size.base,
-    textDecorationLine: 'underline',
   },
   button: {
     alignSelf: 'center',
     marginTop: T.spacing.medium,
   },
-  blocklistSelector: { marginLeft: T.spacing.medium },
 })
