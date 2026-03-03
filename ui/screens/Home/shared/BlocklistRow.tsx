@@ -1,4 +1,8 @@
-import { Pressable, StyleSheet, Switch, Text, View } from 'react-native'
+import { StyleSheet, Switch, View } from 'react-native'
+import {
+  TiedSTextLink,
+  TiedSTextLinkVariant,
+} from '@/ui/design-system/components/shared/TiedSTextLink'
 import { T } from '@/ui/design-system/theme'
 
 type BlocklistRowFields = {
@@ -18,9 +22,14 @@ export function BlocklistRow({
 }: BlocklistRowProps) {
   return (
     <View style={styles.row}>
-      <Pressable onPress={onNavigate} style={styles.nameContainer}>
-        <Text style={styles.nameLink}>{name}</Text>
-      </Pressable>
+      <View style={styles.nameContainer}>
+        <TiedSTextLink
+          text={name}
+          onPress={onNavigate}
+          variant={TiedSTextLinkVariant.Highlight}
+          style={styles.nameLink}
+        />
+      </View>
       <Switch
         accessibilityLabel={`Toggle ${name}`}
         style={styles.toggle}
@@ -44,10 +53,8 @@ const styles = StyleSheet.create({
     marginRight: T.spacing.small,
   },
   nameLink: {
-    color: T.color.lightBlue,
     fontFamily: T.font.family.primary,
     fontSize: T.font.size.base,
-    textDecorationLine: 'underline',
   },
   toggle: { marginLeft: T.spacing.medium },
 })
