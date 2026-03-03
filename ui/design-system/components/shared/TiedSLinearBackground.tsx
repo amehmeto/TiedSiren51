@@ -1,6 +1,6 @@
 import { BlurTargetView } from 'expo-blur'
 import { LinearGradient } from 'expo-linear-gradient'
-import React, { useRef } from 'react'
+import React, { useCallback, useRef, useState } from 'react'
 import { StyleSheet, View } from 'react-native'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { BlurTargetContext } from '@/ui/design-system/contexts/BlurTargetContext'
@@ -13,10 +13,16 @@ export function TiedSLinearBackground({
 }: TiedSLinearBackgroundProps) {
   const insets = useSafeAreaInsets()
   const blurTargetRef = useRef<View>(null)
+  const [isBlurTargetReady, setBlurTargetReady] = useState(false)
+  const onBlurTargetLayout = useCallback(() => setBlurTargetReady(true), [])
 
   return (
     <View style={styles.root}>
-      <BlurTargetView ref={blurTargetRef} style={StyleSheet.absoluteFill}>
+      <BlurTargetView
+        ref={blurTargetRef}
+        onLayout={onBlurTargetLayout}
+        style={StyleSheet.absoluteFill}
+      >
         <LinearGradient
           colors={[T.color.darkBlue, T.color.gradientMid, T.color.purple]}
           start={{ x: 0, y: 0 }}
@@ -27,7 +33,9 @@ export function TiedSLinearBackground({
       <View
         style={[styles.content, { paddingTop: T.spacing.large + insets.top }]}
       >
-        <BlurTargetContext.Provider value={blurTargetRef}>
+        <BlurTargetContext.Provider
+          value={isBlurTargetReady ? blurTargetRef : null}
+        >
           {children}
         </BlurTargetContext.Provider>
       </View>
