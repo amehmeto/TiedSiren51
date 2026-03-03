@@ -7,7 +7,10 @@ import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlockli
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import { showToast } from '@/core/toast/toast.slice'
 import { dependencies } from '@/ui/dependencies'
-import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'
+import {
+  TiedSButton,
+  TiedSButtonVariant,
+} from '@/ui/design-system/components/shared/TiedSButton'
 import { TiedSModal } from '@/ui/design-system/components/shared/TiedSModal'
 import { T } from '@/ui/design-system/theme'
 import { BlocklistRow } from '@/ui/screens/Home/shared/BlocklistRow'
@@ -94,16 +97,16 @@ export function BlocklistsModal({
           )
         })}
       </ScrollView>
-      {blocklists.length === 0 ? (
-        <TiedSButton
-          style={styles.button}
-          onPress={() => {
-            router.push('/(tabs)/blocklists/create-blocklist-screen')
-            onRequestClose()
-          }}
-          text={'CREATE BLOCKLIST'}
-        />
-      ) : (
+      <TiedSButton
+        style={styles.button}
+        onPress={() => {
+          router.push('/(tabs)/blocklists/create-blocklist-screen')
+          onRequestClose()
+        }}
+        text={'CREATE BLOCKLIST'}
+        variant={TiedSButtonVariant.Secondary}
+      />
+      {blocklists.length > 0 && (
         <TiedSButton style={styles.button} onPress={saveList} text={'SAVE'} />
       )}
     </TiedSModal>
