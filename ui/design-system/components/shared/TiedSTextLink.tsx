@@ -1,4 +1,4 @@
-import { type TextStyle, StyleProp, StyleSheet, Text } from 'react-native'
+import { StyleProp, StyleSheet, Text, type TextStyle } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
 export enum TiedSTextLinkVariant {

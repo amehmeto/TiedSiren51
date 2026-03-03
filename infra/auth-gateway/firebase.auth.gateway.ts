@@ -11,15 +11,16 @@ import {
   initializeApp,
 } from 'firebase/app'
 import {
-  applyActionCode,
   Auth,
-  confirmPasswordReset as firebaseConfirmPasswordReset,
+  EmailAuthProvider,
+  GoogleAuthProvider,
+  User,
+  applyActionCode,
   createUserWithEmailAndPassword,
   deleteUser,
-  EmailAuthProvider,
+  confirmPasswordReset as firebaseConfirmPasswordReset,
   getAuth,
   getReactNativePersistence,
-  GoogleAuthProvider,
   initializeAuth,
   onAuthStateChanged,
   reauthenticateWithCredential,
@@ -29,7 +30,6 @@ import {
   signInWithEmailAndPassword,
   signOut,
   updatePassword,
-  User,
 } from 'firebase/auth'
 import {
   AuthGateway,
@@ -65,8 +65,9 @@ export class FirebaseAuthGateway implements AuthGateway {
   }
 
   private getGoogleSignInErrorPattern(error: Error): GoogleSignInError | null {
-    for (const pattern of Object.values(GoogleSignInError))
+    for (const pattern of Object.values(GoogleSignInError)) {
       if (error.message.includes(pattern)) return pattern
+    }
 
     return null
   }

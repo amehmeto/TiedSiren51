@@ -7,8 +7,8 @@ import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAut
 import { applyEmailVerificationCode } from '@/core/auth/usecases/apply-email-verification-code.usecase'
 import { showToast } from '@/core/toast/toast.slice'
 import {
-  extractOobCode,
   FirebaseDeepLinkMode,
+  extractOobCode,
 } from '@/ui/auth-schemas/extract-oob-code.helper'
 import { dependencies } from '@/ui/dependencies'
 

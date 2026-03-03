@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
 import React, { useEffect } from 'react'
-import { View, Text, StyleSheet, Image } from 'react-native'
+import { Image, StyleSheet, Text, View } from 'react-native'
 import { useSelector } from 'react-redux'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import { TiedSButton } from '@/ui/design-system/components/shared/TiedSButton'

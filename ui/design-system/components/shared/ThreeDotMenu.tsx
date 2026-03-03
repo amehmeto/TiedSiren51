@@ -5,9 +5,9 @@ import {
   Pressable,
   StyleProp,
   StyleSheet,
-  useWindowDimensions,
   View,
   ViewStyle,
+  useWindowDimensions,
 } from 'react-native'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'

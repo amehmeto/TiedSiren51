@@ -1,8 +1,8 @@
 import {
   Action,
-  configureStore,
   Middleware,
   ThunkDispatch,
+  configureStore,
 } from '@reduxjs/toolkit'
 import { Dependencies } from './dependencies'
 import { registerListeners } from './registerListeners'

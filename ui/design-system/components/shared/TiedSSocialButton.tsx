@@ -3,9 +3,9 @@ import React from 'react'
 import {
   Animated,
   Pressable,
-  Text,
-  StyleSheet,
   StyleProp,
+  StyleSheet,
+  Text,
   ViewStyle,
 } from 'react-native'
 import { usePressScale } from '@/ui/design-system/hooks/usePressScale'

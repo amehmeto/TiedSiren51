@@ -55,6 +55,9 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      - name: Install npm 11
+        run: npm install -g npm@11
+
       - name: Install dependencies
         run: npm ci
 
@@ -76,8 +79,14 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      - name: Install npm 11
+        run: npm install -g npm@11
+
       - name: Install dependencies
         run: npm ci
+
+      - name: Install platform-specific binaries
+        run: bash scripts/install-platform-binaries.sh
 
       - name: Lint
         run: npm run lint
@@ -100,11 +109,14 @@ jobs:
         with:
           node-version-file: .nvmrc
 
+      - name: Install npm 11
+        run: npm install -g npm@11
+
       - name: Install dependencies
         run: npm ci
 
       - name: Install platform-specific binaries
-        run: npm install --no-save @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu
+        run: bash scripts/install-platform-binaries.sh @rollup/rollup-linux-x64-gnu @unrs/resolver-binding-linux-x64-gnu
 
       - name: Lint
         run: npm run lint
@@ -178,6 +190,9 @@ jobs:
         with:
           eas-version: 16.24.1
           token: ${{ secrets.EXPO_TOKEN }}
+
+      - name: Install npm 11
+        run: npm install -g npm@11
 
       - name: Install dependencies
         run: npm ci --include=dev

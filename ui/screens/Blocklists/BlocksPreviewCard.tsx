@@ -1,8 +1,8 @@
 import React from 'react'
 import {
   Pressable,
-  StyleSheet,
   StyleProp,
+  StyleSheet,
   Text,
   TextStyle,
   View,

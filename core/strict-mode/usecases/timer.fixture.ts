@@ -9,10 +9,10 @@ import { AuthUser } from '@/core/auth/auth-user'
 import { selectNullableAuthUserId } from '@/core/auth/selectors/selectNullableAuthUserId'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import { FakeDataTimerRepository } from '@/infra/timer-repository/fake-data.timer.repository'
-import { extendTimer, ExtendTimerPayload } from './extend-timer.usecase'
+import { ExtendTimerPayload, extendTimer } from './extend-timer.usecase'
 import { loadTimer } from './load-timer.usecase'
 import { notifyLockedSiren } from './notify-locked-siren.usecase'
-import { startTimer, StartTimerPayload } from './start-timer.usecase'
+import { StartTimerPayload, startTimer } from './start-timer.usecase'
 
 const DEFAULT_TEST_DATE = new Date('2024-01-01T00:00:00.000Z')
 
