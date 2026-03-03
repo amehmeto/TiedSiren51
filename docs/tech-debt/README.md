@@ -12,7 +12,7 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ## Active Technical Debt Items
 
 ### Infrastructure & Database
-- [Expo SDK 55 Post-Upgrade](expo-sdk-55-post-upgrade.md) - ⚠️ **MEDIUM PRIORITY** - Metro package exports disabled, `@react-navigation/native` override, Firebase indexedDB guard
+- [Expo SDK 55 Post-Upgrade](expo-sdk-55-post-upgrade.md) - ⚠️ **MEDIUM PRIORITY** - Metro package exports disabled, Firebase indexedDB guard, Firebase Auth missing RN types
 - [Error Handling Enhancement](error-handling.md) - 🚨 **HIGH PRIORITY** - Custom error types needed
 - [Database Configuration](database-configuration.md) - 📋 **LOW PRIORITY** - Configurable paths
 - [Migration Strategy](migration-strategy.md) - ⚠️ **MEDIUM PRIORITY** - Critical for app updates
@@ -46,7 +46,6 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 
 When to revisit these improvements:
 - **Metro Package Exports**: Re-evaluate `unstable_enablePackageExports` after firebase/PowerSync updates
-- **Navigation Override**: Remove `@react-navigation/native` override after next expo-router version bump
 - **Error Handling**: When seeing first error reports from users
 - **Migration Strategy**: Before first app update with schema changes
 - **Testing**: When reaching 1000 active users

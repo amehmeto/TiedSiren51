@@ -187,10 +187,6 @@
     "vitest-tsconfig-paths": "^3.4.1",
     "wait-on": "^7.2.0"
   },
-  "//overrides": "Pins @react-navigation/native to avoid duplicate copies that crash the navigation context. Remove once expo-router ships with a compatible single version.",
-  "overrides": {
-    "@react-navigation/native": "7.1.28"
-  },
   "expo": {
     "install": {
       "exclude": [

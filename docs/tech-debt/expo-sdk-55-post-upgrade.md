@@ -40,15 +40,9 @@ Files:
 
 **Recommendation**: Replace with `Pressable` for consistency.
 
-### 5. `@react-navigation/native` override in `package.json`
+### ~~5. `@react-navigation/native` override in `package.json`~~ ✅ RESOLVED
 
-**Priority**: 📋 LOW
-**Risk**: Override pins version to `7.1.28` to match expo-router's exact pin. If expo-router updates its pin, this override may cause version conflicts.
-**Impact**: Required to prevent duplicate React context crash in BottomTabBar
-
-Location: `package.json` `overrides` field
-
-**Recommendation**: Remove the override after upgrading to a future expo-router version that resolves this deduplication natively.
+Override removed. npm naturally deduplicates `@react-navigation/native` to 7.1.31 (satisfies both `^7.1.28` from expo-router and `^7.1.31` from bottom-tabs). The initial duplication was a stale `package-lock.json` artifact from the SDK 51→55 migration, not a structural npm resolution issue.
 
 ### 6. Firebase Remote Config `indexedDB` guard in React Native
 
@@ -89,3 +83,4 @@ References:
 - ✅ `experiments.typedRoutes` — Still works in expo-router v4
 - ✅ `react-native-popup-menu` — Replaced with custom `Modal` + `Pressable` popup (PR #405)
 - ✅ `react-native-elements` — Replaced `CheckBox` with custom `CheckboxIndicator` (PR #405)
+- ✅ `@react-navigation/native` override — Removed; npm deduplicates naturally to 7.1.31 (PR #405)
