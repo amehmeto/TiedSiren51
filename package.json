@@ -9,7 +9,6 @@
   },
   "scripts": {
     "preinstall": "npx only-allow npm",
-    "postinstall": "bash scripts/generate-esm-rules.sh",
     "install:clean": "rm -rf node_modules && npm ci",
     "start": "expo start",
     "android": "npx expo run:android",
@@ -19,7 +18,6 @@
     "lint": "bash scripts/lint.sh",
     "lint:fix": "bash scripts/lint.sh --fix",
     "lint:types": "tsc --noEmit",
-    "generate:esm-rules": "bash scripts/generate-esm-rules.sh",
     "lint:oxlint": "oxlint --type-aware",
     "lint:oxlint:fix": "oxlint --type-aware --fix",
     "lint:json": "eslint",

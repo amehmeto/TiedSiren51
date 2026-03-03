@@ -2,12 +2,10 @@
  * @fileoverview Tests for prefer-ternary-return rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./prefer-ternary-return.cjs')
+import rule from './prefer-ternary-return.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

@@ -2,12 +2,10 @@
  * @fileoverview Tests for max-statements-per-line rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./max-statements-per-line.cjs')
+import rule from './max-statements-per-line.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

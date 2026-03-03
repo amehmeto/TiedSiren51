@@ -2,12 +2,10 @@
  * @fileoverview Tests for prefer-inline-variable rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./prefer-inline-variable.cjs')
+import rule from './prefer-inline-variable.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

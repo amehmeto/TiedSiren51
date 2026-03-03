@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-redundant-nullish-ternary rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-redundant-nullish-ternary.cjs')
+import rule from './no-redundant-nullish-ternary.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

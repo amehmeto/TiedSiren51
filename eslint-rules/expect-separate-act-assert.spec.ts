@@ -2,12 +2,10 @@
  * @fileoverview Tests for expect-separate-act-assert rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./expect-separate-act-assert.cjs')
+import rule from './expect-separate-act-assert.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

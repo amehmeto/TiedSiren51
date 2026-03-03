@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-entire-state-selector rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-entire-state-selector.cjs')
+import rule from './no-entire-state-selector.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

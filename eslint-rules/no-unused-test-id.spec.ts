@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-unused-test-id rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-unused-test-id.cjs')
+import rule from './no-unused-test-id.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

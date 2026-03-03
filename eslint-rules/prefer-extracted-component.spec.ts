@@ -2,12 +2,10 @@
  * @fileoverview Tests for prefer-extracted-component rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./prefer-extracted-component.cjs')
+import rule from './prefer-extracted-component.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

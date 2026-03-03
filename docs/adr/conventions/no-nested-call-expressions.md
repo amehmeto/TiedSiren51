@@ -35,7 +35,7 @@ Provide an ESLint rule `local-rules/no-nested-call-expressions` that flags neste
 The rule is **disabled globally** because many valid patterns use nesting (e.g., `expect(getValue()).toBe(...)`, builder patterns). Enable it per-file where stricter style is desired.
 
 ```javascript
-// .eslintrc.cjs
+// oxlint.json
 'local-rules/no-nested-call-expressions': 'off',
 ```
 
@@ -120,8 +120,8 @@ const names = users.filter(isActive).map(getName)
 
 ## Implementation
 
-- ESLint rule: `eslint-rules/no-nested-call-expressions.cjs`
-- Tests: `eslint-rules/no-nested-call-expressions.spec.cjs`
+- ESLint rule: `eslint-rules/no-nested-call-expressions.js`
+- Tests: `eslint-rules/no-nested-call-expressions.spec.ts`
 
 ## References
 

@@ -2,12 +2,10 @@
  * @fileoverview Tests for time-constant-multiplication rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./time-constant-multiplication.cjs')
+import rule from './time-constant-multiplication.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

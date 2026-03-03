@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-i-prefix-in-imports rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-i-prefix-in-imports.cjs')
+import rule from './no-i-prefix-in-imports.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

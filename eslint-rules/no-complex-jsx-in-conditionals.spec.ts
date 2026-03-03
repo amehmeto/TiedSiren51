@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-complex-jsx-in-conditionals rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-complex-jsx-in-conditionals.cjs')
+import rule from './no-complex-jsx-in-conditionals.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

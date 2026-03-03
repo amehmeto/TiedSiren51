@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-adapter-in-ui rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-adapter-in-ui.cjs')
+import rule from './no-adapter-in-ui.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

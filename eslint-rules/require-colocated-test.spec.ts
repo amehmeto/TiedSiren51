@@ -2,12 +2,10 @@
  * @fileoverview Tests for require-colocated-test rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./require-colocated-test.cjs')
+import rule from './require-colocated-test.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

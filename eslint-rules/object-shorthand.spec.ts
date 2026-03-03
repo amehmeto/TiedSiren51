@@ -2,12 +2,10 @@
  * @fileoverview Tests for object-shorthand rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./object-shorthand.cjs')
+import rule from './object-shorthand.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

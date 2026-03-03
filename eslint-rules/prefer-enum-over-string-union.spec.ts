@@ -2,12 +2,10 @@
  * @fileoverview Tests for prefer-enum-over-string-union rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./prefer-enum-over-string-union.cjs')
+import rule from './prefer-enum-over-string-union.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

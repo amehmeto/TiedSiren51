@@ -2,12 +2,10 @@
  * @fileoverview Tests for require-logger-in-catch rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./require-logger-in-catch.cjs')
+import rule from './require-logger-in-catch.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

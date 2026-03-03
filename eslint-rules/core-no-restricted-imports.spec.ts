@@ -2,12 +2,10 @@
  * @fileoverview Tests for core-no-restricted-imports rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./core-no-restricted-imports.cjs')
+import rule from './core-no-restricted-imports.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

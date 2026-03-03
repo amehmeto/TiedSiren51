@@ -2,12 +2,10 @@
  * @fileoverview Tests for prefer-jump-table rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./prefer-jump-table.cjs')
+import rule from './prefer-jump-table.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

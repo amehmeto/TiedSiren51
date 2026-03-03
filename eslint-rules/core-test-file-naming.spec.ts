@@ -2,12 +2,10 @@
  * @fileoverview Tests for core-test-file-naming rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./core-test-file-naming.cjs')
+import rule from './core-test-file-naming.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

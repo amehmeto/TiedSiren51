@@ -2,12 +2,10 @@
  * @fileoverview Tests for one-listener-per-file rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./one-listener-per-file.cjs')
+import rule from './one-listener-per-file.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

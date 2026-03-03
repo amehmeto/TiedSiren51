@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-inline-import-type rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-inline-import-type.cjs')
+import rule from './no-inline-import-type.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

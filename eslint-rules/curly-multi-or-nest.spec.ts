@@ -2,12 +2,10 @@
  * @fileoverview Tests for curly-multi-or-nest rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./curly-multi-or-nest.cjs')
+import rule from './curly-multi-or-nest.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

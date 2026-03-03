@@ -2,12 +2,10 @@
  * @fileoverview Tests for listener-error-handling rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./listener-error-handling.cjs')
+import rule from './listener-error-handling.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

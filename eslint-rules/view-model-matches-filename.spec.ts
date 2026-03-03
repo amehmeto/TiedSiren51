@@ -2,12 +2,10 @@
  * @fileoverview Tests for view-model-matches-filename rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./view-model-matches-filename.cjs')
+import rule from './view-model-matches-filename.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

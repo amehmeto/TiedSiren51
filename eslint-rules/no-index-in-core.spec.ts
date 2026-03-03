@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-index-in-core rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-index-in-core.cjs')
+import rule from './no-index-in-core.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-enum-value-as-string-literal rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-enum-value-as-string-literal.cjs')
+import rule from './no-enum-value-as-string-literal.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

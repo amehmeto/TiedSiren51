@@ -2,12 +2,10 @@
  * @fileoverview Tests for require-typed-each rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./require-typed-each.cjs')
+import rule from './require-typed-each.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

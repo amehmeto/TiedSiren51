@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-module-level-constants rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-module-level-constants.cjs')
+import rule from './no-module-level-constants.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

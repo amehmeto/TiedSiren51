@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-icon-size-magic-numbers rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-icon-size-magic-numbers.cjs')
+import rule from './no-icon-size-magic-numbers.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

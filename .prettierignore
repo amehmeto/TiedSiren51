@@ -13,7 +13,7 @@ coverage
 *.generated.*
 package-lock.json
 
-# CJS→ESM generated rules (gitignored, created by scripts/generate-esm-rules.sh)
+# Local OxLint rules (not formatted by Prettier)
 eslint-rules/*.js
 oxlint-plugin-local-rules.js
 oxlint-plugin-sonarjs.js

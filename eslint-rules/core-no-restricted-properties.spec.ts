@@ -2,12 +2,10 @@
  * @fileoverview Tests for core-no-restricted-properties rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./core-no-restricted-properties.cjs')
+import rule from './core-no-restricted-properties.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

@@ -2,12 +2,10 @@
  * @fileoverview Tests for lines-between-class-members rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./lines-between-class-members.cjs')
+import rule from './lines-between-class-members.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

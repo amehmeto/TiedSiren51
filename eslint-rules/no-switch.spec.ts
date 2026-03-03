@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-switch rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-switch.cjs')
+import rule from './no-switch.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

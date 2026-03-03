@@ -2,12 +2,10 @@
  * @fileoverview Tests for inline-single-statement-handlers rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./inline-single-statement-handlers.cjs')
+import rule from './inline-single-statement-handlers.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

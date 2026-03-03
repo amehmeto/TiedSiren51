@@ -2,12 +2,10 @@
  * @fileoverview Tests for one-view-model-per-file rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./one-view-model-per-file.cjs')
+import rule from './one-view-model-per-file.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

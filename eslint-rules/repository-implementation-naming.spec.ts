@@ -2,12 +2,10 @@
  * @fileoverview Tests for repository-implementation-naming rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./repository-implementation-naming.cjs')
+import rule from './repository-implementation-naming.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

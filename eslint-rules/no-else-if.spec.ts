@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-else-if rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-else-if.cjs')
+import rule from './no-else-if.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

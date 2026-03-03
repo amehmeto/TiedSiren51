@@ -2,12 +2,10 @@
  * @fileoverview Tests for require-feature-flag-destructuring rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./require-feature-flag-destructuring.cjs')
+import rule from './require-feature-flag-destructuring.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

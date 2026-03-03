@@ -2,12 +2,10 @@
  * @fileoverview Tests for prefer-named-selector rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./prefer-named-selector.cjs')
+import rule from './prefer-named-selector.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

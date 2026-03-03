@@ -46,7 +46,7 @@ We needed to decide which pattern to enforce for consistency across the codebase
 ESLint rule `local-rules/no-selector-prop-drilling` enforces this pattern:
 
 ```javascript
-// .eslintrc.cjs
+// oxlint.json
 'local-rules/no-selector-prop-drilling': [
   'error',
   {
@@ -143,9 +143,9 @@ Let developers choose per situation.
 
 ### Key Files
 
-- `eslint-rules/no-selector-prop-drilling.cjs` - Rule implementation
-- `eslint-rules/no-selector-prop-drilling.spec.cjs` - Test cases
-- `.eslintrc.cjs` - Rule configuration with ignored components
+- `eslint-rules/no-selector-prop-drilling.js` - Rule implementation
+- `eslint-rules/no-selector-prop-drilling.spec.ts` - Test cases
+- `oxlint.json` - Rule configuration with ignored components
 
 ### Migration Example
 

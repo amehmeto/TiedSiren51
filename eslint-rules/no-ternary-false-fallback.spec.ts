@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-ternary-false-fallback rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-ternary-false-fallback.cjs')
+import rule from './no-ternary-false-fallback.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

@@ -2,12 +2,10 @@
  * @fileoverview Tests for prefer-object-destructuring rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./prefer-object-destructuring.cjs')
+import rule from './prefer-object-destructuring.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

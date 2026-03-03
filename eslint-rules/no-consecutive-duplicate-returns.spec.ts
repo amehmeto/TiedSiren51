@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-consecutive-duplicate-returns rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-consecutive-duplicate-returns.cjs')
+import rule from './no-consecutive-duplicate-returns.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

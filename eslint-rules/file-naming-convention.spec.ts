@@ -2,12 +2,10 @@
  * @fileoverview Tests for file-naming-convention rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./file-naming-convention.cjs')
+import rule from './file-naming-convention.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

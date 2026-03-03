@@ -2,12 +2,10 @@
  * @fileoverview Tests for use-data-builders rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./use-data-builders.cjs')
+import rule from './use-data-builders.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

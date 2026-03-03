@@ -2,12 +2,10 @@
  * @fileoverview Tests for infra-must-rethrow rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./infra-must-rethrow.cjs')
+import rule from './infra-must-rethrow.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

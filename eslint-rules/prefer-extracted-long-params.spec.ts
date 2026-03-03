@@ -2,12 +2,10 @@
  * @fileoverview Tests for prefer-extracted-long-params rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./prefer-extracted-long-params.cjs')
+import rule from './prefer-extracted-long-params.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

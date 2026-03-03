@@ -2,12 +2,10 @@
  * @fileoverview Tests for infra-logger-prefix rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./infra-logger-prefix.cjs')
+import rule from './infra-logger-prefix.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

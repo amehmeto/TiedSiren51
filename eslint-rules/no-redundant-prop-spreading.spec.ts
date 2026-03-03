@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-redundant-prop-spreading rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-redundant-prop-spreading.cjs')
+import rule from './no-redundant-prop-spreading.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

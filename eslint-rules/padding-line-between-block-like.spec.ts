@@ -2,12 +2,10 @@
  * @fileoverview Tests for padding-line-between-block-like rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./padding-line-between-block-like.cjs')
+import rule from './padding-line-between-block-like.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

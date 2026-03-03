@@ -40,105 +40,105 @@
 | 192 règles de base | 🟢 TEMPLATE | Import/order, SonarJS, unicorn, React, etc. |
 | 12 plugins externes | 🟢 TEMPLATE | expo, prettier, react, sonarjs, unicorn, vitest... |
 | 13 blocs d'overrides | 🟡 ADAPTABLE | Retirer overrides domaine-spécifiques |
-| `eslint-plugin-local-rules/index.cjs` | 🟢 TEMPLATE | Agrégateur de règles custom |
+| `oxlint-plugin-local-rules.js` | 🟢 TEMPLATE | Agrégateur de règles custom |
 
 ### Règles Custom par Catégorie
 
 #### Architecture (5 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `no-cross-layer-imports` | `eslint-rules/no-cross-layer-imports.cjs` |
-| `no-index-in-core` | `eslint-rules/no-index-in-core.cjs` |
-| `no-adapter-in-ui` | `eslint-rules/no-adapter-in-ui.cjs` |
-| `one-usecase-per-file` | `eslint-rules/one-usecase-per-file.cjs` |
-| `one-listener-per-file` | `eslint-rules/one-listener-per-file.cjs` |
+| `no-cross-layer-imports` | `eslint-rules/no-cross-layer-imports.js` |
+| `no-index-in-core` | `eslint-rules/no-index-in-core.js` |
+| `no-adapter-in-ui` | `eslint-rules/no-adapter-in-ui.js` |
+| `one-usecase-per-file` | `eslint-rules/one-usecase-per-file.js` |
+| `one-listener-per-file` | `eslint-rules/one-listener-per-file.js` |
 
 #### Naming Conventions (13 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `file-naming-convention` | `eslint-rules/file-naming-convention.cjs` |
-| `core-test-file-naming` | `eslint-rules/core-test-file-naming.cjs` |
-| `selector-matches-filename` | `eslint-rules/selector-matches-filename.cjs` |
-| `usecase-matches-filename` | `eslint-rules/usecase-matches-filename.cjs` |
-| `listener-matches-filename` | `eslint-rules/listener-matches-filename.cjs` |
-| `view-model-matches-filename` | `eslint-rules/view-model-matches-filename.cjs` |
-| `builder-matches-filename` | `eslint-rules/builder-matches-filename.cjs` |
-| `fixture-matches-filename` | `eslint-rules/fixture-matches-filename.cjs` |
-| `slice-matches-folder` | `eslint-rules/slice-matches-folder.cjs` |
-| `repository-implementation-naming` | `eslint-rules/repository-implementation-naming.cjs` |
-| `gateway-implementation-naming` | `eslint-rules/gateway-implementation-naming.cjs` |
-| `schema-matches-filename` | `eslint-rules/schema-matches-filename.cjs` |
-| `reducer-in-domain-folder` | `eslint-rules/reducer-in-domain-folder.cjs` |
+| `file-naming-convention` | `eslint-rules/file-naming-convention.js` |
+| `core-test-file-naming` | `eslint-rules/core-test-file-naming.js` |
+| `selector-matches-filename` | `eslint-rules/selector-matches-filename.js` |
+| `usecase-matches-filename` | `eslint-rules/usecase-matches-filename.js` |
+| `listener-matches-filename` | `eslint-rules/listener-matches-filename.js` |
+| `view-model-matches-filename` | `eslint-rules/view-model-matches-filename.js` |
+| `builder-matches-filename` | `eslint-rules/builder-matches-filename.js` |
+| `fixture-matches-filename` | `eslint-rules/fixture-matches-filename.js` |
+| `slice-matches-folder` | `eslint-rules/slice-matches-folder.js` |
+| `repository-implementation-naming` | `eslint-rules/repository-implementation-naming.js` |
+| `gateway-implementation-naming` | `eslint-rules/gateway-implementation-naming.js` |
+| `schema-matches-filename` | `eslint-rules/schema-matches-filename.js` |
+| `reducer-in-domain-folder` | `eslint-rules/reducer-in-domain-folder.js` |
 
 #### SRP & Structure (5 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `one-component-per-file` | `eslint-rules/one-component-per-file.cjs` |
-| `one-selector-per-file` | `eslint-rules/one-selector-per-file.cjs` |
-| `one-view-model-per-file` | `eslint-rules/one-view-model-per-file.cjs` |
-| `no-and-or-in-names` | `eslint-rules/no-and-or-in-names.cjs` |
-| `no-module-level-constants` | `eslint-rules/no-module-level-constants.cjs` |
+| `one-component-per-file` | `eslint-rules/one-component-per-file.js` |
+| `one-selector-per-file` | `eslint-rules/one-selector-per-file.js` |
+| `one-view-model-per-file` | `eslint-rules/one-view-model-per-file.js` |
+| `no-and-or-in-names` | `eslint-rules/no-and-or-in-names.js` |
+| `no-module-level-constants` | `eslint-rules/no-module-level-constants.js` |
 
 #### Infra Error Handling (5 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `infra-must-rethrow` | `eslint-rules/infra-must-rethrow.cjs` |
-| `infra-public-method-try-catch` | `eslint-rules/infra-public-method-try-catch.cjs` |
-| `listener-error-handling` | `eslint-rules/listener-error-handling.cjs` |
-| `no-try-catch-in-core` | `eslint-rules/no-try-catch-in-core.cjs` |
-| `require-logger-in-catch` | `eslint-rules/require-logger-in-catch.cjs` |
-| `infra-logger-prefix` | `eslint-rules/infra-logger-prefix.cjs` |
-| `try-catch-isolation` | `eslint-rules/try-catch-isolation.cjs` |
+| `infra-must-rethrow` | `eslint-rules/infra-must-rethrow.js` |
+| `infra-public-method-try-catch` | `eslint-rules/infra-public-method-try-catch.js` |
+| `listener-error-handling` | `eslint-rules/listener-error-handling.js` |
+| `no-try-catch-in-core` | `eslint-rules/no-try-catch-in-core.js` |
+| `require-logger-in-catch` | `eslint-rules/require-logger-in-catch.js` |
+| `infra-logger-prefix` | `eslint-rules/infra-logger-prefix.js` |
+| `try-catch-isolation` | `eslint-rules/try-catch-isolation.js` |
 
 #### Redux & State (6 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `no-entire-state-selector` | `eslint-rules/no-entire-state-selector.cjs` |
-| `no-usecallback-selector-wrapper` | `eslint-rules/no-usecallback-selector-wrapper.cjs` |
-| `prefer-named-selector` | `eslint-rules/prefer-named-selector.cjs` |
-| `selector-state-first-param` | `eslint-rules/selector-state-first-param.cjs` |
-| `no-selector-prop-drilling` | `eslint-rules/no-selector-prop-drilling.cjs` |
-| `no-enum-value-as-string-literal` | `eslint-rules/no-enum-value-as-string-literal.cjs` |
+| `no-entire-state-selector` | `eslint-rules/no-entire-state-selector.js` |
+| `no-usecallback-selector-wrapper` | `eslint-rules/no-usecallback-selector-wrapper.js` |
+| `prefer-named-selector` | `eslint-rules/prefer-named-selector.js` |
+| `selector-state-first-param` | `eslint-rules/selector-state-first-param.js` |
+| `no-selector-prop-drilling` | `eslint-rules/no-selector-prop-drilling.js` |
+| `no-enum-value-as-string-literal` | `eslint-rules/no-enum-value-as-string-literal.js` |
 
 #### React/JSX (5 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `react-props-destructuring` | `eslint-rules/react-props-destructuring.cjs` |
-| `no-call-expression-in-jsx-props` | `eslint-rules/no-call-expression-in-jsx-props.cjs` |
-| `no-complex-jsx-in-conditionals` | `eslint-rules/no-complex-jsx-in-conditionals.cjs` |
-| `prefer-ternary-jsx` | `eslint-rules/prefer-ternary-jsx.cjs` |
-| `no-icon-size-magic-numbers` | `eslint-rules/no-icon-size-magic-numbers.cjs` |
+| `react-props-destructuring` | `eslint-rules/react-props-destructuring.js` |
+| `no-call-expression-in-jsx-props` | `eslint-rules/no-call-expression-in-jsx-props.js` |
+| `no-complex-jsx-in-conditionals` | `eslint-rules/no-complex-jsx-in-conditionals.js` |
+| `prefer-ternary-jsx` | `eslint-rules/prefer-ternary-jsx.js` |
+| `no-icon-size-magic-numbers` | `eslint-rules/no-icon-size-magic-numbers.js` |
 
 #### Testing (7 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `expect-separate-act-assert` | `eslint-rules/expect-separate-act-assert.cjs` |
-| `require-colocated-test` | `eslint-rules/require-colocated-test.cjs` |
-| `no-data-builders-in-production` | `eslint-rules/no-data-builders-in-production.cjs` |
-| `use-data-builders` | `eslint-rules/use-data-builders.cjs` |
-| `no-new-in-test-body` | `eslint-rules/no-new-in-test-body.cjs` |
-| `no-unused-test-id` | `eslint-rules/no-unused-test-id.cjs` |
-| `no-generic-result-variable` | `eslint-rules/no-generic-result-variable.cjs` |
+| `expect-separate-act-assert` | `eslint-rules/expect-separate-act-assert.js` |
+| `require-colocated-test` | `eslint-rules/require-colocated-test.js` |
+| `no-data-builders-in-production` | `eslint-rules/no-data-builders-in-production.js` |
+| `use-data-builders` | `eslint-rules/use-data-builders.js` |
+| `no-new-in-test-body` | `eslint-rules/no-new-in-test-body.js` |
+| `no-unused-test-id` | `eslint-rules/no-unused-test-id.js` |
+| `no-generic-result-variable` | `eslint-rules/no-generic-result-variable.js` |
 
 #### Code Style & Readability (18 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `prefer-inline-variable` | `eslint-rules/prefer-inline-variable.cjs` |
-| `prefer-array-destructuring` | `eslint-rules/prefer-array-destructuring.cjs` |
-| `prefer-object-destructuring` | `eslint-rules/prefer-object-destructuring.cjs` |
-| `prefer-ternary-return` | `eslint-rules/prefer-ternary-return.cjs` |
-| `prefer-jump-table` | `eslint-rules/prefer-jump-table.cjs` |
-| `prefer-enum-over-string-union` | `eslint-rules/prefer-enum-over-string-union.cjs` |
-| `inline-single-statement-handlers` | `eslint-rules/inline-single-statement-handlers.cjs` |
-| `no-else-if` | `eslint-rules/no-else-if.cjs` |
-| `no-nested-call-expressions` | `eslint-rules/no-nested-call-expressions.cjs` |
-| `no-redundant-nullish-ternary` | `eslint-rules/no-redundant-nullish-ternary.cjs` |
-| `no-consecutive-duplicate-returns` | `eslint-rules/no-consecutive-duplicate-returns.cjs` |
-| `no-complex-inline-arguments` | `eslint-rules/no-complex-inline-arguments.cjs` |
-| `no-stylesheet-magic-numbers` | `eslint-rules/no-stylesheet-magic-numbers.cjs` |
-| `no-i-prefix-in-imports` | `eslint-rules/no-i-prefix-in-imports.cjs` |
-| `require-named-regex` | `eslint-rules/require-named-regex.cjs` |
-| `time-constant-multiplication` | `eslint-rules/time-constant-multiplication.cjs` |
+| `prefer-inline-variable` | `eslint-rules/prefer-inline-variable.js` |
+| `prefer-array-destructuring` | `eslint-rules/prefer-array-destructuring.js` |
+| `prefer-object-destructuring` | `eslint-rules/prefer-object-destructuring.js` |
+| `prefer-ternary-return` | `eslint-rules/prefer-ternary-return.js` |
+| `prefer-jump-table` | `eslint-rules/prefer-jump-table.js` |
+| `prefer-enum-over-string-union` | `eslint-rules/prefer-enum-over-string-union.js` |
+| `inline-single-statement-handlers` | `eslint-rules/inline-single-statement-handlers.js` |
+| `no-else-if` | `eslint-rules/no-else-if.js` |
+| `no-nested-call-expressions` | `eslint-rules/no-nested-call-expressions.js` |
+| `no-redundant-nullish-ternary` | `eslint-rules/no-redundant-nullish-ternary.js` |
+| `no-consecutive-duplicate-returns` | `eslint-rules/no-consecutive-duplicate-returns.js` |
+| `no-complex-inline-arguments` | `eslint-rules/no-complex-inline-arguments.js` |
+| `no-stylesheet-magic-numbers` | `eslint-rules/no-stylesheet-magic-numbers.js` |
+| `no-i-prefix-in-imports` | `eslint-rules/no-i-prefix-in-imports.js` |
+| `require-named-regex` | `eslint-rules/require-named-regex.js` |
+| `time-constant-multiplication` | `eslint-rules/time-constant-multiplication.js` |
 
 **Résumé ESLint : 60 🟢, 4 🟡, 0 🔴**
 

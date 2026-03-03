@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-call-expression-in-jsx-props rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-call-expression-in-jsx-props.cjs')
+import rule from './no-call-expression-in-jsx-props.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

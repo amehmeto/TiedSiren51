@@ -2,12 +2,10 @@
  * @fileoverview Tests for slice-matches-folder rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./slice-matches-folder.cjs')
+import rule from './slice-matches-folder.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

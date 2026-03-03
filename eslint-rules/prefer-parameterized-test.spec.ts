@@ -2,12 +2,10 @@
  * @fileoverview Tests for prefer-parameterized-test rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./prefer-parameterized-test.cjs')
+import rule from './prefer-parameterized-test.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

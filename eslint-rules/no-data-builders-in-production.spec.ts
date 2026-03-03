@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-data-builders-in-production rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-data-builders-in-production.cjs')
+import rule from './no-data-builders-in-production.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

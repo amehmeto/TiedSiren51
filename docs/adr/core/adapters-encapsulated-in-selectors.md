@@ -82,7 +82,7 @@ const blocklists = useSelector((state: RootState) =>
 The `local-rules/no-adapter-in-ui` rule prevents direct adapter usage in UI files:
 
 ```javascript
-// eslint-rules/no-adapter-in-ui.cjs
+// eslint-rules/no-adapter-in-ui.js
 module.exports = {
   meta: {
     type: 'problem',
@@ -132,7 +132,7 @@ module.exports = {
 ## Implementation Notes
 
 ### Key Files
-- `eslint-rules/no-adapter-in-ui.cjs` - ESLint rule
+- `eslint-rules/no-adapter-in-ui.js` - ESLint rule
 - `core/blocklist/selectors/selectBlocklistById.ts` - Single lookup
 - `core/blocklist/selectors/selectBlocklistsByIds.ts` - Batch lookup
 

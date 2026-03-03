@@ -2,12 +2,10 @@
  * @fileoverview Tests for naming-convention-boolean-prefix rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./naming-convention-boolean-prefix.cjs')
+import rule from './naming-convention-boolean-prefix.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

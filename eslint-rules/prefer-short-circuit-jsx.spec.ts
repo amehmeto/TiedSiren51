@@ -2,12 +2,10 @@
  * @fileoverview Tests for prefer-short-circuit-jsx rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./prefer-short-circuit-jsx.cjs')
+import rule from './prefer-short-circuit-jsx.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

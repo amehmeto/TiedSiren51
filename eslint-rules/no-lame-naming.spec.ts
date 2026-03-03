@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-lame-naming rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-lame-naming.cjs')
+import rule from './no-lame-naming.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

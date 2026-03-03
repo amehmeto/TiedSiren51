@@ -2,12 +2,10 @@
  * @fileoverview Tests for one-usecase-per-file rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./one-usecase-per-file.cjs')
+import rule from './one-usecase-per-file.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-and-or-in-names rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-and-or-in-names.cjs')
+import rule from './no-and-or-in-names.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

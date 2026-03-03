@@ -2,12 +2,10 @@
  * @fileoverview Tests for usecase-matches-filename rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./usecase-matches-filename.cjs')
+import rule from './usecase-matches-filename.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

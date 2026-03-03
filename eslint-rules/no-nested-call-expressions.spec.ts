@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-nested-call-expressions rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-nested-call-expressions.cjs')
+import rule from './no-nested-call-expressions.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

@@ -2,12 +2,10 @@
  * @fileoverview Tests for reducer-in-domain-folder rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./reducer-in-domain-folder.cjs')
+import rule from './reducer-in-domain-folder.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

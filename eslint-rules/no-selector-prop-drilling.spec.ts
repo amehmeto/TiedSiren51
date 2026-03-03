@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-selector-prop-drilling rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-selector-prop-drilling.cjs')
+import rule from './no-selector-prop-drilling.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

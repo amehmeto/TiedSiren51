@@ -2,12 +2,10 @@
  * @fileoverview Tests for no-thunk-result-in-component rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./no-thunk-result-in-component.cjs')
+import rule from './no-thunk-result-in-component.js'
 
 const ruleTester = new RuleTester({
   parserOptions: {

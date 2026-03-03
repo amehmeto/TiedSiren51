@@ -2,12 +2,10 @@
  * @fileoverview Tests for prefer-ternary-jsx rule
  */
 
-import { createRequire } from 'module'
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
 
-const require = createRequire(import.meta.url)
-const rule = require('./prefer-ternary-jsx.cjs')
+import rule from './prefer-ternary-jsx.js'
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),
