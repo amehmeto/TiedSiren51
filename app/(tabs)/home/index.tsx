@@ -62,23 +62,18 @@ export default function HomeScreen() {
         />,
       ]
 
-    // oxlint-disable-next-line typescript/no-unnecessary-condition -- exhaustive type guard
-    if (viewModel.type === HomeViewModel.WithBothSessionTypes)
-      return [
-        <SessionsBoard
-          key={0}
-          sessions={viewModel.activeSessions}
-          type={SessionType.ACTIVE}
-        />,
-        <SessionsBoard
-          key={1}
-          sessions={viewModel.scheduledSessions}
-          type={SessionType.SCHEDULED}
-        />,
-      ]
-
-    const _exhaustiveCheck: never = viewModel
-    return _exhaustiveCheck
+    return [
+      <SessionsBoard
+        key={0}
+        sessions={viewModel.activeSessions}
+        type={SessionType.ACTIVE}
+      />,
+      <SessionsBoard
+        key={1}
+        sessions={viewModel.scheduledSessions}
+        type={SessionType.SCHEDULED}
+      />,
+    ]
   })()
 
   return (

@@ -13,9 +13,4 @@ coverage
 *.generated.*
 package-lock.json
 
-# Local OxLint rules (not formatted by Prettier)
-eslint-rules/*.js
-oxlint-plugin-local-rules.js
-oxlint-plugin-sonarjs.js
-oxlint-plugin-react-native.js
 

@@ -101,7 +101,7 @@
     "local-rules/no-module-level-constants": "error",
     "local-rules/require-named-regex": "error",
     "local-rules/prefer-array-destructuring": "error",
-    "local-rules/prefer-inline-variable": "warn",
+    "local-rules/prefer-inline-variable": "error",
     "local-rules/react-props-destructuring": "error",
     "local-rules/no-call-expression-in-jsx-props": "error",
     "local-rules/one-component-per-file": "error",
@@ -217,7 +217,7 @@
   "ignorePatterns": [
     "node_modules",
     "!.claude",
-    "eslint-rules/",
+    "oxlint-rules/",
     "oxlint-plugin-local-rules.js",
     "oxlint-plugin-sonarjs.js",
     "oxlint-plugin-react-native.js",

@@ -22,7 +22,7 @@ export default {
         'core/**/*.ts',
         'infra/**/*.ts',
         'ui/**/*.ts',
-        'eslint-rules/*.js',
+        'oxlint-rules/*.js',
       ],
       exclude: [
         '**/*.test.ts',
@@ -71,7 +71,7 @@ export default {
           functions: 100,
           lines: 100,
         },
-        'eslint-rules/*.js': {
+        'oxlint-rules/*.js': {
           statements: 99,
           branches: 94,
           functions: 100,

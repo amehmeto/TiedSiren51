@@ -46,7 +46,6 @@ describe('onUserLoggedIn listener', () => {
       level: 'error',
       message: 'Error in onUserLoggedIn listener: Error: Dispatch failed',
     }
-    // oxlint-disable-next-line local-rules/core-test-no-restricted-properties -- store.dispatch can't be injected
     vi.spyOn(store, 'dispatch').mockImplementation(() => {
       throw new Error('Dispatch failed')
     })

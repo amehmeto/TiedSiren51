@@ -47,98 +47,98 @@
 #### Architecture (5 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `no-cross-layer-imports` | `eslint-rules/no-cross-layer-imports.js` |
-| `no-index-in-core` | `eslint-rules/no-index-in-core.js` |
-| `no-adapter-in-ui` | `eslint-rules/no-adapter-in-ui.js` |
-| `one-usecase-per-file` | `eslint-rules/one-usecase-per-file.js` |
-| `one-listener-per-file` | `eslint-rules/one-listener-per-file.js` |
+| `no-cross-layer-imports` | `oxlint-rules/no-cross-layer-imports.js` |
+| `no-index-in-core` | `oxlint-rules/no-index-in-core.js` |
+| `no-adapter-in-ui` | `oxlint-rules/no-adapter-in-ui.js` |
+| `one-usecase-per-file` | `oxlint-rules/one-usecase-per-file.js` |
+| `one-listener-per-file` | `oxlint-rules/one-listener-per-file.js` |
 
 #### Naming Conventions (13 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `file-naming-convention` | `eslint-rules/file-naming-convention.js` |
-| `core-test-file-naming` | `eslint-rules/core-test-file-naming.js` |
-| `selector-matches-filename` | `eslint-rules/selector-matches-filename.js` |
-| `usecase-matches-filename` | `eslint-rules/usecase-matches-filename.js` |
-| `listener-matches-filename` | `eslint-rules/listener-matches-filename.js` |
-| `view-model-matches-filename` | `eslint-rules/view-model-matches-filename.js` |
-| `builder-matches-filename` | `eslint-rules/builder-matches-filename.js` |
-| `fixture-matches-filename` | `eslint-rules/fixture-matches-filename.js` |
-| `slice-matches-folder` | `eslint-rules/slice-matches-folder.js` |
-| `repository-implementation-naming` | `eslint-rules/repository-implementation-naming.js` |
-| `gateway-implementation-naming` | `eslint-rules/gateway-implementation-naming.js` |
-| `schema-matches-filename` | `eslint-rules/schema-matches-filename.js` |
-| `reducer-in-domain-folder` | `eslint-rules/reducer-in-domain-folder.js` |
+| `file-naming-convention` | `oxlint-rules/file-naming-convention.js` |
+| `core-test-file-naming` | `oxlint-rules/core-test-file-naming.js` |
+| `selector-matches-filename` | `oxlint-rules/selector-matches-filename.js` |
+| `usecase-matches-filename` | `oxlint-rules/usecase-matches-filename.js` |
+| `listener-matches-filename` | `oxlint-rules/listener-matches-filename.js` |
+| `view-model-matches-filename` | `oxlint-rules/view-model-matches-filename.js` |
+| `builder-matches-filename` | `oxlint-rules/builder-matches-filename.js` |
+| `fixture-matches-filename` | `oxlint-rules/fixture-matches-filename.js` |
+| `slice-matches-folder` | `oxlint-rules/slice-matches-folder.js` |
+| `repository-implementation-naming` | `oxlint-rules/repository-implementation-naming.js` |
+| `gateway-implementation-naming` | `oxlint-rules/gateway-implementation-naming.js` |
+| `schema-matches-filename` | `oxlint-rules/schema-matches-filename.js` |
+| `reducer-in-domain-folder` | `oxlint-rules/reducer-in-domain-folder.js` |
 
 #### SRP & Structure (5 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `one-component-per-file` | `eslint-rules/one-component-per-file.js` |
-| `one-selector-per-file` | `eslint-rules/one-selector-per-file.js` |
-| `one-view-model-per-file` | `eslint-rules/one-view-model-per-file.js` |
-| `no-and-or-in-names` | `eslint-rules/no-and-or-in-names.js` |
-| `no-module-level-constants` | `eslint-rules/no-module-level-constants.js` |
+| `one-component-per-file` | `oxlint-rules/one-component-per-file.js` |
+| `one-selector-per-file` | `oxlint-rules/one-selector-per-file.js` |
+| `one-view-model-per-file` | `oxlint-rules/one-view-model-per-file.js` |
+| `no-and-or-in-names` | `oxlint-rules/no-and-or-in-names.js` |
+| `no-module-level-constants` | `oxlint-rules/no-module-level-constants.js` |
 
 #### Infra Error Handling (5 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `infra-must-rethrow` | `eslint-rules/infra-must-rethrow.js` |
-| `infra-public-method-try-catch` | `eslint-rules/infra-public-method-try-catch.js` |
-| `listener-error-handling` | `eslint-rules/listener-error-handling.js` |
-| `no-try-catch-in-core` | `eslint-rules/no-try-catch-in-core.js` |
-| `require-logger-in-catch` | `eslint-rules/require-logger-in-catch.js` |
-| `infra-logger-prefix` | `eslint-rules/infra-logger-prefix.js` |
-| `try-catch-isolation` | `eslint-rules/try-catch-isolation.js` |
+| `infra-must-rethrow` | `oxlint-rules/infra-must-rethrow.js` |
+| `infra-public-method-try-catch` | `oxlint-rules/infra-public-method-try-catch.js` |
+| `listener-error-handling` | `oxlint-rules/listener-error-handling.js` |
+| `no-try-catch-in-core` | `oxlint-rules/no-try-catch-in-core.js` |
+| `require-logger-in-catch` | `oxlint-rules/require-logger-in-catch.js` |
+| `infra-logger-prefix` | `oxlint-rules/infra-logger-prefix.js` |
+| `try-catch-isolation` | `oxlint-rules/try-catch-isolation.js` |
 
 #### Redux & State (6 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `no-entire-state-selector` | `eslint-rules/no-entire-state-selector.js` |
-| `no-usecallback-selector-wrapper` | `eslint-rules/no-usecallback-selector-wrapper.js` |
-| `prefer-named-selector` | `eslint-rules/prefer-named-selector.js` |
-| `selector-state-first-param` | `eslint-rules/selector-state-first-param.js` |
-| `no-selector-prop-drilling` | `eslint-rules/no-selector-prop-drilling.js` |
-| `no-enum-value-as-string-literal` | `eslint-rules/no-enum-value-as-string-literal.js` |
+| `no-entire-state-selector` | `oxlint-rules/no-entire-state-selector.js` |
+| `no-usecallback-selector-wrapper` | `oxlint-rules/no-usecallback-selector-wrapper.js` |
+| `prefer-named-selector` | `oxlint-rules/prefer-named-selector.js` |
+| `selector-state-first-param` | `oxlint-rules/selector-state-first-param.js` |
+| `no-selector-prop-drilling` | `oxlint-rules/no-selector-prop-drilling.js` |
+| `no-enum-value-as-string-literal` | `oxlint-rules/no-enum-value-as-string-literal.js` |
 
 #### React/JSX (5 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `react-props-destructuring` | `eslint-rules/react-props-destructuring.js` |
-| `no-call-expression-in-jsx-props` | `eslint-rules/no-call-expression-in-jsx-props.js` |
-| `no-complex-jsx-in-conditionals` | `eslint-rules/no-complex-jsx-in-conditionals.js` |
-| `prefer-ternary-jsx` | `eslint-rules/prefer-ternary-jsx.js` |
-| `no-icon-size-magic-numbers` | `eslint-rules/no-icon-size-magic-numbers.js` |
+| `react-props-destructuring` | `oxlint-rules/react-props-destructuring.js` |
+| `no-call-expression-in-jsx-props` | `oxlint-rules/no-call-expression-in-jsx-props.js` |
+| `no-complex-jsx-in-conditionals` | `oxlint-rules/no-complex-jsx-in-conditionals.js` |
+| `prefer-ternary-jsx` | `oxlint-rules/prefer-ternary-jsx.js` |
+| `no-icon-size-magic-numbers` | `oxlint-rules/no-icon-size-magic-numbers.js` |
 
 #### Testing (7 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `expect-separate-act-assert` | `eslint-rules/expect-separate-act-assert.js` |
-| `require-colocated-test` | `eslint-rules/require-colocated-test.js` |
-| `no-data-builders-in-production` | `eslint-rules/no-data-builders-in-production.js` |
-| `use-data-builders` | `eslint-rules/use-data-builders.js` |
-| `no-new-in-test-body` | `eslint-rules/no-new-in-test-body.js` |
-| `no-unused-test-id` | `eslint-rules/no-unused-test-id.js` |
-| `no-generic-result-variable` | `eslint-rules/no-generic-result-variable.js` |
+| `expect-separate-act-assert` | `oxlint-rules/expect-separate-act-assert.js` |
+| `require-colocated-test` | `oxlint-rules/require-colocated-test.js` |
+| `no-data-builders-in-production` | `oxlint-rules/no-data-builders-in-production.js` |
+| `use-data-builders` | `oxlint-rules/use-data-builders.js` |
+| `no-new-in-test-body` | `oxlint-rules/no-new-in-test-body.js` |
+| `no-unused-test-id` | `oxlint-rules/no-unused-test-id.js` |
+| `no-generic-result-variable` | `oxlint-rules/no-generic-result-variable.js` |
 
 #### Code Style & Readability (18 règles) — 🟢 TEMPLATE
 | Règle | Fichier |
 |-------|---------|
-| `prefer-inline-variable` | `eslint-rules/prefer-inline-variable.js` |
-| `prefer-array-destructuring` | `eslint-rules/prefer-array-destructuring.js` |
-| `prefer-object-destructuring` | `eslint-rules/prefer-object-destructuring.js` |
-| `prefer-ternary-return` | `eslint-rules/prefer-ternary-return.js` |
-| `prefer-jump-table` | `eslint-rules/prefer-jump-table.js` |
-| `prefer-enum-over-string-union` | `eslint-rules/prefer-enum-over-string-union.js` |
-| `inline-single-statement-handlers` | `eslint-rules/inline-single-statement-handlers.js` |
-| `no-else-if` | `eslint-rules/no-else-if.js` |
-| `no-nested-call-expressions` | `eslint-rules/no-nested-call-expressions.js` |
-| `no-redundant-nullish-ternary` | `eslint-rules/no-redundant-nullish-ternary.js` |
-| `no-consecutive-duplicate-returns` | `eslint-rules/no-consecutive-duplicate-returns.js` |
-| `no-complex-inline-arguments` | `eslint-rules/no-complex-inline-arguments.js` |
-| `no-stylesheet-magic-numbers` | `eslint-rules/no-stylesheet-magic-numbers.js` |
-| `no-i-prefix-in-imports` | `eslint-rules/no-i-prefix-in-imports.js` |
-| `require-named-regex` | `eslint-rules/require-named-regex.js` |
-| `time-constant-multiplication` | `eslint-rules/time-constant-multiplication.js` |
+| `prefer-inline-variable` | `oxlint-rules/prefer-inline-variable.js` |
+| `prefer-array-destructuring` | `oxlint-rules/prefer-array-destructuring.js` |
+| `prefer-object-destructuring` | `oxlint-rules/prefer-object-destructuring.js` |
+| `prefer-ternary-return` | `oxlint-rules/prefer-ternary-return.js` |
+| `prefer-jump-table` | `oxlint-rules/prefer-jump-table.js` |
+| `prefer-enum-over-string-union` | `oxlint-rules/prefer-enum-over-string-union.js` |
+| `inline-single-statement-handlers` | `oxlint-rules/inline-single-statement-handlers.js` |
+| `no-else-if` | `oxlint-rules/no-else-if.js` |
+| `no-nested-call-expressions` | `oxlint-rules/no-nested-call-expressions.js` |
+| `no-redundant-nullish-ternary` | `oxlint-rules/no-redundant-nullish-ternary.js` |
+| `no-consecutive-duplicate-returns` | `oxlint-rules/no-consecutive-duplicate-returns.js` |
+| `no-complex-inline-arguments` | `oxlint-rules/no-complex-inline-arguments.js` |
+| `no-stylesheet-magic-numbers` | `oxlint-rules/no-stylesheet-magic-numbers.js` |
+| `no-i-prefix-in-imports` | `oxlint-rules/no-i-prefix-in-imports.js` |
+| `require-named-regex` | `oxlint-rules/require-named-regex.js` |
+| `time-constant-multiplication` | `oxlint-rules/time-constant-multiplication.js` |
 
 **Résumé ESLint : 60 🟢, 4 🟡, 0 🔴**
 

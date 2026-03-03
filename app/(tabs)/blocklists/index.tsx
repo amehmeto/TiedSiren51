@@ -20,20 +20,15 @@ export default function BlocklistScreen() {
     if (viewModel.type === BlocklistViewModel.NoBlocklist)
       return <NoBlocklistMessage message={viewModel.message} />
 
-    // oxlint-disable-next-line typescript/no-unnecessary-condition -- exhaustive type guard
-    if (viewModel.type === BlocklistViewModel.WithBlockLists)
-      return (
-        <FlatList
-          data={viewModel.blocklists}
-          keyExtractor={(blocklist) => blocklist.id}
-          renderItem={({ item: blocklist }) => (
-            <BlocklistCard blocklist={blocklist} />
-          )}
-        />
-      )
-
-    const _exhaustiveCheck: never = viewModel
-    return _exhaustiveCheck
+    return (
+      <FlatList
+        data={viewModel.blocklists}
+        keyExtractor={(blocklist) => blocklist.id}
+        renderItem={({ item: blocklist }) => (
+          <BlocklistCard blocklist={blocklist} />
+        )}
+      />
+    )
   })()
 
   return (

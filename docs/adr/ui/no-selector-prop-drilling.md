@@ -143,8 +143,8 @@ Let developers choose per situation.
 
 ### Key Files
 
-- `eslint-rules/no-selector-prop-drilling.js` - Rule implementation
-- `eslint-rules/no-selector-prop-drilling.spec.ts` - Test cases
+- `oxlint-rules/no-selector-prop-drilling.js` - Rule implementation
+- `oxlint-rules/no-selector-prop-drilling.spec.ts` - Test cases
 - `oxlint.json` - Rule configuration with ignored components
 
 ### Migration Example

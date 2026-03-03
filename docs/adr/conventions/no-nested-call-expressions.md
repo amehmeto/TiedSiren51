@@ -120,8 +120,8 @@ const names = users.filter(isActive).map(getName)
 
 ## Implementation
 
-- ESLint rule: `eslint-rules/no-nested-call-expressions.js`
-- Tests: `eslint-rules/no-nested-call-expressions.spec.ts`
+- ESLint rule: `oxlint-rules/no-nested-call-expressions.js`
+- Tests: `oxlint-rules/no-nested-call-expressions.spec.ts`
 
 ## References
 
