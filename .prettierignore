@@ -13,3 +13,9 @@ coverage
 *.generated.*
 package-lock.json
 
+# CJS→ESM generated rules (gitignored, created by scripts/generate-esm-rules.sh)
+eslint-rules/*.js
+oxlint-plugin-local-rules.js
+oxlint-plugin-sonarjs.js
+oxlint-plugin-react-native.js
+
