@@ -4,8 +4,11 @@
 
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
+import { createRequire } from 'node:module'
 
 import rule from './file-naming-convention.js'
+
+const require = createRequire(import.meta.url)
 
 const ruleTester = new RuleTester({
   parser: require.resolve('@typescript-eslint/parser'),

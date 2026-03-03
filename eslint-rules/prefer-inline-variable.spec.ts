@@ -4,8 +4,11 @@
 
 import { RuleTester } from 'eslint'
 import { describe, it } from 'vitest'
+import { createRequire } from 'node:module'
 
 import rule from './prefer-inline-variable.js'
+
+const require = createRequire(import.meta.url)
 
 const ruleTester = new RuleTester({
   parserOptions: {

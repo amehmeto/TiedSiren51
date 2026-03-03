@@ -107,6 +107,7 @@ export default {
 
         // Skip if it's a function parameter
         if (node.parent.type === 'FunctionDeclaration' && node.parent.params.includes(node)) return
+        if (node.parent.type === 'FunctionExpression' && node.parent.params.includes(node)) return
         if (node.parent.type === 'ArrowFunctionExpression' && node.parent.params.includes(node))
           return
 
