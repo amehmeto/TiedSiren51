@@ -1,6 +1,6 @@
 import { useRouter } from 'expo-router'
 import { useState } from 'react'
-import { StyleSheet, Text } from 'react-native'
+import { ScrollView, StyleSheet, Text } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectAllBlocklists } from '@/core/blocklist/selectors/selectAllBlocklists'
@@ -78,20 +78,22 @@ export function BlocklistsModal({
         <Text style={styles.emptyText}>No blocklists available</Text>
       )}
 
-      {blocklists.map((blocklist) => {
-        const isSelected = selectedIds.includes(blocklist.id)
-        return (
-          <BlocklistRow
-            key={blocklist.id}
-            name={blocklist.name}
-            isSelected={isSelected}
-            onToggle={(isNowSelected) =>
-              toggleBlocklist(blocklist.id, isNowSelected)
-            }
-            onNavigate={() => navigateToEditBlocklist(blocklist.id)}
-          />
-        )
-      })}
+      <ScrollView style={styles.list}>
+        {blocklists.map((blocklist) => {
+          const isSelected = selectedIds.includes(blocklist.id)
+          return (
+            <BlocklistRow
+              key={blocklist.id}
+              name={blocklist.name}
+              isSelected={isSelected}
+              onToggle={(isNowSelected) =>
+                toggleBlocklist(blocklist.id, isNowSelected)
+              }
+              onNavigate={() => navigateToEditBlocklist(blocklist.id)}
+            />
+          )
+        })}
+      </ScrollView>
       {blocklists.length === 0 ? (
         <TiedSButton
           style={styles.button}
@@ -111,6 +113,9 @@ export function BlocklistsModal({
 const styles = StyleSheet.create({
   modal: {
     flexDirection: 'column',
+  },
+  list: {
+    flexGrow: 0,
   },
   emptyText: {
     color: T.color.text,
