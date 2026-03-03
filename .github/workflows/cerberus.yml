@@ -189,62 +189,12 @@ jobs:
         id: compare
         run: bash scripts/compare-fingerprint.sh
 
-      - name: Comment on PR when build is skipped
-        if: steps.compare.outputs.native-changed == 'false'
+      - name: Update fingerprint PR comment
         uses: actions/github-script@v7
         with:
           script: |
-            const marker = '<!-- fingerprint-skip-comment -->';
-            const body = [
-              marker,
-              '**Build skipped** — no native changes detected by Expo fingerprint.',
-              '',
-              'Only JS/TS files changed in this PR. The Android APK build was skipped.',
-              'If you believe this is incorrect, push a no-op change to `app.json` or `app.config.ts` to force a rebuild.',
-            ].join('\n');
-
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            const existing = comments.find(c => c.body.includes(marker));
-
-            if (existing) {
-              await github.rest.issues.updateComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-                body,
-              });
-            } else {
-              await github.rest.issues.createComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                issue_number: context.issue.number,
-                body,
-              });
-            }
-
-      - name: Remove stale skip comment when native changes detected
-        if: steps.compare.outputs.native-changed == 'true'
-        uses: actions/github-script@v7
-        with:
-          script: |
-            const marker = '<!-- fingerprint-skip-comment -->';
-            const { data: comments } = await github.rest.issues.listComments({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              issue_number: context.issue.number,
-            });
-            const existing = comments.find(c => c.body.includes(marker));
-            if (existing) {
-              await github.rest.issues.deleteComment({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                comment_id: existing.id,
-              });
-            }
+            const nativeChanged = '${{ steps.compare.outputs.native-changed }}' !== 'false';
+            await require('./scripts/fingerprint-comment.cjs')({ github, context, nativeChanged });
 
   build:
     needs: [test, hecate, fingerprint]
