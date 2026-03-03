@@ -15,6 +15,7 @@ import { SirenTier } from '@/core/_ports_/siren.tier'
 import { SirensRepository } from '@/core/_ports_/sirens.repository'
 import { TimerRepository } from '@/core/_ports_/timer.repository'
 
+// All external dependencies injected into the Redux store via thunk extraArgument
 export type Dependencies = {
   authGateway: AuthGateway
   blockSessionRepository: BlockSessionRepository
