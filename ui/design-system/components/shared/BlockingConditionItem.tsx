@@ -1,5 +1,5 @@
 import { Ionicons } from '@expo/vector-icons'
-import { View, Text, Pressable, StyleSheet } from 'react-native'
+import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { BlockingCondition } from '@/ui/design-system/components/shared/BlockingConditionModal'
 import { T } from '@/ui/design-system/theme'
 

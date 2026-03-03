@@ -6,9 +6,9 @@ import { createTestStore } from '@/core/_tests_/createTestStore'
 import { stateBuilder } from '@/core/_tests_/state-builder'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
 import {
-  selectStrictModeViewModel,
   StrictModeViewModel,
   StrictModeViewState,
+  selectStrictModeViewModel,
 } from './strict-mode.view-model'
 
 const NOW = new Date(2024, 0, 1, 10, 0, 0, 0)

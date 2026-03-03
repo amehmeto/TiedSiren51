@@ -1,4 +1,4 @@
-import { beforeEach, describe, it, expect } from 'vitest'
+import { beforeEach, describe, expect, it } from 'vitest'
 import { buildBlocklist } from '../../_tests_/data-builders/blocklist.builder'
 import { blocklistFixture } from './blocklist.fixture'
 

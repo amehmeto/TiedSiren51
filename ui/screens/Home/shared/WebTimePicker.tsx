@@ -1,6 +1,6 @@
 import React from 'react'
 import { StyleSheet, View } from 'react-native'
-import { assertHHmmString, HHmmString } from '@/core/_ports_/date-provider'
+import { HHmmString, assertHHmmString } from '@/core/_ports_/date-provider'
 
 type WebTimePickerFields = {
   chosenTime: HHmmString

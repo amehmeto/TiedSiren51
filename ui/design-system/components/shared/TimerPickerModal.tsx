@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { Text, StyleSheet, ScrollView } from 'react-native'
+import { ScrollView, StyleSheet, Text } from 'react-native'
 import { dependencies } from '@/ui/dependencies'
 import { T } from '@/ui/design-system/theme'
 import { formatEndFromOffsets } from '@/ui/utils/timeFormat'

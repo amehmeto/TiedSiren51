@@ -1,7 +1,7 @@
 import WheelPicker from '@quidone/react-native-wheel-picker'
 import WheelPickerFeedback from '@quidone/react-native-wheel-picker-feedback'
 import React from 'react'
-import { View, Text, StyleSheet } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
 type PickerValue = {

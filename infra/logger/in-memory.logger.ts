@@ -1,4 +1,4 @@
-import { Logger, LogEntry, LogLevel } from '@/core/_ports_/logger'
+import { LogEntry, LogLevel, Logger } from '@/core/_ports_/logger'
 
 export class InMemoryLogger implements Logger {
   private logs: LogEntry[] = []

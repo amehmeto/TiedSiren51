@@ -1,6 +1,6 @@
 import { Ionicons } from '@expo/vector-icons'
 import React from 'react'
-import { Text, StyleSheet, View } from 'react-native'
+import { StyleSheet, Text, View } from 'react-native'
 import { TiedSCard } from '@ui/design-system/components/shared/TiedSCard'
 import { T } from '@ui/design-system/theme'
 

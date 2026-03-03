@@ -2,8 +2,8 @@ import { beforeEach, describe, expect, test } from 'vitest'
 import { HOUR, MINUTE } from '@/core/__constants__/time'
 import { createTestStore } from '@/core/_tests_/createTestStore'
 import {
-  instagramAndroidSiren,
   facebookAndroidSiren,
+  instagramAndroidSiren,
 } from '@/core/_tests_/data-builders/android-siren.builder'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import { buildBlocklist } from '@/core/_tests_/data-builders/blocklist.builder'

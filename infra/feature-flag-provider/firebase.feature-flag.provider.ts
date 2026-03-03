@@ -1,9 +1,9 @@
 import { getApp, getApps, initializeApp } from 'firebase/app'
 import {
+  RemoteConfig,
   fetchAndActivate,
   getRemoteConfig,
   getValue,
-  RemoteConfig,
 } from 'firebase/remote-config'
 import { FeatureFlagProvider } from '@/core/_ports_/feature-flag.provider'
 import { Logger } from '@/core/_ports_/logger'

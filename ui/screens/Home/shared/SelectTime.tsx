@@ -1,7 +1,7 @@
 import React, { useCallback, useRef } from 'react'
 import { Pressable, StyleSheet, Text, View } from 'react-native'
 import { useDispatch, useSelector } from 'react-redux'
-import { assertHHmmString, HHmmString } from '@/core/_ports_/date-provider'
+import { HHmmString, assertHHmmString } from '@/core/_ports_/date-provider'
 import { AppDispatch, RootState } from '@/core/_redux_/createStore'
 import { selectIsStrictModeActive } from '@/core/strict-mode/selectors/selectIsStrictModeActive'
 import {

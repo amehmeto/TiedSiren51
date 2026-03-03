@@ -1,7 +1,7 @@
 import { listInstalledApps } from '@amehmeto/expo-list-installed-apps'
 import {
-  InstalledApp,
   AppType,
+  InstalledApp,
 } from '@amehmeto/expo-list-installed-apps/build/ExpoListInstalledApps.types'
 import { InstalledAppRepository } from '@/core/_ports_/installed-app.repository'
 import { Logger } from '@/core/_ports_/logger'

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { extractOobCode, FirebaseDeepLinkMode } from './extract-oob-code.helper'
+import { FirebaseDeepLinkMode, extractOobCode } from './extract-oob-code.helper'
 
 const { VerifyEmail, ResetPassword } = FirebaseDeepLinkMode
 

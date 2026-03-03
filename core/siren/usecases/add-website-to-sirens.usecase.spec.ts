@@ -1,4 +1,4 @@
-import { describe, it, beforeEach } from 'vitest'
+import { beforeEach, describe, it } from 'vitest'
 import { buildSirens } from '../../_tests_/data-builders/sirens.builder'
 import { sirensFixture } from './sirens.fixture'
 

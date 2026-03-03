@@ -5,8 +5,8 @@ import { HHmmString } from '@/core/_ports_/date-provider'
 import { UpdatePayload } from '@/core/_ports_/update.payload'
 import { buildBlockSession } from '@/core/_tests_/data-builders/block-session.builder'
 import {
-  BlockingConditions,
   BlockSession,
+  BlockingConditions,
 } from '@/core/block-session/block-session'
 import { InMemoryRepository } from '@/infra/__abstract__/in-memory.repository'
 

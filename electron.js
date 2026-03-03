@@ -1,4 +1,3 @@
-// eslint-disable-next-line @typescript-eslint/no-var-requires, no-undef
 const { app, BrowserWindow } = require('electron')
 
 const createWindow = () => {
@@ -13,8 +12,6 @@ const createWindow = () => {
   win.loadURL('http://localhost:19006')
 
   win.on('closed', () => {
-    // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-    // @ts-expect-error
     win = null
   })
 }

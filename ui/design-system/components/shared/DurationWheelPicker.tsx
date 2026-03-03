@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react'
-import { View, StyleSheet } from 'react-native'
+import { StyleSheet, View } from 'react-native'
 import { TimerDuration } from '@/ui/design-system/components/shared/TimerPickerModal'
 import { WheelColumn } from '@/ui/design-system/components/shared/WheelColumn'
 import { T } from '@/ui/design-system/theme'

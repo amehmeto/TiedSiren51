@@ -1,11 +1,11 @@
 import { z } from 'zod'
 import {
-  forgotPasswordSchema,
-  signInSchema,
-  signUpSchema,
   ForgotPasswordInput,
   SignInInput,
   SignUpInput,
+  forgotPasswordSchema,
+  signInSchema,
+  signUpSchema,
 } from './auth.schema'
 
 type ValidationFailure = { errorMessage: string; data?: never }

@@ -26,7 +26,7 @@ Components from this codebase that can be extracted for any new project.
 |---------|------|-------|
 | **Time Utils** | `core/__utils__/time.utils.ts` | Formatting, calculations |
 | **Time Constants** | `core/__constants__/time.ts` | SECOND, MINUTE, HOUR, DAY |
-| **Exhaustive Guard** | `core/__utils__/exhaustive-guard.ts` | TypeScript switch safety |
+| **Exhaustive Guard** | Inline `const _exhaustiveCheck: never = x` | TypeScript exhaustive check |
 
 ## Redux Patterns
 
