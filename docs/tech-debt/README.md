@@ -1,7 +1,7 @@
 # Technical Debt & Future Improvements
 
 > Created: January 28, 2025
-> Last Updated: February 20, 2026
+> Last Updated: February 27, 2026
 > Status: Living document
 > Purpose: Track planned improvements across the codebase
 
@@ -12,14 +12,14 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ## Active Technical Debt Items
 
 ### Infrastructure & Database
-- [Expo SDK 54 Upgrade](expo-sdk-54-upgrade.md) - 🔴 **BLOCKED** - Prisma incompatible with New Architecture (estimated H2 2025 fix is overdue — check [prisma-react-native#58](https://github.com/nicksrandall/prisma-react-native/issues/58) for updates)
+- [Expo SDK 55 Post-Upgrade](expo-sdk-55-post-upgrade.md) - ⚠️ **MEDIUM PRIORITY** - Metro package exports disabled, Firebase indexedDB guard, Firebase Auth missing RN types
 - [Error Handling Enhancement](error-handling.md) - 🚨 **HIGH PRIORITY** - Custom error types needed
 - [Database Configuration](database-configuration.md) - 📋 **LOW PRIORITY** - Configurable paths
 - [Migration Strategy](migration-strategy.md) - ⚠️ **MEDIUM PRIORITY** - Critical for app updates
 - [Performance Optimization](performance-optimization.md) - 📊 **LOW PRIORITY** - Monitor and optimize
 
 ### Testing
-- [Testing Coverage](testing-coverage.md) - ⚠️ **MEDIUM PRIORITY** - Integration tests and Prisma test fixes
+- [Testing Coverage](testing-coverage.md) - ⚠️ **MEDIUM PRIORITY** - Integration tests
 
 ### UI/UX
 - [Android Time Picker Styling](android-time-picker-styling.md) - 📋 **LOW PRIORITY** - Border radius not supported on Android
@@ -30,6 +30,7 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 
 ## Archived Items
 
+- [Expo SDK 54 Upgrade](expo-sdk-54-upgrade.md) - ✅ **COMPLETED** - Prisma blocker resolved by migrating to PowerSync; SDK 51 → 55 upgrade completed (PR #405)
 - [Native Siren Filtering](native-siren-filtering.md) - ✅ **COMPLETED** - Superseded by native AccessibilityService blocking path
 
 
@@ -44,7 +45,7 @@ This directory tracks technical debt and planned improvements for TiedSiren51. E
 ## Trigger Points
 
 When to revisit these improvements:
-- **SDK 54 Upgrade**: When @prisma/react-native releases New Architecture support (H2 2025 estimate is overdue — revisit quarterly)
+- **Metro Package Exports**: Re-evaluate `unstable_enablePackageExports` after firebase/PowerSync updates
 - **Error Handling**: When seeing first error reports from users
 - **Migration Strategy**: Before first app update with schema changes
 - **Testing**: When reaching 1000 active users

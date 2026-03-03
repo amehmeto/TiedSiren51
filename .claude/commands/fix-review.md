@@ -43,6 +43,7 @@ Fix all pending review comments on PR #$ARGUMENTS.
    - **Always prefix replies with `🤖 Claude's answer:` ** so they're distinguishable from the repo owner's own comments
    - For each comment you fixed: reply with a concise summary of what you changed (e.g., "🤖 Claude's answer: Fixed — extracted to variable")
    - For questions from the reviewer: reply with a direct answer to their question
+   - **When making a claim** (e.g., "this library requires X", "this file is needed because Y"), **always back it up with authority sources** — link to official documentation, GitHub issues, or relevant RFCs. Never state technical claims without evidence.
    - Reply in-thread using the wrapper script:
      ```bash
      ./scripts/reply-pr-comment.sh $ARGUMENTS COMMENT_ID "🤖 Claude's answer: Your reply"
