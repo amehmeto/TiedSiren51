@@ -32,8 +32,8 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
   useEmailVerificationDeepLink()
 
   useEffect(() => {
-    if (isInitializing || error) return
-    router.replace(isAuthenticated ? '/home' : '/register')
+    if (isInitializing) return
+    if (!error) router.replace(isAuthenticated ? '/home' : '/register')
     SplashScreen.hideAsync()
   }, [isInitializing, isAuthenticated, error, router])
 
