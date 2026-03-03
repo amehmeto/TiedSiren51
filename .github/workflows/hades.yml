@@ -156,9 +156,7 @@ jobs:
         run: npm ci
 
       - name: Generate fingerprint
-        run: |
-          mkdir -p /tmp/base-fingerprint
-          npx @expo/fingerprint fingerprint:generate --platform android > /tmp/base-fingerprint/fingerprint.json
+        run: bash scripts/generate-fingerprint.sh
 
       - name: Save fingerprint to cache
         uses: actions/cache/save@v4
