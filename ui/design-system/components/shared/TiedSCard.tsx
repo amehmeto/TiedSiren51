@@ -1,6 +1,12 @@
 import { BlurView } from 'expo-blur'
-import React from 'react'
-import { Platform, StyleProp, StyleSheet, ViewStyle } from 'react-native'
+import React, { useEffect } from 'react'
+import {
+  Platform,
+  StyleProp,
+  StyleSheet,
+  ViewStyle,
+  findNodeHandle,
+} from 'react-native'
 import { useBlurTarget } from '@/ui/design-system/contexts/BlurTargetContext'
 import { T } from '@/ui/design-system/theme'
 
@@ -15,6 +21,18 @@ const isAndroid = Platform.OS === 'android'
 
 export function TiedSCard({ children, style }: TiedSCardProps) {
   const blurTarget = useBlurTarget()
+
+  useEffect(() => {
+    const node = blurTarget?.current
+    const handle = findNodeHandle(node ?? null)
+    // eslint-disable-next-line no-console
+    console.log('[TiedSCard] blurTarget debug:', {
+      hasRef: blurTarget !== null,
+      hasCurrent: node !== null,
+      nodeHandle: handle,
+      isAndroid,
+    })
+  }, [blurTarget])
 
   return (
     <BlurView
