@@ -13,11 +13,12 @@ source "$SCRIPT_DIR/lib/colors.sh"
 GITHUB_OUTPUT="${GITHUB_OUTPUT:-/dev/null}"
 BASE_FINGERPRINT="/tmp/base-fingerprint/fingerprint.json"
 
-# Generate PR fingerprint
+# Generate PR fingerprint (write to file to avoid ARG_MAX limits with large JSON)
 print_info "Generating fingerprint for current branch..."
-PR_FINGERPRINT=$(npx @expo/fingerprint fingerprint:generate --platform android)
+PR_FINGERPRINT_FILE=$(mktemp)
+npx @expo/fingerprint fingerprint:generate --platform android > "$PR_FINGERPRINT_FILE"
 
-PR_HASH=$(node -p "JSON.parse(process.argv[1]).hash" "$PR_FINGERPRINT")
+PR_HASH=$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')).hash" "$PR_FINGERPRINT_FILE")
 print_info "PR fingerprint hash: $PR_HASH"
 
 # Check if base fingerprint exists
@@ -27,7 +28,7 @@ if [ ! -f "$BASE_FINGERPRINT" ]; then
   exit 0
 fi
 
-BASE_HASH=$(node -p "JSON.parse(require('fs').readFileSync('$BASE_FINGERPRINT','utf8')).hash")
+BASE_HASH=$(node -p "JSON.parse(require('fs').readFileSync(process.argv[1],'utf8')).hash" "$BASE_FINGERPRINT")
 print_info "Base fingerprint hash: $BASE_HASH"
 
 if [ "$PR_HASH" = "$BASE_HASH" ]; then

@@ -36,4 +36,6 @@ oxlint-rules/**/*
 
 # Test / build tool configs
 vitest.config.*
+# tsconfig changes don't affect native builds (metro has its own resolution);
+# if paths/baseUrl ever impacts prebuild, remove this line.
 tsconfig.json

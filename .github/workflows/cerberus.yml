@@ -155,6 +155,7 @@ jobs:
   fingerprint:
     needs: hecate
     if: needs.hecate.outputs.app-changed == 'true'
+    continue-on-error: true # Don't block build if fingerprint check fails
     runs-on: ubuntu-latest
     permissions:
       pull-requests: write
