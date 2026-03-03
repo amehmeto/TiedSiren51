@@ -150,11 +150,108 @@ jobs:
             const compareAndComment = require('./scripts/compare-coverage.cjs');
             await compareAndComment({ github, context });
 
+  # Compare Expo fingerprint against cached main baseline to detect native changes
+  # Runs in parallel with test; build is skipped when only JS/TS changed
+  fingerprint:
+    needs: hecate
+    if: needs.hecate.outputs.app-changed == 'true'
+    runs-on: ubuntu-latest
+    permissions:
+      pull-requests: write
+    outputs:
+      native-changed: ${{ steps.compare.outputs.native-changed }}
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+
+      - name: Install npm 11
+        run: npm install -g npm@11
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Restore base fingerprint from cache
+        id: cache-fingerprint
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/base-fingerprint/fingerprint.json
+          key: fingerprint-main-${{ github.event.pull_request.base.sha }}
+          restore-keys: |
+            fingerprint-main-
+
+      - name: Compare fingerprints
+        id: compare
+        run: bash scripts/compare-fingerprint.sh
+
+      - name: Comment on PR when build is skipped
+        if: steps.compare.outputs.native-changed == 'false'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- fingerprint-skip-comment -->';
+            const body = [
+              marker,
+              '**Build skipped** — no native changes detected by Expo fingerprint.',
+              '',
+              'Only JS/TS files changed in this PR. The Android APK build was skipped.',
+              'If you believe this is incorrect, push a no-op change to `app.json` or `app.config.ts` to force a rebuild.',
+            ].join('\n');
+
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: context.issue.number,
+                body,
+              });
+            }
+
+      - name: Remove stale skip comment when native changes detected
+        if: steps.compare.outputs.native-changed == 'true'
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const marker = '<!-- fingerprint-skip-comment -->';
+            const { data: comments } = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: context.issue.number,
+            });
+            const existing = comments.find(c => c.body.includes(marker));
+            if (existing) {
+              await github.rest.issues.deleteComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+              });
+            }
+
   build:
-    needs: [test, hecate]
-    # Only build if: tests passed, not a draft PR, AND (this push contains app changes OR PR was just marked ready with app changes)
+    needs: [test, hecate, fingerprint]
+    # Only build if: tests passed, not a draft PR, native changes detected,
+    # AND (this push contains app changes OR PR was just marked ready with app changes)
     if: >-
       needs.test.result == 'success'
+      && needs.fingerprint.outputs.native-changed != 'false'
       && github.event.pull_request.draft == false
       && (needs.hecate.outputs.app-changed-this-push == 'true'
           || (github.event.action == 'ready_for_review'
