@@ -43,9 +43,12 @@ vi.mock('@react-native-google-signin/google-signin', () => ({
     configure: vi.fn(),
     hasPlayServices: vi.fn(),
     signIn: vi.fn(),
-    isSignedIn: vi.fn().mockResolvedValue(false),
-    signOut: vi.fn().mockResolvedValue(undefined),
+    getCurrentUser: vi.fn().mockReturnValue(null),
+    signOut: vi.fn().mockResolvedValue(null),
   },
+  isSuccessResponse: vi.fn(
+    (response: { type: string }) => response.type === 'success',
+  ),
 }))
 
 vi.mock('@react-native-async-storage/async-storage', () => ({
@@ -67,7 +70,7 @@ describe('FirebaseAuthGateway - Error Translation', () => {
   beforeEach(() => {
     vi.clearAllMocks()
     vi.mocked(firebaseAuth.signOut).mockResolvedValue(undefined)
-    vi.mocked(GoogleSignin.isSignedIn).mockResolvedValue(false)
+    vi.mocked(GoogleSignin.getCurrentUser).mockReturnValue(null)
     vi.mocked(GoogleSignin.signOut).mockResolvedValue(null)
     const logger = new InMemoryLogger()
     gateway = new FirebaseAuthGateway(logger)
@@ -221,17 +224,29 @@ describe('FirebaseAuthGateway - Error Translation', () => {
 
   describe('logOut', () => {
     it('signs out of Google before Firebase when Google session exists', async () => {
-      vi.mocked(GoogleSignin.isSignedIn).mockResolvedValue(true)
+      vi.mocked(GoogleSignin.getCurrentUser).mockReturnValue({
+        user: {
+          id: '1',
+          name: 'Test',
+          email: 'test@test.com',
+          photo: null,
+          familyName: null,
+          givenName: null,
+        },
+        scopes: [],
+        idToken: null,
+        serverAuthCode: null,
+      })
 
       await gateway.logOut()
 
-      expect(GoogleSignin.isSignedIn).toHaveBeenCalledTimes(1)
+      expect(GoogleSignin.getCurrentUser).toHaveBeenCalledTimes(1)
       expect(GoogleSignin.signOut).toHaveBeenCalledTimes(1)
       expect(firebaseAuth.signOut).toHaveBeenCalledTimes(1)
     })
 
     it('skips Google sign out when no Google session exists', async () => {
-      vi.mocked(GoogleSignin.isSignedIn).mockResolvedValue(false)
+      vi.mocked(GoogleSignin.getCurrentUser).mockReturnValue(null)
 
       await gateway.logOut()
 

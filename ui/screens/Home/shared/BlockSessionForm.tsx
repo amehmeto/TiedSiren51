@@ -83,7 +83,7 @@ export function BlockSessionForm({ mode, ...rest }: BlockSessionFormProps) {
       if (mode === 'edit') dispatch(updateBlockSession(blockSessionPayload))
       else dispatch(createBlockSession(blockSessionPayload))
 
-      router.push('/(tabs)')
+      router.push('/home')
     }
   }
 

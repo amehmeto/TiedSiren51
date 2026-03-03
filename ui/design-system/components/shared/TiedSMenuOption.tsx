@@ -1,29 +1,29 @@
 import { Ionicons } from '@expo/vector-icons'
-import { StyleSheet, Text } from 'react-native'
-import { MenuOption } from 'react-native-popup-menu'
+import { Pressable, StyleSheet, Text } from 'react-native'
 import { TiedSMenu } from '@/ui/design-system/components/shared/ThreeDotMenu'
 import { T } from '@/ui/design-system/theme'
 
 type TiedSMenuOptionOwnProps = {
   option: TiedSMenu
+  onSelect: (name: string) => void
 }
 
 type TiedSMenuOptionProps = Readonly<TiedSMenuOptionOwnProps>
 
-export function TiedSMenuOption({ option }: TiedSMenuOptionProps) {
+export function TiedSMenuOption({ option, onSelect }: TiedSMenuOptionProps) {
   const { name, iconName, isDisabled = false } = option
   const enabledColor = isDisabled ? T.color.textMuted : T.color.text
 
   return (
-    <MenuOption
-      value={name}
+    <Pressable
+      onPress={() => onSelect(name)}
       style={[styles.menuOption, isDisabled && styles.menuOptionDisabled]}
     >
       <Text style={[styles.menuOptionText, { color: enabledColor }]}>
         {name}
       </Text>
       <Ionicons name={iconName} size={T.icon.size.large} color={enabledColor} />
-    </MenuOption>
+    </Pressable>
   )
 }
 

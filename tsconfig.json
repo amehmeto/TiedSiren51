@@ -22,8 +22,7 @@
       "@infra/*": ["infra/*"],
       "@ui/*": ["ui/*"],
       "@app/*": ["app/*"],
-      "@assets/*": ["assets/*"],
-      "@firebase/auth": ["./node_modules/@firebase/auth/dist/index.rn.d.ts"]
+      "@assets/*": ["assets/*"]
     },
     "typeRoots": ["./node_modules/@types"]
   },

@@ -1,9 +1,9 @@
 import { FontAwesome6, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Image, Pressable, StyleSheet, Text } from 'react-native'
-import { CheckBox } from 'react-native-elements'
 import { AndroidSiren, SirenType } from '@/core/siren/sirens'
 import { TiedSCard } from '@/ui/design-system/components/shared/TiedSCard'
 import { T } from '@/ui/design-system/theme'
+import { CheckboxIndicator } from '@/ui/screens/Blocklists/CheckboxIndicator'
 import { LockIcon } from '@/ui/screens/Blocklists/LockIcon'
 
 function isAndroidSiren(
@@ -81,11 +81,8 @@ export function SelectableSirenCard({
         {isLocked ? (
           <LockIcon testID={`${baseTestId}-lock`} />
         ) : (
-          <CheckBox
-            style={styles.checkbox}
-            containerStyle={styles.checkboxContainer}
-            checked={isSelected}
-            checkedColor={T.color.lightBlue}
+          <CheckboxIndicator
+            isSelected={isSelected}
             onPress={onPress}
             testID={`${baseTestId}-checkbox`}
           />
@@ -101,14 +98,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     padding: T.spacing.smallMedium,
     minHeight: T.height.settingsRow,
-  },
-  checkbox: {
-    alignItems: 'flex-end',
-  },
-  checkboxContainer: {
-    padding: T.spacing.none,
-    margin: T.spacing.none,
-    backgroundColor: T.color.transparent,
   },
   appName: {
     color: T.color.text,

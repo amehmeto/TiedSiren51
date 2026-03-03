@@ -88,6 +88,8 @@ module.exports = {
       return false
     }
 
+    const PRESENTATIONAL_PROPS = new Set(['style', 'className'])
+
     function countDynamicProps(openingElement) {
       let count = 0
       for (const attr of openingElement.attributes) {
@@ -97,13 +99,31 @@ module.exports = {
           continue
         }
 
-        if (attr.type === 'JSXAttribute' && isDynamicValue(attr.value)) count++
+        if (attr.type !== 'JSXAttribute') continue
+
+        // Style/className props are purely presentational and don't indicate
+        // a component should be extracted, regardless of complexity
+        const propName = attr.name?.name
+        if (typeof propName === 'string' && PRESENTATIONAL_PROPS.has(propName))
+          continue
+
+        if (isDynamicValue(attr.value)) count++
       }
       return count
     }
 
     function getLineSpan(node) {
       return node.loc.end.line - node.loc.start.line + 1
+    }
+
+    function hasOnlyPresentationalProps(openingElement) {
+      if (openingElement.attributes.length === 0) return false
+      return openingElement.attributes.every(
+        (attr) =>
+          attr.type === 'JSXAttribute' &&
+          typeof attr.name?.name === 'string' &&
+          PRESENTATIONAL_PROPS.has(attr.name.name),
+      )
     }
 
     function isInsideComponentFunction(node) {
@@ -153,6 +173,11 @@ module.exports = {
 
         const lineCount = getLineSpan(node.openingElement)
         if (lineCount < maxLines) return
+
+        // Skip elements whose only props are presentational (style, className).
+        // A verbose style array inflates line count but doesn't mean the
+        // component is boilerplate worth extracting.
+        if (hasOnlyPresentationalProps(node.openingElement)) return
 
         const dynamicCount = countDynamicProps(node.openingElement)
         if (dynamicCount > maxDynamicProps) return

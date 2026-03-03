@@ -1,4 +1,4 @@
-import { StyleProp, StyleSheet, Text, ViewStyle } from 'react-native'
+import { type TextStyle, StyleProp, StyleSheet, Text } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 
 export enum TiedSTextLinkVariant {
@@ -10,7 +10,7 @@ type TiedSTextLinkOwnProps = {
   text: string
   onPress: () => void
   variant?: TiedSTextLinkVariant
-  style?: StyleProp<ViewStyle>
+  style?: StyleProp<TextStyle>
 }
 
 type TiedSTextLinkProps = Readonly<TiedSTextLinkOwnProps>

@@ -1,12 +1,14 @@
 import { Ionicons } from '@expo/vector-icons'
-import { useMemo } from 'react'
+import { useCallback, useMemo, useRef, useState } from 'react'
 import {
+  Modal,
+  Pressable,
   StyleProp,
   StyleSheet,
   useWindowDimensions,
+  View,
   ViewStyle,
 } from 'react-native'
-import { Menu, MenuOptions, MenuTrigger } from 'react-native-popup-menu'
 import { useDispatch } from 'react-redux'
 import { AppDispatch } from '@/core/_redux_/createStore'
 import { showToast } from '@/core/toast/toast.slice'
@@ -35,9 +37,20 @@ type ThreeDotMenuOwnProps = {
 
 type ThreeDotMenuProps = Readonly<ThreeDotMenuOwnProps>
 
+type MenuPosition = {
+  top: number
+  right: number
+}
+
 export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
+  const [isVisible, setIsVisible] = useState(false)
+  const [menuPosition, setMenuPosition] = useState<MenuPosition>({
+    top: 0,
+    right: 0,
+  })
   const { width: windowWidth } = useWindowDimensions()
   const dispatch = useDispatch<AppDispatch>()
+  const triggerRef = useRef<View>(null)
 
   const menuWidth = useMemo(() => {
     const fortyPercent = windowWidth * 0.4
@@ -48,66 +61,82 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
     return Math.min(lowerBound, seventyPercent)
   }, [windowWidth])
 
-  const selectMenuOption = (optionName: TiedSMenu['name']) => {
-    const selectedOption = menuOptions.find(
-      (option) => option.name === optionName,
-    )
-    if (!selectedOption) throw new Error('Invalid menu option')
+  const openMenu = useCallback(() => {
+    triggerRef.current?.measureInWindow((x, y, width, height) => {
+      setMenuPosition({
+        top: y + height,
+        right: windowWidth - (x + width),
+      })
+      setIsVisible(true)
+    })
+  }, [windowWidth])
 
-    if (selectedOption.isDisabled) {
-      const message =
-        selectedOption.disabledMessage ?? 'This action is currently disabled'
-      dispatch(showToast(message))
-      return
-    }
+  const closeMenu = useCallback(() => setIsVisible(false), [])
 
-    selectedOption.action()
-  }
+  const selectMenuOption = useCallback(
+    (optionName: TiedSMenu['name']) => {
+      const selectedOption = menuOptions.find(
+        (option) => option.name === optionName,
+      )
+      if (!selectedOption) throw new Error('Invalid menu option')
 
-  const dynamicStyles = useMemo(
-    () => ({
-      menuOption: {
-        display: 'flex',
-        flexDirection: 'row',
-        justifyContent: 'space-between',
-        alignItems: 'center',
-        width: menuWidth - T.spacing.medium * 2,
-        padding: T.spacing.small,
-        backgroundColor: T.color.transparent,
-      },
-      optionsContainer: {
-        backgroundColor: T.color.transparent,
-        borderRadius: T.border.radius.roundedSmall,
-        width: menuWidth,
-        marginTop: T.spacing.medium + 5,
-        marginLeft: T.spacing.medium,
-        padding: T.spacing.small,
-      },
-    }),
-    [menuWidth],
+      if (selectedOption.isDisabled) {
+        const message =
+          selectedOption.disabledMessage ?? 'This action is currently disabled'
+        dispatch(showToast(message))
+        setIsVisible(false)
+        return
+      }
+
+      setIsVisible(false)
+      selectedOption.action()
+    },
+    [menuOptions, dispatch],
   )
 
   return (
-    <Menu onSelect={selectMenuOption} style={style}>
-      <MenuTrigger style={styles.menuTrigger}>
+    <>
+      <Pressable
+        ref={triggerRef}
+        onPress={openMenu}
+        style={[styles.menuTrigger, style]}
+      >
         <Ionicons
           name={'ellipsis-horizontal'}
           size={T.icon.size.xxLarge}
           color={T.color.text}
         />
-      </MenuTrigger>
-      <MenuOptions
-        customStyles={{
-          optionsContainer: dynamicStyles.optionsContainer,
-        }}
+      </Pressable>
+      <Modal
+        visible={isVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={closeMenu}
       >
-        <TiedSCard style={styles.menuOptions}>
-          {menuOptions.map((menuOption) => (
-            <TiedSMenuOption key={menuOption.name} option={menuOption} />
-          ))}
-        </TiedSCard>
-      </MenuOptions>
-    </Menu>
+        <Pressable style={styles.overlay} onPress={closeMenu}>
+          <Pressable>
+            <TiedSCard
+              style={[
+                styles.menuOptions,
+                {
+                  width: menuWidth,
+                  top: menuPosition.top,
+                  right: menuPosition.right,
+                },
+              ]}
+            >
+              {menuOptions.map((menuOption) => (
+                <TiedSMenuOption
+                  key={menuOption.name}
+                  option={menuOption}
+                  onSelect={selectMenuOption}
+                />
+              ))}
+            </TiedSCard>
+          </Pressable>
+        </Pressable>
+      </Modal>
+    </>
   )
 }
 
@@ -115,11 +144,14 @@ const styles = StyleSheet.create({
   menuTrigger: {
     padding: T.spacing.small,
   },
+  overlay: {
+    flex: 1,
+    backgroundColor: T.color.modalBackgroundColor,
+  },
   menuOptions: {
+    position: 'absolute',
     flexDirection: 'column',
     alignItems: 'flex-start',
     margin: T.spacing.none,
-    marginTop: T.spacing.none,
-    marginBottom: T.spacing.none,
   },
 })
