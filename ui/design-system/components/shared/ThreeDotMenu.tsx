@@ -114,24 +114,26 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
         onRequestClose={closeMenu}
       >
         <Pressable style={styles.overlay} onPress={closeMenu}>
-          <TiedSCard
-            style={[
-              styles.menuOptions,
-              {
-                width: menuWidth,
-                top: menuPosition.top,
-                right: menuPosition.right,
-              },
-            ]}
-          >
-            {menuOptions.map((menuOption) => (
-              <TiedSMenuOption
-                key={menuOption.name}
-                option={menuOption}
-                onSelect={selectMenuOption}
-              />
-            ))}
-          </TiedSCard>
+          <Pressable>
+            <TiedSCard
+              style={[
+                styles.menuOptions,
+                {
+                  width: menuWidth,
+                  top: menuPosition.top,
+                  right: menuPosition.right,
+                },
+              ]}
+            >
+              {menuOptions.map((menuOption) => (
+                <TiedSMenuOption
+                  key={menuOption.name}
+                  option={menuOption}
+                  onSelect={selectMenuOption}
+                />
+              ))}
+            </TiedSCard>
+          </Pressable>
         </Pressable>
       </Modal>
     </>

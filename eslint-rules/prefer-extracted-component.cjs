@@ -117,6 +117,7 @@ module.exports = {
     }
 
     function hasOnlyPresentationalProps(openingElement) {
+      if (openingElement.attributes.length === 0) return false
       return openingElement.attributes.every(
         (attr) =>
           attr.type === 'JSXAttribute' &&

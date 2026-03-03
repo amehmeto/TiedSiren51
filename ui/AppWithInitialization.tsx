@@ -34,11 +34,8 @@ export function AppWithInitialization({ store }: AppWithInitializationProps) {
   useEffect(() => {
     if (isInitializing || error) return
     router.replace(isAuthenticated ? '/home' : '/register')
+    SplashScreen.hideAsync()
   }, [isInitializing, isAuthenticated, error, router])
-
-  useEffect(() => {
-    if (!isInitializing) SplashScreen.hideAsync()
-  }, [isInitializing])
 
   if (error) return <InitializingView isInitializing={false} error={error} />
 
