@@ -84,6 +84,23 @@ jobs:
           path: /tmp/base-coverage/coverage-summary.json
           key: coverage-main-refresh-${{ github.run_id }}
 
+      - name: Restore fingerprint from cache
+        if: steps.check-activity.outputs.skip == 'false'
+        id: fingerprint-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: /tmp/base-fingerprint/fingerprint.json
+          key: fingerprint-main-refresh
+          restore-keys: |
+            fingerprint-main-
+
+      - name: Re-save fingerprint to refresh expiration
+        if: steps.check-activity.outputs.skip == 'false' && steps.fingerprint-restore.outputs.cache-hit != ''
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/base-fingerprint/fingerprint.json
+          key: fingerprint-main-refresh-${{ github.run_id }}
+
   # Cache coverage for PR comparisons
   # Only runs when app code changes (not for docs-only commits)
   # Note: First PR after this merges will show 0% baseline until main has a cached run
@@ -118,6 +135,34 @@ jobs:
         with:
           path: /tmp/base-coverage/coverage-summary.json
           key: coverage-main-${{ github.sha }}
+
+  # Cache Expo fingerprint for PR native-change detection
+  # PRs compare their fingerprint against this cached baseline
+  cache-fingerprint:
+    needs: hecate
+    if: github.event_name == 'push' && needs.hecate.outputs.app-changed == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version-file: .nvmrc
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Generate fingerprint
+        run: bash scripts/generate-fingerprint.sh
+
+      - name: Save fingerprint to cache
+        uses: actions/cache/save@v4
+        with:
+          path: /tmp/base-fingerprint/fingerprint.json
+          key: fingerprint-main-${{ github.sha }}
 
   build-preview:
     needs: hecate

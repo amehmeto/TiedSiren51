@@ -1,0 +1,41 @@
+# Expo Fingerprint ignore list
+# Files here don't affect native builds — changes to them should NOT
+# trigger a full Android APK rebuild in CI.
+
+# JS/TS source (business logic, UI, infra adapters)
+app/**/*
+core/**/*
+ui/**/*
+infra/**/*
+
+# Tests
+**/*.spec.ts
+**/*.test.ts
+tests/**/*
+
+# Documentation & scripts
+docs/**/*
+*.md
+scripts/**/*
+.github/**/*
+
+# Developer tooling
+.claude/**/*
+.husky/**/*
+.nvmrc
+.npmrc
+
+# Lint / format configs
+eslint.config.*
+.eslintrc*
+eslint-rules/**/*
+eslint-plugin-local-rules/**/*
+oxlint-rules/**/*
+.prettierrc*
+.remarkrc*
+
+# Test / build tool configs
+vitest.config.*
+# tsconfig changes don't affect native builds (metro has its own resolution);
+# if paths/baseUrl ever impacts prebuild, remove this line.
+tsconfig.json
