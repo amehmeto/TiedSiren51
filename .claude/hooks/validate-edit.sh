@@ -25,12 +25,12 @@ extension="${filename##*.}"
 # Determine which linters to run based on file type (mirrors lint-staged config)
 case "$extension" in
   ts|tsx|js|jsx)
-    # ESLint with auto-fix, then prettier
-    output=$(npx eslint "$file_path" --fix 2>&1)
+    # OxLint with auto-fix, then prettier
+    output=$(npx oxlint --type-aware --fix "$file_path" 2>&1)
     exit_code=$?
     if [ $exit_code -ne 0 ]; then
-      filtered=$(echo "$output" | grep -E "^\s+[0-9]+:[0-9]+\s+error" || echo "$output")
-      jq -n --arg reason "ESLint failed: $file_path" --arg errors "$filtered" \
+      filtered=$(echo "$output" | grep -E "^\s+x\s" || echo "$output")
+      jq -n --arg reason "OxLint failed: $file_path" --arg errors "$filtered" \
         '{"decision": "block", "reason": $reason, "errors": $errors}'
       exit 2
     fi

@@ -1,8 +1,8 @@
 import { faker } from '@faker-js/faker'
 import { HHmmString } from '@/core/_ports_/date-provider'
 import {
-  BlockingConditions,
   BlockSession,
+  BlockingConditions,
 } from '@/core/block-session/block-session'
 import { buildDevice } from './device.builder'
 

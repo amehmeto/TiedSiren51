@@ -20,7 +20,7 @@ docs:
   - 'docs/**'
   - '.github/workflows/**'
   - '.github/*.md'
-  - 'eslint-rules/**'
+  - 'oxlint-rules/**'
   - '.remarkrc*'
   - '.prettierrc*'
   - '.prettierignore'

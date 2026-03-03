@@ -1,5 +1,5 @@
 import React from 'react'
-import { View, Text, StyleSheet, ScrollView } from 'react-native'
+import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { BlockingConditionItem } from './BlockingConditionItem'
 import { TiedSCloseButton } from './TiedSCloseButton'

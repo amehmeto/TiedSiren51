@@ -6,8 +6,8 @@ import { AppDispatch } from '@/core/_redux_/createStore'
 import { clearConfirmPasswordResetState } from '@/core/auth/reducer'
 import { selectIsUserAuthenticated } from '@/core/auth/selectors/selectIsUserAuthenticated'
 import {
-  extractOobCode,
   FirebaseDeepLinkMode,
+  extractOobCode,
 } from '@/ui/auth-schemas/extract-oob-code.helper'
 import { dependencies } from '@/ui/dependencies'
 

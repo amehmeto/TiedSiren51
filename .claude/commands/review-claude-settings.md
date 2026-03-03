@@ -54,7 +54,7 @@ Review `.claude/settings.local.json` for security, hygiene, and completeness.
 
    ### c. Overly Specific Entries
    Find entries that are unnecessarily specific when a broader pattern already exists or would be better:
-   - Specific file paths when a glob would work (e.g. `Bash(node eslint-rules/no-entire-state-selector.spec.cjs:*)` when `Bash(node eslint-rules/*.cjs:*)` exists)
+   - Specific file paths when a glob would work (e.g. `Bash(node oxlint-rules/no-entire-state-selector.spec.cjs:*)` when `Bash(node oxlint-rules/*.cjs:*)` exists)
    - Specific subcommands when the parent is already allowed (e.g. `Bash(git checkout feat/*:*)` when `Bash(git checkout:*)` exists)
    - Duplicate entries (exact or effectively equivalent)
 

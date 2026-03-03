@@ -1,0 +1,204 @@
+/**
+ * @fileoverview Tests for prefer-named-selector rule
+ */
+
+import { RuleTester } from 'eslint'
+import { describe, it } from 'vitest'
+
+import rule from './prefer-named-selector.js'
+
+const ruleTester = new RuleTester({
+  parserOptions: {
+    ecmaVersion: 2020,
+    sourceType: 'module',
+  },
+})
+
+describe('prefer-named-selector', () => {
+  it('should pass all rule tests', () => {
+    ruleTester.run('prefer-named-selector', rule, {
+      valid: [
+        // Named selector - preferred pattern
+        {
+          code: `useSelector(selectToast)`,
+        },
+        // Calling selector with dependencies - OK
+        {
+          code: `useSelector((state) => selectIsStrictModeActive(state, dateProvider))`,
+        },
+        // Method call on nested property - OK (derived value)
+        {
+          code: `useSelector((state) => state.auth.users.find(u => u.active))`,
+        },
+        // Computed/derived value - OK
+        {
+          code: `useSelector((state) => state.items.filter(i => i.active))`,
+        },
+        // Property access with computation - OK
+        {
+          code: `useSelector((state) => state.items.filter(i => i.active).length)`,
+        },
+        // Multiple statements in block - OK (complex logic)
+        {
+          code: `useSelector((state) => { const x = state.foo; return x.bar })`,
+        },
+        // Destructuring param - OK (different pattern)
+        {
+          code: `useSelector(({ toast }) => toast)`,
+        },
+        // Computed property access - OK
+        {
+          code: `useSelector((state) => state['toast'])`,
+        },
+        // No arguments - OK
+        {
+          code: `useSelector()`,
+        },
+        // Multiple params - OK (not a selector pattern)
+        {
+          code: `useSelector((state, props) => state.foo)`,
+        },
+        // Not useSelector - OK
+        {
+          code: `otherFunction((state) => state.toast)`,
+        },
+        // No params - OK
+        {
+          code: `useSelector(() => defaultValue)`,
+        },
+        // Return without argument - OK
+        {
+          code: `useSelector((state) => { return })`,
+        },
+        // Empty block - OK
+        {
+          code: `useSelector((state) => {})`,
+        },
+        // Selector with extra args - OK (not a passthrough)
+        {
+          code: `useSelector((state) => selectFiltered(state, filter))`,
+        },
+        // Selector with no args - OK (different call pattern)
+        {
+          code: `useSelector((state) => selectAll())`,
+        },
+      ],
+
+      invalid: [
+        // Direct slice access - arrow function expression
+        {
+          code: `useSelector((state) => state.toast)`,
+          errors: [
+            {
+              messageId: 'preferNamedSelector',
+              data: { sliceName: 'toast', SliceName: 'Toast' },
+            },
+          ],
+        },
+        // Different param name
+        {
+          code: `useSelector((s) => s.blockSession)`,
+          errors: [
+            {
+              messageId: 'preferNamedSelector',
+              data: { sliceName: 'blockSession', SliceName: 'BlockSession' },
+            },
+          ],
+        },
+        // Block body with return
+        {
+          code: `useSelector((state) => { return state.auth })`,
+          errors: [
+            {
+              messageId: 'preferNamedSelector',
+              data: { sliceName: 'auth', SliceName: 'Auth' },
+            },
+          ],
+        },
+        // Function expression
+        {
+          code: `useSelector(function(state) { return state.siren })`,
+          errors: [
+            {
+              messageId: 'preferNamedSelector',
+              data: { sliceName: 'siren', SliceName: 'Siren' },
+            },
+          ],
+        },
+        // With rootState naming
+        {
+          code: `useSelector((rootState) => rootState.blocklist)`,
+          errors: [
+            {
+              messageId: 'preferNamedSelector',
+              data: { sliceName: 'blocklist', SliceName: 'Blocklist' },
+            },
+          ],
+        },
+        // Nested property access on slice - should use named selector
+        {
+          code: `useSelector((state) => state.auth.user)`,
+          errors: [
+            {
+              messageId: 'preferNamedSelector',
+              data: { sliceName: 'auth', SliceName: 'Auth' },
+            },
+          ],
+        },
+        // Nested property access for length
+        {
+          code: `useSelector((state) => state.items.length)`,
+          errors: [
+            {
+              messageId: 'preferNamedSelector',
+              data: { sliceName: 'items', SliceName: 'Items' },
+            },
+          ],
+        },
+        // Deep nested property access with optional chaining
+        {
+          code: `useSelector((state) => state.auth.authUser?.authProvider)`,
+          errors: [
+            {
+              messageId: 'preferNamedSelector',
+              data: { sliceName: 'auth', SliceName: 'Auth' },
+            },
+          ],
+        },
+        // Redundant wrapper around named selector
+        {
+          code: `useSelector((state) => selectLoginViewModel(state))`,
+          output: `useSelector(selectLoginViewModel)`,
+          errors: [
+            {
+              messageId: 'redundantSelectorWrapper',
+              data: { selectorName: 'selectLoginViewModel' },
+            },
+          ],
+        },
+        // Redundant wrapper with different param name
+        {
+          code: `useSelector((s) => selectFoo(s))`,
+          output: `useSelector(selectFoo)`,
+          errors: [
+            {
+              messageId: 'redundantSelectorWrapper',
+              data: { selectorName: 'selectFoo' },
+            },
+          ],
+        },
+        // Redundant wrapper in block body
+        {
+          code: `useSelector((state) => { return selectBar(state) })`,
+          output: `useSelector(selectBar)`,
+          errors: [
+            {
+              messageId: 'redundantSelectorWrapper',
+              data: { selectorName: 'selectBar' },
+            },
+          ],
+        },
+      ],
+    })
+  })
+})
