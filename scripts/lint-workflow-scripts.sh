@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Lint GitHub Actions workflow files for inline scripts
-# Fails if any run: block has more than MAX_LINES lines
+# Fails if any run: or script: block has more than MAX_LINES lines
 # Long scripts should be extracted to scripts/ directory
 
 set -euo pipefail
@@ -24,8 +24,8 @@ check_file() {
   while IFS= read -r line || [[ -n "$line" ]]; do
     ((++line_num))
 
-    # Detect start of multi-line run block (run: |)
-    if [[ "$line" =~ ^([[:space:]]*)(-[[:space:]]+)?run:[[:space:]]*\|[[:space:]]*$ ]]; then
+    # Detect start of multi-line block (run: | or script: |)
+    if [[ "$line" =~ ^([[:space:]]*)(-[[:space:]]+)?(run|script):[[:space:]]*\|[[:space:]]*$ ]]; then
       in_run_block=true
       run_block_start=$line_num
       run_block_lines=0
