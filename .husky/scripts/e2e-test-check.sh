@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 # Check if developer has verified e2e tests
 # Set SKIP_E2E_CHECK=true to bypass this check in non-interactive environments
 

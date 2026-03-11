@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Branch naming convention check
 # Configuration is loaded from scripts/lib/branch-config.sh

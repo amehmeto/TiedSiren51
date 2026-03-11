@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 # Store coverage summary to a specified output file
 
 OUTPUT_FILE=$1
