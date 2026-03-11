@@ -85,7 +85,6 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
         const message =
           selectedOption.disabledMessage ?? 'This action is currently disabled'
         dispatch(showToast(message))
-        setIsVisible(false)
         return
       }
 
