@@ -31,6 +31,9 @@ export function BlocklistRow({
         style={styles.toggle}
         value={isSelected}
         onValueChange={onToggle}
+        trackColor={{
+          false: T.color.whiteOverlay,
+        }}
       />
     </View>
   )
