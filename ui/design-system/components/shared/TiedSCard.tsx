@@ -1,6 +1,7 @@
 import { BlurView } from 'expo-blur'
 import React from 'react'
 import { Platform, StyleProp, StyleSheet, ViewStyle } from 'react-native'
+import { useBlurTarget } from '@/ui/design-system/contexts/BlurTargetContext'
 import { T } from '@/ui/design-system/theme'
 
 type TiedSCardOwnProps = {
@@ -13,14 +14,15 @@ type TiedSCardProps = Readonly<TiedSCardOwnProps>
 const isAndroid = Platform.OS === 'android'
 
 export function TiedSCard({ children, style }: TiedSCardProps) {
+  const blurTarget = useBlurTarget()
+
   return (
     <BlurView
       blurReductionFactor={
         isAndroid ? T.effects.blur.reductionFactor : undefined
       }
-      experimentalBlurMethod={
-        isAndroid ? T.effects.blur.method.android : undefined
-      }
+      blurMethod={isAndroid ? T.effects.blur.method.android : undefined}
+      blurTarget={isAndroid && blurTarget ? blurTarget : undefined}
       intensity={T.effects.blur.intensity.modal}
       style={[styles.container, style]}
       tint={T.effects.blur.tint.dark}

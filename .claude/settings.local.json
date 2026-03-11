@@ -36,6 +36,7 @@
       "Bash(adb shell monkey:*)",
       "Bash(adb shell pm:*)",
       "Bash(adb shell:*)",
+      "Bash(adb:*)",
       "Bash(awk:*)",
       "Bash(base64:*)",
       "Bash(bash -n:*)",
@@ -190,6 +191,7 @@
       "Bash(npx shellcheck:*)",
       "Bash(npx tsc:*)",
       "Bash(npx vitest:*)",
+      "Bash(npx:*)",
       "Bash(nvm install:*)",
       "Bash(nvm use:*)",
       "Bash(pbcopy:*)",
@@ -207,6 +209,7 @@
       "Bash(source \"$NVM_DIR/nvm.sh\")",
       "Bash(sw_vers:*)",
       "Bash(tail:*)",
+      "Bash(tar:*)",
       "Bash(tee:*)",
       "Bash(test:*)",
       "Bash(then base=\"$f%.cjs\")",
@@ -431,6 +434,7 @@
       "Write(/**/.claude/**)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["tessl"],
   "hooks": {
     "Notification": [
@@ -483,6 +487,5 @@
         ]
       }
     ]
-  },
-  "enableAllProjectMcpServers": true
+  }
 }
