@@ -2,118 +2,194 @@ Implement the following GitHub issue in this worktree.
 
 PR: none
 
-## Context
+title:	TS-419: fix(android): blocking overlay stops firing after 24-48h during active block session
+state:	OPEN
+author:	amehmeto
+labels:	bug
+comments:	0
+number:	419
 
-`@prisma/react-native` C++ bindings are incompatible with React Native's New Architecture (prisma/react-native-prisma#58 — open since Nov 2025, last release April 2024). Since Expo SDK 55 makes New Architecture mandatory, Prisma must be replaced before the SDK upgrade.
+```yaml
+# METADATA
+repo: tied-siren-blocking-overlay
+story_points: 8
+labels:
+  - bug
+depends_on: []
+blocks: []
+severity: critical
+```
 
-Solution: Replace Prisma with PowerSync + OP-SQLite in local-only mode (no backend sync yet — skip connect()). The hexagonal architecture makes this a clean swap — only the infra layer changes.
+---
 
-Prisma files are kept but marked obsolete (same pattern as the PouchDB to Prisma migration, see ADR abandon-pouchdb.md). Deletion will happen in a separate follow-up issue.
+## Bug Summary
 
-## New Dependencies
+The blocking overlay stops firing after ~24-48 hours of an active block session. `MyAccessibilityService` continues running but `BlockingService` either loses its listener reference or gets killed by Android, resulting in silent failure with no overlay shown.
 
-npx expo install @powersync/react-native @powersync/op-sqlite @op-engineering/op-sqlite
+## Evidence
 
-Optional (for reactive queries / React hooks):
-npx expo install @powersync/react
+| Log/Screenshot | Status |
+|----------------|--------|
+| Overlay fires on session start | OK |
+| Overlay fires after 1h | OK |
+| Overlay fires after 24-48h | FAIL |
+| Sentry error on service death | FAIL (silent failure — no error logged) |
 
-## Files to Create
+---
 
-- infra/database-service/powersync.schema.ts (mirrors schema.prisma)
-- infra/database-service/powersync.database.service.ts (mirrors prisma.database.service.ts, implements DatabaseService)
-- infra/siren-repository/powersync.sirens-repository.ts (mirrors prisma.sirens-repository.ts, implements SirensRepository)
-- infra/block-session-repository/powersync.block-session.repository.ts (mirrors prisma.block-session.repository.ts, implements BlockSessionRepository)
-- infra/blocklist-repository/powersync.blocklist.repository.ts (mirrors prisma.blocklist.repository.ts, implements BlocklistRepository)
-- infra/timer-repository/powersync.timer.repository.ts (mirrors prisma.timer.repository.ts, implements TimerRepository)
-- infra/device-repository/powersync.remote-device.repository.ts (mirrors prisma.remote-device.repository.ts, implements RemoteDeviceRepository)
-- infra/database-service/legacy-prisma-migration.ts
-- docs/adr/infrastructure/powersync-op-sqlite.md
+## Reproduction
 
-## Files Marked Obsolete (NOT deleted)
+### Steps to Reproduce
+1. Start a block session with at least one blocked app
+2. Verify overlay fires when opening the blocked app
+3. Leave the device idle (or in normal use) for 24-48 hours
+4. Open the blocked app again
 
-Following the PouchDB precedent — keep files for easy infra swap, remove in follow-up issue:
+### Actual Behavior
+The blocked app opens normally without any overlay. No Sentry error is logged. The block session still appears active in the JS layer.
 
-- schema.prisma, prisma.d.ts
-- infra/__abstract__/prisma.repository.ts
-- infra/database-service/prisma.database.service.ts
-- infra/block-session-repository/prisma.block-session.repository.ts
-- infra/blocklist-repository/prisma.blocklist.repository.ts
-- infra/siren-repository/prisma.sirens-repository.ts
-- infra/timer-repository/prisma.timer.repository.ts
-- infra/device-repository/prisma.remote-device.repository.ts
-- All prisma.*.repository.test.ts files
+### Expected Behavior
+The blocking overlay should fire every time a blocked app is opened, regardless of how long the session has been active.
 
-Prisma dependencies (@prisma/client, @prisma/react-native, prisma) also stay in package.json until the cleanup issue.
+### Scenarios (Given/When/Then)
 
-## Files to Modify
+#### Bug Scenario
+```gherkin
+Given a block session has been active for 24-48 hours
+  And "Instagram" is in the blocked apps list
+When the user opens Instagram
+Then no blocking overlay is displayed
+  But the block session still shows as active in the app
+```
 
-- ui/dependencies.ts — swap Prisma constructors to PowerSync constructors (both production and E2E test blocks)
-- app.config.js — add @op-engineering/op-sqlite plugin (keep @prisma/react-native until cleanup)
-- babel.config.cjs — add @babel/plugin-transform-async-generator-functions (required for PowerSync watched queries / async iterators)
-- metro.config.cjs — add OP-SQLite inline requires blocklist
-- docs/adr/infrastructure/prisma-orm-sqlite.md — update status to Superseded by powersync-op-sqlite.md
+#### Fixed Scenario
+```gherkin
+Given a block session has been active for 48+ hours
+  And "Instagram" is in the blocked apps list
+When the user opens Instagram
+Then the blocking overlay is displayed within 500ms
+  And BlockingService logs a heartbeat confirming listener is registered
+```
 
-## PowerSync Schema Definition
+---
 
-Map the current Prisma schema to PowerSync's Table/column API in powersync.schema.ts.
-PowerSync auto-creates an id TEXT primary key on every table — no need to declare it.
+## Root Cause Analysis
 
-## Abstract Base Repository Strategy
+### Hypothesis
 
-Decision: No abstract PowerSyncRepository base class. Instead:
+**Primary (most likely):** `MyAccessibilityService` is killed and restarted by Android (normal OS behavior for long-running services). On restart, `onServiceConnected()` fires again but `BlockingService` never re-registers its listener — the static listener reference in `MyAccessibilityService` is null after restart.
 
-1. PowerSyncDatabaseService owns the PowerSyncDatabase instance and handles initialization
-2. Repositories receive the DB instance via constructor injection (simpler than the Prisma base class pattern)
-3. Each repository calls .execute() / .get() / .getAll() directly
+**Secondary:** `BlockingService` itself is killed by Android battery optimization (Doze mode, app standby buckets). Even with `START_STICKY`, the foreground notification may not be sufficient to survive aggressive OEM battery optimization (Samsung, Xiaomi, etc.).
 
-## Data Migration
+**Tertiary:** Race condition — if both services restart around the same time, `BlockingService` may try to register before `MyAccessibilityService` is ready, failing silently.
 
-Existing users have data in Prisma's app.db. Create infra/database-service/legacy-prisma-migration.ts.
+### Suspected Files
+| File | Reason |
+|------|--------|
+| `expo-accessibility-service/.../MyAccessibilityService.kt` | Static listener reference lost on service restart |
+| `tied-siren-blocking-overlay/.../BlockingService.kt` | No re-registration logic on reconnect; possibly killed by Doze |
+| `tied-siren-blocking-overlay/.../BlockingOverlayActivity.kt` | May need wake lock for reliable launch |
+| `AndroidManifest.xml` (both modules) | Service flags, foreground service type, permissions |
 
-Strategy:
-1. On first launch after update, PowerSyncDatabaseService.initialize() checks for legacy DB
-2. Open old app.db directly via OP-SQLite raw connection (NOT Prisma client)
-3. Read all rows from Prisma tables using raw SQL
-4. Map and insert into PowerSync tables
-5. Rename old file to app.db.migrated (do NOT delete — keep as backup)
-6. Set a flag in PowerSync DB to skip migration on subsequent launches
+---
 
-Table Name Mapping:
-- Siren -> siren
-- Blocklist -> blocklist
-- BlockSession -> block_session
-- Device -> device
-- Timer -> timer
-- _BlockSessionToBlocklist -> block_session_blocklist
-- _BlockSessionToDevice -> block_session_device
+## Proposed Fix
 
-Column Mapping: Prisma uses camelCase columns (startedAt, endedAt), PowerSync schema uses snake_case (started_at, ended_at). Junction table columns: Prisma uses "A"/"B" -> PowerSync uses explicit block_session_id/blocklist_id.
+### Changes Required
 
-Error Handling:
-- Wrap full migration in a transaction — rollback on any failure
-- Log migration progress and errors via Logger port
-- On failure: leave app.db untouched, retry on next launch
-- On success: rename to app.db.migrated
+**1. Listener re-registration on service reconnect**
+- In `MyAccessibilityService.onServiceConnected()`: check if `BlockingService` is running and re-register its listener
+- In `BlockingService`: implement `ServiceConnection` or broadcast-based re-registration when `MyAccessibilityService` restarts
+- Replace static listener reference with a more robust pattern (e.g., `WeakReference` + periodic validation, or bind-based approach)
 
-## ADR
+**2. ForegroundService hardening**
+- Ensure `BlockingService` returns `START_STICKY` from `onStartCommand()`
+- Add a partial `WakeLock` for critical detection windows
+- Set `android:foregroundServiceType="specialUse"` (API 34+)
+- Add `FOREGROUND_SERVICE_SPECIAL_USE` permission
 
-Create docs/adr/infrastructure/powersync-op-sqlite.md:
-- Status: Accepted (Supersedes prisma-orm-sqlite.md)
-- Context: Prisma incompatible with New Architecture, PowerSync + OP-SQLite as replacement
-- Decision: local-only mode, constructor injection, snake_case schema
-- Note: Prisma files kept for now (easy rollback), cleanup tracked separately
+**3. Watchdog mechanism**
+- Add periodic self-check (every 5 min via `Handler.postDelayed`) that verifies listener is registered
+- If listener is null, attempt re-registration automatically
+- Log heartbeat to Sentry for gap detection
 
-Update docs/adr/infrastructure/prisma-orm-sqlite.md status to Superseded by powersync-op-sqlite.md.
+**4. Battery optimization exemption**
+- Prompt user for `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` if not already granted
+- Guide user to disable battery optimization for the app on OEM devices
 
-## Key Implementation Notes
+**5. Lifecycle logging**
+- Log every service lifecycle event: `onCreate`, `onDestroy`, `onStartCommand`, `onServiceConnected`, `onUnbind`
+- Log listener registration/unregistration with timestamps
+- Log each app detection -> blocked check -> overlay launch decision chain
 
-- Local-only mode: instantiate PowerSyncDatabase, do NOT call connect(). CRUD via .execute() / .get() / .getAll().
-- JSON fields: same pattern as Prisma — sirens in Blocklist and blockingConditions in BlockSession stored as JSON TEXT, parsed in repository mapping functions.
-- Junction tables: explicit block_session_blocklist and block_session_device tables with indexed foreign keys.
-- Column convention: snake_case in DB, camelCase in TypeScript domain models — repositories handle the mapping.
+### Risks
+- `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` may trigger Google Play policy review if not justified
+- WakeLock misuse can drain battery — must use partial lock with timeout
+- OEM-specific battery optimization (Samsung, Xiaomi) may still kill services regardless of standard Android exemptions
 
-## Verification
+---
 
+## Test Cases
+
+### Passing Cases (After Fix)
+| Input | Expected Output |
+|-------|-----------------|
+| `adb shell am kill <blocking-service-process>` | Service restarts within 30s, listener re-registers |
+| `adb shell dumpsys deviceidle force-idle` (simulate Doze) | Service survives, overlay still fires |
+| Open blocked app after 48h session | Overlay displayed |
+| Kill accessibility service via settings toggle off/on | BlockingService re-registers listener automatically |
+| Both services killed simultaneously | Both restart and reconnect within 60s |
+
+### Rejecting Cases (Should Still Fail)
+| Input | Expected Behavior |
+|-------|-------------------|
+| Open non-blocked app after 48h | No overlay shown |
+| Block session expired/stopped | No overlay, services stop cleanly |
+
+---
+
+## Environment
+
+| Property | Value |
+|----------|-------|
+| Platform | Android |
+| OS Version | Android 12-15 (API 31-35) |
+| App Version | Current dev build |
+| Device | Tested on Samsung Galaxy S23, Pixel 7 |
+
+---
+
+## Acceptance Criteria
+
+- Overlay fires reliably after 48h+ of continuous block session
+- If `BlockingService` is killed by Android, it restarts and re-registers within 30 seconds
+- If `MyAccessibilityService` is restarted, `BlockingService` listener is re-registered automatically
+- Sentry logs show continuous heartbeat with no gaps >10 minutes
+- `adb shell am kill` test passes: service recovers and overlay works
+- Doze mode simulation test passes
+- Regression test added (ADB-based kill/recovery script)
+- No new bugs introduced
+
+---
+
+## Hierarchy
+
+| Level | Link |
+|-------|------|
+| Initiative | #62 - Launch Android App |
+| Epic | #389 - Prevent app uninstall & bypass during strict mode sessions |
+
+## Related
+
+| Relation | Link |
+|----------|------|
+| ADR | `/docs/adr/hexagonal-architecture.md` |
+| Module | expo-accessibility-service (https://github.com/amehmeto/expo-accessibility-service) |
+| Module | tied-siren-blocking-overlay (https://github.com/amehmeto/tied-siren-blocking-overlay) |
+
+Before making structural changes, read /docs/adr/README.md for architectural decisions that must be followed.
+
+Completion checklist:
 - ALL acceptance criteria from the issue are met
 - All unit tests pass (npm test)
 - Lint passes (npm run lint)
@@ -122,6 +198,4 @@ Update docs/adr/infrastructure/prisma-orm-sqlite.md status to Superseded by powe
 - No merge conflicts with main
 - PR description updated to reflect ALL changes made
 
-Before making structural changes, read /docs/adr/README.md for architectural decisions that must be followed.
-
-When ALL criteria are met, output: COMPLETE
+When ALL criteria are met, output: <promise>COMPLETE</promise>
