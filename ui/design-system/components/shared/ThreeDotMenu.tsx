@@ -21,6 +21,7 @@ type IconName =
   | 'create-outline'
   | 'copy-outline'
   | 'trash-outline'
+  | 'lock-closed-outline'
 
 export type TiedSMenu = {
   name: string
