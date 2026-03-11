@@ -94,6 +94,7 @@ app.db
 # Firebase
 google-services.json
 GoogleService-Info.plist
+.firebase/
 
 # Claude Code automation
 .claude-init.sh
