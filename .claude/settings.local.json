@@ -245,6 +245,7 @@
       "WebFetch(domain:docs.sentry.io)",
       "WebFetch(domain:expo.dev)",
       "WebFetch(domain:firebase.google.com)",
+      "WebFetch(domain:github-production-user-asset-6210df.s3.amazonaws.com)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:ifedapo.com)",
       "WebFetch(domain:medium.com)",
