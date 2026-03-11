@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Check if package.json changes affect the build
 # Returns exit code 0 if build-relevant changes exist, 1 otherwise

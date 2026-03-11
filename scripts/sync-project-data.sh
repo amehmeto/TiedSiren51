@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 # sync-project-data.sh — Fetch all project data, parse dependencies, output Kanban board.
 # Replaces Phases 1-3 of /sync-project with a single permission-free call.
 #

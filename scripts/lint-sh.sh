@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # Shell script linter wrapper
 # Usage:
@@ -7,8 +8,6 @@
 #
 # Environment variables:
 #   SHELLCHECK_PATH - Path to shellcheck binary (default: auto-detect)
-
-set -e
 
 # Find shellcheck binary - prefer system installation to avoid npm download rate limits
 find_shellcheck() {
@@ -39,10 +38,35 @@ find_shellcheck() {
 
 SHELLCHECK_BIN=$(find_shellcheck)
 
+# Require `set -e` near the top of every script (within first 10 lines).
+# Excluded: sourced libraries (scripts/lib/) and Claude hooks (.claude/hooks/)
+# which manage their own exit codes.
+check_set_e() {
+  local failed=0
+  for file in "$@"; do
+    case "$file" in
+      */lib/*|.claude/hooks/*) continue ;;
+    esac
+
+    if ! head -n 10 "$file" | grep -q 'set -e'; then
+      echo "error: $file is missing 'set -e' in the first 10 lines" >&2
+      failed=1
+    fi
+  done
+  return $failed
+}
+
 if [ $# -gt 0 ]; then
   # Lint specific files passed as arguments (lint-staged mode)
   "$SHELLCHECK_BIN" "$@"
+  check_set_e "$@"
 else
   # Lint all .sh files in standard directories
-  find scripts .husky/scripts .claude/hooks .github/scripts -name '*.sh' -exec "$SHELLCHECK_BIN" {} +
+  files=()
+  while IFS= read -r -d '' f; do
+    files+=("$f")
+  done < <(find scripts .husky/scripts .claude/hooks .github/scripts -name '*.sh' -print0)
+
+  "$SHELLCHECK_BIN" "${files[@]}"
+  check_set_e "${files[@]}"
 fi
