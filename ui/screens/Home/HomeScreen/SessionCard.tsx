@@ -60,7 +60,9 @@ export function SessionCard({ session, type }: SessionCardProps) {
     },
     {
       name: 'Edit',
-      iconName: 'create-outline' as const,
+      iconName: isStrictModeActive
+        ? ('lock-closed-outline' as const)
+        : ('create-outline' as const),
       action: () => {
         router.push({
           pathname: '/(tabs)/home/edit-block-session/[sessionId]',
@@ -79,7 +81,9 @@ export function SessionCard({ session, type }: SessionCardProps) {
     },
     {
       name: 'Delete',
-      iconName: 'trash-outline' as const,
+      iconName: isStrictModeActive
+        ? ('lock-closed-outline' as const)
+        : ('trash-outline' as const),
       action: () => {
         dispatch(deleteBlockSession(session.id))
       },
