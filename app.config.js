@@ -13,7 +13,7 @@ const APP_DOMAIN = 'com-tiedsiren.firebaseapp.com'
 
 export default {
   expo: {
-    name: 'TiedSiren51',
+    name: 'TiedSiren',
     slug: 'TiedSiren51',
     version: '1.0.0',
     orientation: 'portrait',

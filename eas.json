@@ -54,6 +54,7 @@
     },
     "production": {
       "node": "22.14.0",
+      "autoIncrement": true,
       "env": {
         "EXPO_ROUTER_APP_ROOT": ".app/",
         "EXPO_PUBLIC_FIREBASE_API_KEY": "AIzaSyCLDrarLuQfE9oTVrN6JNOdSKiiVs6oiik",

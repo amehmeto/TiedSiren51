@@ -3,7 +3,7 @@
 This document visualizes the dependencies between GitHub issues to help with planning and prioritization.
 
 > **Auto-generated** from GitHub issue metadata. Do not edit manually.
-> Last updated: 2026-02-25
+> Last updated: 2026-03-11
 
 ## Validation Warnings
 
@@ -11,6 +11,7 @@ The following issues were detected in the dependency graph:
 
 - **dangling_ref**: Node TiedSiren51#389 depends on non-existent node TiedSiren51#57
 - **dangling_ref**: Node TiedSiren51#219 depends on non-existent node TiedSiren51#55
+- **dangling_ref**: Node TiedSiren51#183 depends on non-existent node TiedSiren51#177
 
 ---
 
@@ -19,10 +20,10 @@ The following issues were detected in the dependency graph:
 | Metric | Value |
 |--------|-------|
 | Total Nodes | 114 |
-| Total Edges | 30 |
-| Root Nodes (no dependencies) | 98 |
-| Leaf Nodes (nothing depends on them) | 98 |
-| Orphan Nodes (isolated) | 90 |
+| Total Edges | 28 |
+| Root Nodes (no dependencies) | 100 |
+| Leaf Nodes (nothing depends on them) | 101 |
+| Orphan Nodes (isolated) | 94 |
 | Critical Path Length | 5 |
 
 ### Critical Path
@@ -42,13 +43,15 @@ The longest dependency chain in the graph:
 | #389 | [Epic] Prevent app uninstall & bypass during strict mode sessions | 🔴 13 | #57 | - |
 
 
-### Bugs (1)
+### Bugs (3)
 | # | Title | SP | Severity | Related |
 |---|-------|----:|----------|---------| 
 | #333 | fix: local Prisma database not scoped per user — data leaks between accounts | - | medium | - |
+| #406 | fix(ui): BlurView regression after expo-blur SDK 55 upgrade | - | medium | - |
+| #407 | fix(ui): blocklist card not visually locked during strict mode | - | medium | - |
 
 
-### Features - Other (67)
+### Features - Other (71)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #1 | Add ability to filter between system apps and user-installed apps on Android | - | - | - |
@@ -118,9 +121,13 @@ The longest dependency chain in the graph:
 | #397 | Investigate unstable selector memoization in useSelector calls | - | - | - |
 | #399 | chore: remove dead expo-background-fetch code | - | - | - |
 | #401 | Delete obsolete PouchDB and Prisma related code and dependencies | - | - | - |
+| #410 | fix(ui): use lock icon instead of grayed-out ThreeDotMenu during strict mode | - | - | - |
+| #411 | fix(ui): fix blocklist selection modal height and add link to edit blocklist | - | - | - |
+| #413 | ci: add Expo fingerprint check to skip APK builds on JS-only PRs | - | - | - |
+| #415 | fix(lint): detect and enforce script: | extraction in workflow linter | - | - | - |
 
 
-### Features - Blocking Architecture (38)
+### Features - Blocking Architecture (32)
 | # | Title | SP | Depends On | Blocks |
 |---|-------|----:|------------|--------|
 | #5 | Implement BlockingScheduler with schedule storage | - | - | #8, #7, #6 |
@@ -134,12 +141,6 @@ The longest dependency chain in the graph:
 | #13 | Handle daily recurrence in scheduler | 🟢 3 | #6, #8 | #14 |
 | #14 | Handle weekly recurrence in scheduler | 🟠 5 | #13 | - |
 | #18 | Connect AccessibilityService to native blocking logic | 🟢 3 | #9 | - |
-| #170 | fix(android): Blocking overlay never triggers - JS bridge architecture mismatch | 🔴 8 | - | - |
-| #171 | feat(expo-accessibility-service): Add multiple listeners support | 🟢 3 | - | #173 |
-| #172 | feat(expo-foreground-service): Add callback system via reflection | 🟢 3 | - | #173 |
-| #173 | feat(tied-siren-blocking-overlay): Add BlockingCallback and SharedPreferences support | 🟠 5 | #171, #172 | - |
-| #174 | feat(js): Add native blocking initialization and sync logic | - | - | - |
-| #177 | Refactor SirenTier port to support sub-dependencies injection | 🟢 3 | - | #180, #181, #182, #183 |
 | #178 | Refactor SirenLookout port to support sub-dependencies injection | 🟢 2 | - | #181, #183 |
 | #179 | Create selectBlockingSchedule selector with fresh blocklist join | 🟠 5 | - | #180 |
 | #180 | Create unified listener for blockSession and blocklist state changes | 🟠 5 | #177, #179 | #185, #208 |
@@ -260,6 +261,8 @@ flowchart LR
     end
     subgraph Epic_389["TS#389 Prevent app uninstall ..."]
         direction TB
+        T_TS_410["📝 TS#410 ui: use lock icon instead of<br/>grayed-out ThreeDotMenu during<br/>strict mode"]:::blocking0_todo
+        T_TS_407["📝 TS#407 ui: blocklist card not<br/>visually locked during strict<br/>mode"]:::bug0_todo
         T_TS_397["📝 TS#397 unstable selector memoization<br/>in useSelector calls"]:::blocking0_todo
         T_TS_396["📝 TS#396 : Evaluate Device Admin API<br/>feasibility for Play Store<br/>compliance [1sp]"]:::blocking0_todo
         T_TS_395["📝 TS#395 active strict mode session to<br/>cloud via PowerSync [3sp]"]:::blocking0_todo
@@ -267,7 +270,7 @@ flowchart LR
         T_TS_393["📝 TS#393 foreground service with<br/>auto-restart and force-stop<br/>detection [3sp]"]:::blocking0_todo
         T_TS_392["📝 TS#392 and block navigation to<br/>TiedSiren uninstall screen via<br/>AccessibilityService [3sp]"]:::blocking0_todo
         T_TS_391["📝 TS#391 -block Settings app when<br/>strict mode session starts [1sp]"]:::blocking0_todo
-        T_TS_355["📝 TS#355 : upgrade Expo SDK 51 → 55"]:::blocking0_todo
+        T_TS_355["✅ TS#355 : upgrade Expo SDK 51 → 55"]:::blocking0_done
     end
     subgraph Epic_219["TS#219 Native Blocking Layer"]
         direction TB
@@ -282,6 +285,10 @@ flowchart LR
     end
     subgraph Ungrouped
         direction TB
+        T_TS_415["✅ TS#415 lint: detect and enforce<br/>script: | extraction in<br/>workflow linter"]:::other0_done
+        T_TS_413["🔄 TS#413 : add Expo fingerprint check<br/>to skip APK builds on JS-only<br/>PRs"]:::other0_in_progress
+        T_TS_411["✅ TS#411 ui: fix blocklist selection<br/>modal height and add link to<br/>edit blocklist"]:::other0_done
+        T_TS_406["📝 TS#406 ui: BlurView regression after<br/>expo-blur SDK 55 upgrade"]:::bug0_todo
         T_TS_401["✅ TS#401 obsolete PouchDB and Prisma<br/>related code and dependencies"]:::other0_done
         T_TS_399["✅ TS#399 : remove dead<br/>expo-background-fetch code"]:::other0_done
         T_TS_390["✅ TS#390 infra: extract abstract<br/>PowersyncRepository base class"]:::other0_done
@@ -320,7 +327,7 @@ flowchart LR
         T_TS_289["✅ TS#289 : promote<br/>prefer-extracted-long-params<br/>ESLint rule from warn to error"]:::other0_done
         T_TS_288["✅ TS#288 : promote<br/>no-inline-object-type ESLint<br/>rule from warn to error"]:::other0_done
         T_TS_287["✅ TS#287 : promote require-typed-each<br/>ESLint rule from warn to error"]:::other0_done
-        T_TS_276["📝 TS#276 from ESLint to OxLint"]:::other0_todo
+        T_TS_276["✅ TS#276 from ESLint to OxLint"]:::other0_done
         T_TS_270["✅ TS#270 : add review-fix command,<br/>enhance start-issue with issue<br/>content, and add branch hyg..."]:::other0_done
         T_TS_268["✅ TS#268 strict-mode: show closed lock<br/>icon in tab bar when strict<br/>mode is active"]:::blocking0_done
         T_TS_267["✅ TS#267 strict-mode: prevent siren<br/>deselection from blocklists<br/>during strict mode"]:::blocking0_done
@@ -340,11 +347,6 @@ flowchart LR
         T_TS_180["✅ TS#180 unified listener for<br/>blockSession and blocklist<br/>state changes [5sp]"]:::blocking1_done
         T_TS_179["✅ TS#179 selectBlockingSchedule<br/>selector with fresh blocklist<br/>join [5sp]"]:::blocking0_done
         T_TS_178["✅ TS#178 SirenLookout port to support<br/>sub-dependencies injection [2sp]"]:::blocking0_done
-        T_TS_177["✅ TS#177 SirenTier port to support<br/>sub-dependencies injection [3sp]"]:::blocking0_done
-        T_TS_174["✅ TS#174 js: Add native blocking<br/>initialization and sync logic"]:::blocking0_done
-        T_TS_173["✅ TS#173 tied-siren-blocking-overlay:<br/>Add BlockingCallback and<br/>SharedPreferences support [5sp]"]:::blocking1_done
-        T_TS_172["✅ TS#172 expo-foreground-service: Add<br/>callback system via reflection [3sp]"]:::blocking0_done
-        T_TS_171["✅ TS#171 expo-accessibility-service:<br/>Add multiple listeners support [3sp]"]:::blocking0_done
         T_EFS_4["✅ EFS#4 for this module and request<br/>for tutorial or guide"]:::blocking0_done
         T_TSBO_5["✅ TSBO#5 BlockingScheduler with<br/>schedule storage"]:::blocking0_done
         T_ELIA_10["✅ ELIA#10 : Add uniqueBy option to<br/>deduplicate apps by package or<br/>activity"]:::other0_done
@@ -371,11 +373,10 @@ flowchart LR
         T_TS_208["✅ TS#208 listener: Re-evaluate blocking<br/>schedule on periodic tick [5sp]"]:::blocking2_done
         T_TS_201["✅ TS#201 BlockSession to store<br/>blocklist IDs instead of<br/>embedded blocklists [5sp]"]:::other0_done
         T_TS_200["✅ TS#200 strict-mode: block blocklist<br/>deletion during active strict<br/>mode sessions"]:::blocking0_done
-        T_TS_185["✅ TS#185 legacy updateBlockedApps calls<br/>and related code [2sp]"]:::blocking2_done
-        T_TS_184["✅ TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking2_done
+        T_TS_185["✅ TS#185 legacy updateBlockedApps calls<br/>and related code [2sp]"]:::blocking1_done
+        T_TS_184["✅ TS#184 JS detection path<br/>blockLaunchedApp usecase [3sp]"]:::blocking1_done
         T_TS_183["✅ TS#183 dependency injection with new<br/>architecture [2sp]"]:::blocking1_done
-        T_TS_182["✅ TS#182 AndroidSirenTier to call<br/>setBlockingSchedule [3sp]"]:::blocking1_done
-        T_TS_170["✅ TS#170 android: Blocking overlay<br/>never triggers - JS bridge<br/>architecture mismatch [8sp]"]:::blocking0_done
+        T_TS_182["✅ TS#182 AndroidSirenTier to call<br/>setBlockingSchedule [3sp]"]:::blocking0_done
         T_TSBO_14["✅ TSBO#14 weekly recurrence in scheduler [5sp]"]:::blocking3_done
         T_TSBO_13["✅ TSBO#13 daily recurrence in scheduler [3sp]"]:::blocking2_done
     end
@@ -385,16 +386,10 @@ flowchart LR
     T_TS_182 --> T_TS_185
     T_TS_184 --> T_TS_185
     T_TS_182 --> T_TS_184
-    T_TS_177 --> T_TS_183
     T_TS_178 --> T_TS_183
     T_TS_182 --> T_TS_183
-    T_TS_177 --> T_TS_182
-    T_TS_177 --> T_TS_181
     T_TS_178 --> T_TS_181
-    T_TS_177 --> T_TS_180
     T_TS_179 --> T_TS_180
-    T_TS_171 --> T_TS_173
-    T_TS_172 --> T_TS_173
     T_TSBO_9 --> T_TSBO_18
     T_TSBO_13 --> T_TSBO_14
     T_TSBO_10 --> T_TSBO_12
@@ -421,9 +416,6 @@ Quick reference showing what blocks what:
 | TSBO#10 | #12 |
 | TSBO#11 | #12 |
 | TSBO#13 | #14 |
-| #171 | #173 |
-| #172 | #173 |
-| #177 | #180, #181, #182, #183 |
 | #178 | #181, #183 |
 | #179 | #180 |
 | #180 | #185, #208 |
@@ -472,4 +464,4 @@ Quick reference showing what blocks what:
 
 ---
 
-*Auto-generated on 2026-02-25 from GitHub issue metadata*
+*Auto-generated on 2026-03-11 from GitHub issue metadata*
