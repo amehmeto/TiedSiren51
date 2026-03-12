@@ -21,6 +21,7 @@ type IconName =
   | 'create-outline'
   | 'copy-outline'
   | 'trash-outline'
+  | 'lock-closed-outline'
 
 export type TiedSMenu = {
   name: string
@@ -84,7 +85,6 @@ export function ThreeDotMenu({ menuOptions, style }: ThreeDotMenuProps) {
         const message =
           selectedOption.disabledMessage ?? 'This action is currently disabled'
         dispatch(showToast(message))
-        setIsVisible(false)
         return
       }
 
