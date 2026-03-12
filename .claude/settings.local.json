@@ -26,7 +26,6 @@
       "Bash(/opt/homebrew/bin/shellcheck --version)",
       "Bash(/usr/local/bin/shellcheck:*)",
       "Bash(OWNER=$(gh repo view --json owner -q '.owner.login') && gh project item-list:*)",
-      "Bash(SKIP_E2E_CHECK=true eas build --platform android --profile production --non-interactive 2>&1)",
       "Bash(SKIP_E2E_CHECK=true git push:*)",
       "Bash(adb devices:*)",
       "Bash(adb install:*)",
@@ -182,7 +181,6 @@
       "Bash(npx expo-module:*)",
       "Bash(npx expo-modules-autolinking:*)",
       "Bash(npx expo:*)",
-      "Bash(npx firebase-admin:*)",
       "Bash(npx lint-staged:*)",
       "Bash(npx mocha eslint-rules/react-props-destructuring.spec.cjs)",
       "Bash(npx oxlint:*)",
@@ -405,6 +403,7 @@
       "mcp__github__merge_pull_request"
     ],
     "ask": [
+      "Bash(SKIP_E2E_CHECK=true eas build:*)",
       "Bash(chmod:*)",
       "Bash(curl:*)",
       "Bash(docker:*)",
@@ -418,6 +417,7 @@
       "Bash(git revert:*)",
       "Bash(kill:*)",
       "Bash(npm:*)",
+      "Bash(npx firebase-admin:*)",
       "Bash(pkill:*)",
       "Bash(python3:*)",
       "Bash(python:*)",

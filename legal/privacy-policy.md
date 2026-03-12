@@ -90,14 +90,23 @@ You have the right to:
 
 ### Account Deletion
 
-To delete your account and all associated data:
+You can delete your account and all associated data directly from within the app:
 
 1. Open TiedSiren
 2. Go to Settings
 3. Tap "Delete Account"
 4. Confirm the deletion
 
-This action is irreversible and removes your Firebase Authentication record and all locally stored data.
+**What gets deleted:**
+
+- Your Firebase Authentication account (email, user ID)
+- All blocklists and sirens you created
+- All block session history
+- All device sync data
+
+**Deletion is permanent and irreversible.** All data is fully removed within 30 days of the deletion request. Once deleted, your account cannot be recovered.
+
+If you are unable to access the app and need your account deleted, contact us at privacy@tiedsiren.app with the email address associated with your account.
 
 ## 7. Children's Privacy
 
