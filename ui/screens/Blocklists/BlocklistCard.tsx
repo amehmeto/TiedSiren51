@@ -61,7 +61,9 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
     },
     {
       name: 'Edit',
-      iconName: 'create-outline' as const,
+      iconName: isStrictModeActive
+        ? ('lock-closed-outline' as const)
+        : ('create-outline' as const),
       action: () => {
         router.push({
           pathname: '/(tabs)/blocklists/edit-blocklist-screen/[blocklistId]',
@@ -80,7 +82,9 @@ export function BlocklistCard({ blocklist }: BlocklistCardProps) {
     },
     {
       name: 'Delete',
-      iconName: 'trash-outline' as const,
+      iconName: isStrictModeActive
+        ? ('lock-closed-outline' as const)
+        : ('trash-outline' as const),
       action: () => {
         const activeSessions = selectActiveSessionsUsingBlocklist(
           store.getState(),

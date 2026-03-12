@@ -136,6 +136,7 @@
       "Bash(git pull:*)",
       "Bash(git push:*)",
       "Bash(git remote:*)",
+      "Bash(git reset:*)",
       "Bash(git rev-parse:*)",
       "Bash(git rm:*)",
       "Bash(git show:*)",
@@ -244,6 +245,7 @@
       "WebFetch(domain:docs.sentry.io)",
       "WebFetch(domain:expo.dev)",
       "WebFetch(domain:firebase.google.com)",
+      "WebFetch(domain:github-production-user-asset-6210df.s3.amazonaws.com)",
       "WebFetch(domain:github.com)",
       "WebFetch(domain:ifedapo.com)",
       "WebFetch(domain:medium.com)",
@@ -431,6 +433,7 @@
       "Write(/**/.claude/**)"
     ]
   },
+  "enableAllProjectMcpServers": true,
   "enabledMcpjsonServers": ["tessl"],
   "hooks": {
     "Notification": [
@@ -483,6 +486,5 @@
         ]
       }
     ]
-  },
-  "enableAllProjectMcpServers": true
+  }
 }
