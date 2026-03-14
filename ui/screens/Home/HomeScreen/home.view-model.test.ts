@@ -453,6 +453,40 @@ describe('Home View Model', () => {
       },
       { hours: 8, minutes: 0 },
     ],
+    [
+      'one session that ended before current time',
+      stateBuilder()
+        .withBlockSessions([
+          buildBlockSession({
+            id: 'session-id',
+            name: 'Focus matin',
+            startedAt: '07:01',
+            endedAt: '08:24',
+          }),
+        ])
+        .build(),
+      {
+        type: HomeViewModel.WithoutActiveWithScheduledSessions,
+        greetings: Greetings.GoodMorning,
+        activeSessions: {
+          title: SessionBoardTitle.NO_ACTIVE_SESSIONS,
+          message: SessionBoardMessage.NO_ACTIVE_SESSIONS,
+        },
+        scheduledSessions: {
+          title: 'SCHEDULED SESSIONS',
+          blockSessions: [
+            {
+              id: 'session-id',
+              name: 'Focus matin',
+              minutesLeft: 'Starts at 07:01',
+              blocklists: 1,
+              devices: 2,
+            },
+          ],
+        },
+      },
+      { hours: 9, minutes: 36 },
+    ],
   ])(
     'Example: there is %s',
     (
@@ -470,42 +504,6 @@ describe('Home View Model', () => {
       expect(homeViewModel).toStrictEqual(expectedViewModel)
     },
   )
-
-  describe('stale memoization regression (issue #425)', () => {
-    it('should recompute when time advances past endedAt without Redux state change', () => {
-      const store = createTestStore(
-        {},
-        stateBuilder()
-          .withBlockSessions([
-            buildBlockSession({
-              id: 'session-id',
-              name: 'Focus matin',
-              startedAt: '07:01',
-              endedAt: '08:24',
-            }),
-          ])
-          .build(),
-      )
-
-      // At 08:00, session is active
-      const duringSession = createFixedTestDate({ hours: 8, minutes: 0 })
-      dateProvider.now = duringSession
-
-      const activViewModel = selectHomeViewModel(store.getState(), dateProvider)
-      const withActiveWithoutScheduledSessions =
-        HomeViewModel.WithActiveWithoutScheduledSessions
-      expect(activViewModel.type).toBe(withActiveWithoutScheduledSessions)
-
-      // At 09:36, session has ended — same store, no Redux action dispatched
-      const afterSession = createFixedTestDate({ hours: 9, minutes: 36 })
-      dateProvider.now = afterSession
-
-      const staleViewModel = selectHomeViewModel(store.getState(), dateProvider)
-      const withoutActiveWithScheduledSessions =
-        HomeViewModel.WithoutActiveWithScheduledSessions
-      expect(staleViewModel.type).toBe(withoutActiveWithScheduledSessions)
-    })
-  })
 
   it.each<[Greetings, string, string]>([
     [Greetings.GoodMorning, 'from 06:00 to 11:59', '06:00'],
