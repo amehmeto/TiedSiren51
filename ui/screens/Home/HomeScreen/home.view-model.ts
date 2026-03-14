@@ -1,4 +1,3 @@
-import { createSelector } from '@reduxjs/toolkit'
 import { formatDistance } from 'date-fns'
 import { DAY } from '@/core/__constants__/time'
 import { DateProvider } from '@/core/_ports_/date-provider'
@@ -75,87 +74,83 @@ function formatToViewModel(
   })
 }
 
-const selectNow = (_state: RootState, now: Date) => now
-
-const selectDateProvider = (
-  _state: RootState,
-  _now: Date,
+// Do NOT memoize with createSelector — this selector depends on the current
+// time via dateProvider.getNow(). Because dateProvider is a stable reference,
+// createSelector would cache stale results and sessions would appear active
+// long after they ended (see issue #425).
+export function selectHomeViewModel(
+  state: RootState,
   dateProvider: DateProvider,
-) => dateProvider
+): HomeViewModelType {
+  const blockSessions = selectAllBlockSessions(state)
 
-export const selectHomeViewModel = createSelector(
-  [(rootState: RootState) => rootState, selectNow, selectDateProvider],
-  (state, _now, dateProvider): HomeViewModelType => {
-    const blockSessions = selectAllBlockSessions(state)
+  const greetings = greetUser(dateProvider.getNow())
 
-    const greetings = greetUser(dateProvider.getNow())
+  const NO_ACTIVE_SESSION = {
+    title: SessionBoardTitle.NO_ACTIVE_SESSIONS as const,
+    message: SessionBoardMessage.NO_ACTIVE_SESSIONS as const,
+  }
 
-    const NO_ACTIVE_SESSION = {
-      title: SessionBoardTitle.NO_ACTIVE_SESSIONS as const,
-      message: SessionBoardMessage.NO_ACTIVE_SESSIONS as const,
-    }
+  const NO_SCHEDULED_SESSION = {
+    title: SessionBoardTitle.NO_SCHEDULED_SESSIONS as const,
+    message: SessionBoardMessage.NO_SCHEDULED_SESSIONS as const,
+  }
 
-    const NO_SCHEDULED_SESSION = {
-      title: SessionBoardTitle.NO_SCHEDULED_SESSIONS as const,
-      message: SessionBoardMessage.NO_SCHEDULED_SESSIONS as const,
-    }
-
-    if (!blockSessions.length) {
-      return {
-        type: HomeViewModel.WithoutActiveNorScheduledSessions,
-        greetings,
-        activeSessions: NO_ACTIVE_SESSION,
-        scheduledSessions: NO_SCHEDULED_SESSION,
-      }
-    }
-
-    const activeSessions = selectActiveSessions(state, dateProvider)
-    const formattedActiveSessions = formatToViewModel(
-      activeSessions,
-      dateProvider,
-    )
-
-    const scheduledSessions = selectScheduledSessions(state, dateProvider)
-    const formattedScheduledSessions = formatToViewModel(
-      scheduledSessions,
-      dateProvider,
-    )
-
-    if (!activeSessions.length) {
-      return {
-        type: HomeViewModel.WithoutActiveWithScheduledSessions,
-        greetings,
-        activeSessions: NO_ACTIVE_SESSION,
-        scheduledSessions: {
-          title: SessionBoardTitle.SCHEDULED_SESSIONS,
-          blockSessions: formattedScheduledSessions,
-        },
-      }
-    }
-
-    if (!scheduledSessions.length) {
-      return {
-        type: HomeViewModel.WithActiveWithoutScheduledSessions,
-        greetings,
-        activeSessions: {
-          title: SessionBoardTitle.ACTIVE_SESSIONS,
-          blockSessions: formattedActiveSessions,
-        },
-        scheduledSessions: NO_SCHEDULED_SESSION,
-      }
-    }
-
+  if (!blockSessions.length) {
     return {
-      type: HomeViewModel.WithBothSessionTypes,
+      type: HomeViewModel.WithoutActiveNorScheduledSessions,
       greetings,
-      activeSessions: {
-        title: SessionBoardTitle.ACTIVE_SESSIONS as const,
-        blockSessions: formattedActiveSessions,
-      },
+      activeSessions: NO_ACTIVE_SESSION,
+      scheduledSessions: NO_SCHEDULED_SESSION,
+    }
+  }
+
+  const activeSessions = selectActiveSessions(state, dateProvider)
+  const formattedActiveSessions = formatToViewModel(
+    activeSessions,
+    dateProvider,
+  )
+
+  const scheduledSessions = selectScheduledSessions(state, dateProvider)
+  const formattedScheduledSessions = formatToViewModel(
+    scheduledSessions,
+    dateProvider,
+  )
+
+  if (!activeSessions.length) {
+    return {
+      type: HomeViewModel.WithoutActiveWithScheduledSessions,
+      greetings,
+      activeSessions: NO_ACTIVE_SESSION,
       scheduledSessions: {
-        title: SessionBoardTitle.SCHEDULED_SESSIONS as const,
+        title: SessionBoardTitle.SCHEDULED_SESSIONS,
         blockSessions: formattedScheduledSessions,
       },
     }
-  },
-)
+  }
+
+  if (!scheduledSessions.length) {
+    return {
+      type: HomeViewModel.WithActiveWithoutScheduledSessions,
+      greetings,
+      activeSessions: {
+        title: SessionBoardTitle.ACTIVE_SESSIONS,
+        blockSessions: formattedActiveSessions,
+      },
+      scheduledSessions: NO_SCHEDULED_SESSION,
+    }
+  }
+
+  return {
+    type: HomeViewModel.WithBothSessionTypes,
+    greetings,
+    activeSessions: {
+      title: SessionBoardTitle.ACTIVE_SESSIONS as const,
+      blockSessions: formattedActiveSessions,
+    },
+    scheduledSessions: {
+      title: SessionBoardTitle.SCHEDULED_SESSIONS as const,
+      blockSessions: formattedScheduledSessions,
+    },
+  }
+}

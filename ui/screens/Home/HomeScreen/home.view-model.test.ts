@@ -465,11 +465,7 @@ describe('Home View Model', () => {
       const now = createFixedTestDate(nowTime)
       dateProvider.now = now
 
-      const homeViewModel = selectHomeViewModel(
-        store.getState(),
-        now,
-        dateProvider,
-      )
+      const homeViewModel = selectHomeViewModel(store.getState(), dateProvider)
 
       expect(homeViewModel).toStrictEqual(expectedViewModel)
     },
@@ -495,11 +491,7 @@ describe('Home View Model', () => {
       const duringSession = createFixedTestDate({ hours: 8, minutes: 0 })
       dateProvider.now = duringSession
 
-      const activViewModel = selectHomeViewModel(
-        store.getState(),
-        duringSession,
-        dateProvider,
-      )
+      const activViewModel = selectHomeViewModel(store.getState(), dateProvider)
       const withActiveWithoutScheduledSessions =
         HomeViewModel.WithActiveWithoutScheduledSessions
       expect(activViewModel.type).toBe(withActiveWithoutScheduledSessions)
@@ -508,11 +500,7 @@ describe('Home View Model', () => {
       const afterSession = createFixedTestDate({ hours: 9, minutes: 36 })
       dateProvider.now = afterSession
 
-      const staleViewModel = selectHomeViewModel(
-        store.getState(),
-        afterSession,
-        dateProvider,
-      )
+      const staleViewModel = selectHomeViewModel(store.getState(), dateProvider)
       const withoutActiveWithScheduledSessions =
         HomeViewModel.WithoutActiveWithScheduledSessions
       expect(staleViewModel.type).toBe(withoutActiveWithScheduledSessions)
@@ -546,11 +534,7 @@ describe('Home View Model', () => {
       const now = createFixedTestDate({ hours, minutes })
       dateProvider.now = now
 
-      const homeViewModel = selectHomeViewModel(
-        store.getState(),
-        now,
-        dateProvider,
-      )
+      const homeViewModel = selectHomeViewModel(store.getState(), dateProvider)
 
       expect(homeViewModel.greetings).toStrictEqual(expectedGreetings)
     },
