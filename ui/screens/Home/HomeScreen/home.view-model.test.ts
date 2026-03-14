@@ -475,6 +475,50 @@ describe('Home View Model', () => {
     },
   )
 
+  describe('stale memoization regression (issue #425)', () => {
+    it('should recompute when time advances past endedAt without Redux state change', () => {
+      const store = createTestStore(
+        {},
+        stateBuilder()
+          .withBlockSessions([
+            buildBlockSession({
+              id: 'session-id',
+              name: 'Focus matin',
+              startedAt: '07:01',
+              endedAt: '08:24',
+            }),
+          ])
+          .build(),
+      )
+
+      // At 08:00, session is active
+      const duringSession = createFixedTestDate({ hours: 8, minutes: 0 })
+      dateProvider.now = duringSession
+
+      const activViewModel = selectHomeViewModel(
+        store.getState(),
+        duringSession,
+        dateProvider,
+      )
+      const withActiveWithoutScheduledSessions =
+        HomeViewModel.WithActiveWithoutScheduledSessions
+      expect(activViewModel.type).toBe(withActiveWithoutScheduledSessions)
+
+      // At 09:36, session has ended — same store, no Redux action dispatched
+      const afterSession = createFixedTestDate({ hours: 9, minutes: 36 })
+      dateProvider.now = afterSession
+
+      const staleViewModel = selectHomeViewModel(
+        store.getState(),
+        afterSession,
+        dateProvider,
+      )
+      const withoutActiveWithScheduledSessions =
+        HomeViewModel.WithoutActiveWithScheduledSessions
+      expect(staleViewModel.type).toBe(withoutActiveWithScheduledSessions)
+    })
+  })
+
   it.each<[Greetings, string, string]>([
     [Greetings.GoodMorning, 'from 06:00 to 11:59', '06:00'],
     [Greetings.GoodMorning, 'from 06 to 11:59', '08:50'],
