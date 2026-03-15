@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
-import { rgbaToHex } from './rgba-to-hex.cjs'
+import { rgbaToHex } from './rgba-to-hex.js'
 
 type RgbaToHexCase = { input: string; expected: string; label: string }
 

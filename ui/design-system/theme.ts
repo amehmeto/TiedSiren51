@@ -1,4 +1,4 @@
-import { colors } from './colors.cjs'
+import { colors } from './colors.js'
 
 export const T = {
   color: colors,

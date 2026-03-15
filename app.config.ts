@@ -1,7 +1,7 @@
 import type { ExpoConfig } from 'expo/config'
 
-import { colors } from './ui/design-system/colors.cjs'
-import { rgbaToHex } from './ui/design-system/rgba-to-hex.cjs'
+import { colors } from './ui/design-system/colors.js'
+import { rgbaToHex } from './ui/design-system/rgba-to-hex.js'
 
 const { darkBlue, darkBlueGray, lightBlue, white } = colors
 const DARK_BLUE = rgbaToHex(darkBlue)

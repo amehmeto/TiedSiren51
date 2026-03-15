@@ -1,5 +1,5 @@
 /** @type {Record<string, string>} */
-const colors = {
+export const colors = {
   transparent: 'transparent',
   text: 'rgba(248, 250, 252, 1)',
   textSecondary: 'rgba(30, 41, 59, 1)',
@@ -26,5 +26,3 @@ const colors = {
   inputBackground: 'rgba(15, 23, 42, 0.3)',
   white: 'rgba(255, 255, 255, 1)',
 }
-
-module.exports = { colors }
