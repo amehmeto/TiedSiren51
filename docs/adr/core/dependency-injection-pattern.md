@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51's hexagonal architecture requires injecting infrastructure dependencies into the core business logic layer:
+TiedSiren's hexagonal architecture requires injecting infrastructure dependencies into the core business logic layer:
 
 - Repositories (BlockSession, Blocklist, Siren, RemoteDevice)
 - External services (Auth, Notifications, Database)

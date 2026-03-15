@@ -1,6 +1,6 @@
 # Architecture Decision Records (ADR)
 
-This directory contains Architecture Decision Records for TiedSiren51, documenting significant architectural and design decisions made throughout the project.
+This directory contains Architecture Decision Records for TiedSiren, documenting significant architectural and design decisions made throughout the project.
 
 ## What is an ADR?
 

@@ -1,4 +1,4 @@
-# TiedSiren51
+# TiedSiren
 
 React Native app blocker with device sync (Expo, Firebase Auth, PowerSync, Kotlin native modules for Android AccessibilityService). Users create "sirens" (apps/websites/keywords), organize them into blocklists, and run timed block sessions.
 

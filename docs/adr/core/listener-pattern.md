@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 has cross-domain side effects that need to be triggered by external events:
+TiedSiren has cross-domain side effects that need to be triggered by external events:
 
 **Examples:**
 - **User logs in** (Firebase event) → Load user data + Target sirens

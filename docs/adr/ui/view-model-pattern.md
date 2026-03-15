@@ -9,7 +9,7 @@ Double read by amehmeto
 
 ## Context
 
-TiedSiren51's UI screens need to:
+TiedSiren's UI screens need to:
 
 - Display data from Redux store in display-ready format
 - Handle multiple UI states (loading, empty, active, etc.)

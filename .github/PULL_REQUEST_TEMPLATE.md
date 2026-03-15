@@ -11,8 +11,8 @@ Replace XX with actual issue numbers
 
 | Level | Link |
 |-------|------|
-| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
-| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren/issues/XX) |
+| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren/issues/XX) |
 | 📋 Issue | Closes #XX |
 
 ## Test Plan
@@ -36,8 +36,8 @@ Remove lines that don't apply
 
 | Relation | Link |
 |----------|------|
-| ⬅️ Depends on | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
-| ➡️ Blocks | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| ⬅️ Depends on | [#XX - Title](https://github.com/amehmeto/TiedSiren/issues/XX) |
+| ➡️ Blocks | [#XX - Title](https://github.com/amehmeto/TiedSiren/issues/XX) |
 
 ---
 

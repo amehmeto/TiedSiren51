@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 relies on multiple layers of developer tooling to maintain code quality, enforce conventions, and streamline workflows:
+TiedSiren relies on multiple layers of developer tooling to maintain code quality, enforce conventions, and streamline workflows:
 
 1. **Git hooks** - Automated checks before commits and pushes
 2. **Claude Code hooks** - AI-assisted development with guardrails

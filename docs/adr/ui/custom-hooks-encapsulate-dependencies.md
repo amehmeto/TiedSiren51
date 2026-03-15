@@ -13,7 +13,7 @@ When creating custom React hooks, there's a design decision about how they shoul
 1. **Pass dependencies as parameters**: The caller provides dependencies to the hook
 2. **Encapsulate dependencies internally**: The hook accesses dependencies directly
 
-In TiedSiren51, we have a central `dependencies` object that provides access to infrastructure services (repositories, gateways, providers). Custom hooks often need these dependencies to perform their work.
+In TiedSiren, we have a central `dependencies` object that provides access to infrastructure services (repositories, gateways, providers). Custom hooks often need these dependencies to perform their work.
 
 **Example of the problematic pattern:**
 
@@ -198,6 +198,6 @@ vi.mock('@/ui/dependencies', () => ({
 
 ## References
 
-- [PR #139](https://github.com/amehmeto/TiedSiren51/pull/139) - Pattern emerged from code review
+- [PR #139](https://github.com/amehmeto/TiedSiren/pull/139) - Pattern emerged from code review
 - [React Custom Hooks](https://react.dev/learn/reusing-logic-with-custom-hooks)
 - `ui/dependencies.ts` - Central dependencies object

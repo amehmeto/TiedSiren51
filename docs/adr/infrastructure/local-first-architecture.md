@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 blocks distracting apps and websites during timed focus sessions. The blocking engine runs on the Android AccessibilityService, which must make instant decisions about whether detected content is blocked. A network round-trip for each decision is not viable.
+TiedSiren blocks distracting apps and websites during timed focus sessions. The blocking engine runs on the Android AccessibilityService, which must make instant decisions about whether detected content is blocked. A network round-trip for each decision is not viable.
 
 Key constraints:
 - Blocking decisions must be sub-millisecond (no network latency)

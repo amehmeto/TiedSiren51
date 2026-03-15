@@ -1,4 +1,4 @@
-# TiedSiren51
+# TiedSiren
 
 A React Native app blocker that helps users stay focused. Create "sirens" (apps, websites, or keywords to block), organize them into blocklists, and run timed block sessions to limit distractions.
 
@@ -109,8 +109,8 @@ npm run android
 1. Clone the repository
 
    ```bash
-   git clone git@github.com:amehmeto/TiedSiren51.git
-   cd TiedSiren51
+   git clone git@github.com:amehmeto/TiedSiren.git
+   cd TiedSiren
    ```
 
 2. Install dependencies

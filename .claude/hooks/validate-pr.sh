@@ -147,7 +147,7 @@ if ! echo "$body" | grep -qE '^## 🔗 Hierarchy'; then
 else
   # Check for 📋 Issue row with a full clickable GitHub issue URL
   if ! echo "$body" | grep -qE '📋 Issue.*https://github\.com/[^/]+/[^/]+/issues/[0-9]+'; then
-    errors+=("❌ Hierarchy section must include '📋 Issue' row with a clickable GitHub link (e.g., '[Closes #184](https://github.com/amehmeto/TiedSiren51/issues/184)')")
+    errors+=("❌ Hierarchy section must include '📋 Issue' row with a clickable GitHub link (e.g., '[Closes #184](https://github.com/amehmeto/TiedSiren/issues/184)')")
   fi
 fi
 
@@ -182,9 +182,9 @@ Body:
 
 | Level | Link |
 |-------|------|
-| 🚀 Initiative | [#XX - Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
-| 🏔️ Epic | [#XX - Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
-| 📋 Issue | [Closes #NNN](https://github.com/amehmeto/TiedSiren51/issues/NNN) |  ← full clickable link required
+| 🚀 Initiative | [#XX - Name](https://github.com/amehmeto/TiedSiren/issues/XX) |
+| 🏔️ Epic | [#XX - Name](https://github.com/amehmeto/TiedSiren/issues/XX) |
+| 📋 Issue | [Closes #NNN](https://github.com/amehmeto/TiedSiren/issues/NNN) |  ← full clickable link required
 
 ## Test plan
 - [x] Tests pass

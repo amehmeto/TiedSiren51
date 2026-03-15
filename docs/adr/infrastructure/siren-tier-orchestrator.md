@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 needs to block different types of "sirens" (distractions):
+TiedSiren needs to block different types of "sirens" (distractions):
 
 - **Apps**: Block specific Android/iOS applications
 - **Websites**: Block specific URLs or domains (future)

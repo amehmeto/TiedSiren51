@@ -145,6 +145,6 @@ Rejected: Does not support runtime toggling. See [Static Feature Flags](static-f
 
 ## References
 
-- [PR #366](https://github.com/amehmeto/TiedSiren51/pull/366) - Implementation
+- [PR #366](https://github.com/amehmeto/TiedSiren/pull/366) - Implementation
 - [Firebase Remote Config docs](https://firebase.google.com/docs/remote-config)
 - [Static Feature Flags ADR](static-feature-flags.md) - Superseded

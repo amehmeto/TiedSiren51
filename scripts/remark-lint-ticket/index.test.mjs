@@ -29,7 +29,7 @@ async function lintWithPath(markdown, filePath) {
 describe('remark-lint-ticket', () => {
   describe('Configuration', () => {
     it('should have valid repos list', () => {
-      expect(Object.keys(VALID_REPOS)).toContain('TiedSiren51')
+      expect(Object.keys(VALID_REPOS)).toContain('TiedSiren')
       expect(Object.keys(VALID_REPOS)).toContain('expo-accessibility-service')
     })
 
@@ -45,9 +45,9 @@ describe('remark-lint-ticket', () => {
 
   describe('parseYaml', () => {
     it('should parse valid YAML', () => {
-      const { data, error } = parseYaml('repo: TiedSiren51\nstory_points: 3')
+      const { data, error } = parseYaml('repo: TiedSiren\nstory_points: 3')
       expect(error).toBeNull()
-      expect(data.repo).toBe('TiedSiren51')
+      expect(data.repo).toBe('TiedSiren')
       expect(data.story_points).toBe(3)
     })
 
@@ -128,7 +128,7 @@ blocks: []
       const markdown = `
 \`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 4
 labels:
   - enhancement
@@ -145,7 +145,7 @@ blocks: []
       const markdown = `
 \`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 3
 labels:
   - unknown-label
@@ -162,7 +162,7 @@ blocks: []
       const markdown = `
 \`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 3
 labels:
   - enhancement
@@ -179,7 +179,7 @@ blocks: []
       const markdown = `
 \`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 3
 labels:
   - enhancement
@@ -196,7 +196,7 @@ depends_on: []
       const markdown = `
 \`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 5
 labels:
   - enhancement
@@ -224,8 +224,8 @@ Then something
 
 | Level | Link |
 |-------|------|
-| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren51/issues/62) |
-| 🏔️ Epic | [#55 - Blocking Apps on Android](https://github.com/amehmeto/TiedSiren51/issues/55) |
+| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren/issues/62) |
+| 🏔️ Epic | [#55 - Blocking Apps on Android](https://github.com/amehmeto/TiedSiren/issues/55) |
 `
       const messages = await lint(markdown)
       const errors = messages.filter((m) => m.startsWith('❌'))
@@ -237,7 +237,7 @@ Then something
     const validMetadata = `
 \`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 3
 labels:
   - enhancement
@@ -272,7 +272,7 @@ blocks: []
     const validMetadataAndSections = `
 \`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 3
 labels:
   - enhancement
@@ -316,7 +316,7 @@ Then something
       const markdown = `
 \`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 13
 labels:
   - epic
@@ -345,7 +345,7 @@ Test goal
       const markdown = `
 \`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 3
 labels:
   - enhancement
@@ -376,7 +376,7 @@ blocks: []
 
     it('should identify files with METADATA block', () => {
       const tree = fromMarkdown(
-        '```yaml\n# 📦 METADATA\nrepo: TiedSiren51\n```',
+        '```yaml\n# 📦 METADATA\nrepo: TiedSiren\n```',
       )
       const file = { path: 'random/path.md' }
       expect(isTicketFile(file, tree)).toBe(true)
@@ -429,7 +429,7 @@ Some context here.
     it('should insert missing sections in fix mode', async () => {
       const markdown = `\`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 3
 labels:
   - enhancement
@@ -464,7 +464,7 @@ This is the summary.
     it('should not duplicate existing sections', async () => {
       const markdown = `\`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 3
 labels:
   - enhancement
@@ -496,8 +496,8 @@ Then result
 
 | Level | Link |
 |-------|------|
-| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren51/issues/62) |
-| 🏔️ Epic | [#55 - Blocking Apps on Android](https://github.com/amehmeto/TiedSiren51/issues/55) |
+| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren/issues/62) |
+| 🏔️ Epic | [#55 - Blocking Apps on Android](https://github.com/amehmeto/TiedSiren/issues/55) |
 `
       const { messages, output } = await lintWithFix(
         markdown,
@@ -516,7 +516,7 @@ Then result
     it('should insert sections before Related section', async () => {
       const markdown = `\`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 3
 labels:
   - enhancement
@@ -548,7 +548,7 @@ Summary here.
     it('should work for bug tickets', async () => {
       const markdown = `\`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 2
 labels:
   - bug
@@ -577,7 +577,7 @@ Bug description.
     it('should work for epic tickets', async () => {
       const markdown = `\`\`\`yaml
 # 📦 METADATA
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 21
 labels:
   - epic

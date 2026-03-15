@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51's hexagonal architecture allows swapping real infrastructure with test doubles. Two main types of test doubles are needed:
+TiedSiren's hexagonal architecture allows swapping real infrastructure with test doubles. Two main types of test doubles are needed:
 
 **Test Double Types**:
 - **Stub**: Minimal implementation that returns hard-coded responses

@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 needs to schedule notifications to remind users about:
+TiedSiren needs to schedule notifications to remind users about:
 - **Block session start**: Notify when a blocking session begins
 - **Block session end**: Notify when blocking session completes
 - **Scheduled blocking periods**: Alert users before blocking activates

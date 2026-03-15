@@ -53,28 +53,28 @@ Adds login
 
 | Level | Link |
 |-------|------|
-| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren51/issues/62) |
-| 🏔️ Epic | [#54 - User Auth](https://github.com/amehmeto/TiedSiren51/issues/54) |
+| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren/issues/62) |
+| 🏔️ Epic | [#54 - User Auth](https://github.com/amehmeto/TiedSiren/issues/54) |
 | 📋 Issue | Closes #123 |`,
       )
 
       expect(success).toBe(true)
       expect(result.valid).toBe(true)
       expect(result.title.errors).toHaveLength(0)
-      const expectedMainRepoTicket123 = expect.objectContaining({ repo: 'TiedSiren51', number: 123 })
+      const expectedMainRepoTicket123 = expect.objectContaining({ repo: 'TiedSiren', number: 123 })
       expect(result.linkedTickets).toContainEqual(expectedMainRepoTicket123)
     })
 
     it('should extract ticket from Jira-style prefix', () => {
       const { result } = lintPR('TS-456: feat: add auth', '## Summary\nTest')
 
-      const expectedMainRepoTicket456 = expect.objectContaining({ repo: 'TiedSiren51', number: 456 })
+      const expectedMainRepoTicket456 = expect.objectContaining({ repo: 'TiedSiren', number: 456 })
       expect(result.linkedTickets).toContainEqual(expectedMainRepoTicket456)
     })
 
     it('should support all valid prefixes', () => {
       const prefixes = [
-        { prefix: 'TS', repo: 'TiedSiren51' },
+        { prefix: 'TS', repo: 'TiedSiren' },
         { prefix: 'TSBO', repo: 'tied-siren-blocking-overlay' },
         { prefix: 'EAS', repo: 'expo-accessibility-service' },
         { prefix: 'EFS', repo: 'expo-foreground-service' },
@@ -295,8 +295,8 @@ Implements Google Sign-In using Firebase Authentication.
 
 | Level | Link |
 |-------|------|
-| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren51/issues/62) |
-| 🏔️ Epic | [#54 - User Auth](https://github.com/amehmeto/TiedSiren51/issues/54) |
+| 🚀 Initiative | [#62 - Launch Android App](https://github.com/amehmeto/TiedSiren/issues/62) |
+| 🏔️ Epic | [#54 - User Auth](https://github.com/amehmeto/TiedSiren/issues/54) |
 | 📋 Issue | Closes #87 |
 
 ## Test Plan

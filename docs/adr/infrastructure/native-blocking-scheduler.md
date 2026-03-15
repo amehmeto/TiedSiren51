@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 block sessions require precise start and end times. Users expect blocking to activate exactly when scheduled, not with a ~15 minute delay. The previous approach using Expo Background Fetch had critical limitations:
+TiedSiren block sessions require precise start and end times. Users expect blocking to activate exactly when scheduled, not with a ~15 minute delay. The previous approach using Expo Background Fetch had critical limitations:
 
 **Problem with JS-side scheduling:**
 
@@ -192,7 +192,7 @@ class BlockingScheduler(private val context: Context) {
 
 ### Key Files
 
-**JS (TiedSiren51):**
+**JS (TiedSiren):**
 - `core/_ports_/siren.tier.ts` - Port definition
 - `core/block-session/selectors/selectBlockingSchedule.ts` - Schedule computation
 - `core/siren/listeners/on-blocking-schedule-changed.listener.ts` - Unified listener
@@ -232,9 +232,9 @@ if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
 
 These issues track the implementation work:
 
-- **#177** - SirenTier port refactor (TiedSiren51)
-- **#179** - selectBlockingSchedule selector (TiedSiren51)
-- **#182** - AndroidSirenTier setBlockingSchedule implementation (TiedSiren51)
+- **#177** - SirenTier port refactor (TiedSiren)
+- **#179** - selectBlockingSchedule selector (TiedSiren)
+- **#182** - AndroidSirenTier setBlockingSchedule implementation (TiedSiren)
 - See also: tied-siren-blocking-overlay repo for native Kotlin implementation
 
 ## Related ADRs

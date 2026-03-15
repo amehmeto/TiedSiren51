@@ -138,7 +138,7 @@ function extractIssueReferences(text) {
   const localMatches = text.matchAll(ISSUE_PATTERN)
   for (const match of localMatches) {
     issues.push({
-      repo: 'TiedSiren51',
+      repo: 'TiedSiren',
       number: parseInt(match[1], 10),
       raw: match[0],
     })
@@ -378,7 +378,7 @@ function validateCrossRepoReferences(issues) {
 
   for (const issue of issues) {
     if (
-      issue.repo !== 'TiedSiren51' &&
+      issue.repo !== 'TiedSiren' &&
       !VALID_REPO_NAMES.includes(issue.repo)
     ) {
       warnings.push(`Unknown repository: ${issue.repo} (from ${issue.raw})`)
@@ -477,7 +477,7 @@ function printResults(results) {
     console.log(`${colors.bold}🎫 Linked Tickets:${colors.reset}`)
     for (const issue of results.allIssues) {
       const repoLabel =
-        issue.repo === 'TiedSiren51'
+        issue.repo === 'TiedSiren'
           ? ''
           : ` ${colors.gray}(${issue.repo})${colors.reset}`
       console.log(`   • #${issue.number}${repoLabel}`)

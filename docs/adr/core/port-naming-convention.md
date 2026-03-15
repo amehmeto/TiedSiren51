@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 uses hexagonal architecture with port interfaces in `/core/_ports_/`. There was inconsistency between documentation (using `I` prefix like `IAuthGateway`) and actual implementation (no prefix, like `AuthGateway`, `SirenTier`).
+TiedSiren uses hexagonal architecture with port interfaces in `/core/_ports_/`. There was inconsistency between documentation (using `I` prefix like `IAuthGateway`) and actual implementation (no prefix, like `AuthGateway`, `SirenTier`).
 
 We need a consistent naming convention that:
 - Clearly identifies port interfaces vs implementations

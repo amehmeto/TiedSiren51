@@ -14,7 +14,7 @@ const APP_DOMAIN = 'com-tiedsiren.firebaseapp.com'
 export default {
   expo: {
     name: 'TiedSiren',
-    slug: 'TiedSiren51',
+    slug: 'TiedSiren',
     version: '1.0.0',
     orientation: 'portrait',
     icon: './assets/images/icon.png',
@@ -129,7 +129,7 @@ export default {
         origin: false,
       },
       eas: {
-        projectId: 'b92a6e4e-b682-4d8a-aa5b-d3e299aa6764',
+        projectId: '2153fa0f-b707-4fe0-8231-626c78a2dd1d',
       },
     },
     owner: 'epictechtus',

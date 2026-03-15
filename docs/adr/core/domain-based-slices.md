@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51's state management needs clear organization for:
+TiedSiren's state management needs clear organization for:
 
 - **Auth**: User authentication and session state
 - **Siren**: App/website/keyword definitions to block
