@@ -1,10 +1,9 @@
-import { BlurTargetView, BlurView } from 'expo-blur'
-import { LinearGradient } from 'expo-linear-gradient'
-import React, { useRef } from 'react'
-import { Modal, Platform, StyleSheet, View } from 'react-native'
+import { BlurView } from 'expo-blur'
+import React from 'react'
+import { Modal, Platform, StyleSheet } from 'react-native'
 import { T } from '@/ui/design-system/theme'
-import { BlurTargetContext } from './BlurTargetContext'
 import { TiedSCard } from './TiedSCard'
+import { TiedSModalAndroid } from './TiedSModalAndroid'
 
 type TiedSModalOwnProps = {
   isVisible: boolean
@@ -14,55 +13,6 @@ type TiedSModalOwnProps = {
 }
 
 type TiedSModalProps = Readonly<TiedSModalOwnProps>
-
-const gradientColors = [
-  T.color.darkBlue,
-  T.color.gradientMid,
-  T.color.purple,
-] as const
-
-const gradientStart = { x: 0, y: 0 }
-const gradientEnd = { x: 1, y: 1 }
-
-type TiedSModalAndroidProps = Readonly<{
-  isVisible: boolean
-  children: React.ReactNode
-  onRequestClose: () => void
-  style?: Record<string, unknown>
-}>
-
-function TiedSModalAndroid({
-  isVisible,
-  children,
-  onRequestClose,
-  style,
-}: TiedSModalAndroidProps) {
-  const blurTargetRef = useRef<View | null>(null)
-  return (
-    <Modal
-      animationType="slide"
-      transparent
-      visible={isVisible}
-      onRequestClose={onRequestClose}
-    >
-      <View style={styles.centeredView}>
-        <View style={[styles.cardColumn, styles.blurWrapper, style]}>
-          <BlurTargetView ref={blurTargetRef} style={StyleSheet.absoluteFill}>
-            <LinearGradient
-              colors={gradientColors}
-              start={gradientStart}
-              end={gradientEnd}
-              style={styles.fill}
-            />
-          </BlurTargetView>
-          <BlurTargetContext.Provider value={blurTargetRef}>
-            <TiedSCard style={styles.cardFull}>{children}</TiedSCard>
-          </BlurTargetContext.Provider>
-        </View>
-      </View>
-    </Modal>
-  )
-}
 
 export function TiedSModal({
   isVisible,
@@ -101,9 +51,6 @@ export function TiedSModal({
 }
 
 const styles = StyleSheet.create({
-  fill: {
-    flex: 1,
-  },
   centeredView: {
     flex: 1,
     justifyContent: 'center',
@@ -115,16 +62,5 @@ const styles = StyleSheet.create({
     flexDirection: 'column',
     width: T.layout.width.nineTenths,
     maxHeight: '80%',
-  },
-  blurWrapper: {
-    borderRadius: T.border.radius.roundedMedium,
-    overflow: 'hidden',
-  },
-  cardFull: {
-    flexDirection: 'column',
-    width: '100%',
-    marginTop: T.spacing.none,
-    marginBottom: T.spacing.none,
-    borderRadius: T.spacing.none,
   },
 })
