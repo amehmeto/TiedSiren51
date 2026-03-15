@@ -1,4 +1,5 @@
 import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { useHeaderHeight } from '@react-navigation/elements'
 import { useRouter } from 'expo-router'
 import { ScrollView, StyleSheet, Text, View } from 'react-native'
 import { useDispatch } from 'react-redux'
@@ -20,6 +21,7 @@ export function AccessibilityDisclosureScreen({
 }: AccessibilityDisclosureScreenProps) {
   const router = useRouter()
   const dispatch = useDispatch<AppDispatch>()
+  const headerHeight = useHeaderHeight()
 
   const handleAgree = async () => {
     await dispatch(giveAccessibilityConsent())
@@ -29,7 +31,10 @@ export function AccessibilityDisclosureScreen({
 
   return (
     <ScrollView
-      contentContainerStyle={styles.scrollContent}
+      contentContainerStyle={[
+        styles.scrollContent,
+        { paddingTop: headerHeight },
+      ]}
       style={styles.scroll}
     >
       <View style={styles.iconContainer}>
@@ -93,7 +98,7 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    paddingVertical: T.spacing.xx_large,
+    paddingVertical: T.spacing.large,
   },
   iconContainer: {
     alignItems: 'center',
