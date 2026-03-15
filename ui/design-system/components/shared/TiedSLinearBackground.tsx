@@ -21,7 +21,7 @@ export function TiedSLinearBackground({
   children,
 }: TiedSLinearBackgroundProps) {
   const insets = useSafeAreaInsets()
-  const ref = useRef<View>(null)
+  const blurTargetRef = useRef<View | null>(null)
   const paddingTop = T.spacing.large + insets.top
 
   if (Platform.OS !== 'android') {
@@ -38,9 +38,9 @@ export function TiedSLinearBackground({
   }
 
   return (
-    <BlurTargetContext.Provider value={ref}>
+    <BlurTargetContext.Provider value={blurTargetRef}>
       <View style={styles.container}>
-        <BlurTargetView ref={ref} style={StyleSheet.absoluteFill}>
+        <BlurTargetView ref={blurTargetRef} style={StyleSheet.absoluteFill}>
           <LinearGradient
             colors={gradientColors}
             start={gradientStart}

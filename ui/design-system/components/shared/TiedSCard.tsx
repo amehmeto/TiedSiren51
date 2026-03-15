@@ -20,7 +20,7 @@ export function TiedSCard({ children, style }: TiedSCardProps) {
       tint={T.effects.blur.tint.dark}
       blurMethod={T.effects.blur.method.android}
       blurReductionFactor={T.effects.blur.reductionFactor}
-      blurTarget={blurTarget}
+      blurTarget={blurTarget ?? undefined}
       style={[styles.container, style]}
     >
       {children}
