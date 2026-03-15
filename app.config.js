@@ -129,7 +129,7 @@ export default {
         origin: false,
       },
       eas: {
-        projectId: 'b92a6e4e-b682-4d8a-aa5b-d3e299aa6764',
+        projectId: '2153fa0f-b707-4fe0-8231-626c78a2dd1d',
       },
     },
     owner: 'epictechtus',
