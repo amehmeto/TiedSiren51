@@ -1,6 +1,8 @@
+// Registers sucrase's require hook so Node can resolve .ts imports
+// (theme.ts) when Expo evaluates this config file outside Metro.
 import 'sucrase/register/ts'
 
-import { ExpoConfig } from 'expo/config'
+import type { ExpoConfig } from 'expo/config'
 
 import { rgbaToHex } from './ui/design-system/rgba-to-hex'
 import { T } from './ui/design-system/theme'
