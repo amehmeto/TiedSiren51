@@ -453,6 +453,40 @@ describe('Home View Model', () => {
       },
       { hours: 8, minutes: 0 },
     ],
+    [
+      'one session that ended before current time',
+      stateBuilder()
+        .withBlockSessions([
+          buildBlockSession({
+            id: 'session-id',
+            name: 'Focus matin',
+            startedAt: '07:01',
+            endedAt: '08:24',
+          }),
+        ])
+        .build(),
+      {
+        type: HomeViewModel.WithoutActiveWithScheduledSessions,
+        greetings: Greetings.GoodMorning,
+        activeSessions: {
+          title: SessionBoardTitle.NO_ACTIVE_SESSIONS,
+          message: SessionBoardMessage.NO_ACTIVE_SESSIONS,
+        },
+        scheduledSessions: {
+          title: 'SCHEDULED SESSIONS',
+          blockSessions: [
+            {
+              id: 'session-id',
+              name: 'Focus matin',
+              minutesLeft: 'Starts at 07:01',
+              blocklists: 1,
+              devices: 2,
+            },
+          ],
+        },
+      },
+      { hours: 9, minutes: 36 },
+    ],
   ])(
     'Example: there is %s',
     (
@@ -465,11 +499,7 @@ describe('Home View Model', () => {
       const now = createFixedTestDate(nowTime)
       dateProvider.now = now
 
-      const homeViewModel = selectHomeViewModel(
-        store.getState(),
-        now,
-        dateProvider,
-      )
+      const homeViewModel = selectHomeViewModel(store.getState(), dateProvider)
 
       expect(homeViewModel).toStrictEqual(expectedViewModel)
     },
@@ -502,11 +532,7 @@ describe('Home View Model', () => {
       const now = createFixedTestDate({ hours, minutes })
       dateProvider.now = now
 
-      const homeViewModel = selectHomeViewModel(
-        store.getState(),
-        now,
-        dateProvider,
-      )
+      const homeViewModel = selectHomeViewModel(store.getState(), dateProvider)
 
       expect(homeViewModel.greetings).toStrictEqual(expectedGreetings)
     },
