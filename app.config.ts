@@ -2,22 +2,8 @@ import 'sucrase/register/ts'
 
 import { ExpoConfig } from 'expo/config'
 
+import { rgbaToHex } from './ui/design-system/rgba-to-hex'
 import { T } from './ui/design-system/theme'
-
-const RGBA_CHANNELS_REGEX = /rgba?\((\d+),\s*(\d+),\s*(\d+)/
-
-function rgbaToHex(rgba: string): string {
-  const match = rgba.match(RGBA_CHANNELS_REGEX)
-  if (!match) return rgba
-  const [, r, g, b] = match
-  return (
-    '#' +
-    [r, g, b]
-      .map((c) => Number(c).toString(16).padStart(2, '0'))
-      .join('')
-      .toUpperCase()
-  )
-}
 
 const DARK_BLUE = rgbaToHex(T.color.darkBlue)
 const DARK_BLUE_GRAY = rgbaToHex(T.color.darkBlueGray)
