@@ -113,6 +113,7 @@ export default {
               textColor: { light: WHITE, dark: WHITE },
               textColorSecondary: { light: DARK_BLUE, dark: DARK_BLUE },
               colorAccent: { light: LIGHT_BLUE, dark: LIGHT_BLUE },
+              colorControlNormal: { light: WHITE, dark: WHITE },
               windowBackground: { light: DARK_BLUE_GRAY, dark: DARK_BLUE_GRAY },
             },
           },
