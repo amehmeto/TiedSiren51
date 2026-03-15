@@ -19,7 +19,7 @@ export function TiedSLinearBackground({
       style={[
         styles.container,
         {
-          paddingTop: T.spacing.large + insets.top,
+          paddingTop: insets.top,
         },
       ]}
     >
