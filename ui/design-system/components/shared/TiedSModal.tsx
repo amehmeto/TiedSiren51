@@ -24,38 +24,61 @@ const gradientColors = [
 const gradientStart = { x: 0, y: 0 }
 const gradientEnd = { x: 1, y: 1 }
 
+type TiedSModalAndroidProps = Readonly<{
+  isVisible: boolean
+  children: React.ReactNode
+  onRequestClose: () => void
+  style?: Record<string, unknown>
+}>
+
+function TiedSModalAndroid({
+  isVisible,
+  children,
+  onRequestClose,
+  style,
+}: TiedSModalAndroidProps) {
+  const blurTargetRef = useRef<View | null>(null)
+  return (
+    <Modal
+      animationType="slide"
+      transparent
+      visible={isVisible}
+      onRequestClose={onRequestClose}
+    >
+      <View style={styles.centeredView}>
+        <View style={[styles.cardColumn, styles.blurWrapper, style]}>
+          <BlurTargetView ref={blurTargetRef} style={StyleSheet.absoluteFill}>
+            <LinearGradient
+              colors={gradientColors}
+              start={gradientStart}
+              end={gradientEnd}
+              style={styles.fill}
+            />
+          </BlurTargetView>
+          <BlurTargetContext.Provider value={blurTargetRef}>
+            <TiedSCard style={styles.cardFull}>{children}</TiedSCard>
+          </BlurTargetContext.Provider>
+        </View>
+      </View>
+    </Modal>
+  )
+}
+
 export function TiedSModal({
   isVisible,
   children,
   onRequestClose,
   style,
 }: TiedSModalProps) {
-  const blurTargetRef = useRef<View | null>(null)
-
   if (Platform.OS === 'android') {
     return (
-      <Modal
-        animationType="slide"
-        transparent
-        visible={isVisible}
+      <TiedSModalAndroid
+        isVisible={isVisible}
         onRequestClose={onRequestClose}
+        style={style}
       >
-        <View style={styles.centeredView}>
-          <View style={[styles.cardColumn, styles.blurWrapper, style]}>
-            <BlurTargetView ref={blurTargetRef} style={StyleSheet.absoluteFill}>
-              <LinearGradient
-                colors={gradientColors}
-                start={gradientStart}
-                end={gradientEnd}
-                style={styles.fill}
-              />
-            </BlurTargetView>
-            <BlurTargetContext.Provider value={blurTargetRef}>
-              <TiedSCard style={styles.cardFull}>{children}</TiedSCard>
-            </BlurTargetContext.Provider>
-          </View>
-        </View>
-      </Modal>
+        {children}
+      </TiedSModalAndroid>
     )
   }
 
@@ -100,8 +123,8 @@ const styles = StyleSheet.create({
   cardFull: {
     flexDirection: 'column',
     width: '100%',
-    marginTop: 0,
-    marginBottom: 0,
-    borderRadius: 0,
+    marginTop: T.spacing.none,
+    marginBottom: T.spacing.none,
+    borderRadius: T.spacing.none,
   },
 })
