@@ -1,7 +1,9 @@
+import { BlurView } from 'expo-blur'
 import React from 'react'
-import { Modal, StyleSheet, View } from 'react-native'
+import { Modal, Platform, StyleSheet } from 'react-native'
 import { T } from '@/ui/design-system/theme'
 import { TiedSCard } from './TiedSCard'
+import { TiedSModalAndroid } from './TiedSModalAndroid'
 
 type TiedSModalOwnProps = {
   isVisible: boolean
@@ -18,6 +20,18 @@ export function TiedSModal({
   onRequestClose,
   style,
 }: TiedSModalProps) {
+  if (Platform.OS === 'android') {
+    return (
+      <TiedSModalAndroid
+        isVisible={isVisible}
+        onRequestClose={onRequestClose}
+        style={style}
+      >
+        {children}
+      </TiedSModalAndroid>
+    )
+  }
+
   return (
     <Modal
       animationType="slide"
@@ -25,9 +39,13 @@ export function TiedSModal({
       visible={isVisible}
       onRequestClose={onRequestClose}
     >
-      <View style={styles.centeredView}>
+      <BlurView
+        intensity={T.effects.blur.intensity.strong}
+        tint={T.effects.blur.tint.dark}
+        style={styles.centeredView}
+      >
         <TiedSCard style={[styles.cardColumn, style]}>{children}</TiedSCard>
-      </View>
+      </BlurView>
     </Modal>
   )
 }
