@@ -31,9 +31,7 @@ export default function HomeScreen() {
   const viewModel = useSelector<
     RootState,
     ReturnType<typeof selectHomeViewModel>
-  >((rootState) =>
-    selectHomeViewModel(rootState, dateProvider.getNow(), dateProvider),
-  )
+  >((rootState) => selectHomeViewModel(rootState, dateProvider))
 
   const [activeSessionsNode, scheduledSessionsNode]: ReactNode[] = (() => {
     if (viewModel.type === HomeViewModel.WithoutActiveNorScheduledSessions)
