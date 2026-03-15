@@ -1,16 +1,13 @@
-// Registers sucrase's require hook so Node can resolve .ts imports
-// (theme.ts) when Expo evaluates this config file outside Metro.
-import 'sucrase/register/ts'
-
 import type { ExpoConfig } from 'expo/config'
 
-import { rgbaToHex } from './ui/design-system/rgba-to-hex'
-import { T } from './ui/design-system/theme'
+import { colors } from './ui/design-system/colors.cjs'
+import { rgbaToHex } from './ui/design-system/rgba-to-hex.cjs'
 
-const DARK_BLUE = rgbaToHex(T.color.darkBlue)
-const DARK_BLUE_GRAY = rgbaToHex(T.color.darkBlueGray)
-const LIGHT_BLUE = rgbaToHex(T.color.lightBlue)
-const WHITE = rgbaToHex(T.color.white)
+const { darkBlue, darkBlueGray, lightBlue, white } = colors
+const DARK_BLUE = rgbaToHex(darkBlue)
+const DARK_BLUE_GRAY = rgbaToHex(darkBlueGray)
+const LIGHT_BLUE = rgbaToHex(lightBlue)
+const WHITE = rgbaToHex(white)
 const APP_DOMAIN = 'com-tiedsiren.firebaseapp.com'
 
 const config: { expo: ExpoConfig } = {

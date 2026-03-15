@@ -1,6 +1,10 @@
 const RGBA_CHANNELS_REGEX = /rgba?\((\d+),\s*(\d+),\s*(\d+)/
 
-export function rgbaToHex(rgba: string): string {
+/**
+ * @param {string} rgba
+ * @returns {string}
+ */
+function rgbaToHex(rgba) {
   const match = rgba.match(RGBA_CHANNELS_REGEX)
   if (!match) return rgba
   const [, r, g, b] = match
@@ -12,3 +16,5 @@ export function rgbaToHex(rgba: string): string {
       .toUpperCase()
   )
 }
+
+module.exports = { rgbaToHex }

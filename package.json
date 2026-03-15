@@ -171,7 +171,6 @@
     "remark-validate-links": "^13.1.0",
     "semantic-release": "^22.0.12",
     "shellcheck": "^3.1.0",
-    "sucrase": "^3.35.1",
     "type-fest": "^4.41.0",
     "typescript": "~5.9.3",
     "unist-util-visit": "^5.0.0",
