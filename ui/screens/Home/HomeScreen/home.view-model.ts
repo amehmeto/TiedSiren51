@@ -145,11 +145,11 @@ export function selectHomeViewModel(
     type: HomeViewModel.WithBothSessionTypes,
     greetings,
     activeSessions: {
-      title: SessionBoardTitle.ACTIVE_SESSIONS as const,
+      title: SessionBoardTitle.ACTIVE_SESSIONS,
       blockSessions: formattedActiveSessions,
     },
     scheduledSessions: {
-      title: SessionBoardTitle.SCHEDULED_SESSIONS as const,
+      title: SessionBoardTitle.SCHEDULED_SESSIONS,
       blockSessions: formattedScheduledSessions,
     },
   }
