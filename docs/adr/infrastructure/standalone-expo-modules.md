@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 uses React Native with Expo SDK and needs native functionality that React Native doesn't provide out-of-the-box:
+TiedSiren uses React Native with Expo SDK and needs native functionality that React Native doesn't provide out-of-the-box:
 
 - Android AccessibilityService for app detection
 - Android app blocking overlays
@@ -32,7 +32,7 @@ We need a strategy for developing native modules that:
 3. **Business Logic Separation**: Modules provide primitives, not domain logic
 4. **External Dependency**: Consumed via package.json (git reference or npm)
 5. **Generic API**: Module APIs must not reference TiedSiren-specific concepts
-6. **No Internal Modules**: Never create modules inside TiedSiren51 repository
+6. **No Internal Modules**: Never create modules inside TiedSiren repository
 
 ### Module Organization
 
@@ -66,7 +66,7 @@ Expo modules are **always** consumed as external dependencies via package.json.
 
 **Option 1: Git Reference** (Recommended during development):
 ```json
-// TiedSiren51/package.json
+// TiedSiren/package.json
 {
   "dependencies": {
     "expo-blocking-overlay": "git+https://github.com/amehmeto/expo-blocking-overlay.git#v1.0.0"
@@ -76,7 +76,7 @@ Expo modules are **always** consumed as external dependencies via package.json.
 
 **Option 2: Published npm Package** (Recommended for production):
 ```json
-// TiedSiren51/package.json
+// TiedSiren/package.json
 {
   "dependencies": {
     "expo-blocking-overlay": "^1.0.0"
@@ -86,7 +86,7 @@ Expo modules are **always** consumed as external dependencies via package.json.
 
 **Option 3: Local Development** (Only for active module development):
 ```json
-// TiedSiren51/package.json
+// TiedSiren/package.json
 {
   "dependencies": {
     "expo-blocking-overlay": "file:../expo-blocking-overlay"
@@ -94,7 +94,7 @@ Expo modules are **always** consumed as external dependencies via package.json.
 }
 ```
 
-**Note**: Option 3 requires cloning the module repo as a sibling directory. Never use `/modules/` inside TiedSiren51.
+**Note**: Option 3 requires cloning the module repo as a sibling directory. Never use `/modules/` inside TiedSiren.
 
 ### Integration with Hexagonal Architecture
 
@@ -102,7 +102,7 @@ Expo modules exist **outside** the hexagonal architecture layers:
 
 ```
 ┌─────────────────────────────────────┐
-│  TiedSiren51 Application            │
+│  TiedSiren Application            │
 │                                      │
 │  ┌──────────────────────────────┐  │
 │  │ Core Layer (Business Logic)  │  │
@@ -281,7 +281,7 @@ When creating a new Expo module:
 - [ ] Write unit tests for TypeScript interface
 - [ ] Write Android instrumentation tests
 - [ ] Design for cross-platform (even if starting with one platform)
-- [ ] No imports from TiedSiren51 code
+- [ ] No imports from TiedSiren code
 - [ ] Think: "Could another app use this?"
 - [ ] Tag releases: `v1.0.0`, `v1.0.1`, etc.
 
@@ -318,7 +318,7 @@ Modules are created in separate repositories from day one:
 
 1. **Create repository**: `github.com/amehmeto/{module-name}`
 2. **Setup CI/CD**: GitHub Actions for testing and releases
-3. **Initial consumption**: Use git reference in TiedSiren51's package.json
+3. **Initial consumption**: Use git reference in TiedSiren's package.json
 4. **Publish to npm** (when stable): `npm publish` or GitHub Packages
 5. **Switch to npm version**: Update package.json to use published version
 6. **Maintain independently**: All bug fixes and features in module repo
@@ -327,8 +327,8 @@ Modules are created in separate repositories from day one:
 1. Clone module repo as sibling: `../expo-blocking-overlay/`
 2. Use `"file:../expo-blocking-overlay"` for active development
 3. Commit and tag in module repo when ready
-4. Switch TiedSiren51 to git reference: `"git+https://...#v1.0.0"`
-5. Continue TiedSiren51 development with stable module version
+4. Switch TiedSiren to git reference: `"git+https://...#v1.0.0"`
+5. Continue TiedSiren development with stable module version
 
 ### Related ADRs
 

@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51's core business logic needs a state management solution that can:
+TiedSiren's core business logic needs a state management solution that can:
 
 - Handle complex state synchronization across block sessions, blocklists, and sirens
 - Support normalized data structures (avoid duplication of sirens across blocklists)

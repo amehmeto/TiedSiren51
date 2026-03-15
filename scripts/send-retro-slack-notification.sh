@@ -47,7 +47,7 @@ TOP_CATEGORY="${TOP_CATEGORY:-Unknown}"
 
 # Build links
 SERVER_URL="${GITHUB_SERVER_URL:-https://github.com}"
-REPOSITORY="${GITHUB_REPOSITORY:-amehmeto/TiedSiren51}"
+REPOSITORY="${GITHUB_REPOSITORY:-amehmeto/TiedSiren}"
 PR_URL="${SERVER_URL}/${REPOSITORY}/pull/${PR_NUMBER}"
 RETRO_FILE_URL="${SERVER_URL}/${REPOSITORY}/blob/main/${RETRO_PATH}"
 

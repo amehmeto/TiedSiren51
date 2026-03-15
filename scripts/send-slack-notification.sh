@@ -45,7 +45,7 @@ TAG_NAME=$(echo "$STEPS_CONTEXT" | jq -r '.create_release.outputs.tag_name')
 RELEASE_URL="${SERVER_URL}/${REPOSITORY}/releases/tag/${TAG_NAME}"
 
 # Extract issue number from branch name (e.g., feat/TS300-description -> 300).
-# Only matches the TS prefix (TiedSiren51 repo). Branches for other repos
+# Only matches the TS prefix (TiedSiren repo). Branches for other repos
 # (TSBO, EAS, EFS, ELIA) or non-standard names will skip test plan extraction.
 ISSUE_NUMBER=""
 if [[ "$BRANCH" =~ TS([0-9]+) ]]; then

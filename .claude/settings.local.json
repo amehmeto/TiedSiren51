@@ -97,6 +97,7 @@
       "Bash(gh repo fork:*)",
       "Bash(gh repo list:*)",
       "Bash(gh repo view:*)",
+      "Bash(gh repo:*)",
       "Bash(gh run list:*)",
       "Bash(gh run view:*)",
       "Bash(gh run watch:*)",

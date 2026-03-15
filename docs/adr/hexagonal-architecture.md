@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 is a React Native application with complex business logic around block sessions, blocklists, and siren management. The application needs to:
+TiedSiren is a React Native application with complex business logic around block sessions, blocklists, and siren management. The application needs to:
 
 - Separate business logic from UI and infrastructure concerns
 - Support multiple data persistence strategies (started with PouchDB, migrated to Prisma)

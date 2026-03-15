@@ -87,7 +87,7 @@ cross_repo_files = {
 
 # Tag repos
 for issue in main_issues:
-    issue["repo"] = "TiedSiren51"
+    issue["repo"] = "TiedSiren"
 
 all_issues = list(main_issues)
 for repo_name, file_tag in cross_repo_files.items():
@@ -108,7 +108,7 @@ for issue in all_issues:
     key = f"{issue['repo']}#{issue['number']}"
     issue_state[key] = issue["state"]
     issue_labels[key] = [l.get("name", "") for l in issue.get("labels", [])]
-    if issue["repo"] == "TiedSiren51":
+    if issue["repo"] == "TiedSiren":
         issue_state[str(issue["number"])] = issue["state"]
 
 # ---------------------------------------------------------------------------
@@ -242,7 +242,7 @@ for item in board_items:
     repo = content.get("repository", "")
     status = item.get("status", "")
     item_id = item.get("id", "")
-    if num and "TiedSiren51" in repo:
+    if num and "TiedSiren" in repo:
         board_status_by_issue[num] = status
         board_item_id_by_issue[num] = item_id
 
@@ -426,7 +426,7 @@ for epic in epics:
         expanded.update(["keyword", "keywords"])
     epic_keywords[epic["number"]] = {
         "title": epic["title"],
-        "url": f"https://github.com/amehmeto/TiedSiren51/issues/{epic['number']}",
+        "url": f"https://github.com/amehmeto/TiedSiren/issues/{epic['number']}",
         "keywords": expanded,
     }
 
@@ -687,7 +687,7 @@ for m in matches:
     num = m['number']
     epic_num = m['epic']
     epic_title = m['epic_title']
-    epic_url = f'https://github.com/amehmeto/TiedSiren51/issues/{epic_num}'
+    epic_url = f'https://github.com/amehmeto/TiedSiren/issues/{epic_num}'
 
     result = subprocess.run(
         ['gh', 'issue', 'view', str(num), '--json', 'body', '-q', '.body'],

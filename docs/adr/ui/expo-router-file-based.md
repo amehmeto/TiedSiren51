@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-React Native navigation traditionally requires manual route configuration. TiedSiren51 needs type-safe, maintainable routing for auth flows, tab navigation, and deep linking.
+React Native navigation traditionally requires manual route configuration. TiedSiren needs type-safe, maintainable routing for auth flows, tab navigation, and deep linking.
 
 ## Decision
 

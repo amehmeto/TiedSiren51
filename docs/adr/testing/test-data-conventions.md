@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-Tests in TiedSiren51 need consistent conventions for handling test data:
+Tests in TiedSiren need consistent conventions for handling test data:
 
 - **Date/time values**: Calculations vs hardcoded ISO strings
 - **Payload types**: Required vs optional properties

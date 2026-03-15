@@ -10,7 +10,7 @@ Superseded by [Native Blocking Scheduler](native-blocking-scheduler.md)
 
 ## Context
 
-TiedSiren51 needs to perform background tasks even when the app is not actively running:
+TiedSiren needs to perform background tasks even when the app is not actively running:
 
 - **Auto-block sirens**: Activate blocking when scheduled sessions start
 - **Check active sessions**: Verify if blocking should be enabled

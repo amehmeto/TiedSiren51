@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-The TiedSiren51 mobile application requires a consistent, maintainable approach to UI component development. Without clear design system guidelines, we face:
+The TiedSiren mobile application requires a consistent, maintainable approach to UI component development. Without clear design system guidelines, we face:
 
 - Code duplication across screens and features
 - Inconsistent styling and user experience

@@ -27,7 +27,7 @@ Problems with untyped thunks:
 - Runtime errors if dependency doesn't exist
 - Must manually cast `extra` in every thunk
 
-TiedSiren51 has many dependencies injected via thunk `extraArgument`:
+TiedSiren has many dependencies injected via thunk `extraArgument`:
 - Repositories (BlockSession, Blocklist, Siren, Device)
 - Services (Auth, Notification, Database)
 - Providers (Date, BackgroundTask)

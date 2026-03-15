@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 uses Prisma with SQLite on both iOS and Android. Prisma requires an absolute file path for its SQLite datasource. Each platform has different file system conventions:
+TiedSiren uses Prisma with SQLite on both iOS and Android. Prisma requires an absolute file path for its SQLite datasource. Each platform has different file system conventions:
 
 - **iOS**: Apps store data in `~/Documents/` (backed up to iCloud by default)
 - **Android**: Apps store data in `/data/data/<package>/files/`, with databases conventionally in a `/databases/` subdirectory

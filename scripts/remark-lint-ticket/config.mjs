@@ -9,12 +9,12 @@
 export const GITHUB_ORG = 'amehmeto'
 
 // Main repository name (used as default context for local refs)
-export const MAIN_REPO = 'TiedSiren51'
+export const MAIN_REPO = 'TiedSiren'
 
 // Valid repos with their GitHub URLs
 // Use 'NEW_REPO: <name>' when the ticket requires creating a new repository (e.g., "NEW_REPO: my-new-repo")
 export const VALID_REPOS = {
-  TiedSiren51: `https://github.com/amehmeto/TiedSiren51`,
+  TiedSiren: `https://github.com/amehmeto/TiedSiren`,
   'expo-accessibility-service': `https://github.com/amehmeto/expo-accessibility-service`,
   'expo-foreground-service': `https://github.com/amehmeto/expo-foreground-service`,
   'tied-siren-blocking-overlay': `https://github.com/amehmeto/tied-siren-blocking-overlay`,
@@ -25,13 +25,13 @@ export const VALID_REPOS = {
 // Format: repo#N or abbrev#N (e.g., tied-siren-blocking-overlay#9 or TSBO#9)
 export const REPO_ABBREVIATIONS = {
   // Full names map to themselves
-  TiedSiren51: 'TiedSiren51',
+  TiedSiren: 'TiedSiren',
   'expo-accessibility-service': 'expo-accessibility-service',
   'expo-foreground-service': 'expo-foreground-service',
   'tied-siren-blocking-overlay': 'tied-siren-blocking-overlay',
   'expo-list-installed-apps': 'expo-list-installed-apps',
   // Short abbreviations
-  TS: 'TiedSiren51',
+  TS: 'TiedSiren',
   EAS: 'expo-accessibility-service',
   EFS: 'expo-foreground-service',
   TSBO: 'tied-siren-blocking-overlay',
@@ -41,7 +41,7 @@ export const REPO_ABBREVIATIONS = {
 // Single source of truth: repo name -> prefix mapping
 // Used for display abbreviations, ticket prefixes, and reverse lookups
 const REPO_PREFIXES = {
-  TiedSiren51: 'TS',
+  TiedSiren: 'TS',
   'expo-accessibility-service': 'EAS',
   'expo-foreground-service': 'EFS',
   'tied-siren-blocking-overlay': 'TSBO',
@@ -144,17 +144,17 @@ export const SECTION_TEMPLATES = {
   '📋 Epics':
     '| # | Epic | Status | Notes |\n|---|------|--------|-------|\n| #XX | Epic title | 🔲 Todo | |',
   '🔗 Hierarchy':
-    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
+    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren/issues/XX) |',
 }
 
 // Hierarchy templates per ticket type (used for more specific fix suggestions)
 export const HIERARCHY_TEMPLATES = {
   feature:
-    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
+    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren/issues/XX) |',
   bug:
-    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
+    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren/issues/XX) |\n| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren/issues/XX) |',
   epic:
-    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |',
+    '| Level | Link |\n|-------|------|\n| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren/issues/XX) |',
   initiative:
     '| Level | Description |\n|-------|-------------|\n| 🚀 **Initiative** | ← You are here |\n| 🏔️ Epics | Listed in table above |\n| 📋 Issues | Inside each Epic |',
 }

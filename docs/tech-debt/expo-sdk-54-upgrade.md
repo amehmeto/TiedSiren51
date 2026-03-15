@@ -9,7 +9,7 @@
 
 ## Executive Summary
 
-Upgrading TiedSiren51 from Expo SDK 51 to SDK 54 is **currently blocked** by `@prisma/react-native`, which does not support the New Architecture enabled by default in SDK 53+. The Prisma team is aware of this issue and working on a TypeScript rewrite expected in H2 2025.
+Upgrading TiedSiren from Expo SDK 51 to SDK 54 is **currently blocked** by `@prisma/react-native`, which does not support the New Architecture enabled by default in SDK 53+. The Prisma team is aware of this issue and working on a TypeScript rewrite expected in H2 2025.
 
 **Recommendation**: Wait for Prisma fix, OR migrate to alternative local database solution.
 

@@ -9,9 +9,9 @@ This document visualizes the dependencies between GitHub issues to help with pla
 
 The following issues were detected in the dependency graph:
 
-- **dangling_ref**: Node TiedSiren51#389 depends on non-existent node TiedSiren51#57
-- **dangling_ref**: Node TiedSiren51#219 depends on non-existent node TiedSiren51#55
-- **dangling_ref**: Node TiedSiren51#183 depends on non-existent node TiedSiren51#177
+- **dangling_ref**: Node TiedSiren#389 depends on non-existent node TiedSiren#57
+- **dangling_ref**: Node TiedSiren#219 depends on non-existent node TiedSiren#55
+- **dangling_ref**: Node TiedSiren#183 depends on non-existent node TiedSiren#177
 
 ---
 
@@ -429,7 +429,7 @@ Quick reference showing what blocks what:
 
 | Repo | URL |
 |------|-----|
-| TiedSiren51 | https://github.com/amehmeto/TiedSiren51 |
+| TiedSiren | https://github.com/amehmeto/TiedSiren |
 | expo-accessibility-service | https://github.com/amehmeto/expo-accessibility-service |
 | expo-foreground-service | https://github.com/amehmeto/expo-foreground-service |
 | tied-siren-blocking-overlay | https://github.com/amehmeto/tied-siren-blocking-overlay |

@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51's core feature is blocking distracting apps. To block apps, we must:
+TiedSiren's core feature is blocking distracting apps. To block apps, we must:
 
 - **Discover installed apps**: Get list of all apps on user's device
 - **Filter apps**: Show only user-installed apps (exclude system apps)
@@ -281,7 +281,7 @@ To update the native module:
 2. Modify Kotlin code in `android/src/main/java/`
 3. Test with example app
 4. Publish updated version to npm
-5. Update dependency in TiedSiren51
+5. Update dependency in TiedSiren
 
 ## Related ADRs
 

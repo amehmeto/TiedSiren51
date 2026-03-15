@@ -17,7 +17,7 @@ React's `useEffect` hook is a powerful escape hatch for synchronizing components
 - **Component coupling**: Business logic embedded in components is harder to reuse and test
 - **Performance**: Effects run after every render by default, potentially causing unnecessary work
 
-In TiedSiren51's hexagonal architecture, business logic belongs in the core layer (Redux), not in UI components. When effects contain significant logic, they violate separation of concerns and make the codebase harder to maintain.
+In TiedSiren's hexagonal architecture, business logic belongs in the core layer (Redux), not in UI components. When effects contain significant logic, they violate separation of concerns and make the codebase harder to maintain.
 
 **Example of problematic pattern:**
 
@@ -267,7 +267,7 @@ const useTimerEffect = (callback) => {
 ### 4. React Query / SWR for All Data
 
 **Rejected because**:
-- TiedSiren51 is local-first (not server-driven)
+- TiedSiren is local-first (not server-driven)
 - Redux already handles state management well
 - Would add unnecessary dependency
 - Doesn't solve non-data-fetching effect cases
@@ -344,7 +344,7 @@ builder.addCase(tickTimer, (state) => {
 
 ## References
 
-- [PR #121 Discussion](https://github.com/amehmeto/TiedSiren51/pull/121) - Pattern emerged from code review
+- [PR #121 Discussion](https://github.com/amehmeto/TiedSiren/pull/121) - Pattern emerged from code review
 - [React useEffect Guide](https://react.dev/reference/react/useEffect)
 - [You Might Not Need an Effect](https://react.dev/learn/you-might-not-need-an-effect)
 - [Redux Listeners](https://redux-toolkit.js.org/api/createListenerMiddleware)

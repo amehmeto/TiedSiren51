@@ -10,7 +10,7 @@ have been fully replaced by PowerSync + OP-SQLite.
 
 ## Context
 
-TiedSiren51 initially adopted PouchDB for local-first data persistence:
+TiedSiren initially adopted PouchDB for local-first data persistence:
 
 **Why PouchDB Was Chosen Initially**:
 - Document-oriented database

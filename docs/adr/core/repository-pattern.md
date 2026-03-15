@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51's hexagonal architecture requires abstracting data access from the core business logic:
+TiedSiren's hexagonal architecture requires abstracting data access from the core business logic:
 
 - **Separation of concerns**: Core shouldn't know about PowerSync, SQLite, or any specific database
 - **Testability**: Need to swap real database with in-memory fakes for testing

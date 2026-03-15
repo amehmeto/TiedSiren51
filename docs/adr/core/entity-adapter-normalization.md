@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 manages collections of entities with relationships:
+TiedSiren manages collections of entities with relationships:
 
 - **Sirens**: Individual apps/websites/keywords to block
 - **Blocklists**: Collections of sirens (many sirens per blocklist)

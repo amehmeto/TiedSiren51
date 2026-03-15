@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 needs end-to-end testing to verify complete user workflows:
+TiedSiren needs end-to-end testing to verify complete user workflows:
 
 - User registration and login
 - Creating blocklists

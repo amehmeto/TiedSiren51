@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 needs a unit testing framework for:
+TiedSiren needs a unit testing framework for:
 - Business logic in `/core` (use cases, slices, selectors)
 - UI components and view models in `/ui`
 - Repository implementations in `/infra`

@@ -76,7 +76,7 @@ node scripts/ticket-graph/generate-dependency-graph.mjs
 ```
 
 This script will:
-1. Fetch issues from all repos in parallel (TiedSiren51, tied-siren-blocking-overlay, expo-*, etc.)
+1. Fetch issues from all repos in parallel (TiedSiren, tied-siren-blocking-overlay, expo-*, etc.)
 2. Build a **TicketGraph** data structure with nodes and edges
 3. **Validate** the graph (detect cycles, dangling refs, bidirectional mismatches)
 4. **Auto-fix bidirectional mismatches** by updating GitHub issues via `gh issue edit`
@@ -148,7 +148,7 @@ The script detects orphan tickets (open, non-epic, no hierarchy section) and:
 ## 🔵 In Progress
 | # | Title | Repo | PR |
 |---|-------|------|-----|
-| #179 | selectBlockingSchedule | TiedSiren51 | #197 |
+| #179 | selectBlockingSchedule | TiedSiren | #197 |
 
 ## 🟡 Blocked
 | # | Title | Blocked By |
@@ -240,7 +240,7 @@ npm run graph:view         # ASCII tree view in terminal
 
 | Abbreviation | Full Name |
 |--------------|-----------|
-| TiedSiren51 | amehmeto/TiedSiren51 |
+| TiedSiren | amehmeto/TiedSiren |
 | blocking-overlay | amehmeto/tied-siren-blocking-overlay |
 | expo-accessibility-service | amehmeto/expo-accessibility-service |
 | expo-foreground-service | amehmeto/expo-foreground-service |

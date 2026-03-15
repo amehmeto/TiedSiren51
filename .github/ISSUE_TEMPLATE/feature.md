@@ -11,7 +11,7 @@ assignees: ''
 Example: TS-123: feat(auth): add login button
 
 Ticket prefixes by repo:
-- TS = TiedSiren51
+- TS = TiedSiren
 - TSBO = tied-siren-blocking-overlay
 - EAS = expo-accessibility-service
 - EFS = expo-foreground-service
@@ -26,13 +26,13 @@ This metadata is parsed by the linter and used for tracking.
 ```yaml
 # 📦 METADATA
 # repo: Must be one of:
-#   - TiedSiren51 (https://github.com/amehmeto/TiedSiren51)
+#   - TiedSiren (https://github.com/amehmeto/TiedSiren)
 #   - expo-accessibility-service (https://github.com/amehmeto/expo-accessibility-service)
 #   - expo-foreground-service (https://github.com/amehmeto/expo-foreground-service)
 #   - tied-siren-blocking-overlay (https://github.com/amehmeto/tied-siren-blocking-overlay)
 #   - expo-list-installed-apps (https://github.com/amehmeto/expo-list-installed-apps)
 #   - NEW_REPO: <name> (if a new repository is needed)
-repo: TiedSiren51
+repo: TiedSiren
 story_points: 0    # Fibonacci: 1, 2, 3, 5, 8, 13, 21
 labels:            # From: enhancement, bug, blocking, auth, android, epic, initiative, needs-refinement
   - enhancement
@@ -183,8 +183,8 @@ Replace XX with actual issue numbers
 
 | Level | Link |
 |-------|------|
-| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
-| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| 🚀 Initiative | [#XX - Initiative Name](https://github.com/amehmeto/TiedSiren/issues/XX) |
+| 🏔️ Epic | [#XX - Epic Name](https://github.com/amehmeto/TiedSiren/issues/XX) |
 
 ## 🔗 Related
 
@@ -195,6 +195,6 @@ Remove lines that don't apply
 
 | Relation | Link |
 |----------|------|
-| ⬅️ Depends on | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
-| ➡️ Blocks | [#XX - Title](https://github.com/amehmeto/TiedSiren51/issues/XX) |
+| ⬅️ Depends on | [#XX - Title](https://github.com/amehmeto/TiedSiren/issues/XX) |
+| ➡️ Blocks | [#XX - Title](https://github.com/amehmeto/TiedSiren/issues/XX) |
 | 📚 ADR | `/docs/adr/relevant-decision.md` |

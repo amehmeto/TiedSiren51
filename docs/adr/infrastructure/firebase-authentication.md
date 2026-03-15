@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 requires user authentication to:
+TiedSiren requires user authentication to:
 - Sync user data across devices
 - Manage user-specific blocklists and sessions
 - Provide personalized app experiences

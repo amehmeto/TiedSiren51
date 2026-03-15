@@ -149,5 +149,5 @@ Rejected: More complex build configuration, harder to type-check, and unnecessar
 
 ## References
 
-- [PR #344](https://github.com/amehmeto/TiedSiren51/pull/344) — Initial implementation
+- [PR #344](https://github.com/amehmeto/TiedSiren/pull/344) — Initial implementation
 - [Martin Fowler on Feature Toggles](https://martinfowler.com/articles/feature-toggles.html)

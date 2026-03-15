@@ -7,7 +7,7 @@
 
 ## Overview
 
-This directory tracks technical debt and planned improvements for TiedSiren51. Each file represents a specific area of concern or improvement opportunity.
+This directory tracks technical debt and planned improvements for TiedSiren. Each file represents a specific area of concern or improvement opportunity.
 
 ## Active Technical Debt Items
 

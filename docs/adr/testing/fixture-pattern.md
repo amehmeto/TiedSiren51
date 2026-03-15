@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-Tests in TiedSiren51 need to create complex domain objects:
+Tests in TiedSiren need to create complex domain objects:
 
 - **Sirens**: With type (app/website/keyword), platform, validation rules
 - **Blocklists**: Collections of sirens with metadata

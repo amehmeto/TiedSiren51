@@ -8,7 +8,7 @@ Double read by amehmeto
 
 ## Context
 
-TiedSiren51 extensively uses dates and times for:
+TiedSiren extensively uses dates and times for:
 
 - **Block session scheduling**: Determining when sessions start/end
 - **Timer countdown**: Tracking when strict mode timer expires

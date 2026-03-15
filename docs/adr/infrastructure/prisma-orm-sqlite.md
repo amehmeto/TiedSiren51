@@ -8,7 +8,7 @@ Superseded by [PowerSync + OP-SQLite](powersync-op-sqlite.md)
 
 ## Context
 
-TiedSiren51 requires local-first data persistence for:
+TiedSiren requires local-first data persistence for:
 
 - Block sessions with timing information
 - Blocklists containing collections of sirens

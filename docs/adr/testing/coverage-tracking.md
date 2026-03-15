@@ -8,7 +8,7 @@ Accepted
 
 ## Context
 
-TiedSiren51 maintains high test coverage (currently 98.83%). Need to:
+TiedSiren maintains high test coverage (currently 98.83%). Need to:
 
 - **Track coverage over time**: See trends and regressions
 - **PR reviews**: Compare coverage changes in pull requests
