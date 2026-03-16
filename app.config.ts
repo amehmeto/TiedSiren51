@@ -1,13 +1,12 @@
 import type { ExpoConfig } from 'expo/config'
 
-import { colors } from './ui/design-system/colors.js'
-import { rgbaToHex } from './ui/design-system/rgba-to-hex.js'
-
-const { darkBlue, darkBlueGray, lightBlue, white } = colors
-const DARK_BLUE = rgbaToHex(darkBlue)
-const DARK_BLUE_GRAY = rgbaToHex(darkBlueGray)
-const LIGHT_BLUE = rgbaToHex(lightBlue)
-const WHITE = rgbaToHex(white)
+// Original hex values — kept until we resolve the Android crash
+// caused by using design system rgba-to-hex converted values.
+// TODO: Replace with colors.js imports once root cause is found.
+const DARK_BLUE = '#0C207A'
+const DARK_BLUE_GRAY = '#1E293B'
+const LIGHT_BLUE = '#00D4FF'
+const WHITE = '#FFFFFF'
 const APP_DOMAIN = 'com-tiedsiren.firebaseapp.com'
 
 const config: { expo: ExpoConfig } = {
