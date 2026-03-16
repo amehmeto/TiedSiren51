@@ -1,14 +1,16 @@
-/**
- * Color values sourced from ui/design-system/colors.js
- * Run tests to verify sync: npx vitest run ui/design-system/colors.spec.ts
- */
-const DARK_BLUE = '#0C207A'
-const DARK_BLUE_GRAY = '#1E293B'
-const LIGHT_BLUE = '#00D4FF'
-const WHITE = '#FFFFFF'
+import type { ExpoConfig } from 'expo/config'
+
+import { colors } from './ui/design-system/colors.js'
+import { rgbaToHex } from './ui/design-system/rgba-to-hex.js'
+
+const { darkBlue, darkBlueGray, lightBlue, white } = colors
+const DARK_BLUE = rgbaToHex(darkBlue)
+const DARK_BLUE_GRAY = rgbaToHex(darkBlueGray)
+const LIGHT_BLUE = rgbaToHex(lightBlue)
+const WHITE = rgbaToHex(white)
 const APP_DOMAIN = 'com-tiedsiren.firebaseapp.com'
 
-export default {
+const config: { expo: ExpoConfig } = {
   expo: {
     name: 'TiedSiren',
     slug: 'TiedSiren',
@@ -132,3 +134,5 @@ export default {
     owner: 'epictechtus',
   },
 }
+
+export default config
