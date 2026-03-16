@@ -1,17 +1,16 @@
-/**
- * Colors must stay in sync with ui/design-system/theme.ts
- * - darkBlue:     T.color.darkBlue     = rgba(12, 32, 122, 1)
- * - darkBlueGray: T.color.darkBlueGray = rgba(30, 41, 59, 1)
- * - lightBlue:    T.color.lightBlue    = rgba(0, 212, 255, 1)
- * - white:        T.color.white        = rgba(255, 255, 255, 1)
- */
-const DARK_BLUE = '#0C207A'
-const DARK_BLUE_GRAY = '#1E293B'
-const LIGHT_BLUE = '#00D4FF'
-const WHITE = '#FFFFFF'
+import type { ExpoConfig } from 'expo/config'
+
+import { colors } from './ui/design-system/colors.js'
+import { rgbaToHex } from './ui/design-system/rgba-to-hex.js'
+
+const { darkBlue, darkBlueGray, lightBlue, white } = colors
+const DARK_BLUE = rgbaToHex(darkBlue)
+const DARK_BLUE_GRAY = rgbaToHex(darkBlueGray)
+const LIGHT_BLUE = rgbaToHex(lightBlue)
+const WHITE = rgbaToHex(white)
 const APP_DOMAIN = 'com-tiedsiren.firebaseapp.com'
 
-export default {
+const config: { expo: ExpoConfig } = {
   expo: {
     name: 'TiedSiren',
     slug: 'TiedSiren',
@@ -135,3 +134,5 @@ export default {
     owner: 'epictechtus',
   },
 }
+
+export default config

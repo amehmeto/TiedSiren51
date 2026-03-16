@@ -24,6 +24,7 @@ export const T = {
     borderSubtle: 'rgba(51, 65, 85, 0.4)',
     gradientMid: 'rgba(25, 32, 95, 1)',
     inputBackground: 'rgba(15, 23, 42, 0.3)',
+    white: 'rgba(255, 255, 255, 1)',
   },
   font: {
     size: {
