@@ -127,7 +127,7 @@
     "react-dom": "19.2.0",
     "react-native": "0.83.2",
     "react-native-gesture-handler": "~2.30.0",
-    "react-native-modal-datetime-picker": "github:amehmeto/react-native-modal-datetime-picker",
+    "react-native-modal-datetime-picker": "github:amehmeto/react-native-modal-datetime-picker#0318221",
     "react-native-pager-view": "8.0.0",
     "react-native-quick-base64": "2.1.2",
     "react-native-reanimated": "4.2.1",

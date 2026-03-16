@@ -1,6 +1,6 @@
 // This file is .js (not .ts) because app.config.ts imports it, and Expo
 // evaluates that config in Node.js which cannot resolve .ts imports.
-// See colors.spec.ts for the sync test that prevents drift with T.color.
+// See colors.spec.ts for the sync test that prevents drift with T.
 
 /** @type {Record<string, string>} */
 export const colors = {
@@ -29,4 +29,13 @@ export const colors = {
   gradientMid: 'rgba(25, 32, 95, 1)',
   inputBackground: 'rgba(15, 23, 42, 0.3)',
   white: 'rgba(255, 255, 255, 1)',
+}
+
+/** @type {Record<string, number>} */
+export const borderRadius = {
+  roundedSmall: 8,
+  roundedMedium: 12,
+  roundedLarge: 16,
+  extraRounded: 20,
+  fullRound: 100,
 }

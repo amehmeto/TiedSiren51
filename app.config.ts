@@ -1,6 +1,6 @@
 import type { ExpoConfig } from 'expo/config'
 
-import { colors } from './ui/design-system/colors.js'
+import { borderRadius, colors } from './ui/design-system/colors.js'
 import { rgbaToHex } from './ui/design-system/rgba-to-hex.js'
 
 const { darkBlue, darkBlueGray, lightBlue, white } = colors
@@ -112,7 +112,9 @@ const config: { expo: ExpoConfig } = {
               textColor: { light: WHITE, dark: WHITE },
               textColorSecondary: { light: DARK_BLUE, dark: DARK_BLUE },
               colorAccent: { light: LIGHT_BLUE, dark: LIGHT_BLUE },
+              colorControlNormal: { light: WHITE, dark: WHITE },
               windowBackground: { light: DARK_BLUE_GRAY, dark: DARK_BLUE_GRAY },
+              borderRadius: borderRadius.roundedMedium,
             },
           },
         },
