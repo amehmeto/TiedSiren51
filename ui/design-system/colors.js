@@ -1,3 +1,7 @@
+// This file is .js (not .ts) because app.config.ts imports it, and Expo
+// evaluates that config in Node.js which cannot resolve .ts imports.
+// See colors.spec.ts for the sync test that prevents drift with T.color.
+
 /** @type {Record<string, string>} */
 export const colors = {
   transparent: 'transparent',
