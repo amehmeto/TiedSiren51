@@ -1,15 +1,14 @@
-import type { ExpoConfig } from 'expo/config'
-
-// Original hex values — kept until we resolve the Android crash
-// caused by using design system rgba-to-hex converted values.
-// TODO: Replace with colors.js imports once root cause is found.
+/**
+ * Color values sourced from ui/design-system/colors.js
+ * Run tests to verify sync: npx vitest run ui/design-system/colors.spec.ts
+ */
 const DARK_BLUE = '#0C207A'
 const DARK_BLUE_GRAY = '#1E293B'
 const LIGHT_BLUE = '#00D4FF'
 const WHITE = '#FFFFFF'
 const APP_DOMAIN = 'com-tiedsiren.firebaseapp.com'
 
-const config: { expo: ExpoConfig } = {
+export default {
   expo: {
     name: 'TiedSiren',
     slug: 'TiedSiren',
@@ -133,5 +132,3 @@ const config: { expo: ExpoConfig } = {
     owner: 'epictechtus',
   },
 }
-
-export default config
