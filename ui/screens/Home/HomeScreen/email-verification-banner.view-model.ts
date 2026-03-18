@@ -1,3 +1,4 @@
+import { createSelector } from '@reduxjs/toolkit'
 import { RootState } from '@/core/_redux_/createStore'
 import { AuthProvider } from '@/core/auth/auth-user'
 import { getOpenEmailLabel } from '@/core/auth/email-provider'
@@ -19,28 +20,29 @@ type VisibleBanner = {
 
 type EmailVerificationBannerViewModel = HiddenBanner | VisibleBanner
 
-export function selectEmailVerificationBannerViewModel(
-  state: RootState,
-): EmailVerificationBannerViewModel {
-  const { authUser, isSendingVerificationEmail, error } = state.auth
+export const selectEmailVerificationBannerViewModel = createSelector(
+  [(state: RootState) => state.auth],
+  (auth): EmailVerificationBannerViewModel => {
+    const { authUser, isSendingVerificationEmail, error } = auth
 
-  if (!authUser) return { visible: false }
+    if (!authUser) return { visible: false }
 
-  const { isEmailVerified, authProvider, email } = authUser
+    const { isEmailVerified, authProvider, email } = authUser
 
-  if (isEmailVerified || authProvider !== AuthProvider.Email)
-    return { visible: false }
+    if (isEmailVerified || authProvider !== AuthProvider.Email)
+      return { visible: false }
 
-  return {
-    visible: true,
-    title: 'Verify your email',
-    description: 'Check your inbox and tap the verification link.',
-    openEmailLabel: getOpenEmailLabel(email),
-    isSendingVerificationEmail,
-    resendVerificationEmailLabel: isSendingVerificationEmail
-      ? 'Sending...'
-      : 'Resend email',
-    userEmail: email,
-    error: error?.message ?? null,
-  }
-}
+    return {
+      visible: true,
+      title: 'Verify your email',
+      description: 'Check your inbox and tap the verification link.',
+      openEmailLabel: getOpenEmailLabel(email),
+      isSendingVerificationEmail,
+      resendVerificationEmailLabel: isSendingVerificationEmail
+        ? 'Sending...'
+        : 'Resend email',
+      userEmail: email,
+      error: error?.message ?? null,
+    }
+  },
+)

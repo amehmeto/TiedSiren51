@@ -1,3 +1,4 @@
+import { createSelector } from '@reduxjs/toolkit'
 import { RootState } from '@/core/_redux_/createStore'
 import { AuthBaseViewModel } from '@/ui/screens/Auth/auth-view-model-base'
 
@@ -13,39 +14,42 @@ export type SignUpViewModel = AuthBaseViewModel<SignUpViewState> & {
   password: string
 }
 
-export function selectSignUpViewModel(state: RootState): SignUpViewModel {
-  const { isLoading, email, password } = state.auth
-  const error = state.auth.error?.message ?? null
-  const { Loading, Error, Idle } = SignUpViewState
+export const selectSignUpViewModel = createSelector(
+  [(state: RootState) => state.auth],
+  (auth): SignUpViewModel => {
+    const { isLoading, email, password } = auth
+    const error = auth.error?.message ?? null
+    const { Loading, Error, Idle } = SignUpViewState
 
-  if (isLoading) {
+    if (isLoading) {
+      return {
+        type: Loading,
+        buttonText: 'CREATING ACCOUNT...',
+        isInputDisabled: true,
+        error: null,
+        email,
+        password,
+      }
+    }
+
+    if (error) {
+      return {
+        type: Error,
+        buttonText: 'CREATE YOUR ACCOUNT',
+        isInputDisabled: false,
+        error,
+        email,
+        password,
+      }
+    }
+
     return {
-      type: Loading,
-      buttonText: 'CREATING ACCOUNT...',
-      isInputDisabled: true,
+      type: Idle,
+      buttonText: 'CREATE YOUR ACCOUNT',
+      isInputDisabled: false,
       error: null,
       email,
       password,
     }
-  }
-
-  if (error) {
-    return {
-      type: Error,
-      buttonText: 'CREATE YOUR ACCOUNT',
-      isInputDisabled: false,
-      error,
-      email,
-      password,
-    }
-  }
-
-  return {
-    type: Idle,
-    buttonText: 'CREATE YOUR ACCOUNT',
-    isInputDisabled: false,
-    error: null,
-    email,
-    password,
-  }
-}
+  },
+)
