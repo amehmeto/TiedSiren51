@@ -55,9 +55,6 @@ jobs:
         with:
           node-version-file: .nvmrc
 
-      - name: Install npm 11
-        run: npm install -g npm@11
-
       - name: Install dependencies
         run: npm ci
 
@@ -78,9 +75,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-
-      - name: Install npm 11
-        run: npm install -g npm@11
 
       - name: Install dependencies
         run: npm ci
@@ -108,9 +102,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version-file: .nvmrc
-
-      - name: Install npm 11
-        run: npm install -g npm@11
 
       - name: Install dependencies
         run: npm ci
@@ -190,9 +181,6 @@ jobs:
         with:
           eas-version: 16.24.1
           token: ${{ secrets.EXPO_TOKEN }}
-
-      - name: Install npm 11
-        run: npm install -g npm@11
 
       - name: Install dependencies
         run: npm ci --include=dev
