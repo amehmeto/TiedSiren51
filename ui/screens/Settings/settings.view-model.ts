@@ -1,3 +1,4 @@
+import { createSelector } from '@reduxjs/toolkit'
 import { RootState } from '@/core/_redux_/createStore'
 import { AuthProvider } from '@/core/auth/auth-user'
 
@@ -15,13 +16,16 @@ const AUTH_PROVIDER_LABELS: Record<AuthProvider, string> = {
   [Apple]: 'Apple',
 }
 
-export function selectSettingsViewModel(state: RootState): SettingsViewModel {
-  const authUser = state.auth.authUser
-  const provider = authUser ? authUser.authProvider : Email
+export const selectSettingsViewModel = createSelector(
+  [(state: RootState) => state.auth],
+  (auth): SettingsViewModel => {
+    const authUser = auth.authUser
+    const provider = authUser ? authUser.authProvider : Email
 
-  return {
-    email: authUser?.email ?? '',
-    authProviderLabel: AUTH_PROVIDER_LABELS[provider],
-    hasPasswordProvider: provider === Email,
-  }
-}
+    return {
+      email: authUser?.email ?? '',
+      authProviderLabel: AUTH_PROVIDER_LABELS[provider],
+      hasPasswordProvider: provider === Email,
+    }
+  },
+)

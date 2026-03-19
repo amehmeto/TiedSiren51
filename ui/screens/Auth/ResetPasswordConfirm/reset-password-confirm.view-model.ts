@@ -1,3 +1,4 @@
+import { createSelector } from '@reduxjs/toolkit'
 import { RootState } from '@/core/_redux_/createStore'
 
 export enum ResetPasswordConfirmViewState {
@@ -23,40 +24,41 @@ type FormViewModel = {
 
 export type ResetPasswordConfirmViewModel = FormViewModel | SuccessViewModel
 
-export function selectResetPasswordConfirmViewModel(
-  state: RootState,
-): ResetPasswordConfirmViewModel {
-  const {
-    isConfirmingPasswordReset,
-    confirmPasswordResetError,
-    isPasswordResetConfirmed,
-  } = state.auth
-  const { Success, Loading, Error, Idle } = ResetPasswordConfirmViewState
+export const selectResetPasswordConfirmViewModel = createSelector(
+  [(state: RootState) => state.auth],
+  (auth): ResetPasswordConfirmViewModel => {
+    const {
+      isConfirmingPasswordReset,
+      confirmPasswordResetError,
+      isPasswordResetConfirmed,
+    } = auth
+    const { Success, Loading, Error, Idle } = ResetPasswordConfirmViewState
 
-  if (isPasswordResetConfirmed) return { type: Success }
+    if (isPasswordResetConfirmed) return { type: Success }
 
-  if (isConfirmingPasswordReset) {
-    return {
-      type: Loading,
-      buttonText: 'RESETTING...',
-      isInputDisabled: true,
-      error: null,
+    if (isConfirmingPasswordReset) {
+      return {
+        type: Loading,
+        buttonText: 'RESETTING...',
+        isInputDisabled: true,
+        error: null,
+      }
     }
-  }
 
-  if (confirmPasswordResetError) {
+    if (confirmPasswordResetError) {
+      return {
+        type: Error,
+        buttonText: 'RESET PASSWORD',
+        isInputDisabled: false,
+        error: confirmPasswordResetError,
+      }
+    }
+
     return {
-      type: Error,
+      type: Idle,
       buttonText: 'RESET PASSWORD',
       isInputDisabled: false,
-      error: confirmPasswordResetError,
+      error: null,
     }
-  }
-
-  return {
-    type: Idle,
-    buttonText: 'RESET PASSWORD',
-    isInputDisabled: false,
-    error: null,
-  }
-}
+  },
+)
