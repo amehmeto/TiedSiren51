@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit'
-import { selectAuthSlice } from '@/core/auth/selectors/selectAuthSlice'
+import { RootState } from '@/core/_redux_/createStore'
 import { AuthProvider } from '@/core/auth/auth-user'
 
 type SettingsViewModel = {
@@ -17,7 +17,7 @@ const AUTH_PROVIDER_LABELS: Record<AuthProvider, string> = {
 }
 
 export const selectSettingsViewModel = createSelector(
-  [selectAuthSlice],
+  [(state: RootState) => state.auth],
   (auth): SettingsViewModel => {
     const authUser = auth.authUser
     const provider = authUser ? authUser.authProvider : Email

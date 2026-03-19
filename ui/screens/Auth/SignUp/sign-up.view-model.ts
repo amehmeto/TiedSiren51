@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit'
-import { selectAuthSlice } from '@/core/auth/selectors/selectAuthSlice'
+import { RootState } from '@/core/_redux_/createStore'
 import { AuthBaseViewModel } from '@/ui/screens/Auth/auth-view-model-base'
 
 export enum SignUpViewState {
@@ -15,7 +15,7 @@ export type SignUpViewModel = AuthBaseViewModel<SignUpViewState> & {
 }
 
 export const selectSignUpViewModel = createSelector(
-  [selectAuthSlice],
+  [(state: RootState) => state.auth],
   (auth): SignUpViewModel => {
     const { isLoading, email, password } = auth
     const error = auth.error?.message ?? null
