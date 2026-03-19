@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit'
-import { RootState } from '@/core/_redux_/createStore'
+import { selectAuthSlice } from '@/core/auth/selectors/selectAuthSlice'
 import { AuthProvider } from '@/core/auth/auth-user'
 import { getOpenEmailLabel } from '@/core/auth/email-provider'
 
@@ -21,7 +21,7 @@ type VisibleBanner = {
 type EmailVerificationBannerViewModel = HiddenBanner | VisibleBanner
 
 export const selectEmailVerificationBannerViewModel = createSelector(
-  [(state: RootState) => state.auth],
+  [selectAuthSlice],
   (auth): EmailVerificationBannerViewModel => {
     const { authUser, isSendingVerificationEmail, error } = auth
 

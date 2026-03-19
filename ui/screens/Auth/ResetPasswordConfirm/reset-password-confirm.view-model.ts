@@ -1,5 +1,5 @@
 import { createSelector } from '@reduxjs/toolkit'
-import { RootState } from '@/core/_redux_/createStore'
+import { selectAuthSlice } from '@/core/auth/selectors/selectAuthSlice'
 
 export enum ResetPasswordConfirmViewState {
   Idle = 'IDLE',
@@ -25,7 +25,7 @@ type FormViewModel = {
 export type ResetPasswordConfirmViewModel = FormViewModel | SuccessViewModel
 
 export const selectResetPasswordConfirmViewModel = createSelector(
-  [(state: RootState) => state.auth],
+  [selectAuthSlice],
   (auth): ResetPasswordConfirmViewModel => {
     const {
       isConfirmingPasswordReset,
