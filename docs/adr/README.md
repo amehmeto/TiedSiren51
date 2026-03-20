@@ -25,6 +25,8 @@ Presentation layer: components, screens, design system, routing.
 - [Minimize useEffect Hook Usage](ui/minimize-useeffect-usage.md)
 - [Redux Over Context for UI State](ui/redux-over-context-for-ui-state.md)
 - [No Selector Prop Drilling](ui/no-selector-prop-drilling.md)
+- [Custom Hooks Encapsulate Dependencies](ui/custom-hooks-encapsulate-dependencies.md)
+- [Local State for UI Ticks](ui/local-state-for-ui-ticks.md)
 - [Centralized Services Initialization](services-initialization.md)
 
 #### Core Layer (`core/`)
@@ -35,6 +37,8 @@ Business logic: domain patterns, state management, use cases.
 - [Dependency Injection Pattern](core/dependency-injection-pattern.md)
 - [Repository Pattern](core/repository-pattern.md)
 - [Listener Pattern for Side Effects](core/listener-pattern.md)
+
+- [Port Naming Convention](core/port-naming-convention.md)
 
 **State Management:**
 - [Redux Toolkit for Business Logic](core/redux-toolkit-for-business-logic.md)
@@ -66,6 +70,7 @@ External services, databases, adapters, platform-specific implementations.
 - [Date Provider Pattern](infrastructure/date-provider-pattern.md)
 - [Foreground Service](infrastructure/foreground-service.md)
 - [SirenTier Orchestrator Pattern](infrastructure/siren-tier-orchestrator.md)
+- [Standalone Expo Modules](infrastructure/standalone-expo-modules.md)
 
 ### Cross-Cutting Concerns
 
@@ -80,6 +85,7 @@ Testing strategies, tools, and patterns across all layers.
 - [Exclude Prisma Integration Tests](testing/exclude-prisma-integration-tests.md)
 - [Maestro for E2E Testing](testing/maestro-for-e2e.md)
 - [Coverage Tracking and History](testing/coverage-tracking.md)
+- [Test Data Conventions](testing/test-data-conventions.md)
 
 #### Conventions (`conventions/`)
 Coding conventions and style decisions across all layers.
