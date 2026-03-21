@@ -66,6 +66,17 @@ export const onBlockingScheduleChangedListener = ({
         sirenLookout.stopWatching()
         await foregroundService.stop()
       }
+
+      // Schedule native-side alarms for future window transitions.
+      // This ensures the foreground service starts/stops at the right time
+      // even if the JS runtime is killed.
+      const activeWindows = schedule.map((s) => ({
+        startTime: dateProvider.toHHmm(
+          dateProvider.parseISOString(s.startTime),
+        ),
+        endTime: dateProvider.toHHmm(dateProvider.parseISOString(s.endTime)),
+      }))
+      await foregroundService.setActiveWindows(activeWindows)
     } catch (error) {
       logger.error(`[BlockingScheduleListener] ${error}`)
     }

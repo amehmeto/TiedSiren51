@@ -7,6 +7,7 @@ import { setBlockSessions } from '@/core/block-session/block-session.slice'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { setBlocklists } from '@/core/blocklist/blocklist.slice'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
+import { ForegroundServiceActiveWindow } from '@/core/_ports_/foreground.service'
 import { InMemoryForegroundService } from '@/infra/foreground-service/in-memory.foreground.service'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
@@ -119,6 +120,16 @@ export function blockingScheduleChangedFixture(
         expect(foregroundService.startCallCount).toBe(1)
         expect(sirenLookout.stopWatchingCallCount).toBe(0)
         expect(foregroundService.stopCallCount).toBe(0)
+      },
+      activeWindowsShouldBeSet(
+        expectedWindows: ForegroundServiceActiveWindow[],
+      ) {
+        expect(foregroundService.activeWindows).toEqual(expectedWindows)
+      },
+      activeWindowsShouldHaveBeenSynced() {
+        const setActiveWindowsCallCount =
+          foregroundService.setActiveWindowsCallCount
+        expect(setActiveWindowsCallCount).toBeGreaterThan(0)
       },
       errorShouldBeLogged(expectedMessage: string) {
         const errorLogs = logger

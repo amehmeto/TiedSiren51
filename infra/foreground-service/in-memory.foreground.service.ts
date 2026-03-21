@@ -1,5 +1,6 @@
 import {
   ForegroundService,
+  ForegroundServiceActiveWindow,
   ForegroundServiceConfig,
 } from '@/core/_ports_/foreground.service'
 
@@ -15,6 +16,10 @@ export class InMemoryForegroundService implements ForegroundService {
   public shouldThrowOnStart = false
 
   public shouldThrowOnStop = false
+
+  public activeWindows: ForegroundServiceActiveWindow[] = []
+
+  public setActiveWindowsCallCount = 0
 
   async start(config?: Partial<ForegroundServiceConfig>): Promise<void> {
     this.startCallCount++
@@ -35,10 +40,19 @@ export class InMemoryForegroundService implements ForegroundService {
     return this.isServiceRunning
   }
 
+  async setActiveWindows(
+    windows: ForegroundServiceActiveWindow[],
+  ): Promise<void> {
+    this.setActiveWindowsCallCount++
+    this.activeWindows = windows
+  }
+
   reset(): void {
     this.isServiceRunning = false
     this.startCallCount = 0
     this.stopCallCount = 0
     this.lastConfig = undefined
+    this.activeWindows = []
+    this.setActiveWindowsCallCount = 0
   }
 }
