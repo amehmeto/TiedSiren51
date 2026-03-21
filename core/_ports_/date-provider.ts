@@ -43,6 +43,7 @@ export interface DateProvider {
   getMinutesFromNow(minutes: number): Date
   getHHmmMinutesFromNow(minutes: number): HHmmString
   parseISOString(isoString: ISODateString): Date
+  toHHmmFromISO(isoString: ISODateString): HHmmString
   toISOString(date: Date): ISODateString
   msToISOString(ms: number): ISODateString
 }

@@ -13,8 +13,6 @@ import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
 import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 
-const flushMicrotasks = () => new Promise((r) => setTimeout(r, 0))
-
 type TimeOfDay = { hours: number; minutes: number }
 
 export function blockingScheduleChangedFixture(
@@ -70,7 +68,7 @@ export function blockingScheduleChangedFixture(
         )
         store.dispatch(setBlocklists(blocklists))
         store.dispatch(setBlockSessions(sessions))
-        await flushMicrotasks()
+        await new Promise((r) => setTimeout(r, 0))
       },
       async updatingBlocklist(blocklist: Blocklist) {
         store = createTestStore(
@@ -84,7 +82,7 @@ export function blockingScheduleChangedFixture(
           b.id === blocklist.id ? blocklist : b,
         )
         store.dispatch(setBlocklists(updatedBlocklists))
-        await flushMicrotasks()
+        await new Promise((r) => setTimeout(r, 0))
       },
     },
     then: {

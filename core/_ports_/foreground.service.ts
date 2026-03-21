@@ -1,11 +1,13 @@
+import { HHmmString } from '@/core/_ports_/date-provider'
+
 export type ForegroundServiceConfig = {
   title: string
   description: string
 }
 
 export type ForegroundServiceActiveWindow = {
-  startTime: string // HH:mm format
-  endTime: string // HH:mm format
+  startTime: HHmmString
+  endTime: HHmmString
 }
 
 export interface ForegroundService {
