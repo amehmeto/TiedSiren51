@@ -21,6 +21,8 @@ export class InMemoryForegroundService implements ForegroundService {
 
   public setActiveWindowsCallCount = 0
 
+  public clearActiveWindowsCallCount = 0
+
   async start(config?: Partial<ForegroundServiceConfig>): Promise<void> {
     this.startCallCount++
     if (this.shouldThrowOnStart)
@@ -47,6 +49,11 @@ export class InMemoryForegroundService implements ForegroundService {
     this.activeWindows = windows
   }
 
+  async clearActiveWindows(): Promise<void> {
+    this.clearActiveWindowsCallCount++
+    this.activeWindows = []
+  }
+
   reset(): void {
     this.isServiceRunning = false
     this.startCallCount = 0
@@ -54,5 +61,6 @@ export class InMemoryForegroundService implements ForegroundService {
     this.lastConfig = undefined
     this.activeWindows = []
     this.setActiveWindowsCallCount = 0
+    this.clearActiveWindowsCallCount = 0
   }
 }

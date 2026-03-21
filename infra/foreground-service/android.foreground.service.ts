@@ -76,6 +76,20 @@ export class AndroidForegroundService implements ForegroundService {
     return this.isServiceRunning
   }
 
+  async clearActiveWindows(): Promise<void> {
+    try {
+      if (Platform.OS !== 'android') return
+
+      await ExpoForegroundService.clearActiveWindows()
+      this.logger.info('[AndroidForegroundService] Cleared active windows')
+    } catch (error) {
+      this.logger.error(
+        `[AndroidForegroundService] Failed to clear active windows: ${error}`,
+      )
+      throw error
+    }
+  }
+
   async setActiveWindows(
     windows: ForegroundServiceActiveWindow[],
   ): Promise<void> {

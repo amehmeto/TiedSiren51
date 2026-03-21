@@ -13,4 +13,5 @@ export interface ForegroundService {
   stop(): Promise<void>
   isRunning(): boolean
   setActiveWindows(windows: ForegroundServiceActiveWindow[]): Promise<void>
+  clearActiveWindows(): Promise<void>
 }

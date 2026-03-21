@@ -1,5 +1,8 @@
 import { DateProvider } from '@/core/_ports_/date-provider'
-import { ForegroundService } from '@/core/_ports_/foreground.service'
+import {
+  ForegroundService,
+  ForegroundServiceActiveWindow,
+} from '@/core/_ports_/foreground.service'
 import { Logger } from '@/core/_ports_/logger'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { BlockingSchedule, SirenTier } from '@/core/_ports_/siren.tier'
@@ -45,9 +48,14 @@ export const onBlockingScheduleChangedListener = ({
   }
 
   let lastScheduleKey = ''
+  let lastActiveWindowsKey = ''
   let lastBlockSessionState = store.getState().blockSession
   let lastBlocklistState = store.getState().blocklist
   let isActiveNow = false
+
+  const getActiveWindowsKey = (
+    windows: ForegroundServiceActiveWindow[],
+  ): string => windows.map((w) => `${w.startTime}-${w.endTime}`).join('|')
 
   const syncSchedule = async (
     schedule: BlockingSchedule[],
@@ -65,6 +73,9 @@ export const onBlockingScheduleChangedListener = ({
       if (wasActiveBefore && !hasActiveSessionNow) {
         sirenLookout.stopWatching()
         await foregroundService.stop()
+        await foregroundService.clearActiveWindows()
+        lastActiveWindowsKey = ''
+        return
       }
 
       // Schedule native-side alarms for future window transitions.
@@ -76,7 +87,12 @@ export const onBlockingScheduleChangedListener = ({
         ),
         endTime: dateProvider.toHHmm(dateProvider.parseISOString(s.endTime)),
       }))
-      await foregroundService.setActiveWindows(activeWindows)
+
+      const windowsKey = getActiveWindowsKey(activeWindows)
+      if (windowsKey !== lastActiveWindowsKey) {
+        lastActiveWindowsKey = windowsKey
+        await foregroundService.setActiveWindows(activeWindows)
+      }
     } catch (error) {
       logger.error(`[BlockingScheduleListener] ${error}`)
     }
