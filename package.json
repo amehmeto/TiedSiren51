@@ -80,7 +80,7 @@
   },
   "dependencies": {
     "@amehmeto/expo-accessibility-service": "github:amehmeto/expo-accessibility-service",
-    "@amehmeto/expo-foreground-service": "github:amehmeto/expo-foreground-service",
+    "@amehmeto/expo-foreground-service": "github:amehmeto/expo-foreground-service#df1f0eeae9d8fbe1b9d8cbdc06b26d154acc5bfb",
     "@amehmeto/expo-list-installed-apps": "github:amehmeto/expo-list-installed-apps",
     "@amehmeto/tied-siren-blocking-overlay": "github:amehmeto/tied-siren-blocking-overlay",
     "@expo-google-fonts/inter": "^0.4.2",
