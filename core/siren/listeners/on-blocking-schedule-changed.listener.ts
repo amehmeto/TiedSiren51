@@ -163,6 +163,7 @@ export const onBlockingScheduleChangedListener = ({
     void syncSchedule(schedule, wasActiveBefore, hasActiveSession)
   })
 
+  /* v8 ignore next 4 -- cleanup function only called on unmount */
   return () => {
     unsubscribeServiceState()
     unsubscribeStore()
