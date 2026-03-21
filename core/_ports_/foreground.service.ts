@@ -16,4 +16,5 @@ export interface ForegroundService {
   isRunning(): boolean
   setActiveWindows(windows: ForegroundServiceActiveWindow[]): Promise<void>
   clearActiveWindows(): Promise<void>
+  addServiceStateListener(callback: (isRunning: boolean) => void): () => void
 }

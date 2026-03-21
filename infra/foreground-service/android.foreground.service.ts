@@ -113,6 +113,15 @@ export class AndroidForegroundService implements ForegroundService {
     }
   }
 
+  addServiceStateListener(callback: (isRunning: boolean) => void): () => void {
+    const subscription = ExpoForegroundService.addServiceEventListener(
+      (event) => {
+        callback(event.isRunning)
+      },
+    )
+    return () => subscription.remove()
+  }
+
   private async requestNotificationPermission(): Promise<void> {
     const permissionStatus = await ExpoForegroundService.requestPermissions()
     if (!permissionStatus.granted) {

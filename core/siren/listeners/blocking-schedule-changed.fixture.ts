@@ -115,6 +115,12 @@ export function blockingScheduleChangedFixture(
         expect(sirenLookout.isWatching).toBe(false)
         expect(foregroundService.isRunning()).toBe(false)
       },
+      foregroundServiceShouldNotBeRunning() {
+        expect(foregroundService.isRunning()).toBe(false)
+      },
+      sirenLookoutShouldBeWatchingPreemptively() {
+        expect(sirenLookout.isWatching).toBe(true)
+      },
       blockingShouldRemainActiveWithoutToggling() {
         expect(sirenLookout.isWatching).toBe(true)
         expect(foregroundService.isRunning()).toBe(true)

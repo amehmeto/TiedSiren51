@@ -54,6 +54,26 @@ export class InMemoryForegroundService implements ForegroundService {
     this.activeWindows = []
   }
 
+  addServiceStateListener(callback: (isRunning: boolean) => void): () => void {
+    this._serviceStateCallback = callback
+    return () => {
+      this._serviceStateCallback = undefined
+    }
+  }
+
+  /** Simulate a native service state change (e.g., from AlarmManager) */
+  simulateNativeServiceStart(): void {
+    this.isServiceRunning = true
+    this._serviceStateCallback?.(true)
+  }
+
+  simulateNativeServiceStop(): void {
+    this.isServiceRunning = false
+    this._serviceStateCallback?.(false)
+  }
+
+  private _serviceStateCallback?: (isRunning: boolean) => void
+
   reset(): void {
     this.isServiceRunning = false
     this.startCallCount = 0

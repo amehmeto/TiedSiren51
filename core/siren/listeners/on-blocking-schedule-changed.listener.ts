@@ -4,7 +4,10 @@ import {
   ForegroundServiceActiveWindow,
 } from '@/core/_ports_/foreground.service'
 import { Logger } from '@/core/_ports_/logger'
-import { SirenLookout } from '@/core/_ports_/siren.lookout'
+import {
+  SirenLookout,
+  isAndroidSirenLookout,
+} from '@/core/_ports_/siren.lookout'
 import { BlockingSchedule, SirenTier } from '@/core/_ports_/siren.tier'
 import { AppStore } from '@/core/_redux_/createStore'
 import { selectBlockingSchedule } from '@/core/block-session/selectors/selectBlockingSchedule'
@@ -91,10 +94,37 @@ export const onBlockingScheduleChangedListener = ({
         lastActiveWindowsKey = windowsKey
         await foregroundService.setActiveWindows(activeWindows)
       }
+
+      // Start watching preemptively for future windows so the JS accessibility
+      // listener is ready when the native AlarmManager starts the service.
+      if (!hasActiveSessionNow && activeWindows.length > 0) {
+        const now = dateProvider.getNow()
+        const hasFutureWindow = schedule.some(
+          (s) => dateProvider.parseISOString(s.endTime) > now,
+        )
+        if (hasFutureWindow) sirenLookout.startWatching()
+      }
     } catch (error) {
       logger.error(`[BlockingScheduleListener] ${error}`)
     }
   }
+
+  // Listen for native service starts (e.g., from AlarmManager active window).
+  // When the service starts natively, we need to:
+  // 1. Ensure the JS accessibility listener is active (startWatching)
+  // 2. Detect the currently-foreground app (emitCurrentForegroundApp)
+  //    since TYPE_WINDOW_STATE_CHANGED doesn't fire for already-visible apps
+  const unsubscribeServiceState = foregroundService.addServiceStateListener(
+    (isRunning) => {
+      if (!isRunning) return
+      const hasActive = selectHasActiveSession(dateProvider, store.getState())
+      if (!hasActive) return
+
+      sirenLookout.startWatching()
+      if (isAndroidSirenLookout(sirenLookout))
+        void sirenLookout.emitCurrentForegroundApp()
+    },
+  )
 
   const initialState = store.getState()
   const initialSchedule = selectBlockingSchedule(dateProvider, initialState)
@@ -107,7 +137,7 @@ export const onBlockingScheduleChangedListener = ({
     void syncSchedule(initialSchedule, wasActiveBefore, hasActiveOnInit)
   }
 
-  return store.subscribe(() => {
+  const unsubscribeStore = store.subscribe(() => {
     const state = store.getState()
 
     if (
@@ -132,4 +162,9 @@ export const onBlockingScheduleChangedListener = ({
 
     void syncSchedule(schedule, wasActiveBefore, hasActiveSession)
   })
+
+  return () => {
+    unsubscribeServiceState()
+    unsubscribeStore()
+  }
 }

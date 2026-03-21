@@ -20,6 +20,7 @@ export interface SirenLookout {
 export interface AndroidSirenLookout extends SirenLookout {
   isEnabled(): Promise<boolean>
   askPermission(): Promise<void>
+  emitCurrentForegroundApp(): Promise<void>
 }
 
 export function isAndroidSirenLookout(

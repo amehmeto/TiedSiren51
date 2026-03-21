@@ -63,4 +63,10 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
   async askPermission(): Promise<void> {
     this._isEnabled = true
   }
+
+  emitCurrentForegroundAppCallCount = 0
+
+  async emitCurrentForegroundApp(): Promise<void> {
+    this.emitCurrentForegroundAppCallCount++
+  }
 }

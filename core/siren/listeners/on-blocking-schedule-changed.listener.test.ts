@@ -336,7 +336,8 @@ describe('Feature: Blocking schedule changed listener', () => {
         'com.facebook.katana',
         'com.example.tiktok',
       ])
-      fixture.then.blockingShouldBeInactive()
+      fixture.then.foregroundServiceShouldNotBeRunning()
+      fixture.then.sirenLookoutShouldBeWatchingPreemptively()
     })
   })
 
@@ -556,7 +557,8 @@ describe('Feature: Blocking schedule changed listener', () => {
       fixture.then.activeWindowsShouldBeSet([
         { startTime: '14:00', endTime: '15:00' },
       ])
-      fixture.then.blockingShouldBeInactive()
+      fixture.then.foregroundServiceShouldNotBeRunning()
+      fixture.then.sirenLookoutShouldBeWatchingPreemptively()
     })
   })
 
