@@ -82,7 +82,7 @@
     "@amehmeto/expo-accessibility-service": "github:amehmeto/expo-accessibility-service#32715d9",
     "@amehmeto/expo-foreground-service": "github:amehmeto/expo-foreground-service#e78ee393859548a009260e3df7424770b10a41c7",
     "@amehmeto/expo-list-installed-apps": "github:amehmeto/expo-list-installed-apps",
-    "@amehmeto/tied-siren-blocking-overlay": "github:amehmeto/tied-siren-blocking-overlay",
+    "@amehmeto/tied-siren-blocking-overlay": "github:amehmeto/tied-siren-blocking-overlay#5344bf11a2604f0a7fcb9fa82287303a5e94146c",
     "@expo-google-fonts/inter": "^0.4.2",
     "@expo/vector-icons": "^15.0.2",
     "@faker-js/faker": "^8.4.1",
