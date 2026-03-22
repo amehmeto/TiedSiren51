@@ -19,7 +19,13 @@ export class AndroidForegroundService implements ForegroundService {
 
   private isServiceRunning = false
 
-  constructor(private readonly logger: Logger) {}
+  constructor(private readonly logger: Logger) {
+    if (Platform.OS === 'android') {
+      ExpoForegroundService.addServiceEventListener((event) => {
+        this.isServiceRunning = event.isRunning
+      })
+    }
+  }
 
   async start(config?: Partial<ForegroundServiceConfig>): Promise<void> {
     try {
