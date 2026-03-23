@@ -99,7 +99,7 @@ export const onBlockingScheduleChangedListener = ({
   // Listen for native service starts (e.g., from AlarmManager active window).
   // When the service starts natively, we need to:
   // 1. Ensure the JS accessibility listener is active (startWatching)
-  // 2. Detect the currently-foreground app (detectCurrentApp)
+  // 2. Detect if the currently-visible app is a siren (detectCurrentSiren)
   //    since TYPE_WINDOW_STATE_CHANGED doesn't fire for already-visible apps
   const unsubscribeServiceState = foregroundService.addServiceStateListener(
     (isRunning) => {
@@ -109,7 +109,7 @@ export const onBlockingScheduleChangedListener = ({
 
       sirenLookout.startWatching()
       if (isAndroidSirenLookout(sirenLookout))
-        void sirenLookout.detectCurrentApp()
+        void sirenLookout.detectCurrentSiren()
     },
   )
 

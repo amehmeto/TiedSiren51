@@ -654,7 +654,7 @@ describe('Feature: Blocking schedule changed listener', () => {
   })
 
   describe('Native service start detection', () => {
-    it('should start watching and detect current app when service starts natively during active session', async () => {
+    it('should start watching and detect current siren when service starts natively during active session', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
       const blocklist = buildBlocklist({
         id: 'bl-1',
@@ -676,10 +676,10 @@ describe('Feature: Blocking schedule changed listener', () => {
       fixture.when.simulatingNativeServiceStart()
 
       fixture.then.sirenLookoutShouldBeWatchingPreemptively()
-      fixture.then.detectCurrentAppShouldHaveBeenCalled()
+      fixture.then.detectCurrentSirenShouldHaveBeenCalled()
     })
 
-    it('should not detect current app when service starts but no active session', async () => {
+    it('should not detect current siren when service starts but no active session', async () => {
       fixture.given.nowIs({ hours: 13, minutes: 30 })
       const blocklist = buildBlocklist({
         id: 'bl-1',
@@ -700,7 +700,7 @@ describe('Feature: Blocking schedule changed listener', () => {
       // Service starts but time is still before the session
       fixture.when.simulatingNativeServiceStart()
 
-      fixture.then.detectCurrentAppShouldNotHaveBeenCalled()
+      fixture.then.detectCurrentSirenShouldNotHaveBeenCalled()
     })
 
     it('should not react when service stops', async () => {
@@ -723,7 +723,7 @@ describe('Feature: Blocking schedule changed listener', () => {
 
       fixture.when.simulatingNativeServiceStop()
 
-      fixture.then.detectCurrentAppShouldNotHaveBeenCalled()
+      fixture.then.detectCurrentSirenShouldNotHaveBeenCalled()
     })
   })
 })

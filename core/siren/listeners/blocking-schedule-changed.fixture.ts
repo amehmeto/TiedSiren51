@@ -15,6 +15,8 @@ import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 
 type TimeOfDay = { hours: number; minutes: number }
 
+const flushMicrotasks = () => new Promise((r) => setTimeout(r, 0))
+
 export function blockingScheduleChangedFixture(
   testStateBuilderProvider = stateBuilderProvider(),
 ) {
@@ -68,9 +70,7 @@ export function blockingScheduleChangedFixture(
         )
         store.dispatch(setBlocklists(blocklists))
         store.dispatch(setBlockSessions(sessions))
-        // Flush one microtask tick so the store subscriber's `void syncSchedule()`
-        // (fire-and-forget async) settles before assertions run.
-        await new Promise((r) => setTimeout(r, 0))
+        await flushMicrotasks()
       },
       simulatingNativeServiceStart() {
         foregroundService.simulateNativeServiceStart()
@@ -90,9 +90,7 @@ export function blockingScheduleChangedFixture(
           b.id === blocklist.id ? blocklist : b,
         )
         store.dispatch(setBlocklists(updatedBlocklists))
-        // Flush one microtask tick so the store subscriber's `void syncSchedule()`
-        // (fire-and-forget async) settles before assertions run.
-        await new Promise((r) => setTimeout(r, 0))
+        await flushMicrotasks()
       },
     },
     then: {
@@ -156,13 +154,15 @@ export function blockingScheduleChangedFixture(
       blockingScheduleShouldNotHaveBeenSynced() {
         expect(sirenTier.updateCallCount).toBe(0)
       },
-      detectCurrentAppShouldHaveBeenCalled() {
-        const detectCurrentAppCallCount = sirenLookout.detectCurrentAppCallCount
-        expect(detectCurrentAppCallCount).toBeGreaterThan(0)
+      detectCurrentSirenShouldHaveBeenCalled() {
+        const detectCurrentSirenCallCount =
+          sirenLookout.detectCurrentSirenCallCount
+        expect(detectCurrentSirenCallCount).toBeGreaterThan(0)
       },
-      detectCurrentAppShouldNotHaveBeenCalled() {
-        const detectCurrentAppCallCount = sirenLookout.detectCurrentAppCallCount
-        expect(detectCurrentAppCallCount).toBe(0)
+      detectCurrentSirenShouldNotHaveBeenCalled() {
+        const detectCurrentSirenCallCount =
+          sirenLookout.detectCurrentSirenCallCount
+        expect(detectCurrentSirenCallCount).toBe(0)
       },
     },
   }

@@ -64,9 +64,9 @@ export class InMemorySirenLookout implements AndroidSirenLookout {
     this._isEnabled = true
   }
 
-  detectCurrentAppCallCount = 0
+  detectCurrentSirenCallCount = 0
 
-  async detectCurrentApp(): Promise<void> {
-    this.detectCurrentAppCallCount++
+  async detectCurrentSiren(): Promise<void> {
+    this.detectCurrentSirenCallCount++
   }
 }
