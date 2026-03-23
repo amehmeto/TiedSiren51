@@ -21,8 +21,6 @@ export class InMemoryForegroundService implements ForegroundService {
 
   public setActiveWindowsCallCount = 0
 
-  public clearActiveWindowsCallCount = 0
-
   async start(config?: Partial<ForegroundServiceConfig>): Promise<void> {
     this.startCallCount++
     if (this.shouldThrowOnStart)
@@ -49,30 +47,27 @@ export class InMemoryForegroundService implements ForegroundService {
     this.activeWindows = windows
   }
 
-  async clearActiveWindows(): Promise<void> {
-    this.clearActiveWindowsCallCount++
-    this.activeWindows = []
-  }
-
   addServiceStateListener(callback: (isRunning: boolean) => void): () => void {
-    this._serviceStateCallback = callback
+    this._serviceStateCallbacks.push(callback)
     return () => {
-      this._serviceStateCallback = undefined
+      this._serviceStateCallbacks = this._serviceStateCallbacks.filter(
+        (cb) => cb !== callback,
+      )
     }
   }
 
   /** Simulate a native service state change (e.g., from AlarmManager) */
   simulateNativeServiceStart(): void {
     this.isServiceRunning = true
-    this._serviceStateCallback?.(true)
+    this._serviceStateCallbacks.forEach((cb) => cb(true))
   }
 
   simulateNativeServiceStop(): void {
     this.isServiceRunning = false
-    this._serviceStateCallback?.(false)
+    this._serviceStateCallbacks.forEach((cb) => cb(false))
   }
 
-  private _serviceStateCallback?: (isRunning: boolean) => void
+  private _serviceStateCallbacks: ((isRunning: boolean) => void)[] = []
 
   reset(): void {
     this.isServiceRunning = false
@@ -81,6 +76,6 @@ export class InMemoryForegroundService implements ForegroundService {
     this.lastConfig = undefined
     this.activeWindows = []
     this.setActiveWindowsCallCount = 0
-    this.clearActiveWindowsCallCount = 0
+    this._serviceStateCallbacks = []
   }
 }

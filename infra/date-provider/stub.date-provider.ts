@@ -75,10 +75,6 @@ export class StubDateProvider implements DateProvider {
     return new Date(isoString)
   }
 
-  toHHmmFromISO(isoString: ISODateString): HHmmString {
-    return this.toHHmm(this.parseISOString(isoString))
-  }
-
   toISOString(date: Date): ISODateString {
     const isoString = date.toISOString()
     assertISODateString(isoString)

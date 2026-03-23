@@ -75,15 +75,13 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     }
   }
 
-  async emitCurrentForegroundApp(): Promise<void> {
+  async detectCurrentApp(): Promise<void> {
     try {
       await AccessibilityService.emitCurrentForegroundApp()
-      this.logger.info(
-        '[RealAndroidSirenLookout] Emitted current foreground app',
-      )
+      this.logger.info('[RealAndroidSirenLookout] Detected current app')
     } catch (error) {
       this.logger.error(
-        `[RealAndroidSirenLookout] Failed to emit current foreground app: ${error}`,
+        `[RealAndroidSirenLookout] Failed to detect current app: ${error}`,
       )
       throw error
     }

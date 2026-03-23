@@ -20,6 +20,9 @@ export class AndroidForegroundService implements ForegroundService {
   private isServiceRunning = false
 
   constructor(private readonly logger: Logger) {
+    // Sync isServiceRunning from native events so isRunning() stays accurate
+    // even when the service is started/stopped by AlarmManager outside JS control.
+    // This is separate from addServiceStateListener which notifies external consumers.
     if (Platform.OS === 'android') {
       ExpoForegroundService.addServiceEventListener((event) => {
         this.isServiceRunning = event.isRunning
@@ -80,20 +83,6 @@ export class AndroidForegroundService implements ForegroundService {
 
   isRunning(): boolean {
     return this.isServiceRunning
-  }
-
-  async clearActiveWindows(): Promise<void> {
-    try {
-      if (Platform.OS !== 'android') return
-
-      await ExpoForegroundService.clearActiveWindows()
-      this.logger.info('[AndroidForegroundService] Cleared active windows')
-    } catch (error) {
-      this.logger.error(
-        `[AndroidForegroundService] Failed to clear active windows: ${error}`,
-      )
-      throw error
-    }
   }
 
   async setActiveWindows(

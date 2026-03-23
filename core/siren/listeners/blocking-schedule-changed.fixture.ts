@@ -68,6 +68,8 @@ export function blockingScheduleChangedFixture(
         )
         store.dispatch(setBlocklists(blocklists))
         store.dispatch(setBlockSessions(sessions))
+        // Flush one microtask tick so the store subscriber's `void syncSchedule()`
+        // (fire-and-forget async) settles before assertions run.
         await new Promise((r) => setTimeout(r, 0))
       },
       simulatingNativeServiceStart() {
@@ -88,6 +90,8 @@ export function blockingScheduleChangedFixture(
           b.id === blocklist.id ? blocklist : b,
         )
         store.dispatch(setBlocklists(updatedBlocklists))
+        // Flush one microtask tick so the store subscriber's `void syncSchedule()`
+        // (fire-and-forget async) settles before assertions run.
         await new Promise((r) => setTimeout(r, 0))
       },
     },
@@ -140,17 +144,6 @@ export function blockingScheduleChangedFixture(
       ) {
         expect(foregroundService.activeWindows).toEqual(expectedWindows)
       },
-      activeWindowsShouldHaveBeenSynced() {
-        const setActiveWindowsCallCount =
-          foregroundService.setActiveWindowsCallCount
-        expect(setActiveWindowsCallCount).toBeGreaterThan(0)
-      },
-      activeWindowsShouldHaveBeenCleared() {
-        const clearActiveWindowsCallCount =
-          foregroundService.clearActiveWindowsCallCount
-        expect(clearActiveWindowsCallCount).toBeGreaterThan(0)
-        expect(foregroundService.activeWindows).toEqual([])
-      },
       errorShouldBeLogged(expectedMessage: string) {
         const errorLogs = logger
           .getLogs()
@@ -163,15 +156,13 @@ export function blockingScheduleChangedFixture(
       blockingScheduleShouldNotHaveBeenSynced() {
         expect(sirenTier.updateCallCount).toBe(0)
       },
-      emitCurrentForegroundAppShouldHaveBeenCalled() {
-        const emitCurrentForegroundAppCallCount =
-          sirenLookout.emitCurrentForegroundAppCallCount
-        expect(emitCurrentForegroundAppCallCount).toBeGreaterThan(0)
+      detectCurrentAppShouldHaveBeenCalled() {
+        const detectCurrentAppCallCount = sirenLookout.detectCurrentAppCallCount
+        expect(detectCurrentAppCallCount).toBeGreaterThan(0)
       },
-      emitCurrentForegroundAppShouldNotHaveBeenCalled() {
-        const emitCurrentForegroundAppCallCount =
-          sirenLookout.emitCurrentForegroundAppCallCount
-        expect(emitCurrentForegroundAppCallCount).toBe(0)
+      detectCurrentAppShouldNotHaveBeenCalled() {
+        const detectCurrentAppCallCount = sirenLookout.detectCurrentAppCallCount
+        expect(detectCurrentAppCallCount).toBe(0)
       },
     },
   }

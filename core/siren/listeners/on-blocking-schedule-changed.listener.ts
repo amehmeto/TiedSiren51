@@ -1,4 +1,4 @@
-import { DateProvider } from '@/core/_ports_/date-provider'
+import { DateProvider, ISODateString } from '@/core/_ports_/date-provider'
 import { ForegroundService } from '@/core/_ports_/foreground.service'
 import { Logger } from '@/core/_ports_/logger'
 import {
@@ -68,16 +68,16 @@ export const onBlockingScheduleChangedListener = ({
       if (wasActiveBefore && !hasActiveSessionNow) {
         sirenLookout.stopWatching()
         await foregroundService.stop()
-        await foregroundService.clearActiveWindows()
-        return
       }
 
       // Schedule native-side alarms for future window transitions.
       // This ensures the foreground service starts/stops at the right time
       // even if the JS runtime is killed.
+      const toHHmm = (iso: ISODateString) =>
+        dateProvider.toHHmm(dateProvider.parseISOString(iso))
       const activeWindows = schedule.map((s) => ({
-        startTime: dateProvider.toHHmmFromISO(s.startTime),
-        endTime: dateProvider.toHHmmFromISO(s.endTime),
+        startTime: toHHmm(s.startTime),
+        endTime: toHHmm(s.endTime),
       }))
 
       await foregroundService.setActiveWindows(activeWindows)
@@ -99,7 +99,7 @@ export const onBlockingScheduleChangedListener = ({
   // Listen for native service starts (e.g., from AlarmManager active window).
   // When the service starts natively, we need to:
   // 1. Ensure the JS accessibility listener is active (startWatching)
-  // 2. Detect the currently-foreground app (emitCurrentForegroundApp)
+  // 2. Detect the currently-foreground app (detectCurrentApp)
   //    since TYPE_WINDOW_STATE_CHANGED doesn't fire for already-visible apps
   const unsubscribeServiceState = foregroundService.addServiceStateListener(
     (isRunning) => {
@@ -109,7 +109,7 @@ export const onBlockingScheduleChangedListener = ({
 
       sirenLookout.startWatching()
       if (isAndroidSirenLookout(sirenLookout))
-        void sirenLookout.emitCurrentForegroundApp()
+        void sirenLookout.detectCurrentApp()
     },
   )
 

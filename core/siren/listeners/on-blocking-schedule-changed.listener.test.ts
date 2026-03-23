@@ -507,7 +507,6 @@ describe('Feature: Blocking schedule changed listener', () => {
         },
       })
 
-      fixture.then.activeWindowsShouldHaveBeenSynced()
       fixture.then.activeWindowsShouldBeSet([
         { startTime: '14:00', endTime: '15:00' },
       ])
@@ -533,7 +532,51 @@ describe('Feature: Blocking schedule changed listener', () => {
 
       await fixture.when.creatingBlockSession([])
 
-      fixture.then.activeWindowsShouldHaveBeenCleared()
+      fixture.then.activeWindowsShouldBeSet([])
+    })
+
+    it('should schedule future windows when active session ends but future session remains', async () => {
+      fixture.given.nowIs({ hours: 15, minutes: 30 })
+      const blocklist = buildBlocklist({
+        id: 'bl-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+      fixture.given.existingBlockSessions(
+        [
+          buildBlockSession({
+            id: 'session-active',
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist.id],
+          }),
+          buildBlockSession({
+            id: 'session-future',
+            startedAt: '16:00',
+            endedAt: '17:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      // Remove the ended session, leaving only the future one
+      await fixture.when.creatingBlockSession(
+        [
+          buildBlockSession({
+            id: 'session-future',
+            startedAt: '16:00',
+            endedAt: '17:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      fixture.then.foregroundServiceShouldNotBeRunning()
+      fixture.then.activeWindowsShouldBeSet([
+        { startTime: '16:00', endTime: '17:00' },
+      ])
+      fixture.then.sirenLookoutShouldBeWatchingPreemptively()
     })
 
     it('should set active windows for future scheduled session', async () => {
@@ -611,7 +654,7 @@ describe('Feature: Blocking schedule changed listener', () => {
   })
 
   describe('Native service start detection', () => {
-    it('should start watching and emit current foreground app when service starts natively during active session', async () => {
+    it('should start watching and detect current app when service starts natively during active session', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
       const blocklist = buildBlocklist({
         id: 'bl-1',
@@ -633,10 +676,10 @@ describe('Feature: Blocking schedule changed listener', () => {
       fixture.when.simulatingNativeServiceStart()
 
       fixture.then.sirenLookoutShouldBeWatchingPreemptively()
-      fixture.then.emitCurrentForegroundAppShouldHaveBeenCalled()
+      fixture.then.detectCurrentAppShouldHaveBeenCalled()
     })
 
-    it('should not emit current foreground app when service starts but no active session', async () => {
+    it('should not detect current app when service starts but no active session', async () => {
       fixture.given.nowIs({ hours: 13, minutes: 30 })
       const blocklist = buildBlocklist({
         id: 'bl-1',
@@ -657,7 +700,7 @@ describe('Feature: Blocking schedule changed listener', () => {
       // Service starts but time is still before the session
       fixture.when.simulatingNativeServiceStart()
 
-      fixture.then.emitCurrentForegroundAppShouldNotHaveBeenCalled()
+      fixture.then.detectCurrentAppShouldNotHaveBeenCalled()
     })
 
     it('should not react when service stops', async () => {
@@ -680,7 +723,7 @@ describe('Feature: Blocking schedule changed listener', () => {
 
       fixture.when.simulatingNativeServiceStop()
 
-      fixture.then.emitCurrentForegroundAppShouldNotHaveBeenCalled()
+      fixture.then.detectCurrentAppShouldNotHaveBeenCalled()
     })
   })
 })
