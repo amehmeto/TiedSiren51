@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+set -e
 
 # PostToolUse hook for validating files after edits
 # Mirrors lint-staged configuration for consistency
@@ -13,8 +14,12 @@ if [ -z "$file_path" ]; then
   exit 0
 fi
 
-# Skip node_modules and non-existent files
+# Skip node_modules, non-existent files, and files outside the project
 if [[ "$file_path" =~ node_modules ]] || [ ! -f "$file_path" ]; then
+  exit 0
+fi
+project_root=$(git rev-parse --show-toplevel 2>/dev/null)
+if [ -n "$project_root" ] && [[ "$file_path" != "$project_root"/* ]]; then
   exit 0
 fi
 
