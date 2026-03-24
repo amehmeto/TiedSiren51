@@ -7,10 +7,13 @@ import { setBlockSessions } from '@/core/block-session/block-session.slice'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { setBlocklists } from '@/core/blocklist/blocklist.slice'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
+import { BlockingSessionWindow } from '@/core/_ports_/foreground.service'
 import { InMemoryForegroundService } from '@/infra/foreground-service/in-memory.foreground.service'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
 import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
+
+import { flushMicrotasks } from '@/test-utils/flush-microtasks'
 
 type TimeOfDay = { hours: number; minutes: number }
 
@@ -67,6 +70,7 @@ export function blockingScheduleChangedFixture(
         )
         store.dispatch(setBlocklists(blocklists))
         store.dispatch(setBlockSessions(sessions))
+        await flushMicrotasks()
       },
       async updatingBlocklist(blocklist: Blocklist) {
         store = createTestStore(
@@ -80,6 +84,7 @@ export function blockingScheduleChangedFixture(
           b.id === blocklist.id ? blocklist : b,
         )
         store.dispatch(setBlocklists(updatedBlocklists))
+        await flushMicrotasks()
       },
     },
     then: {
@@ -119,6 +124,13 @@ export function blockingScheduleChangedFixture(
         expect(foregroundService.startCallCount).toBe(1)
         expect(sirenLookout.stopWatchingCallCount).toBe(0)
         expect(foregroundService.stopCallCount).toBe(0)
+      },
+      blockingSessionsShouldBeScheduled(
+        expectedWindows: BlockingSessionWindow[],
+      ) {
+        expect(foregroundService.blockingSessionWindows).toEqual(
+          expectedWindows,
+        )
       },
       errorShouldBeLogged(expectedMessage: string) {
         const errorLogs = logger

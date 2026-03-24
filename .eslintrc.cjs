@@ -4,7 +4,8 @@
 module.exports = {
   root: true,
   ignorePatterns: ['node_modules', '!.claude'],
-  plugins: ['jsonc'],
+  extends: ['plugin:jsonc/recommended-with-json'],
+  plugins: ['jsonc', 'local-rules'],
   overrides: [
     // JSON files linting
     {
@@ -18,8 +19,15 @@ module.exports = {
       rules: {
         'jsonc/indent': ['error', 2],
         'jsonc/key-spacing': 'error',
-        'jsonc/no-dupe-keys': 'error',
         'jsonc/sort-keys': 'off',
+      },
+    },
+    // Enforce @amehmeto/ deps are pinned to a commit hash
+    {
+      files: ['package.json'],
+      parser: 'jsonc-eslint-parser',
+      rules: {
+        'local-rules/require-amehmeto-pinning': 'error',
       },
     },
     // Claude settings - enforce sorted arrays for permissions
@@ -29,7 +37,6 @@ module.exports = {
       rules: {
         'jsonc/indent': ['error', 2],
         'jsonc/key-spacing': 'error',
-        'jsonc/no-dupe-keys': 'error',
         'jsonc/sort-array-values': [
           'error',
           {
@@ -46,7 +53,6 @@ module.exports = {
       rules: {
         'jsonc/indent': ['error', 2],
         'jsonc/key-spacing': 'error',
-        'jsonc/no-dupe-keys': 'error',
         'jsonc/no-comments': 'off',
         'jsonc/sort-keys': 'off',
       },

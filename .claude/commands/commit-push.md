@@ -13,6 +13,7 @@ Commit and push workflow:
 
 3. **Push with SKIP_E2E_CHECK**:
    - Always use `SKIP_E2E_CHECK=true git push` because the e2e test prompt requires interactive TTY which is not available in Claude Code
+   - **CRITICAL: Always set `timeout: 600000` on the Bash tool call.** The post-push hook runs ci-watch which polls CI until it passes or fails. Do NOT use the default timeout — it kills the process and silently bypasses the hook. The script always terminates on its own.
 
 4. **Commit message format**:
 ```

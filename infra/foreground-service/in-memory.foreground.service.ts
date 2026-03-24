@@ -1,4 +1,5 @@
 import {
+  BlockingSessionWindow,
   ForegroundService,
   ForegroundServiceConfig,
 } from '@/core/_ports_/foreground.service'
@@ -15,6 +16,10 @@ export class InMemoryForegroundService implements ForegroundService {
   public shouldThrowOnStart = false
 
   public shouldThrowOnStop = false
+
+  public blockingSessionWindows: BlockingSessionWindow[] = []
+
+  public scheduleBlockingSessionsCallCount = 0
 
   async start(config?: Partial<ForegroundServiceConfig>): Promise<void> {
     this.startCallCount++
@@ -35,10 +40,19 @@ export class InMemoryForegroundService implements ForegroundService {
     return this.isServiceRunning
   }
 
+  async scheduleBlockingSessions(
+    windows: BlockingSessionWindow[],
+  ): Promise<void> {
+    this.scheduleBlockingSessionsCallCount++
+    this.blockingSessionWindows = windows
+  }
+
   reset(): void {
     this.isServiceRunning = false
     this.startCallCount = 0
     this.stopCallCount = 0
     this.lastConfig = undefined
+    this.blockingSessionWindows = []
+    this.scheduleBlockingSessionsCallCount = 0
   }
 }

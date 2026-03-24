@@ -1,8 +1,5 @@
 import { listInstalledApps } from '@amehmeto/expo-list-installed-apps'
-import {
-  AppType,
-  InstalledApp,
-} from '@amehmeto/expo-list-installed-apps/build/ExpoListInstalledApps.types'
+import { InstalledApp } from '@amehmeto/expo-list-installed-apps/build/ExpoListInstalledApps.types'
 import { InstalledAppRepository } from '@/core/_ports_/installed-app.repository'
 import { Logger } from '@/core/_ports_/logger'
 import { InstalledApp as AppModel } from '@/core/installed-app/installed-app'
@@ -12,9 +9,7 @@ export class ExpoListInstalledAppsRepository implements InstalledAppRepository {
 
   async getInstalledApps(): Promise<AppModel[]> {
     try {
-      const installedApps = await listInstalledApps({
-        type: AppType.ALL,
-      })
+      const installedApps = await listInstalledApps()
 
       const sortedApps = installedApps
         .sort((a: InstalledApp, b: InstalledApp) =>

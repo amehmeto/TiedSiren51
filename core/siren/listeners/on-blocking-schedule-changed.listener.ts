@@ -66,6 +66,12 @@ export const onBlockingScheduleChangedListener = ({
         sirenLookout.stopWatching()
         await foregroundService.stop()
       }
+
+      const blockingWindows = schedule.map((s) => ({
+        startTime: dateProvider.toHHmmFromISO(s.startTime),
+        endTime: dateProvider.toHHmmFromISO(s.endTime),
+      }))
+      await foregroundService.scheduleBlockingSessions(blockingWindows)
     } catch (error) {
       logger.error(`[BlockingScheduleListener] ${error}`)
     }

@@ -1,6 +1,7 @@
 import * as ExpoForegroundService from '@amehmeto/expo-foreground-service'
 import { Platform } from 'react-native'
 import {
+  BlockingSessionWindow,
   ForegroundService,
   ForegroundServiceConfig,
 } from '@/core/_ports_/foreground.service'
@@ -73,6 +74,29 @@ export class AndroidForegroundService implements ForegroundService {
 
   isRunning(): boolean {
     return this.isServiceRunning
+  }
+
+  async scheduleBlockingSessions(
+    windows: BlockingSessionWindow[],
+  ): Promise<void> {
+    try {
+      if (Platform.OS !== 'android') {
+        this.logger.info(
+          '[AndroidForegroundService] Blocking sessions scheduling only available on Android',
+        )
+        return
+      }
+
+      await ExpoForegroundService.setActiveWindows(windows)
+      this.logger.info(
+        `[AndroidForegroundService] Scheduled ${windows.length} blocking sessions`,
+      )
+    } catch (error) {
+      this.logger.error(
+        `[AndroidForegroundService] Failed to schedule blocking sessions: ${error}`,
+      )
+      throw error
+    }
   }
 
   private async requestNotificationPermission(): Promise<void> {

@@ -173,6 +173,7 @@
     "local-rules/no-i-prefix-in-imports": "error",
     "local-rules/no-data-builders-in-production": "error",
     "local-rules/no-nested-call-expressions": "error",
+    "local-rules/no-nested-this-calls": "error",
     "local-rules/no-unused-test-id": "error",
     "local-rules/core-no-restricted-globals": "error",
     "local-rules/core-no-restricted-imports": "error",

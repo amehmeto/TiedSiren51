@@ -421,6 +421,186 @@ describe('Feature: Blocking schedule changed listener', () => {
     })
   })
 
+  describe('Blocking sessions scheduling', () => {
+    it('should schedule blocking sessions when session is created', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      const blocklist = buildBlocklist({
+        id: 'bl-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+
+      await fixture.when.creatingBlockSession(
+        [
+          buildBlockSession({
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      fixture.then.blockingSessionsShouldBeScheduled([
+        { startTime: '14:00', endTime: '15:00' },
+      ])
+    })
+
+    it('should schedule blocking sessions for multiple sessions', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      const blocklist1 = buildBlocklist({
+        id: 'bl-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+      const blocklist2 = buildBlocklist({
+        id: 'bl-2',
+        sirens: { android: [instagramAndroidSiren] },
+      })
+
+      await fixture.when.creatingBlockSession(
+        [
+          buildBlockSession({
+            id: 'session-1',
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist1.id],
+          }),
+          buildBlockSession({
+            id: 'session-2',
+            startedAt: '16:00',
+            endedAt: '17:00',
+            blocklistIds: [blocklist2.id],
+          }),
+        ],
+        [blocklist1, blocklist2],
+      )
+
+      fixture.then.blockingSessionsShouldBeScheduled([
+        { startTime: '14:00', endTime: '15:00' },
+        { startTime: '16:00', endTime: '17:00' },
+      ])
+    })
+
+    it('should update blocking sessions when blocklist is edited during active session', async () => {
+      const blocklist = buildBlocklist({
+        id: 'blocklist-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      fixture.given.existingBlockSessions(
+        [
+          buildBlockSession({
+            id: 'session-1',
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      await fixture.when.updatingBlocklist({
+        ...blocklist,
+        sirens: {
+          ...blocklist.sirens,
+          android: [facebookAndroidSiren, tikTokAndroidSiren],
+        },
+      })
+
+      fixture.then.blockingSessionsShouldBeScheduled([
+        { startTime: '14:00', endTime: '15:00' },
+      ])
+    })
+
+    it('should clear blocking sessions when all sessions end', async () => {
+      fixture.given.nowIs({ hours: 14, minutes: 30 })
+      const blocklist = buildBlocklist({
+        id: 'bl-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+      fixture.given.existingBlockSessions(
+        [
+          buildBlockSession({
+            id: 'session-1',
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      await fixture.when.creatingBlockSession([])
+
+      fixture.then.blockingSessionsShouldBeScheduled([])
+    })
+
+    it('should schedule future windows when active session ends but future session remains', async () => {
+      fixture.given.nowIs({ hours: 15, minutes: 30 })
+      const blocklist = buildBlocklist({
+        id: 'bl-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+      fixture.given.existingBlockSessions(
+        [
+          buildBlockSession({
+            id: 'session-active',
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist.id],
+          }),
+          buildBlockSession({
+            id: 'session-future',
+            startedAt: '16:00',
+            endedAt: '17:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      await fixture.when.creatingBlockSession(
+        [
+          buildBlockSession({
+            id: 'session-future',
+            startedAt: '16:00',
+            endedAt: '17:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      fixture.then.blockingShouldBeInactive()
+      fixture.then.blockingSessionsShouldBeScheduled([
+        { startTime: '16:00', endTime: '17:00' },
+      ])
+    })
+
+    it('should schedule blocking sessions for future session', async () => {
+      fixture.given.nowIs({ hours: 13, minutes: 30 })
+      const blocklist = buildBlocklist({
+        id: 'bl-1',
+        sirens: { android: [facebookAndroidSiren] },
+      })
+
+      await fixture.when.creatingBlockSession(
+        [
+          buildBlockSession({
+            startedAt: '14:00',
+            endedAt: '15:00',
+            blocklistIds: [blocklist.id],
+          }),
+        ],
+        [blocklist],
+      )
+
+      fixture.then.blockingSessionsShouldBeScheduled([
+        { startTime: '14:00', endTime: '15:00' },
+      ])
+      fixture.then.blockingShouldBeInactive()
+    })
+  })
+
   describe('Sessions outside active time window', () => {
     it('should sync scheduled sessions but not start foreground when outside active time', async () => {
       fixture.given.nowIs({ hours: 16, minutes: 30 })
