@@ -21,8 +21,7 @@ module.exports = {
   },
 
   create(context) {
-    const filename = context.getFilename()
-    if (!filename.endsWith('package.json')) return {}
+    if (!context.filename.endsWith('package.json')) return {}
 
     return {
       JSONProperty(node) {
