@@ -13,9 +13,9 @@ import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
 import { InMemorySirenTier } from '@infra/siren-tier/in-memory.siren-tier'
 
-type TimeOfDay = { hours: number; minutes: number }
+import { flushMicrotasks } from '@/test-utils/flush-microtasks'
 
-const flushMicrotasks = () => new Promise((r) => setTimeout(r, 0))
+type TimeOfDay = { hours: number; minutes: number }
 
 export function blockingScheduleChangedFixture(
   testStateBuilderProvider = stateBuilderProvider(),
@@ -128,7 +128,9 @@ export function blockingScheduleChangedFixture(
       blockingSessionsShouldBeScheduled(
         expectedWindows: BlockingSessionWindow[],
       ) {
-        expect(foregroundService.activeWindows).toEqual(expectedWindows)
+        expect(foregroundService.blockingSessionWindows).toEqual(
+          expectedWindows,
+        )
       },
       errorShouldBeLogged(expectedMessage: string) {
         const errorLogs = logger

@@ -17,7 +17,7 @@ export class InMemoryForegroundService implements ForegroundService {
 
   public shouldThrowOnStop = false
 
-  public activeWindows: BlockingSessionWindow[] = []
+  public blockingSessionWindows: BlockingSessionWindow[] = []
 
   public scheduleBlockingSessionsCallCount = 0
 
@@ -44,7 +44,7 @@ export class InMemoryForegroundService implements ForegroundService {
     windows: BlockingSessionWindow[],
   ): Promise<void> {
     this.scheduleBlockingSessionsCallCount++
-    this.activeWindows = windows
+    this.blockingSessionWindows = windows
   }
 
   reset(): void {
@@ -52,7 +52,7 @@ export class InMemoryForegroundService implements ForegroundService {
     this.startCallCount = 0
     this.stopCallCount = 0
     this.lastConfig = undefined
-    this.activeWindows = []
+    this.blockingSessionWindows = []
     this.scheduleBlockingSessionsCallCount = 0
   }
 }

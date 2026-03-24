@@ -64,7 +64,8 @@ export class StubDateProvider implements DateProvider {
   }
 
   getHHmmMinutesFromNow(minutes: number): HHmmString {
-    return this.toHHmm(this.getMinutesFromNow(minutes))
+    const date = this.getMinutesFromNow(minutes)
+    return this.toHHmm(date)
   }
 
   getMinutesFromNow(minutes: number): Date {
@@ -76,7 +77,8 @@ export class StubDateProvider implements DateProvider {
   }
 
   toHHmmFromISO(isoString: ISODateString): HHmmString {
-    return this.toHHmm(this.parseISOString(isoString))
+    const date = this.parseISOString(isoString)
+    return this.toHHmm(date)
   }
 
   toISOString(date: Date): ISODateString {

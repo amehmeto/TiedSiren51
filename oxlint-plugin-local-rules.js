@@ -40,6 +40,7 @@ import noInlineObjectType from './oxlint-rules/no-inline-object-type.js'
 import noLameNaming from './oxlint-rules/no-lame-naming.js'
 import noModuleLevelConstants from './oxlint-rules/no-module-level-constants.js'
 import noNestedCallExpressions from './oxlint-rules/no-nested-call-expressions.js'
+import noNestedThisCalls from './oxlint-rules/no-nested-this-calls.js'
 import noNewInTestBody from './oxlint-rules/no-new-in-test-body.js'
 import noRedundantNullishTernary from './oxlint-rules/no-redundant-nullish-ternary.js'
 import noRedundantPropSpreading from './oxlint-rules/no-redundant-prop-spreading.js'
@@ -133,6 +134,7 @@ export default {
     'no-lame-naming': noLameNaming,
     'no-module-level-constants': noModuleLevelConstants,
     'no-nested-call-expressions': noNestedCallExpressions,
+    'no-nested-this-calls': noNestedThisCalls,
     'no-new-in-test-body': noNewInTestBody,
     'no-redundant-nullish-ternary': noRedundantNullishTernary,
     'no-redundant-prop-spreading': noRedundantPropSpreading,

@@ -23,7 +23,8 @@ export class RealDateProvider implements DateProvider {
   }
 
   getHHmmNow(): HHmmString {
-    return this.toHHmm(this.getNow())
+    const now = this.getNow()
+    return this.toHHmm(now)
   }
 
   getMinutesFromNow(minutes: number): Date {
@@ -31,7 +32,8 @@ export class RealDateProvider implements DateProvider {
   }
 
   getHHmmMinutesFromNow(minutes: number): HHmmString {
-    return this.toHHmm(this.getMinutesFromNow(minutes))
+    const date = this.getMinutesFromNow(minutes)
+    return this.toHHmm(date)
   }
 
   recoverDate(timeInHHmm: HHmmString): Date {
@@ -75,7 +77,8 @@ export class RealDateProvider implements DateProvider {
   }
 
   toHHmmFromISO(isoString: ISODateString): HHmmString {
-    return this.toHHmm(this.parseISOString(isoString))
+    const date = this.parseISOString(isoString)
+    return this.toHHmm(date)
   }
 
   toISOString(date: Date): ISODateString {
