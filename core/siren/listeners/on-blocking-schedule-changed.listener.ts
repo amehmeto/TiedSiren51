@@ -1,10 +1,7 @@
 import { DateProvider, ISODateString } from '@/core/_ports_/date-provider'
 import { ForegroundService } from '@/core/_ports_/foreground.service'
 import { Logger } from '@/core/_ports_/logger'
-import {
-  SirenLookout,
-  isAndroidSirenLookout,
-} from '@/core/_ports_/siren.lookout'
+import { SirenLookout } from '@/core/_ports_/siren.lookout'
 import { BlockingSchedule, SirenTier } from '@/core/_ports_/siren.tier'
 import { AppStore } from '@/core/_redux_/createStore'
 import { selectBlockingSchedule } from '@/core/block-session/selectors/selectBlockingSchedule'
@@ -96,23 +93,6 @@ export const onBlockingScheduleChangedListener = ({
     }
   }
 
-  // Listen for native service starts (e.g., from AlarmManager active window).
-  // When the service starts natively, we need to:
-  // 1. Ensure the JS accessibility listener is active (startWatching)
-  // 2. Detect if the currently-visible app is a siren (detectCurrentSiren)
-  //    since TYPE_WINDOW_STATE_CHANGED doesn't fire for already-visible apps
-  const unsubscribeServiceState = foregroundService.addServiceStateListener(
-    (isRunning) => {
-      if (!isRunning) return
-      const hasActive = selectHasActiveSession(dateProvider, store.getState())
-      if (!hasActive) return
-
-      sirenLookout.startWatching()
-      if (isAndroidSirenLookout(sirenLookout))
-        void sirenLookout.detectCurrentSiren()
-    },
-  )
-
   const initialState = store.getState()
   const initialSchedule = selectBlockingSchedule(dateProvider, initialState)
   const hasActiveOnInit = selectHasActiveSession(dateProvider, initialState)
@@ -124,7 +104,7 @@ export const onBlockingScheduleChangedListener = ({
     void syncSchedule(initialSchedule, wasActiveBefore, hasActiveOnInit)
   }
 
-  const unsubscribeStore = store.subscribe(() => {
+  return store.subscribe(() => {
     const state = store.getState()
 
     if (
@@ -149,10 +129,4 @@ export const onBlockingScheduleChangedListener = ({
 
     void syncSchedule(schedule, wasActiveBefore, hasActiveSession)
   })
-
-  /* v8 ignore next 4 -- cleanup function only called on unmount */
-  return () => {
-    unsubscribeServiceState()
-    unsubscribeStore()
-  }
 }

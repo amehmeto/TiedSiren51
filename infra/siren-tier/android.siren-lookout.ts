@@ -75,18 +75,6 @@ export class RealAndroidSirenLookout implements AndroidSirenLookout {
     }
   }
 
-  async detectCurrentSiren(): Promise<void> {
-    try {
-      await AccessibilityService.emitCurrentForegroundApp()
-      this.logger.info('[RealAndroidSirenLookout] Detected current siren')
-    } catch (error) {
-      this.logger.error(
-        `[RealAndroidSirenLookout] Failed to detect current siren: ${error}`,
-      )
-      throw error
-    }
-  }
-
   private startAccessibilitySubscription(): void {
     try {
       this.subscription = AccessibilityService.addAccessibilityEventListener(

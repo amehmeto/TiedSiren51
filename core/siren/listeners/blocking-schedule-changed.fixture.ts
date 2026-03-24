@@ -72,12 +72,6 @@ export function blockingScheduleChangedFixture(
         store.dispatch(setBlockSessions(sessions))
         await flushMicrotasks()
       },
-      simulatingNativeServiceStart() {
-        foregroundService.simulateNativeServiceStart()
-      },
-      simulatingNativeServiceStop() {
-        foregroundService.simulateNativeServiceStop()
-      },
       async updatingBlocklist(blocklist: Blocklist) {
         store = createTestStore(
           dependencies,
@@ -153,16 +147,6 @@ export function blockingScheduleChangedFixture(
       },
       blockingScheduleShouldNotHaveBeenSynced() {
         expect(sirenTier.updateCallCount).toBe(0)
-      },
-      detectCurrentSirenShouldHaveBeenCalled() {
-        const detectCurrentSirenCallCount =
-          sirenLookout.detectCurrentSirenCallCount
-        expect(detectCurrentSirenCallCount).toBeGreaterThan(0)
-      },
-      detectCurrentSirenShouldNotHaveBeenCalled() {
-        const detectCurrentSirenCallCount =
-          sirenLookout.detectCurrentSirenCallCount
-        expect(detectCurrentSirenCallCount).toBe(0)
       },
     },
   }
