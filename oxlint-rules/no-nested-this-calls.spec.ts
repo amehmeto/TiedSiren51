@@ -32,12 +32,49 @@ describe('no-nested-this-calls', () => {
             return this.format("x")
           }
         }`,
+        // Nested but not this — outer is this, inner is not
+        `class A {
+          m() {
+            return this.format(other.parse("a"))
+          }
+        }`,
+        // Nested but not this — outer is not this
+        `class A {
+          m() {
+            return other.format(this.parse("a"))
+          }
+        }`,
+        // this call with no arguments
+        `class A {
+          m() {
+            return this.getAll()
+          }
+        }`,
       ],
       invalid: [
         {
           code: `class A {
             m() {
               return this.format(this.parse("a"))
+            }
+          }`,
+          errors: [{ messageId: 'nestedThisCall' }],
+        },
+        // Computed property names (covers '?' fallback branches)
+        {
+          code: `class A {
+            m() {
+              const key = "format"
+              return this[key](this.parse("a"))
+            }
+          }`,
+          errors: [{ messageId: 'nestedThisCall' }],
+        },
+        {
+          code: `class A {
+            m() {
+              const key = "parse"
+              return this.format(this[key]("a"))
             }
           }`,
           errors: [{ messageId: 'nestedThisCall' }],
