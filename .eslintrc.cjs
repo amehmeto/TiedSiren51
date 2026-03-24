@@ -4,6 +4,7 @@
 module.exports = {
   root: true,
   ignorePatterns: ['node_modules', '!.claude'],
+  extends: ['plugin:jsonc/recommended-with-json'],
   plugins: ['jsonc', 'local-rules'],
   overrides: [
     // JSON files linting
@@ -18,7 +19,6 @@ module.exports = {
       rules: {
         'jsonc/indent': ['error', 2],
         'jsonc/key-spacing': 'error',
-        'jsonc/no-dupe-keys': 'error',
         'jsonc/sort-keys': 'off',
       },
     },
@@ -37,7 +37,6 @@ module.exports = {
       rules: {
         'jsonc/indent': ['error', 2],
         'jsonc/key-spacing': 'error',
-        'jsonc/no-dupe-keys': 'error',
         'jsonc/sort-array-values': [
           'error',
           {
@@ -54,7 +53,6 @@ module.exports = {
       rules: {
         'jsonc/indent': ['error', 2],
         'jsonc/key-spacing': 'error',
-        'jsonc/no-dupe-keys': 'error',
         'jsonc/no-comments': 'off',
         'jsonc/sort-keys': 'off',
       },
