@@ -1,4 +1,4 @@
-import { DateProvider, ISODateString } from '@/core/_ports_/date-provider'
+import { DateProvider } from '@/core/_ports_/date-provider'
 import { ForegroundService } from '@/core/_ports_/foreground.service'
 import { Logger } from '@/core/_ports_/logger'
 import { SirenLookout } from '@/core/_ports_/siren.lookout'
@@ -67,27 +67,11 @@ export const onBlockingScheduleChangedListener = ({
         await foregroundService.stop()
       }
 
-      // Schedule native-side alarms for future window transitions.
-      // This ensures the foreground service starts/stops at the right time
-      // even if the JS runtime is killed.
-      const toHHmm = (iso: ISODateString) =>
-        dateProvider.toHHmm(dateProvider.parseISOString(iso))
-      const activeWindows = schedule.map((s) => ({
-        startTime: toHHmm(s.startTime),
-        endTime: toHHmm(s.endTime),
+      const map = schedule.map((s) => ({
+        startTime: dateProvider.toHHmmFromISO(s.startTime),
+        endTime: dateProvider.toHHmmFromISO(s.endTime),
       }))
-
-      await foregroundService.setActiveWindows(activeWindows)
-
-      // Start watching preemptively for future windows so the JS accessibility
-      // listener is ready when the native AlarmManager starts the service.
-      if (!hasActiveSessionNow && activeWindows.length > 0) {
-        const now = dateProvider.getNow()
-        const hasFutureWindow = schedule.some(
-          (s) => dateProvider.parseISOString(s.endTime) > now,
-        )
-        if (hasFutureWindow) sirenLookout.startWatching()
-      }
+      await foregroundService.scheduleBlockingSessions(map)
     } catch (error) {
       logger.error(`[BlockingScheduleListener] ${error}`)
     }

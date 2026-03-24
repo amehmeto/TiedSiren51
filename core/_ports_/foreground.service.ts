@@ -5,7 +5,7 @@ export type ForegroundServiceConfig = {
   description: string
 }
 
-export type ForegroundServiceActiveWindow = {
+export type BlockingSessionWindow = {
   startTime: HHmmString
   endTime: HHmmString
 }
@@ -14,5 +14,5 @@ export interface ForegroundService {
   start(config?: Partial<ForegroundServiceConfig>): Promise<void>
   stop(): Promise<void>
   isRunning(): boolean
-  setActiveWindows(windows: ForegroundServiceActiveWindow[]): Promise<void>
+  scheduleBlockingSessions(windows: BlockingSessionWindow[]): Promise<void>
 }

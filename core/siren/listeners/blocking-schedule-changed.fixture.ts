@@ -7,7 +7,7 @@ import { setBlockSessions } from '@/core/block-session/block-session.slice'
 import { Blocklist } from '@/core/blocklist/blocklist'
 import { setBlocklists } from '@/core/blocklist/blocklist.slice'
 import { StubDateProvider } from '@/infra/date-provider/stub.date-provider'
-import { ForegroundServiceActiveWindow } from '@/core/_ports_/foreground.service'
+import { BlockingSessionWindow } from '@/core/_ports_/foreground.service'
 import { InMemoryForegroundService } from '@/infra/foreground-service/in-memory.foreground.service'
 import { InMemoryLogger } from '@/infra/logger/in-memory.logger'
 import { InMemorySirenLookout } from '@infra/siren-tier/in-memory.siren-lookout'
@@ -117,12 +117,6 @@ export function blockingScheduleChangedFixture(
         expect(sirenLookout.isWatching).toBe(false)
         expect(foregroundService.isRunning()).toBe(false)
       },
-      foregroundServiceShouldNotBeRunning() {
-        expect(foregroundService.isRunning()).toBe(false)
-      },
-      sirenLookoutShouldBeWatchingPreemptively() {
-        expect(sirenLookout.isWatching).toBe(true)
-      },
       blockingShouldRemainActiveWithoutToggling() {
         expect(sirenLookout.isWatching).toBe(true)
         expect(foregroundService.isRunning()).toBe(true)
@@ -131,8 +125,8 @@ export function blockingScheduleChangedFixture(
         expect(sirenLookout.stopWatchingCallCount).toBe(0)
         expect(foregroundService.stopCallCount).toBe(0)
       },
-      activeWindowsShouldBeSet(
-        expectedWindows: ForegroundServiceActiveWindow[],
+      blockingSessionsShouldBeScheduled(
+        expectedWindows: BlockingSessionWindow[],
       ) {
         expect(foregroundService.activeWindows).toEqual(expectedWindows)
       },

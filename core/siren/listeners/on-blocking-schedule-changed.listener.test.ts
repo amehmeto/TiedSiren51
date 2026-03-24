@@ -336,8 +336,7 @@ describe('Feature: Blocking schedule changed listener', () => {
         'com.facebook.katana',
         'com.example.tiktok',
       ])
-      fixture.then.foregroundServiceShouldNotBeRunning()
-      fixture.then.sirenLookoutShouldBeWatchingPreemptively()
+      fixture.then.blockingShouldBeInactive()
     })
   })
 
@@ -422,8 +421,8 @@ describe('Feature: Blocking schedule changed listener', () => {
     })
   })
 
-  describe('Active windows scheduling', () => {
-    it('should set active windows when session is created', async () => {
+  describe('Blocking sessions scheduling', () => {
+    it('should schedule blocking sessions when session is created', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
       const blocklist = buildBlocklist({
         id: 'bl-1',
@@ -441,7 +440,7 @@ describe('Feature: Blocking schedule changed listener', () => {
         [blocklist],
       )
 
-      fixture.then.activeWindowsShouldBeSet([
+      fixture.then.blockingSessionsShouldBeScheduled([
         { startTime: '14:00', endTime: '15:00' },
       ])
     })
@@ -475,7 +474,7 @@ describe('Feature: Blocking schedule changed listener', () => {
         [blocklist1, blocklist2],
       )
 
-      fixture.then.activeWindowsShouldBeSet([
+      fixture.then.blockingSessionsShouldBeScheduled([
         { startTime: '14:00', endTime: '15:00' },
         { startTime: '16:00', endTime: '17:00' },
       ])
@@ -507,7 +506,7 @@ describe('Feature: Blocking schedule changed listener', () => {
         },
       })
 
-      fixture.then.activeWindowsShouldBeSet([
+      fixture.then.blockingSessionsShouldBeScheduled([
         { startTime: '14:00', endTime: '15:00' },
       ])
     })
@@ -532,7 +531,7 @@ describe('Feature: Blocking schedule changed listener', () => {
 
       await fixture.when.creatingBlockSession([])
 
-      fixture.then.activeWindowsShouldBeSet([])
+      fixture.then.blockingSessionsShouldBeScheduled([])
     })
 
     it('should schedule future windows when active session ends but future session remains', async () => {
@@ -559,7 +558,6 @@ describe('Feature: Blocking schedule changed listener', () => {
         [blocklist],
       )
 
-      // Remove the ended session, leaving only the future one
       await fixture.when.creatingBlockSession(
         [
           buildBlockSession({
@@ -572,14 +570,13 @@ describe('Feature: Blocking schedule changed listener', () => {
         [blocklist],
       )
 
-      fixture.then.foregroundServiceShouldNotBeRunning()
-      fixture.then.activeWindowsShouldBeSet([
+      fixture.then.blockingShouldBeInactive()
+      fixture.then.blockingSessionsShouldBeScheduled([
         { startTime: '16:00', endTime: '17:00' },
       ])
-      fixture.then.sirenLookoutShouldBeWatchingPreemptively()
     })
 
-    it('should set active windows for future scheduled session', async () => {
+    it('should schedule blocking sessions for future session', async () => {
       fixture.given.nowIs({ hours: 13, minutes: 30 })
       const blocklist = buildBlocklist({
         id: 'bl-1',
@@ -597,11 +594,10 @@ describe('Feature: Blocking schedule changed listener', () => {
         [blocklist],
       )
 
-      fixture.then.activeWindowsShouldBeSet([
+      fixture.then.blockingSessionsShouldBeScheduled([
         { startTime: '14:00', endTime: '15:00' },
       ])
-      fixture.then.foregroundServiceShouldNotBeRunning()
-      fixture.then.sirenLookoutShouldBeWatchingPreemptively()
+      fixture.then.blockingShouldBeInactive()
     })
   })
 

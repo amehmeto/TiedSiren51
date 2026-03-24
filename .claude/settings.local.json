@@ -153,6 +153,7 @@
       "Bash(head:*)",
       "Bash(jq:*)",
       "Bash(keytool:*)",
+      "Bash(ln:*)",
       "Bash(ls:*)",
       "Bash(lsof:*)",
       "Bash(mas list:*)",
