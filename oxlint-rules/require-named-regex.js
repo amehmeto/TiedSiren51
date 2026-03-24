@@ -21,7 +21,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
 
     // Allow in test files - inline regex in tests is often acceptable
     if (

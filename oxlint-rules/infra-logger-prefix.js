@@ -23,7 +23,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
 
     // Exclude test files
     if (filename.includes('.test.ts')) return {}
@@ -120,7 +120,7 @@ export default {
     }
 
     function createPrefixFix(fixer, arg, expectedPrefix) {
-      const sourceCode = context.getSourceCode()
+      const sourceCode = context.sourceCode
 
       // Handle template literal: `message` -> `[ClassName] message`
       if (arg.type === 'TemplateLiteral') {

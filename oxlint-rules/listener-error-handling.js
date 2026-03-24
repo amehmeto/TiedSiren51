@@ -22,7 +22,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
 
     // Only apply to */listeners/*.ts files, excluding tests and fixtures
     if (!filename.includes('/listeners/')) return {}

@@ -24,7 +24,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
     const isTestFile =
       filename.endsWith('.test.ts') || filename.endsWith('.spec.ts')
 

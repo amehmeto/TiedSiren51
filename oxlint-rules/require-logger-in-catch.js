@@ -25,7 +25,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
 
     // Only apply to infra/**/*.ts files, excluding tests and fakes
     if (!filename.includes('/infra/')) return {}

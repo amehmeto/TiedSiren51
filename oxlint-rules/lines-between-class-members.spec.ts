@@ -8,8 +8,7 @@ import { describe, it } from 'vitest'
 import rule from './lines-between-class-members.js'
 
 const ruleTester = new RuleTester({
-  parserOptions: {
-    ecmaVersion: 2022,
+  languageOptions: {
     sourceType: 'module',
   },
 })

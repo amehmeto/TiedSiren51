@@ -86,7 +86,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
     const explicitOptions = context.options[0]
     const resolvedOptions = getOptionsForFile(filename, explicitOptions)
 

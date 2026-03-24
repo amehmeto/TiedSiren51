@@ -23,7 +23,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
 
     // Allow in test files - they often need setup constants
     if (

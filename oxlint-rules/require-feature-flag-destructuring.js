@@ -108,7 +108,7 @@ export default {
       },
 
       'Program:exit'() {
-        const sourceCode = context.sourceCode ?? context.getSourceCode()
+        const sourceCode = context.sourceCode
 
         for (const node of pendingNodes) {
           const variableName = node.id.name

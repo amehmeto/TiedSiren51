@@ -23,7 +23,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
 
     // Only apply to UI layer files (app/ and ui/ directories)
     const isUiLayer = filename.includes('/app/') || filename.includes('/ui/')

@@ -85,7 +85,7 @@ export default {
 
     const exemptFunctions = new Set(options.exemptFunctions || [])
     const transparentWrappers = new Set(options.transparentWrappers || [])
-    const sourceCode = context.getSourceCode()
+    const sourceCode = context.sourceCode
     const wrappedCalls = new Set()
     const simpleNodeTypes = new Set([
       'Identifier',

@@ -22,7 +22,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
 
     // Allow in test files
     if (filename.includes('.test.ts') || filename.includes('.test.tsx')) {

@@ -33,7 +33,7 @@ export default {
           node.init.computed === true &&
           node.id.type === 'Identifier'
         ) {
-          const sourceCode = context.getSourceCode()
+          const sourceCode = context.sourceCode
           const arrayName = sourceCode.getText(node.init.object)
           const varName = node.id.name
 

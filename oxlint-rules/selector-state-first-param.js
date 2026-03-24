@@ -34,7 +34,7 @@ export default {
     schema: [],
   },
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
 
     // Only apply to files in selectors directories
     if (!filename.includes('/selectors/')) {

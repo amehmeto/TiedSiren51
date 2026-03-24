@@ -29,7 +29,7 @@ export default {
   },
 
   create(context) {
-    const sourceCode = context.getSourceCode()
+    const sourceCode = context.sourceCode
 
     function isTimeConstant(node) {
       return node.type === 'Identifier' && TIME_CONSTANTS.includes(node.name)

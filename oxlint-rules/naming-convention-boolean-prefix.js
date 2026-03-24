@@ -51,7 +51,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
     if (!isTypeScriptFile(filename)) return {}
 
     const checkTypeProperties = isCoreProductionFile(filename)

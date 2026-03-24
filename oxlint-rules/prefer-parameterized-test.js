@@ -59,7 +59,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
     if (!filename.includes('.spec.') && !filename.includes('.test.')) return {}
 
     return {
