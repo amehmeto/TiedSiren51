@@ -67,11 +67,11 @@ export const onBlockingScheduleChangedListener = ({
         await foregroundService.stop()
       }
 
-      const map = schedule.map((s) => ({
+      const blockingWindows = schedule.map((s) => ({
         startTime: dateProvider.toHHmmFromISO(s.startTime),
         endTime: dateProvider.toHHmmFromISO(s.endTime),
       }))
-      await foregroundService.scheduleBlockingSessions(map)
+      await foregroundService.scheduleBlockingSessions(blockingWindows)
     } catch (error) {
       logger.error(`[BlockingScheduleListener] ${error}`)
     }

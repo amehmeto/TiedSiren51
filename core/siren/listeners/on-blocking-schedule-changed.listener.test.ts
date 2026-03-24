@@ -445,7 +445,7 @@ describe('Feature: Blocking schedule changed listener', () => {
       ])
     })
 
-    it('should set active windows for multiple sessions', async () => {
+    it('should schedule blocking sessions for multiple sessions', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
       const blocklist1 = buildBlocklist({
         id: 'bl-1',
@@ -480,7 +480,7 @@ describe('Feature: Blocking schedule changed listener', () => {
       ])
     })
 
-    it('should update active windows when blocklist is edited during active session', async () => {
+    it('should update blocking sessions when blocklist is edited during active session', async () => {
       const blocklist = buildBlocklist({
         id: 'blocklist-1',
         sirens: { android: [facebookAndroidSiren] },
@@ -511,7 +511,7 @@ describe('Feature: Blocking schedule changed listener', () => {
       ])
     })
 
-    it('should clear active windows when all sessions end', async () => {
+    it('should clear blocking sessions when all sessions end', async () => {
       fixture.given.nowIs({ hours: 14, minutes: 30 })
       const blocklist = buildBlocklist({
         id: 'bl-1',

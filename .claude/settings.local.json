@@ -145,7 +145,6 @@
       "Bash(git rev-parse:*)",
       "Bash(git rm:*)",
       "Bash(git show:*)",
-      "Bash(git show:*)",
       "Bash(git stash:*)",
       "Bash(git status:*)",
       "Bash(git worktree:*)",
