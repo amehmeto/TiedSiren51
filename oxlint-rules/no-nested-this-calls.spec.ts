@@ -60,21 +60,20 @@ describe('no-nested-this-calls', () => {
           }`,
           errors: [{ messageId: 'nestedThisCall' }],
         },
-        // Computed property names (covers '?' fallback branches)
+        // String literal property access (covers '?' fallback for outer)
         {
           code: `class A {
             m() {
-              const key = "format"
-              return this[key](this.parse("a"))
+              return this["format"](this.parse("a"))
             }
           }`,
           errors: [{ messageId: 'nestedThisCall' }],
         },
+        // String literal property access (covers '?' fallback for inner)
         {
           code: `class A {
             m() {
-              const key = "parse"
-              return this.format(this[key]("a"))
+              return this.format(this["parse"]("a"))
             }
           }`,
           errors: [{ messageId: 'nestedThisCall' }],
