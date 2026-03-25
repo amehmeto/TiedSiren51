@@ -11,10 +11,10 @@ import rule from './prefer-inline-variable.js'
 const require = createRequire(import.meta.url)
 
 const ruleTester = new RuleTester({
-  parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: 'module',
-    ecmaFeatures: { jsx: true },
+  languageOptions: {
+    parserOptions: {
+      ecmaFeatures: { jsx: true },
+    },
   },
 })
 
@@ -64,7 +64,7 @@ describe('prefer-inline-variable', () => {
         const x: string = getValue()
         console.log(x)
       `,
-          parser: require.resolve('@typescript-eslint/parser'),
+          languageOptions: { parser: require('@typescript-eslint/parser') },
         },
         // Used in a loop - should NOT report (could change semantics)
         {

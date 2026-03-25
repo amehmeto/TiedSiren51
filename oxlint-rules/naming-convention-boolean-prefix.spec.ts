@@ -11,11 +11,9 @@ import rule from './naming-convention-boolean-prefix.js'
 const require = createRequire(import.meta.url)
 
 const ruleTester = new RuleTester({
-  parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: 'module',
+  languageOptions: {
+    parser: require('@typescript-eslint/parser'),
   },
-  parser: require.resolve('@typescript-eslint/parser'),
 })
 
 describe('naming-convention-boolean-prefix', () => {

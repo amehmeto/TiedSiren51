@@ -11,10 +11,8 @@ import rule from './infra-public-method-try-catch.js'
 const require = createRequire(import.meta.url)
 
 const ruleTester = new RuleTester({
-  parser: require.resolve('@typescript-eslint/parser'),
-  parserOptions: {
-    ecmaVersion: 2022,
-    sourceType: 'module',
+  languageOptions: {
+    parser: require('@typescript-eslint/parser'),
   },
 })
 

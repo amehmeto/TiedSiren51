@@ -22,7 +22,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
 
     // Only apply to React component files (tsx)
     if (!filename.endsWith('.tsx')) return {}

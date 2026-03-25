@@ -28,7 +28,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
     const normalized = filename.replace(/\\/g, '/')
 
     // Only enforce in core/ and ui/ production code

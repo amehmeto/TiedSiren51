@@ -8,8 +8,7 @@ import { describe, it } from 'vitest'
 import rule from './prefer-extracted-long-params.js'
 
 const ruleTester = new RuleTester({
-  parserOptions: {
-    ecmaVersion: 2020,
+  languageOptions: {
     sourceType: 'module',
   },
 })

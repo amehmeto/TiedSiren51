@@ -36,7 +36,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
     if (!isUiProductionFile(filename)) return {}
 
     return {

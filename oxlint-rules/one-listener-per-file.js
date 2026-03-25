@@ -24,7 +24,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
 
     // Skip non-project files
     if (filename.includes('node_modules')) return {}

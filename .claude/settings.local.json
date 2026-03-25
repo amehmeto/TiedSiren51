@@ -4,6 +4,7 @@
   },
   "permissions": {
     "allow": [
+      "Bash(! grep:*)",
       "Bash(*/scripts/setup-ralph-loop.sh:*)",
       "Bash(./android/gradlew:*)",
       "Bash(./gradlew:*)",
@@ -222,6 +223,7 @@
       "Bash(test:*)",
       "Bash(then base=\"$f%.cjs\")",
       "Bash(then echo \"MISSING: $f\")",
+      "Bash(then echo:*)",
       "Bash(then)",
       "Bash(type:*)",
       "Bash(unzip:*)",

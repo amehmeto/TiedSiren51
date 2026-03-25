@@ -8,8 +8,7 @@ import { describe, it } from 'vitest'
 import rule from './require-logger-in-catch.js'
 
 const ruleTester = new RuleTester({
-  parserOptions: {
-    ecmaVersion: 2020,
+  languageOptions: {
     sourceType: 'module',
   },
 })

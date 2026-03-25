@@ -67,7 +67,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
     if (!isCoreTestFile(filename)) return {}
 
     return {

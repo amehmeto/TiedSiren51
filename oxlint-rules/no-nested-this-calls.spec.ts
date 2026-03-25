@@ -7,7 +7,7 @@ import { describe, it } from 'vitest'
 
 import rule from './no-nested-this-calls.js'
 
-const ruleTester = new RuleTester({ parserOptions: { ecmaVersion: 2020 } })
+const ruleTester = new RuleTester()
 
 describe('no-nested-this-calls', () => {
   it('should enforce no nested this.method() calls', () => {

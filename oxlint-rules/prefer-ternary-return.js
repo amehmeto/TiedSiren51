@@ -42,7 +42,7 @@ export default {
     const options = context.options[0] || {}
     const skipJsx = options.skipJsx || false
 
-    const sourceCode = context.getSourceCode()
+    const sourceCode = context.sourceCode
 
     function getReturnStatement(node) {
       if (!node) return null

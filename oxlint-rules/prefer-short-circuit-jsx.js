@@ -61,7 +61,7 @@ export default {
 
         // Pattern: condition ? <JSX /> : null
         if (isJSXNode(consequent) && isNullLiteral(alternate)) {
-          const sourceCode = context.getSourceCode()
+          const sourceCode = context.sourceCode
           const rawCondition = sourceCode.getText(test)
           const conditionText = needsParens(test)
             ? `(${rawCondition})`

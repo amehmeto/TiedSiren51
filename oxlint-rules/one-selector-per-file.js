@@ -19,7 +19,7 @@ export default {
   },
 
   create(context) {
-    const filename = context.getFilename()
+    const filename = context.filename
 
     // Only apply this rule to files in a 'selectors' directory
     if (!filename.includes('/selectors/')) return {}

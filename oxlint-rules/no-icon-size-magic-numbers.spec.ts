@@ -8,10 +8,10 @@ import { describe, it } from 'vitest'
 import rule from './no-icon-size-magic-numbers.js'
 
 const ruleTester = new RuleTester({
-  parserOptions: {
-    ecmaVersion: 2020,
-    sourceType: 'module',
-    ecmaFeatures: { jsx: true },
+  languageOptions: {
+    parserOptions: {
+      ecmaFeatures: { jsx: true },
+    },
   },
 })
 

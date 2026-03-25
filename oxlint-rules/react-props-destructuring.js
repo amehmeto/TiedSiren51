@@ -24,7 +24,7 @@ export default {
   },
 
   create(context) {
-    const sourceCode = context.getSourceCode()
+    const sourceCode = context.sourceCode
 
     // Check if a function looks like a React component (PascalCase name)
     function isReactComponent(node) {
