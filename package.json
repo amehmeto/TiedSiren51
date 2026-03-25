@@ -185,6 +185,9 @@
   "overrides": {
     "eslint-plugin-react-native": {
       "eslint": "$eslint"
+    },
+    "@typescript-eslint/parser": {
+      "typescript": "$typescript"
     }
   },
   "expo": {
